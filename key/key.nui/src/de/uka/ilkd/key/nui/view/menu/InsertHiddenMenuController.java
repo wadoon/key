@@ -77,6 +77,6 @@ public class InsertHiddenMenuController extends ViewController {
     private void handleOpenDialog(Event event) {
         getContext().setCurrentHiddenTacletMenuItems(itemList);
         getMainApp().openNewWindow("Insertion Browser",
-                "view/InsertionBrowser.fxml", false);    
+                "view/InsertionBrowser.fxml", false, false);    
     }
 }

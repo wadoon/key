@@ -13,6 +13,8 @@ import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -47,8 +49,7 @@ public class MainApp extends Application {
                 KeYResourceManager.getManager().getUserInterfaceTitle());
 
         // Set the application icon.
-        this.primaryStage.getIcons().add(
-                new Image(ICON_PATH));
+        this.primaryStage.getIcons().add(new Image(ICON_PATH));
 
         SessionSettings settings = SessionSettings.loadLastSettings();
         boolean useBoundsSettings = settings != null
@@ -98,7 +99,8 @@ public class MainApp extends Application {
 
             // Show the scene containing the root layout.
             scene = new Scene(rootLayout);
-            scene.getStylesheets().add("file:resources/css/themes/DefaultTheme.css");
+            scene.getStylesheets()
+                    .add("file:resources/css/themes/DefaultTheme.css");
 
             rootLayout.prefHeightProperty().bind(scene.heightProperty());
 
@@ -129,28 +131,71 @@ public class MainApp extends Application {
     public RootLayoutController getRootLayoutController() {
         return rootLayoutController;
     }
-    
-    public void openNewWindow(String title, String fxmlPath, boolean resizable) {
+
+    /**
+     * Opens a new window and shows the view specified by given FXML in it. The
+     * CSS applied to the main window will also be applied to the new window.
+     * 
+     * @param title
+     *            the window title
+     * @param fxmlPath
+     *            the path to the FXML
+     * @param resizable
+     *            if the window should be resizable
+     * @param blockParent
+     *            if access to the main window should be blocked
+     * @param additionalStylesheets
+     *            ObservableList containing Strings of paths to additional CSS.
+     * @return the controller for the FXML
+     */
+    public ViewController openNewWindow(String title, String fxmlPath,
+            boolean resizable, boolean blockParent) {
+        return openNewWindow(title, fxmlPath, resizable, blockParent,
+                FXCollections.emptyObservableList());
+    }
+
+    /**
+     * Opens a new window and shows the view specified by given FXML in it. The
+     * CSS applied to the main window will also be applied to the new window.
+     * 
+     * @param title
+     *            the window title
+     * @param fxmlPath
+     *            the path to the FXML
+     * @param resizable
+     *            if the window should be resizable
+     * @param blockParent
+     *            if access to the main window should be blocked
+     * @param additionalStylesheets
+     *            ObservableList containing Strings of paths to additional CSS.
+     * @return the controller for the FXML
+     */
+    public ViewController openNewWindow(String title, String fxmlPath,
+            boolean resizable, boolean blockParent,
+            ObservableList<String> additionalStylesheets) {
         Stage stage = new Stage();
         stage.setTitle(title);
         stage.getIcons().add(new Image(ICON_PATH));
-        
-        stage.initModality(Modality.WINDOW_MODAL);
+
+        if (blockParent)
+            stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(scene.getWindow());
 
         Pair<Object, Object> p = KeyFxmlLoader
                 .loadFxml(MainApp.class.getResource(fxmlPath));
         stage.setScene(new Scene((Parent) p.getKey()));
         stage.show();
-        
+
         stage.getScene().getStylesheets().addAll(scene.getStylesheets());
+        stage.getScene().getStylesheets().addAll(additionalStylesheets);
         stage.setResizable(resizable);
 
         ((ViewController) p.getValue()).setStage(stage);
         ((ViewController) p.getValue()).setMainApp(this,
                 rootLayoutController.getContext());
+        return (ViewController) p.getValue();
     }
-    
+
     /**
      * Listens for ControlDown Event.
      */
@@ -192,8 +237,7 @@ public class MainApp extends Application {
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 
         // Add a custom icon.
-        stage.getIcons().add(
-                new Image(ICON_PATH));
+        stage.getIcons().add(new Image(ICON_PATH));
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() != ButtonType.OK)

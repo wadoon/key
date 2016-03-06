@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
@@ -32,8 +33,10 @@ import javafx.stage.Stage;
 
 /**
  * provides functionallity of UserInterface logic for the KeYMediator
+ * 
  * @author Benedikt Gross
  * @author Nils Muzzulini
+ * @author Victor Schuemmer
  *
  */
 public class MediatorUserInterface
@@ -52,11 +55,16 @@ public class MediatorUserInterface
     @Override
     public void completeAndApplyTacletMatch(TacletInstantiationModel[] models,
             Goal goal) {
-        // models have to be passed via context, as the TacletInstantiationViewController
-        // constructor can not be used. There is no need to pass the goal anymore,
-        // as the controller can get it directly from the KeYMediator.
+        
+        // models has to be passed via context, as the
+        // TacletInstantiationViewController constructor can not be used. There
+        // is no need to pass the goal anymore, as the controller can get it
+        // directly from the KeYMediator.
         mainApp.getRootLayoutController().getContext().setCurrentModels(models);
-        mainApp.openNewWindow("Taclet Instantiation", "view/TacletInstantiationView.fxml", true);
+        mainApp.openNewWindow("Taclet Instantiation",
+                "view/TacletInstantiationView.fxml", true, false,
+                FXCollections.observableArrayList(
+                        "file:resources/css/tacletInstantiation.css"));
     }
 
     @Override
@@ -160,13 +168,15 @@ public class MediatorUserInterface
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Proof closed");
                 alert.setHeaderText("Proved.");
-                alert.setContentText(getMediator().getSelectedProof().getStatistics().toString());
+                alert.setContentText(getMediator().getSelectedProof()
+                        .getStatistics().toString());
                 // Get the Stage.
-                Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+                Stage stage = (Stage) alert.getDialogPane().getScene()
+                        .getWindow();
 
                 // Add a custom icon.
-                stage.getIcons().add(
-                        new Image("file:resources/images/key-color-icon-square.png"));
+                stage.getIcons().add(new Image(
+                        "file:resources/images/key-color-icon-square.png"));
                 alert.show();
             });
         }
