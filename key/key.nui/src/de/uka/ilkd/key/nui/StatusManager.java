@@ -2,23 +2,46 @@ package de.uka.ilkd.key.nui;
 
 import de.uka.ilkd.key.nui.event.HandlerEvent;
 
+/**
+ * This class supplies managed access to the status-bar on the ui.
+ * @author Benedikt Gross
+ *
+ */
 public class StatusManager {
     private HandlerEvent<String> statusUpdatedEvent = new HandlerEvent<String>();
-    public HandlerEvent<String> getStatusUpdatedEvent(){
+
+    /**
+     * An event that is fired each time a new status is set.
+     */
+    public HandlerEvent<String> getStatusUpdatedEvent() {
         return statusUpdatedEvent;
     }
-    
+
     private String status;
+
+    /**
+     * Shows a status on the status-bar of the ui.
+     */
     public void setStatus(String status) {
+        if (this.status.equals(status))
+            return;
         this.status = status;
         statusUpdatedEvent.fire(status);
     }
+
+    /**
+     * Removes the current status from the status-bar.
+     * (equivalent to setting a status with an empty string)
+     */
     public void clearStatus() {
         status = "";
         statusUpdatedEvent.fire(status);
     }
-    
-    public String getStatus(){
+
+    /**
+     * Returns the current status that is currently displayed in the status-bar.
+     */
+    public String getStatus() {
         return status;
     }
 }
