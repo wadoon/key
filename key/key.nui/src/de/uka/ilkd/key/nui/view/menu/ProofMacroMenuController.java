@@ -5,28 +5,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.swing.KeyStroke;
-
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.proof.Node;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
 /**
- * Copied from ProofMacroMenu and adapted to JavaFX style.
- * This is NOT a menu anymore but a controller. There is a field
- * rootMenu to access the actual menu.
- * @see de.uka.ilkd.key.gui.ProofMacroMenu original ProofMacroMenu  
+ * Copied from ProofMacroMenu and adapted to JavaFX style. This is NOT a menu
+ * anymore but a controller. There is a field rootMenu to access the actual
+ * menu.
+ * 
+ * @see ProofMacroMenu
  * @author Victor Schuemmer
  */
 public class ProofMacroMenuController extends ViewController {
@@ -39,36 +37,34 @@ public class ProofMacroMenuController extends ViewController {
      *
      * This is used as iteration source in other parts of KeY's ui.
      */
-    public static final Iterable<ProofMacro> REGISTERED_MACROS = ClassLoaderUtil
-            .loadServices(ProofMacro.class);
+    public static final Iterable<ProofMacro> REGISTERED_MACROS = ClassLoaderUtil.loadServices(ProofMacro.class);
 
     /**
      * The number of defined macros.
      */
-    // TODO the following line is useless. "numberOfMacros" never gets used. can it be removed?
-    //private int numberOfMacros;
-    
+    // TODO the following line is useless. "numberOfMacros" never gets used. can
+    // it be removed?
+    // private int numberOfMacros;
 
     public void init(KeYMediator mediator, PosInOccurrence posInOcc) {
-        // Macros are group according to their category.
-        // Store the submenus in this map.
+        // Macros are grouped according to their category.
+        // Store the sub menus in this map.
         Map<String, Menu> submenus = new HashMap<String, Menu>();
 
-        // TODO the following line is useless. "numberOfMacros" and "count" never get used. can they be removed?
-        //int count = 0;
+        // TODO the following line is useless. "numberOfMacros" and "count"
+        // never get used. can they be removed?
+        // int count = 0;
         Node node = mediator.getSelectedNode();
         for (ProofMacro macro : REGISTERED_MACROS) {
 
-            boolean applicable = node != null
-                    && macro.canApplyTo(node, posInOcc);
+            boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
 
             // NOTE (DS): At the moment, JoinRule is an experimental
             // feature. We therefore only add join-related macros
             // if the feature is currently active.
             // TODO (DS): Remove below check related to the exp. \\
             // feature once JoinRule is considered stable.
-            if (!Main.isExperimentalMode()
-                    && macro.getName().contains("join")) {
+            if (!Main.isExperimentalMode() && macro.getName().contains("join")) {
                 applicable = false;
             }
 
@@ -89,37 +85,39 @@ public class ProofMacroMenuController extends ViewController {
                 }
 
                 submenu.getItems().add(menuItem);
-                // TODO the following line is useless. "numberOfMacros" and "count" never get used. can they be removed?
-                //count++;
+                // TODO the following line is useless. "numberOfMacros" and
+                // "count" never get used. can they be removed?
+                // count++;
             }
         }
-        
-        /* TODO
-        if (Main.isExperimentalMode()) {
-            add(new MenuItem(new ProofScriptAction(mediator)));
-        }
-        */
-        
+
+        /*
+         * TODO if (Main.isExperimentalMode()) { add(new MenuItem(new
+         * ProofScriptAction(mediator))); }
+         */
+
         // TODO mediator.enableWhenProofLoaded(this);
-        
-        // TODO the following line is useless. "numberOfMacros" never gets used again. can it be removed?
-        //this.numberOfMacros = count;
+
+        // TODO the following line is useless. "numberOfMacros" never gets used
+        // again. can it be removed?
+        // this.numberOfMacros = count;
 
     }
 
-    private MenuItem createMenuItem(final ProofMacro macro,
-            final KeYMediator mediator,
+    private MenuItem createMenuItem(final ProofMacro macro, final KeYMediator mediator,
             final PosInOccurrence posInOcc) {
 
         MenuItem menuItem = new MenuItem(macro.getName());
-        //TODO menuItem.setToolTipText(macro.getDescription());
-        
-        //TODO the following line is useless. "macroKey" doesn't get used yet. can it be removed?
-        //final KeyStroke macroKey = KeyStrokeManager.get(macro);
-        
-        //if (macroKey != null && posInOcc == null) { // currently only for global macro applications
-            //TODO menuItem.setAccelerator(macroKey);
-        //}
+        // TODO menuItem.setToolTipText(macro.getDescription());
+
+        // TODO the following line is useless. "macroKey" doesn't get used yet.
+        // can it be removed?
+        // final KeyStroke macroKey = KeyStrokeManager.get(macro);
+
+        // if (macroKey != null && posInOcc == null) { // currently only for
+        // global macro applications
+        // TODO menuItem.setAccelerator(macroKey);
+        // }
         menuItem.setOnAction(e -> {
             if (mediator.isInAutoMode()) {
                 return;
@@ -133,11 +131,10 @@ public class ProofMacroMenuController extends ViewController {
 
         return menuItem;
     }
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-      
+
     }
-    
 
 }

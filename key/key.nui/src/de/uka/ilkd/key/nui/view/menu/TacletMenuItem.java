@@ -19,8 +19,7 @@ public class TacletMenuItem extends MenuItem {
     private NotationInfo notationInfo;
     private Services services;
 
-    public TacletMenuItem(TacletApp tacletApp, NotationInfo notationInfo,
-            Services services) {
+    public TacletMenuItem(TacletApp tacletApp, NotationInfo notationInfo, Services services) {
         super(tacletApp.taclet().displayName());
         this.tacletApp = tacletApp;
         this.notationInfo = notationInfo;
@@ -38,15 +37,15 @@ public class TacletMenuItem extends MenuItem {
     public NotationInfo getNotationInfo() {
         return notationInfo;
     }
-    
+
     public Services getServices() {
         return services;
     }
-    
+
     public void performAction() {
         fire();
     }
-    
+
     @Override
     public String toString() {
         return tacletApp.taclet().displayName();

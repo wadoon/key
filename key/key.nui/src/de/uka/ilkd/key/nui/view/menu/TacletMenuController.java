@@ -13,6 +13,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu.TacletAppComparator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -40,7 +41,7 @@ import javafx.scene.input.ClipboardContent;
  * anymore but a controller. There is a field rootMenu to access the actual
  * menu.
  * 
- * @see de.uka.ilkd.key.gui.nodeviews.TacletMenu original TacletMenu
+ * @see TacletMenu
  * @author Victor Schuemmer
  */
 public class TacletMenuController extends ViewController {
@@ -114,40 +115,40 @@ public class TacletMenuController extends ViewController {
             Goal goal = mediator.getSelectedGoal();
             PosInOccurrence occ = pos.getPosInOccurrence();
 
-            final ImmutableList<BuiltInRule> builtInRules = c
-                    .getBuiltInRule(goal, occ);
-            createTacletMenu(
-                    removeRewrites(c.getFindTaclet(goal, occ))
-                            .prepend(c.getRewriteTaclet(goal, occ)),
+            final ImmutableList<BuiltInRule> builtInRules = c.getBuiltInRule(goal, occ);
+            createTacletMenu(removeRewrites(c.getFindTaclet(goal, occ)).prepend(c.getRewriteTaclet(goal, occ)),
                     c.getNoFindTaclet(goal), builtInRules);
             proofMacroMenuController.init(mediator, pos.getPosInOccurrence());
         }
     }
 
     /**
-     * removes RewriteTaclet from list
+     * Removes RewriteTaclet from the list.
      * 
      * @param list
      *            the IList<Taclet> from where the RewriteTaclet are removed
      * @return list without RewriteTaclets
      */
-    private static ImmutableList<TacletApp> removeRewrites(
-            ImmutableList<TacletApp> list) {
+    private static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
         Iterator<TacletApp> it = list.iterator();
 
         while (it.hasNext()) {
             TacletApp tacletApp = it.next();
             Taclet taclet = tacletApp.taclet();
-            result = (taclet instanceof RewriteTaclet ? result
-                    : result.prepend(tacletApp));
+            result = (taclet instanceof RewriteTaclet ? result : result.prepend(tacletApp));
         }
         return result;
     }
 
-    /** creates the menu by adding all sub-menus and items */
-    private void createTacletMenu(ImmutableList<TacletApp> find,
-            ImmutableList<TacletApp> noFind,
+    /**
+     * Creates the menu by adding all sub-menus and items.
+     * 
+     * @param find
+     * @param noFind
+     * @param builtInList
+     */
+    private void createTacletMenu(ImmutableList<TacletApp> find, ImmutableList<TacletApp> noFind,
             ImmutableList<BuiltInRule> builtInList) {
 
         ImmutableList<TacletApp> toAdd = sort(find, comp);
@@ -175,8 +176,7 @@ public class TacletMenuController extends ViewController {
                 continue;
             }
 
-            final TacletMenuItem item = new TacletMenuItem(app,
-                    mediator.getNotationInfo(), mediator.getServices());
+            final TacletMenuItem item = new TacletMenuItem(app, mediator.getNotationInfo(), mediator.getServices());
             item.setOnAction(this::handleRuleApplication);
 
             if (insertHiddenController.isResponsible(item)) {
@@ -204,8 +204,7 @@ public class TacletMenuController extends ViewController {
 
     }
 
-    public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
-            TacletAppComparator comp) {
+    public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds, TacletAppComparator comp) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
 
         List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
@@ -237,23 +236,20 @@ public class TacletMenuController extends ViewController {
 
     public void handleRuleApplication(ActionEvent event) {
         Goal goal = mediator.getSelectedGoal();
-        mediator.getUI().getProofControl().selectedTaclet(
-                ((TacletMenuItem) event.getSource()).getTaclet(), goal,
+        mediator.getUI().getProofControl().selectedTaclet(((TacletMenuItem) event.getSource()).getTaclet(), goal,
                 pos.getPosInOccurrence());
     }
 
     @FXML
     private void handleFocussedRuleApplication(ActionEvent event) {
-        mediator.getUI().getProofControl().startFocussedAutoMode(
-                pos.getPosInOccurrence(), mediator.getSelectedGoal());
+        mediator.getUI().getProofControl().startFocussedAutoMode(pos.getPosInOccurrence(), mediator.getSelectedGoal());
     }
 
     @FXML
     private void handleCopyToClipboard(ActionEvent event) {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
-        content.putString(parentController.getProofString()
-                .substring(pos.getBounds().start(), pos.getBounds().end()));
+        content.putString(parentController.getProofString().substring(pos.getBounds().start(), pos.getBounds().end()));
         clipboard.setContent(content);
     }
 
