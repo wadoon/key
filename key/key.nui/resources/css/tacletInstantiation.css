@@ -1,0 +1,16 @@
+.table-row-cell:selected {
+    -fx-background-color: lightblue; 
+    -fx-text-background-color: black;
+}
+
+.table-row-cell:completed {
+    -fx-background-color: lightgrey;
+}
+
+.text-area-table-cell:editable {
+    -fx-padding: 0.0;
+    -fx-background-insets: 0.0;
+    -fx-border-color: red;
+    -fx-background-color: white;
+    -fx-focus-color: -fx-control-inner-background;
+}
