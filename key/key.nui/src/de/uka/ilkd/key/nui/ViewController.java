@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui;
 
 import java.net.URL;
+import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import javafx.fxml.Initializable;
@@ -15,16 +16,32 @@ import javafx.util.Pair;
  */
 public abstract class ViewController implements Initializable {
 
-    private Context context;
     private MainApp mainApp;
+    private Context context;
     private Stage stage;
+
+    public MainApp getMainApp() {
+        return mainApp;
+    }
 
     public void setMainApp(MainApp mainApp, Context context) {
         this.mainApp = mainApp;
         this.context = context;
         initializeAfterLoadingFxml();
     }
-    
+
+    public Context getContext() {
+        return context;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
     public <T> Pair<T, ViewController> loadFxmlViewController(URL path) {
         Pair<T, ViewController> pair = KeyFxmlLoader.loadFxml(path);
         pair.getValue().setMainApp(mainApp, context);
@@ -36,40 +53,30 @@ public abstract class ViewController implements Initializable {
         return (T) loadFxmlViewController(path).getKey();
     }
 
-    public MainApp getMainApp() {
-        return mainApp;
-    }
-
-    public Context getContext() {
-        return context;
-    }
-    
-    public Stage getStage() {
-        return stage;
-    }
-    
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-    
     /**
      * Virtual method to be implemented if needed. This function is called after
      * the FXML is loaded.
      */
     public void initializeAfterLoadingFxml() {
     }
-    
+
     /**
-     * Virtual method, called when an already loaded view is closed by the user
+     * Virtual method, called when an already loaded view is closed by the user.
      */
-    public void viewSuspended(){
-        
+    public void viewSuspended() {
     }
-    
+
     /**
-     * Virtual method, called when an already loaded view that was suspenden is opened again.
+     * Virtual method, called when an already loaded view that was suspended is
+     * opened again.
      */
-    public void viewReactivated(){
-        
+    public void viewReactivated() {
+    }
+
+    /**
+     * Virtual method to be implemented if needed. This function is called first
+     * when any {@link ViewController} is loaded.
+     */
+    public void initialize(URL location, ResourceBundle resources) {
     }
 }
