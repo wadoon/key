@@ -3,10 +3,9 @@ package de.uka.ilkd.key.nui.filter;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.nui.event.HandlerEvent;
 import de.uka.ilkd.key.nui.event.EmptyEventArgs;
+import de.uka.ilkd.key.nui.event.HandlerEvent;
 import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * This class provides all information and logic for one triggered filter

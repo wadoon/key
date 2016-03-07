@@ -17,7 +17,6 @@ import javafx.scene.text.Text;
  */
 public class PositionTranslator {
     private String[] strings;
-    private String proofString;
     private String font;
     private int fontSize;
     private int minimizedSize;
@@ -36,7 +35,6 @@ public class PositionTranslator {
     }
 
     public void setProofString(String proofString) {
-        this.proofString = proofString;
         strings = proofString.split("\n");
         filteredLines.clear();
     }

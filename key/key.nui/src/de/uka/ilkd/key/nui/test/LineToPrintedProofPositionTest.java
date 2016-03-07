@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.nui.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.uka.ilkd.key.java.statement.Assert;
 import de.uka.ilkd.key.nui.filter.LineToPrintedProofPosition;
 
 public class LineToPrintedProofPositionTest {

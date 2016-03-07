@@ -1,17 +1,12 @@
 package de.uka.ilkd.key.nui;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.prefs.Preferences;
 
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
-import javafx.collections.ObservableList;
-import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
-import javafx.stage.Stage;
 
 public class SessionSettings {
 
@@ -66,7 +61,6 @@ public class SessionSettings {
 
     public void setWindowX(double value) {
         windowX = value;
-        // CheckBounds();
     }
 
     public double getWindowX() {
@@ -77,7 +71,6 @@ public class SessionSettings {
 
     public void setWindowY(double value) {
         windowY = value;
-        // CheckBounds();
     }
 
     public double getWindowY() {
@@ -91,7 +84,6 @@ public class SessionSettings {
             windowHeight = value;
         else
             windowHeight = MinHeight;
-        // CheckBounds();
     }
 
     public double getWindowHeight() {
@@ -106,7 +98,6 @@ public class SessionSettings {
         else
             windowWidth = MinWidth;
 
-        // CheckBounds();
     }
 
     public double getWindowWidth() {
