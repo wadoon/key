@@ -29,21 +29,17 @@ public class InsertHiddenMenuController extends ViewController {
     }
 
     public boolean isResponsible(TacletMenuItem item) {
-        if (!(item.getTaclet() instanceof NoFindTaclet)
-                || !item.getTaclet().displayName().startsWith("insert_hidden"))
+        if (!(item.getTaclet() instanceof NoFindTaclet) || !item.getTaclet().displayName().startsWith("insert_hidden"))
             return false;
-        final ImmutableList<TacletGoalTemplate> goalTemplates = item.getTaclet()
-                .goalTemplates();
+        final ImmutableList<TacletGoalTemplate> goalTemplates = item.getTaclet().goalTemplates();
         return (goalTemplates.size() == 1);
 
     }
 
     public void add(TacletMenuItem item) {
-        ImmutableList<TacletGoalTemplate> templates = item.getTaclet()
-                .goalTemplates();
+        ImmutableList<TacletGoalTemplate> templates = item.getTaclet().goalTemplates();
         if (templates.size() == 1) {
-            final LogicPrinter printer = new LogicPrinter(new ProgramPrinter(),
-                    new NotationInfo(),
+            final LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), new NotationInfo(),
                     getContext().getKeYMediator().getServices(), true);
             printer.setInstantiation(item.getTacletApp().instantiations());
             printer.printSequent(templates.head().sequent());
@@ -56,8 +52,7 @@ public class InsertHiddenMenuController extends ViewController {
 
         rootMenu.getItems().add(item);
         itemList.add(item);
-        rootMenu.setText("Insert Hidden (" + itemCount()
-                + (itemCount() != 1 ? " items" : " item") + ")");
+        rootMenu.setText("Insert Hidden (" + itemCount() + (itemCount() != 1 ? " items" : " item") + ")");
     }
 
     public boolean isEmpty() {
@@ -65,18 +60,16 @@ public class InsertHiddenMenuController extends ViewController {
     }
 
     public int itemCount() {
-        // Not counting open dialog
         return itemList.size();
     }
 
     public void setVisible(boolean visible) {
         rootMenu.setVisible(visible);
     }
-    
+
     @FXML
     private void handleOpenDialog(Event event) {
         getContext().setCurrentHiddenTacletMenuItems(itemList);
-        getMainApp().openNewWindow("Insertion Browser",
-                "view/InsertionBrowser.fxml", false, false);    
+        getMainApp().openNewWindow("Insertion Browser", "view/InsertionBrowser.fxml", false, false);
     }
 }

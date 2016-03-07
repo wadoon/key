@@ -28,7 +28,9 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * Copied mostly from old GUI. Adjusted to use the {@link KeYMediator} of the new GUI.
+ * Copied mostly from old GUI. Adjusted to use the {@link KeYMediator} of the
+ * new GUI.
+ * 
  * @author Nils Muzzulini
  * 
  * @see AutoModeAction

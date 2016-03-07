@@ -9,15 +9,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface KeYMenu {
     /**
-     * Path to the fxml.
+     * Path to the FXML.
      */
     String path();
 
-    // String[] windows() default "Main";
-
     /**
      * Menu in which this new menu should be added. Default is "" which adds the
-     * menu as a new main menu
+     * menu as a new main menu.
      */
     String parentMenu() default "";
 }
