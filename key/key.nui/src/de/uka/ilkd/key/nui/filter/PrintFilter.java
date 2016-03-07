@@ -31,7 +31,6 @@ public class PrintFilter {
      */
     public void setName(String value) {
         name = value;
-        // no need to notify observer since the name is only for storage
     }
 
     private String searchText;
@@ -85,76 +84,94 @@ public class PrintFilter {
      * custom data.
      */
     public void setIsUserCriteria(boolean value) {
-        if (isUserCriteria == value)
-            return;
         isUserCriteria = value;
     }
 
     private int before;
 
+    /**
+     * Indicates how many lines of the sequent should be displayed <b>before</b>
+     * each filter match. (Ignored when ast-scope is used)
+     */
     public int getBefore() {
         return before;
     }
 
+    /**
+     * Indicates how many lines of the sequent should be displayed <b>before</b>
+     * each filter match. (Ignored when ast-scope is used)
+     */
     public void setBefore(int value) {
-        if (value == before)
-            return;
         before = value;
     }
 
     private int after;
 
+    /**
+     * Indicates how many lines of the sequent should be displayed <b>after</b>
+     * each filter match. (Ignored when ast-scope is used)
+     */
     public int getAfter() {
         return after;
     }
 
+    /**
+     * Indicates how many lines of the sequent should be displayed <b>after</b>
+     * each filter match. (Ignored when ast-scope is used)
+     */
     public void setAfter(int value) {
-        if (after == value)
-            return;
         after = value;
     }
 
     private boolean invert;
 
     /**
-     * Indicates whether the filter should be inverted.
-     */
-    public void setInvert(boolean value) {
-        invert = value;
-    }
-
-    /**
-     * Indicates whether the filter should be inverted.
+     * Indicates whether the filter should be inverted. (Ignored when text-scope
+     * is used)
      */
     public boolean getInvert() {
         return invert;
     }
 
+    /**
+     * Indicates whether the filter should be inverted. (Ignored when text-scope
+     * is used)
+     */
+    public void setInvert(boolean value) {
+        invert = value;
+    }
+
     private boolean useAstScope;
 
     /**
-     * Indicates whether before/after should apply to lines or ast elements.
-     */
-    public void setUseAstScope(boolean value) {
-        useAstScope = value;
-    }
-
-    /**
-     * Indicates whether before/after should apply to lines or ast elements.
+     * Indicates whether before/after should apply to lines or an ast-scope
+     * should be used instead.
      */
     public boolean getUseAstScope() {
         return useAstScope;
     }
 
+    /**
+     * Indicates whether before/after should apply to lines or an ast-scope
+     * should be used instead.
+     */
+    public void setUseAstScope(boolean value) {
+        useAstScope = value;
+    }
+
     private FilterLayout filterLayout;
 
+    /**
+     * The {link FilterLayout} of the current filter.
+     */
     public FilterLayout getFilterLayout() {
         return filterLayout;
     }
 
+    /**
+     * The {link FilterLayout} of the current filter.
+     */
     public void setFilterLayout(FilterLayout value) {
-        if (filterLayout == value)
-            return;
         filterLayout = value;
     }
 
@@ -180,7 +197,22 @@ public class PrintFilter {
         return filter;
     }
 
+    /**
+     * Indicates how lines that did not match a filter should be displayed (
+     * <b>hidden</b>).
+     * 
+     * @author Benedikt Gross
+     *
+     */
     public enum FilterLayout {
-        Collapse, Minimize
+        /**
+         * Each block of <b>hidden</b> lines will be collapsed to "..."
+         */
+        Collapse,
+
+        /**
+         * All <b>hidden</b> lines will be displayed with a smaller font.
+         */
+        Minimize
     }
 }

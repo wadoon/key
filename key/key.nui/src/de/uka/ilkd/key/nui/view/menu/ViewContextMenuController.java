@@ -9,39 +9,44 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
-public class ViewContextMenuController extends ViewController{
-    
+public class ViewContextMenuController extends ViewController {
+
     private ViewInformation viewInformation;
-    public void setParentView(ViewInformation view){
+
+    /**
+     * The view this context menu belongs to. 
+     * @param view
+     */
+    public void setParentView(ViewInformation view) {
         viewInformation = view;
     }
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
     }
-    
+
     @FXML
-    private void handleTopLeft(ActionEvent event){
+    private void handleTopLeft(ActionEvent event) {
         viewInformation.setCurrentPosition(ViewPosition.TOPLEFT);
     }
-    
+
     @FXML
-    private void handleTopRight(ActionEvent event){
+    private void handleTopRight(ActionEvent event) {
         viewInformation.setCurrentPosition(ViewPosition.TOPRIGHT);
     }
-    
+
     @FXML
-    private void handleBottomLeft(ActionEvent event){
+    private void handleBottomLeft(ActionEvent event) {
         viewInformation.setCurrentPosition(ViewPosition.BOTTOMLEFT);
     }
-    
+
     @FXML
-    private void handleBottomRight(ActionEvent event){
+    private void handleBottomRight(ActionEvent event) {
         viewInformation.setCurrentPosition(ViewPosition.BOTTOMRIGHT);
     }
-    
+
     @FXML
-    private void handleCenter(ActionEvent event){
+    private void handleCenter(ActionEvent event) {
         viewInformation.setCurrentPosition(ViewPosition.CENTER);
     }
 }

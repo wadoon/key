@@ -55,7 +55,7 @@ public class ViewSlot {
 
     public void removeTab(ViewInformation view) {
         if (!((TabPane) uiPane.getCenter()).getTabs().contains(view.getUiTab()))
-            System.out.println("NOOOOO!");
+            return;
         ((TabPane) uiPane.getCenter()).getTabs().remove(view.getUiTab());
         tabs.remove(view);
         if (tabs.size() == 0) {

@@ -16,10 +16,6 @@ public class NotCriterion<E> implements Criterion<E>
    {
       criteria = childCriteria;
    }
-
-   public Criterion<E> getChildCriteria(){
-       return criteria;
-   }
    
    public List<E> meetCriteria(List<E> entities)
    {
