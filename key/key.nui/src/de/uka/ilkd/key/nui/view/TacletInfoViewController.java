@@ -4,14 +4,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
-import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.util.TacletInfoPrinter;
 import de.uka.ilkd.key.proof.Node;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 
