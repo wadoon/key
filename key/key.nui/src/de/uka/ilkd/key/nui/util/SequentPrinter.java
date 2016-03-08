@@ -80,7 +80,8 @@ public class SequentPrinter {
     /**
      * 
      */
-    public SequentPrinter(CssFileHandler cssFileHandler, PositionTable posTable, Context context) {
+    public SequentPrinter(CssFileHandler cssFileHandler, PositionTable posTable,
+            Context context) {
         this.cssFileHandler = cssFileHandler;
         this.setPosTable(posTable);
 
@@ -192,9 +193,7 @@ public class SequentPrinter {
 
         String html = sb.toString();
         context.setSequentHtml(html);
-        return
-
-        toHTML(html);
+        return toHTML(html);
     }
 
     private Range getHighlightRange(PosInOccurrence pos) {

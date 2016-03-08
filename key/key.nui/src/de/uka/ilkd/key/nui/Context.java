@@ -87,7 +87,7 @@ public class Context {
         if (cssFileHandler == null)
             try {
                 cssFileHandler = new CssFileHandler(
-                        NUIConstants.DEFAULT_STYLE_CSS);
+                        NUIConstants.DEFAULT_STYLE_CSS_PATH);
             }
             catch (Exception e) {
                 System.err.println("Could not load CSS. No beauty for you!");

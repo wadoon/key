@@ -3,11 +3,13 @@
  */
 package de.uka.ilkd.key.nui.view;
 
+import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.CssRule;
@@ -26,12 +28,15 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * @author Maximilian Li
@@ -53,16 +58,31 @@ public class CssStylerViewController extends ViewController {
             .observableArrayList("Arial", "Liberation Mono", "Courier New",
                     "Comic Sans", "Times New Roman");
 
+    private TreeItem<String> rootItem;
+
     @FXML
-    private TreeView<String> treeView;
+    private MenuItem menuOpen;
     @FXML
-    private Button apply;
+    private MenuItem menuSave;
+    @FXML
+    private MenuItem menuSaveAs;
+    @FXML
+    private MenuItem menuReset;
+    @FXML
+    private MenuItem menuResetDefault;
+
+    @FXML
+    private Button save;
     @FXML
     private Button reset;
     @FXML
-    private Button resetDefault;
-    @FXML
     private WebView previewWeb;
+
+    @FXML
+    private TextField tfSearch;
+    @FXML
+    private TreeView<String> treeView;
+
     @FXML
     private GridPane propValGrid;
 
@@ -83,8 +103,8 @@ public class CssStylerViewController extends ViewController {
      */
     private void initializeTree() {
         // Root for Tree
-        TreeItem<String> rootItem = new TreeItem<String>(
-                "Sequent Style Settings");
+        rootItem = new TreeItem<String>();
+        rootItem.setExpanded(true);
         // SetUp Categories
         rootItem.getChildren().add(new TreeItem<String>("General Settings"));
         rootItem.getChildren().add(new TreeItem<String>("Filter Settings"));
@@ -199,6 +219,8 @@ public class CssStylerViewController extends ViewController {
         }
 
         treeView.setRoot(rootItem);
+        treeView.getSelectionModel().select(0);
+        treeView.requestFocus();
 
         treeView.getSelectionModel().selectedItemProperty().addListener(e -> {
             selected = treeView.getSelectionModel().getSelectedItem()
@@ -444,8 +466,33 @@ public class CssStylerViewController extends ViewController {
     }
 
     @FXML
-    private void handleCancel() {
-        if (apply.disabledProperty().get() == false) {
+    private void handleSearch() {
+        decollapseChildren(rootItem, tfSearch.getText());
+    }
+
+    private void decollapseChildren(TreeItem<String> root,
+            String searchString) {
+        if (root.getValue().toLowerCase()
+                .contains(searchString.toLowerCase())) {
+            root.setExpanded(true);
+        }
+        for (TreeItem<String> child : root.getChildren()) {
+            if (child.isLeaf()) {
+                if (child.getValue().toLowerCase()
+                        .contains(searchString.toLowerCase())) {
+                    root.setExpanded(true);
+                    treeView.getSelectionModel().select(child);
+                }
+            }
+            else {
+                decollapseChildren(child, searchString);
+            }
+        }
+    }
+
+    @FXML
+    private void handleExit() {
+        if (save.disabledProperty().get() == false) {
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Confirm Exit");
             alert.setHeaderText("Do you want to save your changes?");
@@ -460,7 +507,7 @@ public class CssStylerViewController extends ViewController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == saveExit) {
-                handleApply();
+                handleSave();
                 alert.close();
             }
             else if (result.get() == resetExit) {
@@ -476,7 +523,52 @@ public class CssStylerViewController extends ViewController {
     }
 
     @FXML
-    private void handleApply() {
+    private void handleSave() {
+        if (cssFileHandler.getPath().isEmpty()) {
+            handleSaveAs();
+        }
+        writeToCss();
+    }
+
+    @FXML
+    private void handleSaveAs() {
+
+        File file = makeFileChooser().showSaveDialog(getStage());
+
+        if (file != null) {
+            cssFileHandler.setPath(file.getAbsolutePath());
+        }
+        writeToCss();
+
+    }
+
+    @FXML
+    private void handleOpen() {
+        File file = makeFileChooser().showOpenDialog(getStage());
+
+        if (file != null) {
+            cssFileHandler.setPath(file.getAbsolutePath());
+        }
+        try {
+            cssFileHandler.loadCssFile();
+        }
+        catch (Exception e) {
+            System.err.println("Could not load CSS File");
+        }
+        resetUI();
+
+    }
+
+    private FileChooser makeFileChooser() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select a CSS File");
+        fileChooser.getExtensionFilters().addAll(
+                new ExtensionFilter("CSS File", "*.css"),
+                new ExtensionFilter("All Files", "*.*"));
+        return fileChooser;
+    }
+
+    private void writeToCss() {
         try {
             cssFileHandler.writeCssFile();
         }
@@ -485,8 +577,7 @@ public class CssStylerViewController extends ViewController {
             e.printStackTrace();
         }
 
-        apply.setDisable(true);
-        reset.setDisable(true);
+        disableControls();
     }
 
     /**
@@ -516,9 +607,19 @@ public class CssStylerViewController extends ViewController {
      * enables all the buttons in the Bar
      */
     private void enableControls() {
-        apply.setDisable(false);
+        menuSave.setDisable(false);
+        menuReset.setDisable(false);
+
+        save.setDisable(false);
         reset.setDisable(false);
-        resetDefault.setDisable(false);
+    }
+
+    private void disableControls() {
+        menuSave.setDisable(true);
+        menuReset.setDisable(true);
+
+        save.setDisable(true);
+        reset.setDisable(true);
     }
 
     /**
@@ -530,9 +631,7 @@ public class CssStylerViewController extends ViewController {
         }
         updateGrid();
         updatePreview();
-        resetDefault.setDisable(true);
-        apply.setDisable(true);
-        reset.setDisable(true);
+        disableControls();
     }
 
     @FXML
