@@ -109,31 +109,28 @@ public class SequentPrinter {
             if (closeTagsAtIndex.containsKey(i)) {
                 for (int j = StylePos.values().length - 1; j >= 0; j--) {
                     insertTagList = closeTagsAtIndex.get(i)[j];
-                    if (insertTagList != null) {
-                        for (String insertTag : insertTagList) {
-                            if (insertTag != null && !insertTag.isEmpty()) {
+                    if (insertTagList == null)
+                        continue;
+                    for (String insertTag : insertTagList) {
+                        if (insertTag == null || insertTag.isEmpty())
+                            continue;
 
-                                // Check for possible Overlap
-                                while (!tagStack.isEmpty()
-                                        && tagStack.peek().first != j) {
-                                    sb.insert(i + offset,
-                                            NUIConstants.CLOSING_TAG);
-                                    offset += NUIConstants.CLOSING_TAG.length();
-                                    saveTagStack.push(tagStack.pop());
-                                }
+                        // Check for possible Overlap
+                        while (!tagStack.isEmpty()
+                                && tagStack.peek().first != j) {
+                            sb.insert(i + offset, NUIConstants.CLOSING_TAG);
+                            offset += NUIConstants.CLOSING_TAG.length();
+                            saveTagStack.push(tagStack.pop());
+                        }
 
-                                sb.insert(i + offset, insertTag);
-                                offset += insertTag.length();
-                                tagStack.pop();
+                        sb.insert(i + offset, insertTag);
+                        offset += insertTag.length();
+                        tagStack.pop();
 
-                                while (saveTagStack.size() > 0) {
-                                    sb.insert(i + offset,
-                                            saveTagStack.peek().second);
-                                    offset += saveTagStack.peek().second
-                                            .length();
-                                    tagStack.push(saveTagStack.pop());
-                                }
-                            }
+                        while (saveTagStack.size() > 0) {
+                            sb.insert(i + offset, saveTagStack.peek().second);
+                            offset += saveTagStack.peek().second.length();
+                            tagStack.push(saveTagStack.pop());
                         }
                     }
                 }
@@ -142,34 +139,31 @@ public class SequentPrinter {
             if (openTagsAtIndex.containsKey(i)) {
                 for (int j = 0; j < StylePos.values().length; j++) {
                     insertTagList = openTagsAtIndex.get(i)[j];
-                    if (insertTagList != null) {
-                        for (String insertTag : insertTagList) {
-                            if (insertTag != null && !insertTag.isEmpty()) {
+                    if (insertTagList == null)
+                        continue;
+                    for (String insertTag : insertTagList) {
+                        if (insertTag == null || insertTag.isEmpty())
+                            continue;
 
-                                // Correctly Prioritze even inside other spans
-                                while (!tagStack.isEmpty()
-                                        && tagStack.peek().first > j) {
-                                    sb.insert(i + offset,
-                                            NUIConstants.CLOSING_TAG);
-                                    offset += NUIConstants.CLOSING_TAG.length();
-                                    saveTagStack.push(tagStack.pop());
-                                }
-
-                                tagStack.push(new Pair<Integer, String>(j,
-                                        insertTag));
-
-                                sb.insert(i + offset, insertTag);
-                                offset += insertTag.length();
-
-                                while (saveTagStack.size() > 0) {
-                                    sb.insert(i + offset,
-                                            saveTagStack.peek().second);
-                                    offset += saveTagStack.peek().second
-                                            .length();
-                                    tagStack.push(saveTagStack.pop());
-                                }
-                            }
+                        // Correctly Prioritze even inside other spans
+                        while (!tagStack.isEmpty()
+                                && tagStack.peek().first > j) {
+                            sb.insert(i + offset, NUIConstants.CLOSING_TAG);
+                            offset += NUIConstants.CLOSING_TAG.length();
+                            saveTagStack.push(tagStack.pop());
                         }
+
+                        tagStack.push(new Pair<Integer, String>(j, insertTag));
+
+                        sb.insert(i + offset, insertTag);
+                        offset += insertTag.length();
+
+                        while (saveTagStack.size() > 0) {
+                            sb.insert(i + offset, saveTagStack.peek().second);
+                            offset += saveTagStack.peek().second.length();
+                            tagStack.push(saveTagStack.pop());
+                        }
+
                     }
                 }
             }
