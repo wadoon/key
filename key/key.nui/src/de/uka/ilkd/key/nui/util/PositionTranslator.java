@@ -3,8 +3,8 @@
  */
 package de.uka.ilkd.key.nui.util;
 
-import java.io.IOException;
 import java.util.ArrayList;
+
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.util.Pair;
 import javafx.scene.input.MouseEvent;
@@ -27,13 +27,17 @@ public class PositionTranslator {
     private static Font minimizedFont;
 
     /**
-     * 
+     * Creates a PositionTranslator Object, which is able to return the index of
+     * the char in the printed proofString under the mousepointer
      */
     public PositionTranslator(CssFileHandler cssFileHandler) {
         cssHandler = cssFileHandler;
         this.readCSS();
     }
-
+    /**
+     * Setter for the proofString
+     * @param proofString
+     */
     public void setProofString(String proofString) {
         strings = proofString.split("\n");
         filteredLines.clear();
@@ -87,7 +91,6 @@ public class PositionTranslator {
         for (result = 0; result < strings.length; result++) {
 
             // Adjust for filtering
-            // XXX
             if (filterCollapsed) {
                 if (!filteredLines.contains(result)) {
                     if (filteredLines.contains(result + 1)) {
@@ -137,7 +140,6 @@ public class PositionTranslator {
         // Generate Text Object with Font and Size for computing width
         Text text = new Text();
         // Adjust for minimized Filter
-        // XXX
         if (!filterCollapsed && !filteredLines.contains(line)
                 && filteredLines.size() > 0) {
             text.setFont(minimizedFont);
@@ -188,11 +190,8 @@ public class PositionTranslator {
     }
 
     /**
-     * reads the CSS information for HTML Styling
-     * 
-     * @param fileName
-     *            path to the CSS file
-     * @throws IOException
+     * reads the CSS information for HTML Styling from the CSSFileHandler
+     * {@link CssFileHandler}
      */
     private void readCSS() {
         CssRule pre = cssHandler.getRule("pre");
@@ -216,10 +215,12 @@ public class PositionTranslator {
     }
 
     /**
-     * apply Filter information on the PositionTranslator.
+     * gives Information on the Filtering to the PosTranslator
      * 
-     * @param filter
-     *            the PrintFilter object
+     * @param lines
+     *            the number of lines, which are not filtered out
+     * @param layout
+     *            the modus (Minimized/Collapsed) of the Filter
      */
     public void applyFilter(ArrayList<Integer> lines, FilterLayout layout) {
         filteredLines = lines;
@@ -234,19 +235,18 @@ public class PositionTranslator {
             filterCollapsed = false;
             break;
         }
-        // filterCollapsed = false;
     }
 
     /**
-     * computes dimensions of the proofstring given to the PositionTranslator, if
-     * drawn with the Font and Size as defined in the CSS
+     * computes dimensions of the proofstring given to the PositionTranslator,
+     * if drawn with the Font and Size as defined in the CSS
      * 
      * @return a Pair, with Pair.first = width and Pair.second = height
      */
 
     public Pair<Double, Double> getProofHeight() { // Adjustment for Margin
         this.readCSS();
-        double height = 2*fontSize;
+        double height = 2 * fontSize;
 
         Text text = new Text(" ");
         text.setFont(new Font(font, fontSize));
@@ -254,14 +254,17 @@ public class PositionTranslator {
 
         // Iterate over all lines to sum up Height
         for (int i = 0; i < strings.length; i++) {
-            if (strings[i].length() > longestLine.length()){
+            if (strings[i].length() > longestLine.length()) {
                 longestLine = strings[i];
             }
             height += Math.round(text.getLayoutBounds().getHeight());
         }
         text.setText(longestLine);
-        
-        return new Pair<Double, Double>((double) Math.round(text.getLayoutBounds().getWidth()+2*fontSize), height);
+
+        return new Pair<Double, Double>(
+                (double) Math.round(
+                        text.getLayoutBounds().getWidth() + 2 * fontSize),
+                height);
     }
 
 }

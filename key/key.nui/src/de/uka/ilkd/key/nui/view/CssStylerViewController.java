@@ -232,7 +232,11 @@ public class CssStylerViewController extends ViewController {
 
     /**
      * update the Grid with the controls associated with CSS Property
+     * 
      */
+    // Warning can be suppressed. Combobox can only be of Type String, as it is
+    // build by the method: makeComboBox()
+    @SuppressWarnings("unchecked")
     private void updateGrid() {
         if (selected == null || !ruleMap.containsKey(selected)) {
             return;

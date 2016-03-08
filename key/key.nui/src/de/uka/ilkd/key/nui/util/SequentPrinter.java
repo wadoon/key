@@ -10,11 +10,7 @@ import java.util.Stack;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.text.BadLocationException;
-
 import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -222,7 +218,6 @@ public class SequentPrinter {
      * @param tapp
      *            The taclet app for which the if formulae should be
      *            highlighted.
-     * @throws BadLocationException
      */
     private void highlightIfFormulas(TacletApp tapp) {
         final ImmutableList<IfFormulaInstantiation> ifs = tapp
@@ -290,7 +285,6 @@ public class SequentPrinter {
         String[] lines = proofString.split("\n");
 
         int styleStart = 0;
-        // Pointer at the current entry of the ArrayList
 
         // Iterate over the lines
         for (int i = 0; i < lines.length; i++) {
@@ -304,13 +298,13 @@ public class SequentPrinter {
                     minimizeLine(styleStart, styleEnd);
                     break;
                 case Collapse:
+                default:
                     // Add collapsed indicator if collapsed Block ends, or the
                     // last line is reached
                     if (indicesOfLines.contains(i + 1)
                             || i == lines.length - 1) {
                         filterCollapseIndicator.add(styleEnd);
                     }
-                default:
                     collapseLine(styleStart, styleEnd);
                     break;
                 }
@@ -392,36 +386,36 @@ public class SequentPrinter {
      */
     private void putTag(int index, StylePos arrayPos, String tag,
             HashMap<Integer, ArrayList<String>[]> map) {
-        ArrayList<String>[] mapValue = map.get(index);
-        // If Map Entry already exists
-        if (mapValue != null) {
-            // ArrayList<String> tagList = mapValue[arrayPos.slotPosition];
-            // If Array entry is null make ArrayList and add tag
-            if (mapValue[arrayPos.slotPosition] == null) {
-                mapValue[arrayPos.slotPosition] = new ArrayList<>();
-                mapValue[arrayPos.slotPosition].add(tag);
-            }
-            else {
-                // If Tag is empty, one entry shall be removed
-                if (tag.isEmpty()) {
-                    mapValue[arrayPos.slotPosition]
-                            .remove(mapValue[arrayPos.slotPosition].size() - 1);
-                }
-                else {
-                    // If the Array entry is not null, the tag can be appended.
-                    // Solves the problem with double consecutive chars
-                    // ("wellformed")
-                    mapValue[arrayPos.slotPosition].add(tag);
-                }
 
-            }
-        }
-        else {
+        if (map.get(index) == null) {
             // If the Map Entry does not exist, create new Entry and call itself
-            // again. RECURSION!
+            // again.
             map.put(index, new ArrayList[StylePos.values().length]);
             putTag(index, arrayPos, tag, map);
         }
+        ArrayList<String>[] mapValue = map.get(index);
+
+        // ArrayList<String> tagList = mapValue[arrayPos.slotPosition];
+        // If Array entry is null make ArrayList and add tag
+        if (mapValue[arrayPos.slotPosition] == null) {
+            mapValue[arrayPos.slotPosition] = new ArrayList<>();
+            mapValue[arrayPos.slotPosition].add(tag);
+        }
+        else {
+            // If Tag is empty, one entry shall be removed
+            if (tag.isEmpty()) {
+                mapValue[arrayPos.slotPosition]
+                        .remove(mapValue[arrayPos.slotPosition].size() - 1);
+            }
+            else {
+                // If the Array entry is not null, the tag can be appended.
+                // Solves the problem with double consecutive chars
+                // ("wellformed")
+                mapValue[arrayPos.slotPosition].add(tag);
+            }
+
+        }
+
     }
 
     /**
@@ -548,9 +542,6 @@ public class SequentPrinter {
                 putCloseTag(index, StylePos.SEARCH, "");
             }
 
-            // keySet.removeAll(filterIndicesOpen);
-            // keySet.removeAll(filterIndicesClose);
-
             searchIndicesOpen.clear();
             searchIndicesClose.clear();
 
@@ -615,8 +606,7 @@ public class SequentPrinter {
         IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(
                 sequent);
 
-        // TODO References to generic type Class<T> should be parameterized
-        Class lastClass = null;
+        Class<? extends Object> lastClass = null;
         boolean openedTag = false;
 
         // Iterate over String. Insert Tags according to class.

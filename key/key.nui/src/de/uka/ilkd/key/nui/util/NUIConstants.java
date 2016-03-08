@@ -12,8 +12,8 @@ import java.util.HashMap;
  */
 public final class NUIConstants {
 
-    private static HashMap<Class, String> classMap = new HashMap<>();
-    private static HashMap<Class, Boolean> classEnabledMap = new HashMap<>();
+    private static HashMap<Class<? extends Object>, String> classMap = new HashMap<>();
+    private static HashMap<Class<? extends Object>, Boolean> classEnabledMap = new HashMap<>();
     private static HashMap<String, String> classDescriptionMap = new HashMap<>();
 
     public final static String OPEN_TAG_BEGIN = "<span class=\"";
@@ -247,11 +247,11 @@ public final class NUIConstants {
         // TODO Auto-generated constructor stub
     }
 
-    public static HashMap<Class, Boolean> getClassEnabledMap() {
+    public static HashMap<Class<? extends Object>, Boolean> getClassEnabledMap() {
         return classEnabledMap;
     }
 
-    public static HashMap<Class, String> getClassCssMap() {
+    public static HashMap<Class<? extends Object>, String> getClassCssMap() {
         return classMap;
     }
 
