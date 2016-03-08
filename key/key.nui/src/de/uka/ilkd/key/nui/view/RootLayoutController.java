@@ -18,7 +18,6 @@ import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewObserver;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.ViewSlot;
-import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import de.uka.ilkd.key.util.KeYConstants;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -43,9 +42,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 
 /**
  * @author Maximilian Li

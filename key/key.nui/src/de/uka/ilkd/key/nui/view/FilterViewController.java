@@ -4,8 +4,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
 import java.util.ResourceBundle;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.nui.KeYView;
@@ -15,9 +15,9 @@ import de.uka.ilkd.key.nui.event.EmptyEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
-import de.uka.ilkd.key.util.Pair;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -26,7 +26,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
-import javafx.scene.control.Button;
 
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT)
 public class FilterViewController extends ViewController {
