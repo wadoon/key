@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="292.0" prefWidth="277.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
+<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="314.0" prefWidth="277.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
    <children>
       <VBox AnchorPane.bottomAnchor="37.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -51,11 +51,15 @@
                            <content>
                               <VBox>
                                  <children>
-                                    <RadioButton fx:id="useTextScope" mnemonicParsing="false" text="Use text lines">
+                                    <RadioButton fx:id="useNone" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="None">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" />
+                                       </VBox.margin>
                                        <toggleGroup>
                                           <ToggleGroup fx:id="resultRange" />
                                        </toggleGroup>
                                     </RadioButton>
+                                    <RadioButton fx:id="useTextScope" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="Use text lines" toggleGroup="$resultRange" />
                                     <GridPane fx:id="resultRangeText">
                                       <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="93.0" minWidth="10.0" prefWidth="47.0" />
@@ -78,7 +82,7 @@
                                           <Insets left="25.0" />
                                        </padding>
                                     </GridPane>
-                                    <RadioButton fx:id="useAstScope" mnemonicParsing="false" text="Use term scope" toggleGroup="$resultRange" />
+                                    <RadioButton fx:id="useAstScope" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="Use term scope" toggleGroup="$resultRange" />
                                     <CheckBox fx:id="invertFilter" mnemonicParsing="false" onAction="#hanldeInvertChanged" text="Invert Filter">
                                        <VBox.margin>
                                           <Insets left="25.0" />

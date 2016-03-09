@@ -126,7 +126,7 @@ public class PrintFilter {
     private boolean invert;
 
     /**
-     * Indicates whether the filter should be inverted. (Ignored when text-scope
+     * Indicates whether the filter should be inverted. (Ignored when not ast-scope
      * is used)
      */
     public boolean getInvert() {
@@ -134,29 +134,27 @@ public class PrintFilter {
     }
 
     /**
-     * Indicates whether the filter should be inverted. (Ignored when text-scope
+     * Indicates whether the filter should be inverted. (Ignored when not ast-scope
      * is used)
      */
     public void setInvert(boolean value) {
         invert = value;
     }
 
-    private boolean useAstScope;
+    private DisplayScope scope;
 
     /**
-     * Indicates whether before/after should apply to lines or an ast-scope
-     * should be used instead.
+     * Specifies the type of expansion that is used on each match.
      */
-    public boolean getUseAstScope() {
-        return useAstScope;
+    public DisplayScope getScope() {
+        return scope;
     }
 
     /**
-     * Indicates whether before/after should apply to lines or an ast-scope
-     * should be used instead.
+     * Specifies the type of expansion that is used on each match.
      */
-    public void setUseAstScope(boolean value) {
-        useAstScope = value;
+    public void setScope(DisplayScope value) {
+        scope = value;
     }
 
     private FilterLayout filterLayout;
@@ -181,6 +179,7 @@ public class PrintFilter {
         before = 2;
         after = 2;
         filterLayout = FilterLayout.Minimize;
+        scope = DisplayScope.None;
     }
 
     public PrintFilter cloneFilter() {
@@ -193,7 +192,7 @@ public class PrintFilter {
         filter.setAfter(this.after);
         filter.setBefore(this.before);
         filter.setFilterLayout(this.filterLayout);
-        filter.setUseAstScope(this.useAstScope);
+        filter.setScope(this.scope);
         return filter;
     }
 
@@ -214,5 +213,30 @@ public class PrintFilter {
          * All <b>hidden</b> lines will be displayed with a smaller font.
          */
         Minimize
+    }
+
+    /**
+     * Indicates how the area that is displayed around a match is extended.
+     * 
+     * @author Benedikt Gross
+     *
+     */
+    public enum DisplayScope {
+        None,
+
+        /**
+         * Text lines are used as the unit of expansion. The values
+         * <b>before</b> and <b>after</b> are used to extend the visible area
+         * around each match.
+         */
+        Text,
+
+        /**
+         * The AST elements are used as the unit of expansion. For each match,
+         * the start and end of the line in which the match occurred are check
+         * for underlying AST-elements. Each "hit" AST-element is displayed as
+         * expansion of the match.
+         */
+        AST
     }
 }

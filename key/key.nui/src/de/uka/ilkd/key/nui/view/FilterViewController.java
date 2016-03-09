@@ -14,6 +14,7 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.event.EmptyEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
+import de.uka.ilkd.key.nui.filter.PrintFilter.DisplayScope;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.fxml.FXML;
@@ -75,6 +76,9 @@ public class FilterViewController extends ViewController {
     private RadioButton useTextScope;
 
     @FXML
+    private RadioButton useNone;
+
+    @FXML
     private GridPane resultRangeText;
 
     // Note: used in code that is disabled right now.
@@ -95,7 +99,18 @@ public class FilterViewController extends ViewController {
         linesBefore.setValue(currentFilter.getBefore());
         linesAfter.setValue(currentFilter.getAfter());
         filterModeBox.setValue(currentFilter.getFilterLayout());
-        useAstScope.setSelected(currentFilter.getUseAstScope());
+        switch (currentFilter.getScope()) {
+        case AST:
+            useAstScope.setSelected(true);
+            break;
+        case Text:
+            useTextScope.setSelected(true);
+            break;
+        case None:
+        default:
+            useNone.setSelected(true);
+            break;
+        }
     }
 
     @Override
@@ -110,7 +125,7 @@ public class FilterViewController extends ViewController {
                 .bind(useAstScope.selectedProperty().not());
 
         // change propagation to currentFilter
-        //TODO implement all this as handling functions
+        // TODO implement all this as handling functions
         linesBefore.valueProperty().addListener((o, old_val, new_val) -> {
             beforeNumber.setText(Integer.toString(new_val.intValue()));
             currentFilter.setBefore(new_val.intValue());
@@ -123,8 +138,7 @@ public class FilterViewController extends ViewController {
                 (o, old_val, new_val) -> currentFilter.setSearchText(new_val));
         filterModeBox.valueProperty().addListener((o, old_val,
                 new_val) -> currentFilter.setFilterLayout(new_val));
-        useAstScope.selectedProperty().addListener(
-                (o, old_val, new_val) -> currentFilter.setUseAstScope(new_val));
+
         userRadio.selectedProperty().addListener(event -> {
             if (filterSelection != null) {
                 selectionFilterToggle.setSelected(false);
@@ -137,8 +151,7 @@ public class FilterViewController extends ViewController {
         filterModeBox.getItems().add(FilterLayout.Minimize);
         filterModeBox.getItems().add(FilterLayout.Collapse);
         applyButton.setDisable(true);
-        useTextScope.setSelected(true);
-        
+
         currentFilter = new PrintFilter();
         loadCurrentFilter();
     }
@@ -190,6 +203,16 @@ public class FilterViewController extends ViewController {
          * currentFilter = savedFilters.get(filters.getValue());
          * loadCurrentFilter();
          */
+    }
+
+    @FXML
+    private void handleScopeSelectionChanged() {
+        if (useNone.isSelected())
+            currentFilter.setScope(DisplayScope.None);
+        else if (useAstScope.isSelected())
+            currentFilter.setScope(DisplayScope.AST);
+        else if (useTextScope.isSelected())
+            currentFilter.setScope(DisplayScope.Text);
     }
 
     @FXML
