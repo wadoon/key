@@ -23,7 +23,7 @@ public class StatusManager {
      * Shows a status on the status-bar of the ui.
      */
     public void setStatus(String status) {
-        if (this.status.equals(status))
+        if (status == null || this.status.equals(status))
             return;
         this.status = status;
         statusUpdatedEvent.fire(status);
