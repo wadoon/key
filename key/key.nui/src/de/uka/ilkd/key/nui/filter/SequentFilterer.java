@@ -6,11 +6,20 @@ import java.util.stream.IntStream;
 
 import de.uka.ilkd.key.pp.InitialPositionTable;
 
+/**
+ * A static class, used to apply a filter to a printed sequent.
+ * i.e. compiles a filter and uses it to filter all lines based on the given {link PrintFilter}
+ * @author Benedikt Gross
+ *
+ */
 public class SequentFilterer {
 
     /**
      * Applies a criteria to the proofString and returns all lines, that should
      * be displayed to the user after filtering.
+     * @param proofString the plain, printed proofString (the displayed proofString without html tags)
+     * @param filter The filter to be applied.
+     * @param positionTable A position table to provide access to the ast.
      */
     public static List<Integer> applyFilter(String proofString,
             PrintFilter filter, InitialPositionTable positionTable) {
@@ -23,7 +32,7 @@ public class SequentFilterer {
 
     /**
      * Creates a criteria for filtering the sequent from all information that is
-     * stored in this object.
+     * stored in this {link PrintFilter} instance.
      */
     private static Criterion<Integer> compileCriteria(PrintFilter filter,
             InitialPositionTable positionTable, String[] originalLines,
@@ -32,6 +41,7 @@ public class SequentFilterer {
         Criterion<Integer> criteria;
 
         if (filter == null) {
+            // do not filter
             criteria = new CriterionEmpty<>();
             return criteria;
         }

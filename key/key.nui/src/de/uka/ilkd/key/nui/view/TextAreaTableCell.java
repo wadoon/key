@@ -12,7 +12,7 @@ import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 
 /**
- * Custom TableCell which supports multiline editing and commiting on focus loss.
+ * Custom TableCell which supports multiline editing and committing on focus loss.
  * 
  * @author Victor Schuemmer
  */

@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.nui.util;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import org.key_project.util.java.IOUtil;
 
@@ -13,7 +13,9 @@ public class CssFileHandler {
 
     private ArrayList<CssRule> parsedRules;
     private String css;
-    private String path;
+    private String path = "";
+    private Preferences prefs;
+    private final static String PREFERENCE_KEY_PATH = "CSS_FILE_PATH";
 
     private enum State {
         SELECTOR, PROPERTY, VALUE;
@@ -26,6 +28,8 @@ public class CssFileHandler {
     public CssFileHandler() {
         css = "";
         parsedRules = new ArrayList<CssRule>();
+        prefs = Preferences.userNodeForPackage(this.getClass());
+        path = prefs.get(PREFERENCE_KEY_PATH, "");
     }
 
     /**
@@ -37,7 +41,7 @@ public class CssFileHandler {
      */
     public CssFileHandler(String path) throws IOException {
         this();
-        loadCssFile(path);
+        loadCssFile();
     }
 
     /**
@@ -47,10 +51,25 @@ public class CssFileHandler {
      *            path to the css file
      * @throws IOException
      */
-    public void loadCssFile(String path) throws IOException {
-        css = IOUtil.readFrom(new File(path)) + "\n";
-        this.path = path;
+    public void loadCssFile() throws IOException {
+        File file = new File(path);
+        if (file.exists() && !file.isDirectory()) {
+            css = IOUtil.readFrom(new File(path)) + "\n";
+        }
+        else {
+            prefs.put(PREFERENCE_KEY_PATH, "");
+            css = NUIConstants.DEFAULT_SEQUENT_CSS;
+        }
         parse();
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+        prefs.put(PREFERENCE_KEY_PATH, path);
+    }
+
+    public String getPath() {
+        return path;
     }
 
     /**
@@ -65,8 +84,13 @@ public class CssFileHandler {
 
         css = parsedRulestoString();
 
+        if (path.isEmpty()) {
+            return;
+        }
+
         FileWriter fw = new FileWriter(path, false);
-        fw.write("/*We recommend to only change this file using the KeY CSS Styler */ \n");
+        fw.write(
+                "/*We recommend to only change this file using the KeY CSS Styler */ \n");
         fw.write(css);
         fw.close();
     }
@@ -110,7 +134,7 @@ public class CssFileHandler {
     public void reset() {
         parsedRules.clear();
         try {
-            loadCssFile(path);
+            loadCssFile();
         }
         catch (Exception e) {
             System.err.println("Could not read CSS File");
@@ -123,17 +147,18 @@ public class CssFileHandler {
      */
     public void resetDefault() {
         String tmpPath = path;
+        path = "";
         parsedRules.clear();
         try {
-            loadCssFile(NUIConstants.CSS_RESET_TO_DEFAULT_PATH);
+            loadCssFile();
             writeCssFile(tmpPath);
-            path = tmpPath;
+
         }
         catch (Exception e) {
             System.err.println("Could not Reset CSS to Default");
             e.printStackTrace();
         }
-
+        path = tmpPath;
     }
 
     /**

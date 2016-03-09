@@ -5,9 +5,6 @@ package de.uka.ilkd.key.nui.util;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.nui.filter.FilterSelection;
-import de.uka.ilkd.key.speclang.BlockContract.Terms;
-
 /**
  * @author Maximilian Li
  * @author Victor Schuemmer
@@ -15,8 +12,8 @@ import de.uka.ilkd.key.speclang.BlockContract.Terms;
  */
 public final class NUIConstants {
 
-    private static HashMap<Class, String> classMap = new HashMap<>();
-    private static HashMap<Class, Boolean> classEnabledMap = new HashMap<>();
+    private static HashMap<Class<? extends Object>, String> classMap = new HashMap<>();
+    private static HashMap<Class<? extends Object>, Boolean> classEnabledMap = new HashMap<>();
     private static HashMap<String, String> classDescriptionMap = new HashMap<>();
 
     public final static String OPEN_TAG_BEGIN = "<span class=\"";
@@ -63,8 +60,46 @@ public final class NUIConstants {
     public final static String VARSV_TAG = "varSV";
     public final static String WARYSUBSTOP_TAG = "warySubstOp";
 
-    public final static String DEFAULT_STYLE_CSS = "resources/css/sequentStyle.css";
+    public final static String DEFAULT_STYLE_CSS_PATH = "resources/css/sequentStyle.css";
     public final static String CSS_RESET_TO_DEFAULT_PATH = "resources/css/sequentStyleDefault.css";
+
+    public final static String DEFAULT_SEQUENT_CSS = "pre{background-color:#FFFFFF;color:#000000;font-weight:normal;font-size:16px;font-family:Courier New;font-style:normal;}"
+            + ".highlighted{background-color:#FFFF00;color:inherit;font-weight:inherit;font-style:inherit;}"
+            + ".mouseover{background-color:#B0C4DE;color:inherit;font-weight:inherit;font-style:inherit;}"
+            + ".filterSelection{background-color:#ff6666;color:inherit;font-weight:inherit;font-style:inherit;}"
+            + ".minimized{background-color:inherit;color:inherit;font-weight:inherit;font-size:6px;font-style:inherit;}"
+            + ".collapsed{display:none;}.ruleApp{background-color:#B3FD53;color:inherit;font-weight:inherit;font-style:inherit;}"
+            + ".ifInst{background-color:#ccffcc;color:inherit;font-weight:inherit;font-style:inherit;}"
+            + ".ifFormula{background-color:#ccffcc;color:inherit;font-weight:inherit;font-style:inherit;}"
+            + ".equality{background-color:inherit;color:#FF0000;font-weight:inherit;font-style:inherit;}"
+            + ".function{background-color:inherit;color:#000000;font-weight:inherit;font-style:inherit;}"
+            + ".locationVar{background-color:inherit;color:#0000FF;font-weight:bold;font-style:inherit;}"
+            + ".junctor{background-color:inherit;color:#0000FF;font-weight:bold;font-style:italic;}"
+            + ".logicVar{background-color:inherit;color:#008000;font-weight:inherit;font-style:inherit;}"
+            + ".quantifier{background-color:inherit;color:#ff3300;font-weight:inherit;font-style:inherit;}"
+            + ".sortDepFunc{background-color:inherit;color:#000000;font-weight:bold;font-style:inherit;}"
+            + ".modality{background-color:inherit;color:inherit;font-weight:bold;font-style:inherit;}"
+            + ".observerFunc{background-color:#008000;color:inherit;font-weight:inherit;font-style:inherit;}"
+            + ".elemUpdate{background-color:inherit;color:#FFFF00;font-weight:bold;font-style:inherit;}"
+            + ".formulaSV{background-color:#808080;color:#FFFF00;font-weight:inherit;font-style:inherit;}"
+            + ".ifExThenElse{background-color:#008000;color:#FF0000;font-weight:bold;font-style:inherit;}"
+            + ".ifThenElse{background-color:inherit;color:#008000;font-weight:bold;font-style:inherit;}"
+            + ".modalOpSV{background-color:#0000FF;color:#FFFF00;font-weight:bold;font-style:inherit;}"
+            + ".progConst{background-color:#000000;color:#FF0000;font-weight:bold;font-style:inherit;}"
+            + ".progMeth{background-color:#000000;color:#008000;font-weight:bold;font-style:inherit;}"
+            + ".progSV{background-color:#000000;color:#FFFFFF;font-weight:bold;font-style:inherit;}"
+            + ".progVar{background-color:#000000;color:#2fedff;font-weight:bold;font-style:inherit;}"
+            + ".schemaVarFactory{background-color:#003fff;color:#FF0000;font-weight:inherit;font-style:inherit;}"
+            + ".skolemTermSV{background-color:#003fff;color:#FF00FF;font-weight:bold;font-style:inherit;}"
+            + ".substOp{background-color:#808080;color:#FF0000;font-weight:inherit;font-style:inherit;}"
+            + ".termLabelSV{background-color:#808080;color:#008000;font-weight:inherit;font-style:inherit;}"
+            + ".termSV{background-color:#808080;color:#0000FF;font-weight:inherit;font-style:inherit;}"
+            + ".transformer{background-color:#808080;color:#000000;font-weight:inherit;font-style:inherit;}"
+            + ".updateApp{background-color:#FF00FF;color:inherit;font-weight:inherit;font-style:inherit;}"
+            + ".updateJunc{background-color:#FF00FF;color:#008000;font-weight:inherit;font-style:inherit;}"
+            + ".updateSV{background-color:#FF00FF;color:#0000FF;font-weight:bold;font-style:inherit;}"
+            + ".varSV{background-color:violet;color:#000000;font-weight:inherit;font-style:inherit;}"
+            + ".warySubstOp{background-color:#2fedff;color:#FF0000;font-weight:inherit;font-style:italic;}";
 
     static {
         // Defines if this AST Class shall be highlighted
@@ -212,11 +247,11 @@ public final class NUIConstants {
         // TODO Auto-generated constructor stub
     }
 
-    public static HashMap<Class, Boolean> getClassEnabledMap() {
+    public static HashMap<Class<? extends Object>, Boolean> getClassEnabledMap() {
         return classEnabledMap;
     }
 
-    public static HashMap<Class, String> getClassCssMap() {
+    public static HashMap<Class<? extends Object>, String> getClassCssMap() {
         return classMap;
     }
 

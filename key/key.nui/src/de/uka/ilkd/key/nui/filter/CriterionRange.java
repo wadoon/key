@@ -1,14 +1,9 @@
 package de.uka.ilkd.key.nui.filter;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * A criteria that adds X entities before and X entities after all entities left

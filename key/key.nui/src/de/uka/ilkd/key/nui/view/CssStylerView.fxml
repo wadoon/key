@@ -10,10 +10,39 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TextField?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.CssStylerViewController">
+	<top>
+		<MenuBar>
+			<menus>
+				<Menu text="File">
+					<MenuItem fx:id="menuOpen" onAction="#handleOpen" text="Open"></MenuItem>
+					<SeparatorMenuItem />
+					<MenuItem fx:id="menuSave" disable="true" onAction="#handleSave" text="Save"></MenuItem>
+					<MenuItem fx:id="menuSaveAs" onAction="#handleSaveAs" text="Save As"></MenuItem>
+					<SeparatorMenuItem />
+					<MenuItem fx:id="menuReset" disable="true" onAction="#handleReset" text="Reset"></MenuItem>
+					<MenuItem fx:id="menuResetDefault" onAction="#handleResetDefault" text="Reset to Default"></MenuItem>
+					<SeparatorMenuItem />
+					<MenuItem onAction="#handleExit" text="Exit"></MenuItem>
+				</Menu>
+			</menus>
+		</MenuBar>
+	</top>
 	<left>
-		<TreeView fx:id="treeView" />
+	<VBox >
+	<children>
+		<TextField fx:id="tfSearch" text="Search..." onAction="#handleSearch"></TextField>
+		<TreeView fx:id="treeView" showRoot="false"/>
+	</children>
+	</VBox>
+		
 	</left>
    <center>
       <VBox prefHeight="400.0" prefWidth="451.0" BorderPane.alignment="CENTER">
@@ -43,10 +72,9 @@
             </VBox>
             <HBox alignment="CENTER_RIGHT" prefHeight="63.0" prefWidth="212.0" spacing="20.0">
                <children>
-                  <Button fx:id="apply" disable="true" mnemonicParsing="false" onAction="#handleApply" text="Apply" />
+                  <Button fx:id="save" disable="true" mnemonicParsing="false" onAction="#handleSave" text="Save" />
                   <Button fx:id="reset" disable="true" mnemonicParsing="false" onAction="#handleReset" text="Reset" />
-                  <Button fx:id="resetDefault" disable="false" mnemonicParsing="false" onAction="#handleResetDefault" text="Reset to Default" />
-                  <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+                  <Button cancelButton="true" mnemonicParsing="false" onAction="#handleExit" text="Exit" />
                </children>
                <VBox.margin>
                   <Insets right="20.0" />

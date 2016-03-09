@@ -9,28 +9,28 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface KeYView {
     /**
-     * Text of the menu entry
+     * Text of the menu entry.
      */
     String title();
-    
+
     /**
-     * Url to the fxml file of the view
+     * Url to the fxml file of the view.
      */
     String path();
-    
-// not used yet
-//    String windows() default "Main";
-    
+
     /**
-     * Positon in which the view is displayed as default
+     * Position in which the view is displayed as default.
+     * {@link ViewPosition}
      */
     ViewPosition preferredPosition() default ViewPosition.CENTER;
-    
+
     /**
-     * Shortcut KeyCombination (as String)
-     * default "" will be ignored
+     * Shortcut KeyCombination (as String) default "" will be ignored.
      */
-    String accelerator() default ""; 
-    
+    String accelerator() default "";
+
+    /**
+     * Indicates, if a menu entry should be added for this view.
+     */
     boolean hasMenuItem() default true;
 }

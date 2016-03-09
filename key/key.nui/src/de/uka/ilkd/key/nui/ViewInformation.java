@@ -31,16 +31,6 @@ public class ViewInformation extends Observable {
         return nextId++;
     }
 
-    public ViewInformation(String title, URL pathToFxml,
-            ViewPosition preferedPosition, boolean hasMenuItem) {
-        fxmlPath = pathToFxml;
-        this.preferedPosition = preferedPosition;
-        currentPosition = preferedPosition;
-        this.title = title;
-        this.hasMenuItem = hasMenuItem;
-        id = getNextId();
-    }
-
     private boolean hasMenuItem;
 
     public boolean hasMenuItem() {
@@ -58,21 +48,7 @@ public class ViewInformation extends Observable {
     public String getTitle() {
         return title;
     }
-
-    private boolean isActive = false;
-
-    public boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(boolean value) {
-        if (isActive == value)
-            return;
-        isActive = value;
-        this.setChanged();
-        this.notifyObservers(true);
-    }
-
+    
     private ViewPosition preferedPosition;
 
     public ViewPosition getPreferedPosition() {
@@ -105,29 +81,51 @@ public class ViewInformation extends Observable {
         return controller;
     }
 
+    public ViewInformation(String title, URL pathToFxml, ViewPosition preferedPosition, boolean hasMenuItem) {
+        fxmlPath = pathToFxml;
+        this.preferedPosition = preferedPosition;
+        currentPosition = preferedPosition;
+        this.title = title;
+        this.hasMenuItem = hasMenuItem;
+        id = getNextId();
+    }
+
+    private boolean isActive = false;
+
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean value) {
+        if (isActive == value)
+            return;
+        isActive = value;
+        this.setChanged();
+        this.notifyObservers(true);
+    }
+
     public void loadUiTab(ViewController parent) {
-        Pair<Object, ViewController> pair = parent
-                .loadFxmlViewController(getFxmlPath());
+        Pair<Object, ViewController> pair = parent.loadFxmlViewController(getFxmlPath());
         uiTab = createTab((Node) pair.getKey(), parent);
         controller = pair.getValue();
     }
 
     /**
      * 
-     * @param title
      * @param node
-     * @return a tab with content node and title as lable, also drag
+     * @param parent
+     * @return a tab with content node and title as label, also drag
      *         functionality
      */
     private Tab createTab(Node node, ViewController parent) {
-        Tab t = new Tab();
+        Tab tab = new Tab();
         String title = getTitle();
         // t.setText(title);
         Label titleLabel = new Label(title);
         // BorderPane header = new BorderPane();
         // header.setCenter(titleLabel);
-        t.setGraphic(titleLabel);
-        t.setContent(node);
+        tab.setGraphic(titleLabel);
+        tab.setContent(node);
 
         titleLabel.setOnDragDetected(event -> {
             if (event.getButton() != MouseButton.PRIMARY)
@@ -139,30 +137,27 @@ public class ViewInformation extends Observable {
             event.consume();
         });
 
-        t.setOnCloseRequest(event -> {
+        tab.setOnCloseRequest(event -> {
             this.setIsActive(false);
         });
 
         titleLabel.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
 
-                loadViewContextMenu(parent).show(titleLabel, Side.TOP,
-                        event.getX(), event.getY());
+                loadViewContextMenu(parent).show(titleLabel, Side.TOP, event.getX(), event.getY());
         });
 
-        return t;
+        return tab;
     }
 
     private ContextMenu loadViewContextMenu(ViewController parent) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ViewContextMenuController.class
-                .getResource("ViewContextMenu.fxml"));
+        loader.setLocation(ViewContextMenuController.class.getResource("ViewContextMenu.fxml"));
         ContextMenu content;
         try {
             content = loader.load();
         }
         catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }
@@ -172,7 +167,7 @@ public class ViewInformation extends Observable {
         controller.setMainApp(parent.getMainApp(), parent.getContext());
         controller.setParentView(this);
         content.setOnShowing((event) -> {
-            // select current position
+            // TODO select current position
         });
         return content;
     }

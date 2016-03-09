@@ -11,7 +11,6 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
-import de.uka.ilkd.key.rule.RuleApp;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 
@@ -24,8 +23,6 @@ public class MainSequentViewController extends ViewController {
 
     @FXML
     private SequentViewController sequentViewController;
-
-    private KeYSelectionListener proofChangeListener;
 
     /*
      * (non-Javadoc)

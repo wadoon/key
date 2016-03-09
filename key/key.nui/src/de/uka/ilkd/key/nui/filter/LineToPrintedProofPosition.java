@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.nui.filter;
 
+/**
+ * A class that provides utility functionality for criteria.
+ * 
+ * @author Benedikt Gross
+ *
+ */
 public class LineToPrintedProofPosition {
     /**
      * Resolves the index of a char in the document to a line number.
