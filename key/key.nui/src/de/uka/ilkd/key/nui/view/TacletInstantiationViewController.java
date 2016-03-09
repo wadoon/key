@@ -20,7 +20,6 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposerCollection;
-import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;

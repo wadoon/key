@@ -7,8 +7,9 @@ import java.util.stream.IntStream;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 
 /**
- * A static class, used to apply a filter to a printed sequent.
- * i.e. compiles a filter and uses it to filter all lines based on the given {link PrintFilter}
+ * A static class, used to apply a filter to a printed sequent. i.e. compiles a
+ * filter and uses it to filter all lines based on the given {link PrintFilter}
+ * 
  * @author Benedikt Gross
  *
  */
@@ -17,9 +18,14 @@ public class SequentFilterer {
     /**
      * Applies a criteria to the proofString and returns all lines, that should
      * be displayed to the user after filtering.
-     * @param proofString the plain, printed proofString (the displayed proofString without html tags)
-     * @param filter The filter to be applied.
-     * @param positionTable A position table to provide access to the ast.
+     * 
+     * @param proofString
+     *            the plain, printed proofString (the displayed proofString
+     *            without html tags)
+     * @param filter
+     *            The filter to be applied.
+     * @param positionTable
+     *            A position table to provide access to the ast.
      */
     public static List<Integer> applyFilter(String proofString,
             PrintFilter filter, InitialPositionTable positionTable) {
@@ -61,21 +67,23 @@ public class SequentFilterer {
                         originalLines, proofString);
         }
 
-        if (!filter.getUseAstScope())
+        switch (filter.getScope()) {
+        case Text:
             if (filter.getBefore() != 0 || filter.getAfter() != 0) {
                 criteria = new CriterionRange(criteria, filter.getBefore(),
                         filter.getAfter(), originalLines);
             }
-
-        if (filter.getUseAstScope()) {
+            break;
+        case AST:
             criteria = new CriterionAstScope(criteria, positionTable,
                     originalLines);
-
-            // apply invert as last
             if (filter.getInvert())
                 criteria = new NotCriterion<>(criteria);
+            break;
+        case None:
+        default:
+            break;
         }
-
         return criteria;
     }
 

@@ -34,8 +34,10 @@ public class PositionTranslator {
         cssHandler = cssFileHandler;
         this.readCSS();
     }
+
     /**
      * Setter for the proofString
+     * 
      * @param proofString
      */
     public void setProofString(String proofString) {
@@ -244,9 +246,10 @@ public class PositionTranslator {
      * @return a Pair, with Pair.first = width and Pair.second = height
      */
 
-    public Pair<Double, Double> getProofHeight() { // Adjustment for Margin
+    public Pair<Double, Double> getProofDimensions() {
         this.readCSS();
-        double height = 2 * fontSize;
+        // Adjustment for Margin
+        double height = 50;
 
         Text text = new Text(" ");
         text.setFont(new Font(font, fontSize));
@@ -262,8 +265,7 @@ public class PositionTranslator {
         text.setText(longestLine);
 
         return new Pair<Double, Double>(
-                (double) Math.round(
-                        text.getLayoutBounds().getWidth() + 2 * fontSize),
+                (double) Math.round(text.getLayoutBounds().getWidth() + 50),
                 height);
     }
 

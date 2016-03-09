@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="292.0" prefWidth="277.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
+<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="314.0" prefWidth="277.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
    <children>
       <VBox AnchorPane.bottomAnchor="37.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -21,13 +21,13 @@
                         <Label text="Mode:" />
                         <GridPane>
                           <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="78.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="170.0" minWidth="10.0" prefWidth="153.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="128.0" minWidth="0.0" prefWidth="25.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="80.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="186.0" minWidth="10.0" prefWidth="185.0" />
                               <ColumnConstraints />
                           </columnConstraints>
                           <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
@@ -38,7 +38,9 @@
                                  </toggleGroup>
                               </RadioButton>
                               <RadioButton fx:id="selectionRadio" mnemonicParsing="false" text="Selection" toggleGroup="$filterMode" GridPane.rowIndex="1" />
-                              <ToggleButton fx:id="selectionFilterToggle" mnemonicParsing="false" onAction="#handleSelectionFilterToggled" prefWidth="160.0" text="(Mouse Icon)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <ToggleButton fx:id="selectionFilterToggle" alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSelectionFilterToggled" text="(Mouse Icon)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label alignment="BOTTOM_LEFT" text="Layout:" GridPane.halignment="LEFT" GridPane.rowIndex="2" />
+                              <ComboBox fx:id="filterModeBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                            </children>
                            <VBox.margin>
                               <Insets />
@@ -51,11 +53,15 @@
                            <content>
                               <VBox>
                                  <children>
-                                    <RadioButton fx:id="useTextScope" mnemonicParsing="false" text="Use text lines">
+                                    <RadioButton fx:id="useNone" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="None">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" />
+                                       </VBox.margin>
                                        <toggleGroup>
                                           <ToggleGroup fx:id="resultRange" />
                                        </toggleGroup>
                                     </RadioButton>
+                                    <RadioButton fx:id="useTextScope" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="Use text lines" toggleGroup="$resultRange" />
                                     <GridPane fx:id="resultRangeText">
                                       <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="93.0" minWidth="10.0" prefWidth="47.0" />
@@ -78,7 +84,7 @@
                                           <Insets left="25.0" />
                                        </padding>
                                     </GridPane>
-                                    <RadioButton fx:id="useAstScope" mnemonicParsing="false" text="Use term scope" toggleGroup="$resultRange" />
+                                    <RadioButton fx:id="useAstScope" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="Use term scope" toggleGroup="$resultRange" />
                                     <CheckBox fx:id="invertFilter" mnemonicParsing="false" onAction="#hanldeInvertChanged" text="Invert Filter">
                                        <VBox.margin>
                                           <Insets left="25.0" />
@@ -88,16 +94,6 @@
                               </VBox>
                            </content>
                         </TitledPane>
-                        <HBox>
-                           <children>
-                              <Label text="Layout:">
-                                 <HBox.margin>
-                                    <Insets right="45.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <ComboBox fx:id="filterModeBox" prefHeight="25.0" prefWidth="163.0" />
-                           </children>
-                        </HBox>
                      </children>
                   </VBox>
                </center>
