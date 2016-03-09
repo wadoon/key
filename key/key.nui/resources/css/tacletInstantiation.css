@@ -8,9 +8,22 @@
 }
 
 .text-area-table-cell:editable {
-    -fx-padding: 0.0;
+    -fx-padding: 3 5 3 5;
     -fx-background-insets: 0.0;
     -fx-border-color: red;
     -fx-background-color: white;
     -fx-focus-color: -fx-control-inner-background;
+}
+
+.text-area {
+    -fx-background-insets: 0;
+    -fx-background-color: transparent, white, transparent, white;
+}
+
+.text-area .content {
+    -fx-background-color: transparent, white, transparent, white;
+}
+
+.text-area .content {
+    -fx-padding: 0 0 0 0;
 }
