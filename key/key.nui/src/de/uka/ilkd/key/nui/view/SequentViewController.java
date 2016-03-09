@@ -322,7 +322,7 @@ public class SequentViewController extends ViewController {
         // styling update.
         if (sequentChanged && sequentLoaded) {
             sequentChanged = false;
-            Pair<Double, Double> newDimensions = posTranslator.getProofHeight();
+            Pair<Double, Double> newDimensions = posTranslator.getProofDimensions();
 
             // JavaFX 8 has MaxHeight 8192. If bigger, an error will occur.
             // Shall be patched in JDK9

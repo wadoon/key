@@ -34,6 +34,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -55,8 +56,7 @@ public class CssStylerViewController extends ViewController {
     private ObservableList<String> fontStyle = FXCollections
             .observableArrayList("normal", "italic");
     private ObservableList<String> fontFamily = FXCollections
-            .observableArrayList("Arial", "Liberation Mono", "Courier New",
-                    "Comic Sans", "Times New Roman");
+            .observableArrayList(Font.getFontNames());
 
     private TreeItem<String> rootItem;
 
@@ -530,8 +530,9 @@ public class CssStylerViewController extends ViewController {
     private void handleSave() {
         if (cssFileHandler.getPath().isEmpty()) {
             handleSaveAs();
-        }
-        writeToCss();
+        }else{
+            writeToCss();
+        }        
     }
 
     @FXML
@@ -541,9 +542,8 @@ public class CssStylerViewController extends ViewController {
 
         if (file != null) {
             cssFileHandler.setPath(file.getAbsolutePath());
+            writeToCss();
         }
-        writeToCss();
-
     }
 
     @FXML
