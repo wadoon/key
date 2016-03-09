@@ -20,6 +20,7 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposerCollection;
+import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -192,7 +193,7 @@ public class TacletInstantiationViewController extends ViewController {
             // Pseudo class for rows that do not allow editing.
             PseudoClass completedCssClass = PseudoClass
                     .getPseudoClass("completed");
-            
+
             // Cell factory which makes the appropriate cells editable
             instantiationColumn.setCellFactory(cellData -> {
                 TableCell<TacletInstantiationRowModel, String> cell = defaultTextFieldCellFactory
@@ -280,33 +281,25 @@ public class TacletInstantiationViewController extends ViewController {
         try {
             TacletApp app = models[current()].createTacletApp();
             if (app == null) {
-                Alert alert = new Alert(AlertType.ERROR);
-                alert.setHeaderText("Rule Application Failure");
-                alert.setContentText("Could not apply rule");
-                System.out.println("application failure");
+                showErrorAlert("Rule Application Failure",
+                        "Could not apply rule");
                 return;
             }
-            System.out.println("applyInteractive");
             mediator.getUI().getProofControl().applyInteractive(app, goal);
         }
         catch (Exception exc) {
-            /*
-             * if (exc instanceof SVInstantiationExceptionWithPosition) {
-             * errorPositionKnown(exc.getMessage(),
-             * ((SVInstantiationExceptionWithPosition) exc).getRow(),
-             * ((SVInstantiationExceptionWithPosition) exc).getColumn(),
-             * ((SVInstantiationExceptionWithPosition) exc).inIfSequent()); }
-             */
-            // ExceptionDialog.showDialog(TacletMatchCompletionDialog.this,
-            // exc);
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Ooops.");
-            alert.setContentText("Something has gone wrong..");
-            System.out.println("oops");
+            showErrorAlert("Rule Application Failure", exc.toString());
             return;
         }
         InstantiationFileHandler.saveListFor(models[current()]);
         handleClose(event);
+    }
+
+    private void showErrorAlert(String header, String message) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        alert.show();
     }
 
     /**

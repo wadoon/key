@@ -6,11 +6,15 @@ package de.uka.ilkd.key.nui.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -43,12 +47,12 @@ public class SequentPrinter {
 
     private TreeSet<Integer> keySet = new TreeSet<Integer>();
 
-    // HashMap maps Index in ProofString to Styling Info Array
-    // Array holds Styling Info separated for every Styling Case.
-    // Array Slots Defined in StylePos Enum
-    // ArrayList inside of Array: List of all Tags
-    private HashMap<Integer, ArrayList<String>[]> openTagsAtIndex = new HashMap<Integer, ArrayList<String>[]>();;
-    private HashMap<Integer, ArrayList<String>[]> closeTagsAtIndex = new HashMap<Integer, ArrayList<String>[]>();;
+    // Outer Map maps Index in ProofString to Styling Info Map
+    // Inner Map holds Styling Info separated for every Styling Case.
+    // It's Keys are defined in the StylePos enum
+    // List: List of all Tags
+    private Map<Integer, Map<Integer, List<String>>> openTagsAtIndex = new HashMap<Integer, Map<Integer, List<String>>>();;
+    private Map<Integer, Map<Integer, List<String>>> closeTagsAtIndex = new HashMap<Integer, Map<Integer, List<String>>>();;
 
     private ArrayList<Integer> lessThenList = new ArrayList<Integer>();
 
@@ -98,13 +102,13 @@ public class SequentPrinter {
         Stack<Pair<Integer, String>> tagStack = new Stack<>();
         Stack<Pair<Integer, String>> saveTagStack = new Stack<>();
 
-        ArrayList<String> insertTagList;
+        List<String> insertTagList;
 
         for (Integer i : keySet) {
             // Apply Close Tags first
             if (closeTagsAtIndex.containsKey(i)) {
                 for (int j = StylePos.values().length - 1; j >= 0; j--) {
-                    insertTagList = closeTagsAtIndex.get(i)[j];
+                    insertTagList = closeTagsAtIndex.get(i).get(j);
                     if (insertTagList == null)
                         continue;
                     for (String insertTag : insertTagList) {
@@ -134,7 +138,7 @@ public class SequentPrinter {
             // Apply OpenTags
             if (openTagsAtIndex.containsKey(i)) {
                 for (int j = 0; j < StylePos.values().length; j++) {
-                    insertTagList = openTagsAtIndex.get(i)[j];
+                    insertTagList = openTagsAtIndex.get(i).get(j);
                     if (insertTagList == null)
                         continue;
                     for (String insertTag : insertTagList) {
@@ -385,33 +389,32 @@ public class SequentPrinter {
      *            the map to be inserted into
      */
     private void putTag(int index, StylePos arrayPos, String tag,
-            HashMap<Integer, ArrayList<String>[]> map) {
+            Map<Integer, Map<Integer, List<String>>> map) {
 
         if (map.get(index) == null) {
             // If the Map Entry does not exist, create new Entry and call itself
             // again.
-            map.put(index, new ArrayList[StylePos.values().length]);
-            putTag(index, arrayPos, tag, map);
+            map.put(index, new HashMap<Integer, List<String>>());
         }
-        ArrayList<String>[] mapValue = map.get(index);
+        Map<Integer, List<String>> mapValue = map.get(index);
 
         // ArrayList<String> tagList = mapValue[arrayPos.slotPosition];
         // If Array entry is null make ArrayList and add tag
-        if (mapValue[arrayPos.slotPosition] == null) {
-            mapValue[arrayPos.slotPosition] = new ArrayList<>();
-            mapValue[arrayPos.slotPosition].add(tag);
+        if (!mapValue.containsKey(arrayPos.slotPosition)) {
+            mapValue.put(arrayPos.slotPosition, new ArrayList<String>());
+            mapValue.get(arrayPos.slotPosition).add(tag);
         }
         else {
             // If Tag is empty, one entry shall be removed
             if (tag.isEmpty()) {
-                mapValue[arrayPos.slotPosition]
-                        .remove(mapValue[arrayPos.slotPosition].size() - 1);
+                mapValue.get(arrayPos.slotPosition)
+                        .remove(mapValue.get(arrayPos.slotPosition).size() - 1);
             }
             else {
                 // If the Array entry is not null, the tag can be appended.
                 // Solves the problem with double consecutive chars
                 // ("wellformed")
-                mapValue[arrayPos.slotPosition].add(tag);
+                mapValue.get(arrayPos.slotPosition).add(tag);
             }
 
         }
@@ -427,9 +430,9 @@ public class SequentPrinter {
      *            the StylePosition
      * @param tag
      *            the opening tag const or empty String
-     * @return the HashMap with all the openTag indices
+     * @return the Map with all the openTag indices
      */
-    private HashMap<Integer, ArrayList<String>[]> putOpenTag(int index,
+    private Map<Integer, Map<Integer, List<String>>> putOpenTag(int index,
             StylePos arrayPos, String tag) {
         if (tag.isEmpty()) {
             putTag(index, arrayPos, tag, openTagsAtIndex);
@@ -451,9 +454,9 @@ public class SequentPrinter {
      *            the StylePosition
      * @param tag
      *            the closingTag const or empty String
-     * @return the HashMap with all the closeTag indices
+     * @return the Map with all the closeTag indices
      */
-    private HashMap<Integer, ArrayList<String>[]> putCloseTag(int index,
+    private Map<Integer, Map<Integer, List<String>>> putCloseTag(int index,
             StylePos arrayPos, String tag) {
         putTag(index, arrayPos, tag, closeTagsAtIndex);
         return closeTagsAtIndex;
