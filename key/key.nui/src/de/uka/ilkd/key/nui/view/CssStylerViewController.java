@@ -48,7 +48,6 @@ public class CssStylerViewController extends ViewController {
     private LinkedHashMap<String, CssRule> ruleMap = new LinkedHashMap<>();
     private String selected;
     private CssFileHandler cssFileHandler;
-    private PreviewPrinter previewPrinter = new PreviewPrinter();
     private HashMap<String, String> masterRules;
 
     private ObservableList<String> fontWeight = FXCollections
@@ -465,7 +464,7 @@ public class CssStylerViewController extends ViewController {
         if (selected == null || !ruleMap.containsKey(selected)) {
             return;
         }
-        previewWeb.getEngine().loadContent(previewPrinter.printPreview(
+        previewWeb.getEngine().loadContent(PreviewPrinter.printPreview(
                 cssFileHandler.parsedRulestoString(), ruleMap.get(selected)));
     }
 
