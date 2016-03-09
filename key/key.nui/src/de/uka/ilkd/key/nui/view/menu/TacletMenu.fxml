@@ -27,14 +27,14 @@
 
 		<MenuItem mnemonicParsing="false" fx:id="copyToClipboard"
 			onAction="#handleCopyToClipboard" text="Copy to clipboard" />
-		<MenuItem mnemonicParsing="false" fx:id="createAbbr"
-			onAction="#handleCreateAbbriviation" text="Create abbriviation" />
+		<MenuItem mnemonicParsing="false" fx:id="createAbbr" visible="false"
+			onAction="#handleCreateAbbreviation" text="Create abbreviation" />
 		<MenuItem mnemonicParsing="false" fx:id="enableAbbr" visible="false"
-			onAction="#handleEnableAbbriviation" text="Enable abbriviation" />
+			onAction="#handleEnableAbbreviation" text="Enable abbreviation" />
 		<MenuItem mnemonicParsing="false" fx:id="disableAbbr"
-			visible="false" onAction="#handleDisableAbbriviation" text="Disable abbriviation" />
+			visible="false" onAction="#handleDisableAbbreviation" text="Disable abbreviation" />
 		<MenuItem mnemonicParsing="false" fx:id="changeAbbr" visible="false"
-			onAction="#handleChangeAbbriviation" text="Change abbriviation" />
+			onAction="#handleChangeAbbreviation" text="Change abbreviation" />
 
 	</items>
 </ContextMenu>

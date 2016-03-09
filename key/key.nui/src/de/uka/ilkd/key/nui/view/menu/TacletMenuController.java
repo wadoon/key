@@ -1,12 +1,11 @@
 package de.uka.ilkd.key.nui.view.menu;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Optional;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
@@ -17,8 +16,10 @@ import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu.TacletAppComparator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.view.SequentViewController;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -29,16 +30,19 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 
 /**
  * 
  * Copied from TacletMenu and adapted to JavaFX style. This is NOT a menu
- * anymore but a controller. There is a field rootMenu to access the actual
+ * anymore but a view controller. There is a field rootMenu to access the actual
  * menu.
  * 
  * @see TacletMenu
@@ -105,21 +109,66 @@ public class TacletMenuController extends ViewController {
     private MenuItem changeAbbr;
     @FXML
     private ProofMacroMenuController proofMacroMenuController;
+    private Goal goal;
+    private PosInOccurrence occ;
 
-    public void init(PosInSequent pos, ViewController parentController) {
-        this.pos = pos;
-        this.parentController = (SequentViewController) parentController;
+    public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
+            TacletAppComparator comp) {
+        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
 
-        if (pos != null) {
-            MediatorProofControl c = mediator.getUI().getProofControl();
-            Goal goal = mediator.getSelectedGoal();
-            PosInOccurrence occ = pos.getPosInOccurrence();
+        List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
 
-            final ImmutableList<BuiltInRule> builtInRules = c.getBuiltInRule(goal, occ);
-            createTacletMenu(removeRewrites(c.getFindTaclet(goal, occ)).prepend(c.getRewriteTaclet(goal, occ)),
-                    c.getNoFindTaclet(goal), builtInRules);
-            proofMacroMenuController.init(mediator, pos.getPosInOccurrence());
+        for (final TacletApp app : finds) {
+            list.add(app);
         }
+
+        Collections.sort(list, comp);
+
+        for (final TacletApp app : list) {
+            result = result.prepend(app);
+        }
+
+        return result;
+    }
+
+    @Override
+    public void initializeAfterLoadingFxml() {
+        mediator = getContext().getKeYMediator();
+        goal = mediator.getSelectedGoal();
+        comp = new TacletAppComparator();
+        insertHiddenController.setMainApp(getMainApp(), getContext());
+    };
+
+    /**
+     * Use this method to pass additional Information that would normally given
+     * to the constructor.
+     * 
+     * @param pos
+     *            the position in the sequent for which the rules will be
+     *            applied
+     * @param parentController
+     *            the SequentViewController that requested the menu
+     * @throws IllegalArgumentException when pos is null
+     */
+    public void init(PosInSequent pos, ViewController parentController) throws IllegalArgumentException{
+        if (pos == null)
+            throw new IllegalArgumentException("Argument pos must not be null.");
+        this.pos = pos;
+        
+        this.parentController = (SequentViewController) parentController; 
+        
+        occ = pos.getPosInOccurrence();
+        
+        MediatorProofControl c = mediator.getUI().getProofControl();
+
+        final ImmutableList<BuiltInRule> builtInRules = c
+                .getBuiltInRule(goal, occ);
+        createTacletMenu(
+                removeRewrites(c.getFindTaclet(goal, occ))
+                        .prepend(c.getRewriteTaclet(goal, occ)),
+                c.getNoFindTaclet(goal), builtInRules);
+        
+        proofMacroMenuController.init(mediator, occ);
     }
 
     /**
@@ -129,14 +178,16 @@ public class TacletMenuController extends ViewController {
      *            the IList<Taclet> from where the RewriteTaclet are removed
      * @return list without RewriteTaclets
      */
-    private static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
+    private static ImmutableList<TacletApp> removeRewrites(
+            ImmutableList<TacletApp> list) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
         Iterator<TacletApp> it = list.iterator();
 
         while (it.hasNext()) {
             TacletApp tacletApp = it.next();
             Taclet taclet = tacletApp.taclet();
-            result = (taclet instanceof RewriteTaclet ? result : result.prepend(tacletApp));
+            result = (taclet instanceof RewriteTaclet ? result
+                    : result.prepend(tacletApp));
         }
         return result;
     }
@@ -148,13 +199,14 @@ public class TacletMenuController extends ViewController {
      * @param noFind
      * @param builtInList
      */
-    private void createTacletMenu(ImmutableList<TacletApp> find, ImmutableList<TacletApp> noFind,
+    private void createTacletMenu(ImmutableList<TacletApp> find,
+            ImmutableList<TacletApp> noFind,
             ImmutableList<BuiltInRule> builtInList) {
 
         ImmutableList<TacletApp> toAdd = sort(find, comp);
         boolean rulesAvailable = find.size() > 0;
 
-        if (pos != null && pos.isSequent()) {
+        if (pos.isSequent()) {
             rulesAvailable |= noFind.size() > 0;
             toAdd = toAdd.prepend(noFind);
         }
@@ -165,6 +217,10 @@ public class TacletMenuController extends ViewController {
         else {
             noRules.setVisible(true);
         }
+        
+        if (occ != null)
+            createAbbrevSection(pos.getPosInOccurrence().subTerm());
+
     }
 
     private void createMenuItems(ImmutableList<TacletApp> taclets) {
@@ -176,7 +232,8 @@ public class TacletMenuController extends ViewController {
                 continue;
             }
 
-            final TacletMenuItem item = new TacletMenuItem(app, mediator.getNotationInfo(), mediator.getServices());
+            final TacletMenuItem item = new TacletMenuItem(app,
+                    mediator.getNotationInfo(), mediator.getServices());
             item.setOnAction(this::handleRuleApplication);
 
             if (insertHiddenController.isResponsible(item)) {
@@ -204,73 +261,132 @@ public class TacletMenuController extends ViewController {
 
     }
 
-    public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds, TacletAppComparator comp) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
-
-        List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
-
-        for (final TacletApp app : finds) {
-            list.add(app);
+    private void createAbbrevSection(Term t) {
+        AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
+        if (scm.containsTerm(t)) {
+            changeAbbr.setVisible(true);
+            if (scm.isEnabled(t)) {
+                disableAbbr.setVisible(true);
+            }
+            else {
+                enableAbbr.setVisible(true);
+            }
         }
-
-        Collections.sort(list, comp);
-
-        for (final TacletApp app : list) {
-            result = result.prepend(app);
+        else {
+            createAbbr.setVisible(true);
         }
-
-        return result;
     }
-
-    @Override
-    public void initialize(URL arg0, ResourceBundle arg1) {
-
-    }
-
-    @Override
-    public void initializeAfterLoadingFxml() {
-        mediator = getContext().getKeYMediator();
-        comp = new TacletAppComparator();
-        insertHiddenController.setMainApp(getMainApp(), getContext());
-    };
 
     public void handleRuleApplication(ActionEvent event) {
-        Goal goal = mediator.getSelectedGoal();
-        mediator.getUI().getProofControl().selectedTaclet(((TacletMenuItem) event.getSource()).getTaclet(), goal,
+        mediator.getUI().getProofControl().selectedTaclet(
+                ((TacletMenuItem) event.getSource()).getTaclet(), goal,
                 pos.getPosInOccurrence());
     }
 
     @FXML
     private void handleFocussedRuleApplication(ActionEvent event) {
-        mediator.getUI().getProofControl().startFocussedAutoMode(pos.getPosInOccurrence(), mediator.getSelectedGoal());
+        mediator.getUI().getProofControl().startFocussedAutoMode(
+                pos.getPosInOccurrence(), mediator.getSelectedGoal());
     }
 
     @FXML
     private void handleCopyToClipboard(ActionEvent event) {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
-        content.putString(parentController.getProofString().substring(pos.getBounds().start(), pos.getBounds().end()));
+        content.putString(parentController.getProofString()
+                .substring(pos.getBounds().start(), pos.getBounds().end()));
         clipboard.setContent(content);
     }
 
-    @FXML
-    private void handleCreateAbbriviation(ActionEvent event) {
-        // TODO implement
+    private boolean validateAbbreviation(String s) {
+        if (s == null || s.length() == 0)
+            return false;
+        for (int i = 0; i < s.length(); i++) {
+            if (!((s.charAt(i) <= '9' && s.charAt(i) >= '0')
+                    || (s.charAt(i) <= 'z' && s.charAt(i) >= 'a')
+                    || (s.charAt(i) <= 'Z' && s.charAt(i) >= 'A')
+                    || s.charAt(i) == '_'))
+                return false;
+        }
+        return true;
     }
 
     @FXML
-    private void handleEnableAbbriviation(ActionEvent event) {
-        // TODO implement
+    private void handleCreateAbbreviation(ActionEvent event) {
+        if (occ.posInTerm() != null) {
+            final String oldTerm = occ.subTerm().toString();
+            final String term = oldTerm.length() > 200
+                    ? oldTerm.substring(0, 200) : oldTerm;
+            abbreviationDialog("Create Abbreviation",
+                    "Enter abbreviation for term: \n" + term + "\n", null, occ,
+                    false);
+        }
     }
 
     @FXML
-    private void handleDisableAbbriviation(ActionEvent event) {
-        // TODO implement
+    private void handleChangeAbbreviation(ActionEvent event) {
+        if (occ.posInTerm() != null) {
+            abbreviationDialog("Change Abbreviation",
+                    "Enter abbreviation for term: \n"
+                            + occ.subTerm().toString(),
+                    mediator.getNotationInfo().getAbbrevMap()
+                            .getAbbrev(occ.subTerm()).substring(1),
+                    occ, true);
+        }
+    }
+
+    private void abbreviationDialog(String header, String message,
+            String inputText, PosInOccurrence occ, boolean change) {
+        TextInputDialog dialog = new TextInputDialog(inputText);
+        dialog.setHeaderText(header);
+        dialog.setContentText(message);
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(abbreviation -> {
+            if (abbreviation != null) {
+                if (!validateAbbreviation(abbreviation)) {
+                    Alert alert = new Alert(AlertType.INFORMATION);
+                    alert.setHeaderText("Sorry");
+                    alert.setContentText(
+                            "Only letters, numbers and '_' are allowed for Abbreviations");
+                    alert.show();
+                }
+                else {
+                    try {
+                        if (change)
+                            mediator.getNotationInfo().getAbbrevMap()
+                                    .changeAbbrev(occ.subTerm(), abbreviation);
+                        else
+                            mediator.getNotationInfo().getAbbrevMap()
+                                    .put(occ.subTerm(), abbreviation, true);
+                        parentController.forceRefresh();
+                    }
+                    catch (Exception e) {
+                        Alert alert = new Alert(AlertType.ERROR);
+                        alert.setHeaderText("Something has gone wrong.");
+                        alert.setContentText(e.getMessage());
+                        alert.show();
+                    }
+                }
+            }
+        });
     }
 
     @FXML
-    private void handleChangeAbbriviation(ActionEvent event) {
-        // TODO implement
+    private void handleEnableAbbreviation(ActionEvent event) {
+        if (occ.posInTerm() != null) {
+            mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(),
+                    true);
+            parentController.forceRefresh();
+        }
+    }
+
+    @FXML
+    private void handleDisableAbbreviation(ActionEvent event) {
+        if (occ.posInTerm() != null) {
+            mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(),
+                    false);
+            parentController.forceRefresh();
+        }
     }
 
 }

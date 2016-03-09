@@ -61,7 +61,7 @@ public class SequentViewController extends ViewController {
     private InitialPositionTable abstractSyntaxTree;
     private String proofString;
     private WebEngine webEngine;
-    private NotationInfo notationInfo = new NotationInfo();
+    private NotationInfo notationInfo;
     private Services services;
     private Sequent sequent;
     private FilterChangedEventArgs lastFilter = null;
@@ -194,6 +194,7 @@ public class SequentViewController extends ViewController {
 
     @Override
     public void initializeAfterLoadingFxml() {
+        notationInfo = getContext().getKeYMediator().getNotationInfo();
         getContext().getFilterChangedEvent().addHandler(eventArgs -> {
             apply(eventArgs);
             updateView();
@@ -271,6 +272,7 @@ public class SequentViewController extends ViewController {
     }
 
     /**
+     * 
      * Enables/Disables Unicode.
      */
     @FXML
@@ -289,6 +291,18 @@ public class SequentViewController extends ViewController {
     @FXML
     private void useRegex() {
         printer.setUseRegex(checkBoxRegexSearch.isSelected());
+    }
+
+    /**
+     * Forces the creation of a new LogicPrinter and syntax tree and reloads the
+     * webview. Use this after changes of the NotationInfo of the mediator.
+     */
+    public void forceRefresh() {
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
+        abstractSyntaxTree = logicPrinter.getInitialPositionTable();
+        printSequent();
+        updateView();
     }
 
     /**
@@ -314,7 +328,7 @@ public class SequentViewController extends ViewController {
         webEngine.loadContent(s);
     }
 
-    private void updateView() {
+    public void updateView() {
         // Redraw WebArea to use optimal Height. Called here as PosTranslater
         // needs to know the ProofString.
         // If-clause added for optimization purposes. Only when the Sequent
@@ -327,14 +341,14 @@ public class SequentViewController extends ViewController {
             // JavaFX 8 has MaxHeight 8192. If bigger, an error will occur.
             // Shall be patched in JDK9
             if (newDimensions.second > 8192) {
-                System.out.println(
-                        "Proof might be too large with Size " + newDimensions.second);
+                System.out.println("Proof might be too large with Size "
+                        + newDimensions.second);
                 textArea.setPrefHeight(8192);
             }
             else {
                 textArea.setPrefHeight(newDimensions.second);
             }
-            
+
             textArea.setPrefWidth(newDimensions.first);
             textArea.autosize();
         }
@@ -410,27 +424,26 @@ public class SequentViewController extends ViewController {
                 try {
                     // XXX loader stuff should be moved
                     // XXX menu should only be loaded once
-
-                    FXMLLoader loader = new FXMLLoader();
-                    loader.setLocation(TacletMenuController.class
-                            .getResource("TacletMenu.fxml"));
-
                     KeYMediator mediator = getContext().getKeYMediator();
 
                     Goal goal = mediator.getSelectedGoal();
                     if (goal != null) {
+                        int idx = posTranslator.getCharIdxUnderPointer(event);
+                        PosInSequent pos = abstractSyntaxTree.getPosInSequent(
+                                idx, new IdentitySequentPrintFilter(sequent));
 
+                        if (pos == null)
+                            return;
+
+                        FXMLLoader loader = new FXMLLoader();
+                        loader.setLocation(TacletMenuController.class
+                                .getResource("TacletMenu.fxml"));
                         tacletMenu = loader.load();
                         // Give the controller access to the main app.
                         TacletMenuController controller = loader
                                 .getController();
                         controller.setMainApp(this.getMainApp(),
                                 this.getContext());
-
-                        int idx = posTranslator.getCharIdxUnderPointer(event);
-                        PosInSequent pos = abstractSyntaxTree.getPosInSequent(
-                                idx, new IdentitySequentPrintFilter(sequent));
-
                         controller.init(pos, this);
 
                         tacletMenu.show(textArea, event.getScreenX(),
@@ -444,7 +457,8 @@ public class SequentViewController extends ViewController {
                     }
                 }
                 catch (IOException e) {
-                    System.err.print("Could not load TacletMenu.fxml");
+                    e.printStackTrace();
+                    System.err.print("Could not load TacletMenu.\n");
                 }
             }
         }

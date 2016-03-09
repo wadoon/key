@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.nui.view.menu;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import org.key_project.util.reflection.ClassLoaderUtil;
 
@@ -21,7 +19,7 @@ import javafx.scene.control.MenuItem;
 
 /**
  * Copied from ProofMacroMenu and adapted to JavaFX style. This is NOT a menu
- * anymore but a controller. There is a field rootMenu to access the actual
+ * anymore but a view controller. There is a field rootMenu to access the actual
  * menu.
  * 
  * @see ProofMacroMenu
@@ -38,22 +36,12 @@ public class ProofMacroMenuController extends ViewController {
      * This is used as iteration source in other parts of KeY's ui.
      */
     public static final Iterable<ProofMacro> REGISTERED_MACROS = ClassLoaderUtil.loadServices(ProofMacro.class);
-
-    /**
-     * The number of defined macros.
-     */
-    // TODO the following line is useless. "numberOfMacros" never gets used. can
-    // it be removed?
-    // private int numberOfMacros;
-
+    
     public void init(KeYMediator mediator, PosInOccurrence posInOcc) {
         // Macros are grouped according to their category.
         // Store the sub menus in this map.
         Map<String, Menu> submenus = new HashMap<String, Menu>();
 
-        // TODO the following line is useless. "numberOfMacros" and "count"
-        // never get used. can they be removed?
-        // int count = 0;
         Node node = mediator.getSelectedNode();
         for (ProofMacro macro : REGISTERED_MACROS) {
 
@@ -74,8 +62,6 @@ public class ProofMacroMenuController extends ViewController {
                 String category = macro.getCategory();
                 Menu submenu = rootMenu;
                 if (category != null) {
-                    // find the submenu to be used. Create and store if
-                    // necessary.
                     submenu = submenus.get(category);
                     if (submenu == null) {
                         submenu = new Menu(category);
@@ -85,39 +71,15 @@ public class ProofMacroMenuController extends ViewController {
                 }
 
                 submenu.getItems().add(menuItem);
-                // TODO the following line is useless. "numberOfMacros" and
-                // "count" never get used. can they be removed?
-                // count++;
             }
         }
-
-        /*
-         * TODO if (Main.isExperimentalMode()) { add(new MenuItem(new
-         * ProofScriptAction(mediator))); }
-         */
-
-        // TODO mediator.enableWhenProofLoaded(this);
-
-        // TODO the following line is useless. "numberOfMacros" never gets used
-        // again. can it be removed?
-        // this.numberOfMacros = count;
-
     }
 
     private MenuItem createMenuItem(final ProofMacro macro, final KeYMediator mediator,
             final PosInOccurrence posInOcc) {
 
         MenuItem menuItem = new MenuItem(macro.getName());
-        // TODO menuItem.setToolTipText(macro.getDescription());
 
-        // TODO the following line is useless. "macroKey" doesn't get used yet.
-        // can it be removed?
-        // final KeyStroke macroKey = KeyStrokeManager.get(macro);
-
-        // if (macroKey != null && posInOcc == null) { // currently only for
-        // global macro applications
-        // TODO menuItem.setAccelerator(macroKey);
-        // }
         menuItem.setOnAction(e -> {
             if (mediator.isInAutoMode()) {
                 return;
@@ -132,9 +94,5 @@ public class ProofMacroMenuController extends ViewController {
         return menuItem;
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
-    }
 
 }
