@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.nui.view.menu;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -19,10 +16,6 @@ public class ViewContextMenuController extends ViewController {
      */
     public void setParentView(ViewInformation view) {
         viewInformation = view;
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
     }
 
     @FXML
