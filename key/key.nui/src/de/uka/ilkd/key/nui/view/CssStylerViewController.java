@@ -4,12 +4,10 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
@@ -88,11 +86,6 @@ public class CssStylerViewController extends ViewController {
 
     @FXML
     private GridPane propValGrid;
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
-    }
 
     @Override
     public void initializeAfterLoadingFxml() {

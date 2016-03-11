@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.nui.view;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
@@ -14,11 +11,6 @@ public class DebugViewController extends ViewController {
 
     @FXML
     private TextArea outputText;
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
-    }
 
     @Override
     public void initializeAfterLoadingFxml() {

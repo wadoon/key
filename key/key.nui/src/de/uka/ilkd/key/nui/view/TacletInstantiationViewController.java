@@ -2,8 +2,6 @@ package de.uka.ilkd.key.nui.view;
 
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.function.Function;
 
 import org.key_project.util.collection.ImmutableList;
@@ -73,10 +71,6 @@ public class TacletInstantiationViewController extends ViewController {
     private Goal goal;
 
     private InstantiationProposerCollection instantiationProposers;
-
-    @Override
-    public void initialize(URL arg0, ResourceBundle arg1) {
-    }
 
     @Override
     public void initializeAfterLoadingFxml() {

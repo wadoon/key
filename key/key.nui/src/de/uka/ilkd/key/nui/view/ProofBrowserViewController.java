@@ -59,7 +59,7 @@ public class ProofBrowserViewController extends ViewController {
         public void selectedNodeChanged(KeYSelectionEvent event) {
             Platform.runLater(() -> {
                 proof = event.getSource().getSelectedProof();
-                updateImage(proof);
+                updateProofIcon(proof);
                 proofBrowserTreeView.getSelectionModel().getSelectedItem().setGraphic(proofIcon);
             });
         }
@@ -106,7 +106,7 @@ public class ProofBrowserViewController extends ViewController {
     /**
      * Updates the image for a given proof.
      */
-    private void updateImage(Proof proof) {
+    private void updateProofIcon(Proof proof) {
         ProofStatus ps = proof.mgt().getStatus();
         if (ps.getProofClosed()) {
             proofIcon = new ImageView(CLOSED_PROOF_IMAGE);
@@ -130,7 +130,7 @@ public class ProofBrowserViewController extends ViewController {
         String proofName = proof.name().toString();
         listOfProofs.put(proofName, proof);
 
-        updateImage(proof);
+        updateProofIcon(proof);
 
         TreeItem<String> newProof = new TreeItem<String>(proofName, proofIcon);
         boolean found = false;

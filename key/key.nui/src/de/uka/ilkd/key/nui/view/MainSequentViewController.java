@@ -3,9 +3,6 @@
  */
 package de.uka.ilkd.key.nui.view;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.nui.KeYView;
@@ -23,17 +20,6 @@ public class MainSequentViewController extends ViewController {
 
     @FXML
     private SequentViewController sequentViewController;
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javafx.fxml.Initializable#initialize(java.net.URL,
-     * java.util.ResourceBundle)
-     */
-    @Override
-    public void initialize(URL arg0, ResourceBundle arg1) {
-
-    }
 
     @Override
     public void initializeAfterLoadingFxml() {
