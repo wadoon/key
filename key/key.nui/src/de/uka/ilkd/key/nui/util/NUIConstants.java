@@ -11,10 +11,7 @@ import java.util.HashMap;
  *
  */
 public final class NUIConstants {
-
-    private static HashMap<Class<? extends Object>, String> classMap = new HashMap<>();
     private static HashMap<Class<? extends Object>, Boolean> classEnabledMap = new HashMap<>();
-    private static HashMap<String, String> classDescriptionMap = new HashMap<>();
 
     public final static String OPEN_TAG_BEGIN = "<span class=\"";
     public final static String OPEN_TAG_END = "\">";
@@ -59,9 +56,8 @@ public final class NUIConstants {
     public final static String UPDATESV_TAG = "updateSV";
     public final static String VARSV_TAG = "varSV";
     public final static String WARYSUBSTOP_TAG = "warySubstOp";
-
-    public final static String DEFAULT_STYLE_CSS_PATH = "resources/css/sequentStyle.css";
-    public final static String CSS_RESET_TO_DEFAULT_PATH = "resources/css/sequentStyleDefault.css";
+    
+    public final static String DEFAULT_XML_PATH = "resources/xml/cssList.xml";
 
     public final static String DEFAULT_SEQUENT_CSS = "pre{background-color:#FFFFFF;color:#000000;font-weight:normal;font-size:16px;font-family:Courier New;font-style:normal;}"
             + ".highlighted{background-color:#FFFF00;color:inherit;font-weight:inherit;font-style:inherit;}"
@@ -101,162 +97,11 @@ public final class NUIConstants {
             + ".varSV{background-color:violet;color:#000000;font-weight:inherit;font-style:inherit;}"
             + ".warySubstOp{background-color:#2fedff;color:#FF0000;font-weight:inherit;font-style:italic;}";
 
-    static {
-        // Defines if this AST Class shall be highlighted
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Equality.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Function.class, false);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Junctor.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.LogicVariable.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Quantifier.class, true);
-        classEnabledMap.put(
-                de.uka.ilkd.key.logic.op.SortDependingFunction.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Modality.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ObserverFunction.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ElementaryUpdate.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.IfExThenElse.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.IfThenElse.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ModalOperatorSV.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramConstant.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramMethod.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.ProgramVariable.class,
-                true);
-        classEnabledMap.put(
-                de.uka.ilkd.key.logic.op.SchemaVariableFactory.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.SkolemTermSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.SubstOp.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.TermLabelSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.TermSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.Transformer.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.UpdateApplication.class,
-                true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.UpdateJunctor.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, true);
-        classEnabledMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class, true);
-
-        // Define Style Span for each Class
-        classMap.put(de.uka.ilkd.key.logic.op.Equality.class, EQUALITY_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.Function.class, FUNCTION_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.LocationVariable.class,
-                LOCATIONVAR_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.Junctor.class, JUNCTOR_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.LogicVariable.class,
-                LOCATIONVAR_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.Quantifier.class, QUANTIFIER_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.SortDependingFunction.class,
-                SORTDEPFUNC_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.Modality.class, MODALITY_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.ObserverFunction.class,
-                OBSERVERFUNC_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.ElementaryUpdate.class,
-                ELEMUPDATE_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.FormulaSV.class, FORMULASV_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.IfExThenElse.class,
-                IFEXTHENELSE_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.IfThenElse.class, IFTHENELSE_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.ModalOperatorSV.class,
-                MODALOPSV_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramConstant.class,
-                PROGCONST_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramMethod.class,
-                PROGMETH_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramSV.class, PROGSV_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.ProgramVariable.class,
-                PROGVAR_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.SchemaVariableFactory.class,
-                SCHEMAVARFACTORY_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.SkolemTermSV.class,
-                SKOLEMTERMSV_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.SubstOp.class, SUBSTOP_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.TermLabelSV.class,
-                TERMLABELSV_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.TermSV.class, TERMSV_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.Transformer.class,
-                TRANSFORMER_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.UpdateApplication.class,
-                UPDATEAPP_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.UpdateJunctor.class,
-                UPDATEJUNC_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.UpdateSV.class, UPDATESV_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.VariableSV.class, VARSV_TAG);
-        classMap.put(de.uka.ilkd.key.logic.op.WarySubstOp.class,
-                WARYSUBSTOP_TAG);
-
-        classDescriptionMap.put(MASTER_TAG, "Basic Appearance");
-        classDescriptionMap.put("." + HIGHLIGHTED_TAG, "Search Highlighting");
-        classDescriptionMap.put("." + MOUSE_TAG, "Mouseover Highlighting");
-        classDescriptionMap.put("." + FILTER_SELECTION_TAG,
-                "Filter Mouse Selection Highlighing");
-        classDescriptionMap.put("." + FILTER_MINIMIZED_TAG,
-                "Filter: Minimization");
-        classDescriptionMap.put("." + FILTER_COLLAPSED_TAG, "Filter: Hidden");
-        classDescriptionMap.put("." + RULE_APP_TAG, "Last Applied Rule");
-        classDescriptionMap.put("." + IF_INST_TAG, "Applied Rule Branch 1");
-        classDescriptionMap.put("." + IF_FORMULA_TAG, "Applied Rule Branch 2");
-        classDescriptionMap.put("." + EQUALITY_TAG, "Equality Term");
-        classDescriptionMap.put("." + FUNCTION_TAG, "Function Term");
-        classDescriptionMap.put("." + LOCATIONVAR_TAG, "Location Variable");
-        classDescriptionMap.put("." + JUNCTOR_TAG, "Junctor");
-        classDescriptionMap.put("." + LOGICVAR_TAG, "Logic Variable");
-        classDescriptionMap.put("." + QUANTIFIER_TAG, "Quantifier");
-        classDescriptionMap.put("." + SORTDEPFUNC_TAG,
-                "Sort Depending Function");
-        classDescriptionMap.put("." + MODALITY_TAG, "Modality Term");
-        classDescriptionMap.put("." + OBSERVERFUNC_TAG, "Oberserver Function");
-        classDescriptionMap.put("." + ELEMUPDATE_TAG, "Elementary Updater");
-        classDescriptionMap.put("." + FORMULASV_TAG, "Formula Schema Variable");
-        classDescriptionMap.put("." + IFEXTHENELSE_TAG,
-                "If Ex then Else... Term");
-        classDescriptionMap.put("." + IFTHENELSE_TAG, "If then Else... Term");
-        classDescriptionMap.put("." + MODALOPSV_TAG,
-                "Modal Operator Schema Variable");
-        classDescriptionMap.put("." + PROGCONST_TAG, "Program Constants");
-        classDescriptionMap.put("." + PROGMETH_TAG, "Program Method");
-        classDescriptionMap.put("." + PROGSV_TAG, "Program Schema Variable");
-        classDescriptionMap.put("." + PROGVAR_TAG, "Program Variable");
-        classDescriptionMap.put("." + SCHEMAVARFACTORY_TAG,
-                "Schema Variable Factory");
-        classDescriptionMap.put("." + SKOLEMTERMSV_TAG,
-                "Skolem Term Schema Variable");
-        classDescriptionMap.put("." + SUBSTOP_TAG, "Substitution Operator");
-        classDescriptionMap.put("." + TERMLABELSV_TAG,
-                "Term Label Schema Variable");
-        classDescriptionMap.put("." + TERMSV_TAG, "Term Schema Variable");
-        classDescriptionMap.put("." + TRANSFORMER_TAG, "Transformer");
-        classDescriptionMap.put("." + UPDATEAPP_TAG, "Update Application");
-        classDescriptionMap.put("." + UPDATEJUNC_TAG, "Update Junctor");
-        classDescriptionMap.put("." + UPDATESV_TAG, "Update Schema Variable");
-        classDescriptionMap.put("." + VARSV_TAG, "Variable Schema Variable");
-        classDescriptionMap.put("." + WARYSUBSTOP_TAG,
-                "Wary Substition Operator");
-
-    }
-
     /**
      * 
      */
     public NUIConstants() {
         // TODO Auto-generated constructor stub
-    }
-
-    public static HashMap<Class<? extends Object>, Boolean> getClassEnabledMap() {
-        return classEnabledMap;
-    }
-
-    public static HashMap<Class<? extends Object>, String> getClassCssMap() {
-        return classMap;
-    }
-
-    public static HashMap<String, String> getClassDescriptionMap() {
-        return classDescriptionMap;
     }
 
 }

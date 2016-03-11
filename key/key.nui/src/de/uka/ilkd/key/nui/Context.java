@@ -9,6 +9,7 @@ import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.NUIConstants;
+import de.uka.ilkd.key.nui.util.XmlReader;
 import de.uka.ilkd.key.nui.view.menu.TacletMenuItem;
 import javafx.collections.ObservableList;
 
@@ -16,7 +17,7 @@ public class Context {
 
     private KeYMediator mediator = null;
     private MainApp mainApp;
-    
+
     /**
      * Lazy loaded KeyMediator
      * 
@@ -86,13 +87,25 @@ public class Context {
     public CssFileHandler getCssFileHandler() {
         if (cssFileHandler == null)
             try {
-                cssFileHandler = new CssFileHandler(
-                        NUIConstants.DEFAULT_STYLE_CSS_PATH);
+                cssFileHandler = new CssFileHandler();
             }
             catch (Exception e) {
                 System.err.println("Could not load CSS. No beauty for you!");
             }
         return cssFileHandler;
+    }
+
+    private XmlReader xmlReader;
+
+    public XmlReader getXmlReader() {
+        if (xmlReader == null || cssFileHandler == null) {
+            cssFileHandler = getCssFileHandler();
+
+            xmlReader = new XmlReader(
+                    NUIConstants.DEFAULT_XML_PATH,
+                    cssFileHandler.getParsedRules());
+        }
+        return xmlReader;
     }
 
     private HandlerEvent<SelectModeEventArgs> selectModeActivatedEvent = new HandlerEvent<>();
@@ -110,20 +123,22 @@ public class Context {
     }
 
     private TacletInstantiationModel[] models;
-    
+
     public void setCurrentModels(TacletInstantiationModel[] models) {
-       this.models = models;
+        this.models = models;
     }
+
     public TacletInstantiationModel[] getCurrentModels() {
         return models;
     }
-    
+
     private ObservableList<TacletMenuItem> hiddenTacletMenuItems;
-    
-    public void setCurrentHiddenTacletMenuItems(ObservableList<TacletMenuItem> hiddenItems) {
+
+    public void setCurrentHiddenTacletMenuItems(
+            ObservableList<TacletMenuItem> hiddenItems) {
         this.hiddenTacletMenuItems = hiddenItems;
     }
-    
+
     public ObservableList<TacletMenuItem> getCurrentHiddenTacletMenuItems() {
         return hiddenTacletMenuItems;
     }

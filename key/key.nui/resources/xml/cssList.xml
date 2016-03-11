@@ -1,0 +1,251 @@
+<?xml version="1.0"?>
+<class>
+	<TreeItem text="General Settings">
+		<CSSRule>
+			<selector>pre</selector>
+			<Description>Basic Appearance</Description>
+			<Class>null</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.highlighted</selector>
+			<Description>Search Highlighting</Description>
+			<Class>null</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.mouseover</selector>
+			<Description>Mouseover Highlighting</Description>
+			<Class>null</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+	</TreeItem>
+	<TreeItem text="Filter Settings">
+		<CSSRule>
+			<selector>.filterSelection</selector>
+			<Description>Filter Mouse Selection Highlighing</Description>
+			<Class>null</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.minimized</selector>
+			<Description>Filter: Minimized</Description>
+			<Class>null</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.collapsed</selector>
+			<Description>Filter: Hidden</Description>
+			<Class>null</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+	</TreeItem>
+	<TreeItem text="Rule Application">
+		<CSSRule>
+			<selector>.ruleApp</selector>
+			<Description>Last Applied Rule</Description>
+			<Class></Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.ifInst</selector>
+			<Description>Applied Rule Branch 1</Description>
+			<Class></Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.ifFormula</selector>
+			<Description>Applied Rule Branch 2</Description>
+			<Class></Class>
+			<enabled>true</enabled>
+		</CSSRule>
+	</TreeItem>
+	<TreeItem text="Operators">
+		<CSSRule>
+			<selector>.elemUpdate</selector>
+			<Description>Elementary Updater</Description>
+			<Class>ElementaryUpdate</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.equality</selector>
+			<Description>Equality Term</Description>
+			<Class>Equality</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.junctor</selector>
+			<Description>Junctor</Description>
+			<Class>Junctor</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.substOp</selector>
+			<Description>Substitution Operator</Description>
+			<Class>SubstOp</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.warySubstOp</selector>
+			<Description>Wary Substitution Operator</Description>
+			<Class>WarySubstOp</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+	</TreeItem>
+	<TreeItem text="Logic Terms">
+		<CSSRule>
+			<selector>.logicVar</selector>
+			<Description>Logic Variable</Description>
+			<Class>LogicVariable</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.observerFunc</selector>
+			<Description>Observer Function</Description>
+			<Class>ObserverFunction</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.quantifier</selector>
+			<Description>Quantifier</Description>
+			<Class>Quantifier</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+	</TreeItem>
+	<TreeItem text="Function Terms">
+		<CSSRule>
+			<selector>.function</selector>
+			<Description>Basic Function Term</Description>
+			<Class>Function</Class>
+			<enabled>false</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.sortDepFunc</selector>
+			<Description>Sort Depending Function</Description>
+			<Class>SortDependingFunction</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.transformer</selector>
+			<Description>Transformer</Description>
+			<Class>Transformer</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.varSV</selector>
+			<Description>Variable Schema Variable</Description>
+			<Class>VariableSV</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+	</TreeItem>
+	<TreeItem text="Java Styling">
+		<CSSRule>
+			<selector>.modality</selector>
+			<Description>Modality Term</Description>
+			<Class>Modality</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.modalOpSV</selector>
+			<Description>Modal Operator Schema Variable</Description>
+			<Class>ModalOperatorSV</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.locationVar</selector>
+			<Description>Location Variable</Description>
+			<Class>LocationVariable</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.progConst</selector>
+			<Description>Program Constants</Description>
+			<Class>ProgramConstant</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.progMeth</selector>
+			<Description>Program Method</Description>
+			<Class>ProgramMethod</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.progVar</selector>
+			<Description>Program Variable</Description>
+			<Class>ProgramVariable</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.progSV</selector>
+			<Description>Program Schema Variable</Description>
+			<Class>ProgramSV</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+	</TreeItem>
+	<TreeItem text="Conditional Operators">
+		<CSSRule>
+			<selector>.ifExThenElse</selector>
+			<Description>If Ex Then Else... Term</Description>
+			<Class>IfExThenElse</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.ifThenElse</selector>
+			<Description>If Then Else... Term</Description>
+			<Class>IfThenElse</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+	</TreeItem>
+	<TreeItem text="Updater">
+		<CSSRule>
+			<selector>.updateApp</selector>
+			<Description>Application Updater</Description>
+			<Class>UpdateApplication</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.updateJunc</selector>
+			<Description>Junctor Updater</Description>
+			<Class>UpdateJunctor</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.updateSV</selector>
+			<Description>Schema Variable Updater</Description>
+			<Class>UpdateSV</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+	</TreeItem>
+	<TreeItem text="Schema Variables">
+		<CSSRule>
+			<selector>.formulaSV</selector>
+			<Description>Formula Schema Variable</Description>
+			<Class>FormulaSV</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.termSV</selector>
+			<Description>Term Schema Variable</Description>
+			<Class>TermSV</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.termLabelSV</selector>
+			<Description>Term Label Schema Variable</Description>
+			<Class>TermLabelSV</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.skolemTermSV</selector>
+			<Description>Skolem Term Schema Variable</Description>
+			<Class>SkolemTermSV</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
+			<selector>.schemaVarFactory</selector>
+			<Description>Schema Variable Factory</Description>
+			<Class>SchemaVariableFactory</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+	</TreeItem>
+</class>

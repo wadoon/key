@@ -7,6 +7,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.CssRule;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.util.PreviewPrinter;
+import de.uka.ilkd.key.nui.util.XmlReader;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -59,6 +61,8 @@ public class CssStylerViewController extends ViewController {
 
     private TreeItem<String> rootItem;
 
+    private XmlReader xmlReader;
+
     @FXML
     private MenuItem menuOpen;
     @FXML
@@ -93,6 +97,7 @@ public class CssStylerViewController extends ViewController {
     @Override
     public void initializeAfterLoadingFxml() {
         cssFileHandler = getContext().getCssFileHandler();
+        xmlReader = getContext().getXmlReader();
 
         initializeTree();
     }
@@ -101,122 +106,11 @@ public class CssStylerViewController extends ViewController {
      * initializes the TreeView
      */
     private void initializeTree() {
-        // Root for Tree
-        rootItem = new TreeItem<String>();
-        rootItem.setExpanded(true);
-        // SetUp Categories
-        rootItem.getChildren().add(new TreeItem<String>("General Settings"));
-        rootItem.getChildren().add(new TreeItem<String>("Filter Settings"));
-        rootItem.getChildren().add(new TreeItem<String>("Rule Application"));
-        rootItem.getChildren().add(new TreeItem<String>("Operators"));
-        rootItem.getChildren().add(new TreeItem<String>("Logic Terms"));
-        rootItem.getChildren().add(new TreeItem<String>("Function Terms"));
-        rootItem.getChildren().add(new TreeItem<String>("Java Styling"));
-        rootItem.getChildren()
-                .add(new TreeItem<String>("Conditional Operators"));
-        rootItem.getChildren().add(new TreeItem<String>("Updater"));
-        rootItem.getChildren().add(new TreeItem<String>("Schema Variables"));
-        rootItem.getChildren().add(new TreeItem<String>("Other Settings"));
 
-        // For every rule: get Description from Constants and Sort into Tree
         for (CssRule rule : cssFileHandler.getParsedRules()) {
-            String ruleDescription = NUIConstants.getClassDescriptionMap()
-                    .get(rule.selectorsAsString());
-
-            if (ruleDescription == null) {
-                ruleDescription = rule.selectorsAsString();
-            }
-
-            switch (rule.selectorsAsString()) {
-            case NUIConstants.MASTER_TAG:
-                masterRules = rule.getPropertyValuePairs();
-            case "." + NUIConstants.HIGHLIGHTED_TAG:
-            case "." + NUIConstants.MOUSE_TAG:
-                // General Settings
-                rootItem.getChildren().get(0).getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            case "." + NUIConstants.FILTER_SELECTION_TAG:
-            case "." + NUIConstants.FILTER_MINIMIZED_TAG:
-            case "." + NUIConstants.FILTER_COLLAPSED_TAG:
-                // Filter Settings
-                rootItem.getChildren().get(1).getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            case "." + NUIConstants.RULE_APP_TAG:
-            case "." + NUIConstants.IF_INST_TAG:
-            case "." + NUIConstants.IF_FORMULA_TAG:
-                // Rule Application
-                rootItem.getChildren().get(2).getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            case "." + NUIConstants.ELEMUPDATE_TAG:
-            case "." + NUIConstants.EQUALITY_TAG:
-            case "." + NUIConstants.JUNCTOR_TAG:
-            case "." + NUIConstants.SUBSTOP_TAG:
-            case "." + NUIConstants.WARYSUBSTOP_TAG:
-                // Operator
-                rootItem.getChildren().get(3).getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            case "." + NUIConstants.LOGICVAR_TAG:
-            case "." + NUIConstants.OBSERVERFUNC_TAG:
-            case "." + NUIConstants.QUANTIFIER_TAG:
-                // Logic Terms
-                rootItem.getChildren().get(4).getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            case "." + NUIConstants.FUNCTION_TAG:
-            case "." + NUIConstants.SORTDEPFUNC_TAG:
-            case "." + NUIConstants.TRANSFORMER_TAG:
-            case "." + NUIConstants.VARSV_TAG:
-                // Function Terms
-                rootItem.getChildren().get(5).getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            case "." + NUIConstants.MODALITY_TAG:
-            case "." + NUIConstants.MODALOPSV_TAG:
-            case "." + NUIConstants.LOCATIONVAR_TAG:
-            case "." + NUIConstants.PROGCONST_TAG:
-            case "." + NUIConstants.PROGMETH_TAG:
-            case "." + NUIConstants.PROGSV_TAG:
-            case "." + NUIConstants.PROGVAR_TAG:
-                // Java Styling
-                rootItem.getChildren().get(6).getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            case "." + NUIConstants.IFEXTHENELSE_TAG:
-            case "." + NUIConstants.IFTHENELSE_TAG:
-                // Cond. Operator
-                rootItem.getChildren().get(7).getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            case "." + NUIConstants.UPDATEAPP_TAG:
-            case "." + NUIConstants.UPDATEJUNC_TAG:
-            case "." + NUIConstants.UPDATESV_TAG:
-                // Update Terms
-                rootItem.getChildren().get(8).getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            case "." + NUIConstants.FORMULASV_TAG:
-            case "." + NUIConstants.SCHEMAVARFACTORY_TAG:
-            case "." + NUIConstants.TERMLABELSV_TAG:
-            case "." + NUIConstants.TERMSV_TAG:
-            case "." + NUIConstants.SKOLEMTERMSV_TAG:
-                // Schema Variable
-                rootItem.getChildren().get(9).getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            default:
-                // Default: Other
-                rootItem.getChildren().get(rootItem.getChildren().size() - 1)
-                        .getChildren()
-                        .add(new TreeItem<String>(ruleDescription));
-                break;
-            }
             setRule(rule);
         }
-
+        rootItem = xmlReader.getTree();
         treeView.setRoot(rootItem);
         treeView.getSelectionModel().select(0);
         treeView.requestFocus();
@@ -529,9 +423,10 @@ public class CssStylerViewController extends ViewController {
     private void handleSave() {
         if (cssFileHandler.getPath().isEmpty()) {
             handleSaveAs();
-        }else{
+        }
+        else {
             writeToCss();
-        }        
+        }
     }
 
     @FXML
@@ -587,8 +482,9 @@ public class CssStylerViewController extends ViewController {
      * sets the ruleInformation used by the grid
      */
     private void setRule(CssRule rule) {
-        String ruleDescription = NUIConstants.getClassDescriptionMap()
-                .get(rule.selectorsAsString());
+        Map<String, String> descriptionMap = xmlReader.getDescriptionMap();
+
+        String ruleDescription = descriptionMap.get(rule.selectorsAsString());
 
         if (ruleDescription == null) {
             ruleDescription = rule.selectorsAsString();

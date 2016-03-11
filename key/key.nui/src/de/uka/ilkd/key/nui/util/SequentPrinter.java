@@ -598,6 +598,10 @@ public class SequentPrinter {
      * puts Syntax Styling Info in tagsAtIndex Map
      */
     private void applySyntaxHighlighting() {
+        Map<String, String> classMap = context.getXmlReader()
+                .getClassMap();
+        Map<String, Boolean> classEnabledMap = context.getXmlReader()
+                .getClassEnabledMap();
 
         if (!(posTable instanceof InitialPositionTable)) {
             throw new AssertionError(
@@ -634,16 +638,12 @@ public class SequentPrinter {
                 PosInOccurrence oc = pos.getPosInOccurrence();
                 if (oc != null && oc.posInTerm() != null) {
                     Operator op = oc.subTerm().op();
-
+                    String className = op.getClass().getSimpleName();
                     // Open First Tag
-                    if (lastClass == null
-                            && NUIConstants.getClassCssMap()
-                                    .containsKey(op.getClass())
-                            && NUIConstants.getClassEnabledMap()
-                                    .get(op.getClass())) {
+                    if (lastClass == null && classMap.containsKey(className)
+                            && classEnabledMap.get(className)) {
 
-                        putOpenTag(i, StylePos.SYNTAX, NUIConstants
-                                .getClassCssMap().get(op.getClass()));
+                        putOpenTag(i, StylePos.SYNTAX, classMap.get(className));
                         keySet.add(i);
 
                         openedTag = true;
@@ -658,13 +658,11 @@ public class SequentPrinter {
                         keySet.add(i);
 
                         openedTag = false;
-                        if (NUIConstants.getClassCssMap()
-                                .containsKey(op.getClass())
-                                && NUIConstants.getClassEnabledMap()
-                                        .get(op.getClass())) {
+                        if (classMap.containsKey(className)
+                                && classEnabledMap.get(className)) {
 
-                            putOpenTag(i, StylePos.SYNTAX, NUIConstants
-                                    .getClassCssMap().get(op.getClass()));
+                            putOpenTag(i, StylePos.SYNTAX,
+                                    classMap.get(className));
                             keySet.add(i);
                             lastClass = op.getClass();
                             openedTag = true;
@@ -673,13 +671,12 @@ public class SequentPrinter {
                         else {
                             lastClass = null;
                             openedTag = false;
-                            if (!NUIConstants.getClassCssMap()
-                                    .containsKey(op.getClass())) {
+                            if (!classMap.containsKey(className)) {
                                 System.out.println("");
                                 System.out.println(
                                         "The following Class does not exist in the ClassDictionary");
                                 System.out.println("EXPRESSION: " + op);
-                                System.out.println("CLASS: " + op.getClass());
+                                System.out.println("CLASS: " + className);
                                 System.out.println("");
                             }
                         }

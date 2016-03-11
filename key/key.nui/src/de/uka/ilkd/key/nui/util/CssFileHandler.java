@@ -24,23 +24,14 @@ public class CssFileHandler {
     /**
      * Constructs a CssFileHandler without file. Call loadCssFile to add the
      * file afterwards.
+     * 
+     * @throws IOException
      */
-    public CssFileHandler() {
+    public CssFileHandler() throws IOException {
         css = "";
         parsedRules = new ArrayList<CssRule>();
         prefs = Preferences.userNodeForPackage(this.getClass());
         path = prefs.get(PREFERENCE_KEY_PATH, "");
-    }
-
-    /**
-     * Constructs a CssFileHandler.
-     * 
-     * @param path
-     *            path to the css file
-     * @throws IOException
-     */
-    public CssFileHandler(String path) throws IOException {
-        this();
         loadCssFile();
     }
 
