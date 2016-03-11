@@ -58,7 +58,9 @@ public class ProofBrowserViewController extends ViewController {
         @Override
         public void selectedNodeChanged(KeYSelectionEvent event) {
             Platform.runLater(() -> {
-                updateImage();
+                proof = event.getSource().getSelectedProof();
+                updateImage(proof);
+                proofBrowserTreeView.getSelectionModel().getSelectedItem().setGraphic(proofIcon);
             });
         }
     };
@@ -102,14 +104,18 @@ public class ProofBrowserViewController extends ViewController {
     }
 
     /**
-     * Changes the Image once a proof was closed.
+     * Updates the image for a given proof.
      */
-    private void updateImage() {
-        if (proof.closed()) {
+    private void updateImage(Proof proof) {
+        ProofStatus ps = proof.mgt().getStatus();
+        if (ps.getProofClosed()) {
             proofIcon = new ImageView(CLOSED_PROOF_IMAGE);
-            proofBrowserTreeView.getSelectionModel().getSelectedItem().setGraphic(proofIcon);
+        } else if (ps.getProofClosedButLemmasLeft()) {
+            proofIcon = new ImageView(CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_IMAGE);
+        } else {
+            assert ps.getProofOpen();
+            proofIcon = new ImageView(OPEN_PROOF_IMAGE);
         }
-        
     }
 
     /**
@@ -124,15 +130,7 @@ public class ProofBrowserViewController extends ViewController {
         String proofName = proof.name().toString();
         listOfProofs.put(proofName, proof);
 
-        ProofStatus ps = proof.mgt().getStatus();
-        if (ps.getProofClosed()) {
-            proofIcon = new ImageView(CLOSED_PROOF_IMAGE);
-        } else if (ps.getProofClosedButLemmasLeft()) {
-            proofIcon = new ImageView(CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_IMAGE);
-        } else {
-            assert ps.getProofOpen();
-            proofIcon = new ImageView(OPEN_PROOF_IMAGE);
-        }
+        updateImage(proof);
 
         TreeItem<String> newProof = new TreeItem<String>(proofName, proofIcon);
         boolean found = false;
