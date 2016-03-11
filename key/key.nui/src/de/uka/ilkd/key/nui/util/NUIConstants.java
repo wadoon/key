@@ -3,15 +3,12 @@
  */
 package de.uka.ilkd.key.nui.util;
 
-import java.util.HashMap;
-
 /**
  * @author Maximilian Li
  * @author Victor Schuemmer
  *
  */
 public final class NUIConstants {
-    private static HashMap<Class<? extends Object>, Boolean> classEnabledMap = new HashMap<>();
 
     public final static String OPEN_TAG_BEGIN = "<span class=\"";
     public final static String OPEN_TAG_END = "\">";

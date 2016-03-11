@@ -42,21 +42,24 @@ public class XmlReader {
         handleFile();
     }
 
-    public void handleFile() {
+    private void handleFile() {
         try {
+            //Make Reader
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory
                     .newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(inputFile);
             doc.getDocumentElement().normalize();
             NodeList nList = doc.getElementsByTagName("TreeItem");
-
+            
+            //Make new TreeItem for CSSStylerView
             for (int i = 0; i < nList.getLength(); i++) {
                 Node node = nList.item(i);
                 TreeItem<String> categoryNode = new TreeItem<String>(
                         ((Element) node).getAttribute("text"));
                 NodeList childList = node.getChildNodes();
-
+                
+                //Build Maps for each Rule by Selector
                 for (int j = 0; j < childList.getLength(); j++) {
                     Node child = childList.item(j);
                     if (child.getNodeType() == Node.ELEMENT_NODE) {
