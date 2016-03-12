@@ -35,7 +35,7 @@
 		</CSSRule>
 		<CSSRule>
 			<selector>.collapsed</selector>
-			<Description>Filter: Hidden</Description>
+			<Description>Filter: Collapsed</Description>
 			<Class>null</Class>
 			<enabled>true</enabled>
 		</CSSRule>
