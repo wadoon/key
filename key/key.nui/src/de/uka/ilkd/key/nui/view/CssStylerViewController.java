@@ -55,7 +55,7 @@ public class CssStylerViewController extends ViewController {
     private ObservableList<String> fontStyle = FXCollections
             .observableArrayList("normal", "italic");
     private ObservableList<String> fontFamily = FXCollections
-            .observableArrayList(Font.getFontNames());
+            .observableArrayList(Font.getFamilies());
 
     private TreeItem<String> rootItem;
 
