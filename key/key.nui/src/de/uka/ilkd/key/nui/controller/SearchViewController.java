@@ -115,7 +115,7 @@ public class SearchViewController extends NUIController {
      * 
      * @return
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "cast" })
     private Set<ProofTreeCell> getProofTreeCells() {
         try {
             Field f = VirtualContainerBase.class.getDeclaredField("flow");
@@ -168,6 +168,9 @@ public class SearchViewController extends NUIController {
                  * @return <b>list</b>, but with all the TreeItems appended to
                  *         it
                  */
+
+                // just to get rid of an odd warning – see http://stackoverflow.com/questions/921025
+                protected TreeToListHelper(){}
 
                 private <T> List<TreeItem<T>> treeToList(final TreeItem<T> root,
                         final List<TreeItem<T>> list) {

@@ -55,17 +55,17 @@ public class NUI extends Application {
     /**
      * 
      */
-    private HashMap<String, NUIController> controllers = new HashMap<String, NUIController>();
+    private HashMap<String, NUIController> controllers = new HashMap<>();
 
     /**
      * 
      */
-    private HashMap<String, Pane> components = new HashMap<String, Pane>();
+    private HashMap<String, Pane> components = new HashMap<>();
 
     /**
      * 
      */
-    private HashMap<String, ToggleGroup> toggleGroups = new HashMap<String, ToggleGroup>();
+    private HashMap<String, ToggleGroup> toggleGroups = new HashMap<>();
 
     private ResourceBundle bundle = null;
     private BorderPane root = null;
@@ -272,7 +272,7 @@ public class NUI extends Application {
         return toggleGroups.get(name);
     }
 
-    private String cutFileExtension(String filename) {
+    private static String cutFileExtension(String filename) {
         return filename.substring(0, filename.lastIndexOf("."));
     }
 

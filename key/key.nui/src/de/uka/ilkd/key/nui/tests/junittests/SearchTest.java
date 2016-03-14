@@ -2,18 +2,15 @@ package de.uka.ilkd.key.nui.tests.junittests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import static org.junit.Assert.fail;
+
 import java.io.File;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
-
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
@@ -151,7 +148,7 @@ public class SearchTest {
      *            The expected size of the list of results.
      * @return True iff the size of the result list equals the expectedSize.
      */
-    private boolean searchAndCompareSize(String searchTerm, int expectedSize) {
+    private static boolean searchAndCompareSize(String searchTerm, int expectedSize) {
         ptVisualizer.getRootNode().search(searchTerm);
         return (expectedSize == ptVisualizer.getRootNode().asList().stream()
                 .filter((node) -> node.isSearchResult()).count());

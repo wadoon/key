@@ -7,8 +7,6 @@ import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.ProofStarter;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -40,8 +38,8 @@ public class StrategyViewController extends NUIController {
             @Override
             public String toString(Double n) {
                 int val = (int) Math.pow(10, n);
-                return "" + (val >= 10000 ? val >= 1000000
-                        ? (val / 1000000) + "M" : (val / 1000) + "k" : +val);
+                return "" + (val >= 10000
+                        ? val >= 1000000 ? (val / 1000000) + "M" : (val / 1000) + "k" : +val);
             }
 
             @Override
@@ -52,25 +50,21 @@ public class StrategyViewController extends NUIController {
         });
 
         maxRuleAppSlider.valueProperty()
-                .addListener(new ChangeListener<Number>() {
-                    public void changed(ObservableValue<? extends Number> ov,
-                            Number old_val, Number new_val) {
-                        maxRuleAppLabel.setText(bundle
-                                .getString("maxRuleAppLabel") + " "
-                                + (int) Math.pow(10, new_val.doubleValue()));
-                    }
-                });
+                .addListener((obs, newVal, oldVal) -> maxRuleAppLabel
+                        .setText(bundle.getString("maxRuleAppLabel") + " "
+                                + (int) Math.pow(10, newVal.doubleValue()))
+
+        );
     }
 
-    public void handleOnAction(final ActionEvent e)
-            throws ControllerNotFoundException {
+    public void handleOnAction(@SuppressWarnings("unused")
+    final ActionEvent e) throws ControllerNotFoundException {
 
         ProofStarter proofStarter = new ProofStarter(false);
         String filename;
 
         try {
-            filename = dataModel.getLoadedTreeViewState().getProof()
-                    .getProofFile().getName();
+            filename = dataModel.getLoadedTreeViewState().getProof().getProofFile().getName();
         }
         catch (NullPointerException e2) {
             nui.updateStatusbar("A proof file must be loaded first!");
@@ -92,12 +86,10 @@ public class StrategyViewController extends NUIController {
         Proof updatedProof = proofStarter.getProof();
 
         // create new tree from updateProof
-        ProofTreeItem fxtree = new ProofTreeConverter(updatedProof)
-                .createFXProofTree();
+        ProofTreeItem fxtree = new ProofTreeConverter(updatedProof).createFXProofTree();
 
         // Create new TreeViewState for updatedProof
-        TreeViewState updatedTreeViewState = new TreeViewState(updatedProof,
-                fxtree);
+        TreeViewState updatedTreeViewState = new TreeViewState(updatedProof, fxtree);
 
         // update datamodel
         dataModel.updateTreeViewState(filename, updatedTreeViewState);

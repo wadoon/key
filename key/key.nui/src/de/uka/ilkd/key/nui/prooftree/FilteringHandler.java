@@ -80,7 +80,7 @@ public class FilteringHandler {
      */
     private List<ProofTreeFilter> searchFilterClasses() {
 
-        final List<ProofTreeFilter> filters = new LinkedList<ProofTreeFilter>();
+        final List<ProofTreeFilter> filters = new LinkedList<>();
 
         // Path were filter class's are stored
         final String PATH = "filter/";
@@ -90,7 +90,7 @@ public class FilteringHandler {
         // Look for all class files in PATH and store their urls
         File[] files = new File(getClass().getResource(PATH).getPath())
                 .listFiles();
-        ArrayList<URL> listOfURLs = new ArrayList<URL>();
+        ArrayList<URL> listOfURLs = new ArrayList<>();
         for (File file : files) {
             if (file.isFile() && file.getName().matches(".*[.class]")) {
                 try {
@@ -128,20 +128,18 @@ public class FilteringHandler {
                 if (annotations == null) {
                     continue;
                 }
-                else {
-                    for (Annotation annotation : annotations) {
-                        // Check if there is a annotations of type
-                        // FilterAnnotation
-                        if (annotation instanceof FilterAnnotation) {
-                            FilterAnnotation filterAnnotation = (FilterAnnotation) annotation;
-                            /*
-                             * If the annotation isFilter is true, the current
-                             * class is a valid filter class therefore create a
-                             * new instance of it and add it to filters.
-                             */
-                            if (filterAnnotation.isFilter()) {
-                                filters.add((ProofTreeFilter) c.newInstance());
-                            }
+                for (Annotation annotation : annotations) {
+                    // Check if there is a annotations of type
+                    // FilterAnnotation
+                    if (annotation instanceof FilterAnnotation) {
+                        FilterAnnotation filterAnnotation = (FilterAnnotation) annotation;
+                        /*
+                         * If the annotation isFilter is true, the current
+                         * class is a valid filter class therefore create a
+                         * new instance of it and add it to filters.
+                         */
+                        if (filterAnnotation.isFilter()) {
+                            filters.add((ProofTreeFilter) c.newInstance());
                         }
                     }
                 }
@@ -171,7 +169,7 @@ public class FilteringHandler {
      */
     private List<ProofTreeFilter> getActiveFilters() {
 
-        final List<ProofTreeFilter> filters = new LinkedList<ProofTreeFilter>();
+        final List<ProofTreeFilter> filters = new LinkedList<>();
 
         filtersMap.forEach((filter, active) -> {
             if (active) {

@@ -20,7 +20,7 @@ public class DataModel extends Observable {
      * HashMap storing the pairs of (String, {@link TreeViewState}), where
      * String represents the filename of the proof file.
      */
-    private HashMap<String, TreeViewState> treeViewStates = new HashMap<String, TreeViewState>();
+    private HashMap<String, TreeViewState> treeViewStates = new HashMap<>();
 
     /**
      * Represents the lastly stored TreeViewState, therefore it is displayed

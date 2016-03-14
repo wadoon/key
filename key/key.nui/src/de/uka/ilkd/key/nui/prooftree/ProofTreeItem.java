@@ -1,21 +1,14 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import java.lang.reflect.Field;
+import java.util.function.Predicate;
+
+import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.TreeItem;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-
-import java.lang.reflect.Field;
-import java.util.concurrent.Callable;
-import java.util.function.Predicate;
-
-import de.uka.ilkd.key.nui.prooftree.ProofTreeStyler.StyleConfiguration;
-import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
 
 /**
  * A node of the javafx tree item that is used in proof trees.
@@ -52,7 +45,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
         super(value);
 
         internalChildren = FXCollections.observableArrayList();
-        filteredChildren = new FilteredList<ProofTreeItem>(internalChildren);
+        filteredChildren = new FilteredList<>(internalChildren);
 
         setAllChildren(filteredChildren);
     }

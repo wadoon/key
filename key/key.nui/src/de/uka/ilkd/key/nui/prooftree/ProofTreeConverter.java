@@ -81,7 +81,7 @@ public class ProofTreeConverter {
         nuiRoot.setLabel(LBL_ROOT);
 
         // reset linked leafs
-        linkedLeafs = new LinkedList<NUINode>();
+        linkedLeafs = new LinkedList<>();
 
         // Convert recursively the ProofTree to a NUITree
         addProofTreeToNUITree(pRoot, nuiRoot);

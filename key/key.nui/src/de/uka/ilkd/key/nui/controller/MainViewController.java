@@ -109,7 +109,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Includes the components which were added to the main Window
      */
-    private HashMap<String, Pane> components = new HashMap<String, Pane>();
+    private HashMap<String, Pane> components = new HashMap<>();
 
     /**
      * Stores the position of components added to the SplitPane. Other views can
@@ -145,22 +145,20 @@ public class MainViewController extends NUIController implements Observer {
         // located
         File parentDirectory = null;
         if (dataModel.getLoadedTreeViewState() != null) {
-            parentDirectory = loadedTVS.getProof().getProofFile()
-                    .getParentFile();
+            parentDirectory = loadedTVS.getProof().getProofFile().getParentFile();
         }
         if (parentDirectory != null) {
             fileChooser.setInitialDirectory(parentDirectory);
         }
         // if no proof is loaded, use the example directory (default)
         else {
-            fileChooser.setInitialDirectory(
-                    new File("resources/de/uka/ilkd/key/examples"));
+            fileChooser.setInitialDirectory(new File("resources/de/uka/ilkd/key/examples"));
         }
 
-        FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
-                "Proof files", "*.proof");
-        FileChooser.ExtensionFilter extFilterKey = new FileChooser.ExtensionFilter(
-                "Proof files", "*.key");
+        FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter("Proof files",
+                "*.proof");
+        FileChooser.ExtensionFilter extFilterKey = new FileChooser.ExtensionFilter("Proof files",
+                "*.key");
         fileChooser.getExtensionFilters().add(extFilterProof);
         fileChooser.getExtensionFilters().add(extFilterKey);
 
@@ -242,12 +240,9 @@ public class MainViewController extends NUIController implements Observer {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("dialogTitle"));
         alert.setHeaderText(nui.getStringFromBundle("dialogHeader"));
-        String filename = dataModel.getLoadedTreeViewState().getProof()
-                .getProofFile().getName();
-        alert.setContentText(nui.getStringFromBundle("dialogQuestion") + " '"
-                + filename + "' ?");
-        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO,
-                ButtonType.CANCEL);
+        String filename = dataModel.getLoadedTreeViewState().getProof().getProofFile().getName();
+        alert.setContentText(nui.getStringFromBundle("dialogQuestion") + " '" + filename + "' ?");
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.YES || result.get() == ButtonType.NO) {
@@ -311,8 +306,8 @@ public class MainViewController extends NUIController implements Observer {
                 fileChooser.setInitialDirectory(parentDir);
             }
         }
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                "Proof files", "*.proof");
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Proof files",
+                "*.proof");
         fileChooser.getExtensionFilters().add(extFilter);
 
         File selectedFile = fileChooser.showSaveDialog(contextMenu);
@@ -328,7 +323,7 @@ public class MainViewController extends NUIController implements Observer {
     }
 
     @FXML
-    protected final void handleCancelLoadingProcess(final ActionEvent e) {
+    protected final void handleCancelLoadingProcess(@SuppressWarnings("unused") final ActionEvent e) {
         cancelLoadProof();
     }
 
@@ -470,8 +465,7 @@ public class MainViewController extends NUIController implements Observer {
     private void cancelLoadProof() {
 
         // try to set loading status atomically
-        final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true,
-                false);
+        final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true, false);
 
         if (hasBeenCanceled) {
 
@@ -481,30 +475,22 @@ public class MainViewController extends NUIController implements Observer {
             try {
 
                 try {
-                    final java.lang.reflect.Method tsm = Thread.class
-                            .getDeclaredMethod("stop0",
-                                    new Class[] { Object.class });
+                    final java.lang.reflect.Method tsm = Thread.class.getDeclaredMethod("stop0",
+                            new Class[] { Object.class });
                     tsm.setAccessible(true);
                     tsm.invoke(loadingThread, new ThreadDeath());
                 }
                 catch (java.lang.ThreadDeath e) {
-                    System.out.println(
-                            "ThreadDeath to ignore? Speak with Matthias"); // TODO
+                    System.out.println("ThreadDeath to ignore? Speak with Matthias"); // TODO
                 }
 
                 // reset loading state
-                Platform.runLater(new Runnable() {
-                    /**
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    public void run() {
-                        statustext.setText("Loading has been cancelled.");
-                        root.setCursor(Cursor.DEFAULT);
-                        openProof.setDisable(false);
-                        progressIndicator.setVisible(false);
-                        cancelButton.setVisible(false);
-                    }
+                Platform.runLater(() -> {
+                    statustext.setText("Loading has been cancelled.");
+                    root.setCursor(Cursor.DEFAULT);
+                    openProof.setDisable(false);
+                    progressIndicator.setVisible(false);
+                    cancelButton.setVisible(false);
                 });
             }
             catch (NoSuchMethodException e1) {
@@ -523,8 +509,8 @@ public class MainViewController extends NUIController implements Observer {
                 e1.printStackTrace();
             }
             catch (java.lang.ThreadDeath e) {
-                System.out.println(
-                        "Unexpected ThreadDeath in cancelLoadProof. Speak with Matthias."); // TODO
+                System.out
+                        .println("Unexpected ThreadDeath in cancelLoadProof. Speak with Matthias."); // TODO
             }
         }
     }
@@ -544,8 +530,8 @@ public class MainViewController extends NUIController implements Observer {
         // de.uka.ilkd.key.nui.NUI.prooftree.NUINode
         // --> ProofTreeItem (JavaFX)
 
-        statustext.setText(MessageFormat.format(
-                bundle.getString("statusLoading"), proofFileName.getName()));
+        statustext.setText(
+                MessageFormat.format(bundle.getString("statusLoading"), proofFileName.getName()));
         progressIndicator.setVisible(true);
         cancelButton.setVisible(true);
         root.setCursor(Cursor.WAIT);
@@ -563,36 +549,30 @@ public class MainViewController extends NUIController implements Observer {
 
                     // load proof
                     final KeYEnvironment<?> environment = KeYEnvironment.load(
-                            JavaProfile.getDefaultInstance(), proofFileName,
-                            null, null, null, true);
+                            JavaProfile.getDefaultInstance(), proofFileName, null, null, null,
+                            true);
                     final Proof proof = environment.getLoadedProof();
 
                     proof.setProofFile(proofFileName);
 
                     // convert proof to fx tree
-                    final ProofTreeItem fxtree = new ProofTreeConverter(proof)
-                            .createFXProofTree();
+                    final ProofTreeItem fxtree = new ProofTreeConverter(proof).createFXProofTree();
 
                     // set Loading = false as you can no longer cancel
-                    final boolean hasNotBeenCanceled = isLoadingProof
-                            .compareAndSet(true, false);
+                    final boolean hasNotBeenCanceled = isLoadingProof.compareAndSet(true, false);
 
                     if (hasNotBeenCanceled) {
                         // reset set gui waiting state
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Store state of treeView into data model.
-                                dataModel.saveTreeViewState(
-                                        new TreeViewState(proof, fxtree),
-                                        proofFileName.getName());
+                        Platform.runLater(() -> {
+                            // Store state of treeView into data model.
+                            dataModel.saveTreeViewState(new TreeViewState(proof, fxtree),
+                                    proofFileName.getName());
 
-                                statustext.setText("Ready.");
-                                progressIndicator.setVisible(false);
-                                cancelButton.setVisible(false);
-                                root.setCursor(Cursor.DEFAULT);
-                                openProof.setDisable(false);
-                            }
+                            statustext.setText("Ready.");
+                            progressIndicator.setVisible(false);
+                            cancelButton.setVisible(false);
+                            root.setCursor(Cursor.DEFAULT);
+                            openProof.setDisable(false);
                         });
                     }
 
@@ -601,8 +581,7 @@ public class MainViewController extends NUIController implements Observer {
                     // This Exception is thrown if the thread has been killed.
                     if (isLoadingProof.get()) {
                         // error during loading
-                        System.out
-                                .println("If this occurs speak with Matthias");
+                        System.out.println("If this occurs speak with Matthias");
                         e.printStackTrace();
                     }
                     else {
@@ -611,8 +590,7 @@ public class MainViewController extends NUIController implements Observer {
                     }
                 }
                 catch (java.lang.ThreadDeath e) {
-                    System.out.println(
-                            "Unexpected Thread Death in call. Talk to Matthias");
+                    System.out.println("Unexpected Thread Death in call. Talk to Matthias");
                 }
 
                 return null;

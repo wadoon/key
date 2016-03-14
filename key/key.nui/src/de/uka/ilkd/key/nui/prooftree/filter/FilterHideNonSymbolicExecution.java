@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.nui.prooftree.filter;
 
 import de.uka.ilkd.key.nui.prooftree.NUIBranchNode;
-import de.uka.ilkd.key.nui.prooftree.NUILeafNode;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 
 /**
@@ -21,9 +20,7 @@ public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
         if (node instanceof NUIBranchNode) {
             return true;
         }
-        else {
-            return node.isSymbolicExecution();
-        }
+        return node.isSymbolicExecution();
     }
 
     /**
