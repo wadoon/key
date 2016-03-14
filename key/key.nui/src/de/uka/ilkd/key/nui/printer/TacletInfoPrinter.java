@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.util;
+package de.uka.ilkd.key.nui.printer;
 
 import org.key_project.util.collection.ImmutableSet;
 

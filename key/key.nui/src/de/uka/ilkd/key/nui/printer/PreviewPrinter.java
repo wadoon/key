@@ -1,7 +1,10 @@
 /**
  * 
  */
-package de.uka.ilkd.key.nui.util;
+package de.uka.ilkd.key.nui.printer;
+
+import de.uka.ilkd.key.nui.util.CssRule;
+import de.uka.ilkd.key.nui.util.NUIConstants;
 
 /**
  * Provides a dummy text that can be printed with CSS as a preview.

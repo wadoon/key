@@ -1,15 +1,11 @@
 /**
  * 
  */
-package de.uka.ilkd.key.nui.util;
+package de.uka.ilkd.key.nui.printer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +17,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.nui.Context;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
+import de.uka.ilkd.key.nui.util.CssFileHandler;
+import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -36,7 +34,6 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * @author Maximilian Li
  * @author Victor Schuemmer
- *
  */
 public class SequentPrinter {
     private String proofString;
@@ -45,35 +42,9 @@ public class SequentPrinter {
     private Sequent sequent;
     private boolean useRegex = false;
 
-    private TreeSet<Integer> keySet = new TreeSet<Integer>();
-
-    // Outer Map maps Index in ProofString to Styling Info Map
-    // Inner Map holds Styling Info separated for every Styling Case.
-    // It's Keys are defined in the StylePos enum
-    // List: List of all Tags
-    private Map<Integer, Map<Integer, List<String>>> openTagsAtIndex = new HashMap<Integer, Map<Integer, List<String>>>();;
-    private Map<Integer, Map<Integer, List<String>>> closeTagsAtIndex = new HashMap<Integer, Map<Integer, List<String>>>();;
-
+    private PrintDictionary dictionary = new PrintDictionary();
     private ArrayList<Integer> lessThenList = new ArrayList<Integer>();
-
-    private Range mouseRange;
-    private ArrayList<Integer> searchIndicesOpen = new ArrayList<Integer>();
-    private ArrayList<Integer> searchIndicesClose = new ArrayList<Integer>();
-    private ArrayList<Integer> filterIndicesOpen = new ArrayList<Integer>();
-    private ArrayList<Integer> filterIndicesClose = new ArrayList<Integer>();
     private ArrayList<Integer> filterCollapseIndicator = new ArrayList<Integer>();
-
-    // Use Unique values in incremental order. Value Correspond to
-    // ArrayPosition. Higher Value = Higher Priority.
-    private enum StylePos {
-        MOUSE(0), FILTER(1), SELECTION(2), RULEAPP(3), SEARCH(4), SYNTAX(5);
-
-        private int slotPosition;
-
-        private StylePos(int i) {
-            slotPosition = i;
-        }
-    }
 
     private Context context;
 
@@ -99,89 +70,29 @@ public class SequentPrinter {
     public String printProofString() {
         int offset = 0;
         StringBuilder sb = new StringBuilder(proofString);
-        Stack<Pair<Integer, String>> tagStack = new Stack<>();
-        Stack<Pair<Integer, String>> saveTagStack = new Stack<>();
 
-        List<String> insertTagList;
+        List<Pair<Integer, String>> tagList = dictionary.getTagList();
+        int listPointer = 0;
+        String tag;
 
-        for (Integer i : keySet) {
-            // Apply Close Tags first
-            if (closeTagsAtIndex.containsKey(i)) {
-                for (int j = StylePos.values().length - 1; j >= 0; j--) {
-                    insertTagList = closeTagsAtIndex.get(i).get(j);
-                    if (insertTagList == null)
-                        continue;
-                    for (String insertTag : insertTagList) {
-                        if (insertTag == null || insertTag.isEmpty())
-                            continue;
-
-                        // Check for possible Overlap
-                        while (!tagStack.isEmpty()
-                                && tagStack.peek().first != j) {
-                            sb.insert(i + offset, NUIConstants.CLOSING_TAG);
-                            offset += NUIConstants.CLOSING_TAG.length();
-                            saveTagStack.push(tagStack.pop());
-                        }
-
-                        sb.insert(i + offset, insertTag);
-                        offset += insertTag.length();
-                        tagStack.pop();
-
-                        while (saveTagStack.size() > 0) {
-                            sb.insert(i + offset, saveTagStack.peek().second);
-                            offset += saveTagStack.peek().second.length();
-                            tagStack.push(saveTagStack.pop());
-                        }
-                    }
-                }
+        for (int i = 0; i < proofString.length(); i++) {
+            // Insert StyleTags at i
+            while (listPointer < tagList.size()
+                    && tagList.get(listPointer).first == i) {
+                tag = tagList.get(listPointer).second;
+                sb.insert(i + offset, tag);
+                offset += tag.length();
+                listPointer++;
             }
-            // Apply OpenTags
-            if (openTagsAtIndex.containsKey(i)) {
-                for (int j = 0; j < StylePos.values().length; j++) {
-                    insertTagList = openTagsAtIndex.get(i).get(j);
-                    if (insertTagList == null)
-                        continue;
-                    for (String insertTag : insertTagList) {
-                        if (insertTag == null || insertTag.isEmpty())
-                            continue;
-
-                        // Correctly Prioritze even inside other spans
-                        while (!tagStack.isEmpty()
-                                && tagStack.peek().first > j) {
-                            sb.insert(i + offset, NUIConstants.CLOSING_TAG);
-                            offset += NUIConstants.CLOSING_TAG.length();
-                            saveTagStack.push(tagStack.pop());
-                        }
-
-                        tagStack.push(new Pair<Integer, String>(j, insertTag));
-
-                        sb.insert(i + offset, insertTag);
-                        offset += insertTag.length();
-
-                        while (saveTagStack.size() > 0) {
-                            sb.insert(i + offset, saveTagStack.peek().second);
-                            offset += saveTagStack.peek().second.length();
-                            tagStack.push(saveTagStack.pop());
-                        }
-
-                    }
-                }
-            }
+            // Insert CollapsedIndicator at i
             if (filterCollapseIndicator.contains(i)) {
                 sb.insert(i + offset, "...\n");
                 offset += 4;
             }
-            // HTML Formatting
+            // HTML Formatting at i
             if (lessThenList.contains(i)) {
                 sb.replace(i + offset, i + offset + 1, "&lt;");
                 offset += 3;
-            }
-
-            // Clean KeySet
-            if (!closeTagsAtIndex.containsKey(i)
-                    && !openTagsAtIndex.containsKey(i)
-                    && !lessThenList.contains(i)) {
-                keySet.remove(i);
             }
         }
 
@@ -189,7 +100,7 @@ public class SequentPrinter {
         context.setSequentHtml(html);
         return toHTML(html);
     }
-
+    
     private Range getHighlightRange(PosInOccurrence pos) {
         if (!(posTable instanceof InitialPositionTable)) {
             throw new AssertionError(
@@ -200,14 +111,15 @@ public class SequentPrinter {
                 .pathForPosition(pos, new IdentitySequentPrintFilter(sequent));
         return ((InitialPositionTable) posTable).rangeForPath(path);
     }
-
+    /**
+     * applies highlighting for the last applied Rule
+     * @param app the last applied RuleApplication
+     */
     public void applyRuleAppHighlighting(RuleApp app) {
         if (app.posInOccurrence() != null) {
             Range r = getHighlightRange(app.posInOccurrence());
-            putOpenTag(r.start(), StylePos.RULEAPP, NUIConstants.RULE_APP_TAG);
-            putCloseTag(r.end(), StylePos.RULEAPP, NUIConstants.CLOSING_TAG);
-            keySet.add(r.start());
-            keySet.add(r.end());
+            putStyleTags(r.start(), r.end(), HighlightType.RULEAPP,
+                    NUIConstants.RULE_APP_TAG);
         }
 
         if (app instanceof TacletApp) {
@@ -238,11 +150,8 @@ public class SequentPrinter {
                     inst.getConstrainedFormula(), PosInTerm.getTopLevel(),
                     inst.inAntec());
             Range r = getHighlightRange(pos);
-            putOpenTag(r.start(), StylePos.RULEAPP,
+            putStyleTags(r.start(), r.end(), HighlightType.RULEAPP,
                     NUIConstants.IF_FORMULA_TAG);
-            putCloseTag(r.end(), StylePos.RULEAPP, NUIConstants.CLOSING_TAG);
-            keySet.add(r.start());
-            keySet.add(r.end());
         }
     }
 
@@ -250,10 +159,8 @@ public class SequentPrinter {
         final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
         for (PosInOccurrence pio : ifs) {
             Range r = getHighlightRange(pio);
-            putOpenTag(r.start(), StylePos.RULEAPP, NUIConstants.IF_INST_TAG);
-            putCloseTag(r.end(), StylePos.RULEAPP, NUIConstants.CLOSING_TAG);
-            keySet.add(r.start());
-            keySet.add(r.end());
+            putStyleTags(r.start(), r.end(), HighlightType.RULEAPP,
+                    NUIConstants.IF_INST_TAG);
         }
     }
 
@@ -266,14 +173,8 @@ public class SequentPrinter {
      */
     public void applyMouseHighlighting(Range range) {
         removeMouseHighlighting();
-
-        keySet.add(range.start());
-        keySet.add(range.end());
-
-        putOpenTag(range.start(), StylePos.MOUSE, NUIConstants.MOUSE_TAG);
-        putCloseTag(range.end(), StylePos.MOUSE, NUIConstants.CLOSING_TAG);
-
-        mouseRange = range;
+        putStyleTags(range.start(), range.end(), HighlightType.MOUSE,
+                NUIConstants.MOUSE_TAG);
     }
 
     /**
@@ -315,8 +216,6 @@ public class SequentPrinter {
             }
             styleStart = styleEnd;
         }
-        keySet.addAll(filterIndicesOpen);
-        keySet.addAll(filterIndicesClose);
     }
 
     /**
@@ -328,12 +227,8 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void collapseLine(int lineStart, int lineEnd) {
-        putOpenTag(lineStart, StylePos.FILTER,
+        putStyleTags(lineStart, lineEnd, HighlightType.FILTER,
                 NUIConstants.FILTER_COLLAPSED_TAG);
-        putCloseTag(lineEnd, StylePos.FILTER, NUIConstants.CLOSING_TAG);
-
-        filterIndicesOpen.add(lineStart);
-        filterIndicesClose.add(lineEnd);
     }
 
     /**
@@ -345,132 +240,71 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void minimizeLine(int lineStart, int lineEnd) {
-        putOpenTag(lineStart, StylePos.FILTER,
+        putStyleTags(lineStart, lineEnd, HighlightType.FILTER,
                 NUIConstants.FILTER_MINIMIZED_TAG);
-        putCloseTag(lineEnd, StylePos.FILTER, NUIConstants.CLOSING_TAG);
-
-        filterIndicesOpen.add(lineStart);
-        filterIndicesClose.add(lineEnd);
     }
 
     /**
      * removes all the applied Styling by the filter functions
      */
     private void removeFilter() {
-        if (filterIndicesOpen != null) {
-            for (Iterator<Integer> iterator = filterIndicesOpen
-                    .iterator(); iterator.hasNext();) {
-                int index = (int) iterator.next();
-                putOpenTag(index, StylePos.FILTER, "");
-            }
-            for (Iterator<Integer> iterator = filterIndicesClose
-                    .iterator(); iterator.hasNext();) {
-                int index = (int) iterator.next();
-                putCloseTag(index, StylePos.FILTER, "");
-            }
-
-            filterIndicesOpen.clear();
-            filterIndicesClose.clear();
-            filterCollapseIndicator.clear();
-        }
+        dictionary.removeAllTypeTags(HighlightType.FILTER);
+        filterCollapseIndicator.clear();
     }
 
     /**
-     * inserts the tag into the given HashMap. Use only if you are sure you know
-     * what to do
+     * to be used to add an opening <span class="..."> tag. Do not forget to
+     * call putCloseTag
      * 
      * @param index
      *            position inside the proofstring
-     * @param arrayPos
-     *            the StylePosition
+     * @param highlightType
+     *            the {@link HighlightType}
      * @param tag
-     *            the tag itself.
-     * @param map
-     *            the map to be inserted into
+     *            the opening tag constant
      */
-    private void putTag(int index, StylePos arrayPos, String tag,
-            Map<Integer, Map<Integer, List<String>>> map) {
-
-        if (map.get(index) == null) {
-            // If the Map Entry does not exist, create new Entry and call itself
-            // again.
-            map.put(index, new HashMap<Integer, List<String>>());
-        }
-        Map<Integer, List<String>> mapValue = map.get(index);
-
-        // ArrayList<String> tagList = mapValue[arrayPos.slotPosition];
-        // If Array entry is null make ArrayList and add tag
-        if (!mapValue.containsKey(arrayPos.slotPosition)) {
-            mapValue.put(arrayPos.slotPosition, new ArrayList<String>());
-            mapValue.get(arrayPos.slotPosition).add(tag);
-        }
-        else {
-            // If Tag is empty, one entry shall be removed
-            if (tag.isEmpty()) {
-                mapValue.get(arrayPos.slotPosition)
-                        .remove(mapValue.get(arrayPos.slotPosition).size() - 1);
-            }
-            else {
-                // If the Array entry is not null, the tag can be appended.
-                // Solves the problem with double consecutive chars
-                // ("wellformed")
-                mapValue.get(arrayPos.slotPosition).add(tag);
-            }
-
-        }
-
+    private void putOpenTag(int index, HighlightType highlightType,
+            String tag) {
+        dictionary.putOpenTag(index, highlightType, tag);
     }
 
     /**
-     * to be used to add an opening <span...> tag. Calls {@link putTag}
+     * puts an opening tag at the start position and a closing one at the end
+     * position
      * 
-     * @param index
-     *            position inside the proofstring
-     * @param arrayPos
-     *            the StylePosition
+     * @param start
+     *            startposition inside the proofstring
+     * @param end
+     *            endposition inside the proofstring
+     * @param type
+     *            the {@link HighlightType}
      * @param tag
-     *            the opening tag const or empty String
-     * @return the Map with all the openTag indices
+     *            the opening tag constant
      */
-    private Map<Integer, Map<Integer, List<String>>> putOpenTag(int index,
-            StylePos arrayPos, String tag) {
-        if (tag.isEmpty()) {
-            putTag(index, arrayPos, tag, openTagsAtIndex);
-        }
-        else {
-            putTag(index, arrayPos, NUIConstants.OPEN_TAG_BEGIN.concat(tag)
-                    .concat(NUIConstants.OPEN_TAG_END), openTagsAtIndex);
-        }
-
-        return openTagsAtIndex;
+    private void putStyleTags(int start, int end, HighlightType type,
+            String tag) {
+        putOpenTag(start, type, tag);
+        putCloseTag(end, type);
     }
 
     /**
-     * to be used to add a closing </span> tag. Calls {@link putTag}
+     * to be used to add a closing </span> tag. Do not forget to call
+     * putOpenTag.
      * 
      * @param index
      *            position inside the proofstring
-     * @param arrayPos
-     *            the StylePosition
-     * @param tag
-     *            the closingTag const or empty String
-     * @return the Map with all the closeTag indices
+     * @param highlightType
+     *            the {@link HighlightType}
      */
-    private Map<Integer, Map<Integer, List<String>>> putCloseTag(int index,
-            StylePos arrayPos, String tag) {
-        putTag(index, arrayPos, tag, closeTagsAtIndex);
-        return closeTagsAtIndex;
+    private void putCloseTag(int index, HighlightType highlightType) {
+        dictionary.putCloseTag(index, highlightType);
     }
 
     /**
      * removes all the Mouseover Highlighting currently applied.
      */
     public void removeMouseHighlighting() {
-        if (mouseRange != null) {
-            putOpenTag(mouseRange.start(), StylePos.MOUSE, "");
-            putCloseTag(mouseRange.end(), StylePos.MOUSE, "");
-            mouseRange = null;
-        }
+        dictionary.removeAllTypeTags(HighlightType.MOUSE);
     }
 
     /**
@@ -494,13 +328,9 @@ public class SequentPrinter {
                     while (matcher.find()) {
 
                         // Check all occurrences
-                        putOpenTag(matcher.start(), StylePos.SEARCH,
+                        putStyleTags(matcher.start(), matcher.end(),
+                                HighlightType.SEARCH,
                                 NUIConstants.HIGHLIGHTED_TAG);
-                        putCloseTag(matcher.end(), StylePos.SEARCH,
-                                NUIConstants.CLOSING_TAG);
-
-                        searchIndicesOpen.add(matcher.start());
-                        searchIndicesClose.add(matcher.end());
                     }
                 }
                 catch (RuntimeException e) {
@@ -513,19 +343,11 @@ public class SequentPrinter {
                 // removal
                 for (int i = -1; (i = proofString.indexOf(searchString,
                         i + 1)) != -1;) {
-                    putOpenTag(i, StylePos.SEARCH,
-                            NUIConstants.HIGHLIGHTED_TAG);
-                    putCloseTag(i + searchString.length(), StylePos.SEARCH,
-                            NUIConstants.CLOSING_TAG);
-
-                    searchIndicesOpen.add(i);
-                    searchIndicesClose.add(i + searchString.length());
+                    putStyleTags(i, i + searchString.length(),
+                            HighlightType.SEARCH, NUIConstants.HIGHLIGHTED_TAG);
                 }
             }
         }
-
-        keySet.addAll(searchIndicesOpen);
-        keySet.addAll(searchIndicesClose);
     }
 
     /**
@@ -533,22 +355,7 @@ public class SequentPrinter {
      * remove references in Styling TreeMap
      */
     private void removeSearchIndices() {
-        if (searchIndicesOpen != null) {
-            for (Iterator<Integer> iterator = searchIndicesOpen
-                    .iterator(); iterator.hasNext();) {
-                int index = (int) iterator.next();
-                putOpenTag(index, StylePos.SEARCH, "");
-            }
-            for (Iterator<Integer> iterator = searchIndicesClose
-                    .iterator(); iterator.hasNext();) {
-                int index = (int) iterator.next();
-                putCloseTag(index, StylePos.SEARCH, "");
-            }
-
-            searchIndicesOpen.clear();
-            searchIndicesClose.clear();
-
-        }
+        dictionary.removeAllTypeTags(HighlightType.SEARCH);
     }
 
     /**
@@ -558,12 +365,9 @@ public class SequentPrinter {
     public void setProofString(String proofString) {
         this.proofString = proofString;
 
-        // As a new ProofString means old styling Info is deprecated, Map is
-        // cleared.
+        // As a new ProofString means old styling Info is deprecated.
         lessThenList.clear();
-        openTagsAtIndex.clear();
-        closeTagsAtIndex.clear();
-        keySet.clear();
+        dictionary.clear();
 
         setLessThenIndices(proofString);
         applySyntaxHighlighting();
@@ -582,7 +386,6 @@ public class SequentPrinter {
         // removal
         for (int i = -1; (i = proofString.indexOf("<", i + 1)) != -1;) {
             lessThenList.add(i);
-            keySet.add(i);
         }
     }
 
@@ -598,8 +401,7 @@ public class SequentPrinter {
      * puts Syntax Styling Info in tagsAtIndex Map
      */
     private void applySyntaxHighlighting() {
-        Map<String, String> classMap = context.getXmlReader()
-                .getClassMap();
+        Map<String, String> classMap = context.getXmlReader().getClassMap();
         Map<String, Boolean> classEnabledMap = context.getXmlReader()
                 .getClassEnabledMap();
 
@@ -624,8 +426,7 @@ public class SequentPrinter {
             if ((proofString.charAt(i) == ' '
                     || proofString.charAt(i) == '\n')) {
                 if (openedTag) {
-                    putCloseTag(i, StylePos.SYNTAX, NUIConstants.CLOSING_TAG);
-                    keySet.add(i);
+                    putCloseTag(i, HighlightType.SYNTAX);
 
                     openedTag = false;
                     lastClass = null;
@@ -643,8 +444,8 @@ public class SequentPrinter {
                     if (lastClass == null && classMap.containsKey(className)
                             && classEnabledMap.get(className)) {
 
-                        putOpenTag(i, StylePos.SYNTAX, classMap.get(className));
-                        keySet.add(i);
+                        putOpenTag(i, HighlightType.SYNTAX,
+                                classMap.get(className));
 
                         openedTag = true;
                         lastClass = op.getClass();
@@ -653,17 +454,14 @@ public class SequentPrinter {
                     // If Class changed, close the existing Tag, open new one
                     else if (lastClass != null && lastClass != op.getClass()) {
 
-                        putCloseTag(i, StylePos.SYNTAX,
-                                NUIConstants.CLOSING_TAG);
-                        keySet.add(i);
+                        putCloseTag(i, HighlightType.SYNTAX);
 
                         openedTag = false;
                         if (classMap.containsKey(className)
                                 && classEnabledMap.get(className)) {
 
-                            putOpenTag(i, StylePos.SYNTAX,
+                            putOpenTag(i, HighlightType.SYNTAX,
                                     classMap.get(className));
-                            keySet.add(i);
                             lastClass = op.getClass();
                             openedTag = true;
                         }
@@ -726,16 +524,12 @@ public class SequentPrinter {
     }
 
     public void applySelection(Range range) {
-        keySet.add(range.start());
-        keySet.add(range.end());
-
-        putOpenTag(range.start(), StylePos.SELECTION,
+        putStyleTags(range.start(), range.end(), HighlightType.SELECTION,
                 NUIConstants.FILTER_SELECTION_TAG);
-        putCloseTag(range.end(), StylePos.SELECTION, NUIConstants.CLOSING_TAG);
     }
 
     public void removeSelection(Range range) {
-        putOpenTag(range.start(), StylePos.SELECTION, "");
-        putCloseTag(range.end(), StylePos.SELECTION, "");
+        dictionary.removeSingleStyleTag(range.start(), range.end(),
+                HighlightType.SELECTION);
     }
 }
