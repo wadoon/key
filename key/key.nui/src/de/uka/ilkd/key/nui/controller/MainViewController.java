@@ -47,7 +47,7 @@ import javafx.stage.FileChooser;
 
 /**
  * Controller for the main GUI which is displayed when the program was started.
- * 
+ *
  * @author Florian Breitfelder
  * @author Patrick Jattke
  * @author Stefan Pilot
@@ -132,7 +132,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles the ActionEvent resulting in the user clicking "Open Proof..." in
      * the File menu. Usually <b> not to be called by developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
@@ -155,12 +155,11 @@ public class MainViewController extends NUIController implements Observer {
             fileChooser.setInitialDirectory(new File("resources/de/uka/ilkd/key/examples"));
         }
 
-        FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter("Proof files",
-                "*.proof");
-        FileChooser.ExtensionFilter extFilterKey = new FileChooser.ExtensionFilter("Proof files",
-                "*.key");
+
+        FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
+                "Proof files", "*.proof", "*.key");
+
         fileChooser.getExtensionFilters().add(extFilterProof);
-        fileChooser.getExtensionFilters().add(extFilterKey);
 
         final File file = fileChooser.showOpenDialog(contextMenu);
 
@@ -172,7 +171,7 @@ public class MainViewController extends NUIController implements Observer {
 
     /**
      * Returns the Pane where all the Components in the Place p are stored.
-     * 
+     *
      * @param p
      *            a {@link Place}
      * @return the respective Pane
@@ -197,7 +196,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles the ActionEvent resulting in the user clicking "About KeY" in the
      * About menu. Usually <b> not to be called by developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
@@ -213,19 +212,12 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles the ActionEvent resulting in the user clicking "Close" in the
      * File menu. Usually <b> not to be called by developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
     @FXML
     public final void handleCloseWindow(final Event e) {
-
-        // enforces to show the confirmation dialog always before closing KeY
-        // TODO remove this line after 2nd round of user study
-        // TODO set visibility of setModified to private
-        if (dataModel.getLoadedTreeViewState() != null) {
-            dataModel.getLoadedTreeViewState().setModified(true);
-        }
 
         // If no proof file was loaded OR file was not changed: close
         // application immediately
@@ -239,17 +231,32 @@ public class MainViewController extends NUIController implements Observer {
         // create alert window
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("dialogTitle"));
+<<<<<<< HEAD
         alert.setHeaderText(nui.getStringFromBundle("dialogHeader"));
         String filename = dataModel.getLoadedTreeViewState().getProof().getProofFile().getName();
         alert.setContentText(nui.getStringFromBundle("dialogQuestion") + " '" + filename + "' ?");
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+=======
+        String filename = dataModel.getLoadedTreeViewState().getProof()
+                .getProofFile().getName();
+        alert.setHeaderText(MessageFormat.format(
+                nui.getStringFromBundle("dialogHeader"), "'" + filename + "'"));
+        alert.setContentText(nui.getStringFromBundle("dialogQuestion"));
+
+        ButtonType buttonSaveAs = new ButtonType(
+                bundle.getString("dialogSaveAs"));
+        ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
+        ButtonType buttonAbort = new ButtonType(
+                bundle.getString("dialogAbort"));
+
+        alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
+>>>>>>> da-bpTeam10
         Optional<ButtonType> result = alert.showAndWait();
 
-        if (result.get() == ButtonType.YES || result.get() == ButtonType.NO) {
+        if (result.get() == buttonSaveAs || result.get() == buttonClose) {
             // If YES was selected: save changes made to file
-            if (result.get() == ButtonType.YES) {
-                Proof proof = dataModel.getLoadedTreeViewState().getProof();
-                dataModel.saveProof(proof, proof.getProofFile());
+            if (result.get() == buttonSaveAs) {
+                handleSaveProofAs(null);
             }
             // Close application without saving
             Platform.exit();
@@ -263,7 +270,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles saving of a proof file if no destination path is specified. Uses
      * the location where the proof was saved to the last time.
-     * 
+     *
      * @param e
      *            the ActionEvent raised by clicking on the MenuItem.
      */
@@ -285,7 +292,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles saving of a proof file if the destination path should be
      * specified. Opens a file chooser dialog where the path can be chosen.
-     * 
+     *
      * @param e
      *            the ActionEvent raised by clicking on the MenuItem.
      */
@@ -329,7 +336,7 @@ public class MainViewController extends NUIController implements Observer {
 
     /**
      * NEW
-     * 
+     *
      * @param component
      * @param place
      */
@@ -369,7 +376,7 @@ public class MainViewController extends NUIController implements Observer {
      * Handles the ActionEvent resulting in the user adding, hiding or moving
      * GUI components via the View menu. Usually <b> not to be called by
      * developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
@@ -410,7 +417,7 @@ public class MainViewController extends NUIController implements Observer {
      * Executes the given EventHandler e if any key was pressed, therefore the
      * provided Handler <b>must check by itself</b> if the right KeyCode was
      * pressed.
-     * 
+     *
      * @param e
      *            The EventHandler
      */
@@ -423,14 +430,13 @@ public class MainViewController extends NUIController implements Observer {
      */
     @Override
     protected void init() {
-
         dataModel.addObserver(this);
     }
 
     /**
      * Updates the status bar on the mainView by the given text. Keeps the text
      * on the status bar till the next update is performed.
-     * 
+     *
      * @param text
      *            String to be set to the status bar.
      */
@@ -442,7 +448,7 @@ public class MainViewController extends NUIController implements Observer {
 
     /**
      * Updates the MainView if any change in the dataModel occurred.
-     * 
+     *
      * @param o
      *            The observable, here the dataModel
      * @param arg
