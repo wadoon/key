@@ -128,18 +128,20 @@ public class FilteringHandler {
                 if (annotations == null) {
                     continue;
                 }
-                for (Annotation annotation : annotations) {
-                    // Check if there is a annotations of type
-                    // FilterAnnotation
-                    if (annotation instanceof FilterAnnotation) {
-                        FilterAnnotation filterAnnotation = (FilterAnnotation) annotation;
-                        /*
-                         * If the annotation isFilter is true, the current
-                         * class is a valid filter class therefore create a
-                         * new instance of it and add it to filters.
-                         */
-                        if (filterAnnotation.isFilter()) {
-                            filters.add((ProofTreeFilter) c.newInstance());
+                else {
+                    for (Annotation annotation : annotations) {
+                        // Check if there is a annotations of type
+                        // FilterAnnotation
+                        if (annotation instanceof FilterAnnotation) {
+                            FilterAnnotation filterAnnotation = (FilterAnnotation) annotation;
+                            /*
+                             * If the annotation isFilter is true, the current
+                             * class is a valid filter class therefore create a
+                             * new instance of it and add it to filters.
+                             */
+                            if (filterAnnotation.isFilter()) {
+                                filters.add((ProofTreeFilter) c.newInstance());
+                            }
                         }
                     }
                 }
