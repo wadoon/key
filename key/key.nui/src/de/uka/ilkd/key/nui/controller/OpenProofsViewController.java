@@ -48,7 +48,7 @@ public class OpenProofsViewController extends NUIController
         deleteProof.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                dataModel.deleteProof(listView.getSelectionModel()
+                dataModel.removeProof(listView.getSelectionModel()
                         .getSelectedItem().toString());
             }
         });

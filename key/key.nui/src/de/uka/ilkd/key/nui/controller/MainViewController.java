@@ -234,8 +234,8 @@ public class MainViewController extends NUIController implements Observer {
         String filename = dataModel.getLoadedTreeViewState().getProof()
                 .getProofFile().getName();
         alert.setHeaderText(MessageFormat.format(
-                nui.getStringFromBundle("dialogHeader"), "'" + filename + "'"));
-        alert.setContentText(nui.getStringFromBundle("dialogQuestion"));
+                bundle.getString("dialogHeader"), "'" + filename + "'"));
+        alert.setContentText(bundle.getString("dialogQuestion"));
 
         ButtonType buttonSaveAs = new ButtonType(
                 bundle.getString("dialogSaveAs"));
@@ -501,19 +501,9 @@ public class MainViewController extends NUIController implements Observer {
                     }
                 });
             }
-            catch (NoSuchMethodException e1) {
-                e1.printStackTrace();
-            }
-            catch (SecurityException e1) {
-                e1.printStackTrace();
-            }
-            catch (IllegalAccessException e1) {
-                e1.printStackTrace();
-            }
-            catch (IllegalArgumentException e1) {
-                e1.printStackTrace();
-            }
-            catch (InvocationTargetException e1) {
+            catch (NoSuchMethodException | SecurityException
+                    | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e1) {
                 e1.printStackTrace();
             }
             catch (java.lang.ThreadDeath e) {

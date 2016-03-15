@@ -6,7 +6,7 @@ public class ComponentNotFoundException extends NUIException {
      * 
      */
     private static final long serialVersionUID = 1L;
-    
+
     private String file;
 
     public ComponentNotFoundException(String file) {

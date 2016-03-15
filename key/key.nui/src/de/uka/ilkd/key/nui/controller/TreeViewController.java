@@ -36,16 +36,6 @@ import javafx.scene.layout.VBox;
 public class TreeViewController extends NUIController implements Observer {
 
     /**
-     * The name of the GUI component.
-     */
-    public static final String NAME = "treeView";
-
-    /**
-     * The fxml file name.
-     */
-    public static final String RESOURCE = "treeView.fxml";
-
-    /**
      * The IconFactory used to create icons for the proof tree nodes.
      */
     private IconFactory icf;

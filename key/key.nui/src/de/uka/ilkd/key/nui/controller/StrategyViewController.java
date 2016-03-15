@@ -122,7 +122,7 @@ public class StrategyViewController extends NUIController {
 
     public void handleOnAction(final ActionEvent e)
             throws ControllerNotFoundException {
-        
+
         ProofStarter proofStarter = new ProofStarter(false);
         String filename;
 
@@ -167,7 +167,7 @@ public class StrategyViewController extends NUIController {
                     fxtree);
 
             // update datamodel
-            dataModel.updateTreeViewState(filename, updatedTreeViewState);
+            dataModel.saveTreeViewState(updatedTreeViewState, filename);
 
         }
     }

@@ -14,8 +14,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 
 /**
@@ -178,7 +176,7 @@ public class ProofTreeContextMenu extends ContextMenu {
         mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
         mISearch.setAccelerator(KeyCombination.keyCombination("Ctrl+F"));
         mISearch.setOnAction(aEvt -> treeViewController.openSearchView());
-        
+
     }
 
     private void addMenuItemsFilter() {

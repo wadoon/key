@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -69,6 +68,7 @@ public class IconFactory {
     // StrategyView
     /** file name of goButton icon */
     public static final String GO_BUTTON = folderRoot + "goButton.png";
+
     /**
      * The constructor.
      * 

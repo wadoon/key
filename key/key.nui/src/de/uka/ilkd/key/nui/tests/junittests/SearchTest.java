@@ -2,18 +2,15 @@ package de.uka.ilkd.key.nui.tests.junittests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import static org.junit.Assert.fail;
+
 import java.io.File;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
-
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
@@ -28,7 +25,6 @@ public class SearchTest {
     /**
      * The proof file used for this test.
      */
-    // private static String TESTFILE_01 = "../../../examples/example01.proof";
     private final String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**

@@ -5,11 +5,12 @@ import de.uka.ilkd.key.nui.prooftree.NUILeafNode;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 
 /**
- * A proof tree filter that can be used to hide all nodes
- * that are non-interactive.
+ * A proof tree filter that can be used to hide all nodes that are
+ * non-interactive.
+ * 
  * @author Matthias Schultheis
  */
-@FilterAnnotation(isFilter=true)
+@FilterAnnotation(isFilter = true)
 public class FilterHideNonInteractive implements ProofTreeFilter {
 
     /**

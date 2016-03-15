@@ -423,7 +423,7 @@ public abstract class NUINode implements Cloneable {
         ProofTreeStyler pts = new ProofTreeStyler();
         this.style = pts.getStyleConfiguration(this);
     }
-    
+
     public StyleConfiguration getStyleConfiguration() {
         return this.style;
     }

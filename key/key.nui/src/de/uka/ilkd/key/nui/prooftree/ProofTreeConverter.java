@@ -10,7 +10,6 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -209,16 +208,18 @@ public class ProofTreeConverter {
         newNode.setLabel(nodeName);
         newNode.setHasNotes(proofNode.getNodeInfo().getNotes() != null);
         newNode.setActive(proofNode.getNodeInfo().getActiveStatement() != null);
-        
+
         // set symbolic execution field
         boolean symbolicExecution;
         final RuleApp rule = proofNode.getAppliedRuleApp();
         if (rule instanceof TacletApp) {
-            symbolicExecution = NodeInfo.isSymbolicExecution(((TacletApp) rule).taclet());
+            symbolicExecution = NodeInfo
+                    .isSymbolicExecution(((TacletApp) rule).taclet());
         }
         else if (rule instanceof IBuiltInRuleApp) {
             symbolicExecution = true;
-        } else {
+        }
+        else {
             symbolicExecution = false;
         }
         newNode.setSymbolicExcecution(symbolicExecution);

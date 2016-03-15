@@ -29,6 +29,7 @@ import javafx.stage.Stage;
  * Main Class for initializing the GUI.
  * 
  * @author Florian Breitfelder
+ * @author Patrick Jattke
  *
  */
 public class NUI extends Application {
@@ -42,7 +43,9 @@ public class NUI extends Application {
      * The main method.
      * 
      * @param args
-     *            The arguments passed to the program.
+     *            The arguments passed to the program. Can take the path to a
+     *            proof file as argument, which is loaded right after program
+     *            startup.
      */
     public static void main(final String... args) {
         if (args.length != 0) {
@@ -53,30 +56,65 @@ public class NUI extends Application {
     }
 
     /**
-     * 
+     * Contains references to all loaded controllers, where <br \>
+     * <ul>
+     * <li>String is the fx:id of the loaded controller.
+     * <li>NUIController is the reference to the loaded controller.
+     * </ul>
      */
-    private HashMap<String, NUIController> controllers = new HashMap<String, NUIController>();
+    private HashMap<String, NUIController> controllers = new HashMap<>();
 
     /**
-     * 
+     * Contains the loaded components, where
+     * <ul>
+     * <li>String represents the fx:id of the loaded component.
+     * <li>Pane is the reference to the loaded component.
+     * </ul>
      */
-    private HashMap<String, Pane> components = new HashMap<String, Pane>();
+    private HashMap<String, Pane> components = new HashMap<>();
 
     /**
-     * 
+     * Contains the loaded toggle groups, where
+     * <ul>
+     * <li>String represents the fx:id of the loaded toggle group.
+     * <li>ToggleGroup is the reference to the loaded toggle group.
+     * </ul>
      */
-    private HashMap<String, ToggleGroup> toggleGroups = new HashMap<String, ToggleGroup>();
+    private HashMap<String, ToggleGroup> toggleGroups = new HashMap<>();
 
+    /**
+     * The currently loaded resource bundle (language file).
+     */
     private ResourceBundle bundle = null;
+
+    /**
+     * The root border pane where all others components get loaded in.
+     */
     private BorderPane root = null;
+
+    /**
+     * The FXML Loader used to load the other controllers and components.
+     */
     private FXMLLoader fxmlLoader = null;
+
+    /**
+     * A reference to the {@link MainViewController}.
+     */
     private MainViewController mainViewController = null;
 
+    /**
+     * The menu "View" of the menu bar.
+     */
     private Menu viewPositionMenu = null;
-    private DataModel dataModel = new DataModel(this);
 
     /**
-     * When program is starting method "start" is called.
+     * The data model used to store the loaded proof as a {@link TreeViewState}.
+     */
+    private DataModel dataModel = new DataModel(this, bundle);
+
+    /**
+     * When program is starting method "start" is called. Loads the stage and
+     * scene.
      */
     @Override
     public final void start(final Stage stage) throws Exception {
@@ -96,17 +134,22 @@ public class NUI extends Application {
                 ((MainViewController) getController("MainView"))
                         .handleCloseWindow(e);
             }
-            catch (Exception e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+            catch (ControllerNotFoundException e1) {
+                e1.showMessage();
             }
         });
     }
 
+    /**
+     * Initializes the application, such as all components, all controllers and
+     * views.
+     * 
+     * @throws Exception
+     */
     public void initializeNUI() throws Exception {
         // Load Main View
         String filename = "MainView.fxml";
-        String name = cutFileExtension(filename);
+        String name = filename.substring(0, filename.lastIndexOf("."));
 
         bundle = new PropertyResourceBundle(
                 getClass().getResourceAsStream("bundle_en_EN.properties"));
@@ -138,11 +181,21 @@ public class NUI extends Application {
         mainViewController.addComponent(getComponent("proofViewPane"),
                 Place.MIDDLE);
         mainViewController.addComponent(getComponent("strategyViewPane"),
-                Place.RIGHT); // TODO
+                Place.RIGHT);
         mainViewController.addComponent(getComponent("openProofsViewPane"),
                 Place.BOTTOM);
     }
 
+    /**
+     * Loads the FXML components and stores the references to
+     * <ul>
+     * <li>the controllers in {@link #controllers}
+     * <li>the components in {@link #components}
+     * <li>the toggle groups in {@link #toggleGroups}.
+     * </ul>
+     * 
+     * @throws Exception
+     */
     private void loadComponents() throws Exception {
         File[] files = new File(getClass().getResource("components").getPath())
                 .listFiles();
@@ -153,7 +206,6 @@ public class NUI extends Application {
                         getClass().getResource("components/" + file.getName()),
                         bundle);
 
-                // String componentName = cutFileExtension(file.getName());
                 Pane component = fxmlLoader.load();
                 components.put(component.getId(), component);
                 NUIController nuiController;// = new NUIController();
@@ -165,99 +217,117 @@ public class NUI extends Application {
                             component.getId(), file.getName());
                 controllers.put(component.getId(), nuiController);
 
+                // get all annotations of type ControllerAnnotation
+                // if no annotations are present, returns a array of length 0
                 Annotation[] annotations = nuiController.getClass()
-                        .getAnnotations();
+                        .getAnnotationsByType(ControllerAnnotation.class);
 
                 // create a view position menu for every component
-                if (annotations != null) {
-                    for (Annotation annotation : annotations) {
-                        if (annotation instanceof ControllerAnnotation) {
-                            ControllerAnnotation controllerAnnotation = (ControllerAnnotation) annotation;
-                            if (controllerAnnotation.createMenu()) {
-                                ToggleGroup toggleGroup = new ToggleGroup();
-                                toggleGroups.put(component.getId(),
-                                        toggleGroup);
-                                viewPositionMenu.getItems().add(createSubMenu(
-                                        component.getId(), toggleGroup));
-                                break;
-                            }
-                        }
+                for (Annotation annotation : annotations) {
+                    if (((ControllerAnnotation) annotation).createMenu()) {
+                        ToggleGroup toggleGroup = new ToggleGroup();
+                        toggleGroups.put(component.getId(), toggleGroup);
+                        viewPositionMenu.getItems().add(
+                                createSubMenu(component.getId(), toggleGroup));
+                        break;
                     }
-
                 }
             }
         }
     }
 
-    private Menu createSubMenu(String componentName, ToggleGroup toggleGroup) {
-        Menu menu = new Menu(bundle.getString(componentName));
-
+    /**
+     * Creates sub menu entries for the "View" menu.
+     * 
+     * @param menuName
+     *            The name of the menu where sub menu should be added to.
+     * @param toggleGroup
+     *            The toggle group containing the sub menu entries.
+     * @return The constructed Menu.
+     */
+    private Menu createSubMenu(String menuName, ToggleGroup toggleGroup) {
+        Menu menu = new Menu(bundle.getString(menuName));
         String hideText = bundle.getString("hide");
         String leftText = bundle.getString("left");
         String rightText = bundle.getString("right");
         String bottomText = bundle.getString("bottom");
         String middleText = bundle.getString("middle");
 
-        RadioMenuItem hide = new RadioMenuItem(hideText);
-        hide.setOnAction(mainViewController.getNewHandleLoadComponent());
-        hide.setId("hide");
-        // hide.getProperties().put("componentResource", componentName +
-        // ".fxml");
-        hide.getProperties().put("componentName", componentName);
-        hide.setToggleGroup(toggleGroup);
-        hide.setSelected(true);
-        hide.setUserData(Place.HIDDEN);
-        menu.getItems().add(hide);
+        addRadioMenuItem(hideText, menuName, toggleGroup, true, Place.HIDDEN,
+                menu);
 
-        RadioMenuItem left = new RadioMenuItem(leftText);
-        left.setOnAction(mainViewController.getNewHandleLoadComponent());
-        left.setId("left");
-        // left.getProperties().put("componentResource", componentName +
-        // ".fxml");
-        left.getProperties().put("componentName", componentName);
-        left.setToggleGroup(toggleGroup);
-        left.setUserData(Place.LEFT);
-        menu.getItems().add(left);
+        addRadioMenuItem(leftText, menuName, toggleGroup, false, Place.LEFT,
+                menu);
 
-        RadioMenuItem right = new RadioMenuItem(rightText);
-        right.setOnAction(mainViewController.getNewHandleLoadComponent());
-        right.setId("right");
-        // right.getProperties().put("componentResource", componentName +
-        // ".fxml");
-        right.getProperties().put("componentName", componentName);
-        right.setToggleGroup(toggleGroup);
-        right.setUserData(Place.RIGHT);
-        menu.getItems().add(right);
+        addRadioMenuItem(rightText, menuName, toggleGroup, false, Place.RIGHT,
+                menu);
 
-        RadioMenuItem bottom = new RadioMenuItem(bottomText);
-        bottom.setOnAction(mainViewController.getNewHandleLoadComponent());
-        bottom.setId("bottom");
-        // bottom.getProperties().put("componentResource",
-        // componentName + ".fxml");
-        bottom.getProperties().put("componentName", componentName);
-        bottom.setToggleGroup(toggleGroup);
-        bottom.setUserData(Place.BOTTOM);
-        menu.getItems().add(bottom);
+        addRadioMenuItem(bottomText, menuName, toggleGroup, false, Place.BOTTOM,
+                menu);
 
-        RadioMenuItem middle = new RadioMenuItem(middleText);
-        middle.setOnAction(mainViewController.getNewHandleLoadComponent());
-        middle.setId("middle");
-        // middle.getProperties().put("componentResource",
-        // componentName + ".fxml");
-        middle.getProperties().put("componentName", componentName);
-        middle.setToggleGroup(toggleGroup);
-        middle.setUserData(Place.MIDDLE);
-        menu.getItems().add(middle);
+        addRadioMenuItem(middleText, menuName, toggleGroup, false, Place.MIDDLE,
+                menu);
 
         return menu;
     }
 
+    /**
+     * Creates a radio menu item entry and adds it to the given Menu
+     * <code>destinationMenu</code>.
+     * 
+     * @param menuItemName
+     *            The fx:id and shown name of the menu entry.
+     * @param componentName
+     *            The component name associated with.
+     * @param tGroup
+     *            The toggle group where the item belongs to.
+     * @param isSelected
+     *            Specifies whether the item is selected by default or not.
+     * @param position
+     *            The position of the view associated with the menu item entry.
+     * @param destinationMenu
+     *            The destination menu where the menu item should be added to.
+     */
+    private void addRadioMenuItem(String menuItemName, String componentName,
+            ToggleGroup tGroup, Boolean isSelected, Place position,
+            Menu destinationMenu) {
+        RadioMenuItem menuItem = new RadioMenuItem(menuItemName);
+        menuItem.setOnAction(mainViewController.getNewHandleLoadComponent());
+        menuItem.setId(menuItemName);
+        menuItem.getProperties().put("componentName", componentName);
+        menuItem.setToggleGroup(tGroup);
+        menuItem.setSelected(isSelected);
+        menuItem.setUserData(position);
+        destinationMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * Returns the component with the specified fx:id of the list of loaded
+     * components {@link #components}.
+     * 
+     * @param name
+     *            The fx:id of the component.
+     * @return A reference to a pane corresponding to the given fx:id.
+     * @throws ComponentNotFoundException
+     *             If no component with the given fx:id was found.
+     */
     public Pane getComponent(String name) throws ComponentNotFoundException {
         if (!components.containsKey(name))
             throw new ComponentNotFoundException(name);
         return components.get(name);
     }
 
+    /**
+     * Returns the controller with the specified fx:id of the list of loaded
+     * controller {@link #controllers}.
+     * 
+     * @param name
+     *            The fx:id of the controller.
+     * @return A subclass of NUIController, which is a reference to the
+     *         controller.
+     * @throws ControllerNotFoundException
+     *             If no controller with the given fx:id was found.
+     */
     public NUIController getController(String name)
             throws ControllerNotFoundException {
         if (!controllers.containsKey(name))
@@ -272,10 +342,11 @@ public class NUI extends Application {
         return toggleGroups.get(name);
     }
 
-    private String cutFileExtension(String filename) {
-        return filename.substring(0, filename.lastIndexOf("."));
-    }
-
+    /**
+     * Returns the main border pane containing all other components.
+     * 
+     * @return BorderPane where all other components are in.
+     */
     public BorderPane getRoot() {
         return root;
     }
@@ -287,18 +358,6 @@ public class NUI extends Application {
      */
     public static File getInitialProofFile() {
         return initialProofFile;
-    }
-
-    /**
-     * Returns the text from the current loaded bundle corresponding to the
-     * provided String key.
-     * 
-     * @param key
-     *            the String used to identify the string in the bundle file
-     * @return the String of the corresponding key
-     */
-    public String getStringFromBundle(String key) {
-        return bundle.getString(key);
     }
 
     /**

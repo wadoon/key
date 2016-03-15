@@ -5,14 +5,15 @@ import de.uka.ilkd.key.nui.prooftree.NUILeafNode;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 
 /**
- * A proof tree filter that can be used to hide nodes that
- * are no symbolic executions.
+ * A proof tree filter that can be used to hide nodes that are no symbolic
+ * executions.
+ * 
  * @author Matthias Schultheis
  *
  */
-@FilterAnnotation(isFilter=true)
+@FilterAnnotation(isFilter = true)
 public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
-    
+
     /**
      * {@inheritDoc}
      */

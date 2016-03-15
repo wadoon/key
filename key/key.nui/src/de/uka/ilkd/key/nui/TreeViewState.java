@@ -76,7 +76,7 @@ public class TreeViewState {
 
     /**
      * Returns TRUE if the proof of the TreeViewState was modified after loading
-     * it, else returns FALSE.
+     * or after last saving it, else returns FALSE.
      * 
      * @return the status of the changes at the proof file.
      */

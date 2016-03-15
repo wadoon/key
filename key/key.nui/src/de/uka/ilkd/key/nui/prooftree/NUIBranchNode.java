@@ -52,15 +52,16 @@ public class NUIBranchNode extends NUINode {
     public final List<NUINode> getChildren() {
         return children;
     }
-    
+
     /**
      * Sets the children of the branch node.
+     * 
      * @param children
      */
     public void setChildren(final List<NUINode> children) {
         this.children = children;
     }
-    
+
     /**
      * Returns the parent node of the branch node.
      * 
@@ -103,7 +104,8 @@ public class NUIBranchNode extends NUINode {
             return 0;
         }
 
-        boolean thisIsASearchResult = getLabel().toLowerCase().contains(term.toLowerCase());
+        boolean thisIsASearchResult = getLabel().toLowerCase()
+                .contains(term.toLowerCase());
 
         int numberOfResultsAccumulator = thisIsASearchResult ? 1 : 0;
 
@@ -122,10 +124,11 @@ public class NUIBranchNode extends NUINode {
      * @param parent
      *            The node to set as parent node of the branch node.
      */
-    public final void setProofParentNode(final de.uka.ilkd.key.proof.Node parent) {
+    public final void setProofParentNode(
+            final de.uka.ilkd.key.proof.Node parent) {
         this.proofParentNode = parent;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -133,7 +136,7 @@ public class NUIBranchNode extends NUINode {
         // create clone
         final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
         this.copyFields(this, cloned);
-        
+
         // set children
         final LinkedList<NUINode> newChildren = new LinkedList<NUINode>();
         for (final NUINode child : this.children) {
@@ -142,30 +145,29 @@ public class NUIBranchNode extends NUINode {
             newChildren.add(clonedChild);
         }
         cloned.setChildren(newChildren);
-        
+
         return cloned;
     }
-    
+
     /**
-     * Clones the branch node without children.
-     * The children list will be empty.
+     * Clones the branch node without children. The children list will be empty.
+     * 
      * @return the cloned branch node
      */
     public NUIBranchNode cloneWithoutChildren() {
         // create clone
         final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
         this.copyFields(this, cloned);
-        
+
         return cloned;
     }
-    
 
     @Override
-    public List<NUINode> asList(){
+    public List<NUINode> asList() {
         List<NUINode> l = new LinkedList<>();
         l.add(this);
         children.forEach((child) -> l.addAll(child.asList()));
         return l;
     }
-    
+
 }
