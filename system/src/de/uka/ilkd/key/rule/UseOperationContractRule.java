@@ -669,7 +669,7 @@ public class UseOperationContractRule implements BuiltInRule {
             Term[] subs = new Term[resultFct.arity()];
             int i = 0;
             for(LocationVariable h : heapContext) {
-                subs[i++] = tb.var(h);
+                subs[i++] = atPres.get(h);
             }
             if (contractSelf != null) {
                 subs[i++] = contractSelf;
