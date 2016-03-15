@@ -34,6 +34,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -646,7 +647,40 @@ public class UseOperationContractRule implements BuiltInRule {
                                            tb.var(excVar),
                                            atPres,
                                            services);
-        final Term post = globalDefs==null? originalPost: tb.apply(globalDefs, originalPost);
+        
+        Term post = tb.tt();
+        if (contractResult != null) {
+            String name = "resultOf"+inst.pm.getFullName();
+            for (ParameterDeclaration pd : inst.pm.getParameters()) {
+                name += ("_"+pd.getTypeReference().getName());
+            }            
+            Name resultFctName = new Name(name);
+            Function resultFct = (Function) services.getNamespaces().functions().lookup(resultFctName);
+            if (resultFct == null) {                
+                Sort[] params = new Sort[inst.pm.arity()];
+                int i = 0;
+                for(Sort paramSort : inst.pm.argSorts()) {
+                    params[i++] = paramSort;
+                }
+                resultFct = new Function(resultFctName, resultVar.sort(), params);
+                services.getNamespaces().functions().add(resultFct);
+            }  
+            
+            Term[] subs = new Term[resultFct.arity()];
+            int i = 0;
+            for(LocationVariable h : heapContext) {
+                subs[i++] = tb.var(h);
+            }
+            if (contractSelf != null) {
+                subs[i++] = contractSelf;
+            }
+            for(Term param : contractParams) {
+                subs[i++] = param;
+            }            
+            
+            post = tb.and(post, tb.equals(contractResult, tb.func(resultFct, subs)));
+        }        
+        post = tb.and(globalDefs==null? originalPost: tb.apply(globalDefs, originalPost), post);
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 
         for(LocationVariable heap : heapContext) {
