@@ -65,7 +65,9 @@ public class TreeViewController extends NUIController implements Observer {
     @FXML
     private TreeView<NUINode> proofTreeView;
 
-    // TODO comments
+    /**
+     * Handles the filtering of the proofTree.
+     */
     private FilteringHandler fh;
 
     /**
@@ -146,24 +148,35 @@ public class TreeViewController extends NUIController implements Observer {
                 .getTreeViewState((String) arg);
         ProofTreeItem treeItem;
 
-        if (treeViewState == null) {
-            treeItem = null;
-        }
-        else {
-            treeItem = treeViewState.getTreeItem();
-        }
+        treeItem = (treeViewState == null) ? null : treeViewState.getTreeItem();
+
         // update the proofTreeView component in the treeView
         proofTreeView.setRoot(treeItem);
     }
 
+    /**
+     * Adds the given searchViewPane to the TreeViewController and stores a
+     * reference to the SearchViewController.
+     * 
+     * @param searchViewPane
+     *            The pane containing the SearchView.
+     * @param nuiController
+     *            The SearchViewController used to search in the TreeView.
+     */
     public void addSearchView(Pane searchViewPane,
             NUIController nuiController) {
-
         this.searchViewPane = searchViewPane;
         if (nuiController instanceof SearchViewController)
             this.searchViewController = (SearchViewController) nuiController;
     }
 
+    /**
+     * Returns a set of all {@link ProofTreeCell} currently display in the
+     * TreeView.
+     * 
+     * @return Set&tl;ProofTreeCell%gt; a set of ProofTreeCells.
+     * 
+     */
     public Set<ProofTreeCell> getProofTreeCells() {
         return this.proofTreeCells;
     }

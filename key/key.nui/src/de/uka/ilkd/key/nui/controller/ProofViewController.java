@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 
 /**
+ * Controller for the view showing the proof file statistics.
  * 
  * @author Florian Breitfelder
  *
@@ -32,14 +33,11 @@ public class ProofViewController extends NUIController implements Observer {
             textAreaProof.setText(
                     treeViewState.getProof().getStatistics().toString());
         }
+        else if (((DataModel) o).getListOfProofs().size() >= 1) {
+            textAreaProof.setText(bundle.getString("noProofSelected"));
+        }
         else {
-            if (((DataModel) o).getListOfProofs().size() >= 1) {
-                textAreaProof.setText(bundle.getString("noProofSelected"));
-            }
-            else {
-                textAreaProof.setText(bundle.getString("noProofLoaded"));
-            }
+            textAreaProof.setText(bundle.getString("noProofLoaded"));
         }
     }
-
 }

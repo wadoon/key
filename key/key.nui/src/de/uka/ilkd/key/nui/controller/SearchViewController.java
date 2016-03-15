@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.sun.javafx.scene.control.skin.TreeViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualContainerBase;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualFlow.ArrayLinkedList;
@@ -26,6 +25,8 @@ import javafx.util.Duration;
 
 /**
  * 
+ * Controller for handling the search functionality in the searchViewPane.
+ * 
  * @author Florian Breitfelder
  *
  */
@@ -36,6 +37,9 @@ public class SearchViewController extends NUIController {
         UP, DOWN
     }
 
+    /**
+     * The number of results returned by the last search.
+     */
     private int numberOfSearchResults = 0;
 
     /**
@@ -98,7 +102,6 @@ public class SearchViewController extends NUIController {
      */
     public void initSearch(TreeView<NUINode> proofTreeView,
             Set<ProofTreeCell> proofTreeCells, Pane treeViewPane) {
-
         this.proofTreeView = proofTreeView;
         this.proofTreeCells = proofTreeCells;
         this.treeViewPane = treeViewPane;
@@ -106,14 +109,20 @@ public class SearchViewController extends NUIController {
         Platform.runLater(() -> tfSearchQuery.requestFocus());
     }
 
+    /**
+     * Moves the focus to the text field in the searchView.
+     */
     public void performFocusRequest() {
         tfSearchQuery.requestFocus();
     }
 
     /**
-     * TODO Bitte nicht loeschen, in Code Reviews bitte ignorieren
+     * Returns the {@link ProofTreeCell ProofTreeCells} currently shown in the
+     * TreeView. <br />
      * 
-     * @return
+     * <b> Temporary solution, please ignore in Code Reviews </b>
+     * 
+     * @return Set&lt;ProofTreeCell&gt; containing the rendered ProofTreeCells.
      */
     @SuppressWarnings({ "unchecked", "cast" })
     private Set<ProofTreeCell> getProofTreeCells() {
@@ -124,9 +133,7 @@ public class SearchViewController extends NUIController {
             g.setAccessible(true);
             Set<ProofTreeCell> s = new HashSet<>();
             s.addAll((ArrayLinkedList<ProofTreeCell>) g
-                    .get(((VirtualFlow<ProofTreeCell>) f
-                            .get(((TreeViewSkin<NUINode>) proofTreeView
-                                    .skinProperty().get())))));
+                    .get((f.get((proofTreeView.skinProperty().get())))));
             return s;
         }
         catch (NoSuchFieldException | SecurityException
@@ -161,9 +168,22 @@ public class SearchViewController extends NUIController {
                  *         it
                  */
 
-                // just to get rid of an odd warning – see http://stackoverflow.com/questions/921025
-                protected TreeToListHelper(){}
+                // just to get rid of an odd warning – see
+                // http://stackoverflow.com/questions/921025
+                protected TreeToListHelper() {
+                }
 
+                /**
+                 * Converts the given {@link TreeItem} into a list containing
+                 * all elements of the tree.
+                 * 
+                 * @param root
+                 *            The root of the (sub)tree whose nodes should be
+                 *            collected.
+                 * @param list
+                 *            The accumulator used to collect the nodes.
+                 * @return A {@link List} of TreeItems.
+                 */
                 private <T> List<TreeItem<T>> treeToList(final TreeItem<T> root,
                         final List<TreeItem<T>> list) {
                     if (root == null || list == null) {
@@ -202,13 +222,8 @@ public class SearchViewController extends NUIController {
         }
 
         List<TreeItem<NUINode>> treeItems = getTreeItems();
-        // catch bad calls
-        // if (searchMatches == null || searchMatches.isEmpty())
-        // return;
-
         final TreeItem<NUINode> currentlySelectedItem = proofTreeView
                 .getSelectionModel().getSelectedItem();
-
         TreeItem<NUINode> itemToSelect = null;
 
         // Basically does: itemToSelect = currentlySelectedItem + 1
@@ -286,18 +301,28 @@ public class SearchViewController extends NUIController {
 
     @Override
     protected void init() {
+        // Define action for 'previous (<)' button
         btnSearchPrev.setOnAction(
                 (event) -> moveSelectionAndScrollIfNeeded(Direction.DOWN));
+
+        // Define action for 'next (>)' button
         btnSearchNext.setOnAction(
                 (event) -> moveSelectionAndScrollIfNeeded(Direction.UP));
+
+        // Define action for 'close (X)' button
         btnCloseSearchView.setOnAction((event) -> closeSearchView());
+
+        // Add listener for text field
         tfSearchQuery.textProperty().addListener((obs, oldText, newText) -> {
             btnSearchNext.setDisable(newText.isEmpty());
             btnSearchPrev.setDisable(newText.isEmpty());
+            // If no text was entered -> clear search
             if (newText.isEmpty()) {
                 proofTreeView.getRoot().getValue().resetSearch();
                 nui.updateStatusbar("");
             }
+            // If any text was entered -> update status bar and depending on
+            // numberOfSearchResults add/remove CSS class
             else {
                 numberOfSearchResults = proofTreeView.getRoot().getValue()
                         .search(newText);
@@ -317,6 +342,8 @@ public class SearchViewController extends NUIController {
             }
         });
 
+        // Add actions for keys ESCAPE and ENTER while focusing the
+        // searchViewPane.
         searchViewPane.setOnKeyPressed((e) -> {
             if (KeyCode.ESCAPE == e.getCode()) {
                 closeSearchView();
@@ -335,7 +362,7 @@ public class SearchViewController extends NUIController {
             }
         });
 
-        // Assign stylesheet
+        // Assign style sheet
         searchViewPane.getStylesheets().add(getClass()
                 .getResource("../components/searchView.css").toExternalForm());
     }
@@ -345,7 +372,6 @@ public class SearchViewController extends NUIController {
         treeViewPane.getChildren().remove(searchViewPane);
         // reset proofTreeView
         proofTreeView.getRoot().getValue().resetSearch();
-
         tfSearchQuery.setText("");
     }
 }

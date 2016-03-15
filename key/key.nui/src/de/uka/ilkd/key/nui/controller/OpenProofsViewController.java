@@ -4,19 +4,16 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
 
 /**
+ * Controller for the view showing an overview of all loaded proofs.
  * 
  * @author Florian Breitfelder
- *
  */
 @ControllerAnnotation(createMenu = true)
 public class OpenProofsViewController extends NUIController
@@ -33,25 +30,21 @@ public class OpenProofsViewController extends NUIController
     @Override
     protected void init() {
         dataModel.addObserver(this);
-        listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                String selectedItem = listView.getSelectionModel()
-                        .getSelectedItem();
-                if (selectedItem != null) {
-                    dataModel.loadProofFormMemory(selectedItem);
-                }
+        // Define action to be performed if user clicks on a proof entry
+        listView.setOnMouseClicked((event) -> {
+            String selectedItem = listView.getSelectionModel()
+                    .getSelectedItem();
+            if (selectedItem != null) {
+                dataModel.loadProofFormMemory(selectedItem);
             }
         });
+
         MenuItem deleteProof = new MenuItem(bundle.getString("closeProof"));
         contextMenu = new ContextMenu(deleteProof);
-        deleteProof.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                dataModel.removeProof(listView.getSelectionModel()
-                        .getSelectedItem().toString());
-            }
-        });
+        // Define action to be performed if user clicks on 'Close Proof' in the
+        // context menu
+        deleteProof.setOnAction((event) -> dataModel
+                .removeProof(listView.getSelectionModel().getSelectedItem()));
     }
 
     @Override

@@ -25,7 +25,7 @@ public class TextFilteringHandler {
         // label matches -> copy subtree
         if (matchesFilter(root, search)) {
             // TODO set parent??
-            final NUINode filteredTreeRoot = (NUINode) root.clone();
+            final NUINode filteredTreeRoot = root.clone();
 
             return filteredTreeRoot;
         }

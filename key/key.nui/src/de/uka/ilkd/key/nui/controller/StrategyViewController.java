@@ -18,7 +18,8 @@ import javafx.scene.image.ImageView;
 import javafx.util.StringConverter;
 
 /**
- *
+ * Controller for StrategyView GUI element, used to show proof strategy options.
+ * 
  * @author Florian Breitfelder
  *
  */
@@ -86,9 +87,12 @@ public class StrategyViewController extends NUIController {
 
     @Override
     protected void init() {
+        // Set image of the 'GO' button
         IconFactory iconFactory = new IconFactory(15, 15);
         goButtonImage.setImage(
                 iconFactory.getImage(IconFactory.GO_BUTTON).getImage());
+
+        // Set formatter of 'Maximum rules' slider
         maxRuleAppSlider.setLabelFormatter(new StringConverter<Double>() {
             @Override
             public String toString(Double n) {
@@ -103,6 +107,8 @@ public class StrategyViewController extends NUIController {
             }
         });
 
+        // Adds a listener to the 'Maximum rules' slider, used to update the
+        // label with the currently chosen value
         maxRuleAppSlider.valueProperty().addListener((ov, old_val, new_val) -> {
             calculateCurrentSliderValue(new_val);
             maxRuleAppLabel.setText(bundle.getString("maxRuleAppLabel") + " "
@@ -164,30 +170,37 @@ public class StrategyViewController extends NUIController {
         }
     }
 
+    /**
+     * Calculates the value of the slider based on the current position.
+     * 
+     * @param new_val
+     *            {@link Number} the value obtained from the slider.
+     */
     private void calculateCurrentSliderValue(Number new_val) {
-        if (new_val.doubleValue() > 0.0 && new_val.doubleValue() < 1.0) {
-            currentSliderValue = ((int) (new_val.doubleValue() % 9.0 * 10.0))
-                    + 1;
+        double sliderValue = new_val.doubleValue();
+
+        if (sliderValue > 0.0 && sliderValue < 1.0) {
+            currentSliderValue = ((int) (sliderValue % 9.0 * 10.0)) + 1;
         }
-        else if (new_val.doubleValue() > 1.0 && new_val.doubleValue() < 2.0) {
-            currentSliderValue = ((int) (((new_val.doubleValue() % 9.0) - 1)
-                    * 10) * 10) + 10;
+        else if (sliderValue > 1.0 && sliderValue < 2.0) {
+            currentSliderValue = ((int) (((sliderValue % 9.0) - 1) * 10) * 10)
+                    + 10;
         }
-        else if (new_val.doubleValue() > 2.0 && new_val.doubleValue() < 3.0) {
-            currentSliderValue = ((int) (((new_val.doubleValue() % 9.0) - 2)
-                    * 10) * 100) + 100;
+        else if (sliderValue > 2.0 && sliderValue < 3.0) {
+            currentSliderValue = ((int) (((sliderValue % 9.0) - 2) * 10) * 100)
+                    + 100;
         }
-        else if (new_val.doubleValue() > 3.0 && new_val.doubleValue() < 4.0) {
-            currentSliderValue = ((int) (((new_val.doubleValue() % 9.0) - 3)
-                    * 10) * 1000) + 1000;
+        else if (sliderValue > 3.0 && sliderValue < 4.0) {
+            currentSliderValue = ((int) (((sliderValue % 9.0) - 3) * 10) * 1000)
+                    + 1000;
         }
-        else if (new_val.doubleValue() > 4.0 && new_val.doubleValue() < 5.0) {
-            currentSliderValue = ((int) (((new_val.doubleValue() % 9.0) - 4)
-                    * 10) * 10000) + 10000;
+        else if (sliderValue > 4.0 && sliderValue < 5.0) {
+            currentSliderValue = ((int) (((sliderValue % 9.0) - 4) * 10)
+                    * 10000) + 10000;
         }
-        else if (new_val.doubleValue() > 5.0 && new_val.doubleValue() < 6.0) {
-            currentSliderValue = ((int) (((new_val.doubleValue() % 9.0) - 5)
-                    * 10) * 100000) + 100000;
+        else if (sliderValue > 5.0 && sliderValue < 6.0) {
+            currentSliderValue = ((int) (((sliderValue % 9.0) - 5) * 10)
+                    * 100000) + 100000;
         }
         else {
             switch (new_val.intValue()) {
@@ -210,8 +223,6 @@ public class StrategyViewController extends NUIController {
                 currentSliderValue = 1000000;
                 break;
             }
-
         }
     }
-
 }
