@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.prooftree.filter;
 
 import de.uka.ilkd.key.nui.prooftree.NUIBranchNode;
+import de.uka.ilkd.key.nui.prooftree.NUILeafNode;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 
 /**

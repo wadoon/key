@@ -7,6 +7,8 @@ import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.ProofStarter;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -49,17 +51,11 @@ public class StrategyViewController extends NUIController {
             }
         });
 
-        maxRuleAppSlider.valueProperty() // TODO use lambda
-                .addListener(new ChangeListener<Number>() {
-                    public void changed(ObservableValue<? extends Number> ov,
-                            Number old_val, Number new_val) {
-                        maxRuleAppLabel.setText(bundle
-                                .getString("maxRuleAppLabel") + " "
-                                + (int) Math.pow(10, new_val.doubleValue()));
-                        maxRuleApplications = (int) Math.pow(10,
-                                new_val.doubleValue());
-                    }
-                });
+        maxRuleAppSlider.valueProperty().addListener((ov, old_val, new_val) -> {
+            maxRuleAppLabel.setText(bundle.getString("maxRuleAppLabel") + " "
+                    + (int) Math.pow(10, new_val.doubleValue()));
+            maxRuleApplications = (int) Math.pow(10, new_val.doubleValue());
+        });
     }
 
     public void handleOnAction(@SuppressWarnings("unused")
@@ -99,21 +95,11 @@ public class StrategyViewController extends NUIController {
             // load updated proof
             Proof updatedProof = proofStarter.getProof();
 
-<<<<<<< HEAD
-        // create new tree from updateProof
-        ProofTreeItem fxtree = new ProofTreeConverter(updatedProof).createFXProofTree();
-
-        // Create new TreeViewState for updatedProof
-        TreeViewState updatedTreeViewState = new TreeViewState(updatedProof, fxtree);
-=======
             // create new tree from updateProof
-            ProofTreeItem fxtree = new ProofTreeConverter(updatedProof)
-                    .createFXProofTree();
+            ProofTreeItem fxtree = new ProofTreeConverter(updatedProof).createFXProofTree();
 
             // Create new TreeViewState for updatedProof
-            TreeViewState updatedTreeViewState = new TreeViewState(updatedProof,
-                    fxtree);
->>>>>>> da-bpTeam10
+            TreeViewState updatedTreeViewState = new TreeViewState(updatedProof, fxtree);
 
             // update datamodel
             dataModel.updateTreeViewState(filename, updatedTreeViewState);

@@ -231,12 +231,6 @@ public class MainViewController extends NUIController implements Observer {
         // create alert window
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("dialogTitle"));
-<<<<<<< HEAD
-        alert.setHeaderText(nui.getStringFromBundle("dialogHeader"));
-        String filename = dataModel.getLoadedTreeViewState().getProof().getProofFile().getName();
-        alert.setContentText(nui.getStringFromBundle("dialogQuestion") + " '" + filename + "' ?");
-        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
-=======
         String filename = dataModel.getLoadedTreeViewState().getProof()
                 .getProofFile().getName();
         alert.setHeaderText(MessageFormat.format(
@@ -250,7 +244,6 @@ public class MainViewController extends NUIController implements Observer {
                 bundle.getString("dialogAbort"));
 
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
->>>>>>> da-bpTeam10
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == buttonSaveAs || result.get() == buttonClose) {
