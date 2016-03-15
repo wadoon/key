@@ -15,7 +15,7 @@ public class FilterMultiple implements ProofTreeFilter {
     /**
      * The list of filers that are combined.
      */
-    private List<ProofTreeFilter> filters = new LinkedList<ProofTreeFilter>();
+    private List<ProofTreeFilter> filters = new LinkedList<>();
 
     /**
      * {@inheritDoc}

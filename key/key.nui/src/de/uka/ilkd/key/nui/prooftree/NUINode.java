@@ -67,7 +67,7 @@ public abstract class NUINode implements Cloneable {
     /**
      * the parent node of this node.
      */
-    private final SimpleObjectProperty<NUINode> parent = new SimpleObjectProperty<NUINode>();
+    private final SimpleObjectProperty<NUINode> parent = new SimpleObjectProperty<>();
 
     /**
      * The serial number of the proof node.

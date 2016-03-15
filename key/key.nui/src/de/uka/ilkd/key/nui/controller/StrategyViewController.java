@@ -8,8 +8,6 @@ import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.ProofStarter;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -20,7 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.util.StringConverter;
 
 /**
- * 
+ *
  * @author Florian Breitfelder
  *
  */
@@ -105,17 +103,11 @@ public class StrategyViewController extends NUIController {
             }
         });
 
-        maxRuleAppSlider.valueProperty()
-                .addListener(new ChangeListener<Number>() {
-                    public void changed(ObservableValue<? extends Number> ov,
-                            Number old_val, Number new_val) {
-
-                        calculateCurrentSliderValue(new_val);
-                        maxRuleAppLabel
-                                .setText(bundle.getString("maxRuleAppLabel")
-                                        + " " + currentSliderValue);
-                    }
-                });
+        maxRuleAppSlider.valueProperty().addListener((ov, old_val, new_val) -> {
+            calculateCurrentSliderValue(new_val);
+            maxRuleAppLabel.setText(bundle.getString("maxRuleAppLabel") + " "
+                    + currentSliderValue);
+        });
         maxRuleAppLabel.setText(
                 bundle.getString("maxRuleAppLabel") + " " + currentSliderValue);
     }

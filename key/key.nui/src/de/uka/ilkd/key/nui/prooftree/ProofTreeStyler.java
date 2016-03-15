@@ -61,7 +61,7 @@ public final class ProofTreeStyler {
          * Creates a new StyleConfiguration object.
          */
         public StyleConfiguration() {
-            cssClasses = new ArrayList<String>();
+            cssClasses = new ArrayList<>();
             iconImage = null;
         }
 

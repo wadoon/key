@@ -147,7 +147,7 @@ public class SearchTest {
      *            The expected size of the list of results.
      * @return True iff the size of the result list equals the expectedSize.
      */
-    private boolean searchAndCompareSize(String searchTerm, int expectedSize) {
+    private static boolean searchAndCompareSize(String searchTerm, int expectedSize) {
         ptVisualizer.getRootNode().search(searchTerm);
         return (expectedSize == ptVisualizer.getRootNode().asList().stream()
                 .filter((node) -> node.isSearchResult()).count());

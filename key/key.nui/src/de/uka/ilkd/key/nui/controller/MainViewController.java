@@ -47,7 +47,7 @@ import javafx.stage.FileChooser;
 
 /**
  * Controller for the main GUI which is displayed when the program was started.
- * 
+ *
  * @author Florian Breitfelder
  * @author Patrick Jattke
  * @author Stefan Pilot
@@ -109,7 +109,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Includes the components which were added to the main Window
      */
-    private HashMap<String, Pane> components = new HashMap<String, Pane>();
+    private HashMap<String, Pane> components = new HashMap<>();
 
     /**
      * Stores the position of components added to the SplitPane. Other views can
@@ -132,7 +132,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles the ActionEvent resulting in the user clicking "Open Proof..." in
      * the File menu. Usually <b> not to be called by developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
@@ -159,6 +159,7 @@ public class MainViewController extends NUIController implements Observer {
 
         FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
                 "Proof files", "*.proof", "*.key");
+
         fileChooser.getExtensionFilters().add(extFilterProof);
 
         final File file = fileChooser.showOpenDialog(contextMenu);
@@ -171,7 +172,7 @@ public class MainViewController extends NUIController implements Observer {
 
     /**
      * Returns the Pane where all the Components in the Place p are stored.
-     * 
+     *
      * @param p
      *            a {@link Place}
      * @return the respective Pane
@@ -196,7 +197,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles the ActionEvent resulting in the user clicking "About KeY" in the
      * About menu. Usually <b> not to be called by developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
@@ -212,7 +213,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles the ActionEvent resulting in the user clicking "Close" in the
      * File menu. Usually <b> not to be called by developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
@@ -231,6 +232,7 @@ public class MainViewController extends NUIController implements Observer {
         // create alert window
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("dialogTitle"));
+
         String filename = dataModel.getLoadedTreeViewState().getProof()
                 .getProofFile().getName();
         alert.setHeaderText(MessageFormat.format(
@@ -244,6 +246,7 @@ public class MainViewController extends NUIController implements Observer {
                 bundle.getString("dialogAbort"));
 
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
+
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == buttonSaveAs || result.get() == buttonClose) {
@@ -263,7 +266,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles saving of a proof file if no destination path is specified. Uses
      * the location where the proof was saved to the last time.
-     * 
+     *
      * @param e
      *            the ActionEvent raised by clicking on the MenuItem.
      */
@@ -285,7 +288,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Handles saving of a proof file if the destination path should be
      * specified. Opens a file chooser dialog where the path can be chosen.
-     * 
+     *
      * @param e
      *            the ActionEvent raised by clicking on the MenuItem.
      */
@@ -323,13 +326,14 @@ public class MainViewController extends NUIController implements Observer {
     }
 
     @FXML
-    protected final void handleCancelLoadingProcess(final ActionEvent e) {
+    protected final void handleCancelLoadingProcess(@SuppressWarnings("unused")
+    final ActionEvent e) {
         cancelLoadProof();
     }
 
     /**
      * NEW
-     * 
+     *
      * @param component
      * @param place
      */
@@ -369,7 +373,7 @@ public class MainViewController extends NUIController implements Observer {
      * Handles the ActionEvent resulting in the user adding, hiding or moving
      * GUI components via the View menu. Usually <b> not to be called by
      * developers. </b>
-     * 
+     *
      * @param e
      *            The ActionEvent
      */
@@ -410,7 +414,7 @@ public class MainViewController extends NUIController implements Observer {
      * Executes the given EventHandler e if any key was pressed, therefore the
      * provided Handler <b>must check by itself</b> if the right KeyCode was
      * pressed.
-     * 
+     *
      * @param e
      *            The EventHandler
      */
@@ -429,7 +433,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Updates the status bar on the mainView by the given text. Keeps the text
      * on the status bar till the next update is performed.
-     * 
+     *
      * @param text
      *            String to be set to the status bar.
      */
@@ -441,7 +445,7 @@ public class MainViewController extends NUIController implements Observer {
 
     /**
      * Updates the MainView if any change in the dataModel occurred.
-     * 
+     *
      * @param o
      *            The observable, here the dataModel
      * @param arg
@@ -487,18 +491,12 @@ public class MainViewController extends NUIController implements Observer {
                 }
 
                 // reset loading state
-                Platform.runLater(new Runnable() {
-                    /**
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    public void run() {
-                        statustext.setText("Loading has been cancelled.");
-                        root.setCursor(Cursor.DEFAULT);
-                        openProof.setDisable(false);
-                        progressIndicator.setVisible(false);
-                        cancelButton.setVisible(false);
-                    }
+                Platform.runLater(() -> {
+                    statustext.setText("Loading has been cancelled.");
+                    root.setCursor(Cursor.DEFAULT);
+                    openProof.setDisable(false);
+                    progressIndicator.setVisible(false);
+                    cancelButton.setVisible(false);
                 });
             }
             catch (NoSuchMethodException | SecurityException
@@ -563,20 +561,17 @@ public class MainViewController extends NUIController implements Observer {
 
                     if (hasNotBeenCanceled) {
                         // reset set gui waiting state
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Store state of treeView into data model.
-                                dataModel.saveTreeViewState(
-                                        new TreeViewState(proof, fxtree),
-                                        proofFileName.getName());
+                        Platform.runLater(() -> {
+                            // Store state of treeView into data model.
+                            dataModel.saveTreeViewState(
+                                    new TreeViewState(proof, fxtree),
+                                    proofFileName.getName());
 
-                                statustext.setText("Ready.");
-                                progressIndicator.setVisible(false);
-                                cancelButton.setVisible(false);
-                                root.setCursor(Cursor.DEFAULT);
-                                openProof.setDisable(false);
-                            }
+                            statustext.setText("Ready.");
+                            progressIndicator.setVisible(false);
+                            cancelButton.setVisible(false);
+                            root.setCursor(Cursor.DEFAULT);
+                            openProof.setDisable(false);
                         });
                     }
 

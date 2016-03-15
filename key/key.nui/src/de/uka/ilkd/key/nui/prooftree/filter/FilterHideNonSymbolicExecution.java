@@ -22,9 +22,7 @@ public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
         if (node instanceof NUIBranchNode || node instanceof NUILeafNode) {
             return true;
         }
-        else {
-            return node.isSymbolicExecution();
-        }
+        return node.isSymbolicExecution();
     }
 
     /**

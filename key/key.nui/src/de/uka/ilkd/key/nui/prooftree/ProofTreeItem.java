@@ -45,7 +45,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
         super(value);
 
         internalChildren = FXCollections.observableArrayList();
-        filteredChildren = new FilteredList<ProofTreeItem>(internalChildren);
+        filteredChildren = new FilteredList<>(internalChildren);
 
         setAllChildren(filteredChildren);
     }

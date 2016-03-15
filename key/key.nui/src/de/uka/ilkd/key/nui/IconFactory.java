@@ -33,7 +33,7 @@ public class IconFactory {
     /**
      * An HashMap for storing loaded icon images.
      */
-    private final Map<String, Image> icons = new HashMap<String, Image>();
+    private final Map<String, Image> icons = new HashMap<>();
 
     // Inner Nodes
     /** file name of open branch node icon. */
@@ -117,7 +117,7 @@ public class IconFactory {
      *            The desired height
      * @return an ImageView containing the scaled Image
      */
-    private ImageView scaleIcon(final Image image, final int width,
+    private static ImageView scaleIcon(final Image image, final int width,
             final int height) {
         final ImageView view = new ImageView(image);
         view.setFitWidth(width);

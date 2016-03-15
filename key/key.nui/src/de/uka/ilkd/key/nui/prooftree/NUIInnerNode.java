@@ -35,9 +35,7 @@ public class NUIInnerNode extends NUINode {
         return proofNode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public NUIInnerNode clone() {
         // create clone
         final NUIInnerNode cloned = new NUIInnerNode(proofNode);

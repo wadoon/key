@@ -129,16 +129,14 @@ public class NUIBranchNode extends NUINode {
         this.proofParentNode = parent;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public NUIBranchNode clone() {
         // create clone
         final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
         this.copyFields(this, cloned);
 
         // set children
-        final LinkedList<NUINode> newChildren = new LinkedList<NUINode>();
+        final LinkedList<NUINode> newChildren = new LinkedList<>();
         for (final NUINode child : this.children) {
             final NUINode clonedChild = child.clone();
             clonedChild.setParent(cloned);

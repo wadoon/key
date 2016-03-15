@@ -21,9 +21,7 @@ public class FilterHideNonInteractive implements ProofTreeFilter {
         if (node instanceof NUIBranchNode || node instanceof NUILeafNode) {
             return true;
         }
-        else {
-            return node.isInteractive();
-        }
+        return node.isInteractive();
     }
 
     /**

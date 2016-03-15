@@ -35,9 +35,7 @@ public class NUILeafNode extends NUINode {
         return proofNode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public NUILeafNode clone() {
         // create clone
         final NUILeafNode cloned = new NUILeafNode(proofNode);

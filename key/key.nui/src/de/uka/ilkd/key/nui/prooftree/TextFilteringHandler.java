@@ -31,8 +31,7 @@ public class TextFilteringHandler {
         }
         // branch nodes -> look at children
         else if (root instanceof NUIBranchNode) {
-
-            final LinkedList<NUINode> matchedChildren = new LinkedList<NUINode>();
+            final LinkedList<NUINode> matchedChildren = new LinkedList<>();
             final NUIBranchNode rootBN = (NUIBranchNode) root;
 
             // add matching children
