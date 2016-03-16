@@ -17,18 +17,13 @@ public class FilterMultiple implements ProofTreeFilter {
      */
     private List<ProofTreeFilter> filters = new LinkedList<>();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean test(final NUINode node) {
-
         for (final Predicate<NUINode> filter : filters) {
             if (!filter.test(node)) {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -59,9 +54,6 @@ public class FilterMultiple implements ProofTreeFilter {
         this.filters.clear();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getContextMenuItemText() {
         return "";

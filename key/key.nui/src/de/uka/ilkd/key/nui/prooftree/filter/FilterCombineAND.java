@@ -33,17 +33,11 @@ public class FilterCombineAND implements ProofTreeFilter {
         this.f2 = f2;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean test(final NUINode node) {
         return f1.test(node) && f2.test(node);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getContextMenuItemText() {
         return "";

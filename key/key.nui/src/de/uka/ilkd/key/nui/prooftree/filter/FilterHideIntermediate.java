@@ -14,17 +14,11 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
 @FilterAnnotation(isFilter = true)
 public class FilterHideIntermediate implements ProofTreeFilter {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean test(final NUINode node) {
         return node instanceof NUIBranchNode || node instanceof NUILeafNode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getContextMenuItemText() {
         return "Hide Intermediate";

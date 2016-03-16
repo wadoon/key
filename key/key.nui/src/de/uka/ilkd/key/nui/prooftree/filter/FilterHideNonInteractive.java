@@ -13,9 +13,6 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
 @FilterAnnotation(isFilter = true)
 public class FilterHideNonInteractive implements ProofTreeFilter {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean test(final NUINode node) {
         if (node instanceof NUIBranchNode || node instanceof NUILeafNode) {
@@ -24,9 +21,6 @@ public class FilterHideNonInteractive implements ProofTreeFilter {
         return node.isInteractive();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getContextMenuItemText() {
         return "Hide Non-Interactive";

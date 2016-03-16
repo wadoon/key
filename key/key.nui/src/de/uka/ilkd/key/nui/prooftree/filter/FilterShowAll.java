@@ -10,17 +10,11 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
  */
 public class FilterShowAll implements ProofTreeFilter {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean test(final NUINode node) {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getContextMenuItemText() {
         return "";

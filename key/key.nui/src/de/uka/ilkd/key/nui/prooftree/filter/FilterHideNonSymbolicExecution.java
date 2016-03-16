@@ -14,9 +14,6 @@ import de.uka.ilkd.key.nui.prooftree.NUINode;
 @FilterAnnotation(isFilter = true)
 public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean test(final NUINode node) {
         if (node instanceof NUIBranchNode || node instanceof NUILeafNode) {
@@ -25,9 +22,6 @@ public class FilterHideNonSymbolicExecution implements ProofTreeFilter {
         return node.isSymbolicExecution();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getContextMenuItemText() {
         return "Hide Non-Symbolic-Execution";
