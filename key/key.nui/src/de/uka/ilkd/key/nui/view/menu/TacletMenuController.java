@@ -161,14 +161,12 @@ public class TacletMenuController extends ViewController {
         
         MediatorProofControl c = mediator.getUI().getProofControl();
 
-        if (occ != null) {
-            final ImmutableList<BuiltInRule> builtInRules = c
-                    .getBuiltInRule(goal, occ);
-            createTacletMenu(
-                    removeRewrites(c.getFindTaclet(goal, occ))
-                            .prepend(c.getRewriteTaclet(goal, occ)),
-                    c.getNoFindTaclet(goal), builtInRules);
-        }
+        final ImmutableList<BuiltInRule> builtInRules = c
+                .getBuiltInRule(goal, occ);
+        createTacletMenu(
+                removeRewrites(c.getFindTaclet(goal, occ))
+                        .prepend(c.getRewriteTaclet(goal, occ)),
+                c.getNoFindTaclet(goal), builtInRules);
         
         proofMacroMenuController.init(mediator, occ);
     }
