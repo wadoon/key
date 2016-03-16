@@ -31,6 +31,8 @@ public class TreeViewTest extends NUITest {
         // press enter to load file
         type(KeyCode.ENTER);
         
+        waitUntilStatusIs("Ready.");
+        
     	doubleClickOn("." + ProofTreeStyleConstants.CSS_NODE_BRANCH);
     	clickOn("0: andRight ");
     	doubleClickOn("Case 1 ");
@@ -61,12 +63,6 @@ public class TreeViewTest extends NUITest {
     	rightClickOn().clickOn("Search");
     	rightClickOn().clickOn("Search");
     	
-    	write("Case 1");*/
-    	// TODO test is not working. Find a way to address nodes in the tree.
-       /* for (int i = 0; i < 15; i++) {
-        	doubleClickOn("#Proof_Tree");
-        }
-
         for (int i = 0; i < 25; i++) {
             scroll(VerticalDirection.DOWN);
         }

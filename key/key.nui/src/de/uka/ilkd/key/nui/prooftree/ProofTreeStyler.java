@@ -8,7 +8,8 @@ import javafx.scene.image.ImageView;
 
 /**
  * Defines for each type of NUI Node which style classes are associated with and
- * which icon image is used.
+ * which icon image is used. For example for closed branch nodes, linked inner
+ * nodes etc.
  * 
  * @author Patrick Jattke
  *
@@ -220,9 +221,7 @@ public final class ProofTreeStyler {
 
         // Apply CSS classes
         ArrayList<String> cssClasses = scfg.getCssClasses();
-        for (String cssClass : cssClasses) {
-            label.getStyleClass().add(cssClass);
-        }
+        cssClasses.forEach(cssClass -> label.getStyleClass().add(cssClass));
 
         // Apply icon image
         ImageView image = scfg.getIconImage();
@@ -233,7 +232,8 @@ public final class ProofTreeStyler {
 
     /**
      * Returns the matching {@link StyleConfiguration} for the given type of
-     * {@link NUINode}.
+     * {@link NUINode}. If no type matches, an empty StyleConfiguration is
+     * returned.
      * 
      * @param node
      *            The node whose StyleConfiguration should be determined.
@@ -268,7 +268,7 @@ public final class ProofTreeStyler {
             }
         }
         // if the node is an inner node
-        else {
+        else if (node instanceof NUIInnerNode){
             if (node.isInteractive()) {
                 return INNER_NODE_INTERACTIVE;
             }

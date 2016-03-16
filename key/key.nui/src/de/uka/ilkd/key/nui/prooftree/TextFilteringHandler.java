@@ -57,15 +57,10 @@ public class TextFilteringHandler {
                 return filteredRoot;
 
             }
-            // no children match -> branch doesnt match
-            else {
-                return null;
-            }
         }
-        // root doesnt match and is no branch node
-        else {
-            return null;
-        }
+        // root does not match and is no branch node
+        // OR no children match -> branch does not match
+        return null;
     }
 
     /**

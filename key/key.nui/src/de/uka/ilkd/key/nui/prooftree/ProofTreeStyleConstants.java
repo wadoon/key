@@ -2,7 +2,7 @@ package de.uka.ilkd.key.nui.prooftree;
 
 /**
  * Constants used for defining names and paths for the decoration of the proof
- * tree (icon paths, CSS classes, etc.) .
+ * tree (icon paths, CSS classes etc.).
  * 
  * @author Matthias Schultheis
  * @author Patrick Jattke

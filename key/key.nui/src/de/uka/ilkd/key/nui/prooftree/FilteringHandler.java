@@ -29,7 +29,7 @@ import de.uka.ilkd.key.nui.prooftree.filter.ProofTreeFilter;
 public class FilteringHandler {
 
     /**
-     * A map storing filters with their resp. activation flag.
+     * A map storing filters with their respective activation flag.
      */
     final private Map<ProofTreeFilter, Boolean> filtersMap = Collections
             .synchronizedMap(new LinkedHashMap<>());
@@ -38,10 +38,6 @@ public class FilteringHandler {
      * The data model.
      */
     final private DataModel dm;
-
-    // TODO stores the current tree. When the model class provides a
-    // funtion to get the current tree this can be deleted.
-    private String currentTree;
 
     /**
      * Constructor.
@@ -52,11 +48,12 @@ public class FilteringHandler {
     public FilteringHandler(final DataModel model) {
         this.dm = model;
 
+        // Load filters and store all loaded filters into the filtersMap
         final List<ProofTreeFilter> filters = searchFilterClasses();
         filters.forEach((filter) -> filtersMap.put(filter, false));
 
+        // Reinitialize filters if the data model changed
         model.addObserver((final Observable obs, final Object arg) -> {
-            currentTree = (String) arg;
             reinit();
         });
     }
@@ -79,7 +76,6 @@ public class FilteringHandler {
      * @return A list of filters
      */
     private List<ProofTreeFilter> searchFilterClasses() {
-
         final List<ProofTreeFilter> filters = new LinkedList<>();
 
         // Path were filter class's are stored
@@ -87,10 +83,11 @@ public class FilteringHandler {
         // Prefix for binary class names
         final String BINARY_NAME_PREFIX = "de.uka.ilkd.key.nui.prooftree.filter.";
 
-        // Look for all class files in PATH and store their urls
+        // Look for all class files in PATH and store their URLs
         File[] files = new File(getClass().getResource(PATH).getPath())
                 .listFiles();
         ArrayList<URL> listOfURLs = new ArrayList<>();
+
         for (File file : files) {
             if (file.isFile() && file.getName().matches(".*[.class]")) {
                 try {
@@ -98,7 +95,6 @@ public class FilteringHandler {
                     listOfURLs.add(urlClassFile);
                 }
                 catch (MalformedURLException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -123,41 +119,24 @@ public class FilteringHandler {
                 // Load possible filter class
                 Class<?> c = classLoader.loadClass(binaryClassName);
                 // Load annotations of the class
-                Annotation[] annotations = c.getAnnotations();
-                // if the class has no annotations it cannot be a filter class
-                if (annotations == null) {
-                    continue;
-                }
-                else {
-                    for (Annotation annotation : annotations) {
-                        // Check if there is a annotations of type
-                        // FilterAnnotation
-                        if (annotation instanceof FilterAnnotation) {
-                            FilterAnnotation filterAnnotation = (FilterAnnotation) annotation;
-                            /*
-                             * If the annotation isFilter is true, the current
-                             * class is a valid filter class therefore create a
-                             * new instance of it and add it to filters.
-                             */
-                            if (filterAnnotation.isFilter()) {
-                                filters.add((ProofTreeFilter) c.newInstance());
-                            }
-                        }
+                Annotation[] annotations = c
+                        .getAnnotationsByType(FilterAnnotation.class);
+
+                // check if isFilter is true
+                for (Annotation annotation : annotations) {
+                    /*
+                     * If the annotation isFilter is true, the current class is
+                     * a valid filter class therefore create a new instance of
+                     * it and add it to filters.
+                     */
+                    if (((FilterAnnotation) annotation).isFilter()) {
+                        filters.add((ProofTreeFilter) c.newInstance());
                     }
                 }
-
             }
         }
-        catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
+        catch (ClassNotFoundException | InstantiationException
+                | IllegalAccessException e) {
             e.printStackTrace();
         }
 
@@ -194,13 +173,17 @@ public class FilteringHandler {
                     return new FilterCombineAND(f1, f2);
                 });
 
-        final ProofTreeItem root = dm.getTreeViewState(currentTree)
-                .getTreeItem();
-        root.filter(redFilter);
+        final ProofTreeItem root;
+        if (dm.getLoadedTreeViewState() != null) {
+            root = dm.getLoadedTreeViewState().getTreeItem();
+            root.filter(redFilter);
+        }
     }
 
     /**
-     * @return the filtersMap
+     * Returns the list of loaded filters.
+     * 
+     * @return the {@link #filtersMap}.
      */
     public Map<ProofTreeFilter, Boolean> getFiltersMap() {
         return filtersMap;

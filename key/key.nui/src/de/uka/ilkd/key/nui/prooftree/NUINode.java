@@ -412,18 +412,36 @@ public abstract class NUINode implements Cloneable {
         return match ? 1 : 0;
     }
 
-    // TODO comments, maybe outsource
+    /**
+     * Returns the nodes of the subtree rooted by the this node, including this
+     * node itself.
+     * 
+     * @return a {@link List} of NUINodes.
+     */
     public List<NUINode> asList() {
         List<NUINode> l = new LinkedList<>();
         l.add(this);
         return l;
     }
 
+    /**
+     * Determines and sets the {@link StyleConfiguration} of this node. This
+     * configuration is later applied to the rendered {@link ProofTreeCell}.
+     * <p>
+     * 
+     * This 'caching' of the style configuration is required for testing
+     * purposes.
+     */
     protected void setStyleConfiguration() {
         ProofTreeStyler pts = new ProofTreeStyler();
         this.style = pts.getStyleConfiguration(this);
     }
 
+    /**
+     * Returns the assigned {@link StyleConfiguration} of this node.
+     * 
+     * @return StyleConfiguration assigned to this node.
+     */
     public StyleConfiguration getStyleConfiguration() {
         return this.style;
     }

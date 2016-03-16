@@ -1,10 +1,15 @@
 package de.uka.ilkd.key.nui.exceptions;
 
+import de.uka.ilkd.key.nui.NUI;
+
+/**
+ * Exception thrown by {@link NUI#getController(String)} if controller with the
+ * given fx:id was not found.
+ * 
+ * @author Florian Breitfelder
+ */
 public class ControllerNotFoundException extends NUIException {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     private String file;

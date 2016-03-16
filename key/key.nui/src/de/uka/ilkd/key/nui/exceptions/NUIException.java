@@ -3,11 +3,12 @@ package de.uka.ilkd.key.nui.exceptions;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
+/**
+ * @author Florian Breitfelder
+ *
+ */
 public class NUIException extends Exception {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     public void showMessage() {

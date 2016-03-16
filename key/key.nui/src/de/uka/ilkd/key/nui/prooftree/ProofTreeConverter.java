@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * This class converts a proof tree to an fx tree.
+ * This class converts a proof tree to a fx tree.
  * 
  * @author Patrick Jattke
  * @author Matthias Schultheis
@@ -69,7 +69,7 @@ public class ProofTreeConverter {
     }
 
     /**
-     * loads a proof tree by converting it to a NUITree which is used as an
+     * Loads a proof tree by converting it to a NUITree which is used as an
      * intermediate representation (decorated abstract tree).
      *
      * @param proof
@@ -91,9 +91,7 @@ public class ProofTreeConverter {
         addProofTreeToNUITree(pRoot, nuiRoot);
 
         // set linked leafs
-        for (final NUINode linkedLeaf : linkedLeafs) {
-            setNUINodeLinkedTrue(linkedLeaf);
-        }
+        linkedLeafs.forEach((linkedLeaf) -> setNUINodeLinkedTrue(linkedLeaf));
     }
 
     /**
@@ -134,6 +132,7 @@ public class ProofTreeConverter {
             addProofTreeToNUITree(proofNode.child(0), parent);
         }
         else if (numChildren > 1) {
+
             // for each child create a branch node and add it to parent
             for (final Iterator<Node> childrenIterator = proofNode
                     .childrenIterator(); childrenIterator.hasNext();) {

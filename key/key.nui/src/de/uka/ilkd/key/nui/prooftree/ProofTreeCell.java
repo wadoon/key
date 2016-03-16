@@ -38,8 +38,14 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
     private ImageView icon;
 
+    /**
+     * The filtering handler used to filter the tree's cells.
+     */
     private FilteringHandler fh;
 
+    /**
+     * The treeViewController used to handle the actions of the treeView.
+     */
     private TreeViewController treeViewController = null;
 
     /**
@@ -81,15 +87,14 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * @param icon
      *            the icon to set
      */
-    void setIcon(final ImageView icon) {
+    protected void setIcon(final ImageView icon) {
         this.icon = icon;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected final void updateItem(final NUINode item, final boolean empty) {
+
+        String cssHighlighting = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
 
         if (getItem() != null) {
             getItem().removeSearchResultListener(searchResultListener);
@@ -98,21 +103,18 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         super.updateItem(item, empty);
 
         if (item == null) {
-            getStyleClass().remove(ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT);
+            getStyleClass().remove(cssHighlighting);
 
         }
         else {
             item.addSearchResultListener(searchResultListener);
             if (item.isSearchResult()) {
-                if (!getStyleClass()
-                        .contains(ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT)) {
-                    getStyleClass()
-                            .add(ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT);
+                if (!getStyleClass().contains(cssHighlighting)) {
+                    getStyleClass().add(cssHighlighting);
                 }
             }
             else {
-                getStyleClass()
-                        .remove(ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT);
+                getStyleClass().remove(cssHighlighting);
             }
         }
 
@@ -143,12 +145,8 @@ public class ProofTreeCell extends TreeCell<NUINode> {
             setGraphic(label);
         }
         else {
-            final HBox hbox = new HBox();
-            hbox.setSpacing(ICON_SPACING);
-
-            final Label iconLabel = new Label();
-            iconLabel.setGraphic(icon);
-
+            final HBox hbox = new HBox(ICON_SPACING);
+            final Label iconLabel = new Label("", icon);
             hbox.getChildren().addAll(iconLabel, label);
             setGraphic(hbox);
         }

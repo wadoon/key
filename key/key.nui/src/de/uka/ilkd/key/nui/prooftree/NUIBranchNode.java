@@ -85,32 +85,26 @@ public class NUIBranchNode extends NUINode {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void resetSearch() {
         setSearchResult(false);
         children.forEach((child) -> child.resetSearch());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public int search(final String term) { // TODO this method seems much to
-                                           // verbose
+    public int search(final String term) { 
+        // case: Empty search term given
         if (term.isEmpty()) {
             return 0;
         }
-
+        
+        // case: Non-Empty search term given
         boolean thisIsASearchResult = getLabel().toLowerCase()
                 .contains(term.toLowerCase());
-
         int numberOfResultsAccumulator = thisIsASearchResult ? 1 : 0;
-
         setSearchResult(thisIsASearchResult);
 
+        // search in all children of current node
         for (NUINode child : children) {
             numberOfResultsAccumulator += child.search(term);
         }

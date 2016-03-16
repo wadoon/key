@@ -67,14 +67,14 @@ public class ProofTreeItem extends TreeItem<NUINode> {
             // apply filter to all children and hide node if
             // all children are hidden
             boolean allChildrenHidden = true;
-            for (ProofTreeItem child : internalChildren) {
-                final boolean childTestResult = child.filter(filter);
 
-                if (childTestResult) {
+            // check recursively if any child in this subtree is supposed to be
+            // displayed after filtering
+            for (ProofTreeItem child : internalChildren) {
+                if (child.filter(filter)) {
                     allChildrenHidden = false;
                 }
             }
-
             testResult = !allChildrenHidden;
         }
 
@@ -146,7 +146,6 @@ public class ProofTreeItem extends TreeItem<NUINode> {
      * 'setVisible'.
      */
     public void applyVisibilitiyOfChildren() {
-
         // define new predicate for the filtered children list
         final Predicate<ProofTreeItem> pred = new Predicate<ProofTreeItem>() {
             @Override
