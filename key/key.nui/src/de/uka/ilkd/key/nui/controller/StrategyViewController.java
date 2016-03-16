@@ -93,6 +93,7 @@ public class StrategyViewController extends NUIController {
                 iconFactory.getImage(IconFactory.GO_BUTTON).getImage());
 
         // Set formatter of 'Maximum rules' slider
+
         maxRuleAppSlider.setLabelFormatter(new StringConverter<Double>() {
             @Override
             public String toString(Double n) {
