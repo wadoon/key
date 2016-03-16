@@ -35,7 +35,7 @@
 		</CSSRule>
 		<CSSRule>
 			<selector>.collapsed</selector>
-			<Description>Filter: Hidden</Description>
+			<Description>Filter: Collapsed</Description>
 			<Class>null</Class>
 			<enabled>true</enabled>
 		</CSSRule>
@@ -63,7 +63,7 @@
 	<TreeItem text="Operators">
 		<CSSRule>
 			<selector>.elemUpdate</selector>
-			<Description>Elementary Updater</Description>
+			<Description>Elementary Update</Description>
 			<Class>ElementaryUpdate</Class>
 			<enabled>true</enabled>
 		</CSSRule>
@@ -196,22 +196,22 @@
 			<enabled>true</enabled>
 		</CSSRule>
 	</TreeItem>
-	<TreeItem text="Updater">
+	<TreeItem text="Update">
 		<CSSRule>
 			<selector>.updateApp</selector>
-			<Description>Application Updater</Description>
+			<Description>Application Update</Description>
 			<Class>UpdateApplication</Class>
 			<enabled>true</enabled>
 		</CSSRule>
 		<CSSRule>
 			<selector>.updateJunc</selector>
-			<Description>Junctor Updater</Description>
+			<Description>Junctor Update</Description>
 			<Class>UpdateJunctor</Class>
 			<enabled>true</enabled>
 		</CSSRule>
 		<CSSRule>
 			<selector>.updateSV</selector>
-			<Description>Schema Variable Updater</Description>
+			<Description>Schema Variable Update</Description>
 			<Class>UpdateSV</Class>
 			<enabled>true</enabled>
 		</CSSRule>

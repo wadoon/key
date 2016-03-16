@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.printer.PreviewPrinter;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.CssRule;
 import de.uka.ilkd.key.nui.util.NUIConstants;
-import de.uka.ilkd.key.nui.util.PreviewPrinter;
 import de.uka.ilkd.key.nui.util.XmlReader;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -55,7 +55,7 @@ public class CssStylerViewController extends ViewController {
     private ObservableList<String> fontStyle = FXCollections
             .observableArrayList("normal", "italic");
     private ObservableList<String> fontFamily = FXCollections
-            .observableArrayList(Font.getFontNames());
+            .observableArrayList(Font.getFamilies());
 
     private TreeItem<String> rootItem;
 

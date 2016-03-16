@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nui.util;
+package de.uka.ilkd.key.nui.printer;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
