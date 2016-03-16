@@ -110,7 +110,7 @@ public class NUI extends Application {
     /**
      * The data model used to store the loaded proof as a {@link TreeViewState}.
      */
-    private DataModel dataModel = new DataModel(this, bundle);
+    private DataModel dataModel;
 
     /**
      * When program is starting method "start" is called. Loads the stage and
@@ -153,6 +153,7 @@ public class NUI extends Application {
 
         bundle = new PropertyResourceBundle(
                 getClass().getResourceAsStream("bundle_en_EN.properties"));
+        dataModel = new DataModel(this, bundle);
         fxmlLoader = new FXMLLoader(getClass().getResource(filename), bundle);
         System.out.println("start launched successfully.");
         root = fxmlLoader.load();

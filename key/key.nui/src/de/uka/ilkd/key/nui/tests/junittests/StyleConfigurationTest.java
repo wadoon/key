@@ -5,13 +5,13 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.util.stream.Stream;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeStyler;
+import de.uka.ilkd.key.nui.prooftree.ProofTreeStyler.StyleConfiguration;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -23,6 +23,10 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  * <li>Farbige Hinterlegung von Knoten im Beweisbaum #14662
  * </ul>
  * 
+ * This test go through each node of the tree and checks whether the
+ * {@link StyleConfiguration} stored in the {@link NUINode} is the right one for
+ * this specific node.
+ * 
  * @author Patrick Jattke
  *
  */
@@ -31,17 +35,24 @@ public class StyleConfigurationTest {
     /**
      * The proof file used for this test.
      */
-
     private static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
+    private static String TESTFILE_02 = "resources//de/uka//ilkd//key//examples//example02.proof";
+    private static String TESTFILE_03 = "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.
      */
     private static ProofTreeConverter ptVisualizer;
 
-    @BeforeClass
-    public static void setUpBeforeClass() {
-        File proofFileName = new File(TESTFILE_01);
+    /**
+     * Prepares the test environment by using the provided path to the test
+     * file.
+     * 
+     * @param testfilePath
+     *            The path to the test file to load.
+     */
+    public static void prepareTest(String testfilePath) {
+        File proofFileName = new File(testfilePath);
 
         // load proof
         KeYEnvironment<?> environment = null;
@@ -55,17 +66,40 @@ public class StyleConfigurationTest {
         Proof proof = environment.getLoadedProof();
         proof.setProofFile(proofFileName);
 
-        // initalize ProofConverter object used for tests
-
+        // initialize ProofConverter object used for tests
         ptVisualizer = new ProofTreeConverter(proof);
     }
 
     @Test
     public void StyleConfigurationTest01() {
+        prepareTest(TESTFILE_01);
+        assertEquals(checkConfiguration(), 0);
+    }
+
+    @Test
+    public void StyleConfigurationTest02() {
+        prepareTest(TESTFILE_02);
+        assertEquals(checkConfiguration(), 0);
+    }
+
+    @Test
+    public void StyleConfigurationTest03() {
+        prepareTest(TESTFILE_03);
+        assertEquals(checkConfiguration(), 0);
+    }
+
+    /**
+     * Checks whether the {@link StyleConfiguration} stored in each
+     * {@link NUINode} is the correct one determined by the node's properties.
+     * 
+     * @return The number of nodes which have an incorrect StyleConfiguration
+     *         assigned.
+     */
+    private int checkConfiguration() {
         ProofTreeStyler ptStyler = new ProofTreeStyler(null);
         Stream<NUINode> nstream = ptVisualizer.getRootNode().asList().stream()
                 .filter((nd) -> (!(nd.getStyleConfiguration()
                         .equals(ptStyler.getStyleConfiguration(nd)))));
-        assertEquals(nstream.count(), 0);
+        return ((int) nstream.count());
     }
 }

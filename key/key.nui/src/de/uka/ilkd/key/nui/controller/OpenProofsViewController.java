@@ -1,14 +1,21 @@
 package de.uka.ilkd.key.nui.controller;
 
+import java.text.MessageFormat;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 
+import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Alert.AlertType;
 
 /**
  * Controller for the view showing an overview of all loaded proofs.
@@ -30,7 +37,7 @@ public class OpenProofsViewController extends NUIController
     @Override
     protected void init() {
         dataModel.addObserver(this);
-        // Define action to be performed if user clicks on a proof entry
+        // Action to be performed if user clicks (left) on a proof entry
         listView.setOnMouseClicked((event) -> {
             String selectedItem = listView.getSelectionModel()
                     .getSelectedItem();
@@ -41,10 +48,56 @@ public class OpenProofsViewController extends NUIController
 
         MenuItem deleteProof = new MenuItem(bundle.getString("closeProof"));
         contextMenu = new ContextMenu(deleteProof);
-        // Define action to be performed if user clicks on 'Close Proof' in the
-        // context menu
-        deleteProof.setOnAction((event) -> dataModel
-                .removeProof(listView.getSelectionModel().getSelectedItem()));
+
+        // Action to be performed if user clicks on 'Close Proof' in the context
+        // menu
+        deleteProof.setOnAction((event) -> {
+            showSaveDialog();
+            dataModel.removeProof(
+                    listView.getSelectionModel().getSelectedItem());
+        });
+    }
+
+    private void showSaveDialog() {
+        // If file was not changed: do nothing
+        if (!dataModel.getLoadedTreeViewState().isModified()) {
+            return;
+        }
+
+        // File was changed: ask user if he wants to save changes
+        // create alert window
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle(bundle.getString("dialogTitle"));
+
+        // --- define text for header and content area
+        String filename = dataModel.getLoadedTreeViewState().getProof()
+                .getProofFile().getName();
+        alert.setHeaderText(MessageFormat.format(
+                bundle.getString("dialogHeader"), "'" + filename + "'"));
+        alert.setContentText(bundle.getString("dialogQuestion"));
+
+        // --- define button types
+        ButtonType buttonSaveAs = new ButtonType(
+                bundle.getString("dialogSaveAs"));
+        ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
+        ButtonType buttonAbort = new ButtonType(
+                bundle.getString("dialogAbort"));
+        alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonSaveAs) {
+            try {
+                ((MainViewController) nui.getController("MainView"))
+                        .saveProofAsDialog();
+            }
+            catch (ControllerNotFoundException e) {
+                e.showMessage();
+            }
+        }
+
+        // If NO/CANCEL was selected (or in any other case): just close the
+        // loaded proof
+        alert.close();
     }
 
     @Override

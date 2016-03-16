@@ -297,6 +297,10 @@ public class MainViewController extends NUIController implements Observer {
      */
     @FXML
     protected final void handleSaveProofAs(final ActionEvent e) {
+        saveProofAsDialog();
+    }
+
+    public void saveProofAsDialog() {
         // Get loaded proof
         Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
 

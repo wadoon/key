@@ -2,7 +2,6 @@ package de.uka.ilkd.key.nui.tests.guitests;
 
 import org.junit.Test;
 
-import de.uka.ilkd.key.nui.prooftree.ProofTreeStyleConstants;
 import javafx.scene.input.KeyCode;
 
 /**
@@ -33,41 +32,17 @@ public class TreeViewTest extends NUITest {
         
         waitUntilStatusIs("Ready.");
         
-    	doubleClickOn("." + ProofTreeStyleConstants.CSS_NODE_BRANCH);
     	clickOn("0: andRight ");
     	doubleClickOn("Case 1 ");
     	doubleClickOn("Case 2 ");
     	doubleClickOn("Case 1 ");
     	rightClickOn().clickOn("Expand All");
-    	clickOn("Case 1");
-    	rightClickOn().clickOn("Expand All");
-    	clickOn("Case 1");
-    	rightClickOn().clickOn("Expand All");
-    	clickOn("Case 1");
-    	rightClickOn().clickOn("Expand All");
-    	clickOn("Case 1");
-    	rightClickOn().clickOn("Expand All");
-    	clickOn("Case 1");
-    	//rightClickOn().clickOn("Expand Below");
-    	//rightClickOn().clickOn("Collapse All");
-    	//rightClickOn().clickOn("Collapse Below");
-    	/*rightClickOn().clickOn("Search");
-    	rightClickOn().clickOn("Search");
-    	rightClickOn().clickOn("Search");
-    	rightClickOn().clickOn("Search");
-    	rightClickOn().clickOn("Search");
-    	rightClickOn().clickOn("Search");
-    	rightClickOn().clickOn("Search");
-    	rightClickOn().clickOn("Search");
-    	rightClickOn().clickOn("Search");
-    	rightClickOn().clickOn("Search");
-    	rightClickOn().clickOn("Search");
     	
-        for (int i = 0; i < 25; i++) {
-            scroll(VerticalDirection.DOWN);
-        }
+//        for (int i = 0; i < 25; i++) {
+//            scroll(VerticalDirection.DOWN);
+//        }
 
-        doubleClickOn("#if_x_true");
-        doubleClickOn("#if_x_false");*/
+//        doubleClickOn("#if_x_true");
+//        doubleClickOn("#if_x_false");
     }
 }
