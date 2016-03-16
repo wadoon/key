@@ -309,12 +309,14 @@ public class RootLayoutController extends ViewController {
                 .addAll(new ExtensionFilter("Proofs, KeY or Java Files",
                         "*.proof", "*.key", "*.java"),
                 new ExtensionFilter("All Files", "*.*"));
-        
+
         if (file != null) {
             File existDirectory = file.getParentFile();
             fileChooser.setInitialDirectory(existDirectory);
-        } else {
-            // TODO reset initial directory to "../" (changed for faster access to
+        }
+        else {
+            // TODO reset initial directory to "../" (changed for faster access
+            // to
             // proofs for testing purposes)
             fileChooser.setInitialDirectory(
                     new File("../key.core.test/resources/testcase/join"));
@@ -638,26 +640,34 @@ public class RootLayoutController extends ViewController {
 
     @FXML
     private void handleSequentCssStylerAction() {
-        getMainApp().openNewWindow("Sequent CSS Styler", "view/CssStylerView.fxml", true, true);
+        getMainApp().openNewWindow("Sequent CSS Styler",
+                "view/CssStylerView.fxml", true, true);
     }
-    
+
     @FXML
     private void openInNew() {
-        de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator().getSelectedNode();
-        
-        ViewInformation info = new ViewInformation(node.serialNr() + ": " + node.name(), SequentViewController.class.getResource("SequentView.fxml"),
+        de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator()
+                .getSelectedNode();
+
+        ViewInformation info = new ViewInformation(
+                node.serialNr() + ": " + node.name(),
+                StaticSequentViewController.class.getResource(
+                        "StaticSequentView.fxml"),
                 ViewPosition.CENTER, false);
-        
-        //if moved to other menu outside of RootLayoutController, swap the following lines
-        //info.addObserver(new ViewObserver(getMainApp().getRootLayoutController()));
-        //getMainApp().getRootLayoutController().registerView(info, "");
+
+        // if moved to other menu outside of RootLayoutController, swap the
+        // following lines
+        // info.addObserver(new
+        // ViewObserver(getMainApp().getRootLayoutController()));
+        // getMainApp().getRootLayoutController().registerView(info, "");
         info.addObserver(new ViewObserver(this));
         this.registerView(info, "");
-        
+
         info.setIsActive(true);
-        
+
         Platform.runLater(() -> {
-            ((SequentViewController)info.getController()).loadProofToView(node);
+            ((StaticSequentViewController) info.getController())
+                    .getSequentViewController().loadNodeToView(node);
         });
     }
 }

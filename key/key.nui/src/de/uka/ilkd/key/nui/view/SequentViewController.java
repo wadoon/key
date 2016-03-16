@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Pair;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
@@ -95,7 +96,7 @@ public class SequentViewController extends ViewController {
     public SequentViewController() {
     }
 
-    public void loadProofToView(Node node) {
+    public void loadNodeToView(Node node) {
         showSequent(node);
         tacletInfoViewController.showTacletInfo(node);
         notationInfo.refresh(services, checkBoxPrettySyntax.isSelected(),
@@ -121,12 +122,13 @@ public class SequentViewController extends ViewController {
         initializeSearchBox();
         tacletInfo.setDisable(true);
         tacletInfo.setExpanded(false);
+        enableTacletMenu(true);
 
         sequentOptions.setDisable(true);
         sequentOptions.setExpanded(false);
         sequentOptions.expandedProperty()
                 .addListener((observable, oldValue, newValue) -> {
-                    if (sequentOptions.isExpanded()) {
+                    if (newValue) {
                         sequentOptions.setText("Less Options");
                     }
                     else {
@@ -336,7 +338,8 @@ public class SequentViewController extends ViewController {
         // styling update.
         if (sequentChanged && sequentLoaded) {
             sequentChanged = false;
-            Pair<Double, Double> newDimensions = posTranslator.getProofDimensions();
+            Pair<Double, Double> newDimensions = posTranslator
+                    .getProofDimensions();
 
             // JavaFX 8 has MaxHeight 8192. If bigger, an error will occur.
             // Shall be patched in JDK9
@@ -380,6 +383,7 @@ public class SequentViewController extends ViewController {
 
     boolean selectionModeIsActive = false;
     private FilterSelection filterSelection;
+    private boolean enableTacletMenu;
 
     private void selectModeActivated(SelectModeEventArgs eventArgs) {
         filterSelection = eventArgs.getFilterSelection();
@@ -421,6 +425,8 @@ public class SequentViewController extends ViewController {
             if (tacletMenu != null)
                 tacletMenu.hide();
             else {
+                if (!enableTacletMenu)
+                    return;
                 try {
                     // XXX loader stuff should be moved
                     // XXX menu should only be loaded once
@@ -462,5 +468,10 @@ public class SequentViewController extends ViewController {
                 }
             }
         }
+    }
+
+    public void enableTacletMenu(boolean enable) {
+        enableTacletMenu = enable;
+
     }
 }

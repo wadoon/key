@@ -34,7 +34,7 @@ public class MainSequentViewController extends ViewController {
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 // execute ui update on javafx thread
                 Platform.runLater(() -> {
-                    sequentViewController.loadProofToView(
+                    sequentViewController.loadNodeToView(
                             getContext().getKeYMediator().getSelectedNode());
                                    });
             }
