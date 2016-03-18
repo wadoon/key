@@ -5,28 +5,34 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.NUI;
 
+/**
+ * Abstract common base class for all controllers.
+ * 
+ * @author Florian Breitfelder
+ *
+ */
 public abstract class NUIController {
 
     /**
      * A reference to the {@link NUI} which manages the main application.
      */
-    protected NUI nui = null;
+    protected NUI nui;
     /**
      * The fx:id of the controller.
      */
-    protected String componentName = null;
+    protected String componentName;
     /**
      * The filename of the associated FXML file.
      */
-    protected String filename = null;
+    protected String filename;
     /**
      * The data model linked to application.
      */
-    protected DataModel dataModel = null;
+    protected DataModel dataModel;
     /**
      * The bundle used for internationalization of text strings.
      */
-    protected ResourceBundle bundle = null;
+    protected ResourceBundle bundle;
 
     /**
      * Replaces the usual java constructor, because JavaFX does not allow to use
@@ -44,8 +50,8 @@ public abstract class NUIController {
      * @param filename
      *            The filename of the associated FXML file.
      */
-    public void constructor(NUI nuiRef, DataModel dataModel,
-            ResourceBundle bundle, String componentName, String filename) {
+    public void constructor(final NUI nuiRef, final DataModel dataModel,
+            final ResourceBundle bundle, final String componentName, final String filename) {
         this.nui = nuiRef;
         this.dataModel = dataModel;
         this.bundle = bundle;

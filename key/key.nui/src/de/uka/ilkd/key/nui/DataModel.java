@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nui;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.ResourceBundle;
 
@@ -23,7 +24,7 @@ public class DataModel extends Observable {
      * HashMap storing the pairs of (String, {@link TreeViewState}), where
      * String represents the filename of the proof file.
      */
-    private HashMap<String, TreeViewState> treeViewStates = new HashMap<>();
+    private final Map<String, TreeViewState> treeViewStates = new HashMap<String, TreeViewState>();
 
     /**
      * Represents the lastly stored TreeViewState, therefore it is displayed
@@ -34,12 +35,12 @@ public class DataModel extends Observable {
     /**
      * An instance representing the associated NUI.
      */
-    private NUI nui;
+    private final NUI nui;
 
     /**
      * References the currently loaded resource bundle in the {@link NUI}.
      */
-    private ResourceBundle bundle;
+    private final ResourceBundle bundle;
 
     /**
      * Creates a new data model for the GUI instance.
@@ -49,7 +50,7 @@ public class DataModel extends Observable {
      * @param bundle
      *            The current loaded resource bundle in the {@link NUI}.
      */
-    public DataModel(NUI nui, ResourceBundle bundle) {
+    public DataModel(final NUI nui, final ResourceBundle bundle) {
         this.nui = nui;
         this.bundle = bundle;
     }
@@ -62,7 +63,7 @@ public class DataModel extends Observable {
      *            TreeViewState.
      * @return TreeViewState The TreeViewState searched for.
      */
-    public TreeViewState getTreeViewState(String name) {
+    public TreeViewState getTreeViewState(final String name) {
         return treeViewStates.get(name);
     }
 
@@ -78,7 +79,7 @@ public class DataModel extends Observable {
      *            The name of the key associated with the state (filename of
      *            proof file).
      */
-    public void saveTreeViewState(TreeViewState treeViewState, String name) {
+    public void saveTreeViewState(final TreeViewState treeViewState, final String name) {
         if (treeViewStates.containsKey(name)) {
             treeViewState.setModified(true);
         }
@@ -105,7 +106,7 @@ public class DataModel extends Observable {
      * @param destinationFile
      *            the destination {@link File} where the proof is saved to.
      */
-    public final void saveProof(Proof proof, File destinationFile) {
+    public final void saveProof(final Proof proof, final File destinationFile) {
         try {
             proof.saveToFile(destinationFile);
             proof.setProofFile(destinationFile);
@@ -126,9 +127,9 @@ public class DataModel extends Observable {
      *         loaded proofs.
      */
     public ObservableList<String> getListOfProofs() {
-        ObservableList<String> listOfProofs = FXCollections
+        final ObservableList<String> listOfProofs = FXCollections
                 .observableArrayList();
-        for (String proofName : treeViewStates.keySet()) {
+        for (final String proofName : treeViewStates.keySet()) {
             listOfProofs.add(proofName);
         }
         return listOfProofs;
@@ -141,7 +142,7 @@ public class DataModel extends Observable {
      * @param proofName
      *            The filename of the proof to be loaded.
      */
-    public void loadProofFormMemory(String proofName) {
+    public void loadProofFormMemory(final String proofName) {
         loadedTreeViewState = treeViewStates.get(proofName);
         this.setChanged();
         this.notifyObservers(proofName);
@@ -154,7 +155,7 @@ public class DataModel extends Observable {
      * @param proofName
      *            The proof's filename associated with the TreeViewState.
      */
-    public void removeProof(String proofName) {
+    public void removeProof(final String proofName) {
         if (loadedTreeViewState.equals(treeViewStates.get(proofName))) {
             loadedTreeViewState = null;
         }

@@ -25,7 +25,7 @@ public class SearchTest {
     /**
      * The proof file used for this test.
      */
-    private final String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
+    private static final String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.

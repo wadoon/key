@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,16 +38,17 @@ public class FilteringHandler {
     /**
      * The data model.
      */
-    final private DataModel dm;
+    final private DataModel dataModel;
 
     /**
      * Constructor.
      * 
      * @param model
      *            The DataModel.
+     * @throws FileNotFoundException
      */
     public FilteringHandler(final DataModel model) {
-        this.dm = model;
+        this.dataModel = model;
 
         // Load filters and store all loaded filters into the filtersMap
         final List<ProofTreeFilter> filters = searchFilterClasses();
@@ -61,7 +63,7 @@ public class FilteringHandler {
     /**
      * Resets all active filters.
      */
-    public void reinit() {
+    public final void reinit() {
         filtersMap.forEach((filter, active) -> {
             if (active) {
                 filtersMap.put(filter, false);
@@ -88,16 +90,22 @@ public class FilteringHandler {
                 .listFiles();
         ArrayList<URL> listOfURLs = new ArrayList<>();
 
-        for (File file : files) {
-            if (file.isFile() && file.getName().matches(".*[.class]")) {
-                try {
-                    URL urlClassFile = file.toURI().toURL();
-                    listOfURLs.add(urlClassFile);
-                }
-                catch (MalformedURLException e) {
-                    e.printStackTrace();
+        try {
+            for (File file : files) {
+                if (file.isFile() && file.getName().matches(".*[.class]")) {
+                    try {
+                        URL urlClassFile = file.toURI().toURL();
+                        listOfURLs.add(urlClassFile);
+                    }
+                    catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+        }
+        catch (Exception e) {
+            System.out.println((getClass().getName() + ": " + "Path " + PATH
+                    + " not found."));
         }
 
         // Convert listOfURLs to an array of URLs. This array is needed for the
@@ -174,8 +182,8 @@ public class FilteringHandler {
                 });
 
         final ProofTreeItem root;
-        if (dm.getLoadedTreeViewState() != null) {
-            root = dm.getLoadedTreeViewState().getTreeItem();
+        if (dataModel.getLoadedTreeViewState() != null) {
+            root = dataModel.getLoadedTreeViewState().getTreeItem();
             root.filter(redFilter);
         }
     }

@@ -1,11 +1,13 @@
 package de.uka.ilkd.key.nui.tests.junittests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.stream.Stream;
 
 import org.junit.Test;
+import org.junit.internal.runners.statements.Fail;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
@@ -64,10 +66,14 @@ public class StyleConfigurationTest {
             e.printStackTrace();
         }
         Proof proof = environment.getLoadedProof();
-        proof.setProofFile(proofFileName);
+        if (proof != null) {
+            proof.setProofFile(proofFileName);
 
-        // initialize ProofConverter object used for tests
-        ptVisualizer = new ProofTreeConverter(proof);
+            // initialize ProofConverter object used for tests
+            ptVisualizer = new ProofTreeConverter(proof);
+        } else {
+            fail("Proof file could not be loaded.");
+        }
     }
 
     @Test

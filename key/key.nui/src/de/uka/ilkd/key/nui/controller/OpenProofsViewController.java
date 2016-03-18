@@ -6,16 +6,15 @@ import java.util.Observer;
 import java.util.Optional;
 
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.Alert.AlertType;
 
 /**
  * Controller for the view showing an overview of all loaded proofs.
@@ -27,10 +26,10 @@ public class OpenProofsViewController extends NUIController
         implements Observer {
 
     @FXML
-    TextArea textAreaOpenProofs;
+    private TextArea textAreaOpenProofs;
 
     @FXML
-    ListView<String> listView;
+    private ListView<String> listView;
 
     private ContextMenu contextMenu;
 
@@ -39,14 +38,14 @@ public class OpenProofsViewController extends NUIController
         dataModel.addObserver(this);
         // Action to be performed if user clicks (left) on a proof entry
         listView.setOnMouseClicked((event) -> {
-            String selectedItem = listView.getSelectionModel()
+            final String selectedItem = listView.getSelectionModel()
                     .getSelectedItem();
             if (selectedItem != null) {
                 dataModel.loadProofFormMemory(selectedItem);
             }
         });
 
-        MenuItem deleteProof = new MenuItem(bundle.getString("closeProof"));
+        final MenuItem deleteProof = new MenuItem(bundle.getString("closeProof"));
         contextMenu = new ContextMenu(deleteProof);
 
         // Action to be performed if user clicks on 'Close Proof' in the context

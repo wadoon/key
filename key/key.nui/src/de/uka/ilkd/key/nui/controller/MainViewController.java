@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
@@ -28,7 +29,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -106,7 +107,7 @@ public class MainViewController extends NUIController implements Observer {
     /**
      * Includes the components which were added to the main Window
      */
-    private HashMap<String, Pane> components = new HashMap<>();
+    final private Map<String, Pane> components = new HashMap<>();
 
     /**
      * Stores the position of components added to the SplitPane. Other views can
@@ -144,9 +145,9 @@ public class MainViewController extends NUIController implements Observer {
      */
     @FXML
     public final void handleOpenProof(final ActionEvent e) {
-        FileChooser fileChooser = new FileChooser();
+        final FileChooser fileChooser = new FileChooser();
 
-        TreeViewState loadedTVS = dataModel.getLoadedTreeViewState();
+        final TreeViewState loadedTVS = dataModel.getLoadedTreeViewState();
         // set default directory to location where currently loaded proof is
         // located
         File parentDirectory = null;
@@ -163,7 +164,7 @@ public class MainViewController extends NUIController implements Observer {
                     new File("resources/de/uka/ilkd/key/examples"));
         }
 
-        FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
+        final FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
                 "Proof files", "*.proof", "*.key");
         fileChooser.getExtensionFilters().add(extFilterProof);
         final File file = fileChooser.showOpenDialog(contextMenu);
@@ -233,25 +234,25 @@ public class MainViewController extends NUIController implements Observer {
 
         // File was changed: ask user if he wants to save changes
         // create alert window
-        Alert alert = new Alert(AlertType.CONFIRMATION);
+        final Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("dialogTitle"));
 
         // --- define text for header and content area
-        String filename = dataModel.getLoadedTreeViewState().getProof()
+        final String filename = dataModel.getLoadedTreeViewState().getProof()
                 .getProofFile().getName();
         alert.setHeaderText(MessageFormat.format(
                 bundle.getString("dialogHeader"), "'" + filename + "'"));
         alert.setContentText(bundle.getString("dialogQuestion"));
 
         // --- define button types
-        ButtonType buttonSaveAs = new ButtonType(
+        final ButtonType buttonSaveAs = new ButtonType(
                 bundle.getString("dialogSaveAs"));
-        ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
-        ButtonType buttonAbort = new ButtonType(
+        final ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
+        final ButtonType buttonAbort = new ButtonType(
                 bundle.getString("dialogAbort"));
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
 
-        Optional<ButtonType> result = alert.showAndWait();
+        final Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == buttonSaveAs || result.get() == buttonClose) {
             // If YES was selected: save changes made to file
             if (result.get() == buttonSaveAs) {
@@ -276,7 +277,7 @@ public class MainViewController extends NUIController implements Observer {
     @FXML
     protected final void handleSaveProof(final ActionEvent e) {
         // retrieve last saved location from proof file
-        Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
+        final Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
 
         if (loadedProof != null && loadedProof.getProofFile() != null) {
             // call saveProof with proof file
@@ -302,24 +303,24 @@ public class MainViewController extends NUIController implements Observer {
 
     public void saveProofAsDialog() {
         // Get loaded proof
-        Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
+        final Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
 
         // Open file picker window
-        FileChooser fileChooser = new FileChooser();
+        final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(bundle.getString("fileChooserSaveTitle"));
         // set initial directory to last saved location (if available)
         if (loadedProof.getProofFile() != null) {
             // if file has a parent directory, set initial directory
-            File parentDir = loadedProof.getProofFile().getParentFile();
+            final File parentDir = loadedProof.getProofFile().getParentFile();
             if (parentDir != null) {
                 fileChooser.setInitialDirectory(parentDir);
             }
         }
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+        final FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "Proof files", "*.proof");
         fileChooser.getExtensionFilters().add(extFilter);
 
-        File selectedFile = fileChooser.showSaveDialog(contextMenu);
+        final File selectedFile = fileChooser.showSaveDialog(contextMenu);
 
         // save proof file if any destination was specified
         if (selectedFile != null) {
@@ -347,8 +348,7 @@ public class MainViewController extends NUIController implements Observer {
      * @param place
      *            The position where the component should be moved to.
      */
-    private void moveComponentTo(Pane component, Place place) {
-
+    private void moveComponentTo(final Pane component, final Place place) {
         selectToggle(component.getId(), place);
         if (place == Place.HIDDEN) {
             component.setVisible(false);
@@ -371,7 +371,7 @@ public class MainViewController extends NUIController implements Observer {
      * @param place
      *            The position where the component should be moved to.
      */
-    public void addComponent(Pane component, Place place) {
+    public void addComponent(final Pane component, final Place place) {
         components.put(component.getId(), component);
         moveComponentTo(component, place);
     }
@@ -385,9 +385,9 @@ public class MainViewController extends NUIController implements Observer {
      * @param place
      *            The new position of the component.
      */
-    private void selectToggle(String componentName, Place place) {
+    private void selectToggle(final String componentName, final Place place) {
         try {
-            for (Toggle t : nui.getToggleGroup(componentName).getToggles()) {
+            for (final Toggle t : nui.getToggleGroup(componentName).getToggles()) {
                 if (t.getUserData().equals(place)) {
                     t.setSelected(true);
                 }
@@ -407,34 +407,30 @@ public class MainViewController extends NUIController implements Observer {
      *            The ActionEvent
      */
     public EventHandler<ActionEvent> getNewHandleLoadComponent() {
-        return new EventHandler<ActionEvent>() {
+        return ((actionEvent) -> {
+            RadioMenuItem clickedItem = (RadioMenuItem) actionEvent.getSource();
+            String componentName = (String) // e.g. "treeView", "proofView"
+            clickedItem.getProperties().get("componentName");
+            String clickedText = clickedItem.getText();
+            Place place;
 
-            @Override
-            public void handle(ActionEvent e) {
-                RadioMenuItem clickedItem = (RadioMenuItem) e.getSource();
-                String componentName = (String) // e.g. "treeView", "proofView"
-                clickedItem.getProperties().get("componentName");
-                String clickedText = clickedItem.getText();
-                Place place;
-
-                if (clickedItem.getText().equals(bundle.getString("left"))) {
-                    place = Place.LEFT;
-                }
-                else if (clickedText.equals(bundle.getString("middle"))) {
-                    place = Place.MIDDLE;
-                }
-                else if (clickedText.equals(bundle.getString("right"))) {
-                    place = Place.RIGHT;
-                }
-                else if (clickedText.equals(bundle.getString("bottom"))) {
-                    place = Place.BOTTOM;
-                }
-                else {
-                    place = Place.HIDDEN;
-                }
-                moveComponentTo(components.get(componentName), place);
+            if (clickedItem.getText().equals(bundle.getString("left"))) {
+                place = Place.LEFT;
             }
-        };
+            else if (clickedText.equals(bundle.getString("middle"))) {
+                place = Place.MIDDLE;
+            }
+            else if (clickedText.equals(bundle.getString("right"))) {
+                place = Place.RIGHT;
+            }
+            else if (clickedText.equals(bundle.getString("bottom"))) {
+                place = Place.BOTTOM;
+            }
+            else {
+                place = Place.HIDDEN;
+            }
+            moveComponentTo(components.get(componentName), place);
+        });
     }
 
     /**
@@ -445,7 +441,7 @@ public class MainViewController extends NUIController implements Observer {
      * @param e
      *            The EventHandler
      */
-    public void registerKeyListener(EventHandler<KeyEvent> e) {
+    public void registerKeyListener(final EventHandler<KeyEvent> e) {
         root.addEventHandler(KeyEvent.KEY_PRESSED, e);
     }
 
@@ -461,7 +457,7 @@ public class MainViewController extends NUIController implements Observer {
      * @param text
      *            String to be set to the status bar.
      */
-    public void updateStatusbar(String text) {
+    public void updateStatusbar(final String text) {
         if (text != null) {
             statustext.setText(text);
         }
@@ -476,7 +472,7 @@ public class MainViewController extends NUIController implements Observer {
      *            An argument (not used)
      */
     @Override
-    public void update(Observable o, Object arg) {
+    public void update(final Observable o, final Object arg) {
         if (dataModel.getLoadedTreeViewState() == null) {
             saveProof.setVisible(false);
             saveProofAs.setVisible(false);

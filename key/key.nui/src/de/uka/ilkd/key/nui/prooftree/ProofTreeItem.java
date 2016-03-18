@@ -40,6 +40,7 @@ public class ProofTreeItem extends TreeItem<NUINode> {
      * 
      * @param value
      *            The NUINode encapsulated in the tree item.
+     * @throws NoSuchFieldException
      */
     public ProofTreeItem(final NUINode value) {
         super(value);
@@ -92,7 +93,8 @@ public class ProofTreeItem extends TreeItem<NUINode> {
      *            The children list to set.
      */
     @SuppressWarnings("unchecked")
-    protected void setAllChildren(final ObservableList<ProofTreeItem> list) {
+    protected final void setAllChildren(
+            final ObservableList<ProofTreeItem> list) {
         try {
             final Field childrenField = TreeItem.class
                     .getDeclaredField("children");

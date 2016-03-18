@@ -43,7 +43,7 @@ public class IconFactory {
     /** file name of linked branch node icon. */
     public static final String BRANCH_LINKED = folderRoot + "linkedBranch.png";
     /** file name of interactive inner node icon. */
-    public static final String INNER_NODE_INTERACTIVE = folderRoot
+    public static final String INNER_INTERACTIVE = folderRoot
             + "interactiveNode.png";
 
     // Leafs
