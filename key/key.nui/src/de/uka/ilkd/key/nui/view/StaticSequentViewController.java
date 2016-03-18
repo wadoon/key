@@ -93,6 +93,7 @@ public class StaticSequentViewController extends ViewController {
             
             @Override
             public void proofPruned(ProofTreeEvent e) {
+                //TODO what happens in this if case?
                 if (e.getNode().find(node)) {}
             }
             

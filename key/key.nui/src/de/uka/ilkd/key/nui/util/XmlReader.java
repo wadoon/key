@@ -96,8 +96,9 @@ public class XmlReader {
                 treeRoot.getChildren().add(categoryNode);
             }
 
-        }
-        catch (Exception e) {
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
             e.printStackTrace();
         }
         TreeItem<String> otherNode = new TreeItem<String>("Other");

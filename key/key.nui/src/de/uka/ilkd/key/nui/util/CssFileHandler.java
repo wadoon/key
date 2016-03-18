@@ -78,12 +78,20 @@ public class CssFileHandler {
         if (path.isEmpty()) {
             return;
         }
-
-        FileWriter fw = new FileWriter(path, false);
-        fw.write(
-                "/*We recommend to only change this file using the KeY CSS Styler */ \n");
-        fw.write(css);
-        fw.close();
+        
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(path, false);
+            fw.write(
+                    "/*We recommend to only change this file using the KeY CSS Styler */ \n");
+            fw.write(css);
+        } catch (final IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fw != null) {
+                fw.close();
+            }
+        }
     }
 
     /**

@@ -155,7 +155,9 @@ public class TacletMenuController extends ViewController {
             throw new IllegalArgumentException("Argument pos must not be null.");
         this.pos = pos;
         
-        this.parentController = (SequentViewController) parentController; 
+        if (parentController instanceof SequentViewController) {
+            this.parentController = (SequentViewController) parentController; 
+        }
         
         occ = pos.getPosInOccurrence();
         

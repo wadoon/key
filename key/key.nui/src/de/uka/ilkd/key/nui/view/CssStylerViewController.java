@@ -322,8 +322,9 @@ public class CssStylerViewController extends ViewController {
                 enableControls();
             });
             node = cp;
-        }
-        catch (Exception e) {
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
             System.err.println("Could not read Color. Using TextField");
             node = makeTextField(value, property);
         }
