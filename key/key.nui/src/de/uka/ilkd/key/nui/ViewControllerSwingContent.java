@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.nui;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import de.uka.ilkd.key.java.statement.Return;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
@@ -43,13 +40,6 @@ public abstract class ViewControllerSwingContent extends ViewController {
 
     public SwingNode getSwingNode() {
         return swingNode;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
     }
 
     /**
