@@ -14,7 +14,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
+import javafx.scene.layout.Pane;
 
 /**
  * Controller for the view showing an overview of all loaded proofs.
@@ -26,11 +26,10 @@ public class OpenProofsViewController extends NUIController
         implements Observer {
 
     @FXML
-    private TextArea textAreaOpenProofs;
-
+    private Pane openProofsViewPane;
     @FXML
     private ListView<String> listView;
-
+    
     private ContextMenu contextMenu;
 
     @Override
@@ -65,25 +64,25 @@ public class OpenProofsViewController extends NUIController
 
         // File was changed: ask user if he wants to save changes
         // create alert window
-        Alert alert = new Alert(AlertType.CONFIRMATION);
+        final Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("dialogTitle"));
 
         // --- define text for header and content area
-        String filename = dataModel.getLoadedTreeViewState().getProof()
+        final String filename = dataModel.getLoadedTreeViewState().getProof()
                 .getProofFile().getName();
         alert.setHeaderText(MessageFormat.format(
                 bundle.getString("dialogHeader"), "'" + filename + "'"));
         alert.setContentText(bundle.getString("dialogQuestion"));
 
         // --- define button types
-        ButtonType buttonSaveAs = new ButtonType(
+        final ButtonType buttonSaveAs = new ButtonType(
                 bundle.getString("dialogSaveAs"));
-        ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
-        ButtonType buttonAbort = new ButtonType(
+        final ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
+        final ButtonType buttonAbort = new ButtonType(
                 bundle.getString("dialogAbort"));
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
 
-        Optional<ButtonType> result = alert.showAndWait();
+        final Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == buttonSaveAs) {
             try {
                 ((MainViewController) nui.getController("MainView"))
@@ -100,8 +99,8 @@ public class OpenProofsViewController extends NUIController
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-        ObservableList<String> loadedProofs = dataModel.getListOfProofs();
+    public void update(final Observable observable, final Object arg) {
+        final ObservableList<String> loadedProofs = dataModel.getListOfProofs();
         if (loadedProofs.size() >= 1) {
             listView.setContextMenu(contextMenu);
         }

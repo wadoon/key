@@ -94,12 +94,12 @@ public class NUI extends Application {
     /**
      * The filename of the mainView, without extension (.fxml).
      */
-    private final String MAINVIEW_FILENAME = "MainView";
+    private final static String MAINVIEW_FILENAME = "MainView";
 
     /**
      * Directory containing the component files (.fxml).
      */
-    private final String componentsDir = "components";
+    private final static String COMPONENTS_DIR = "components";
 
     /**
      * The data model used to store the loaded proof as a {@link TreeViewState}.
@@ -225,18 +225,19 @@ public class NUI extends Application {
             final Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
                 final String fileName = entries.nextElement().getName();
-                if (fileName.matches(
-                        "(de/uka/ilkd/key/nui/components/).*(.fxml)")) {
+                if (fileName.matches("(de/uka/ilkd/key/nui/" + COMPONENTS_DIR
+                        + "/).*(.fxml)")) {
                     loadComponent(fileName.substring(
-                            fileName.lastIndexOf("/") + 1, fileName.length()));
+                            fileName.lastIndexOf('/') + 1, fileName.length()));
                 }
             }
             jar.close();
         }
         else {// Run with IDE
-            File[] files = new File(
-                    getClass().getResource("components").getPath()).listFiles();
-            for (File file : files) {
+            final File[] files = new File(
+                    getClass().getResource(COMPONENTS_DIR).getPath())
+                            .listFiles();
+            for (final File file : files) {
                 if (file.isFile() && file.getName().matches(".*[.fxml]")) {
                     loadComponent(file.getName());
                 }
@@ -245,30 +246,32 @@ public class NUI extends Application {
     }
 
     private void loadComponent(String fileName) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(
-                getClass().getResource("components/" + fileName), bundle);
+        final FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
+                COMPONENTS_DIR + File.separator + fileName), bundle);
 
         // String componentName = cutFileExtension(file.getName());
-        Pane component = fxmlLoader.load();
+        final Pane component = fxmlLoader.load();
         components.put(component.getId(), component);
         NUIController nuiController;// = new NUIController();
         // before you can get the controller
         // you have to call fxmlLoader.load()
         nuiController = fxmlLoader.getController();
-        if (nuiController != null)
+        if (nuiController != null) {
             nuiController.constructor(this, dataModel, bundle,
                     component.getId(), fileName);
+        }
         controllers.put(component.getId(), nuiController);
 
-        Annotation[] annotations = nuiController.getClass().getAnnotations();
+        final Annotation[] annotations = nuiController.getClass()
+                .getAnnotations();
 
         // create a view position menu for every component
         if (annotations != null) {
-            for (Annotation annotation : annotations) {
+            for (final Annotation annotation : annotations) {
                 if (annotation instanceof ControllerAnnotation) {
-                    ControllerAnnotation controllerAnnotation = (ControllerAnnotation) annotation;
-                    if (controllerAnnotation.createMenu()) {
-                        ToggleGroup toggleGroup = new ToggleGroup();
+                    final ControllerAnnotation ctrlAnnotation = (ControllerAnnotation) annotation;
+                    if (ctrlAnnotation.createMenu()) {
+                        final ToggleGroup toggleGroup = new ToggleGroup();
                         toggleGroups.put(component.getId(), toggleGroup);
                         viewPositionMenu.getItems().add(
                                 createSubMenu(component.getId(), toggleGroup));
@@ -374,7 +377,7 @@ public class NUI extends Application {
      * @return A subclass of NUIController, which is a reference to the
      *         controller.
      * @throws ControllerNotFoundException
-     *             If no controller with the given fx:id was found.
+     *             Iff there was no controller with the given fx:id loaded.
      */
     public NUIController getController(final String name)
             throws ControllerNotFoundException {
@@ -384,6 +387,15 @@ public class NUI extends Application {
         return controllers.get(name);
     }
 
+    /**
+     * Returns the toggle group with the given fx:id.
+     * 
+     * @param name
+     *            The fx:id of the toggle group.
+     * @return The toggle group with the given fx:id.
+     * @throws ToggleGroupNotFoundException
+     *             Iff there was no toggle group with the given fx:id loaded.
+     */
     public ToggleGroup getToggleGroup(final String name)
             throws ToggleGroupNotFoundException {
         if (!toggleGroups.containsKey(name)) {
