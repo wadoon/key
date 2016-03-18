@@ -18,7 +18,7 @@ import javafx.scene.control.TextArea;
 public class ProofViewController extends NUIController implements Observer {
 
     @FXML
-    TextArea textAreaProof;
+    private TextArea textAreaProof;
 
     @Override
     protected void init() {
@@ -26,14 +26,14 @@ public class ProofViewController extends NUIController implements Observer {
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-        TreeViewState treeViewState = dataModel
+    public void update(final Observable observable, final Object arg) {
+        final TreeViewState treeViewState = dataModel
                 .getTreeViewState(arg.toString());
         if (treeViewState != null) {
             textAreaProof.setText(
                     treeViewState.getProof().getStatistics().toString());
         }
-        else if (((DataModel) o).getListOfProofs().size() >= 1) {
+        else if (((DataModel) observable).getListOfProofs().size() >= 1) {
             textAreaProof.setText(bundle.getString("noProofSelected"));
         }
         else {

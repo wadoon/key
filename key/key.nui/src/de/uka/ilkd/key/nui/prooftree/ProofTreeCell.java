@@ -53,30 +53,34 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
     private Label label;
 
-    private final ChangeListener<Boolean> searchResultListener = new ChangeListener<Boolean>() {
-        @Override
-        public void changed(ObservableValue<? extends Boolean> observable,
-                Boolean didMatchSearch, Boolean nowMatchesSearch) {
-            final ObservableList<String> styles = getStyleClass();
-            final String cssClassHighlight = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
-            if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
-                styles.add(cssClassHighlight);
-            }
-            if (nowMatchesSearch) {
-                styles.remove(cssClassHighlight);
-            }
-            ProofTreeCell.this.updateItem(ProofTreeCell.this.getItem(), false);
+    /**
+     * The change listener registered to this ProofTreeCell.
+     */
+    private final ChangeListener<Boolean> searchResultListener = (observable,
+            didMatchSearch, nowMatchesSearch) -> {
+        final ObservableList<String> styles = getStyleClass();
+        final String cssClassHighlight = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
+        if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
+            styles.add(cssClassHighlight);
         }
+        if (nowMatchesSearch) {
+            styles.remove(cssClassHighlight);
+        }
+        ProofTreeCell.this.updateItem(ProofTreeCell.this.getItem(), false);
     };
 
     /**
      * The constructor of the ProofTreeCell.
      * 
      * @param icf
-     *            the icon factory used to display node icons
+     *            the {@link IconFactory} used to display node icons
+     * @param fh
+     *          the {@link FilteringHandler} used to filter this ProofTreeCell
+     * @param tvc
+     *          the {@link TreeViewController} associated with the TreeView
      */
     public ProofTreeCell(final IconFactory icf, final FilteringHandler fh,
-            TreeViewController tvc) {
+            final TreeViewController tvc) {
         super();
         this.fh = fh;
         this.icf = icf;
@@ -94,7 +98,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     @Override
     protected final void updateItem(final NUINode item, final boolean empty) {
 
-        String cssHighlighting = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
+        final String cssHighlighting = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
 
         if (getItem() != null) {
             getItem().removeSearchResultListener(searchResultListener);
@@ -133,7 +137,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         icon = null;
 
         // set decoration (style, icon)
-        ProofTreeStyler pts = new ProofTreeStyler(this);
+        final ProofTreeStyler pts = new ProofTreeStyler(this);
         // applies the style assigned in ProofTreeConverter to the
         // current ProofTreeCell
         pts.applyStyle(getItem());

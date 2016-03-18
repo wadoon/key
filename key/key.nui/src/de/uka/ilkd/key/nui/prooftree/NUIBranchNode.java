@@ -57,6 +57,7 @@ public class NUIBranchNode extends NUINode {
      * Sets the children of the branch node.
      * 
      * @param children
+     *            The children to set for the branch node.
      */
     public void setChildren(final List<NUINode> children) {
         this.children = children;
@@ -92,14 +93,14 @@ public class NUIBranchNode extends NUINode {
     }
 
     @Override
-    public int search(final String term) { 
+    public int search(final String term) {
         // case: Empty search term given
         if (term.isEmpty()) {
             return 0;
         }
-        
+
         // case: Non-Empty search term given
-        boolean thisIsASearchResult = getLabel().toLowerCase()
+        final boolean thisIsASearchResult = getLabel().toLowerCase()
                 .contains(term.toLowerCase());
         int numberOfResultsAccumulator = thisIsASearchResult ? 1 : 0;
         setSearchResult(thisIsASearchResult);
@@ -156,7 +157,7 @@ public class NUIBranchNode extends NUINode {
 
     @Override
     public List<NUINode> asList() {
-        List<NUINode> l = new LinkedList<>();
+        final List<NUINode> l = new LinkedList<>();
         l.add(this);
         children.forEach((child) -> l.addAll(child.asList()));
         return l;

@@ -102,8 +102,20 @@ public class StrategyViewController extends NUIController implements Observer {
     @FXML
     private AnchorPane proofSearchStrategy;
 
-    private int currentSliderValue = 10;
+    /**
+     * The default value for the maximum number of rule applications.
+     */
+    private static int DEFAULT_MAX_RULE_APPL = 10;
 
+    /**
+     * The current value of the slider.
+     */
+    private int currentSliderValue = DEFAULT_MAX_RULE_APPL;
+
+    /**
+     * The instance of the strategyWrapper containing the radio buttons of the
+     * StrategyView.
+     */
     private StrategyWrapper strategyWrapper = null;
 
     @Override
@@ -111,7 +123,7 @@ public class StrategyViewController extends NUIController implements Observer {
         dataModel.addObserver(this);
         strategyWrapper = new StrategyWrapper();
         addStrategyViewSwing(null);
-        IconFactory iconFactory = new IconFactory(15, 15);
+        final IconFactory iconFactory = new IconFactory(15, 15);
         goButtonImage.setImage(
                 iconFactory.getImage(IconFactory.GO_BUTTON).getImage());
 
@@ -121,20 +133,20 @@ public class StrategyViewController extends NUIController implements Observer {
             @Override
             public String toString(Double n) {
                 int val = (int) Math.pow(10, n);
-                return "" + (val >= 10000 ? val >= 1000000
-                        ? (val / 1000000) + "M" : (val / 1000) + "k" : +val);
+                return "" + (val >= 10000 ? (val >= 1000000
+                        ? (val / 1000000) + "M" : (val / 1000) + "k") : +val);
             }
 
             @Override
-            public Double fromString(String string) {
+            public Double fromString(final String string) {
                 return null;
             }
         });
 
         // Adds a listener to the 'Maximum rules' slider, used to update the
         // label with the currently chosen value
-        maxRuleAppSlider.valueProperty().addListener((ov, old_val, new_val) -> {
-            calculateCurrentSliderValue(new_val);
+        maxRuleAppSlider.valueProperty().addListener((ov, oldVal, newVal) -> {
+            calculateCurrentSliderValue(newVal);
             maxRuleAppLabel.setText(bundle.getString("maxRuleAppLabel") + " "
                     + currentSliderValue);
         });
@@ -142,10 +154,16 @@ public class StrategyViewController extends NUIController implements Observer {
                 bundle.getString("maxRuleAppLabel") + " " + currentSliderValue);
     }
 
-    public void handleOnAction(final ActionEvent e)
+    /**
+     * Action handler for the 'Start' (auto proving) button.
+     * 
+     * @param actionEvent
+     * @throws ControllerNotFoundException
+     */
+    public void handleOnAction(final ActionEvent actionEvent)
             throws ControllerNotFoundException {
 
-        ProofStarter proofStarter = new ProofStarter(false);
+        final ProofStarter proofStarter = new ProofStarter(false);
         String filename;
 
         try {
@@ -158,12 +176,13 @@ public class StrategyViewController extends NUIController implements Observer {
         }
 
         // retrieve proof file and init proofStarter
-        TreeViewState treeViewState = dataModel.getTreeViewState(filename);
-        Proof p = treeViewState.getProof();
+        final TreeViewState treeViewState = dataModel
+                .getTreeViewState(filename);
+        final Proof p = treeViewState.getProof();
         proofStarter.init(p);
 
         // TODO
-        Strategy strategy = strategyWrapper.getStrategy();
+        final Strategy strategy = strategyWrapper.getStrategy();
         proofStarter.setStrategy(strategy);
         // restrict maximum number of rule applications based on slider value
         // only set value of slider if slider was moved
@@ -172,7 +191,7 @@ public class StrategyViewController extends NUIController implements Observer {
         }
 
         // start automatic proof
-        ApplyStrategyInfo strategyInfo = proofStarter.start();
+        final ApplyStrategyInfo strategyInfo = proofStarter.start();
 
         // update statusbar
         nui.updateStatusbar(strategyInfo.reason());
@@ -181,15 +200,15 @@ public class StrategyViewController extends NUIController implements Observer {
         // of proof required
         if (strategyInfo.getAppliedRuleApps() > 0) {
             // load updated proof
-            Proof updatedProof = proofStarter.getProof();
+            final Proof updatedProof = proofStarter.getProof();
 
             // create new tree from updateProof
-            ProofTreeItem fxtree = new ProofTreeConverter(updatedProof)
+            final ProofTreeItem fxtree = new ProofTreeConverter(updatedProof)
                     .createFXProofTree();
 
             // Create new TreeViewState for updatedProof
-            TreeViewState updatedTreeViewState = new TreeViewState(updatedProof,
-                    fxtree);
+            final TreeViewState updatedTreeViewState = new TreeViewState(
+                    updatedProof, fxtree);
 
             // update datamodel
             dataModel.saveTreeViewState(updatedTreeViewState, filename);
@@ -200,11 +219,11 @@ public class StrategyViewController extends NUIController implements Observer {
     /**
      * Calculates the value of the slider based on the current position.
      * 
-     * @param new_val
+     * @param newVal
      *            {@link Number} the value obtained from the slider.
      */
-    private void calculateCurrentSliderValue(Number new_val) {
-        double sliderValue = new_val.doubleValue();
+    private void calculateCurrentSliderValue(final Number newVal) {
+        final double sliderValue = newVal.doubleValue();
 
         if (sliderValue > 0.0 && sliderValue < 1.0) {
             currentSliderValue = ((int) (sliderValue % 9.0 * 10.0)) + 1;
@@ -230,7 +249,7 @@ public class StrategyViewController extends NUIController implements Observer {
                     * 100000) + 100000;
         }
         else {
-            switch (new_val.intValue()) {
+            switch (newVal.intValue()) {
             case 1:
                 currentSliderValue = 10;
                 break;
@@ -249,13 +268,16 @@ public class StrategyViewController extends NUIController implements Observer {
             case 6:
                 currentSliderValue = 1000000;
                 break;
+            default:
+                // This should never happen
+                break;
             }
         }
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-        TreeViewState treeViewState = ((DataModel) o)
+    public void update(final Observable observable, final Object arg) {
+        final TreeViewState treeViewState = ((DataModel) observable)
                 .getTreeViewState(arg.toString());
 
         if (treeViewState != null) {
@@ -264,13 +286,17 @@ public class StrategyViewController extends NUIController implements Observer {
 
     }
 
-    private void addStrategyViewSwing(Proof proof) {
+    /**
+     * Adds the StrategySelectionView from Swing to the JavaFX StrategyView.
+     * 
+     * @param proof
+     *            The proof file loaded in the treeView.
+     */
+    private void addStrategyViewSwing(final Proof proof) {
         proofSearchStrategy.getChildren().clear();
         SwingUtilities.invokeLater(() -> {
-            SwingNode swingNode = strategyWrapper
+            final SwingNode swingNode = strategyWrapper
                     .createStrategyComponent(proof);
-            ;
-
             Platform.runLater(
                     () -> proofSearchStrategy.getChildren().add(swingNode));
 

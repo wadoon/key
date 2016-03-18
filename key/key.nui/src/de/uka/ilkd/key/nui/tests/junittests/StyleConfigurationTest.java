@@ -7,7 +7,6 @@ import java.io.File;
 import java.util.stream.Stream;
 
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
@@ -35,11 +34,22 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 public class StyleConfigurationTest {
 
     /**
-     * The proof file used for this test.
+     * The testfile 01 used for the tests.
      */
-    private static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
-    private static String TESTFILE_02 = "resources//de/uka//ilkd//key//examples//example02.proof";
-    private static String TESTFILE_03 = "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof";
+    private static String TESTFILE_01 = 
+            "resources//de/uka//ilkd//key//examples//example01.proof";
+
+    /**
+     * The testfile 02 used for the tests.
+     */
+    private static String TESTFILE_02 = 
+            "resources//de/uka//ilkd//key//examples//example02.proof";
+
+    /**
+     * The testfile 03 used for the tests.
+     */
+    private static String TESTFILE_03 = 
+            "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.
@@ -53,8 +63,8 @@ public class StyleConfigurationTest {
      * @param testfilePath
      *            The path to the test file to load.
      */
-    public static void prepareTest(String testfilePath) {
-        File proofFileName = new File(testfilePath);
+    public static void prepareTest(final String testfilePath) {
+        final File proofFileName = new File(testfilePath);
 
         // load proof
         KeYEnvironment<?> environment = null;
@@ -65,31 +75,44 @@ public class StyleConfigurationTest {
         catch (ProblemLoaderException e) {
             e.printStackTrace();
         }
-        Proof proof = environment.getLoadedProof();
+        final Proof proof = environment.getLoadedProof();
         if (proof != null) {
             proof.setProofFile(proofFileName);
 
             // initialize ProofConverter object used for tests
             ptVisualizer = new ProofTreeConverter(proof);
-        } else {
+        }
+        else {
             fail("Proof file could not be loaded.");
         }
     }
 
+    /**
+     * Checks whether the {@link StyleConfiguration} applied to
+     * {@link #TESTFILE_01} is correct.
+     */
     @Test
-    public void StyleConfigurationTest01() {
+    public void styleConfigurationTest01() {
         prepareTest(TESTFILE_01);
         assertEquals(checkConfiguration(), 0);
     }
 
+    /**
+     * Checks whether the {@link StyleConfiguration} applied to
+     * {@link #TESTFILE_02} is correct.
+     */
     @Test
-    public void StyleConfigurationTest02() {
+    public void styleConfigurationTest02() {
         prepareTest(TESTFILE_02);
         assertEquals(checkConfiguration(), 0);
     }
 
+    /**
+     * Checks whether the {@link StyleConfiguration} applied to
+     * {@link #TESTFILE_03} is correct.
+     */
     @Test
-    public void StyleConfigurationTest03() {
+    public void styleConfigurationTest03() {
         prepareTest(TESTFILE_03);
         assertEquals(checkConfiguration(), 0);
     }
@@ -102,9 +125,9 @@ public class StyleConfigurationTest {
      *         assigned.
      */
     private int checkConfiguration() {
-        ProofTreeStyler ptStyler = new ProofTreeStyler(null);
-        Stream<NUINode> nstream = ptVisualizer.getRootNode().asList().stream()
-                .filter((nd) -> (!(nd.getStyleConfiguration()
+        final ProofTreeStyler ptStyler = new ProofTreeStyler(null);
+        final Stream<NUINode> nstream = ptVisualizer.getRootNode().asList()
+                .stream().filter((nd) -> (!(nd.getStyleConfiguration()
                         .equals(ptStyler.getStyleConfiguration(nd)))));
         return ((int) nstream.count());
     }

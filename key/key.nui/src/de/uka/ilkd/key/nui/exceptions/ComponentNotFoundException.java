@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.nui.exceptions;
 
-import de.uka.ilkd.key.nui.NUI;
-
 /**
  * Exception thrown by {@link NUI#getComponent(String)} if component with the
  * given fx:id was not found.
@@ -10,11 +8,23 @@ import de.uka.ilkd.key.nui.NUI;
  */
 public class ComponentNotFoundException extends NUIException {
 
+    /**
+     * The class version number.
+     */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The file which caused the exception.
+     */
     private String file;
 
-    public ComponentNotFoundException(String file) {
+    /**
+     * Creates a new ComponentNotFoundException.
+     * 
+     * @param file
+     *            The file causing this exception.
+     */
+    public ComponentNotFoundException(final String file) {
         this.file = file;
     }
 

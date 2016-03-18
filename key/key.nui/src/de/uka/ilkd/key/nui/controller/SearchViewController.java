@@ -28,13 +28,28 @@ import javafx.util.Duration;
  * Controller for handling the search functionality in the searchViewPane.
  * 
  * @author Florian Breitfelder
+ * @author Stefan Pilot
  *
  */
 @ControllerAnnotation(createMenu = false)
 public class SearchViewController extends NUIController {
 
+    /**
+     * Indicates the direction of scrolling in the treeView for the next search
+     * result.
+     * 
+     * @author Stefan Pilot
+     *
+     */
     private enum Direction {
-        UP, DOWN
+        /**
+         * The next upper search result will be shown.
+         */
+        UP,
+        /**
+         * The next lower search result will be shown.
+         */
+        DOWN
     }
 
     /**
@@ -43,55 +58,55 @@ public class SearchViewController extends NUIController {
     private int numberOfSearchResults = 0;
 
     /**
-     * The Button toggling selectNextItem in searching
+     * The Button toggling selectNextItem in searching.
      */
     @FXML
     private Button btnSearchNext;
     /**
-     * The Button toggling selectPreviousItem in searching
+     * The Button toggling selectPreviousItem in searching.
      */
     @FXML
     private Button btnSearchPrev;
 
     /**
-     * A click on this Button closes the SearchView
+     * A click on this Button closes the SearchView.
      */
     @FXML
     private Button btnCloseSearchView;
 
     /**
-     * The TextField where search terms are entered
+     * The TextField where search terms are entered.
      */
     @FXML
     private TextField tfSearchQuery;
 
     /**
-     * Weak-referenced Set of ProofTreeCells
+     * Weak-referenced Set of ProofTreeCells.
      */
     private Set<ProofTreeCell> proofTreeCells;
 
     /**
-     * Reference of TreeView
+     * Reference of TreeView.
      */
     private TreeView<NUINode> proofTreeView;
     /**
-     * Reference of Parent Connection between TreeView and SearchView
+     * Reference of Parent Connection between TreeView and SearchView.
      */
     private Pane treeViewPane;
 
     /**
-     * The Anchor Pane holding the Search Field and its buttons
+     * The Anchor Pane holding the Search Field and its buttons.
      */
     @FXML
     private Pane searchViewPane;
 
     /**
-     * A List representation of the all the TreeItems
+     * A List representation of the all the TreeItems.
      */
     private List<TreeItem<NUINode>> treeItems;
 
     /**
-     * Set TreeView used for the search
+     * Set the TreeView used for the search.
      * 
      * @param proofTreeView
      *            reference to treeView
@@ -100,8 +115,8 @@ public class SearchViewController extends NUIController {
      * @param treeViewPane
      *            reference to treeViewPane(Parent of searchView)
      */
-    public void initSearch(TreeView<NUINode> proofTreeView,
-            Set<ProofTreeCell> proofTreeCells, Pane treeViewPane) {
+    public void initSearch(final TreeView<NUINode> proofTreeView,
+            final Set<ProofTreeCell> proofTreeCells, final Pane treeViewPane) {
         this.proofTreeView = proofTreeView;
         this.proofTreeCells = proofTreeCells;
         this.treeViewPane = treeViewPane;
@@ -127,11 +142,11 @@ public class SearchViewController extends NUIController {
     @SuppressWarnings({ "unchecked", "cast" })
     private Set<ProofTreeCell> getProofTreeCells() {
         try {
-            Field f = VirtualContainerBase.class.getDeclaredField("flow");
+            final Field f = VirtualContainerBase.class.getDeclaredField("flow");
             f.setAccessible(true);
-            Field g = VirtualFlow.class.getDeclaredField("cells");
+            final Field g = VirtualFlow.class.getDeclaredField("cells");
             g.setAccessible(true);
-            Set<ProofTreeCell> s = new HashSet<>();
+            final Set<ProofTreeCell> s = new HashSet<>();
             s.addAll((ArrayLinkedList<ProofTreeCell>) g
                     .get((f.get((proofTreeView.skinProperty().get())))));
             return s;
@@ -145,31 +160,31 @@ public class SearchViewController extends NUIController {
 
     /**
      * Recursively walks through the tree, storing all items in the List being
-     * returned
+     * returned.
      * 
      * @return a List of all the TreeItems in the underlying ProofTreeView
      */
     private List<TreeItem<NUINode>> getTreeItems() {
 
         if (treeItems == null) {
+            /**
+             * Parses a Tree, beginning at <b>t</b>, and adds to list every
+             * TreeItem that is a child of <b>root</b> or of its children
+             * <b>l</b>.
+             * 
+             * @param root
+             *            Where to start parsing
+             * 
+             * @param list
+             *            Where all the TreeItems are added to
+             * 
+             * @return <b>list</b>, but with all the TreeItems appended to it
+             */
             class TreeToListHelper {
                 /**
-                 * Parses a Tree, beginning at <b>t</b>, and adds to list every
-                 * TreeItem that is a child of <b>root</b> or of its children
-                 * <b>l</b>.
-                 * 
-                 * @param root
-                 *            Where to start parsing
-                 * 
-                 * @param list
-                 *            Where all the TreeItems are added to
-                 * 
-                 * @return <b>list</b>, but with all the TreeItems appended to
-                 *         it
+                 * Just to get rid of an odd warning, see
+                 * http://stackoverflow.com/questions/921025
                  */
-
-                // just to get rid of an odd warning – see
-                // http://stackoverflow.com/questions/921025
                 protected TreeToListHelper() {
                 }
 
@@ -213,15 +228,15 @@ public class SearchViewController extends NUIController {
      * ProofTreeView as needed. Only to be used together with
      * <tt>TreeViewController.search()</tt>.
      * 
-     * @param moveDownwards
+     * @param direction
      *            whether the selection is to be moved up- or downwards
      */
-    private void moveSelectionAndScrollIfNeeded(Direction direction) {
+    private void moveSelectionAndScrollIfNeeded(final Direction direction) {
         if (numberOfSearchResults < 1) {
             return;
         }
 
-        List<TreeItem<NUINode>> treeItems = getTreeItems();
+        final List<TreeItem<NUINode>> treeItems = getTreeItems();
         final TreeItem<NUINode> currentlySelectedItem = proofTreeView
                 .getSelectionModel().getSelectedItem();
         TreeItem<NUINode> itemToSelect = null;
@@ -289,7 +304,7 @@ public class SearchViewController extends NUIController {
             }
         }
 
-        if (performScroll)
+        if (performScroll) {
             // if we are to scroll downwards, we have to subtract an offset to
             // make
             // the selected item appear in middle.
@@ -297,6 +312,7 @@ public class SearchViewController extends NUIController {
                     proofTreeView.getSelectionModel().getSelectedIndex()
                             - (direction == Direction.UP ? 0
                                     : (int) (proofTreeCells.size() / 2)));
+        }
     }
 
     @Override
@@ -349,7 +365,7 @@ public class SearchViewController extends NUIController {
                 closeSearchView();
             }
             else if (KeyCode.ENTER == e.getCode()) {
-                PauseTransition pause = new PauseTransition(
+                final PauseTransition pause = new PauseTransition(
                         Duration.millis(130));
                 Button button;
                 button = e.isShiftDown() ? btnSearchPrev : btnSearchNext;
@@ -372,6 +388,9 @@ public class SearchViewController extends NUIController {
                 .add("/de/uka/ilkd/key/nui/components/searchView.css");
     }
 
+    /**
+     * Closes the search view.
+     */
     private void closeSearchView() {
         // delete searchView component form treeViewPane
         treeViewPane.getChildren().remove(searchViewPane);

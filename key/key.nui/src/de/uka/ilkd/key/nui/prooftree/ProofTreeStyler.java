@@ -133,7 +133,7 @@ public final class ProofTreeStyler {
 
         @Override
         public int hashCode() {
-            int prime = 31;
+            final int prime = 31;
             int result = 1;
             result = prime * result + getOuterType().hashCode();
             result = prime * result
@@ -144,9 +144,9 @@ public final class ProofTreeStyler {
         }
 
         @Override
-        public boolean equals(Object sc) {
+        public boolean equals(final Object sc) {
             if (sc instanceof StyleConfiguration) {
-                StyleConfiguration scfg = (StyleConfiguration) sc;
+                final StyleConfiguration scfg = (StyleConfiguration) sc;
                 // Check existence of all CSS classes
                 for (String cssClassName : getCssClasses()) {
                     if (!(scfg.getCssClasses().contains(cssClassName))) {
@@ -171,6 +171,13 @@ public final class ProofTreeStyler {
             return false;
         }
 
+        /**
+         * Returns the outer, enclosing instance if the class is an inner class
+         * (non-static nested class).
+         * 
+         * @return The outer, enclosing instance, iff the class is an non-static
+         *         nested class.
+         */
         private ProofTreeStyler getOuterType() {
             return ProofTreeStyler.this;
         }
@@ -179,8 +186,12 @@ public final class ProofTreeStyler {
 
     /**
      * Creates a new ProofTreeStyler with the ProofTreeCell ptc assigned to it.
+     * 
+     * @param ptc
+     *            The {@link ProofTreeCell} associated with this
+     *            ProofTreeStyler.
      */
-    public ProofTreeStyler(ProofTreeCell ptc) {
+    public ProofTreeStyler(final ProofTreeCell ptc) {
         this.ptc = ptc;
         icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
         initDefaultStyleConfigurations();
@@ -255,17 +266,17 @@ public final class ProofTreeStyler {
      * @param node
      *            The node where the StyleConfiguration should be applied to.
      */
-    public void applyStyle(NUINode node) {
-        Label label = ptc.getLabel();
+    public void applyStyle(final NUINode node) {
+        final Label label = ptc.getLabel();
 
-        StyleConfiguration scfg = node.getStyleConfiguration();
+        final StyleConfiguration scfg = node.getStyleConfiguration();
 
         // Apply CSS classes
-        ArrayList<String> cssClasses = scfg.getCssClasses();
+        final ArrayList<String> cssClasses = scfg.getCssClasses();
         cssClasses.forEach(cssClass -> label.getStyleClass().add(cssClass));
 
         // Apply icon image
-        ImageView image = scfg.getIconImage();
+        final ImageView image = scfg.getIconImage();
         if (image != null) {
             ptc.setIcon(image);
         }
@@ -280,7 +291,7 @@ public final class ProofTreeStyler {
      *            The node whose StyleConfiguration should be determined.
      * @return StyleConfiguration of the given node.
      */
-    public StyleConfiguration getStyleConfiguration(NUINode node) {
+    public StyleConfiguration getStyleConfiguration(final NUINode node) {
         // if the node is branch node
         if (node instanceof NUIBranchNode) {
             if (node.isClosed()) {

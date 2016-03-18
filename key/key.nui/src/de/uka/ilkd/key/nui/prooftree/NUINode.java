@@ -86,6 +86,9 @@ public abstract class NUINode implements Cloneable {
     private final SimpleBooleanProperty symbolicExecution = new SimpleBooleanProperty(
             false);
 
+    /**
+     * The {@link StyleConfiguration} of the NUINode.
+     */
     private StyleConfiguration style;
 
     /**
@@ -419,7 +422,7 @@ public abstract class NUINode implements Cloneable {
      * @return a {@link List} of NUINodes.
      */
     public List<NUINode> asList() {
-        List<NUINode> l = new LinkedList<>();
+        final List<NUINode> l = new LinkedList<>();
         l.add(this);
         return l;
     }
@@ -433,7 +436,7 @@ public abstract class NUINode implements Cloneable {
      * purposes.
      */
     protected void setStyleConfiguration() {
-        ProofTreeStyler pts = new ProofTreeStyler();
+        final ProofTreeStyler pts = new ProofTreeStyler();
         this.style = pts.getStyleConfiguration(this);
     }
 

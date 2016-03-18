@@ -10,7 +10,6 @@ import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
-import de.uka.ilkd.key.nui.exceptions.NoSearchViewAddedException;
 import de.uka.ilkd.key.nui.prooftree.FilteringHandler;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
@@ -48,9 +47,13 @@ public class TreeViewController extends NUIController implements Observer {
     private VBox treeViewPane;
 
     /**
-     * Includes the Sub-Window for search
+     * Includes the Sub-Window for search.
      */
     private Pane searchViewPane;
+
+    /**
+     * A reference to the controller associated with the searchView.
+     */
     private SearchViewController searchViewController;
 
     /**
@@ -90,18 +93,20 @@ public class TreeViewController extends NUIController implements Observer {
      * @throws NoSearchViewAddedException
      */
     public final void openSearchView() {
-        if (searchViewPane == null || searchViewController == null)
+        if (searchViewPane == null || searchViewController == null) {
             return;
+        }
 
         searchViewController.initSearch(proofTreeView, proofTreeCells,
                 treeViewPane);
 
-        if (!treeViewPane.getChildren().contains(searchViewPane))
+        if (!treeViewPane.getChildren().contains(searchViewPane)) {
             treeViewPane.getChildren().add(searchViewPane);
+        }
     }
 
     /**
-     * init() is called by the NUIController constructor
+     * init() is called by the NUIController constructor.
      */
     @Override
     protected void init() {
@@ -131,12 +136,6 @@ public class TreeViewController extends NUIController implements Observer {
             });
 
             // add CSS file to view
-            // TODO check if command is equivalent
-            /*
-             * final String cssPath = this.getClass() .getResource(
-             * "../components/" + ProofTreeStyleConstants.CSS_FILE)
-             * .toExternalForm(); proofTreeView.getStylesheets().add(cssPath);
-             */
             proofTreeView.getStylesheets()
                     .add("/de/uka/ilkd/key/nui/components/"
                             + ProofTreeStyleConstants.CSS_FILE);
@@ -147,8 +146,8 @@ public class TreeViewController extends NUIController implements Observer {
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-        TreeViewState treeViewState = ((DataModel) o)
+    public void update(final Observable observable, final Object arg) {
+        final TreeViewState treeViewState = ((DataModel) observable)
                 .getTreeViewState((String) arg);
         ProofTreeItem treeItem;
 
@@ -167,11 +166,12 @@ public class TreeViewController extends NUIController implements Observer {
      * @param nuiController
      *            The SearchViewController used to search in the TreeView.
      */
-    public void addSearchView(Pane searchViewPane,
-            NUIController nuiController) {
+    public void addSearchView(final Pane searchViewPane,
+            final NUIController nuiController) {
         this.searchViewPane = searchViewPane;
-        if (nuiController instanceof SearchViewController)
+        if (nuiController instanceof SearchViewController) {
             this.searchViewController = (SearchViewController) nuiController;
+        }
     }
 
     /**

@@ -28,7 +28,7 @@ public class DataModel extends Observable {
 
     /**
      * Represents the lastly stored TreeViewState, therefore it is displayed
-     * currently in the TreeView
+     * currently in the TreeView.
      */
     private TreeViewState loadedTreeViewState;
 

@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.nui.prooftree;
 
-import java.util.function.Function;
-
 import javafx.scene.control.TreeItem;
 
 /**

@@ -13,12 +13,12 @@ public class FilterCombineAND implements ProofTreeFilter {
     /**
      * The first filter used for combination.
      */
-    ProofTreeFilter f1;
+    private ProofTreeFilter f1;
 
     /**
      * The second filter used for combination.
      */
-    ProofTreeFilter f2;
+    private ProofTreeFilter f2;
 
     /**
      * Constructor.
@@ -28,7 +28,7 @@ public class FilterCombineAND implements ProofTreeFilter {
      * @param f2
      *            The second filter.
      */
-    public FilterCombineAND(ProofTreeFilter f1, ProofTreeFilter f2) {
+    public FilterCombineAND(final ProofTreeFilter f1, final ProofTreeFilter f2) {
         this.f1 = f1;
         this.f2 = f2;
     }

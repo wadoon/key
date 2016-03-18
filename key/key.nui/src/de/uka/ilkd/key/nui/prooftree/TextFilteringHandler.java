@@ -9,7 +9,13 @@ import java.util.LinkedList;
  * @version 1.0
  *
  */
-public class TextFilteringHandler {
+public final class TextFilteringHandler {
+    
+    /**
+     * Utility class should not be instantiated. 
+     */
+    private TextFilteringHandler() {
+    }
 
     /**
      * Returns a subtree consisting of only matching nodes.

@@ -5,7 +5,7 @@ import org.junit.Test;
 import javafx.scene.input.KeyCode;
 
 /**
- * Test for User Stroys
+ * Test for User Stroys.
  * (002) Beweisbaumvisualisierung #14298
  * (007) Farbige Hinterlegung von Knoten im Beweisbaum #14662
  * (008) Icons im Beweisbaum #14470

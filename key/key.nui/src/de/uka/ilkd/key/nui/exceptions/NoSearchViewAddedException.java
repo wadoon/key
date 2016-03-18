@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.nui.exceptions;
 
-import de.uka.ilkd.key.nui.controller.TreeViewController;
-
 /**
  * Exception thrown by {@link TreeViewController#openSearchView()} if the
  * searchView was never added before, see
@@ -12,6 +10,9 @@ import de.uka.ilkd.key.nui.controller.TreeViewController;
  */
 public class NoSearchViewAddedException extends NUIException {
 
+    /**
+     * The class version number.
+     */
     private static final long serialVersionUID = 1L;
 
     @Override

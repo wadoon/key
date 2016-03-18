@@ -94,12 +94,12 @@ public class NUI extends Application {
     /**
      * The filename of the mainView, without extension (.fxml).
      */
-    private final static String MAINVIEW_FILENAME = "MainView";
+    private static final String MAINVIEW_FILENAME = "MainView";
 
     /**
      * Directory containing the component files (.fxml).
      */
-    private final static String COMPONENTS_DIR = "components";
+    private static final String COMPONENTS_DIR = "components";
 
     /**
      * The data model used to store the loaded proof as a {@link TreeViewState}.
@@ -163,8 +163,6 @@ public class NUI extends Application {
      * @throws IOException
      * @throws ComponentNotFoundException
      * @throws ControllerNotFoundException
-     * 
-     * @throws Exception
      */
     public void initializeNUI() throws IOException, ComponentNotFoundException,
             ControllerNotFoundException {
@@ -215,7 +213,7 @@ public class NUI extends Application {
      * <li>the toggle groups in {@link #toggleGroups}.
      * </ul>
      * 
-     * @throws IOException
+     * @exception IOException
      */
     private void loadComponents() throws IOException {
         final File jarFile = new File(getClass().getProtectionDomain()
@@ -233,7 +231,8 @@ public class NUI extends Application {
             }
             jar.close();
         }
-        else {// Run with IDE
+        // Run with IDE
+        else {
             final File[] files = new File(
                     getClass().getResource(COMPONENTS_DIR).getPath())
                             .listFiles();
@@ -245,17 +244,23 @@ public class NUI extends Application {
         }
     }
 
-    private void loadComponent(String fileName) throws IOException {
+    /**
+     * Loads the component with the given filename.
+     * 
+     * @param fileName
+     *            The filename of the component to load.
+     * @throws IOException
+     */
+    private void loadComponent(final String fileName) throws IOException {
         final FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
                 COMPONENTS_DIR + File.separator + fileName), bundle);
 
         // String componentName = cutFileExtension(file.getName());
         final Pane component = fxmlLoader.load();
         components.put(component.getId(), component);
-        NUIController nuiController;// = new NUIController();
         // before you can get the controller
         // you have to call fxmlLoader.load()
-        nuiController = fxmlLoader.getController();
+        final NUIController nuiController = fxmlLoader.getController();
         if (nuiController != null) {
             nuiController.constructor(this, dataModel, bundle,
                     component.getId(), fileName);
@@ -449,10 +454,11 @@ public class NUI extends Application {
     }
 
     /**
-     * returns a text from the language file which corresponds to the textId
+     * Returns the text from the language file which corresponds to the textId.
      * 
      * @param textId
-     * @return
+     *            The key associated with the text to be searched for.
+     * @return The text string associated with the key.
      */
     public String getText(final String textId) {
         return bundle.getString(textId);

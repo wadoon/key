@@ -13,17 +13,23 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.input.KeyCode;
 
+/**
+ * Common base class for testing with TestFX.
+ * 
+ * @author Florian Breitfelder
+ *
+ */
 public class NUITest extends GuiTest {
 
     /**
-     * Allows access to all loaded files
+     * Allows access to all loaded files.
      */
-    public NUI nui = null;
+    public NUI nui;
 
     /**
-     * DataModel contains all loaded proofs
+     * DataModel contains all loaded proofs.
      */
-    public DataModel dataModel = null;
+    public DataModel dataModel;
 
     @Override
     /**
@@ -50,9 +56,10 @@ public class NUITest extends GuiTest {
      * Wait until NUI statustext is equal to the parameter statustext.
      * 
      * @param statustext
+     *            The status text to wait for.
      */
-    protected void waitUntilStatusIs(String statustext) {
-        Label label = ((Label) find("#statustext"));
+    protected void waitUntilStatusIs(final String statustext) {
+        final Label label = ((Label) find("#statustext"));
 
         while (!label.getText().equals(statustext)) {
             sleep(2000);
@@ -60,17 +67,21 @@ public class NUITest extends GuiTest {
     }
 
     /**
-     * Can used to load a file in GUI mode
+     * Can be used to load a file in GUI mode.
      * 
      * @param filename
-     *            of proof
+     *            the filename of the proof.
+     * @param cancelLoading
+     *            indicates whether the loading process should be canceled.
+     * 
      */
-    protected void loadProof(String filename, boolean cancelLoading) {
+    protected void loadProof(final String filename,
+            final boolean cancelLoading) {
         // open load file dialog
         clickOn("File").clickOn("Open Proof...");
 
         // Enter file name: example01.proof
-        KeyCodeHelper key = new KeyCodeHelper(this);
+        final KeyCodeHelper key = new KeyCodeHelper(this);
         key.typeKeys(key.getKeyCode(filename.toUpperCase()));
 
         // press enter to load file
@@ -81,7 +92,8 @@ public class NUITest extends GuiTest {
             waitUntilStatusIs("Ready.");
 
             // check if proof was loaded and stored in the datamodel
-            TreeViewState treeViewState = dataModel.getTreeViewState(filename);
+            final TreeViewState treeViewState = dataModel
+                    .getTreeViewState(filename);
             assertTrue(treeViewState != null);
             assertTrue(treeViewState.getProof() != null);
             assertTrue(treeViewState.getTreeItem() != null);
@@ -90,17 +102,17 @@ public class NUITest extends GuiTest {
             // cancel loading process
             clickOn("#cancelButton");
 
-            Label label = ((Label) find("#statustext"));
+            final Label label = ((Label) find("#statustext"));
             // Loading process was canceled
             assertTrue(label.getText().equals("Loading has been cancelled."));
         }
 
-        ProgressIndicator progressIndicator = ((ProgressIndicator) find(
+        final ProgressIndicator progressIndicator = ((ProgressIndicator) find(
                 "#progressIndicator"));
         // ProgressIndicator is not visible
         assertTrue(!progressIndicator.isVisible());
 
-        Button cancelButton = ((Button) find("#cancelButton"));
+        final Button cancelButton = ((Button) find("#cancelButton"));
         assertTrue(!cancelButton.isVisible());
     }
 

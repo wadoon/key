@@ -65,7 +65,7 @@ public class IconFactory {
     public static final String SEARCH = folderRoot + "search.png";
 
     // StrategyView
-    /** file name of goButton icon */
+    /** file name of goButton icon. */
     public static final String GO_BUTTON = folderRoot + "goButton.png";
 
     /**
@@ -100,7 +100,7 @@ public class IconFactory {
                     .getResourceAsStream(imageConstant);
             img = new Image(istream);*/
             // TODO
-            img = new Image("/de/uka/ilkd/key/nui/"+imageConstant);
+            img = new Image("/de/uka/ilkd/key/nui/" + imageConstant);
             icons.put(imageConstant, img);
         }
         return scaleIcon(img, iconSizeWidth, iconSizeHeight);
