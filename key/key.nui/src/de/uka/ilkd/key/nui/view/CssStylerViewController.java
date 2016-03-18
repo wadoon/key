@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nui.view;
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -363,14 +364,14 @@ public class CssStylerViewController extends ViewController {
 
     private void decollapseChildren(TreeItem<String> root,
             String searchString) {
-        if (root.getValue().toLowerCase()
-                .contains(searchString.toLowerCase())) {
+        if (root.getValue().toLowerCase(Locale.ENGLISH)
+                .contains(searchString.toLowerCase(Locale.ENGLISH))) {
             root.setExpanded(true);
         }
         for (TreeItem<String> child : root.getChildren()) {
             if (child.isLeaf()) {
-                if (child.getValue().toLowerCase()
-                        .contains(searchString.toLowerCase())) {
+                if (child.getValue().toLowerCase(Locale.ENGLISH)
+                        .contains(searchString.toLowerCase(Locale.ENGLISH))) {
                     root.setExpanded(true);
                     treeView.getSelectionModel().select(child);
                 }

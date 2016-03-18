@@ -29,7 +29,11 @@ import javafx.util.Pair;
 
 public class MainApp extends Application {
 
-    public static boolean isDebugView = false;
+    private static boolean isDebugView = false;
+    public static boolean isDebugView() {
+        return isDebugView;
+    }
+
     private static final String ICON_PATH = "file:resources/images/key-color-icon-square.png";
     private Stage primaryStage;
     private BorderPane rootLayout;

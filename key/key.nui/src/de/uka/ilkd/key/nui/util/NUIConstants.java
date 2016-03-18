@@ -94,6 +94,10 @@ public final class NUIConstants {
             + ".varSV{background-color:violet;color:#000000;font-weight:inherit;font-style:inherit;}"
             + ".warySubstOp{background-color:#2fedff;color:#FF0000;font-weight:inherit;font-style:italic;}";
 
+    public static String getDefaultSequentCss() {
+        return DEFAULT_SEQUENT_CSS;
+    }
+
     /**
      * 
      */

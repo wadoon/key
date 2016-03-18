@@ -33,7 +33,9 @@ public class CriterionRange implements Criterion<Integer> {
         this.before = before;
         this.after = after;
         this.criteria = criteria;
-        this.originalLines = originalLines;
+        if (originalLines != null) {
+            this.originalLines = (String[]) originalLines.clone();
+        }
     }
 
     @Override

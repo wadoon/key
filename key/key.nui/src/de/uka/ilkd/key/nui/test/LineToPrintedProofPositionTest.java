@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.uka.ilkd.key.nui.filter.LineToPrintedProofPosition;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class LineToPrintedProofPositionTest {
 
@@ -38,13 +39,15 @@ public class LineToPrintedProofPositionTest {
         assertEquals(4, LineToPrintedProofPosition.getLineIndex(14, lines));
         assertEquals(4, LineToPrintedProofPosition.getLineIndex(18, lines));
     }
-
+    
+    @SuppressFBWarnings(justification="Testcase", value="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test(expected = IndexOutOfBoundsException.class)
     public void testGetLineIndex_outOfRange_start() {
         init();
         LineToPrintedProofPosition.getLineIndex(-1, lines);
     }
-
+    
+    @SuppressFBWarnings(justification="Testcase", value="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test(expected = IndexOutOfBoundsException.class)
     public void testGetLineIndex_outOfRange_end() {
         init();
@@ -69,13 +72,15 @@ public class LineToPrintedProofPositionTest {
         init();
         assertEquals(14, LineToPrintedProofPosition.getCharIndex(4, lines));
     }
-
+    
+    @SuppressFBWarnings(justification="Testcase", value="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test(expected = IndexOutOfBoundsException.class)
     public void testGetCharIndex_outOfRange_start() {
         init();
         LineToPrintedProofPosition.getCharIndex(-1, lines);
     }
-
+    
+    @SuppressFBWarnings(justification="Testcase", value="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test(expected = IndexOutOfBoundsException.class)
     public void testGetCharIndex_outOfRange_end() {
         init();

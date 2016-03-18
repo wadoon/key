@@ -174,7 +174,7 @@ public class RootLayoutController extends ViewController {
 
         toggleSettings();
 
-        if (!MainApp.isDebugView) {
+        if (!MainApp.isDebugView()) {
             debugButtons.setOpacity(0);
             debugButtons.setDisable(true);
             debugMode.setSelected(false);

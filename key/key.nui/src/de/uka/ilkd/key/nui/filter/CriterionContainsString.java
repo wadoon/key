@@ -23,7 +23,9 @@ public class CriterionContainsString implements Criterion<Integer> {
         if (searchText == null)
             throw new IllegalArgumentException("searchText");
         this.searchText = searchText;
-        this.originalLines = originalLines;
+        if (originalLines != null) {
+            this.originalLines = (String[]) originalLines.clone();
+        }
         this.proofString = proofString;
     }
 
