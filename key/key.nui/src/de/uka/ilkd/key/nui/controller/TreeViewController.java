@@ -131,11 +131,15 @@ public class TreeViewController extends NUIController implements Observer {
             });
 
             // add CSS file to view
-            final String cssPath = this.getClass()
-                    .getResource(
-                            "../components/" + ProofTreeStyleConstants.CSS_FILE)
-                    .toExternalForm();
-            proofTreeView.getStylesheets().add(cssPath);
+            // TODO check if command is equivalent
+            /*
+             * final String cssPath = this.getClass() .getResource(
+             * "../components/" + ProofTreeStyleConstants.CSS_FILE)
+             * .toExternalForm(); proofTreeView.getStylesheets().add(cssPath);
+             */
+            proofTreeView.getStylesheets()
+                    .add("/de/uka/ilkd/key/nui/components/"
+                            + ProofTreeStyleConstants.CSS_FILE);
         });
 
         // register to the data model

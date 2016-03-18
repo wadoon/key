@@ -362,9 +362,14 @@ public class SearchViewController extends NUIController {
             }
         });
 
-        // Assign style sheet
-        searchViewPane.getStylesheets().add(getClass()
-                .getResource("../components/searchView.css").toExternalForm());
+        // Assign stylesheet
+        // TODO check if command is equivalent
+        /*
+         * searchViewPane.getStylesheets().add(getClass()
+         * .getResource("../components/searchView.css").toExternalForm());
+         */
+        searchViewPane.getStylesheets()
+                .add("/de/uka/ilkd/key/nui/components/searchView.css");
     }
 
     private void closeSearchView() {

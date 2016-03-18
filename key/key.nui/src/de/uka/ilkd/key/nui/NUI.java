@@ -1,13 +1,15 @@
 package de.uka.ilkd.key.nui;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import de.uka.ilkd.key.nui.controller.ControllerAnnotation;
 import de.uka.ilkd.key.nui.controller.MainViewController;
@@ -158,10 +160,14 @@ public class NUI extends Application {
      * Initializes the application, such as all components, all controllers and
      * views.
      * 
+     * @throws IOException
+     * @throws ComponentNotFoundException
+     * @throws ControllerNotFoundException
+     * 
      * @throws Exception
      */
-    public void initializeNUI() throws NullPointerException, IOException,
-            ComponentNotFoundException, ControllerNotFoundException {
+    public void initializeNUI() throws IOException, ComponentNotFoundException,
+            ControllerNotFoundException {
         // Load Main View
         final String filename = MAINVIEW_FILENAME + ".fxml";
 
@@ -212,47 +218,57 @@ public class NUI extends Application {
      * @throws IOException
      */
     private void loadComponents() throws IOException {
-        final File[] files = new File(
-                getClass().getResource(componentsDir).getPath()).listFiles();
-        FXMLLoader fxmlLoader;
-        if (files == null) {
-            throw new FileNotFoundException(getClass().getName() + ": "
-                    + "Path " + componentsDir + " not found.");
+        final File jarFile = new File(getClass().getProtectionDomain()
+                .getCodeSource().getLocation().getPath());
+        if (jarFile.isFile()) { // Run with JAR file
+            final JarFile jar = new JarFile(jarFile);
+            final Enumeration<JarEntry> entries = jar.entries();
+            while (entries.hasMoreElements()) {
+                final String fileName = entries.nextElement().getName();
+                if (fileName.matches(
+                        "(de/uka/ilkd/key/nui/components/).*(.fxml)")) {
+                    loadComponent(fileName.substring(
+                            fileName.lastIndexOf("/") + 1, fileName.length()));
+                }
+            }
+            jar.close();
         }
-
-        for (final File file : files) {
-            if (file.isFile() && file.getName().matches(".*[.fxml]")) {
-                fxmlLoader = new FXMLLoader(
-                        getClass().getResource("components/" + file.getName()),
-                        bundle);
-
-                final Pane component = fxmlLoader.load();
-                components.put(component.getId(), component);
-                // before you can get the controller
-                // you have to call fxmlLoader.load(
-                final NUIController nuiController = fxmlLoader.getController();
-                // Stop current iteration if the retrieved controller is
-                // null
-                if (nuiController == null) {
-                    continue;
+        else {// Run with IDE
+            File[] files = new File(
+                    getClass().getResource("components").getPath()).listFiles();
+            for (File file : files) {
+                if (file.isFile() && file.getName().matches(".*[.fxml]")) {
+                    loadComponent(file.getName());
                 }
-                else {
-                    nuiController.constructor(this, dataModel, bundle,
-                            component.getId(), file.getName());
-                }
-                controllers.put(component.getId(), nuiController);
+            }
+        }
+    }
 
-                // get all annotations of type ControllerAnnotation
-                // if no annotations are present, returns a array of length
-                // 0
-                final Annotation[] annotations = nuiController.getClass()
-                        .getAnnotationsByType(ControllerAnnotation.class);
+    private void loadComponent(String fileName) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(
+                getClass().getResource("components/" + fileName), bundle);
 
-                ToggleGroup toggleGroup;
-                // create a view position menu for every component
-                for (final Annotation annotation : annotations) {
-                    if (((ControllerAnnotation) annotation).createMenu()) {
-                        toggleGroup = new ToggleGroup();
+        // String componentName = cutFileExtension(file.getName());
+        Pane component = fxmlLoader.load();
+        components.put(component.getId(), component);
+        NUIController nuiController;// = new NUIController();
+        // before you can get the controller
+        // you have to call fxmlLoader.load()
+        nuiController = fxmlLoader.getController();
+        if (nuiController != null)
+            nuiController.constructor(this, dataModel, bundle,
+                    component.getId(), fileName);
+        controllers.put(component.getId(), nuiController);
+
+        Annotation[] annotations = nuiController.getClass().getAnnotations();
+
+        // create a view position menu for every component
+        if (annotations != null) {
+            for (Annotation annotation : annotations) {
+                if (annotation instanceof ControllerAnnotation) {
+                    ControllerAnnotation controllerAnnotation = (ControllerAnnotation) annotation;
+                    if (controllerAnnotation.createMenu()) {
+                        ToggleGroup toggleGroup = new ToggleGroup();
                         toggleGroups.put(component.getId(), toggleGroup);
                         viewPositionMenu.getItems().add(
                                 createSubMenu(component.getId(), toggleGroup));
@@ -260,6 +276,7 @@ public class NUI extends Application {
                     }
                 }
             }
+
         }
     }
 
