@@ -153,7 +153,6 @@
    <rule ref="rulesets/java/junit.xml/JUnitTestsShouldIncludeAssert"/>
    <rule ref="rulesets/java/migrating.xml/JUnitUseExpected"/>
    <rule ref="rulesets/java/basic.xml/JumbledIncrementer"/>
-<!--   <rule ref="rulesets/java/coupling.xml/LawOfDemeter"/> -->
    <rule ref="rulesets/java/j2ee.xml/LocalHomeNamingConvention"/>
    <rule ref="rulesets/java/j2ee.xml/LocalInterfaceSessionNamingConvention"/>
    <rule ref="rulesets/java/optimizations.xml/LocalVariableCouldBeFinal"/>
