@@ -2,10 +2,10 @@ package de.uka.ilkd.key.nui;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.uka.ilkd.key.proof.Proof;
 import javafx.collections.FXCollections;
@@ -21,10 +21,9 @@ import javafx.collections.ObservableList;
 public class DataModel extends Observable {
 
     /**
-     * HashMap storing the pairs of (String, {@link TreeViewState}), where
-     * String represents the filename of the proof file.
+     * References the currently loaded resource bundle in the {@link NUI}.
      */
-    private final Map<String, TreeViewState> treeViewStates = new HashMap<String, TreeViewState>();
+    private final ResourceBundle bundle;
 
     /**
      * Represents the lastly stored TreeViewState, therefore it is displayed
@@ -38,9 +37,10 @@ public class DataModel extends Observable {
     private final NUI nui;
 
     /**
-     * References the currently loaded resource bundle in the {@link NUI}.
+     * HashMap storing the pairs of (String, {@link TreeViewState}), where
+     * String represents the filename of the proof file.
      */
-    private final ResourceBundle bundle;
+    private final Map<String, TreeViewState> treeViewStates = new ConcurrentHashMap<>();
 
     /**
      * Creates a new data model for the GUI instance.
@@ -51,8 +51,50 @@ public class DataModel extends Observable {
      *            The current loaded resource bundle in the {@link NUI}.
      */
     public DataModel(final NUI nui, final ResourceBundle bundle) {
+        super();
         this.nui = nui;
         this.bundle = bundle;
+    }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+
+    /**
+     * Returns the list of filenames of currently loaded proofs.
+     * 
+     * @return An ObservableList&lt;String&gt; containing the filenames of the
+     *         loaded proofs.
+     */
+    public ObservableList<String> getListOfProofs() {
+        final ObservableList<String> listOfProofs = FXCollections.observableArrayList();
+        for (final String proofName : treeViewStates.keySet()) {
+            listOfProofs.add(proofName);
+        }
+        return listOfProofs;
+    }
+
+    /**
+     * Returns the currently loaded TreeViewState.
+     * 
+     * @return TreeViewState currently loaded in the TreeView.
+     */
+    public TreeViewState getLoadedTreeViewState() {
+        return loadedTreeViewState;
+    }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public NUI getNui() {
+        return nui;
     }
 
     /**
@@ -68,71 +110,12 @@ public class DataModel extends Observable {
     }
 
     /**
-     * Stores a <b>new</b> TreeViewState into the list of TreeViewStates.
-     * Overwrites the an existing state if the key is already present. <br>
-     * Does check if the key already exists, if yes, then the modified flag is
-     * set, see {@link TreeViewState#setModified(boolean)}.
+     * TODO
      * 
-     * @param treeViewState
-     *            The new treeViewState to store.
-     * @param name
-     *            The name of the key associated with the state (filename of
-     *            proof file).
+     * @return
      */
-    public void saveTreeViewState(final TreeViewState treeViewState, final String name) {
-        if (treeViewStates.containsKey(name)) {
-            treeViewState.setModified(true);
-        }
-        treeViewStates.put(name, treeViewState);
-        loadedTreeViewState = treeViewState;
-        this.setChanged();
-        this.notifyObservers(name);
-    }
-
-    /**
-     * Returns the currently loaded TreeViewState.
-     * 
-     * @return TreeViewState currently loaded in the TreeView.
-     */
-    public TreeViewState getLoadedTreeViewState() {
-        return loadedTreeViewState;
-    }
-
-    /**
-     * Saves the proof file proof to the given File destinationFile.
-     * 
-     * @param proof
-     *            the {@link Proof} file to be saved.
-     * @param destinationFile
-     *            the destination {@link File} where the proof is saved to.
-     */
-    public final void saveProof(final Proof proof, final File destinationFile) {
-        try {
-            proof.saveToFile(destinationFile);
-            proof.setProofFile(destinationFile);
-            nui.updateStatusbar(bundle.getString("savedSuccessfully") + " "
-                    + destinationFile.getAbsolutePath());
-            // If proof is successfully saved, unset isModified flag
-            getLoadedTreeViewState().setModified(false);
-        }
-        catch (IOException e) {
-            nui.updateStatusbar(e.getMessage());
-        }
-    }
-
-    /**
-     * Returns the list of filenames of currently loaded proofs.
-     * 
-     * @return An ObservableList&lt;String&gt; containing the filenames of the
-     *         loaded proofs.
-     */
-    public ObservableList<String> getListOfProofs() {
-        final ObservableList<String> listOfProofs = FXCollections
-                .observableArrayList();
-        for (final String proofName : treeViewStates.keySet()) {
-            listOfProofs.add(proofName);
-        }
-        return listOfProofs;
+    public Map<String, TreeViewState> getTreeViewStates() {
+        return treeViewStates;
     }
 
     /**
@@ -162,6 +145,50 @@ public class DataModel extends Observable {
         treeViewStates.remove(proofName);
         this.setChanged();
         this.notifyObservers(proofName);
+    }
+
+    /**
+     * Saves the proof file proof to the given File destinationFile.
+     * 
+     * @param proof
+     *            the {@link Proof} file to be saved.
+     * @param destinationFile
+     *            the destination {@link File} where the proof is saved to.
+     */
+    public final void saveProof(final Proof proof, final File destinationFile) {
+        try {
+            proof.saveToFile(destinationFile);
+            proof.setProofFile(destinationFile);
+            nui.updateStatusbar(bundle.getString("savedSuccessfully") + " "
+                    + destinationFile.getAbsolutePath());
+            // If proof is successfully saved, unset isModified flag
+            getLoadedTreeViewState().setModified(false);
+        }
+        catch (IOException e) {
+            nui.updateStatusbar(e.getMessage());
+        }
+    }
+
+    /**
+     * Stores a <b>new</b> TreeViewState into the list of TreeViewStates.
+     * Overwrites the an existing state if the key is already present. <br>
+     * Does check if the key already exists, if yes, then the modified flag is
+     * set, see {@link TreeViewState#setModified(boolean)}.
+     * 
+     * @param treeViewState
+     *            The new treeViewState to store.
+     * @param name
+     *            The name of the key associated with the state (filename of
+     *            proof file).
+     */
+    public void saveTreeViewState(final TreeViewState treeViewState, final String name) {
+        if (treeViewStates.containsKey(name)) {
+            treeViewState.setModified(true);
+        }
+        treeViewStates.put(name, treeViewState);
+        loadedTreeViewState = treeViewState;
+        this.setChanged();
+        this.notifyObservers(name);
     }
 
 }
