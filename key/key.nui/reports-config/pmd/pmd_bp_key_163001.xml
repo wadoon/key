@@ -184,7 +184,6 @@
    <rule ref="rulesets/java/design.xml/NonThreadSafeSingleton"/>
    <rule ref="rulesets/java/controversial.xml/NullAssignment"/>
    <rule ref="rulesets/java/controversial.xml/OneDeclarationPerLine"/>
-   <rule ref="rulesets/java/controversial.xml/OnlyOneReturn"/>
    <rule ref="rulesets/java/design.xml/OptimizableToArrayCall"/>
    <rule ref="rulesets/java/basic.xml/OverrideBothEqualsAndHashcode"/>
    <rule ref="rulesets/java/naming.xml/PackageCase"/>
