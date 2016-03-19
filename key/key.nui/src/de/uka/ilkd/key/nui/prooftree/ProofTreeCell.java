@@ -29,24 +29,19 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     public static final int ICON_SPACING = 5;
 
     /**
+     * The filtering handler used to filter the tree's cells.
+     */
+    private FilteringHandler filteringHandler;
+
+    /**
      * The IconFactory used to create the required icons.
      */
-    private final IconFactory icf;
+    private final IconFactory iconFactory;
 
     /**
      * The icon that will be displayed left next to the label.
      */
     private ImageView icon;
-
-    /**
-     * The filtering handler used to filter the tree's cells.
-     */
-    private FilteringHandler fh;
-
-    /**
-     * The treeViewController used to handle the actions of the treeView.
-     */
-    private TreeViewController treeViewController = null;
 
     /**
      * The label that will be displayed.
@@ -70,17 +65,58 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     };
 
     /**
+     * The treeViewController used to handle the actions of the treeView.
+     */
+    private final TreeViewController treeViewController;
+
+    /**
+     * Returns the TreeViewController associated with the ProofTreeCell.
+     * 
+     * @return the {@link TreeViewController}.
+     */
+    public TreeViewController getTreeViewController() {
+        return treeViewController;
+    }
+
+    /**
      * The constructor of the ProofTreeCell.
      * 
      * @param icf
      *            the icon factory used to display node icons
      */
-    public ProofTreeCell(final IconFactory icf, final FilteringHandler fh,
-            TreeViewController tvc) {
+    public ProofTreeCell(final IconFactory icf, final FilteringHandler filteringHandler,
+            final TreeViewController treeViewController) {
         super();
-        this.fh = fh;
-        this.icf = icf;
-        this.treeViewController = tvc;
+        this.filteringHandler = filteringHandler;
+        this.iconFactory = icf;
+        this.treeViewController = treeViewController;
+    }
+
+    /**
+     * Returns the icon factory associated with the ProofTreeCell.
+     * 
+     * @return the {@link IconFactory}.
+     */
+    public IconFactory getIconFactory() {
+        return iconFactory;
+    }
+
+    /**
+     * Returns the icon associated with the ProofTreeCell.
+     * 
+     * @return {@link ImageView} containing the icon for the cell.
+     */
+    public ImageView getIcon() {
+        return this.icon;
+    }
+
+    /**
+     * Returns the label associated with the ProofTreeCell.
+     * 
+     * @return label the {@link Label} used by the {@link ProofTreeCell}.
+     */
+    public Label getLabel() {
+        return label;
     }
 
     /**
@@ -94,7 +130,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     @Override
     protected final void updateItem(final NUINode item, final boolean empty) {
 
-        String cssHighlighting = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
+        final String cssHighlighting = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
 
         if (getItem() != null) {
             getItem().removeSearchResultListener(searchResultListener);
@@ -126,14 +162,14 @@ public class ProofTreeCell extends TreeCell<NUINode> {
         }
 
         setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(),
-                icf, fh, treeViewController));
+                iconFactory, filteringHandler, treeViewController));
 
         // reset label and icon
         label = new Label(item.getLabel() + " ");
         icon = null;
 
         // set decoration (style, icon)
-        ProofTreeStyler pts = new ProofTreeStyler(this);
+        final ProofTreeStyler pts = new ProofTreeStyler(this);
         // applies the style assigned in ProofTreeConverter to the
         // current ProofTreeCell
         pts.applyStyle(getItem());
@@ -150,23 +186,5 @@ public class ProofTreeCell extends TreeCell<NUINode> {
             hbox.getChildren().addAll(iconLabel, label);
             setGraphic(hbox);
         }
-    }
-
-    /**
-     * Returns the icon associated with the ProofTreeCell.
-     * 
-     * @return {@link ImageView} containing the icon for the cell.
-     */
-    public ImageView getIcon() {
-        return this.icon;
-    }
-
-    /**
-     * Returns the label associated with the ProofTreeCell.
-     * 
-     * @return label the {@link Label} used by the {@link ProofTreeCell}.
-     */
-    public Label getLabel() {
-        return label;
     }
 }
