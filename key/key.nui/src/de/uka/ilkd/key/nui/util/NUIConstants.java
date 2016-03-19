@@ -53,7 +53,7 @@ public final class NUIConstants {
     public final static String UPDATESV_TAG = "updateSV";
     public final static String VARSV_TAG = "varSV";
     public final static String WARYSUBSTOP_TAG = "warySubstOp";
-    
+
     public final static String DEFAULT_XML_PATH = "resources/xml/cssList.xml";
     public final static String KEY_WINDOW_ICON = "file:resources/images/key-color-icon-square.png";
 
@@ -92,7 +92,7 @@ public final class NUIConstants {
             + ".updateApp{background-color:#FF00FF;color:inherit;font-weight:inherit;font-style:inherit;}"
             + ".updateJunc{background-color:#FF00FF;color:#008000;font-weight:inherit;font-style:inherit;}"
             + ".updateSV{background-color:#FF00FF;color:#0000FF;font-weight:bold;font-style:inherit;}"
-            + ".varSV{background-color:violet;color:#000000;font-weight:inherit;font-style:inherit;}"
+            + ".varSV{background-color:#9B30FF;color:#000000;font-weight:inherit;font-style:inherit;}"
             + ".warySubstOp{background-color:#2fedff;color:#FF0000;font-weight:inherit;font-style:italic;}";
 
     public static String getDefaultSequentCss() {

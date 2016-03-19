@@ -38,7 +38,7 @@
 	<left>
 	<VBox >
 	<children>
-		<TextField fx:id="tfSearch" text="Search..." onAction="#handleSearch"></TextField>
+		<TextField fx:id="tfSearch" text="Search..." onAction="#handleSearch" onMouseClicked="#handleSearchClick"></TextField>
 		<TreeView fx:id="treeView" showRoot="false"/>
 	</children>
 	</VBox>

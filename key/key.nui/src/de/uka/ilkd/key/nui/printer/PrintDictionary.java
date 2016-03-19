@@ -193,7 +193,7 @@ public class PrintDictionary {
      * @return a sorted List of Pairs, with the insertion index and the tag to
      *         be inserted. No offset has been computed.
      */
-    // 2 Seperate LoopPhases for Tag Applieng, to avoid selfcancelling and slim
+    // 2 separate LoopPhases for Tag Applying, to avoid self canceling and slim
     // down amount of tags.
     public List<Pair<Integer, String>> getTagList() {
         Set<Integer> keySet = new TreeSet<>();
