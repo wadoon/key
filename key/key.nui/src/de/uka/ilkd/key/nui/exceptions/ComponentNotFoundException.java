@@ -11,10 +11,23 @@ import de.uka.ilkd.key.nui.NUI;
 public class ComponentNotFoundException extends NUIException {
 
     private static final long serialVersionUID = 1L;
-
-    private String file;
-
-    public ComponentNotFoundException(String file) {
+    /**
+     * TODO
+     */
+    private final String file;
+    /**
+     * TODO
+     * @return
+     */
+    public String getFile() {
+        return file;
+    }
+    /**
+     * TODO
+     * @param file
+     */
+    public ComponentNotFoundException(final String file) {
+        super();
         this.file = file;
     }
 
