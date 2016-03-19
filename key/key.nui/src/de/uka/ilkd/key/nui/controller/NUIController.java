@@ -11,28 +11,32 @@ import de.uka.ilkd.key.nui.NUI;
  * @author Florian Breitfelder
  *
  */
+@SuppressWarnings("PMD.AtLeastOneConstructor")
 public abstract class NUIController {
+
+    /**
+     * The bundle used for internationalization of text strings.
+     */
+    protected ResourceBundle bundle;
+    /**
+     * The fx:id of the controller.
+     */
+    protected String componentName;
+
+    /**
+     * The data model linked to application.
+     */
+    protected DataModel dataModel;
+
+    /**
+     * The filename of the associated FXML file.
+     */
+    protected String filename;
 
     /**
      * A reference to the {@link NUI} which manages the main application.
      */
     protected NUI nui;
-    /**
-     * The fx:id of the controller.
-     */
-    protected String componentName;
-    /**
-     * The filename of the associated FXML file.
-     */
-    protected String filename;
-    /**
-     * The data model linked to application.
-     */
-    protected DataModel dataModel;
-    /**
-     * The bundle used for internationalization of text strings.
-     */
-    protected ResourceBundle bundle;
 
     /**
      * Replaces the usual java constructor, because JavaFX does not allow to use
@@ -59,6 +63,76 @@ public abstract class NUIController {
         this.filename = filename;
 
         init();
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public String getComponentName() {
+        return componentName;
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public DataModel getDataModel() {
+        return dataModel;
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public String getFilename() {
+        return filename;
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public NUI getNui() {
+        return nui;
+    }
+    /**
+     * TODO
+     * @param bundle
+     */
+    public void setBundle(final ResourceBundle bundle) {
+        this.bundle = bundle;
+    }
+    /**
+     * TODO
+     * @param componentName
+     */
+    public void setComponentName(final String componentName) {
+        this.componentName = componentName;
+    }
+    /**
+     * TODO
+     * @param dataModel
+     */
+    public void setDataModel(final DataModel dataModel) {
+        this.dataModel = dataModel;
+    }
+    /**
+     * TODO
+     * @param filename
+     */
+    public void setFilename(final String filename) {
+        this.filename = filename;
+    }
+    /**
+     * TODO
+     * @param nui
+     */
+    public void setNui(final NUI nui) {
+        this.nui = nui;
     }
 
     /**
