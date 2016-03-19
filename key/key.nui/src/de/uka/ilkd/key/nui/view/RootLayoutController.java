@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,11 +21,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
@@ -34,7 +29,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
@@ -42,7 +36,6 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 
 /**
  * @author Maximilian Li
@@ -101,18 +94,11 @@ public class RootLayoutController extends ViewController {
     @FXML
     private Menu helpMenu;
     @FXML
-    private Accordion accordion;
-    @FXML
-    private ToggleButton settingsButton;
-    @FXML
     private Label statusLabel;
     @FXML
     private ButtonBar debugButtons;
     @FXML
     private CheckMenuItem debugMode;
-
-    @FXML
-    private Button cssStyler;
 
     /**
      * The constructor
@@ -172,8 +158,6 @@ public class RootLayoutController extends ViewController {
         statusLabel.setGraphic(new ImageView(STATUSLOGO));
         statusLabel.setText(STATUSWELCOMETEXT);
 
-        toggleSettings();
-
         if (!MainApp.isDebugView()) {
             debugButtons.setOpacity(0);
             debugButtons.setDisable(true);
@@ -195,31 +179,8 @@ public class RootLayoutController extends ViewController {
      */
     @FXML
     private void handleAbout(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(
-                    MainApp.class.getResource("view/AboutView.fxml"));
-
-            Stage stage = new Stage();
-            stage.setTitle("About Key");
-
-            stage.setScene(new Scene((BorderPane) loader.load()));
-
-            stage.show();
-
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Show/hide Settings.
-     */
-    @FXML
-    private void toggleSettings() {
-        accordion.managedProperty().bind(accordion.visibleProperty());
-        accordion.setVisible(settingsButton.isSelected());
+        getMainApp().openNewWindow("About KeY",
+                "view/AboutView.fxml", true, true);
     }
 
     /**
@@ -290,10 +251,10 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Closes the program on Click
+     * Exits the program on Click.
      */
     @FXML
-    private void handleClose() {
+    private void handleExit() {
         getMainApp().closeWindowAlert();
     }
 

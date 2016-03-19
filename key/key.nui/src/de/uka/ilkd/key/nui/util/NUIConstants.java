@@ -55,6 +55,7 @@ public final class NUIConstants {
     public final static String WARYSUBSTOP_TAG = "warySubstOp";
     
     public final static String DEFAULT_XML_PATH = "resources/xml/cssList.xml";
+    public final static String KEY_WINDOW_ICON = "file:resources/images/key-color-icon-square.png";
 
     public final static String DEFAULT_SEQUENT_CSS = "pre{background-color:#FFFFFF;color:#000000;font-weight:normal;font-size:16px;font-family:Courier New;font-style:normal;}"
             + ".highlighted{background-color:#FFFF00;color:inherit;font-weight:inherit;font-style:inherit;}"

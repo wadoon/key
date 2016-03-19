@@ -24,6 +24,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.image.Image;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -38,6 +39,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
@@ -390,6 +392,12 @@ public class CssStylerViewController extends ViewController {
             alert.setHeaderText("Do you want to save your changes?");
             alert.setContentText("Unsaved changes will be lost upon exit");
 
+            // Get the Stage.
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+
+            // Add a custom icon.
+            stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
+            
             ButtonType saveExit = new ButtonType("Save and Exit");
             ButtonType resetExit = new ButtonType("Exit without Saving");
             ButtonType cancel = new ButtonType("Cancel",

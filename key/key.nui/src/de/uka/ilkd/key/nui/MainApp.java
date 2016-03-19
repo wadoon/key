@@ -10,6 +10,7 @@ import org.reflections.Reflections;
 
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
+import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import javafx.application.Application;
@@ -34,7 +35,6 @@ public class MainApp extends Application {
         return isDebugView;
     }
 
-    private static final String ICON_PATH = "file:resources/images/key-color-icon-square.png";
     private Stage primaryStage;
     private BorderPane rootLayout;
     private RootLayoutController rootLayoutController;
@@ -53,7 +53,7 @@ public class MainApp extends Application {
                 KeYResourceManager.getManager().getUserInterfaceTitle());
 
         // Set the application icon.
-        this.primaryStage.getIcons().add(new Image(ICON_PATH));
+        this.primaryStage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
 
         SessionSettings settings = SessionSettings.loadLastSettings();
         boolean useBoundsSettings = settings != null
@@ -179,7 +179,7 @@ public class MainApp extends Application {
             ObservableList<String> additionalStylesheets) {
         Stage stage = new Stage();
         stage.setTitle(title);
-        stage.getIcons().add(new Image(ICON_PATH));
+        stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
 
         if (blockParent)
             stage.initModality(Modality.WINDOW_MODAL);
@@ -241,7 +241,7 @@ public class MainApp extends Application {
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 
         // Add a custom icon.
-        stage.getIcons().add(new Image(ICON_PATH));
+        stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() != ButtonType.OK)
