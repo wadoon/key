@@ -147,6 +147,9 @@ public class SequentViewController extends ViewController {
                     });
                 });
 
+        // Disable the standard context menu, as it only offers a page refresh,
+        // which is not needed.
+        textArea.setContextMenuEnabled(false);
         textArea.setOnMouseClicked(this::handleWebViewClicked);
 
         textArea.setOnScroll(event -> {
