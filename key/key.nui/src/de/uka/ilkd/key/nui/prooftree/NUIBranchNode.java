@@ -92,24 +92,17 @@ public class NUIBranchNode extends NUINode {
     }
 
     @Override
-    public int search(final String term) { 
+    public int search(final String term) {
         // case: Empty search term given
         if (term.isEmpty()) {
             return 0;
         }
-        
+
         // case: Non-Empty search term given
-        boolean thisIsASearchResult = getLabel().toLowerCase()
-                .contains(term.toLowerCase());
-        int numberOfResultsAccumulator = thisIsASearchResult ? 1 : 0;
+        final boolean thisIsASearchResult = getLabel().toLowerCase().contains(term.toLowerCase());
         setSearchResult(thisIsASearchResult);
-
-        // search in all children of current node
-        for (NUINode child : children) {
-            numberOfResultsAccumulator += child.search(term);
-        }
-
-        return numberOfResultsAccumulator;
+        return children.parallelStream().mapToInt((child) -> child.search(term)).sum()
+                + (thisIsASearchResult ? 1 : 0);
     }
 
     /**
@@ -118,13 +111,12 @@ public class NUIBranchNode extends NUINode {
      * @param parent
      *            The node to set as parent node of the branch node.
      */
-    public final void setProofParentNode(
-            final de.uka.ilkd.key.proof.Node parent) {
+    public final void setProofParentNode(final de.uka.ilkd.key.proof.Node parent) {
         this.proofParentNode = parent;
     }
 
     @Override
-    public NUIBranchNode clone() {
+    public NUIBranchNode clone() throws CloneNotSupportedException {
         // create clone
         final NUIBranchNode cloned = new NUIBranchNode(proofParentNode);
         this.copyFields(this, cloned);
@@ -156,10 +148,10 @@ public class NUIBranchNode extends NUINode {
 
     @Override
     public List<NUINode> asList() {
-        List<NUINode> l = new LinkedList<>();
-        l.add(this);
-        children.forEach((child) -> l.addAll(child.asList()));
-        return l;
+        final List<NUINode> list = new LinkedList<>();
+        list.add(this);
+        children.forEach((child) -> list.addAll(child.asList()));
+        return list;
     }
 
 }
