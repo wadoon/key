@@ -36,7 +36,7 @@ public class NUILeafNode extends NUINode {
     }
 
     @Override
-    public NUILeafNode clone() {
+    public NUILeafNode clone(){
         // create clone
         final NUILeafNode cloned = new NUILeafNode(proofNode);
         this.copyFields(this, cloned);
