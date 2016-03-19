@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.uka.ilkd.key.nui.IconFactory;
 import javafx.scene.control.Label;
@@ -42,14 +43,14 @@ public final class ProofTreeStyler {
     private static StyleConfiguration leafNodeClosed;
 
     /**
-     * Style for linked leaf nodes.
-     */
-    private static StyleConfiguration leafNodeLinked;
-
-    /**
      * Style for interactive leaf nodes.
      */
     private static StyleConfiguration leafNodeInteractive;
+
+    /**
+     * Style for linked leaf nodes.
+     */
+    private static StyleConfiguration leafNodeLinked;
 
     /**
      * Style for open leaf nodes.
@@ -60,7 +61,6 @@ public final class ProofTreeStyler {
      * The icon factory to be used to get the image icons.
      */
     private final IconFactory icf;
-
     /**
      * The {@link ProofTreeCell} assigned to the current ProofTreeStyler.
      */
@@ -78,7 +78,7 @@ public final class ProofTreeStyler {
         /**
          * A list of Strings, each one representing one CSS class name.
          */
-        private final ArrayList<String> cssClasses;
+        private final List<String> cssClasses;
         /**
          * The assigned iconImage.
          */
@@ -101,6 +101,53 @@ public final class ProofTreeStyler {
             cssClasses.add(cssClass);
         }
 
+
+        @Override
+        public boolean equals(Object obj) {
+
+            return obj instanceof StyleConfiguration && !(
+
+            // Check existence of all CSS classes
+            getCssClasses().stream()
+                    .anyMatch((item) -> !((StyleConfiguration) obj).getCssClasses().contains(item))
+
+                    || ( // Check if image is the same
+
+            // First check if images are set
+            getIconImage() != null && ((StyleConfiguration) obj).getIconImage() != null
+            // Then compare the image filename stored in ID field
+                    && !(getIconImage().getId()
+                            .equals(((StyleConfiguration) obj).getIconImage().getId()))));
+        }
+
+        /**
+         * Returns the list of CSS classes.
+         * 
+         * @return A list of Strings, each one representing one CSS class.
+         */
+        public List<String> getCssClasses() {
+            return cssClasses;
+        }
+
+        /**
+         * Returns the currently assigned iconImage.
+         * 
+         * @return {@link ImageView} containing the image.
+         */
+        public ImageView getIconImage() {
+            return iconImage;
+        }
+
+        @Override
+        public int hashCode() {
+            int prime = 31;
+            int result = 1;
+            result = prime * result + getOuterType().hashCode();
+            result = prime * result + ((cssClasses == null) ? 0 : cssClasses.hashCode());
+            result = prime * result + ((iconImage == null) ? 0 : iconImage.hashCode());
+            return result;
+        }
+
         /**
          * Defines the iconImage to be set to the StyleConfiguration, overwrites
          * if any iconImage was set before.
@@ -113,78 +160,11 @@ public final class ProofTreeStyler {
             iconImage.setId(iconFileName);
         }
 
-        /**
-         * Returns the currently assigned iconImage.
-         * 
-         * @return {@link ImageView} containing the image.
-         */
-        public ImageView getIconImage() {
-            return iconImage;
-        }
-
-        /**
-         * Returns the list of CSS classes.
-         * 
-         * @return A list of Strings, each one representing one CSS class.
-         */
-        public ArrayList<String> getCssClasses() {
-            return cssClasses;
-        }
-
-        @Override
-        public int hashCode() {
-            int prime = 31;
-            int result = 1;
-            result = prime * result + getOuterType().hashCode();
-            result = prime * result
-                    + ((cssClasses == null) ? 0 : cssClasses.hashCode());
-            result = prime * result
-                    + ((iconImage == null) ? 0 : iconImage.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object sc) {
-            if (sc instanceof StyleConfiguration) {
-                StyleConfiguration scfg = (StyleConfiguration) sc;
-                // Check existence of all CSS classes
-                for (String cssClassName : getCssClasses()) {
-                    if (!(scfg.getCssClasses().contains(cssClassName))) {
-                        return false;
-                    }
-                }
-
-                // Check if image is the same
-                // First check if images are set
-                if (getIconImage() != null && scfg.getIconImage() != null) {
-                    // Then compare the image filename stored in ID field
-                    if (!(getIconImage().getId()
-                            .equals(scfg.getIconImage().getId()))) {
-                        return false;
-                    }
-                }
-
-                // If no condition is violated till here, both objects are equal
-                return true;
-            }
-            // if given object is no StyleConfiguration
-            return false;
-        }
-
         private ProofTreeStyler getOuterType() {
             return ProofTreeStyler.this;
         }
 
     } // end of class StyleConfiguration
-
-    /**
-     * Creates a new ProofTreeStyler with the ProofTreeCell ptc assigned to it.
-     */
-    public ProofTreeStyler(ProofTreeCell ptc) {
-        this.ptc = ptc;
-        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
-        initDefaultStyleConfigurations();
-    }
 
     /**
      * Creates a new ProofTreeStyler without any ProofTreeCell assigned to it,
@@ -193,6 +173,111 @@ public final class ProofTreeStyler {
     public ProofTreeStyler() {
         icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
         initDefaultStyleConfigurations();
+    }
+
+    /**
+     * Creates a new ProofTreeStyler with the ProofTreeCell ptc assigned to it.
+     */
+    public ProofTreeStyler(final ProofTreeCell ptc) {
+        this.ptc = ptc;
+        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
+        initDefaultStyleConfigurations();
+    }
+
+    /**
+     * Applies the {@link StyleConfiguration} determined by
+     * {@link #getStyleConfiguration(NUINode)} to the given node.
+     * 
+     * @param node
+     *            The node where the StyleConfiguration should be applied to.
+     */
+    public void applyStyle(final NUINode node) {
+        final Label label = ptc.getLabel();
+
+        final StyleConfiguration scfg = node.getStyleConfiguration();
+
+        // Apply CSS classes
+        final List<String> cssClasses = scfg.getCssClasses();
+        cssClasses.forEach(cssClass -> label.getStyleClass().add(cssClass));
+
+        // Apply icon image
+        final ImageView image = scfg.getIconImage();
+        if (image != null) {
+            ptc.setIcon(image);
+        }
+    }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public IconFactory getIcf() {
+        return icf;
+    }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public ProofTreeCell getPtc() {
+        return ptc;
+    }
+
+    /**
+     * Returns the matching {@link StyleConfiguration} for the given type of
+     * {@link NUINode}. If no type matches, an empty StyleConfiguration is
+     * returned.
+     * 
+     * @param node
+     *            The node whose StyleConfiguration should be determined.
+     * @return StyleConfiguration of the given node.
+     */
+    public StyleConfiguration getStyleConfiguration(final NUINode node) {
+        // if the node is branch node
+        if (node instanceof NUIBranchNode) {
+            if (node.isClosed()) {
+                return branchNodeClosed;
+            }
+            else if (node.isLinked()) {
+                return branchNodeLinked;
+            }
+            else {
+                return branchNodeOpen;
+            }
+        }
+        // if the node is a leaf node
+        else if (node instanceof NUILeafNode) {
+            if (node.isClosed()) {
+                return leafNodeClosed;
+            }
+            else if (node.isLinked()) {
+                return leafNodeLinked;
+            }
+            else if (node.isInteractive()) {
+                return leafNodeInteractive;
+            }
+            else {
+                return leafNodeOpen;
+            }
+        }
+        // if the node is an inner node
+        else if (node instanceof NUIInnerNode && node.isInteractive()) {
+            return innerNodeInteractive;
+        }
+
+        // otherwise an empty style configuration is returned
+        return new StyleConfiguration();
+    }
+
+    /**
+     * TODO
+     * 
+     * @param ptc
+     */
+    public void setPtc(final ProofTreeCell ptc) {
+        this.ptc = ptc;
     }
 
     /**
@@ -236,8 +321,7 @@ public final class ProofTreeStyler {
 
         // initialize default styles for interactive leaf nodes
         leafNodeInteractive = new StyleConfiguration();
-        leafNodeInteractive
-                .addCssClass(ProofTreeStyleConstants.CSS_NODE_INTERACTIVE);
+        leafNodeInteractive.addCssClass(ProofTreeStyleConstants.CSS_NODE_INTERACTIVE);
         leafNodeInteractive.addCssClass(ProofTreeStyleConstants.CSS_NODE_LEAF);
         leafNodeInteractive.setIconImage(IconFactory.LEAF_INTERACTIVE);
 
@@ -246,77 +330,6 @@ public final class ProofTreeStyler {
         leafNodeOpen.addCssClass(ProofTreeStyleConstants.CSS_NODE_OPEN);
         leafNodeOpen.addCssClass(ProofTreeStyleConstants.CSS_NODE_LEAF);
         leafNodeOpen.setIconImage(IconFactory.LEAF_OPEN);
-    }
-
-    /**
-     * Applies the {@link StyleConfiguration} determined by
-     * {@link #getStyleConfiguration(NUINode)} to the given node.
-     * 
-     * @param node
-     *            The node where the StyleConfiguration should be applied to.
-     */
-    public void applyStyle(NUINode node) {
-        Label label = ptc.getLabel();
-
-        StyleConfiguration scfg = node.getStyleConfiguration();
-
-        // Apply CSS classes
-        ArrayList<String> cssClasses = scfg.getCssClasses();
-        cssClasses.forEach(cssClass -> label.getStyleClass().add(cssClass));
-
-        // Apply icon image
-        ImageView image = scfg.getIconImage();
-        if (image != null) {
-            ptc.setIcon(image);
-        }
-    }
-
-    /**
-     * Returns the matching {@link StyleConfiguration} for the given type of
-     * {@link NUINode}. If no type matches, an empty StyleConfiguration is
-     * returned.
-     * 
-     * @param node
-     *            The node whose StyleConfiguration should be determined.
-     * @return StyleConfiguration of the given node.
-     */
-    public StyleConfiguration getStyleConfiguration(NUINode node) {
-        // if the node is branch node
-        if (node instanceof NUIBranchNode) {
-            if (node.isClosed()) {
-                return branchNodeClosed;
-            }
-            else if (node.isLinked()) {
-                return branchNodeLinked;
-            }
-            else {
-                return branchNodeOpen;
-            }
-        }
-        // if the node is a leaf node
-        else if (node instanceof NUILeafNode) {
-            if (node.isClosed()) {
-                return leafNodeClosed;
-            }
-            else if (node.isLinked()) {
-                return leafNodeLinked;
-            }
-            else if (node.isInteractive()) {
-                return leafNodeInteractive;
-            }
-            else {
-                return leafNodeOpen;
-            }
-        }
-        // if the node is an inner node
-        else if (node instanceof NUIInnerNode) {
-            if (node.isInteractive()) {
-                return innerNodeInteractive;
-            }
-        }
-
-        // otherwise an empty style configuration is returned
-        return new StyleConfiguration();
     }
 
 }
