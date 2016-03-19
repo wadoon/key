@@ -116,8 +116,7 @@ public class NUI extends Application {
      */
     public static void main(final String... args) {
         if (args.length != 0) {
-            initialProofFile = new File(
-                    System.getProperty("user.dir") + args[0]);
+            initialProofFile = new File(System.getProperty("user.dir") + args[0]);
         }
         launch(args);
     }
@@ -131,16 +130,14 @@ public class NUI extends Application {
         try {
             initializeNUI();
         }
-        catch (IOException | ComponentNotFoundException
-                | ControllerNotFoundException e2) {
+        catch (IOException | ComponentNotFoundException | ControllerNotFoundException e2) {
             e2.printStackTrace();
         }
 
         // Load scene and set preferences
         final Scene scene = new Scene(root, 1024, 768);
         stage.setTitle("KeY");
-        stage.getIcons().add(new Image(
-                getClass().getResourceAsStream("images/KeY-Mono.png")));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("images/KeY-Mono.png")));
         stage.setScene(scene);
         stage.show();
 
@@ -159,30 +156,26 @@ public class NUI extends Application {
     /**
      * Initializes the application, such as all components, all controllers and
      * views.
-     * 
+     *
      * @throws IOException
      * @throws ComponentNotFoundException
      * @throws ControllerNotFoundException
-     * 
-     * @throws Exception
      */
-    public void initializeNUI() throws IOException, ComponentNotFoundException,
-            ControllerNotFoundException {
+    public void initializeNUI()
+            throws IOException, ComponentNotFoundException, ControllerNotFoundException {
         // Load Main View
         final String filename = MAINVIEW_FILENAME + ".fxml";
 
         bundle = new PropertyResourceBundle(
                 getClass().getResourceAsStream("bundle_en_EN.properties"));
         dataModel = new DataModel(this, bundle);
-        final FXMLLoader fxmlLoader = new FXMLLoader(
-                getClass().getResource(filename), bundle);
+        final FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(filename), bundle);
         System.out.println("start launched successfully.");
         root = fxmlLoader.load();
         components.put(MAINVIEW_FILENAME, root);
 
         mainViewCont = fxmlLoader.getController();
-        mainViewCont.constructor(this, dataModel, bundle, MAINVIEW_FILENAME,
-                filename);
+        mainViewCont.constructor(this, dataModel, bundle, MAINVIEW_FILENAME, filename);
         controllers.put(MAINVIEW_FILENAME, mainViewCont);
 
         // initialize viewPositionMenu
@@ -192,19 +185,16 @@ public class NUI extends Application {
         // Load all components
         loadComponents();
 
-        ((TreeViewController) getController("treeViewPane")).addSearchView(
-                getComponent("searchViewPane"),
-                getController("searchViewPane"));
+        ((TreeViewController) getController("treeViewPane"))
+                .addSearchView(getComponent("searchViewPane"), getController("searchViewPane"));
         // create file menu for MainView
         mainViewCont.getViewMenu().getItems().add(viewPositionMenu);
 
         // place component on MainView
         mainViewCont.addComponent(getComponent("treeViewPane"), Place.LEFT);
         mainViewCont.addComponent(getComponent("proofViewPane"), Place.MIDDLE);
-        mainViewCont.addComponent(getComponent("strategyViewPane"),
-                Place.RIGHT);
-        mainViewCont.addComponent(getComponent("openProofsViewPane"),
-                Place.BOTTOM);
+        mainViewCont.addComponent(getComponent("strategyViewPane"), Place.RIGHT);
+        mainViewCont.addComponent(getComponent("openProofsViewPane"), Place.BOTTOM);
     }
 
     /**
@@ -218,25 +208,23 @@ public class NUI extends Application {
      * @throws IOException
      */
     private void loadComponents() throws IOException {
-        final File jarFile = new File(getClass().getProtectionDomain()
-                .getCodeSource().getLocation().getPath());
+        final File jarFile = new File(
+                getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
         if (jarFile.isFile()) { // Run with JAR file
             final JarFile jar = new JarFile(jarFile);
             final Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
                 final String fileName = entries.nextElement().getName();
-                if (fileName.matches("(de/uka/ilkd/key/nui/" + COMPONENTS_DIR
-                        + "/).*(.fxml)")) {
-                    loadComponent(fileName.substring(
-                            fileName.lastIndexOf('/') + 1, fileName.length()));
+                if (fileName.matches("(de/uka/ilkd/key/nui/" + COMPONENTS_DIR + "/).*(.fxml)")) {
+                    loadComponent(
+                            fileName.substring(fileName.lastIndexOf('/') + 1, fileName.length()));
                 }
             }
             jar.close();
         }
         else {// Run with IDE
-            final File[] files = new File(
-                    getClass().getResource(COMPONENTS_DIR).getPath())
-                            .listFiles();
+            final File[] files = new File(getClass().getResource(COMPONENTS_DIR).getPath())
+                    .listFiles();
             for (final File file : files) {
                 if (file.isFile() && file.getName().matches(".*[.fxml]")) {
                     loadComponent(file.getName());
@@ -246,8 +234,8 @@ public class NUI extends Application {
     }
 
     private void loadComponent(String fileName) throws IOException {
-        final FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                COMPONENTS_DIR + File.separator + fileName), bundle);
+        final FXMLLoader fxmlLoader = new FXMLLoader(
+                getClass().getResource(COMPONENTS_DIR + File.separator + fileName), bundle);
 
         // String componentName = cutFileExtension(file.getName());
         final Pane component = fxmlLoader.load();
@@ -257,13 +245,11 @@ public class NUI extends Application {
         // you have to call fxmlLoader.load()
         nuiController = fxmlLoader.getController();
         if (nuiController != null) {
-            nuiController.constructor(this, dataModel, bundle,
-                    component.getId(), fileName);
+            nuiController.constructor(this, dataModel, bundle, component.getId(), fileName);
         }
         controllers.put(component.getId(), nuiController);
 
-        final Annotation[] annotations = nuiController.getClass()
-                .getAnnotations();
+        final Annotation[] annotations = nuiController.getClass().getAnnotations();
 
         // create a view position menu for every component
         if (annotations != null) {
@@ -273,8 +259,8 @@ public class NUI extends Application {
                     if (ctrlAnnotation.createMenu()) {
                         final ToggleGroup toggleGroup = new ToggleGroup();
                         toggleGroups.put(component.getId(), toggleGroup);
-                        viewPositionMenu.getItems().add(
-                                createSubMenu(component.getId(), toggleGroup));
+                        viewPositionMenu.getItems()
+                                .add(createSubMenu(component.getId(), toggleGroup));
                         break;
                     }
                 }
@@ -292,8 +278,7 @@ public class NUI extends Application {
      *            The toggle group containing the sub menu entries.
      * @return The constructed Menu.
      */
-    private Menu createSubMenu(final String menuName,
-            final ToggleGroup toggleGroup) {
+    private Menu createSubMenu(final String menuName, final ToggleGroup toggleGroup) {
         final Menu menu = new Menu(bundle.getString(menuName));
         final String hideText = bundle.getString("hide");
         final String leftText = bundle.getString("left");
@@ -301,20 +286,15 @@ public class NUI extends Application {
         final String bottomText = bundle.getString("bottom");
         final String middleText = bundle.getString("middle");
 
-        addRadioMenuItem(hideText, menuName, toggleGroup, true, Place.HIDDEN,
-                menu);
+        addRadioMenuItem(hideText, menuName, toggleGroup, true, Place.HIDDEN, menu);
 
-        addRadioMenuItem(leftText, menuName, toggleGroup, false, Place.LEFT,
-                menu);
+        addRadioMenuItem(leftText, menuName, toggleGroup, false, Place.LEFT, menu);
 
-        addRadioMenuItem(rightText, menuName, toggleGroup, false, Place.RIGHT,
-                menu);
+        addRadioMenuItem(rightText, menuName, toggleGroup, false, Place.RIGHT, menu);
 
-        addRadioMenuItem(bottomText, menuName, toggleGroup, false, Place.BOTTOM,
-                menu);
+        addRadioMenuItem(bottomText, menuName, toggleGroup, false, Place.BOTTOM, menu);
 
-        addRadioMenuItem(middleText, menuName, toggleGroup, false, Place.MIDDLE,
-                menu);
+        addRadioMenuItem(middleText, menuName, toggleGroup, false, Place.MIDDLE, menu);
 
         return menu;
     }
@@ -336,9 +316,8 @@ public class NUI extends Application {
      * @param destinationMenu
      *            The destination menu where the menu item should be added to.
      */
-    private void addRadioMenuItem(final String menuItemName,
-            final String componentName, final ToggleGroup tGroup,
-            final Boolean isSelected, final Place position,
+    private void addRadioMenuItem(final String menuItemName, final String componentName,
+            final ToggleGroup tGroup, final Boolean isSelected, final Place position,
             final Menu destinationMenu) {
         final RadioMenuItem menuItem = new RadioMenuItem(menuItemName);
         menuItem.setOnAction(mainViewCont.getNewHandleLoadComponent());
@@ -360,8 +339,7 @@ public class NUI extends Application {
      * @throws ComponentNotFoundException
      *             If no component with the given fx:id was found.
      */
-    public Pane getComponent(final String name)
-            throws ComponentNotFoundException {
+    public Pane getComponent(final String name) throws ComponentNotFoundException {
         if (!components.containsKey(name)) {
             throw new ComponentNotFoundException(name);
         }
@@ -379,8 +357,7 @@ public class NUI extends Application {
      * @throws ControllerNotFoundException
      *             Iff there was no controller with the given fx:id loaded.
      */
-    public NUIController getController(final String name)
-            throws ControllerNotFoundException {
+    public NUIController getController(final String name) throws ControllerNotFoundException {
         if (!controllers.containsKey(name)) {
             throw new ControllerNotFoundException(name);
         }
@@ -396,8 +373,7 @@ public class NUI extends Application {
      * @throws ToggleGroupNotFoundException
      *             Iff there was no toggle group with the given fx:id loaded.
      */
-    public ToggleGroup getToggleGroup(final String name)
-            throws ToggleGroupNotFoundException {
+    public ToggleGroup getToggleGroup(final String name) throws ToggleGroupNotFoundException {
         if (!toggleGroups.containsKey(name)) {
             throw new ToggleGroupNotFoundException(name);
         }
@@ -431,8 +407,7 @@ public class NUI extends Application {
      */
     public void updateStatusbar(final String text) {
         try {
-            ((MainViewController) getController(MAINVIEW_FILENAME))
-                    .updateStatusbar(text);
+            ((MainViewController) getController(MAINVIEW_FILENAME)).updateStatusbar(text);
         }
         catch (ControllerNotFoundException e) {
             e.showMessage();
