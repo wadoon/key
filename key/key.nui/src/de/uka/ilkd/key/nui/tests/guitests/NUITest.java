@@ -18,12 +18,12 @@ public class NUITest extends GuiTest {
     /**
      * Allows access to all loaded files
      */
-    public NUI nui = null;
+    public NUI nui = null; // NOPMD
 
     /**
      * DataModel contains all loaded proofs
      */
-    public DataModel dataModel = null;
+    public DataModel dataModel = null; // NOPMD
 
     @Override
     /**
@@ -51,8 +51,8 @@ public class NUITest extends GuiTest {
      * 
      * @param statustext
      */
-    protected void waitUntilStatusIs(String statustext) {
-        Label label = ((Label) find("#statustext"));
+    protected void waitUntilStatusIs(final String statustext) {
+        final Label label = ((Label) find("#statustext"));
 
         while (!label.getText().equals(statustext)) {
             sleep(2000);
@@ -65,42 +65,42 @@ public class NUITest extends GuiTest {
      * @param filename
      *            of proof
      */
-    protected void loadProof(String filename, boolean cancelLoading) {
+    protected void loadProof(final String filename, final boolean cancelLoading) {
         // open load file dialog
         clickOn("File").clickOn("Open Proof...");
 
         // Enter file name: example01.proof
-        KeyCodeHelper key = new KeyCodeHelper(this);
+        final KeyCodeHelper key = new KeyCodeHelper(this);
         key.typeKeys(key.getKeyCode(filename.toUpperCase()));
 
         // press enter to load file
         type(KeyCode.ENTER);
 
-        if (!cancelLoading) {
-            // wait until load file is finished
-            waitUntilStatusIs("Ready.");
-
-            // check if proof was loaded and stored in the datamodel
-            TreeViewState treeViewState = dataModel.getTreeViewState(filename);
-            assertTrue(treeViewState != null);
-            assertTrue(treeViewState.getProof() != null);
-            assertTrue(treeViewState.getTreeItem() != null);
-        }
-        else {
-            // cancel loading process
+        if (cancelLoading) {// cancel loading process
             clickOn("#cancelButton");
 
             Label label = ((Label) find("#statustext"));
             // Loading process was canceled
             assertTrue(label.getText().equals("Loading has been cancelled."));
         }
+        else {
 
-        ProgressIndicator progressIndicator = ((ProgressIndicator) find(
-                "#progressIndicator"));
+            // wait until load file is finished
+            waitUntilStatusIs("Ready.");
+
+            // check if proof was loaded and stored in the datamodel
+            final TreeViewState treeViewState = dataModel.getTreeViewState(filename);
+            assertTrue(treeViewState != null);
+            assertTrue(treeViewState.getProof() != null);
+            assertTrue(treeViewState.getTreeItem() != null);
+
+        }
+
+        final ProgressIndicator progressIndicator = ((ProgressIndicator) find("#progressIndicator"));
         // ProgressIndicator is not visible
         assertTrue(!progressIndicator.isVisible());
 
-        Button cancelButton = ((Button) find("#cancelButton"));
+        final Button cancelButton = ((Button) find("#cancelButton"));
         assertTrue(!cancelButton.isVisible());
     }
 
