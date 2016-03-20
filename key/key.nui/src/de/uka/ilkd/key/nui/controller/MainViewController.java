@@ -10,6 +10,8 @@ import java.util.Observer;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.sun.javafx.collections.ObservableMapWrapper;
+
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.nui.TreeViewState;
@@ -17,7 +19,9 @@ import de.uka.ilkd.key.nui.exceptions.ToggleGroupNotFoundException;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
 import javafx.collections.ObservableMap;
@@ -133,6 +137,8 @@ public class MainViewController extends NUIController implements Observer {
      */
     private final ObservableMap<String, Place> placeComponent = new ObservableMapWrapper<>(
             new HashMap<>());
+
+    private KeYEnvironment<DefaultUserInterfaceControl> keyEnvironment;
 
     /**
      * Returns the {@link #viewMenu} which contains the menu items of the menu
@@ -522,45 +528,34 @@ public class MainViewController extends NUIController implements Observer {
         // try to set loading status atomically
         final boolean hasBeenCanceled = isLoadingProof.compareAndSet(true,
                 false);
-
         if (hasBeenCanceled) {
-
-            // TODO not a very kind way to stop a thread
-            // However the method KeYEnvironment.load doesn't support
-            // interrupting.
+            /*
+             * Not a very kind way to stop a thread However the method
+             * KeYEnvironment.load doesn't support interrupting
+             */
             try {
-
-                try {
-                    final java.lang.reflect.Method tsm = Thread.class
-                            .getDeclaredMethod("stop0",
-                                    new Class[] { Object.class });
-                    tsm.setAccessible(true);
-                    tsm.invoke(loadingThread, new ThreadDeath());
-                }
-                catch (java.lang.ThreadDeath e) {
-                    System.out.println(
-                            "ThreadDeath to ignore? Speak with Matthias"); // TODO
-                }
-
-                // reset loading state
-                Platform.runLater(() -> {
-                    statustext.setText("Loading has been cancelled.");
-                    root.setCursor(Cursor.DEFAULT);
-                    openProof.setDisable(false);
-                    progressIndicator.setVisible(false);
-                    cancelButton.setVisible(false);
-                });
+                java.lang.reflect.Method tsm = Thread.class.getDeclaredMethod(
+                        "stop0", new Class[] { Object.class });
+                tsm.setAccessible(true);
+                tsm.invoke(loadingThread, new ThreadDeath());
             }
             catch (NoSuchMethodException | SecurityException
                     | IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException e1) {
-                e1.printStackTrace();
+                    | InvocationTargetException e) {
+                // Exception can be ignored, because KeYEnvironment object will
+                // be re-created by next proof loading
             }
-            catch (java.lang.ThreadDeath e) {
-                System.out.println(
-                        "Unexpected ThreadDeath in cancelLoadProof. Speak with Matthias."); // TODO
-            }
+
+            // reset loading state
+            Platform.runLater(() -> {
+                statustext.setText("Loading has been cancelled.");
+                root.setCursor(Cursor.DEFAULT);
+                openProof.setDisable(false);
+                progressIndicator.setVisible(false);
+                cancelButton.setVisible(false);
+            });
         }
+
     }
 
     /**
@@ -600,11 +595,24 @@ public class MainViewController extends NUIController implements Observer {
                     mainWindow.setVisible(false);
                     // load proof
                     System.out.println("Start loading proof: " + proofFileName);
-                    final KeYEnvironment<?> environment = KeYEnvironment.load(
-                            JavaProfile.getDefaultInstance(), proofFileName,
-                            null, null, null, true);
-                    final Proof proof = environment.getLoadedProof();
 
+                    // Load proof
+                    DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(
+                            null);
+                    AbstractProblemLoader loader = ui.load(null, proofFileName,
+                            null, null, null, null, false);
+                    InitConfig initConfig = loader.getInitConfig();
+                    keyEnvironment = new KeYEnvironment<DefaultUserInterfaceControl>(
+                            ui, initConfig, loader.getProof(),
+                            loader.getResult());
+                    /*
+                     * final KeYEnvironment<?> environment =
+                     * KeYEnvironment.load( JavaProfile.getDefaultInstance(),
+                     * proofFileName, null, null, null, true);
+                     * 
+                     * final Proof proof = environment.getLoadedProof();
+                     */
+                    final Proof proof = keyEnvironment.getLoadedProof();
                     proof.setProofFile(proofFileName);
 
                     System.out.println("loading finished!");
@@ -634,24 +642,10 @@ public class MainViewController extends NUIController implements Observer {
                     }
 
                 }
-                catch (ProblemLoaderException e) {
-                    // This Exception is thrown if the thread has been killed.
-                    if (isLoadingProof.get()) {
-                        // error during loading
-                        System.out
-                                .println("If this occurs speak with Matthias");
-                        e.printStackTrace();
-                    }
-                    else {
-                        // exception occured by thread killing (canceling)
-                        System.out.println("Usual PLException...");
-                    }
+                catch (ProblemLoaderException | java.lang.ThreadDeath e) {
+                    // This Exception is thrown if the thread has been killed
+                    // and can thus be ignored.
                 }
-                catch (java.lang.ThreadDeath e) {
-                    System.out.println(
-                            "Unexpected Thread Death in call. Talk to Matthias");
-                }
-
                 return null;
             }
 
