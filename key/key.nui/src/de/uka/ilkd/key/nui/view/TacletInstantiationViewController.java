@@ -32,7 +32,6 @@ import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -310,31 +309,19 @@ public class TacletInstantiationViewController extends ViewController {
         try {
             TacletApp app = models[current()].createTacletApp();
             if (app == null) {
-                showErrorAlert("Rule Application Failure",
-                        "Could not apply rule");
+                getMainApp().showAlert("Error", "Rule Application Failure",
+                        "Could not apply rule.", AlertType.ERROR);
                 return;
             }
             mediator.getUI().getProofControl().applyInteractive(app, goal);
         }
         catch (Exception exc) {
-            showErrorAlert("Rule Application Failure", exc.toString());
+            getMainApp().showAlert("Error", "Rule Application Failure",
+                    exc.toString(), AlertType.ERROR);
             return;
         }
         InstantiationFileHandler.saveListFor(models[current()]);
         handleClose(event);
-    }
-
-    private void showErrorAlert(String header, String message) {
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setHeaderText(header);
-        alert.setContentText(message);
-        
-        // FIXME Due to a bug in javafx (JDK-8087981) alerts do not
-        // resize with content on several linux systems. Remove the
-        // following workaround as soon as the bug is fixed.
-        alert.setResizable(true);
-        
-        alert.show();
     }
 
     /**

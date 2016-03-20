@@ -45,10 +45,9 @@ public class CriterionRange implements Criterion<Integer> {
         // get X before and after
         ArrayList<Integer> filterFor = new ArrayList<>();
         for (Integer lineIndex : childlist) {
-            // TODO optimize
             IntStream.range(0, before).forEach(n -> {
                 int d = lineIndex - before + n;
-                if (d > 0)
+                if (d >= 0)
                     filterFor.add(d);
             });
             // add the element itself

@@ -148,28 +148,31 @@ public class TacletMenuController extends ViewController {
      *            applied
      * @param parentController
      *            the SequentViewController that requested the menu
-     * @throws IllegalArgumentException when pos is null
+     * @throws IllegalArgumentException
+     *             when pos is null
      */
-    public void init(PosInSequent pos, ViewController parentController) throws IllegalArgumentException{
+    public void init(PosInSequent pos, ViewController parentController)
+            throws IllegalArgumentException {
         if (pos == null)
-            throw new IllegalArgumentException("Argument pos must not be null.");
+            throw new IllegalArgumentException(
+                    "Argument pos must not be null.");
         this.pos = pos;
-        
+
         if (parentController instanceof SequentViewController) {
-            this.parentController = (SequentViewController) parentController; 
+            this.parentController = (SequentViewController) parentController;
         }
-        
+
         occ = pos.getPosInOccurrence();
-        
+
         MediatorProofControl c = mediator.getUI().getProofControl();
 
-        final ImmutableList<BuiltInRule> builtInRules = c
-                .getBuiltInRule(goal, occ);
+        final ImmutableList<BuiltInRule> builtInRules = c.getBuiltInRule(goal,
+                occ);
         createTacletMenu(
                 removeRewrites(c.getFindTaclet(goal, occ))
                         .prepend(c.getRewriteTaclet(goal, occ)),
                 c.getNoFindTaclet(goal), builtInRules);
-        
+
         proofMacroMenuController.init(mediator, occ);
     }
 
@@ -219,7 +222,7 @@ public class TacletMenuController extends ViewController {
         else {
             noRules.setVisible(true);
         }
-        
+
         if (occ != null)
             createAbbrevSection(pos.getPosInOccurrence().subTerm());
 
@@ -346,11 +349,9 @@ public class TacletMenuController extends ViewController {
         result.ifPresent(abbreviation -> {
             if (abbreviation != null) {
                 if (!validateAbbreviation(abbreviation)) {
-                    Alert alert = new Alert(AlertType.INFORMATION);
-                    alert.setHeaderText("Sorry");
-                    alert.setContentText(
-                            "Only letters, numbers and '_' are allowed for Abbreviations");
-                    alert.show();
+                    getMainApp().showAlert("Sorry", null,
+                            "Only letters, numbers and '_' are allowed for Abbreviations",
+                            AlertType.INFORMATION);
                 }
                 else {
                     try {
@@ -363,10 +364,9 @@ public class TacletMenuController extends ViewController {
                         parentController.forceRefresh();
                     }
                     catch (Exception e) {
-                        Alert alert = new Alert(AlertType.ERROR);
-                        alert.setHeaderText("Something has gone wrong.");
-                        alert.setContentText(e.getMessage());
-                        alert.show();
+                        getMainApp().showAlert("Sorry",
+                                "Something has gone wrong.", e.getMessage(),
+                                AlertType.ERROR);
                     }
                 }
             }

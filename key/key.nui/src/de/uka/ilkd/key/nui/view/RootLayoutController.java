@@ -17,7 +17,6 @@ import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewObserver;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.ViewSlot;
-import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.UnicodeHelper;
@@ -25,7 +24,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.CheckMenuItem;
@@ -40,7 +38,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
@@ -177,17 +174,10 @@ public class RootLayoutController extends ViewController {
      */
     @FXML
     private void handleAbout(ActionEvent event) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("About KeY");
-        alert.setContentText(KeYConstants.COPYRIGHT.replace("and", "\n" + UnicodeHelper.emSpaces(8) + "and")
-                + "\n\nWWW: http://key-project.org/" + "\n\nVersion " + KeYConstants.VERSION);
-        // Get the Stage and add KeY Icon.
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
-
-        alert.setHeaderText("The KeY Project");
-        alert.getDialogPane().setPrefWidth(550.0);
-        alert.showAndWait();
+        getMainApp().showAlert("About KeY", "The KeY Project",
+                KeYConstants.COPYRIGHT.replace("and", "\n" + UnicodeHelper.emSpaces(8) + "and")
+                        + "\n\nWWW: http://key-project.org/" + "\n\nVersion " + KeYConstants.VERSION,
+                AlertType.INFORMATION);
     }
 
     /**
@@ -383,7 +373,7 @@ public class RootLayoutController extends ViewController {
         if (view.getUiTab() == null) {
             view.loadUiTab(this);
         }
-        setPosition(view, view.getPreferedPosition());
+        setPosition(view, view.getCurrentPosition());
     }
 
     /**

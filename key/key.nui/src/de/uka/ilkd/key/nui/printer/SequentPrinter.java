@@ -75,7 +75,8 @@ public class SequentPrinter {
         int listPointer = 0;
         String tag;
 
-        for (int i = 0; i < proofString.length(); i++) {
+        // Iterate to Length+1 to Append CollapsedIndicator if all is hidden
+        for (int i = 0; i < proofString.length() + 1; i++) {
             // Insert StyleTags at i
             while (listPointer < tagList.size()
                     && tagList.get(listPointer).first == i) {
@@ -100,7 +101,7 @@ public class SequentPrinter {
         context.setSequentHtml(html);
         return toHTML(html);
     }
-    
+
     private Range getHighlightRange(PosInOccurrence pos) {
         if (!(posTable instanceof InitialPositionTable)) {
             throw new AssertionError(
@@ -111,9 +112,12 @@ public class SequentPrinter {
                 .pathForPosition(pos, new IdentitySequentPrintFilter(sequent));
         return ((InitialPositionTable) posTable).rangeForPath(path);
     }
+
     /**
      * applies highlighting for the last applied Rule
-     * @param app the last applied RuleApplication
+     * 
+     * @param app
+     *            the last applied RuleApplication
      */
     public void applyRuleAppHighlighting(RuleApp app) {
         if (app.posInOccurrence() != null) {
@@ -215,6 +219,12 @@ public class SequentPrinter {
                 }
             }
             styleStart = styleEnd;
+        }
+
+        // Append CollapsedIndicator if all is hidden
+        if ((indicesOfLines == null || indicesOfLines.isEmpty())
+                && layout == FilterLayout.Collapse) {
+            filterCollapseIndicator.add(proofString.length());
         }
     }
 
