@@ -33,4 +33,9 @@ public @interface KeYView {
      * Indicates, if a menu entry should be added for this view.
      */
     boolean hasMenuItem() default true;
+    
+    /**
+     * Indicates, if the view is active with default settings.
+     */
+    boolean defaultActive() default true;
 }

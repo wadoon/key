@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -16,7 +14,6 @@ import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.PrintFilter.DisplayScope;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -28,16 +25,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
 
-@KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT)
+@KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT, defaultActive = false)
 public class FilterViewController extends ViewController {
 
     private PrintFilter currentFilter;
 
     @FXML
     private TextField searchText;
-
-    // @FXML
-    // private ComboBox<String> filters;
 
     @FXML
     private Slider linesBefore;
@@ -81,10 +75,7 @@ public class FilterViewController extends ViewController {
     @FXML
     private GridPane resultRangeText;
 
-    // Note: used in code that is disabled right now.
-    @SuppressFBWarnings(justification = "Not used in code right now", value = "URF_UNREAD_FIELD")
-
-    private Map<String, PrintFilter> savedFilters = new HashMap<>();
+    private FilterSelection filterSelection;
 
     private void loadCurrentFilter() {
         if (currentFilter.getIsUserCriteria()) {
@@ -178,33 +169,6 @@ public class FilterViewController extends ViewController {
         currentFilter.setInvert(invertFilter.isSelected());
     }
 
-    // TODO: save filter on disk
-
-    @FXML
-    private void handleSaveFilter() {
-        /*
-         * String name = filters.getEditor().getText(); if (name.isEmpty()) {
-         * Alert alert = new Alert(AlertType.WARNING); alert.setContentText(
-         * "Please choose a name before saving!"); alert.showAndWait(); return;
-         * } updateCurrentFilter();
-         * 
-         * if (savedFilters.containsKey(name)) { currentFilter =
-         * savedFilters.get(name); } else { currentFilter.setName(name);
-         * savedFilters.put(name, currentFilter.cloneFilter());
-         * filters.getItems().add(currentFilter.getName()); }
-         */
-    }
-
-    @FXML
-    private void handleFilterSelectionChanged() {
-        /*
-         * if (filters.getValue() == null) return;
-         * 
-         * currentFilter = savedFilters.get(filters.getValue());
-         * loadCurrentFilter();
-         */
-    }
-
     @FXML
     private void handleScopeSelectionChanged() {
         if (useNone.isSelected())
@@ -228,8 +192,6 @@ public class FilterViewController extends ViewController {
         }
         getContext().setCurrentFilter(currentFilter);
     }
-
-    private FilterSelection filterSelection;
 
     @FXML
     private void handleSelectionFilterToggled() {

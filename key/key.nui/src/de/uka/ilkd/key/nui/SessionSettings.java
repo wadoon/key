@@ -135,7 +135,6 @@ public class SessionSettings {
         checkBounds();
         if (boundsCorrupted)
             return;
-
         Preferences prefs = Preferences
                 .userNodeForPackage(SessionSettings.class);
         prefs.putDouble("windowHeight", windowHeight);
