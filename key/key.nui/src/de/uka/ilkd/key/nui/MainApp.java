@@ -296,7 +296,6 @@ public class MainApp extends Application {
             else
                 info.setIsActive(annot.defaultActive());
         }
-        System.out.println("Views: " + annotated.size());
     }
 
     private void scanForMenus() {
@@ -315,7 +314,6 @@ public class MainApp extends Application {
             }
             // }
         }
-        System.out.println("Menus: " + annotated.size());
     }
 
     /**
