@@ -17,6 +17,11 @@ public class Context {
 
     private KeYMediator mediator = null;
     private MainApp mainApp;
+    private MediatorUserInterface userInterface;
+
+    public MediatorUserInterface getUserInterface() {
+        return userInterface;
+    }
 
     /**
      * Lazy loaded KeyMediator
@@ -25,7 +30,7 @@ public class Context {
      */
     public KeYMediator getKeYMediator() {
         if (mediator == null) {
-            MediatorUserInterface userInterface = new MediatorUserInterface(
+            userInterface = new MediatorUserInterface(
                     statusManager, mainApp);
             mediator = new KeYMediator(userInterface);
             userInterface.setMediator(mediator);
