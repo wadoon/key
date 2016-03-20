@@ -16,12 +16,12 @@ import javafx.scene.text.Text;
  *
  */
 public class PositionTranslator {
-    private String[] strings;
+    private String[] lines;
     private String font;
     private int fontSize;
     private int minimizedSize;
     private boolean filterCollapsed = false;
-    private ArrayList<Integer> filteredLines = new ArrayList<Integer>();
+    private ArrayList<Integer> unfilteredLines = new ArrayList<Integer>();
     private CssFileHandler cssHandler;
     private static Font normalFont;
     private static Font minimizedFont;
@@ -41,8 +41,8 @@ public class PositionTranslator {
      * @param proofString
      */
     public void setProofString(String proofString) {
-        strings = proofString.split("\n");
-        filteredLines.clear();
+        lines = proofString.split("\n");
+        unfilteredLines.clear();
     }
 
     /**
@@ -59,14 +59,14 @@ public class PositionTranslator {
         int line = getLine(event.getY());
 
         // If valid Line
-        if (line != -1 && line < strings.length) {
+        if (line != -1 && line < lines.length) {
             // Get Position of the Char under MousePointer in this specific Line
             int charPosInLine = getCharIdxInLine(event.getX(), line);
 
             // If to the right of last char in Line, return last char (-2
             // adjustment for linebreak)
             if (charPosInLine == -1) {
-                return getCharIndex(line, strings[line].length() - 2);
+                return getCharIndex(line, lines[line].length() - 2);
             }
             else {
                 return getCharIndex(line, charPosInLine);
@@ -90,12 +90,12 @@ public class PositionTranslator {
         text.setFont(normalFont);
         int collapsedLinesAdjustment = 0;
 
-        for (result = 0; result < strings.length; result++) {
+        for (result = 0; result < lines.length; result++) {
 
             // Adjust for filtering
             if (filterCollapsed) {
-                if (!filteredLines.contains(result)) {
-                    if (filteredLines.contains(result + 1)) {
+                if (!unfilteredLines.contains(result)) {
+                    if (unfilteredLines.contains(result + 1)) {
                         yCoord -= Math
                                 .round(text.getLayoutBounds().getHeight());
                     }
@@ -103,8 +103,8 @@ public class PositionTranslator {
                 }
             }
             else {
-                if (!filteredLines.contains(result)
-                        && filteredLines.size() > 0) {
+                if (!unfilteredLines.contains(result)
+                        && unfilteredLines.size() > 0) {
                     text.setFont(minimizedFont);
                 }
                 else {
@@ -118,8 +118,8 @@ public class PositionTranslator {
             }
         }
         result -= collapsedLinesAdjustment;
-        if (yCoord > 0 || (filterCollapsed && filteredLines.size() > 0
-                && !filteredLines.contains(result))) {
+        if (yCoord > 0 || (filterCollapsed && unfilteredLines.size() > 0
+                && !unfilteredLines.contains(result))) {
             return -1;
         }
         return result;
@@ -142,8 +142,8 @@ public class PositionTranslator {
         // Generate Text Object with Font and Size for computing width
         Text text = new Text();
         // Adjust for minimized Filter
-        if (!filterCollapsed && !filteredLines.contains(line)
-                && filteredLines.size() > 0) {
+        if (!filterCollapsed && !unfilteredLines.contains(line)
+                && unfilteredLines.size() > 0) {
             text.setFont(minimizedFont);
         }
         else {
@@ -152,7 +152,7 @@ public class PositionTranslator {
 
         // For each char check width
 
-        for (char c : strings[line].toCharArray()) {
+        for (char c : lines[line].toCharArray()) {
             text.setText(String.valueOf(c));
             xCoord -= text.getLayoutBounds().getWidth();
 
@@ -183,7 +183,7 @@ public class PositionTranslator {
         int idx = 0;
         // ++ length of lines before
         for (int i = 0; i < line; i++) {
-            idx += strings[i].length();
+            idx += lines[i].length();
         }
         // ++ position of char in line; ++ (number of linebreaks) == line
         idx += charPosInLine + line;
@@ -225,7 +225,7 @@ public class PositionTranslator {
      *            the modus (Minimized/Collapsed) of the Filter
      */
     public void applyFilter(ArrayList<Integer> lines, FilterLayout layout) {
-        filteredLines = lines;
+        unfilteredLines = lines;
         switch (layout) {
         case Minimize:
             filterCollapsed = false;
@@ -256,9 +256,9 @@ public class PositionTranslator {
         String longestLine = "";
 
         // Iterate over all lines to sum up Height
-        for (int i = 0; i < strings.length; i++) {
-            if (strings[i].length() > longestLine.length()) {
-                longestLine = strings[i];
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].length() > longestLine.length()) {
+                longestLine = lines[i];
             }
             height += Math.round(text.getLayoutBounds().getHeight());
         }
@@ -267,6 +267,38 @@ public class PositionTranslator {
         return new Pair<Double, Double>(
                 (double) Math.round(text.getLayoutBounds().getWidth() + 50),
                 height);
+    }
+
+    public Double getHeightForIndex(int index) {
+        double height = 5.0;
+        int stringIndex = 0;
+
+        Text text = new Text("\\W|QpXgj�&");
+        text.setFont(normalFont);
+
+        for (int i = 0; i < lines.length; i++) {
+            if (stringIndex >= index) {
+                if (filterCollapsed && !unfilteredLines.contains(i - 1)) {
+                    return -1.0;
+                }
+                break;
+            }
+            if (!unfilteredLines.contains(i)) {
+                if (filterCollapsed) {
+                    continue;
+                }
+                else {
+                    text.setFont(minimizedFont);
+                }
+            }
+            else {
+                text.setFont(normalFont);
+            }
+            height += text.getLayoutBounds().getHeight();
+            stringIndex += lines[i].length() + 1;
+        }
+
+        return height;
     }
 
 }
