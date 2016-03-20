@@ -132,12 +132,14 @@ public class SequentViewController extends ViewController {
                                     new KeyCodeCombination(KeyCode.F,
                                             KeyCombination.CONTROL_DOWN),
                                     () -> {
-                        if (sequentOptions.isExpanded() && !searchBox.isFocused()) {
+                        if (sequentOptions.isExpanded()
+                                && !searchBox.isFocused()) {
                             searchBox.requestFocus();
                             return;
                         }
                         sequentOptions.setAnimated(false);
-                        sequentOptions.setExpanded(!sequentOptions.isExpanded());
+                        sequentOptions
+                                .setExpanded(!sequentOptions.isExpanded());
                         searchBox.requestFocus();
                         sequentOptions.setAnimated(true);
                     });
@@ -211,6 +213,8 @@ public class SequentViewController extends ViewController {
     public void initializeAfterLoadingFxml() {
         notationInfo = getContext().getKeYMediator().getNotationInfo();
         getContext().getFilterChangedEvent().addHandler(eventArgs -> {
+            if (getContext().getKeYMediator().getSelectedProof() == null)
+                return;
             apply(eventArgs);
             updateView();
         });
@@ -395,6 +399,8 @@ public class SequentViewController extends ViewController {
     private boolean enableTacletMenu;
 
     private void selectModeActivated(SelectModeEventArgs eventArgs) {
+        if (getContext().getKeYMediator().getSelectedProof() == null)
+            return;
         filterSelection = eventArgs.getFilterSelection();
         filterSelection.getSelectionModeFinishedEvent()
                 .addHandler(this::finishSelectionMode);
