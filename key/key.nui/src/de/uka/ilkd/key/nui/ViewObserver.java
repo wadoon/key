@@ -5,6 +5,10 @@ import java.util.Observer;
 
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 
+/**
+ * @author Benedikt Gross
+ *
+ */
 public class ViewObserver implements Observer {
     private RootLayoutController container;
 

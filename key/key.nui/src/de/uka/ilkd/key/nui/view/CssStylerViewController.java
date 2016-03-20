@@ -232,7 +232,7 @@ public class CssStylerViewController extends ViewController {
                         tf.setText(text);
                     }
                     propertyValuePairMap.put(property,
-                            masterRules.get(property));
+                            "inherit");
                     updatePreview();
                     enableControls();
                 }
