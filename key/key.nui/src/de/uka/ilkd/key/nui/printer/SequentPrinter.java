@@ -186,7 +186,7 @@ public class SequentPrinter {
      * 
      * @param filter
      */
-    public void applyFilter(ArrayList<Integer> indicesOfLines,
+    public void applyFilter(ArrayList<Integer> indicesOfUnfilteredLines,
             FilterLayout layout) {
         // remove old Filter styling
         removeFilter();
@@ -201,7 +201,7 @@ public class SequentPrinter {
             int styleEnd = styleStart + lines[i].length() + 1;
 
             // If line is in list apply styles
-            if (!indicesOfLines.contains(i)) {
+            if (!indicesOfUnfilteredLines.contains(i)) {
                 switch (layout) {
                 case Minimize:
                     minimizeLine(styleStart, styleEnd);
@@ -210,7 +210,7 @@ public class SequentPrinter {
                 default:
                     // Add collapsed indicator if collapsed Block ends, or the
                     // last line is reached
-                    if (indicesOfLines.contains(i + 1)
+                    if (indicesOfUnfilteredLines.contains(i + 1)
                             || i == lines.length - 1) {
                         filterCollapseIndicator.add(styleEnd);
                     }
@@ -222,7 +222,8 @@ public class SequentPrinter {
         }
 
         // Append CollapsedIndicator if all is hidden
-        if ((indicesOfLines == null || indicesOfLines.isEmpty())
+        if ((indicesOfUnfilteredLines == null
+                || indicesOfUnfilteredLines.isEmpty())
                 && layout == FilterLayout.Collapse) {
             filterCollapseIndicator.add(proofString.length());
         }
@@ -323,10 +324,10 @@ public class SequentPrinter {
      * @param searchString
      *            the freetext searchString
      */
-    public void applyFreetextSearch(String searchString) {
+    public List<Integer> applyFreetextSearch(String searchString) {
         // remove old Search Highlighting
         removeSearchIndices();
-
+        ArrayList<Integer> result = new ArrayList<>();
         if (!searchString.isEmpty()) {
             if (useRegex) {
                 // try-catch block for incomplete Regex Patterns
@@ -336,7 +337,7 @@ public class SequentPrinter {
 
                     // Iterate over all findings and add to TreeMap
                     while (matcher.find()) {
-
+                        result.add(matcher.start());
                         // Check all occurrences
                         putStyleTags(matcher.start(), matcher.end(),
                                 HighlightType.SEARCH,
@@ -344,7 +345,7 @@ public class SequentPrinter {
                     }
                 }
                 catch (RuntimeException e) {
-                    return;
+                    return result;
                 }
 
             }
@@ -353,11 +354,13 @@ public class SequentPrinter {
                 // removal
                 for (int i = -1; (i = proofString.indexOf(searchString,
                         i + 1)) != -1;) {
+                    result.add(i);
                     putStyleTags(i, i + searchString.length(),
                             HighlightType.SEARCH, NUIConstants.HIGHLIGHTED_TAG);
                 }
             }
         }
+        return result;
     }
 
     /**

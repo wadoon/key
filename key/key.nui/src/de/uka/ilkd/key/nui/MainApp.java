@@ -14,6 +14,7 @@ import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
+import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -330,6 +331,7 @@ public class MainApp extends Application {
                 rootLayoutController.getSplitterPositions());
         settings.setViews(rootLayoutController.getViewInformations());
         settings.saveAsLast();
+        rootLayoutController.getRecentFiles().store(PathConfig.getRecentFileStorage());
         System.out.println("Where we go from here is a choice I leave to you.");
         primaryStage.close();
     }

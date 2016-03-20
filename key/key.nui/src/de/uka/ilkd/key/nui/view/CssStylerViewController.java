@@ -33,14 +33,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 
 /**
  * @author Maximilian Li
@@ -234,7 +232,7 @@ public class CssStylerViewController extends ViewController {
                         tf.setText(text);
                     }
                     propertyValuePairMap.put(property,
-                            masterRules.get(property));
+                            "inherit");
                     updatePreview();
                     enableControls();
                 }

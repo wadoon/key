@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nui.view;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -67,6 +68,9 @@ public class SequentViewController extends ViewController {
     private Sequent sequent;
     private FilterChangedEventArgs lastFilter = null;
     private PositionTranslator posTranslator;
+    private List<Integer> searchIndices;
+    private int searchIndPointer = 0;
+    private String formerSearchText = "";
 
     @FXML
     private TitledPane sequentOptions;
@@ -109,6 +113,11 @@ public class SequentViewController extends ViewController {
         if (app != null) {
             printer.applyRuleAppHighlighting(app);
         }
+
+        searchIndices = null;
+        searchIndPointer = 0;
+        formerSearchText = "";
+
         updateView();
     }
 
@@ -227,9 +236,12 @@ public class SequentViewController extends ViewController {
         tacletInfoViewController.setMainApp(getMainApp(), getContext());
     }
 
-    // TODO add comments
+    /**
+     * initializes the Searchbox: registers all the Event behavior
+     */
     private void initializeSearchBox() {
         searchBox.setOnKeyReleased(event -> {
+            // Ignore Regex with "."
             if (searchBox.getText().equals(".")
                     && checkBoxRegexSearch.isSelected()) {
                 printer.applyFreetextSearch("");
@@ -237,7 +249,38 @@ public class SequentViewController extends ViewController {
                 event.consume();
                 return;
             }
-            printer.applyFreetextSearch(searchBox.getText());
+
+            // Jump to Next Search Highlight if Searchtext is not Changed
+            if (formerSearchText.equals(searchBox.getText())
+                    && searchIndices != null && searchIndices.size() > 0
+                    && sequentOptions.isExpanded()) {
+
+                double searchedHeight = posTranslator
+                        .getHeightForIndex(searchIndices.get(searchIndPointer));
+
+                // While the Next Highlight is in a Collapsed Line, jump to next
+                // or return if it is the last line
+                while (searchedHeight == -1) {
+                    searchIndPointer++;
+                    if (searchIndPointer == searchIndices.size()) {
+                        return;
+                    }
+                    System.out.println(searchedHeight);
+                    searchedHeight = posTranslator.getHeightForIndex(
+                            searchIndices.get(searchIndPointer));
+                }
+
+                // Scroll to the next Search Highlight
+                scrollPane.setVvalue(searchedHeight / scrollPane.getHeight());
+                event.consume();
+                searchIndPointer = (++searchIndPointer % searchIndices.size());
+                return;
+            }
+
+            // Search
+            formerSearchText = searchBox.getText();
+            searchIndices = printer.applyFreetextSearch(searchBox.getText());
+            searchIndPointer = 0;
             updateView();
             event.consume();
         });
