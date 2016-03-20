@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.pp.StringBackend;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -222,6 +223,16 @@ public class TacletInstantiationViewController extends ViewController {
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
             table.setItems(tableModel);
 
+            // when the tab is changed, instantly select the first editable cell
+            // and put it in selection mode
+            tab.setOnSelectionChanged(event -> {
+                focusFirstEditable(table, instantiationColumn);
+            });
+
+            // select first tab for instant editing
+            if (i == 0)
+                focusFirstEditable(table, instantiationColumn);
+
             if (!models[i].application().taclet().ifSequent().isEmpty()) {
                 // TODO implement TacletIfSelectionDialog
 
@@ -231,6 +242,31 @@ public class TacletInstantiationViewController extends ViewController {
                 // tabContent.add(ifSelection);
             }
         }
+    }
+
+    /**
+     * Focuses the first editable row in the given table and switches the
+     * editable cell to edit state.
+     * 
+     * @param table
+     *            the table
+     * @param col
+     *            the column with the editable cells
+     */
+    private void focusFirstEditable(
+            TableView<TacletInstantiationRowModel> table,
+            TableColumn<TacletInstantiationRowModel, ?> col) {
+        Platform.runLater(() -> {
+            for (TacletInstantiationRowModel m : table.getItems()) {
+                if (m.isEditable() && table.getEditingCell() == null) {
+                    table.requestFocus();
+                    table.edit(m.getRowNumber(), col);
+                    table.getSelectionModel().select(m.getRowNumber());
+                    table.getFocusModel().focus(m.getRowNumber());
+                    break;
+                }
+            }
+        });
     }
 
     /**

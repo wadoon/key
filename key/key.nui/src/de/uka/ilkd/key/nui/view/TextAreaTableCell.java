@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui.view;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.Cell;
 import javafx.scene.control.TableCell;
@@ -12,12 +13,13 @@ import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 
 /**
- * Custom TableCell which supports multiline editing and committing on focus loss.
+ * Custom TableCell which supports multiline editing and committing on focus
+ * loss.
  * 
  * @author Victor Schuemmer
  */
 public class TextAreaTableCell<S, T> extends TableCell<S, T> {
-    
+
     private TextArea textArea;
     private StringConverter<T> converter;
 
@@ -39,25 +41,28 @@ public class TextAreaTableCell<S, T> extends TableCell<S, T> {
 
     private static <T> TextArea createTextArea(final Cell<T> cell,
             final StringConverter<T> converter) {
-        
+
         TextArea textArea = new TextArea(getItemText(cell, converter));
-        
-        Tooltip t = new Tooltip("Press Shift+Enter to apply changes or Esc to cancel.");
+
+        Tooltip t = new Tooltip(
+                "Press Shift+Enter to apply changes or Esc to cancel.");
         Tooltip.install(textArea, t);
-        
+
         textArea.setOnKeyReleased(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
                 cell.cancelEdit();
                 e.consume();
             }
             else if (e.getCode() == KeyCode.ENTER && e.isShiftDown()) {
-                cell.commitEdit(converter.fromString(textArea.getText().trim()));
+                cell.commitEdit(
+                        converter.fromString(textArea.getText().trim()));
                 e.consume();
             }
         });
         textArea.focusedProperty().addListener((observable, oldVal, newVal) -> {
             if (!newVal)
-                cell.commitEdit(converter.fromString(textArea.getText().trim()));
+                cell.commitEdit(
+                        converter.fromString(textArea.getText().trim()));
         });
 
         textArea.prefRowCountProperty()
@@ -69,7 +74,7 @@ public class TextAreaTableCell<S, T> extends TableCell<S, T> {
         this.getStyleClass().add("text-area-table-cell");
         this.converter = converter;
     }
-    
+
     private void startEdit(final Cell<T> cell,
             final StringConverter<T> converter) {
         if (textArea == null)
@@ -122,6 +127,7 @@ public class TextAreaTableCell<S, T> extends TableCell<S, T> {
 
         if (isEditing()) {
             startEdit(this, converter);
+            Platform.runLater(() -> textArea.requestFocus());
         }
     }
 

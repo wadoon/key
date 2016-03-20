@@ -22,8 +22,7 @@
 					prefWidth="500.0" AnchorPane.bottomAnchor="0.0"
 					AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
 					AnchorPane.topAnchor="0.0">
-					<WebView fx:id="textArea" maxHeight="Infinity" prefHeight="8000"
-						prefWidth="4000" />
+					<WebView fx:id="textArea" maxHeight="Infinity"/>
 				</ScrollPane>
 			</children>
 		</AnchorPane>

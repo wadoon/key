@@ -10,7 +10,7 @@
 .text-area-table-cell:editable {
     -fx-padding: 3 5 3 5;
     -fx-background-insets: 0.0;
-    -fx-border-color: red;
+    -fx-border-color: orange;
     -fx-background-color: white;
     -fx-focus-color: -fx-control-inner-background;
 }
