@@ -259,6 +259,8 @@ public class CssStylerViewController extends ViewController {
      *            the initial Value
      * @param property
      *            the property to be represented by this node
+     * @param toolTip
+     *            a tooltip to be attached to the Combobox
      * @return a Textfield "bound" to the Css Property
      */
     private Node makeTextField(String value, String property, Tooltip toolTip) {
@@ -275,6 +277,9 @@ public class CssStylerViewController extends ViewController {
      * @param fontSize,
      *            a boolean indicating if this control represents the property
      *            "fontSize". If true, handles "-px" suffix for font size
+     * 
+     * @param toolTip
+     *            a tooltip to be attached to the Combobox
      * @return a Textfield "bound" to the Css Property
      */
     private Node makeTextField(String value, String property, boolean fontSize,
@@ -333,6 +338,8 @@ public class CssStylerViewController extends ViewController {
      *            the initial value
      * @param property
      *            the property to be represented by this node
+     * @param toolTip
+     *            a tooltip to be attached to the Combobox
      * @return a ColorPicker if the initial value can be parsed as a Color, a
      *         TextArea if else. This node is then "bound" to the Css Property
      */
