@@ -170,6 +170,12 @@ public class MediatorUserInterface
                 alert.setHeaderText("Proved.");
                 alert.setContentText(getMediator().getSelectedProof()
                         .getStatistics().toString());
+                
+                // FIXME Due to a bug in javafx (JDK-8087981) alerts do not
+                // resize with content on several linux systems. Remove the
+                // following workaround as soon as the bug is fixed.
+                alert.setResizable(true);
+                
                 // Get the Stage.
                 Stage stage = (Stage) alert.getDialogPane().getScene()
                         .getWindow();
