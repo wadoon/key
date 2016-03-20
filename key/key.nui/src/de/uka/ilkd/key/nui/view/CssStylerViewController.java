@@ -427,16 +427,10 @@ public class CssStylerViewController extends ViewController {
     @FXML
     private void handleExit() {
         if (save.disabledProperty().get() == false) {
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Confirm Exit");
-            alert.setHeaderText("Do you want to save your changes?");
-            alert.setContentText("Unsaved changes will be lost upon exit");
-
-            // Get the Stage.
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-
-            // Add a custom icon.
-            stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
+            Alert alert = getMainApp().createAlert("Confirm Exit",
+                    "Do you want to save your changes?",
+                    "Unsaved changes will be lost upon exit",
+                    AlertType.CONFIRMATION);
 
             ButtonType saveExit = new ButtonType("Save and Exit");
             ButtonType resetExit = new ButtonType("Exit without Saving");

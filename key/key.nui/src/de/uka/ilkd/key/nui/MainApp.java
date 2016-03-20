@@ -205,6 +205,61 @@ public class MainApp extends Application {
     }
 
     /**
+     * Convenience method to create an alert and show it directly. To further
+     * customize the alert use createAlert() instead and show it manually.
+     * 
+     * @param title
+     *            the String displayed in the title bar
+     * @param header
+     *            the String displayed in the alert header (to disable the
+     *            header, pass null)
+     * @param message
+     *            the String displayed as alert message
+     * @param alertType
+     *            the alertType
+     * @return the result of the dialog
+     */
+    public Optional<ButtonType> showAlert(String title, String header,
+            String message, AlertType alertType) {
+        return createAlert(title, header, message, alertType).showAndWait();
+    }
+
+    /**
+     * Creates and returns a new alert with the KeY icon. You still need to call
+     * show on the alert.
+     * 
+     * @param title
+     *            the String displayed in the title bar
+     * @param header
+     *            the String displayed in the alert header (to disable the
+     *            header, pass null)
+     * @param message
+     *            the String displayed as alert message
+     * @param alertType
+     *            the alertType
+     * @return the alert
+     */
+    public Alert createAlert(String title, String header, String message,
+            AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+
+        // Get the Stage and add KeY Icon.
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
+
+        // FIXME Due to a bug in javafx (JDK-8087981) alerts do not
+        // resize with content on several linux systems. Remove the
+        // following workaround as soon as the bug is fixed.
+        alert.setResizable(true);
+        alert.getDialogPane().setPrefWidth(550.0);
+
+        return alert;
+    }
+
+    /**
      * Listens for ControlDown Event.
      */
     private void setCtrlPressedHandler() {
@@ -237,18 +292,8 @@ public class MainApp extends Application {
      * Alert that pops up when trying to close the application.
      */
     public void closeWindowAlert() {
-        Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle("Close KeY");
-        alert.setHeaderText(null);
-        alert.setContentText("Really quit?");
-        // Get the Stage.
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-
-        // Add a custom icon.
-        stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() != ButtonType.OK)
+        if (showAlert("Close KeY", null, "Really quit?", AlertType.CONFIRMATION)
+                .get() != ButtonType.OK)
             return;
 
         saveAndClose();
@@ -332,9 +377,10 @@ public class MainApp extends Application {
                 isDebugView = true;
                 break;
             case "reset":
-                System.out.println("'reset' paramter found -> resetting preferences");
+                System.out.println(
+                        "'reset' paramter found -> resetting preferences");
                 Preferences prefs = Preferences
-                .userNodeForPackage(SessionSettings.class);
+                        .userNodeForPackage(SessionSettings.class);
                 try {
                     prefs.clear();
                 }
