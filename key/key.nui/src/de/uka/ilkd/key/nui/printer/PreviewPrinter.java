@@ -12,7 +12,7 @@ import de.uka.ilkd.key.nui.util.NUIConstants;
  * @author Maximilian Li
  */
 public class PreviewPrinter {
-    private final static String PREVIEW_TEXT = "This is a preview text\n"
+    private final static String PREVIEW_TEXT = "This is a preview text.\n"
             + "It shows you how elements in this class will be styled. \n"
             + "Use the controls to change certain settings. \n"
             + "All changes can be reverted by the 'Reset to Default' menu entry.";

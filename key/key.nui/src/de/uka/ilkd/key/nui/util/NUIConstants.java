@@ -9,7 +9,6 @@ package de.uka.ilkd.key.nui.util;
  *
  */
 public final class NUIConstants {
-
     public final static String OPEN_TAG_BEGIN = "<span class=\"";
     public final static String OPEN_TAG_END = "\">";
     public final static String CLOSING_TAG = "</span>";
@@ -24,35 +23,13 @@ public final class NUIConstants {
     public final static String IF_INST_TAG = "ifInst";
     public final static String IF_FORMULA_TAG = "ifFormula";
 
-    public final static String EQUALITY_TAG = "equality";
-    public final static String FUNCTION_TAG = "function";
-    public final static String LOCATIONVAR_TAG = "locationVar";
-    public final static String JUNCTOR_TAG = "junctor";
-    public final static String LOGICVAR_TAG = "logicVar";
-    public final static String QUANTIFIER_TAG = "quantifier";
-    public final static String SORTDEPFUNC_TAG = "sortDepFunc";
-    public final static String MODALITY_TAG = "modality";
-    public final static String OBSERVERFUNC_TAG = "observerFunc";
-    public final static String ELEMUPDATE_TAG = "elemUpdate";
-    public final static String FORMULASV_TAG = "formulaSV";
-    public final static String IFEXTHENELSE_TAG = "ifExThenElse";
-    public final static String IFTHENELSE_TAG = "ifThenElse";
-    public final static String MODALOPSV_TAG = "modalOpSV";
-    public final static String PROGCONST_TAG = "progConst";
-    public final static String PROGMETH_TAG = "progMeth";
-    public final static String PROGSV_TAG = "progSV";
-    public final static String PROGVAR_TAG = "progVar";
-    public final static String SCHEMAVARFACTORY_TAG = "schemaVarFactory";
-    public final static String SKOLEMTERMSV_TAG = "skolemTermSV";
-    public final static String SUBSTOP_TAG = "substOp";
-    public final static String TERMLABELSV_TAG = "termLabelSV";
-    public final static String TERMSV_TAG = "termSV";
-    public final static String TRANSFORMER_TAG = "transformer";
-    public final static String UPDATEAPP_TAG = "updateApp";
-    public final static String UPDATEJUNC_TAG = "updateJunc";
-    public final static String UPDATESV_TAG = "updateSV";
-    public final static String VARSV_TAG = "varSV";
-    public final static String WARYSUBSTOP_TAG = "warySubstOp";
+    public final static String CSSSTYLER_COLOR_TT_TEXT = "Pick a Color";
+    public final static String CSSSTYLER_WEIGHT_TT_TEXT = "Choose the Boldness";
+    public final static String CSSSTYLER_STYLE_TT_TEXT = "Turn Italics on/off";
+    public final static String CSSSTYLER_SIZE_TT_TEXT = "Choose the Font Size";
+    public final static String CSSSTYLER_FONT_TT_TEXT = "Choose a Font.\n The Browser might not be able to render every Font.";
+    public final static String CSSSTYLER_OTHER_TT_TEMPLATE = "Edit ";
+    public final static String CSSSTYLER_INHERITED_TT_TEMPLATE = "If this checkbox is checked, the property will be styled like the corresponding property defined in ";
 
     public final static String DEFAULT_XML_PATH = "resources/xml/cssList.xml";
     public final static String KEY_WINDOW_ICON = "file:resources/images/key-color-icon-square.png";
