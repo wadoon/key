@@ -13,10 +13,10 @@ import de.uka.ilkd.key.nui.event.EmptyEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterChangedEventArgs;
 import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
-import de.uka.ilkd.key.nui.printer.SequentPrinter;
-import de.uka.ilkd.key.nui.printer.TermInfoPrinter;
 import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.filter.SequentFilterer;
+import de.uka.ilkd.key.nui.printer.SequentPrinter;
+import de.uka.ilkd.key.nui.printer.TermInfoPrinter;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.view.menu.TacletMenuController;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -154,8 +154,8 @@ public class SequentViewController extends ViewController {
         textArea.setOnScroll(event -> {
             // Adjustment: Event.getDelta is absolute amount of pixels,
             // Scrollpane.getHvalue and .getVvalue relative from 0.0 to 1.0
-            this.scrollPane.setVvalue(
-                    this.scrollPane.getVvalue() - event.getDeltaY() / 800);
+            this.scrollPane.setVvalue(this.scrollPane.getVvalue()
+                    - event.getDeltaY() / this.scrollPane.getHeight());
             this.scrollPane.setHvalue(this.scrollPane.getHvalue()
                     - event.getDeltaX() / this.scrollPane.getWidth());
         });
