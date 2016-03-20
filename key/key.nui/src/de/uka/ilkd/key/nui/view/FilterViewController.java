@@ -20,12 +20,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT, defaultActive = false)
@@ -77,6 +78,12 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private GridPane resultRangeText;
+
+    @FXML
+    private Label selectionCount;
+
+    @FXML
+    private AnchorPane filterContainer;
 
     private FilterSelection filterSelection;
     private boolean suppressValueUpdate = false;
@@ -178,8 +185,9 @@ public class FilterViewController extends ViewController {
                     @Override
                     public void selectedProofChanged(KeYSelectionEvent e) {
                         if (getContext().getKeYMediator()
-                                .getSelectedProof() != null)
+                                .getSelectedProof() != null) {
                             applyButton.setDisable(false);
+                        }
                     }
 
                     @Override
@@ -225,7 +233,6 @@ public class FilterViewController extends ViewController {
             filterSelection = new FilterSelection();
             currentFilter.setIsUserCriteria(false);
             getContext().activateSelectMode(filterSelection);
-            selectionFilterToggle.setStyle("-fx-background-color: #ff6666;");
         }
         else {
             finishSelection();
@@ -239,8 +246,6 @@ public class FilterViewController extends ViewController {
         List<String> resolvedSelection = filterSelection.getResolvedSelection();
         currentFilter.setSelections(resolvedSelection);
         filterSelection = null;
-
-        selectionFilterToggle.setStyle("-fx-background-color: lightgrey;");
     }
 
     private void updateRangeValue(Slider slider, Spinner<Integer> spinner,
