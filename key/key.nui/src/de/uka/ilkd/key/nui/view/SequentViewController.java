@@ -252,7 +252,8 @@ public class SequentViewController extends ViewController {
 
             // Jump to Next Search Highlight if Searchtext is not Changed
             if (formerSearchText.equals(searchBox.getText())
-                    && searchIndices != null && searchIndices.size() > 0) {
+                    && searchIndices != null && searchIndices.size() > 0
+                    && sequentOptions.isExpanded()) {
 
                 double searchedHeight = posTranslator
                         .getHeightForIndex(searchIndices.get(searchIndPointer));
