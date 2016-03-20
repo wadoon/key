@@ -120,13 +120,16 @@ public class FilterViewController extends ViewController {
         // change propagation to currentFilter
         // TODO implement all this as handling functions
 
-        beforeNumber.valueProperty().addListener((o, old_val, new_val) -> {
-            updateRangeValue(linesBefore, beforeNumber,
-                    currentFilter::setBefore);
-        });
-        afterNumber.valueProperty().addListener((o, old_val, new_val) -> {
-            updateRangeValue(linesAfter, afterNumber, currentFilter::setAfter);
-        });
+        beforeNumber.getEditor().textProperty()
+                .addListener((o, old_val, new_val) -> {
+                    updateRangeValue(linesBefore, beforeNumber,
+                            currentFilter::setBefore);
+                });
+        afterNumber.getEditor().textProperty()
+                .addListener((o, old_val, new_val) -> {
+                    updateRangeValue(linesAfter, afterNumber,
+                            currentFilter::setAfter);
+                });
         linesBefore.valueProperty().addListener((o, old_val, new_val) -> {
             if (!suppressValueUpdate)
                 beforeNumber.getValueFactory().setValue(new_val.intValue());
@@ -234,8 +237,12 @@ public class FilterViewController extends ViewController {
 
     private void updateRangeValue(Slider slider, Spinner<Integer> spinner,
             Consumer<Integer> setAction) {
+        if (suppressValueUpdate)
+            return;
+
+        int nval;
         try {
-            int nval = spinner.getValue();
+            nval = Integer.parseInt(spinner.getEditor().getText());
             if (nval > slider.getMax()) {
                 suppressValueUpdate = true;
                 slider.setValue(slider.getMax());
@@ -244,7 +251,11 @@ public class FilterViewController extends ViewController {
             setAction.accept(nval);
         }
         catch (NumberFormatException e) {
-            return;
+            suppressValueUpdate = true;
+            spinner.getEditor().setText("0");
+            nval = 0;
+            suppressValueUpdate = false;
         }
+        setAction.accept(nval);
     }
 }
