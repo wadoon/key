@@ -165,25 +165,8 @@ public class MediatorUserInterface
     public void notify(NotificationEvent event) {
         if (event instanceof ProofClosedNotificationEvent) {
             Platform.runLater(() -> {
-                Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Proof closed");
-                alert.setHeaderText("Proved.");
-                alert.setContentText(getMediator().getSelectedProof()
-                        .getStatistics().toString());
-                
-                // FIXME Due to a bug in javafx (JDK-8087981) alerts do not
-                // resize with content on several linux systems. Remove the
-                // following workaround as soon as the bug is fixed.
-                alert.setResizable(true);
-                
-                // Get the Stage.
-                Stage stage = (Stage) alert.getDialogPane().getScene()
-                        .getWindow();
-
-                // Add a custom icon.
-                stage.getIcons().add(new Image(
-                        "file:resources/images/key-color-icon-square.png"));
-                alert.show();
+                mainApp.showAlert("Prove closed", "Proved.", getMediator().getSelectedProof()
+                        .getStatistics().toString(), AlertType.INFORMATION);
             });
         }
 
