@@ -53,7 +53,7 @@
                            <content>
                               <VBox>
                                  <children>
-                                    <RadioButton fx:id="useNone" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="None">
+                                    <RadioButton fx:id="useNone" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="No expansion">
                                        <VBox.margin>
                                           <Insets bottom="5.0" />
                                        </VBox.margin>
