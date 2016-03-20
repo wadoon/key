@@ -27,7 +27,9 @@ public final class NUIConstants {
     public final static String CSSSTYLER_WEIGHT_TT_TEXT = "Choose the Boldness";
     public final static String CSSSTYLER_STYLE_TT_TEXT = "Turn Italics on/off";
     public final static String CSSSTYLER_SIZE_TT_TEXT = "Choose the Font Size";
-    public final static String CSSSTYLER_FONT_TT_TEXT = "Choose a Font.\n The Browser might not be able to render every Font.";
+    public final static String CSSSTYLER_FONT_TT_TEXT = "Choose a Font.\n"
+            + "The SequentView might not be able to render every Font.\n"
+            + "This is due to WebBrowser Compability.";
     public final static String CSSSTYLER_OTHER_TT_TEMPLATE = "Edit ";
     public final static String CSSSTYLER_INHERITED_TT_TEMPLATE = "If this checkbox is checked, the property will be styled like the corresponding property defined in ";
 
