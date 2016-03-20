@@ -26,13 +26,13 @@
       				<Menu mnemonicParsing="false" text="File">
       					<items>
       						<MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open" />
-      						<MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
+      						<MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit" />
       					</items>
       				</Menu>
       				<Menu mnemonicParsing="false" text="Edit">
       					<items>
       						<MenuItem mnemonicParsing="false" onAction="#handleSequentCssStylerAction" text="Sequent CSS Styler" />
-      						<MenuItem mnemonicParsing="false" onAction="#openInNew" text="Open Node in new Sequent"  />
+      						<MenuItem mnemonicParsing="false" onAction="#openInNew" text="Open Node in new Sequent" />
       					</items>
       				</Menu>
       				<Menu fx:id="viewsMenu" mnemonicParsing="false" text="Views" />
@@ -52,7 +52,6 @@
                   <Button mnemonicParsing="false" onAction="#loadUnsolvableProof" text="Load Unsolvable" />
                   <Button mnemonicParsing="false" onAction="#loadProofSplitTest" text="Split Test" />
                   <Button mnemonicParsing="false" onAction="#loadModelSearchVsBasicTest" text="ModelSearch vs Basic" />
-                  <ToggleButton fx:id="settingsButton" mnemonicParsing="false" onAction="#toggleSettings" text="Settings" />
               </buttons>
             </ButtonBar>
          </children>
@@ -104,32 +103,4 @@
          </children>
       </AnchorPane>
    </bottom>
-   <right>
-      <Accordion fx:id="accordion" minWidth="0.0" BorderPane.alignment="CENTER">
-        <panes>
-          <TitledPane animated="false" text="Style Settings">
-               <content>
-               <VBox >
-               		<ButtonBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0">
-               			<buttons>
-               				<Button text="Sequent CSS Styler" onAction="#handleSequentCssStylerAction" />
-               			</buttons>
-               		</ButtonBar>
-                  	<ColorPicker />
-               </VBox>
-               </content></TitledPane>
-          <TitledPane animated="false" text="Other Settings">
-               <content>
-                  <ButtonBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0">
-                    <buttons>
-                      <Button mnemonicParsing="false" text="Button" />
-                        <Button mnemonicParsing="false" text="Button" />
-                    </buttons>
-                  </ButtonBar>
-               </content>
-          </TitledPane>
-          <TitledPane animated="false" text="untitled 3" />
-        </panes>
-      </Accordion>
-   </right>
 </BorderPane>

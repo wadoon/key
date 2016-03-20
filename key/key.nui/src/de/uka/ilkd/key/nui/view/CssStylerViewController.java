@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nui.view;
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.image.Image;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -30,6 +32,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.GridPane;
@@ -37,6 +40,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
@@ -60,6 +64,8 @@ public class CssStylerViewController extends ViewController {
     private TreeItem<String> rootItem;
 
     private XmlReader xmlReader;
+
+    private final Tooltip INHERITED_TOOLTIP = new Tooltip();
 
     @FXML
     private MenuItem menuOpen;
@@ -91,6 +97,10 @@ public class CssStylerViewController extends ViewController {
     public void initializeAfterLoadingFxml() {
         cssFileHandler = getContext().getCssFileHandler();
         xmlReader = getContext().getXmlReader();
+
+        INHERITED_TOOLTIP.setText(
+                "If this checkbox is checked, the property will be styled like the corresponding property defined in "
+                        + xmlReader.getDescriptionMap().get("pre"));
 
         initializeTree();
     }
@@ -168,7 +178,10 @@ public class CssStylerViewController extends ViewController {
                 break;
             case "font-family":
                 propertyLabel = "Font:";
-                valueNode = makeComboBox(fontFamily, value, property);
+                Tooltip fontTooltip = new Tooltip(
+                        "Mind the WebBrowser Compability");
+                valueNode = makeComboBox(fontFamily, value, property,
+                        fontTooltip);
                 break;
             case "font-style":
                 propertyLabel = "Italics:";
@@ -185,7 +198,11 @@ public class CssStylerViewController extends ViewController {
             }
             // Logic for CSS Inheritance Handling
             CheckBox cbxInherited = new CheckBox("Inherited");
-            cbxInherited.setSelected(false);
+
+            cbxInherited.setSelected(inherited);
+            valueNode.setDisable(inherited);
+
+            cbxInherited.setTooltip(INHERITED_TOOLTIP);
             cbxInherited.setOnAction(event -> {
                 if (cbxInherited.isSelected()) {
                     if (valueNode instanceof ColorPicker) {
@@ -211,11 +228,6 @@ public class CssStylerViewController extends ViewController {
                 }
                 valueNode.setDisable(cbxInherited.isSelected());
             });
-
-            if (inherited) {
-                valueNode.setDisable(true);
-                cbxInherited.setSelected(true);
-            }
 
             propValGrid.add(new Label(propertyLabel), 0, gridRow);
             propValGrid.add(valueNode, 1, gridRow);
@@ -286,6 +298,25 @@ public class CssStylerViewController extends ViewController {
      */
     private Node makeComboBox(ObservableList<String> comboList, String value,
             String property) {
+        return makeComboBox(comboList, value, property, null);
+    }
+
+    /**
+     * makes a ComboBox control for the Grid
+     * 
+     * @param comboList
+     *            the list containing all the options for this comboBox
+     * @param value
+     *            the initial Value
+     * @param property
+     *            the property to be represented by this node
+     * 
+     * @param toolTip
+     *            a tooltip to be attached to the Combobox
+     * @return a ComboBox "bound" to the Css Property
+     */
+    private Node makeComboBox(ObservableList<String> comboList, String value,
+            String property, Tooltip toolTip) {
         ComboBox<String> cb = new ComboBox<>(comboList);
         cb.setValue(value);
         cb.setOnAction(event -> {
@@ -293,6 +324,9 @@ public class CssStylerViewController extends ViewController {
             updatePreview();
             enableControls();
         });
+        if (toolTip != null) {
+            cb.setTooltip(toolTip);
+        }
         return cb;
     }
 
@@ -323,6 +357,9 @@ public class CssStylerViewController extends ViewController {
             });
             node = cp;
         }
+        // Catch all the Exceptions. If a CSS Value cannot be converted into a
+        // color, an error gets thrown. This is catched and a simple Textfield
+        // used instead.
         catch (Exception e) {
             System.err.println("Could not read Color. Using TextField");
             node = makeTextField(value, property);
@@ -362,14 +399,18 @@ public class CssStylerViewController extends ViewController {
 
     private void decollapseChildren(TreeItem<String> root,
             String searchString) {
-        if (root.getValue().toLowerCase()
-                .contains(searchString.toLowerCase())) {
+        if (searchString == null || searchString.isEmpty()) {
+            return;
+        }
+
+        if (root.getValue().toLowerCase(Locale.ENGLISH)
+                .contains(searchString.toLowerCase(Locale.ENGLISH))) {
             root.setExpanded(true);
         }
         for (TreeItem<String> child : root.getChildren()) {
             if (child.isLeaf()) {
-                if (child.getValue().toLowerCase()
-                        .contains(searchString.toLowerCase())) {
+                if (child.getValue().toLowerCase(Locale.ENGLISH)
+                        .contains(searchString.toLowerCase(Locale.ENGLISH))) {
                     root.setExpanded(true);
                     treeView.getSelectionModel().select(child);
                 }
@@ -387,6 +428,12 @@ public class CssStylerViewController extends ViewController {
             alert.setTitle("Confirm Exit");
             alert.setHeaderText("Do you want to save your changes?");
             alert.setContentText("Unsaved changes will be lost upon exit");
+
+            // Get the Stage.
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+
+            // Add a custom icon.
+            stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
 
             ButtonType saveExit = new ButtonType("Save and Exit");
             ButtonType resetExit = new ButtonType("Exit without Saving");

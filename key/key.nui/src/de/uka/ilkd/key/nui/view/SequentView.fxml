@@ -53,7 +53,7 @@
 									</padding>
 								</Separator>
 								<TextField fx:id="searchBox" maxWidth="1.7976931348623157E308"
-									HBox.hgrow="ALWAYS" />
+									promptText="Search..." HBox.hgrow="ALWAYS" />
 							</children>
 						</HBox>
 					</center>
@@ -61,10 +61,10 @@
 			</content>
 		</TitledPane>
 	</top>
-	<bottom> 
-                <TitledPane fx:id="tacletInfo" text="Taclet Info"
-                        BorderPane.alignment="CENTER">
-                        <fx:include fx:id="tacletInfoView" source="TacletInfoView.fxml" />
-                </TitledPane>
-        </bottom>
+	<bottom>
+		<TitledPane fx:id="tacletInfo" text="Taclet Info"
+			BorderPane.alignment="CENTER">
+			<fx:include fx:id="tacletInfoView" source="TacletInfoView.fxml" />
+		</TitledPane>
+	</bottom>
 </BorderPane>

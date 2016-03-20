@@ -125,11 +125,17 @@ public class Context {
     private TacletInstantiationModel[] models;
 
     public void setCurrentModels(TacletInstantiationModel[] models) {
-        this.models = models;
+        if (models == null) {
+            return;
+        }
+        this.models = (TacletInstantiationModel[]) models.clone();
     }
 
     public TacletInstantiationModel[] getCurrentModels() {
-        return models;
+        if (models == null) {
+            return new TacletInstantiationModel[0];
+        }
+        return (TacletInstantiationModel[]) models.clone();
     }
 
     private ObservableList<TacletMenuItem> hiddenTacletMenuItems;

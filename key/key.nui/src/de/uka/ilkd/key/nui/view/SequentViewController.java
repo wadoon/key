@@ -31,7 +31,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Pair;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
@@ -215,17 +214,6 @@ public class SequentViewController extends ViewController {
 
     // TODO add comments
     private void initializeSearchBox() {
-        String searchBoxLabel = "Search...";
-        searchBox.setText(searchBoxLabel);
-        searchBox.focusedProperty()
-                .addListener((arg0, oldPropertyValue, newPropertyValue) -> {
-                    if (newPropertyValue
-                            && searchBox.getText().equals(searchBoxLabel))
-                        searchBox.clear();
-                    else if (searchBox.getText().isEmpty())
-                        searchBox.setText(searchBoxLabel);
-                });
-
         searchBox.setOnKeyReleased(event -> {
             printer.applyFreetextSearch(searchBox.getText());
             updateView();

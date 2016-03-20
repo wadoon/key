@@ -17,70 +17,70 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.TextField?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.CssStylerViewController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.CssStylerViewController">
 	<top>
 		<MenuBar>
 			<menus>
 				<Menu text="File">
-					<MenuItem fx:id="menuOpen" onAction="#handleOpen" text="Open"></MenuItem>
+					<MenuItem fx:id="menuOpen" onAction="#handleOpen" text="Open" />
 					<SeparatorMenuItem />
-					<MenuItem fx:id="menuSave" disable="true" onAction="#handleSave" text="Save"></MenuItem>
-					<MenuItem fx:id="menuSaveAs" onAction="#handleSaveAs" text="Save As"></MenuItem>
+					<MenuItem fx:id="menuSave" disable="true" onAction="#handleSave" text="Save" />
+					<MenuItem fx:id="menuSaveAs" onAction="#handleSaveAs" text="Save As" />
 					<SeparatorMenuItem />
-					<MenuItem fx:id="menuReset" disable="true" onAction="#handleReset" text="Reset"></MenuItem>
-					<MenuItem fx:id="menuResetDefault" onAction="#handleResetDefault" text="Reset to Default"></MenuItem>
+					<MenuItem fx:id="menuReset" disable="true" onAction="#handleReset" text="Reset" />
+					<MenuItem fx:id="menuResetDefault" onAction="#handleResetDefault" text="Reset to Default" />
 					<SeparatorMenuItem />
-					<MenuItem onAction="#handleExit" text="Exit"></MenuItem>
+					<MenuItem onAction="#handleExit" text="Exit" />
 				</Menu>
 			</menus>
 		</MenuBar>
 	</top>
 	<left>
-	<VBox >
-	<children>
-		<TextField fx:id="tfSearch" text="Search..." onAction="#handleSearch"></TextField>
-		<TreeView fx:id="treeView" showRoot="false"/>
-	</children>
-	</VBox>
-		
+		<VBox>
+			<children>
+				<TextField fx:id="tfSearch" onAction="#handleSearch" promptText="Search..." />
+				<TreeView fx:id="treeView" showRoot="false" />
+			</children>
+		</VBox>
+
 	</left>
-   <center>
-      <VBox prefHeight="400.0" prefWidth="451.0" BorderPane.alignment="CENTER">
-         <children>
-            <GridPane fx:id="propValGrid" hgap="5.0" prefHeight="180.0" prefWidth="348.0" vgap="5.0">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="216.0" minWidth="10.0" prefWidth="160.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="269.0" minWidth="10.0" prefWidth="160.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="326.0" minWidth="10.0" prefWidth="125.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-               <padding>
-                  <Insets bottom="5.0" left="5.0" top="5.0" />
-               </padding>
-            </GridPane>
-            <VBox prefHeight="159.0" prefWidth="350.0">
-               <children>
-                  <WebView fx:id="previewWeb" prefHeight="180.0" prefWidth="451.0" />
-               </children>
-            </VBox>
-            <HBox alignment="CENTER_RIGHT" prefHeight="63.0" prefWidth="212.0" spacing="20.0">
-               <children>
-                  <Button fx:id="save" disable="true" mnemonicParsing="false" onAction="#handleSave" text="Save" />
-                  <Button fx:id="reset" disable="true" mnemonicParsing="false" onAction="#handleReset" text="Reset" />
-                  <Button cancelButton="true" mnemonicParsing="false" onAction="#handleExit" text="Exit" />
-               </children>
-               <VBox.margin>
-                  <Insets right="20.0" />
-               </VBox.margin>
-            </HBox>
-         </children>
-      </VBox>
-   </center>
+	<center>
+		<VBox prefHeight="400.0" prefWidth="451.0" BorderPane.alignment="CENTER">
+			<children>
+				<GridPane fx:id="propValGrid" hgap="5.0" prefHeight="180.0" prefWidth="348.0" vgap="5.0">
+					<columnConstraints>
+						<ColumnConstraints hgrow="SOMETIMES" maxWidth="216.0" minWidth="10.0" prefWidth="160.0" />
+						<ColumnConstraints hgrow="SOMETIMES" maxWidth="269.0" minWidth="10.0" prefWidth="160.0" />
+						<ColumnConstraints hgrow="SOMETIMES" maxWidth="326.0" minWidth="10.0" prefWidth="125.0" />
+					</columnConstraints>
+					<rowConstraints>
+						<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+						<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+					</rowConstraints>
+					<padding>
+						<Insets bottom="5.0" left="5.0" top="5.0" />
+					</padding>
+				</GridPane>
+				<VBox prefHeight="159.0" prefWidth="350.0">
+					<children>
+						<WebView fx:id="previewWeb" prefHeight="180.0" prefWidth="451.0" />
+					</children>
+				</VBox>
+				<HBox alignment="CENTER_RIGHT" prefHeight="63.0" prefWidth="212.0" spacing="20.0">
+					<children>
+						<Button fx:id="save" disable="true" mnemonicParsing="false" onAction="#handleSave" text="Save" />
+						<Button fx:id="reset" disable="true" mnemonicParsing="false" onAction="#handleReset" text="Reset" />
+						<Button cancelButton="true" mnemonicParsing="false" onAction="#handleExit" text="Exit" />
+					</children>
+					<VBox.margin>
+						<Insets right="20.0" />
+					</VBox.margin>
+				</HBox>
+			</children>
+		</VBox>
+	</center>
 </BorderPane>

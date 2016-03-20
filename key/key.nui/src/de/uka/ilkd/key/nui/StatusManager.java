@@ -17,7 +17,7 @@ public class StatusManager {
         return statusUpdatedEvent;
     }
 
-    private String status;
+    private String status = null;
 
     /**
      * Shows a status on the status-bar of the ui.

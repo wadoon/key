@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.nui.util;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -49,7 +51,7 @@ public class CssFileHandler {
         }
         else {
             prefs.put(PREFERENCE_KEY_PATH, "");
-            css = NUIConstants.DEFAULT_SEQUENT_CSS;
+            css = NUIConstants.getDefaultSequentCss();
         }
         parse();
     }
@@ -79,11 +81,18 @@ public class CssFileHandler {
             return;
         }
 
-        FileWriter fw = new FileWriter(path, false);
-        fw.write(
-                "/*We recommend to only change this file using the KeY CSS Styler */ \n");
-        fw.write(css);
-        fw.close();
+        File file = new File(path);
+        Writer w = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+        try {
+            w.write("/*We recommend to only change this file using the KeY CSS Styler */ \n");
+            w.write(css);
+        }
+        catch (final IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            w.close();
+        }
     }
 
     /**
@@ -223,8 +232,7 @@ public class CssFileHandler {
                 }
                 case ',': {
                     if (selector.equals(""))
-                        System.err
-                                .println("Leading comma in selectors ignored.");
+                        System.err.println("Leading comma in selectors ignored.");
                     else
                         rule.addSelector(selector.trim());
                     selector = "";

@@ -24,7 +24,9 @@ public class CriterionAstScope implements Criterion<Integer> {
             InitialPositionTable positionTable, String[] originalLines) {
         this.criteria = criteria;
         this.positionTable = positionTable;
-        this.originalLines = originalLines;
+        if (originalLines != null) {
+            this.originalLines = (String[]) originalLines.clone();
+        }
     }
 
     @Override
