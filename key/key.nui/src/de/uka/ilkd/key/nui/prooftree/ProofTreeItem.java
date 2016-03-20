@@ -67,8 +67,16 @@ public class ProofTreeItem extends TreeItem<NUINode> {
      */
     public void applyVisibilitiyOfChildren() {
         // define new predicate for the filtered children list
-        final Predicate<ProofTreeItem> pred = (pti) -> pti.isVisible();
-        filteredChildren.setPredicate(pred);
+
+        // HINT: DO NOT TRY TO USE JAVA 8 FOR THIS! (or do it and find out why it does not work)
+
+                final Predicate<? super ProofTreeItem> pred = new Predicate<ProofTreeItem>() {
+                    @Override
+                    public boolean test(final ProofTreeItem pti) {
+                        return pti.isVisible();
+                    }
+                };
+                filteredChildren.setPredicate(pred);
     }
 
     /**
