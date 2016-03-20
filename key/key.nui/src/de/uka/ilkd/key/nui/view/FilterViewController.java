@@ -2,6 +2,8 @@ package de.uka.ilkd.key.nui.view;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
@@ -65,7 +67,7 @@ public class FilterViewController extends ViewController {
     private RadioButton selectionRadio;
 
     @FXML
-    private Button applyButton;
+    private ToggleButton applyButton;
 
     @FXML
     private RadioButton useAstScope;
@@ -87,33 +89,7 @@ public class FilterViewController extends ViewController {
 
     private FilterSelection filterSelection;
     private boolean suppressValueUpdate = false;
-
-    private void loadCurrentFilter() {
-        if (currentFilter.getIsUserCriteria()) {
-            searchText.setText(currentFilter.getSearchText());
-            userRadio.setSelected(true);
-        }
-        else {
-            selectionRadio.setSelected(true);
-        }
-        invertFilter.setSelected(currentFilter.getInvert());
-
-        linesBefore.setValue(currentFilter.getBefore());
-        linesAfter.setValue(currentFilter.getAfter());
-        filterModeBox.setValue(currentFilter.getFilterLayout());
-        switch (currentFilter.getScope()) {
-        case AST:
-            useAstScope.setSelected(true);
-            break;
-        case Text:
-            useTextScope.setSelected(true);
-            break;
-        case None:
-        default:
-            useNone.setSelected(true);
-            break;
-        }
-    }
+    private boolean suppressUsedFilterUpdates = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -156,16 +132,22 @@ public class FilterViewController extends ViewController {
 
         searchText.textProperty().addListener(
                 (o, old_val, new_val) -> currentFilter.setSearchText(new_val));
-        filterModeBox.valueProperty().addListener((o, old_val,
-                new_val) -> currentFilter.setFilterLayout(new_val));
+        filterModeBox.valueProperty().addListener((o, old_val, new_val) -> {
+            currentFilter.setFilterLayout(new_val);
+        });
 
         userRadio.selectedProperty().addListener(event -> {
             if (filterSelection != null) {
                 selectionFilterToggle.setSelected(false);
                 finishSelection();
             }
+            updateSelectionCount(0);
             currentFilter.setIsUserCriteria(true);
+            if (applyButton.isSelected())
+                getContext().setCurrentFilter(currentFilter);
         });
+
+        applyButton.selectedProperty().addListener(event -> handleApply());
 
         // default data
         filterModeBox.getItems().add(FilterLayout.Minimize);
@@ -173,9 +155,7 @@ public class FilterViewController extends ViewController {
         applyButton.setDisable(true);
 
         currentFilter = new PrintFilter();
-
-        loadCurrentFilter();
-
+        loadCurrentFilterToUi();
     }
 
     @Override
@@ -212,30 +192,73 @@ public class FilterViewController extends ViewController {
     }
 
     @FXML
-    private void handleReset() {
-        getContext().setCurrentFilter(null);
-    }
-
-    @FXML
     private void handleApply() {
-        if (filterSelection != null) {
-            selectionFilterToggle.setSelected(false);
-            finishSelection();
+        if (applyButton.isSelected()) {
+            if (filterSelection != null) {
+                selectionFilterToggle.setSelected(false);
+                finishSelection();
+            }
+            getContext().setCurrentFilter(currentFilter);
         }
-        getContext().setCurrentFilter(currentFilter);
+        else {
+            getContext().setCurrentFilter(null);
+            updateSelectionCount(0);
+        }
     }
 
     @FXML
     private void handleSelectionFilterToggled() {
         if (selectionFilterToggle.isSelected()) {
             // reset old filter to make selection more easily
+            suppressUsedFilterUpdates = true;
+            applyButton.setDisable(true);
             getContext().setCurrentFilter(null);
             filterSelection = new FilterSelection();
             currentFilter.setIsUserCriteria(false);
             getContext().activateSelectMode(filterSelection);
         }
         else {
+            applyButton.setDisable(false);
+            suppressUsedFilterUpdates = false;
             finishSelection();
+            updateUsedFilter();
+        }
+    }
+
+    private void loadCurrentFilterToUi() {
+        if (currentFilter.getIsUserCriteria()) {
+            searchText.setText(currentFilter.getSearchText());
+            userRadio.setSelected(true);
+        }
+        else {
+            selectionRadio.setSelected(true);
+        }
+        invertFilter.setSelected(currentFilter.getInvert());
+        linesBefore.setValue(currentFilter.getBefore());
+        linesAfter.setValue(currentFilter.getAfter());
+        filterModeBox.setValue(currentFilter.getFilterLayout());
+        switch (currentFilter.getScope()) {
+        case AST:
+            useAstScope.setSelected(true);
+            break;
+        case Text:
+            useTextScope.setSelected(true);
+            break;
+        case None:
+        default:
+            useNone.setSelected(true);
+            break;
+        }
+        currentFilter.addObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                updateUsedFilter();
+            }
+        });
+    }
+
+    private void updateUsedFilter() {
+        if (applyButton.isSelected() && !suppressUsedFilterUpdates) {
             getContext().setCurrentFilter(currentFilter);
         }
     }
@@ -246,6 +269,7 @@ public class FilterViewController extends ViewController {
         List<String> resolvedSelection = filterSelection.getResolvedSelection();
         currentFilter.setSelections(resolvedSelection);
         filterSelection = null;
+        updateSelectionCount(resolvedSelection.size());
     }
 
     private void updateRangeValue(Slider slider, Spinner<Integer> spinner,
@@ -270,5 +294,9 @@ public class FilterViewController extends ViewController {
             suppressValueUpdate = false;
         }
         setAction.accept(nval);
+    }
+
+    private void updateSelectionCount(int value) {
+        selectionCount.setText("(selections: " + Integer.toString(value) + ")");
     }
 }

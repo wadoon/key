@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui.filter;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Observable;
 
 /**
  * A class that handles all information needed to create a criteria for
@@ -11,27 +12,7 @@ import java.util.List;
  * @author Benedikt Gross
  *
  */
-public class PrintFilter {
-
-    private String name;
-
-    /**
-     * Name used to save this filter.
-     * 
-     * @return
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Name used to save this filter.
-     * 
-     * @return
-     */
-    public void setName(String value) {
-        name = value;
-    }
+public class PrintFilter extends Observable {
 
     private String searchText;
 
@@ -39,7 +20,11 @@ public class PrintFilter {
      * The text that should be filtered for.
      */
     public void setSearchText(String value) {
+        if (searchText == null && value == null
+                || searchText != null && searchText.equals(value))
+            return;
         searchText = value;
+        notifyChanged();
     }
 
     /**
@@ -60,6 +45,7 @@ public class PrintFilter {
         if (value == selections)
             return;
         selections = value;
+        notifyChanged();
     }
 
     /**
@@ -84,7 +70,10 @@ public class PrintFilter {
      * custom data.
      */
     public void setIsUserCriteria(boolean value) {
+        if (isUserCriteria == value)
+            return;
         isUserCriteria = value;
+        notifyChanged();
     }
 
     private int before;
@@ -102,7 +91,10 @@ public class PrintFilter {
      * each filter match. (Ignored when ast-scope is used)
      */
     public void setBefore(int value) {
+        if (before == value)
+            return;
         before = value;
+        notifyChanged();
     }
 
     private int after;
@@ -120,25 +112,31 @@ public class PrintFilter {
      * each filter match. (Ignored when ast-scope is used)
      */
     public void setAfter(int value) {
+        if (after == value)
+            return;
         after = value;
+        notifyChanged();
     }
 
     private boolean invert;
 
     /**
-     * Indicates whether the filter should be inverted. (Ignored when not ast-scope
-     * is used)
+     * Indicates whether the filter should be inverted. (Ignored when not
+     * ast-scope is used)
      */
     public boolean getInvert() {
         return invert;
     }
 
     /**
-     * Indicates whether the filter should be inverted. (Ignored when not ast-scope
-     * is used)
+     * Indicates whether the filter should be inverted. (Ignored when not
+     * ast-scope is used)
      */
     public void setInvert(boolean value) {
+        if (invert == value)
+            return;
         invert = value;
+        notifyChanged();
     }
 
     private DisplayScope scope;
@@ -154,7 +152,10 @@ public class PrintFilter {
      * Specifies the type of expansion that is used on each match.
      */
     public void setScope(DisplayScope value) {
+        if (scope == value)
+            return;
         scope = value;
+        notifyChanged();
     }
 
     private FilterLayout filterLayout;
@@ -170,7 +171,10 @@ public class PrintFilter {
      * The {link FilterLayout} of the current filter.
      */
     public void setFilterLayout(FilterLayout value) {
+        if (filterLayout == value)
+            return;
         filterLayout = value;
+        notifyChanged();
     }
 
     public PrintFilter() {
@@ -184,7 +188,6 @@ public class PrintFilter {
 
     public PrintFilter cloneFilter() {
         PrintFilter filter = new PrintFilter();
-        filter.setName(this.name);
         filter.setSelections(this.selections);
         filter.setIsUserCriteria(this.isUserCriteria);
         filter.setSearchText(this.searchText);
@@ -194,6 +197,11 @@ public class PrintFilter {
         filter.setFilterLayout(this.filterLayout);
         filter.setScope(this.scope);
         return filter;
+    }
+
+    private void notifyChanged() {
+        this.setChanged();
+        this.notifyObservers();
     }
 
     /**

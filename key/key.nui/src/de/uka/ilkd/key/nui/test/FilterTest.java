@@ -9,18 +9,6 @@ import org.junit.Test;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 
 public class FilterTest {
-
-    @Test
-    public void testPrintFilter_name() {
-        PrintFilter filter = new PrintFilter();
-        String name = "Name";
-        filter.setName(name);
-        assertEquals(name, filter.getName());
-        
-        String name2 = "Name2";
-        filter.setName(name2);
-        assertEquals(name2, filter.getName());
-    }
     
     @Test
     public void testPrintFilter_searchText() {
@@ -113,7 +101,6 @@ public class FilterTest {
         assertEquals(filter.getFilterLayout(), filter2.getFilterLayout());
         assertEquals(filter.getInvert(), filter2.getInvert());
         assertEquals(filter.getIsUserCriteria(), filter2.getIsUserCriteria());
-        assertEquals(filter.getName(), filter2.getName());
         assertEquals(filter.getScope(), filter2.getScope());
         assertEquals(filter.getSearchText(), filter2.getSearchText());
         assertEquals(filter.getSelections(), filter2.getSelections());

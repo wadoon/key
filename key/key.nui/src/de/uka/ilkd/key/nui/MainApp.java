@@ -10,23 +10,22 @@ import java.util.prefs.Preferences;
 
 import org.reflections.Reflections;
 
-import de.uka.ilkd.key.nui.view.RootLayoutController;
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
+import de.uka.ilkd.key.nui.view.RootLayoutController;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;

@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.control.SpinnerValueFactory?>
 
-<AnchorPane fx:id="filterContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="338.0" prefWidth="278.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
+<AnchorPane fx:id="filterContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="353.0" prefWidth="277.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
    <children>
       <VBox AnchorPane.bottomAnchor="37.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -48,7 +48,7 @@
                                           <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                        </padding>
                                     </ToggleButton>
-                                    <Label fx:id="selectionCount" maxHeight="1.7976931348623157E308" text="selectionCount">
+                                    <Label fx:id="selectionCount" maxHeight="1.7976931348623157E308" text="(selections: 0)">
                                        <HBox.margin>
                                           <Insets left="5.0" />
                                        </HBox.margin>
@@ -122,14 +122,13 @@
             </BorderPane>
          </children>
       </VBox>
-      <HBox alignment="CENTER" prefHeight="35.0" prefWidth="277.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+      <HBox alignment="CENTER" prefHeight="35.0" prefWidth="277.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0">
          <children>
-            <Button fx:id="applyButton" mnemonicParsing="false" onAction="#handleApply" text="Apply" />
-            <Button mnemonicParsing="false" onAction="#handleReset" text="Reset">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
-            </Button>
+            <ToggleButton fx:id="applyButton" mnemonicParsing="false" style="-fx-font-weight: bold;" text="Apply Filter">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </ToggleButton>
          </children>
       </HBox>
    </children>
