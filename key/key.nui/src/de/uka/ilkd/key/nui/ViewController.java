@@ -5,6 +5,8 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Control;
+import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -28,6 +30,7 @@ public abstract class ViewController implements Initializable {
         this.mainApp = mainApp;
         this.context = context;
         initializeAfterLoadingFxml();
+        setTooltips();
     }
 
     public Context getContext() {
@@ -78,5 +81,15 @@ public abstract class ViewController implements Initializable {
      * when any {@link ViewController} is loaded.
      */
     public void initialize(URL location, ResourceBundle resources) {
+    }
+
+    /**
+     * Virtual method. Sets tooltips for chosen elements in the corresponding
+     * view.
+     * <p>
+     * To implement use {@link Control#setTooltip(Tooltip)} to set a
+     * {@link Tooltip} for the desired {@link Control}.
+     */
+    public void setTooltips() {
     }
 }
