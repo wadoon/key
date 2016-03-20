@@ -393,11 +393,6 @@ public class CssStylerViewController extends ViewController {
     }
 
     @FXML
-    private void handleSearchClick() {
-        tfSearch.setText("");
-    }
-
-    @FXML
     private void handleSearch() {
         decollapseChildren(rootItem, tfSearch.getText());
     }
