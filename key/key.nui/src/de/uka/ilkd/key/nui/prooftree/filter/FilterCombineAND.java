@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui.prooftree.filter;
 
+import java.util.function.Predicate;
+
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 
 /**
@@ -21,6 +23,11 @@ public class FilterCombineAND implements ProofTreeFilter {
     private final ProofTreeFilter filter2;
 
     /**
+     * The filter combined of {@link #filter1} and {@link #filter2}.
+     */
+    private Predicate<NUINode> combinedFilter;
+
+    /**
      * Constructor.
      * 
      * @param filter1
@@ -29,10 +36,11 @@ public class FilterCombineAND implements ProofTreeFilter {
      *            The second filter.
      */
 
-    public FilterCombineAND(final ProofTreeFilter filter1, final ProofTreeFilter filter2) {
+    public FilterCombineAND(final ProofTreeFilter filter1,
+            final ProofTreeFilter filter2) {
         this.filter1 = filter1;
         this.filter2 = filter2;
-
+        this.combinedFilter = filter1.and(filter2);
     }
 
     @Override
@@ -41,18 +49,22 @@ public class FilterCombineAND implements ProofTreeFilter {
     }
 
     /**
-     * TODO
+     * Returns the {@link #filter1} used to create the
+     * {@link #combinedFilter}.
      * 
      * @return
+     *      The {@code filter1} of the combined filter.
      */
     public ProofTreeFilter getFilter1() {
         return filter1;
     }
 
     /**
-     * TODO
+     * Returns the {@link #filter2} used to create the
+     * {@link #combinedFilter}.
      * 
      * @return
+     *      The {@code filter2} of the combined filter.
      */
     public ProofTreeFilter getFilter2() {
         return filter2;
@@ -60,6 +72,6 @@ public class FilterCombineAND implements ProofTreeFilter {
 
     @Override
     public boolean test(final NUINode node) {
-        return filter1.test(node) && filter2.test(node);
+        return combinedFilter.test(node);
     }
 }
