@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.control.SpinnerValueFactory?>
 
-<AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="338.0" prefWidth="278.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
+<AnchorPane fx:id="filterContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="338.0" prefWidth="278.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
    <children>
       <VBox AnchorPane.bottomAnchor="37.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -48,9 +48,9 @@
                                           <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                        </padding>
                                     </ToggleButton>
-                                    <Label fx:id="selectionCount" text="selectionCount">
+                                    <Label fx:id="selectionCount" maxHeight="1.7976931348623157E308" text="selectionCount">
                                        <HBox.margin>
-                                          <Insets />
+                                          <Insets left="5.0" />
                                        </HBox.margin>
                                     </Label>
                                  </children>

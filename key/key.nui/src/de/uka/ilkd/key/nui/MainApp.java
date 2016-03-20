@@ -19,13 +19,18 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -255,8 +260,22 @@ public class MainApp extends Application {
         // resize with content on several linux systems. Remove the
         // following workaround as soon as the bug is fixed.
         alert.setResizable(true);
-        alert.getDialogPane().setPrefWidth(550.0);
 
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setPrefWidth(550.0);
+
+        // When a button is focused with arrow keys, a press of the enter key
+        // usually would still trigger the default button (JavaFX default
+        // behavior). As this led to confusion with some users, the following
+        // code makes enter trigger the focused button instead.
+        dialogPane.getButtonTypes().stream().map(dialogPane::lookupButton)
+                .forEach(button -> button.addEventHandler(KeyEvent.KEY_PRESSED,
+                        event -> {
+                            if (KeyCode.ENTER.equals(event.getCode())
+                                    && event.getTarget() instanceof Button) {
+                                ((Button) event.getTarget()).fire();
+                            }
+                        }));
         return alert;
     }
 
