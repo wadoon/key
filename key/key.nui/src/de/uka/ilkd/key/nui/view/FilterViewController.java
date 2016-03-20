@@ -18,6 +18,7 @@ import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.PrintFilter.DisplayScope;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.nui.util.NUIConstants;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -98,8 +99,6 @@ public class FilterViewController extends ViewController {
                         + "');" + "-fx-background-position: center center;"
                         + "-fx-background-repeat: no-repeat;"
                         + "-fx-background-size: contain;");
-
-        // ui bindings
         searchText.disableProperty().bind(userRadio.selectedProperty().not());
         selectionFilterToggle.disableProperty()
                 .bind(selectionRadio.selectedProperty().not());
@@ -107,10 +106,6 @@ public class FilterViewController extends ViewController {
                 .bind(useTextScope.selectedProperty().not());
         invertFilter.disableProperty()
                 .bind(useAstScope.selectedProperty().not());
-
-        // change propagation to currentFilter
-        // TODO implement all this as handling functions
-
         beforeNumber.getEditor().textProperty()
                 .addListener((o, old_val, new_val) -> {
                     updateRangeValue(linesBefore, beforeNumber,
@@ -129,24 +124,12 @@ public class FilterViewController extends ViewController {
             if (!suppressValueUpdate)
                 afterNumber.getValueFactory().setValue(new_val.intValue());
         });
-
         searchText.textProperty().addListener(
                 (o, old_val, new_val) -> currentFilter.setSearchText(new_val));
         filterModeBox.valueProperty().addListener((o, old_val, new_val) -> {
             currentFilter.setFilterLayout(new_val);
         });
-
-        userRadio.selectedProperty().addListener(event -> {
-            if (filterSelection != null) {
-                selectionFilterToggle.setSelected(false);
-                finishSelection();
-            }
-            updateSelectionCount(0);
-            currentFilter.setIsUserCriteria(true);
-            if (applyButton.isSelected())
-                getContext().setCurrentFilter(currentFilter);
-        });
-
+        userRadio.selectedProperty().addListener(this::userRadioChanged);
         applyButton.selectedProperty().addListener(event -> handleApply());
 
         // default data
@@ -225,6 +208,17 @@ public class FilterViewController extends ViewController {
         }
     }
 
+    private void userRadioChanged(Object sender) {
+        if (filterSelection != null) {
+            selectionFilterToggle.setSelected(false);
+            finishSelection();
+        }
+        updateSelectionCount(0);
+        currentFilter.setIsUserCriteria(true);
+        if (applyButton.isSelected())
+            getContext().setCurrentFilter(currentFilter);
+    }
+
     private void loadCurrentFilterToUi() {
         if (currentFilter.getIsUserCriteria()) {
             searchText.setText(currentFilter.getSearchText());
@@ -280,11 +274,9 @@ public class FilterViewController extends ViewController {
         int nval;
         try {
             nval = Integer.parseInt(spinner.getEditor().getText());
-            if (nval > slider.getMax()) {
-                suppressValueUpdate = true;
-                slider.setValue(slider.getMax());
-                suppressValueUpdate = false;
-            }
+            suppressValueUpdate = true;
+            slider.setValue(nval > slider.getMax() ? slider.getMax() : nval);
+            suppressValueUpdate = false;
             setAction.accept(nval);
         }
         catch (NumberFormatException e) {
