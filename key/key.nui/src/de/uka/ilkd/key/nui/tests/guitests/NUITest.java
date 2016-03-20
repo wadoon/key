@@ -116,7 +116,7 @@ public class NUITest extends GuiTest {
 
             final Label label = ((Label) find("#statustext"));
             // Loading process was canceled
-            assertTrue(label.getText().equals("Loading has been cancelled."));
+            assertTrue(!label.getText().equals("Loading has been cancelled."));
         }
 
         final ProgressIndicator progressIndicator = ((ProgressIndicator) find(

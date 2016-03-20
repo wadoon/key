@@ -178,10 +178,13 @@ public class MainViewController extends NUIController implements Observer {
         }
         // if no proof is loaded, use the example directory (default)
         else {
-            // TODO find a solution such that the examples can be loaded by
-            // running the JAR as well
-            // fileChooser.setInitialDirectory(
-            // new File("resources/de/uka/ilkd/key/examples"));
+            final File jarFile = new File(getClass().getProtectionDomain()
+                    .getCodeSource().getLocation().getPath());
+            if (!jarFile.isFile()) { // one for gui tests, while running
+                                     // application in ide
+                fileChooser.setInitialDirectory(
+                        new File("resources/de/uka/ilkd/key/examples"));
+            }
         }
 
         final FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
