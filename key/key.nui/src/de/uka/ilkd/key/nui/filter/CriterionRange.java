@@ -48,7 +48,7 @@ public class CriterionRange implements Criterion<Integer> {
             // TODO optimize
             IntStream.range(0, before).forEach(n -> {
                 int d = lineIndex - before + n;
-                if (d > 0)
+                if (d >= 0)
                     filterFor.add(d);
             });
             // add the element itself
