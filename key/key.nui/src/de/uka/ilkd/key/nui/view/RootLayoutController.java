@@ -17,7 +17,7 @@ import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewObserver;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.ViewSlot;
-import de.uka.ilkd.key.nui.view.menu.RecentFileMenu;
+import de.uka.ilkd.key.nui.view.menu.RecentFileMenuController;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.UnicodeHelper;
@@ -97,15 +97,13 @@ public class RootLayoutController extends ViewController {
     @FXML
     private Menu helpMenu;
     @FXML
-    private Menu recentFiles;
+    private RecentFileMenuController recentFileMenuController;
     @FXML
     private Label statusLabel;
     @FXML
     private ButtonBar debugButtons;
     @FXML
     private CheckMenuItem debugMode;
-
-    private RecentFileMenu recentFileMenu;
 
     /**
      * The constructor
@@ -169,16 +167,15 @@ public class RootLayoutController extends ViewController {
     @Override
     public void initializeAfterLoadingFxml() {
         getContext().getStatusManager().getStatusUpdatedEvent().addHandler(this::setStatus);
-        recentFileMenu = new RecentFileMenu(getContext().getKeYMediator());
-        recentFiles.getItems().add(recentFileMenu.getMenu());
+        recentFileMenuController.init(getContext().getKeYMediator());
     };
-    
+
     public void addRecentFile(String absolutePath) {
-        recentFileMenu.addRecentFile(absolutePath);
+        recentFileMenuController.addRecentFile(absolutePath);
     }
 
-    public RecentFileMenu getRecentFiles() {
-        return recentFileMenu;
+    public RecentFileMenuController getRecentFiles() {
+        return recentFileMenuController;
     }
 
     /**

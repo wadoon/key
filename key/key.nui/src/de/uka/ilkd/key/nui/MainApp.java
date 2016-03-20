@@ -57,16 +57,13 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.primaryStage.setTitle(
-                KeYResourceManager.getManager().getUserInterfaceTitle());
+        this.primaryStage.setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
 
         // Set the application icon.
-        this.primaryStage.getIcons()
-                .add(new Image(NUIConstants.KEY_WINDOW_ICON));
+        this.primaryStage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
 
         SessionSettings settings = SessionSettings.loadLastSettings();
-        boolean useBoundsSettings = settings != null
-                && !settings.getBoundsIsCorrupted();
+        boolean useBoundsSettings = settings != null && !settings.getBoundsIsCorrupted();
         Map<String, SerializableViewInformation> viewmap = new HashMap<>();
         if (useBoundsSettings) {
             primaryStage.setX(settings.getWindowX());
@@ -75,8 +72,7 @@ public class MainApp extends Application {
             primaryStage.setHeight(settings.getWindowHeight());
         }
         else
-            System.out.println(
-                    "Gui bound settings are corrupted - using default");
+            System.out.println("Gui bound settings are corrupted - using default");
         if (settings != null) {
             for (SerializableViewInformation sv : settings.getViews()) {
                 viewmap.put(sv.getFxmlUrl(), sv);
@@ -92,8 +88,7 @@ public class MainApp extends Application {
         primaryStage.show();
 
         if (useBoundsSettings) {
-            rootLayoutController
-                    .setSplitterPositions(settings.getSplitterPositions());
+            rootLayoutController.setSplitterPositions(settings.getSplitterPositions());
         }
     }
 
@@ -112,22 +107,17 @@ public class MainApp extends Application {
 
             // Show the scene containing the root layout.
             scene = new Scene(rootLayout);
-            scene.getStylesheets()
-                    .add("file:resources/css/themes/DefaultTheme.css");
+            scene.getStylesheets().add("file:resources/css/themes/DefaultTheme.css");
 
             rootLayout.prefHeightProperty().bind(scene.heightProperty());
 
-            scene.widthProperty().addListener(
-                    (observableValue, oldSceneWidth, newSceneWidth) -> {
-                        ((RootLayoutController) loader.getController())
-                                .resize();
-                    });
+            scene.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
+                ((RootLayoutController) loader.getController()).resize();
+            });
 
-            scene.heightProperty().addListener(
-                    (observableValue, oldSceneHeight, newSceneHeight) -> {
-                        ((RootLayoutController) loader.getController())
-                                .resize();
-                    });
+            scene.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> {
+                ((RootLayoutController) loader.getController()).resize();
+            });
 
             primaryStage.setScene(scene);
 
@@ -161,10 +151,8 @@ public class MainApp extends Application {
      *            ObservableList containing Strings of paths to additional CSS.
      * @return the controller for the FXML
      */
-    public ViewController openNewWindow(String title, String fxmlPath,
-            boolean resizable, boolean blockParent) {
-        return openNewWindow(title, fxmlPath, resizable, blockParent,
-                FXCollections.emptyObservableList());
+    public ViewController openNewWindow(String title, String fxmlPath, boolean resizable, boolean blockParent) {
+        return openNewWindow(title, fxmlPath, resizable, blockParent, FXCollections.emptyObservableList());
     }
 
     /**
@@ -183,8 +171,7 @@ public class MainApp extends Application {
      *            ObservableList containing Strings of paths to additional CSS.
      * @return the controller for the FXML
      */
-    public ViewController openNewWindow(String title, String fxmlPath,
-            boolean resizable, boolean blockParent,
+    public ViewController openNewWindow(String title, String fxmlPath, boolean resizable, boolean blockParent,
             ObservableList<String> additionalStylesheets) {
         Stage stage = new Stage();
         stage.setTitle(title);
@@ -194,8 +181,7 @@ public class MainApp extends Application {
             stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(scene.getWindow());
 
-        Pair<Object, Object> p = KeyFxmlLoader
-                .loadFxml(MainApp.class.getResource(fxmlPath));
+        Pair<Object, Object> p = KeyFxmlLoader.loadFxml(MainApp.class.getResource(fxmlPath));
         stage.setScene(new Scene((Parent) p.getKey()));
         stage.show();
 
@@ -204,8 +190,7 @@ public class MainApp extends Application {
         stage.setResizable(resizable);
 
         ((ViewController) p.getValue()).setStage(stage);
-        ((ViewController) p.getValue()).setMainApp(this,
-                rootLayoutController.getContext());
+        ((ViewController) p.getValue()).setMainApp(this, rootLayoutController.getContext());
         return (ViewController) p.getValue();
     }
 
@@ -224,8 +209,7 @@ public class MainApp extends Application {
      *            the alertType
      * @return the result of the dialog
      */
-    public Optional<ButtonType> showAlert(String title, String header,
-            String message, AlertType alertType) {
+    public Optional<ButtonType> showAlert(String title, String header, String message, AlertType alertType) {
         return createAlert(title, header, message, alertType).showAndWait();
     }
 
@@ -244,8 +228,7 @@ public class MainApp extends Application {
      *            the alertType
      * @return the alert
      */
-    public Alert createAlert(String title, String header, String message,
-            AlertType alertType) {
+    public Alert createAlert(String title, String header, String message, AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(header);
@@ -268,13 +251,11 @@ public class MainApp extends Application {
         // behavior). As this led to confusion with some users, the following
         // code makes enter trigger the focused button instead.
         dialogPane.getButtonTypes().stream().map(dialogPane::lookupButton)
-                .forEach(button -> button.addEventHandler(KeyEvent.KEY_PRESSED,
-                        event -> {
-                            if (KeyCode.ENTER.equals(event.getCode())
-                                    && event.getTarget() instanceof Button) {
-                                ((Button) event.getTarget()).fire();
-                            }
-                        }));
+                .forEach(button -> button.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+                    if (KeyCode.ENTER.equals(event.getCode()) && event.getTarget() instanceof Button) {
+                        ((Button) event.getTarget()).fire();
+                    }
+                }));
         return alert;
     }
 
@@ -311,8 +292,7 @@ public class MainApp extends Application {
      * Alert that pops up when trying to close the application.
      */
     public void closeWindowAlert() {
-        if (showAlert("Close KeY", null, "Really quit?", AlertType.CONFIRMATION)
-                .get() != ButtonType.OK)
+        if (showAlert("Close KeY", null, "Really quit?", AlertType.CONFIRMATION).get() != ButtonType.OK)
             return;
 
         saveAndClose();
@@ -327,8 +307,7 @@ public class MainApp extends Application {
         settings.setWindowY(primaryStage.getY());
         settings.setWindowHeight(primaryStage.getHeight());
         settings.setWindowWidth(primaryStage.getWidth());
-        settings.setSplitterPositions(
-                rootLayoutController.getSplitterPositions());
+        settings.setSplitterPositions(rootLayoutController.getSplitterPositions());
         settings.setViews(rootLayoutController.getViewInformations());
         settings.saveAsLast();
         rootLayoutController.getRecentFiles().store(PathConfig.getRecentFileStorage());
@@ -336,24 +315,20 @@ public class MainApp extends Application {
         primaryStage.close();
     }
 
-    private void scanForViews(
-            Map<String, SerializableViewInformation> lastViewPositions) {
+    private void scanForViews(Map<String, SerializableViewInformation> lastViewPositions) {
         ViewObserver rootViewObserver = new ViewObserver(rootLayoutController);
-        Set<Class<?>> annotated = reflections
-                .getTypesAnnotatedWith(KeYView.class);
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYView.class);
         for (Class<?> c : annotated) {
             KeYView annot = c.getAnnotation(KeYView.class);
 
             URL fxmlUrl = c.getResource(annot.path());
             ViewPosition pos = annot.preferredPosition();
-            SerializableViewInformation sv = lastViewPositions
-                    .containsKey(fxmlUrl.getPath())
-                            ? lastViewPositions.get(fxmlUrl.getPath()) : null;
+            SerializableViewInformation sv = lastViewPositions.containsKey(fxmlUrl.getPath())
+                    ? lastViewPositions.get(fxmlUrl.getPath()) : null;
             if (sv != null) {
                 pos = sv.getViewPosition();
             }
-            ViewInformation info = new ViewInformation(annot.title(), fxmlUrl,
-                    pos, annot.hasMenuItem());
+            ViewInformation info = new ViewInformation(annot.title(), fxmlUrl, pos, annot.hasMenuItem());
             info.addObserver(rootViewObserver);
             rootLayoutController.registerView(info, annot.accelerator());
             if (sv != null)
@@ -364,8 +339,7 @@ public class MainApp extends Application {
     }
 
     private void scanForMenus() {
-        Set<Class<?>> annotated = reflections
-                .getTypesAnnotatedWith(KeYMenu.class);
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYMenu.class);
         for (Class<?> c : annotated) {
             KeYMenu annot = c.getAnnotation(KeYMenu.class);
             // not used yet
@@ -374,8 +348,7 @@ public class MainApp extends Application {
                 rootLayoutController.registerMenu(c.getResource(annot.path()));
             }
             else {
-                rootLayoutController.registerMenuEntry(
-                        c.getResource(annot.path()), annot.parentMenu());
+                rootLayoutController.registerMenuEntry(c.getResource(annot.path()), annot.parentMenu());
             }
             // }
         }
@@ -397,10 +370,8 @@ public class MainApp extends Application {
                 isDebugView = true;
                 break;
             case "reset":
-                System.out.println(
-                        "'reset' paramter found -> resetting preferences");
-                Preferences prefs = Preferences
-                        .userNodeForPackage(SessionSettings.class);
+                System.out.println("'reset' paramter found -> resetting preferences");
+                Preferences prefs = Preferences.userNodeForPackage(SessionSettings.class);
                 try {
                     prefs.clear();
                 }
