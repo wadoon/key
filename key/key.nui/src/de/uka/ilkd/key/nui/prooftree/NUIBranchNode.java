@@ -104,7 +104,7 @@ public class NUIBranchNode extends NUINode {
         final boolean thisIsASearchResult = getLabel().toLowerCase().contains(term.toLowerCase());
 
         setSearchResult(thisIsASearchResult);
-        return children.parallelStream().mapToInt((child) -> child.search(term)).sum()
+        return children.stream()/*.parallel()*/.mapToInt((child) -> child.search(term)).sum()
                 + (thisIsASearchResult ? 1 : 0);
     }
 
