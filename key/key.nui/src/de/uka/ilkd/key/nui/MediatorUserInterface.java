@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -12,6 +13,7 @@ import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -20,16 +22,21 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.MiscTools;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * provides functionallity of UserInterface logic for the KeYMediator
@@ -252,5 +259,68 @@ public class MediatorUserInterface
                 .getProofOblInput() instanceof KeYUserProblemFile) {
             ((KeYUserProblemFile) poContainer.getProofOblInput()).close();
         }
+    }
+    
+    public File saveProof(Proof proof, String fileExtension) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save current Proof");
+        fileChooser.getExtensionFilters().addAll(
+                new ExtensionFilter("Proofs, KeY or Java Files", "*.proof", "*.key", "*.java"),
+                new ExtensionFilter("All Files", "*.*"));
+
+        String defaultFileName = suggestDefaultFileName(proof, fileExtension);
+        fileChooser.setInitialFileName(defaultFileName);
+        File file = fileChooser.showSaveDialog(null);
+        
+        if (file == null) {
+            statusManager.setStatus("No file name provided");
+            return null;
+        }
+        
+        final String filename = file.getAbsolutePath();
+        ProofSaver saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+        String errorMsg;
+        try {
+            errorMsg = saver.save();
+        }
+        catch (IOException e) {
+            errorMsg = e.toString();
+        }
+        if (errorMsg != null) {
+            statusManager.setStatus("Saving Proof failed. Error: " + errorMsg);
+        }
+        else {
+            proof.setProofFile(file);
+            statusManager.setStatus("Proof saved in: " + file.getAbsolutePath());
+        }
+        return file;
+    }
+
+    private String suggestDefaultFileName(Proof proof, String fileExtension) {
+        File selectedFile = null;
+        if (proof != null) {
+            selectedFile = proof.getProofFile();
+        }
+
+        // Suggest default file name if required
+        final String defaultName;
+        if (selectedFile == null) {
+            defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
+        }
+        else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
+            defaultName = selectedFile.getName();
+        }
+        else {
+            String proofName = proof.name().toString();
+            if (proofName.endsWith(".key")) {
+                proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
+            }
+            else if (proofName.endsWith(".proof")) {
+                proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
+            }
+            System.out.println(proofName);
+            defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
+        }
+        return defaultName;
     }
 }
