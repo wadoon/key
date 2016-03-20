@@ -30,7 +30,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;

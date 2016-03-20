@@ -11,14 +11,16 @@ import java.util.LinkedHashMap;
 import java.util.Properties;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
-public class RecentFileMenu {
+public class RecentFileMenuController extends ViewController {
     /**
      * The maximum number of recent files displayed.
      */
@@ -29,6 +31,7 @@ public class RecentFileMenu {
 
     private EventHandler<ActionEvent> actionHandler;
 
+    @FXML
     private Menu menu;
 
     /**
@@ -53,8 +56,7 @@ public class RecentFileMenu {
      *            files to be displayed initially. Or <code>null</code> to use
      *            no initial information.
      */
-    public RecentFileMenu(final KeYMediator mediator) {
-        this.menu = new Menu("Recent Files");
+    public void init(final KeYMediator mediator) {
         this.maxNumberOfEntries = MAX_RECENT_FILES;
         this.recentFiles = new LinkedHashMap<MenuItem, RecentFileEntry>();
 
