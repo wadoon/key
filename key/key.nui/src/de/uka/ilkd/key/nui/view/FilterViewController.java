@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nui.view;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -18,9 +19,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
@@ -37,13 +38,13 @@ public class FilterViewController extends ViewController {
     private Slider linesBefore;
 
     @FXML
-    private Label beforeNumber;
+    private Spinner<Integer> beforeNumber;
 
     @FXML
     private Slider linesAfter;
 
     @FXML
-    private Label afterNumber;
+    private Spinner<Integer> afterNumber;
 
     @FXML
     private CheckBox invertFilter;
@@ -76,6 +77,7 @@ public class FilterViewController extends ViewController {
     private GridPane resultRangeText;
 
     private FilterSelection filterSelection;
+    private boolean suppressValueUpdate = false;
 
     private void loadCurrentFilter() {
         if (currentFilter.getIsUserCriteria()) {
@@ -117,14 +119,23 @@ public class FilterViewController extends ViewController {
 
         // change propagation to currentFilter
         // TODO implement all this as handling functions
+
+        beforeNumber.valueProperty().addListener((o, old_val, new_val) -> {
+            updateRangeValue(linesBefore, beforeNumber,
+                    currentFilter::setBefore);
+        });
+        afterNumber.valueProperty().addListener((o, old_val, new_val) -> {
+            updateRangeValue(linesAfter, afterNumber, currentFilter::setAfter);
+        });
         linesBefore.valueProperty().addListener((o, old_val, new_val) -> {
-            beforeNumber.setText(Integer.toString(new_val.intValue()));
-            currentFilter.setBefore(new_val.intValue());
+            if (!suppressValueUpdate)
+                beforeNumber.getValueFactory().setValue(new_val.intValue());
         });
         linesAfter.valueProperty().addListener((o, old_val, new_val) -> {
-            afterNumber.setText(Integer.toString(new_val.intValue()));
-            currentFilter.setAfter(new_val.intValue());
+            if (!suppressValueUpdate)
+                afterNumber.getValueFactory().setValue(new_val.intValue());
         });
+
         searchText.textProperty().addListener(
                 (o, old_val, new_val) -> currentFilter.setSearchText(new_val));
         filterModeBox.valueProperty().addListener((o, old_val,
@@ -144,7 +155,9 @@ public class FilterViewController extends ViewController {
         applyButton.setDisable(true);
 
         currentFilter = new PrintFilter();
+
         loadCurrentFilter();
+
     }
 
     @Override
@@ -217,5 +230,21 @@ public class FilterViewController extends ViewController {
         filterSelection = null;
 
         selectionFilterToggle.setStyle("-fx-background-color: lightgrey;");
+    }
+
+    private void updateRangeValue(Slider slider, Spinner<Integer> spinner,
+            Consumer<Integer> setAction) {
+        try {
+            int nval = spinner.getValue();
+            if (nval > slider.getMax()) {
+                suppressValueUpdate = true;
+                slider.setValue(slider.getMax());
+                suppressValueUpdate = false;
+            }
+            setAction.accept(nval);
+        }
+        catch (NumberFormatException e) {
+            return;
+        }
     }
 }
