@@ -328,6 +328,12 @@ public class TacletInstantiationViewController extends ViewController {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setHeaderText(header);
         alert.setContentText(message);
+        
+        // FIXME Due to a bug in javafx (JDK-8087981) alerts do not
+        // resize with content on several linux systems. Remove the
+        // following workaround as soon as the bug is fixed.
+        alert.setResizable(true);
+        
         alert.show();
     }
 

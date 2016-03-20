@@ -18,10 +18,13 @@ import de.uka.ilkd.key.nui.ViewObserver;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.ViewSlot;
 import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.UnicodeHelper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
@@ -172,15 +175,21 @@ public class RootLayoutController extends ViewController {
     };
 
     /**
-     * Opens a new Window with About Functionality. View: AboutView.fxml
+     * Shows a dialog with information about KeY.
      * 
      * @param event
      *            ActionEvent
      */
     @FXML
     private void handleAbout(ActionEvent event) {
-        getMainApp().openNewWindow("About KeY",
-                "view/AboutView.fxml", true, true);
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("About KeY");
+        alert.setContentText(KeYConstants.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
+                + "\n\nWWW: http://key-project.org/"
+                + "\n\nVersion " + KeYConstants.VERSION);
+        alert.setHeaderText("The KeY Project");
+        alert.getDialogPane().setPrefWidth(550.0);
+        alert.showAndWait();
     }
 
     /**

@@ -98,7 +98,8 @@ public class SequentViewController extends ViewController {
     public void loadNodeToView(Node node) {
         showSequent(node);
         tacletInfoViewController.showTacletInfo(node);
-        notationInfo.refresh(services, checkBoxPrettySyntax.isSelected(), checkBoxUnicode.isSelected());
+        notationInfo.refresh(services, checkBoxPrettySyntax.isSelected(),
+                checkBoxUnicode.isSelected());
         useRegex();
         printSequent();
         RuleApp app = node.getAppliedRuleApp();
@@ -124,15 +125,19 @@ public class SequentViewController extends ViewController {
 
         sequentOptions.setDisable(true);
         sequentOptions.setExpanded(false);
-        sequentOptions.disabledProperty().addListener((observable, oldValue, newValue) -> {
-            sequentOptions.getScene().getAccelerators()
-                    .put(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), () -> {
-                sequentOptions.setAnimated(false);
-                sequentOptions.setExpanded(true);
-                searchBox.requestFocus();
-                sequentOptions.setAnimated(true);
-            });
-        });
+        sequentOptions.disabledProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    sequentOptions.getScene()
+                            .getAccelerators().put(
+                                    new KeyCodeCombination(KeyCode.F,
+                                            KeyCombination.CONTROL_DOWN),
+                                    () -> { 
+                        sequentOptions.setAnimated(false);
+                        sequentOptions.setExpanded(!sequentOptions.isExpanded());
+                        searchBox.requestFocus();
+                        sequentOptions.setAnimated(true);
+                    });
+                });
 
         // Disable the standard context menu, as it only offers a page refresh,
         // which is not needed.
@@ -154,8 +159,10 @@ public class SequentViewController extends ViewController {
      */
     @Override
     public void setTooltips() {
-        checkBoxRegexSearch.setTooltip(new Tooltip("Evaluate as regular expression."));
-        checkBoxPrettySyntax.setTooltip(new Tooltip("If ticked, infix notations are used."));
+        checkBoxRegexSearch
+                .setTooltip(new Tooltip("Evaluate as regular expression."));
+        checkBoxPrettySyntax.setTooltip(
+                new Tooltip("If ticked, infix notations are used."));
         checkBoxUnicode.setTooltip(new Tooltip(
                 "If ticked, formulae are displayed with special Unicode characters (such as `\u22C0`) instead of the traditional ASCII ones. "
                         + "Only works in combination with pretty printing (see above)."));
@@ -183,8 +190,10 @@ public class SequentViewController extends ViewController {
         this.updateView();
 
         if (event.isAltDown()) {
-            getContext().getStatusManager().setStatus(TermInfoPrinter.printTermInfo(sequent,
-                    (abstractSyntaxTree.getPosInSequent(pos, new IdentitySequentPrintFilter(sequent)))));
+            getContext().getStatusManager()
+                    .setStatus(TermInfoPrinter.printTermInfo(sequent,
+                            (abstractSyntaxTree.getPosInSequent(pos,
+                                    new IdentitySequentPrintFilter(sequent)))));
         }
     }
 
@@ -201,9 +210,11 @@ public class SequentViewController extends ViewController {
             apply(eventArgs);
             updateView();
         });
-        getContext().getSelectModeActivateEvent().addHandler(this::selectModeActivated);
+        getContext().getSelectModeActivateEvent()
+                .addHandler(this::selectModeActivated);
 
-        posTranslator = new PositionTranslator(getContext().getCssFileHandler());
+        posTranslator = new PositionTranslator(
+                getContext().getCssFileHandler());
 
         tacletInfoViewController.setMainApp(getMainApp(), getContext());
     }
@@ -211,7 +222,8 @@ public class SequentViewController extends ViewController {
     // TODO add comments
     private void initializeSearchBox() {
         searchBox.setOnKeyReleased(event -> {
-            if (searchBox.getText().equals(".") && checkBoxRegexSearch.isSelected()) {
+            if (searchBox.getText().equals(".")
+                    && checkBoxRegexSearch.isSelected()) {
                 printer.applyFreetextSearch("");
                 updateView();
                 event.consume();
@@ -234,9 +246,11 @@ public class SequentViewController extends ViewController {
         services = proof.getServices();
         sequent = node.sequent();
 
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        printer = new SequentPrinter(getContext().getCssFileHandler(), abstractSyntaxTree, getContext());
+        printer = new SequentPrinter(getContext().getCssFileHandler(),
+                abstractSyntaxTree, getContext());
         sequentChanged = true;
 
         sequentOptions.setDisable(false);
@@ -248,7 +262,8 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void usePrettySyntax() {
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         if (!checkBoxPrettySyntax.isSelected()) {
             notationInfo.refresh(services, false, false);
@@ -269,7 +284,8 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void useUnicode() {
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         notationInfo.refresh(services, true, checkBoxUnicode.isSelected());
         printSequent();
@@ -289,7 +305,8 @@ public class SequentViewController extends ViewController {
      * webview. Use this after changes of the NotationInfo of the mediator.
      */
     public void forceRefresh() {
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
+                services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         printSequent();
         updateView();
@@ -326,12 +343,14 @@ public class SequentViewController extends ViewController {
         // styling update.
         if (sequentChanged && sequentLoaded) {
             sequentChanged = false;
-            Pair<Double, Double> newDimensions = posTranslator.getProofDimensions();
+            Pair<Double, Double> newDimensions = posTranslator
+                    .getProofDimensions();
 
             // JavaFX 8 has MaxHeight 8192. If bigger, an error will occur.
             // Shall be patched in JDK9
             if (newDimensions.second > 8192) {
-                System.out.println("Proof might be too large with Size " + newDimensions.second);
+                System.out.println("Proof might be too large with Size "
+                        + newDimensions.second);
                 textArea.setPrefHeight(8192);
             }
             else {
@@ -351,11 +370,13 @@ public class SequentViewController extends ViewController {
         lastFilter = args;
 
         ArrayList<Integer> lines = new ArrayList<Integer>(
-                SequentFilterer.applyFilter(proofString, args.getFilter(), abstractSyntaxTree));
+                SequentFilterer.applyFilter(proofString, args.getFilter(),
+                        abstractSyntaxTree));
 
         if (args.getFilter() != null) {
             printer.applyFilter(lines, args.getFilter().getFilterLayout());
-            posTranslator.applyFilter(lines, args.getFilter().getFilterLayout());
+            posTranslator.applyFilter(lines,
+                    args.getFilter().getFilterLayout());
         }
         else {
             // filter layout does not matter here, but can't be acquired from
@@ -371,7 +392,8 @@ public class SequentViewController extends ViewController {
 
     private void selectModeActivated(SelectModeEventArgs eventArgs) {
         filterSelection = eventArgs.getFilterSelection();
-        filterSelection.getSelectionModeFinishedEvent().addHandler(this::finishSelectionMode);
+        filterSelection.getSelectionModeFinishedEvent()
+                .addHandler(this::finishSelectionMode);
         selectionModeIsActive = true;
     }
 
@@ -418,21 +440,25 @@ public class SequentViewController extends ViewController {
                     Goal goal = mediator.getSelectedGoal();
                     if (goal != null) {
                         int idx = posTranslator.getCharIdxUnderPointer(event);
-                        PosInSequent pos = abstractSyntaxTree.getPosInSequent(idx,
-                                new IdentitySequentPrintFilter(sequent));
+                        PosInSequent pos = abstractSyntaxTree.getPosInSequent(
+                                idx, new IdentitySequentPrintFilter(sequent));
 
                         if (pos == null)
                             return;
 
                         FXMLLoader loader = new FXMLLoader();
-                        loader.setLocation(TacletMenuController.class.getResource("TacletMenu.fxml"));
+                        loader.setLocation(TacletMenuController.class
+                                .getResource("TacletMenu.fxml"));
                         tacletMenu = loader.load();
                         // Give the controller access to the main app.
-                        TacletMenuController controller = loader.getController();
-                        controller.setMainApp(this.getMainApp(), this.getContext());
+                        TacletMenuController controller = loader
+                                .getController();
+                        controller.setMainApp(this.getMainApp(),
+                                this.getContext());
                         controller.init(pos, this);
 
-                        tacletMenu.show(textArea, event.getScreenX(), event.getScreenY());
+                        tacletMenu.show(textArea, event.getScreenX(),
+                                event.getScreenY());
 
                         enableMouseOver(false);
                         tacletMenu.setOnHiding(evt -> {
