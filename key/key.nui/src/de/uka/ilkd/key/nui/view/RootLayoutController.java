@@ -379,7 +379,7 @@ public class RootLayoutController extends ViewController {
         if (view.getUiTab() == null) {
             view.loadUiTab(this);
         }
-        setPosition(view, view.getPreferedPosition());
+        setPosition(view, view.getCurrentPosition());
     }
 
     /**
