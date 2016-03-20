@@ -9,7 +9,13 @@ import java.util.LinkedList;
  * @version 1.0
  *
  */
-public class TextFilteringHandler {
+public final class TextFilteringHandler {
+
+    /**
+     * Utility class should not be instantiated.
+     */
+    private TextFilteringHandler() {
+    }
 
     /**
      * Returns a subtree consisting of only matching nodes.
@@ -19,9 +25,10 @@ public class TextFilteringHandler {
      * @param search
      *            the query used for filtering
      * @return the root node of a filtered tree or null if not found
+     * @throws CloneNotSupportedException
      */
-    public static NUINode getMatchedSubtree(final NUINode root,
-            final String search) {
+    public static NUINode getMatchedSubtree(final NUINode root, final String search)
+            throws CloneNotSupportedException {
         // label matches -> copy subtree
         if (matchesFilter(root, search)) {
             // TODO set parent??
@@ -36,8 +43,7 @@ public class TextFilteringHandler {
 
             // add matching children
             for (final NUINode child : rootBN.getChildren()) {
-                final NUINode childMatchedSubTree = getMatchedSubtree(child,
-                        search);
+                final NUINode childMatchedSubTree = getMatchedSubtree(child, search);
                 if (childMatchedSubTree != null) {
                     matchedChildren.add(childMatchedSubTree);
                 }
@@ -46,13 +52,11 @@ public class TextFilteringHandler {
             // if children match it is also a match
             if (!matchedChildren.isEmpty()) {
 
-                final NUIBranchNode filteredRoot = rootBN
-                        .cloneWithoutChildren();
+                final NUIBranchNode filteredRoot = rootBN.cloneWithoutChildren();
                 filteredRoot.setChildren(matchedChildren);
 
                 // set parent for children
-                matchedChildren
-                        .forEach((child) -> child.setParent(filteredRoot));
+                matchedChildren.forEach((child) -> child.setParent(filteredRoot));
 
                 return filteredRoot;
 
@@ -72,8 +76,7 @@ public class TextFilteringHandler {
      *            the filter string
      * @return true iff the node matches the filter rule
      */
-    private static boolean matchesFilter(final NUINode node,
-            final String filter) {
+    private static boolean matchesFilter(final NUINode node, final String filter) {
         final String lblLC = node.getLabel().toLowerCase();
         final String filterLC = filter.toLowerCase();
         return lblLC.contains(filterLC);

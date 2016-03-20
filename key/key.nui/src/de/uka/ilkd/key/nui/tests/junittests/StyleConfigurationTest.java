@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.stream.Stream;
 import org.junit.Test;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
@@ -31,11 +32,20 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 public class StyleConfigurationTest {
 
     /**
-     * The proof file used for this test.
+     * The testfile 01 used for the tests.
      */
-    private final static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
-    private final static String TESTFILE_02 = "resources//de/uka//ilkd//key//examples//example02.proof"; // NOPMD
-    private final static String TESTFILE_03 = "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof"; // NOPMD
+
+    private static String TESTFILE_01 = "resources//de/uka//ilkd//key//examples//example01.proof";
+
+    /**
+     * The testfile 02 used for the tests.
+     */
+    private static String TESTFILE_02 = "resources//de/uka//ilkd//key//examples//example02.proof";
+
+    /**
+     * The testfile 03 used for the tests.
+     */
+    private static String TESTFILE_03 = "resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof";
 
     /**
      * The ProofTreeVisualizer used to load the test file.
@@ -66,8 +76,10 @@ public class StyleConfigurationTest {
 
         if (proof == null) {
             fail("Proof file could not be loaded.");
+
         }
         else {
+
             proof.setProofFile(proofFileName);
 
             // initialize ProofConverter object used for tests
@@ -75,18 +87,30 @@ public class StyleConfigurationTest {
         }
     }
 
+    /**
+     * Checks whether the {@link StyleConfiguration} applied to
+     * {@link #TESTFILE_01} is correct.
+     */
     @Test
     public void styleConfigurationTest01() {
         prepareTest(TESTFILE_01);
         assertEquals(checkConfiguration(), 0);
     }
 
+    /**
+     * Checks whether the {@link StyleConfiguration} applied to
+     * {@link #TESTFILE_02} is correct.
+     */
     @Test
     public void styleConfigurationTest02() {
         prepareTest(TESTFILE_02);
         assertEquals(checkConfiguration(), 0);
     }
 
+    /**
+     * Checks whether the {@link StyleConfiguration} applied to
+     * {@link #TESTFILE_03} is correct.
+     */
     @Test
     public void styleConfigurationTest03() {
         prepareTest(TESTFILE_03);
@@ -100,10 +124,12 @@ public class StyleConfigurationTest {
      * @return The number of nodes which have an incorrect StyleConfiguration
      *         assigned.
      */
+
     private static int checkConfiguration() {
         final ProofTreeStyler ptStyler = new ProofTreeStyler(null);
         final Stream<NUINode> nstream = ptVisualizer.getRootNode().asList().stream().filter(
-                (node) -> !(node.getStyleConfiguration().equals(ptStyler.getStyleConfiguration(node))));
+                (nd) -> (!(nd.getStyleConfiguration().equals(ptStyler.getStyleConfiguration(nd)))));
+
         return ((int) nstream.count());
     }
 }

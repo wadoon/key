@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nui.prooftree;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.controller.TreeViewController;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeCell;
@@ -48,20 +47,20 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      */
     private Label label;
 
-    private final ChangeListener<Boolean> searchResultListener = new ChangeListener<Boolean>() {
-        @Override
-        public void changed(ObservableValue<? extends Boolean> observable,
-                Boolean didMatchSearch, Boolean nowMatchesSearch) {
-            final ObservableList<String> styles = getStyleClass();
-            final String cssClassHighlight = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
-            if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
-                styles.add(cssClassHighlight);
-            }
-            if (nowMatchesSearch) {
-                styles.remove(cssClassHighlight);
-            }
-            ProofTreeCell.this.updateItem(ProofTreeCell.this.getItem(), false);
+    /**
+     * The change listener registered to this ProofTreeCell.
+     */
+    private final ChangeListener<Boolean> searchResultListener = (observable,
+            didMatchSearch, nowMatchesSearch) -> {
+        final ObservableList<String> styles = getStyleClass();
+        final String cssClassHighlight = ProofTreeStyleConstants.CSS_NODE_HIGHLIGHT;
+        if (nowMatchesSearch && !styles.contains(cssClassHighlight)) {
+            styles.add(cssClassHighlight);
         }
+        if (nowMatchesSearch) {
+            styles.remove(cssClassHighlight);
+        }
+        ProofTreeCell.this.updateItem(ProofTreeCell.this.getItem(), false);
     };
 
     /**
@@ -82,10 +81,16 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * The constructor of the ProofTreeCell.
      * 
      * @param icf
-     *            the icon factory used to display node icons
+     *            the {@link IconFactory} used to display node icons
+     * @param fh
+     *          the {@link FilteringHandler} used to filter this ProofTreeCell
+     * @param tvc
+     *          the {@link TreeViewController} associated with the TreeView
      */
+
     public ProofTreeCell(final IconFactory icf, final FilteringHandler filteringHandler,
             final TreeViewController treeViewController) {
+
         super();
         this.filteringHandler = filteringHandler;
         this.iconFactory = icf;

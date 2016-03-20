@@ -41,93 +41,108 @@ import javafx.util.StringConverter;
 public class StrategyViewController extends NUIController implements Observer {
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired", "PMD.AvoidDuplicateLiterals"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired",
+            "PMD.AvoidDuplicateLiterals" })
     private Button goButton;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private Slider maxRuleAppSlider;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private Label maxRuleAppLabel;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ImageView goButtonImage;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup stopAt;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup proofSplitting;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup loopTreatment;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup blockTreatment;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup methodTreatment;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup dependencyContracts;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup queryTreatment;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup expandLocalQueries;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup arithmeticTreatment;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup quantifierTreatment;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup classAxiom;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup autoInduction;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup userOptions1;
 
-    @FXML@
-    SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @FXML
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup userOptions2;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private ToggleGroup userOptions3;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private AnchorPane strategyViewPane;
 
     @FXML
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
     private AnchorPane proofSearchStrategy;
 
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
-    private int currentSliderValue = 10;
+    /**
+     * The default value for the maximum number of rule applications.
+     */
+    private static int DEFAULT_MAX_RULE_APPL = 10;
 
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.CommentRequired"})
+    /**
+     * The current value of the slider.
+     */
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+    private int currentSliderValue = DEFAULT_MAX_RULE_APPL;
+
+    /**
+     * The instance of the strategyWrapper containing the radio buttons of the
+     * StrategyView.
+     */
+
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.CommentRequired" })
+
     private StrategyWrapper strategyWrapper = null;
 
     @Override
@@ -136,21 +151,24 @@ public class StrategyViewController extends NUIController implements Observer {
         strategyWrapper = new StrategyWrapper();
         addStrategyViewSwing(null);
         final IconFactory iconFactory = new IconFactory(15, 15);
+
         goButtonImage.setImage(iconFactory.getImage(IconFactory.GO_BUTTON).getImage());
 
         // Set formatter of 'Maximum rules' slider
 
         maxRuleAppSlider.setLabelFormatter(new StringConverter<Double>() {
             @Override
+
             public String toString(final Double n) {
                 final int val = (int) Math.pow(10, n);
-                if (val < 10000){
+                if (val < 10000) {
                     return String.valueOf(val);
                 }
-                if (val < 1000000){
+                if (val < 1000000) {
                     return (val / 1000) + "k";
                 }
                 return (val / 1000000) + "M";
+
             }
 
             @Override
@@ -161,14 +179,23 @@ public class StrategyViewController extends NUIController implements Observer {
 
         // Adds a listener to the 'Maximum rules' slider, used to update the
         // label with the currently chosen value
+
         maxRuleAppSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             calculateCurrentSliderValue(newVal);
             maxRuleAppLabel.setText(bundle.getString("maxRuleAppLabel") + " " + currentSliderValue);
+
         });
         maxRuleAppLabel.setText(bundle.getString("maxRuleAppLabel") + " " + currentSliderValue);
     }
 
-    public void handleOnAction(final ActionEvent e) throws ControllerNotFoundException {
+    /**
+     * Action handler for the 'Start' (auto proving) button.
+     * 
+     * @param actionEvent
+     * @throws ControllerNotFoundException
+     */
+    public void handleOnAction(final ActionEvent actionEvent) throws ControllerNotFoundException {
+
         String filename;
         try {
             filename = dataModel.getLoadedTreeViewState().getProof().getProofFile().getName();
@@ -179,6 +206,7 @@ public class StrategyViewController extends NUIController implements Observer {
         }
 
         // retrieve proof file and init proofStarter
+
         final TreeViewState treeViewState = dataModel.getTreeViewState(filename);
         final Proof proof = treeViewState.getProof();
         final ProofStarter proofStarter = new ProofStarter(false);
@@ -206,6 +234,7 @@ public class StrategyViewController extends NUIController implements Observer {
             final Proof updatedProof = proofStarter.getProof();
 
             // create new tree from updateProof
+
             final ProofTreeItem fxtree = new ProofTreeConverter(updatedProof).createFXProofTree();
 
             // Create new TreeViewState for updatedProof
@@ -265,12 +294,16 @@ public class StrategyViewController extends NUIController implements Observer {
                 currentSliderValue = 1000000;
                 break;
             default:
+
+                // This should never happen
+
                 break;
             }
         }
     }
 
     @Override
+
     public void update(final Observable obs, final Object arg) {
         final TreeViewState treeViewState = ((DataModel) obs).getTreeViewState(arg.toString());
 
@@ -279,6 +312,12 @@ public class StrategyViewController extends NUIController implements Observer {
         }
     }
 
+    /**
+     * Adds the StrategySelectionView from Swing to the JavaFX StrategyView.
+     * 
+     * @param proof
+     *            The proof file loaded in the treeView.
+     */
     private void addStrategyViewSwing(final Proof proof) {
         proofSearchStrategy.getChildren().clear();
         SwingUtilities.invokeLater(() -> {

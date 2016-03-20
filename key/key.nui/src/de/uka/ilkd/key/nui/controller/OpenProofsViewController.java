@@ -29,7 +29,10 @@ public class OpenProofsViewController extends NUIController
     private Pane openProofsViewPane;
     @FXML
     private ListView<String> listView;
-    
+
+    /**
+     * The context menu shown when the user right-clicks on an loaded proof.
+     */
     private ContextMenu contextMenu;
 
     @Override
@@ -44,7 +47,8 @@ public class OpenProofsViewController extends NUIController
             }
         });
 
-        final MenuItem deleteProof = new MenuItem(bundle.getString("closeProof"));
+        final MenuItem deleteProof = new MenuItem(
+                bundle.getString("closeProof"));
         contextMenu = new ContextMenu(deleteProof);
 
         // Action to be performed if user clicks on 'Close Proof' in the context
@@ -56,6 +60,10 @@ public class OpenProofsViewController extends NUIController
         });
     }
 
+    /**
+     * Shows the save dialog after the user closed a proof via the
+     * {@link #contextMenu}.
+     */
     private void showSaveDialog() {
         // If file was not changed: do nothing
         if (!dataModel.getLoadedTreeViewState().isModified()) {
@@ -77,7 +85,8 @@ public class OpenProofsViewController extends NUIController
         // --- define button types
         final ButtonType buttonSaveAs = new ButtonType(
                 bundle.getString("dialogSaveAs"));
-        final ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
+        final ButtonType buttonClose = new ButtonType(
+                bundle.getString("dialogExit"));
         final ButtonType buttonAbort = new ButtonType(
                 bundle.getString("dialogAbort"));
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);

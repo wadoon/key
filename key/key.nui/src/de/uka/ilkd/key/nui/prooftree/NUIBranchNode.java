@@ -57,6 +57,7 @@ public class NUIBranchNode extends NUINode {
      * Sets the children of the branch node.
      * 
      * @param children
+     *            The children to set for the branch node.
      */
     public void setChildren(final List<NUINode> children) {
         this.children = children;
@@ -99,7 +100,9 @@ public class NUIBranchNode extends NUINode {
         }
 
         // case: Non-Empty search term given
+
         final boolean thisIsASearchResult = getLabel().toLowerCase().contains(term.toLowerCase());
+
         setSearchResult(thisIsASearchResult);
         return children.parallelStream().mapToInt((child) -> child.search(term)).sum()
                 + (thisIsASearchResult ? 1 : 0);
@@ -148,10 +151,12 @@ public class NUIBranchNode extends NUINode {
 
     @Override
     public List<NUINode> asList() {
+
         final List<NUINode> list = new LinkedList<>();
         list.add(this);
         children.forEach((child) -> list.addAll(child.asList()));
         return list;
+
     }
 
 }

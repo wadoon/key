@@ -13,11 +13,13 @@ public class FilterCombineAND implements ProofTreeFilter {
     /**
      * The first filter used for combination.
      */
+
     private final ProofTreeFilter filter1;
     /**
      * The second filter used for combination.
      */
     private final ProofTreeFilter filter2;
+
     /**
      * Constructor.
      * 
@@ -26,9 +28,11 @@ public class FilterCombineAND implements ProofTreeFilter {
      * @param filter2
      *            The second filter.
      */
+
     public FilterCombineAND(final ProofTreeFilter filter1, final ProofTreeFilter filter2) {
         this.filter1 = filter1;
         this.filter2 = filter2;
+
     }
 
     @Override
@@ -38,6 +42,7 @@ public class FilterCombineAND implements ProofTreeFilter {
 
     /**
      * TODO
+     * 
      * @return
      */
     public ProofTreeFilter getFilter1() {
@@ -46,6 +51,7 @@ public class FilterCombineAND implements ProofTreeFilter {
 
     /**
      * TODO
+     * 
      * @return
      */
     public ProofTreeFilter getFilter2() {

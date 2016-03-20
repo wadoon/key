@@ -9,9 +9,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.sun.javafx.collections.ObservableMapWrapper;
-
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.nui.TreeViewState;
@@ -30,7 +28,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -63,7 +61,26 @@ public class MainViewController extends NUIController implements Observer {
      * Provides an enum for the available places in the main window.
      */
     public enum Place {
-        BOTTOM, HIDDEN, LEFT, MIDDLE, RIGHT
+        /**
+         * Indicates that the view is placed in the bottom pane.
+         */
+        BOTTOM,
+        /**
+         * Indicates that the view is not placed in any view and thus is hidden.
+         */
+        HIDDEN,
+        /**
+         * Indicates that the view is placed in the left pane.
+         */
+        LEFT,
+        /**
+         * Indicates that the view is placed in the middle pane.
+         */
+        MIDDLE,
+        /**
+         * Indicates that the view is placed in the right pane.
+         */
+        RIGHT
     }
 
     // Definition of GUI fields
@@ -98,7 +115,7 @@ public class MainViewController extends NUIController implements Observer {
      * An atomic boolean to indicate if loading is in progress While this is set
      * to true, the loading task can be cancelled.
      */
-    final private AtomicBoolean isLoadingProof = new AtomicBoolean(false);
+    private final AtomicBoolean isLoadingProof = new AtomicBoolean(false);
 
     /**
      * The thread that is used for the loading task.
@@ -106,9 +123,9 @@ public class MainViewController extends NUIController implements Observer {
     private Thread loadingThread;
 
     /**
-     * Includes the components which were added to the main Window
+     * Includes the components which were added to the main Window.
      */
-    final private Map<String, Pane> components = new HashMap<>();
+    private final Map<String, Pane> components = new HashMap<>();
 
     /**
      * Stores the position of components added to the SplitPane. Other views can
@@ -161,8 +178,10 @@ public class MainViewController extends NUIController implements Observer {
         }
         // if no proof is loaded, use the example directory (default)
         else {
-           // fileChooser.setInitialDirectory(
-           //         new File("resources/de/uka/ilkd/key/examples"));
+            // TODO find a solution such that the examples can be loaded by
+            // running the JAR as well
+            // fileChooser.setInitialDirectory(
+            // new File("resources/de/uka/ilkd/key/examples"));
         }
 
         final FileChooser.ExtensionFilter extFilterProof = new FileChooser.ExtensionFilter(
@@ -248,7 +267,8 @@ public class MainViewController extends NUIController implements Observer {
         // --- define button types
         final ButtonType buttonSaveAs = new ButtonType(
                 bundle.getString("dialogSaveAs"));
-        final ButtonType buttonClose = new ButtonType(bundle.getString("dialogExit"));
+        final ButtonType buttonClose = new ButtonType(
+                bundle.getString("dialogExit"));
         final ButtonType buttonAbort = new ButtonType(
                 bundle.getString("dialogAbort"));
         alert.getButtonTypes().setAll(buttonSaveAs, buttonClose, buttonAbort);
@@ -302,6 +322,9 @@ public class MainViewController extends NUIController implements Observer {
         saveProofAsDialog();
     }
 
+    /**
+     * Shows a save dialog with a file chooser.
+     */
     public void saveProofAsDialog() {
         // Get loaded proof
         final Proof loadedProof = dataModel.getLoadedTreeViewState().getProof();
@@ -388,7 +411,8 @@ public class MainViewController extends NUIController implements Observer {
      */
     private void selectToggle(final String componentName, final Place place) {
         try {
-            for (final Toggle t : nui.getToggleGroup(componentName).getToggles()) {
+            for (final Toggle t : nui.getToggleGroup(componentName)
+                    .getToggles()) {
                 if (t.getUserData().equals(place)) {
                     t.setSelected(true);
                 }
@@ -403,16 +427,18 @@ public class MainViewController extends NUIController implements Observer {
      * Handles the ActionEvent resulting in the user adding, hiding or moving
      * GUI components via the View menu. Usually <b> not to be called by
      * developers. </b>
-     *
-     * @param e
-     *            The ActionEvent
+     * 
+     * @return EventHandler<ActionEvent> The action event associated with the
+     *         clicked menu entry.
      */
     public EventHandler<ActionEvent> getNewHandleLoadComponent() {
         return ((actionEvent) -> {
-            RadioMenuItem clickedItem = (RadioMenuItem) actionEvent.getSource();
-            String componentName = (String) // e.g. "treeView", "proofView"
-            clickedItem.getProperties().get("componentName");
-            String clickedText = clickedItem.getText();
+            final RadioMenuItem clickedItem = (RadioMenuItem) actionEvent
+                    .getSource();
+            // e.g. "treeView", "proofView"
+            final String componentName = (String) clickedItem.getProperties()
+                    .get("componentName");
+            final String clickedText = clickedItem.getText();
             Place place;
 
             if (clickedItem.getText().equals(bundle.getString("left"))) {
@@ -567,17 +593,17 @@ public class MainViewController extends NUIController implements Observer {
                     isLoadingProof.set(true);
 
                     // important to initialize KeYEnvironment
-                    MainWindow mainWindow = MainWindow.getInstance();
+                    final MainWindow mainWindow = MainWindow.getInstance();
                     mainWindow.setVisible(false);
                     // load proof
-                    System.out.println("Start loading proof: "+ proofFileName);
+                    System.out.println("Start loading proof: " + proofFileName);
                     final KeYEnvironment<?> environment = KeYEnvironment.load(
                             JavaProfile.getDefaultInstance(), proofFileName,
                             null, null, null, true);
                     final Proof proof = environment.getLoadedProof();
 
                     proof.setProofFile(proofFileName);
-                    
+
                     System.out.println("loading finished!");
 
                     // convert proof to fx tree

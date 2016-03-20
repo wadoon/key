@@ -10,7 +10,6 @@ import de.uka.ilkd.key.nui.DataModel;
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
-import de.uka.ilkd.key.nui.exceptions.NoSearchViewAddedException;
 import de.uka.ilkd.key.nui.prooftree.FilteringHandler;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
@@ -59,7 +58,7 @@ public class TreeViewController extends NUIController implements Observer {
     private TreeView<NUINode> proofTreeView;
 
     /**
-     * TODO
+     * A reference to the controller associated with the searchView.
      */
     private SearchViewController searchViewController;
     /**
@@ -69,7 +68,7 @@ public class TreeViewController extends NUIController implements Observer {
 
     /**
      * The VBox containing both the TreeView and the Anchor Pane where the
-     * Search elements are.
+     * Search elements are. Includes the Sub-Window for search.
      */
     @FXML
     private VBox treeViewPane;
@@ -171,6 +170,7 @@ public class TreeViewController extends NUIController implements Observer {
      * @throws NoSearchViewAddedException
      */
     public final void openSearchView() {
+
         if (searchViewPane != null || searchViewController != null) {
 
             searchViewController.initSearch(proofTreeView, proofTreeCells, treeViewPane);
@@ -180,50 +180,55 @@ public class TreeViewController extends NUIController implements Observer {
             }
         }
     }
+
     /**
      * TODO
-     * @param filteringHandler
-     */
-    public void setFh(final FilteringHandler filteringHandler) {
-        this.filteringHandler = filteringHandler;
-    }
-    /**
-     * TODO
+     * 
      * @param filteringHandler
      */
     public void setFilteringHandler(final FilteringHandler filteringHandler) {
         this.filteringHandler = filteringHandler;
     }
+
     /**
      * TODO
+     * 
      * @param icf
      */
     public void setIcf(final IconFactory icf) {
         this.icf = icf;
     }
+
     /**
      * TODO
+     * 
      * @param proofTreeView
      */
     public void setProofTreeView(final TreeView<NUINode> proofTreeView) {
         this.proofTreeView = proofTreeView;
     }
+
     /**
      * TODO
+     * 
      * @param searchViewController
      */
     public void setSearchViewController(final SearchViewController searchViewController) {
         this.searchViewController = searchViewController;
     }
+
     /**
      * TODO
+     * 
      * @param searchViewPane
      */
     public void setSearchViewPane(final Pane searchViewPane) {
         this.searchViewPane = searchViewPane;
     }
+
     /**
      * TODO
+     * 
      * @param treeViewPane
      */
     public void setTreeViewPane(final VBox treeViewPane) {
@@ -250,10 +255,11 @@ public class TreeViewController extends NUIController implements Observer {
      */
     private void registerTreeCell(final ProofTreeCell treeCell) {
         proofTreeCells.add(treeCell);
+
     }
 
     /**
-     * init() is called by the NUIController constructor
+     * init() is called by the NUIController constructor.
      */
     @Override
     protected void init() {
@@ -263,7 +269,8 @@ public class TreeViewController extends NUIController implements Observer {
         Platform.runLater(() -> {
             // listener for opening search view
             try {
-                ((MainViewController) nui.getController("MainView")).registerKeyListener((event) -> {
+                ((MainViewController) nui.getController("MainView"))
+                        .registerKeyListener((event) -> {
                     if (event.getCode().equals(KeyCode.F) && event.isShortcutDown()
                             && dataModel.getLoadedTreeViewState() != null) {
                         openSearchView();
@@ -282,12 +289,6 @@ public class TreeViewController extends NUIController implements Observer {
             });
 
             // add CSS file to view
-            // TODO check if command is equivalent
-            /*
-             * final String cssPath = this.getClass() .getResource(
-             * "../components/" + ProofTreeStyleConstants.CSS_FILE)
-             * .toExternalForm(); proofTreeView.getStylesheets().add(cssPath);
-             */
             proofTreeView.getStylesheets()
                     .add("/de/uka/ilkd/key/nui/components/" + ProofTreeStyleConstants.CSS_FILE);
         });
@@ -295,4 +296,5 @@ public class TreeViewController extends NUIController implements Observer {
         // register to the data model
         dataModel.addObserver(this);
     }
+
 }

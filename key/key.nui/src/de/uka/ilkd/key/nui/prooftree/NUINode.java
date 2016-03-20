@@ -72,7 +72,7 @@ public abstract class NUINode implements Cloneable {
     private final SimpleStringProperty serialNumber = new SimpleStringProperty();
 
     /**
-     * TODO
+     * The {@link StyleConfiguration} of the NUINode.
      */
     private StyleConfiguration style;
 
@@ -117,6 +117,7 @@ public abstract class NUINode implements Cloneable {
      */
     @Override
     public abstract NUINode clone() throws CloneNotSupportedException;
+
 
     /**
      * Retrieves the label (name) of the node. <br>
@@ -460,7 +461,9 @@ public abstract class NUINode implements Cloneable {
      * purposes.
      */
     protected void setStyleConfiguration() {
+
         this.style = new ProofTreeStyler().getStyleConfiguration(this);
+
     }
 
 }

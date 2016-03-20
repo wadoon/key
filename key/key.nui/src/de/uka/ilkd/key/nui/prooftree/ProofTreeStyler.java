@@ -140,13 +140,14 @@ public final class ProofTreeStyler {
 
         @Override
         public int hashCode() {
-            int prime = 31;
+            final int prime = 31;
             int result = 1;
             result = prime * result + getOuterType().hashCode();
             result = prime * result + ((cssClasses == null) ? 0 : cssClasses.hashCode());
             result = prime * result + ((iconImage == null) ? 0 : iconImage.hashCode());
             return result;
         }
+
 
         /**
          * Defines the iconImage to be set to the StyleConfiguration, overwrites
@@ -160,6 +161,13 @@ public final class ProofTreeStyler {
             iconImage.setId(iconFileName);
         }
 
+        /**
+         * Returns the outer, enclosing instance if the class is an inner class
+         * (non-static nested class).
+         * 
+         * @return The outer, enclosing instance, iff the class is an non-static
+         *         nested class.
+         */
         private ProofTreeStyler getOuterType() {
             return ProofTreeStyler.this;
         }
@@ -177,6 +185,9 @@ public final class ProofTreeStyler {
 
     /**
      * Creates a new ProofTreeStyler with the ProofTreeCell ptc assigned to it.
+     * * @param ptc
+     *            The {@link ProofTreeCell} associated with this
+     *            ProofTreeStyler.
      */
     public ProofTreeStyler(final ProofTreeCell ptc) {
         this.ptc = ptc;
@@ -197,7 +208,9 @@ public final class ProofTreeStyler {
         final StyleConfiguration scfg = node.getStyleConfiguration();
 
         // Apply CSS classes
+
         final List<String> cssClasses = scfg.getCssClasses();
+
         cssClasses.forEach(cssClass -> label.getStyleClass().add(cssClass));
 
         // Apply icon image

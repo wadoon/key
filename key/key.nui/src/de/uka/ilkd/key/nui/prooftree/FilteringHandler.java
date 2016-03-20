@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
@@ -36,16 +35,28 @@ public class FilteringHandler {
     /**
      * A map storing filters with their respective activation flag.
      */
+
     final private Map<ProofTreeFilter, Boolean> filtersMap = Collections
             .synchronizedMap(new ConcurrentHashMap<>());
 
     /**
      * The data model.
      */
-    final private DataModel dataModel;
+    private final DataModel dataModel;
+
+    /**
+     * Path where filter classes are stored.
+     */
+    static final String FILTER_PATH = "filter/";
+
+    /**
+     * Prefix for binary class files.
+     */
+    static final String BINARY_NAME_PREFIX = "de.uka.ilkd.key.nui.prooftree.filter.";
 
     /**
      * TODO
+     * 
      * @return
      */
     public DataModel getDataModel() {
@@ -92,10 +103,6 @@ public class FilteringHandler {
     private List<ProofTreeFilter> searchFilterClasses() {
         final List<ProofTreeFilter> filters = new LinkedList<>();
 
-        // Path were filter class's are stored
-        final String PATH = "filter/";
-        // Prefix for binary class names
-        final String BINARY_NAME_PREFIX = "de.uka.ilkd.key.nui.prooftree.filter.";
         // path of the jar file
         final File jarFile = new File(
                 getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
@@ -108,7 +115,9 @@ public class FilteringHandler {
                 final Enumeration<JarEntry> entries = jar.entries();
                 while (entries.hasMoreElements()) {
                     final String fileName = entries.nextElement().getName();
+
                     if (fileName.matches("(de/uka/ilkd/key/nui/prooftree/filter/).*(.class)")) {
+
                         final URL url = new File(fileName).toURI().toURL();
                         listOfURLs.add(url);
                         listOfFileNames.add(fileName.substring(fileName.lastIndexOf('/') + 1,
@@ -117,6 +126,7 @@ public class FilteringHandler {
                 }
             }
             catch (IOException e) {
+
                 // TODO Auto-generated catch block
                 // TODO maybe we should throw a RuntimeException
                 e.printStackTrace();
@@ -124,7 +134,8 @@ public class FilteringHandler {
         }
         else {// Run with IDE
               // Look for all class files in PATH and store their urls
-            final File[] files = new File(getClass().getResource(PATH).getPath()).listFiles();
+            final File[] files = new File(getClass().getResource(FILTER_PATH).getPath())
+                    .listFiles();
 
             for (final File file : files) {
                 if (file.isFile() && file.getName().matches(".*(.class)")) {
@@ -159,9 +170,11 @@ public class FilteringHandler {
                         + fileName.substring(0, fileName.lastIndexOf('.'));
 
                 // Load possible filter class
+
                 final Class<?> myClass = classLoader.loadClass(binaryClassName);
                 // Load annotations of the class
-                final Annotation[] annotations = myClass.getAnnotationsByType(FilterAnnotation.class);
+                final Annotation[] annotations = myClass
+                        .getAnnotationsByType(FilterAnnotation.class);
 
                 // check if isFilter is true
                 for (final Annotation annotation : annotations) {

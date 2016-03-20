@@ -77,15 +77,19 @@ public class ProofTreeContextMenu extends ContextMenu {
      * The constructor.
      * 
      * @param treeItem
-     *            the treeItem of node
+     *            the {@link TreeItem} of the node
      * @param treeView
-     *            the treeview that treeItem is in
+     *            the {@link TreeView} which contains the treeItem
      * @param icf
-     *            an icon factory for creating icons
+     *            the {@link IconFactory} for creating icons
+     * @param fh
+     *            the {@link FilteringHandler} for filtering the tree
+     * @param tvc
+     *            the {@link TreeViewController} associated with the treeView
      */
     public ProofTreeContextMenu(final TreeItem<NUINode> treeItem,
             final TreeView<NUINode> treeView, final IconFactory icf,
-            final FilteringHandler fh, TreeViewController tvc) {
+            final FilteringHandler fh, final TreeViewController tvc) {
         super();
 
         this.treeItem = treeItem;
@@ -101,8 +105,8 @@ public class ProofTreeContextMenu extends ContextMenu {
     }
 
     /**
-     * {@inheritDoc} This method is called to show the context menu. Displays and
-     * fills the context menu.
+     * {@inheritDoc} This method is called to show the context menu. Displays
+     * and fills the context menu.
      */
     @Override
     public final void show() {
@@ -182,15 +186,27 @@ public class ProofTreeContextMenu extends ContextMenu {
         mISearch.setOnAction(aEvt -> treeViewController.openSearchView());
     }
 
+    /**
+     * Adds the filter entries to the context menu.
+     */
     private void addMenuItemsFilter() {
-        Map<ProofTreeFilter, Boolean> a = fh.getFiltersMap();
+        final Map<ProofTreeFilter, Boolean> a = fh.getFiltersMap();
         for (Entry<ProofTreeFilter, Boolean> k : a.entrySet()) {
             addMenuItemFilter(k.getKey(), k.getValue());
         }
     }
 
-    private void addMenuItemFilter(ProofTreeFilter k, boolean initState) {
-        CheckMenuItem cmi = new CheckMenuItem(k.getContextMenuItemText());
+    /**
+     * Configures the filter context menu entry.
+     * 
+     * @param k
+     *            The filter to configure.
+     * @param initState
+     *            Indicates whether the filter is selected by default or not.
+     */
+    private void addMenuItemFilter(final ProofTreeFilter k,
+            final boolean initState) {
+        final CheckMenuItem cmi = new CheckMenuItem(k.getContextMenuItemText());
         cmi.setSelected(initState);
 
         cmi.selectedProperty().addListener((observable, oldValue, newValue) -> {
