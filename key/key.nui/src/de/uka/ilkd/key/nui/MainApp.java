@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import org.reflections.Reflections;
 
@@ -31,6 +33,7 @@ import javafx.util.Pair;
 public class MainApp extends Application {
 
     private static boolean isDebugView = false;
+
     public static boolean isDebugView() {
         return isDebugView;
     }
@@ -53,7 +56,8 @@ public class MainApp extends Application {
                 KeYResourceManager.getManager().getUserInterfaceTitle());
 
         // Set the application icon.
-        this.primaryStage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
+        this.primaryStage.getIcons()
+                .add(new Image(NUIConstants.KEY_WINDOW_ICON));
 
         SessionSettings settings = SessionSettings.loadLastSettings();
         boolean useBoundsSettings = settings != null
@@ -290,9 +294,8 @@ public class MainApp extends Application {
             if (sv != null)
                 info.setIsActive(sv.getIsActibe());
             else
-                info.setIsActive(true);
+                info.setIsActive(annot.defaultActive());
         }
-        System.out.println("Views: " + annotated.size());
     }
 
     private void scanForMenus() {
@@ -311,7 +314,6 @@ public class MainApp extends Application {
             }
             // }
         }
-        System.out.println("Menus: " + annotated.size());
     }
 
     /**
@@ -325,8 +327,23 @@ public class MainApp extends Application {
 
     public static void main(String[] args) {
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("debug")) {
+            switch (args[i]) {
+            case "debug":
                 isDebugView = true;
+                break;
+            case "reset":
+                System.out.println("'reset' paramter found -> resetting preferences");
+                Preferences prefs = Preferences
+                .userNodeForPackage(SessionSettings.class);
+                try {
+                    prefs.clear();
+                }
+                catch (BackingStoreException e) {
+                    e.printStackTrace();
+                }
+                break;
+            default:
+                break;
             }
         }
         launch(args);

@@ -115,6 +115,12 @@ public class SessionSettings {
         if (windowY < 0)
             windowY = 0;
 
+        // catch negative size, because bounds.contains does not handle this
+        if(windowHeight < 0 || windowWidth < 0){
+            boundsCorrupted = true;
+            return;
+        }
+        
         // get screens for x and y position (regardless of size)
         List<Screen> containers = Screen.getScreensForRectangle(windowX,
                 windowY, 1, 1);
@@ -135,7 +141,6 @@ public class SessionSettings {
         checkBounds();
         if (boundsCorrupted)
             return;
-
         Preferences prefs = Preferences
                 .userNodeForPackage(SessionSettings.class);
         prefs.putDouble("windowHeight", windowHeight);
