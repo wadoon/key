@@ -17,14 +17,13 @@ import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewObserver;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.ViewSlot;
-import de.uka.ilkd.key.nui.util.NUIConstants;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.UnicodeHelper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.CheckMenuItem;
@@ -39,7 +38,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
@@ -51,8 +49,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class RootLayoutController extends ViewController {
 
     private static final int MAXMENUENTRIES = 8;
-    private static final Image STATUSLOGO = new Image(
-            "file:resources/images/key-color-transparent-background.png");
+    private static final Image STATUSLOGO = new Image("file:resources/images/key-color-transparent-background.png");
     private static final String STATUSWELCOMETEXT = KeYConstants.COPYRIGHT
             + "\nKeY is free Software and comes with ABSOLUTELY NO WARRANTY";
 
@@ -141,24 +138,18 @@ public class RootLayoutController extends ViewController {
                 boolean success = false;
                 if (event.getDragboard().hasString()) {
                     String id = event.getDragboard().getString();
-                    allViews.get(Integer.parseInt(id))
-                            .setCurrentPosition(getTabPosition(node));
+                    allViews.get(Integer.parseInt(id)).setCurrentPosition(getTabPosition(node));
                     success = true;
                 }
                 event.setDropCompleted(success);
                 event.consume();
             });
         });
-        viewSlots.put(ViewPosition.BOTTOMLEFT,
-                new ViewSlot(ViewPosition.BOTTOMLEFT, bottomLeft));
-        viewSlots.put(ViewPosition.BOTTOMRIGHT,
-                new ViewSlot(ViewPosition.BOTTOMRIGHT, bottomRight));
-        viewSlots.put(ViewPosition.CENTER,
-                new ViewSlot(ViewPosition.CENTER, center));
-        viewSlots.put(ViewPosition.TOPLEFT,
-                new ViewSlot(ViewPosition.TOPLEFT, topLeft));
-        viewSlots.put(ViewPosition.TOPRIGHT,
-                new ViewSlot(ViewPosition.TOPRIGHT, topRight));
+        viewSlots.put(ViewPosition.BOTTOMLEFT, new ViewSlot(ViewPosition.BOTTOMLEFT, bottomLeft));
+        viewSlots.put(ViewPosition.BOTTOMRIGHT, new ViewSlot(ViewPosition.BOTTOMRIGHT, bottomRight));
+        viewSlots.put(ViewPosition.CENTER, new ViewSlot(ViewPosition.CENTER, center));
+        viewSlots.put(ViewPosition.TOPLEFT, new ViewSlot(ViewPosition.TOPLEFT, topLeft));
+        viewSlots.put(ViewPosition.TOPRIGHT, new ViewSlot(ViewPosition.TOPRIGHT, topRight));
 
         statusLabel.setGraphic(new ImageView(STATUSLOGO));
         statusLabel.setText(STATUSWELCOMETEXT);
@@ -172,8 +163,7 @@ public class RootLayoutController extends ViewController {
 
     @Override
     public void initializeAfterLoadingFxml() {
-        getContext().getStatusManager().getStatusUpdatedEvent()
-                .addHandler(this::setStatus);
+        getContext().getStatusManager().getStatusUpdatedEvent().addHandler(this::setStatus);
     };
 
     /**
@@ -185,10 +175,8 @@ public class RootLayoutController extends ViewController {
     @FXML
     private void handleAbout(ActionEvent event) {
         getMainApp().showAlert("About KeY", "The KeY Project",
-                KeYConstants.COPYRIGHT.replace("and",
-                        "\n" + UnicodeHelper.emSpaces(8) + "and")
-                        + "\n\nWWW: http://key-project.org/" + "\n\nVersion "
-                        + KeYConstants.VERSION,
+                KeYConstants.COPYRIGHT.replace("and", "\n" + UnicodeHelper.emSpaces(8) + "and")
+                        + "\n\nWWW: http://key-project.org/" + "\n\nVersion " + KeYConstants.VERSION,
                 AlertType.INFORMATION);
     }
 
@@ -197,8 +185,7 @@ public class RootLayoutController extends ViewController {
      */
     @FXML
     private void loadDefaultProof() {
-        getContext().getKeYMediator().getUI()
-                .loadProblem(new File("resources/proofs/gcd.closed.proof"));
+        getContext().getKeYMediator().getUI().loadProblem(new File("resources/proofs/gcd.closed.proof"));
     }
 
     /**
@@ -206,8 +193,7 @@ public class RootLayoutController extends ViewController {
      */
     @FXML
     private void loadBigProof() {
-        getContext().getKeYMediator().getUI().loadProblem(
-                new File("resources/SampleProof/sampleProof.proof"));
+        getContext().getKeYMediator().getUI().loadProblem(new File("resources/SampleProof/sampleProof.proof"));
     }
 
     /**
@@ -215,8 +201,7 @@ public class RootLayoutController extends ViewController {
      */
     @FXML
     private void loadProofSplitTest() {
-        getContext().getKeYMediator().getUI()
-                .loadProblem(new File("resources/proofs/testSplit.key"));
+        getContext().getKeYMediator().getUI().loadProblem(new File("resources/proofs/testSplit.key"));
     }
 
     /**
@@ -225,8 +210,7 @@ public class RootLayoutController extends ViewController {
      */
     @FXML
     private void loadModelSearchVsBasicTest() {
-        getContext().getKeYMediator().getUI().loadProblem(
-                new File("resources/proofs/testModelSearchVsBasic.key"));
+        getContext().getKeYMediator().getUI().loadProblem(new File("resources/proofs/testModelSearchVsBasic.key"));
     }
 
     /**
@@ -234,8 +218,8 @@ public class RootLayoutController extends ViewController {
      */
     @FXML
     private void loadSolvableProof() {
-        getContext().getKeYMediator().getUI().loadProblem(new File(
-                "resources/proofs/IndistinguishablePathConditions.proof"));
+        getContext().getKeYMediator().getUI()
+                .loadProblem(new File("resources/proofs/IndistinguishablePathConditions.proof"));
     }
 
     /**
@@ -243,8 +227,8 @@ public class RootLayoutController extends ViewController {
      */
     @FXML
     private void loadUnsolvableProof() {
-        getContext().getKeYMediator().getUI().loadProblem(new File(
-                "resources/proofs/IndistinguishablePathConditions.twoJoins.proof"));
+        getContext().getKeYMediator().getUI()
+                .loadProblem(new File("resources/proofs/IndistinguishablePathConditions.twoJoins.proof"));
     }
 
     @FXML
@@ -275,9 +259,8 @@ public class RootLayoutController extends ViewController {
         setStatus("Loading Proof...");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a proof to load");
-        fileChooser.getExtensionFilters()
-                .addAll(new ExtensionFilter("Proofs, KeY or Java Files",
-                        "*.proof", "*.key", "*.java"),
+        fileChooser.getExtensionFilters().addAll(
+                new ExtensionFilter("Proofs, KeY or Java Files", "*.proof", "*.key", "*.java"),
                 new ExtensionFilter("All Files", "*.*"));
 
         if (file != null) {
@@ -288,8 +271,7 @@ public class RootLayoutController extends ViewController {
             // TODO reset initial directory to "../" (changed for faster access
             // to
             // proofs for testing purposes)
-            fileChooser.setInitialDirectory(
-                    new File("../key.core.test/resources/testcase/join"));
+            fileChooser.setInitialDirectory(new File("../key.core.test/resources/testcase/join"));
         }
 
         file = fileChooser.showOpenDialog(null);
@@ -299,6 +281,18 @@ public class RootLayoutController extends ViewController {
             return;
         }
         getContext().getKeYMediator().getUI().loadProblem(file);
+    }
+
+    @FXML
+    private void handleSave() {
+        if (getContext().getKeYMediator().ensureProofLoaded()) {
+            // Try to save back to file where proof was initially loaded from
+            final Proof selectedProof = getContext().getKeYMediator().getSelectedProof();
+            getContext().getUserInterface().saveProof(selectedProof, ".proof");
+        }
+        else {
+            setStatus("No proof loaded. Oops...");
+        }
     }
 
     private void setStatus(String status) {
@@ -441,8 +435,7 @@ public class RootLayoutController extends ViewController {
      */
     public ViewPosition getTabPosition(Node node) {
         for (ViewSlot slot : viewSlots.values()) {
-            if (slot.getUiPane().getChildren().size() == 1
-                    && slot.getUiPane().getChildren().get(0) == node)
+            if (slot.getUiPane().getChildren().size() == 1 && slot.getUiPane().getChildren().get(0) == node)
                 return slot.getViewPosition();
         }
         return null;
@@ -568,20 +561,17 @@ public class RootLayoutController extends ViewController {
      */
     public void registerMenu(URL sourcePath) {
         // add additional menus right before the "Help" entry
-        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu),
-                loadFxmlFromContext(sourcePath));
+        menuBar.getMenus().add(menuBar.getMenus().indexOf(helpMenu), loadFxmlFromContext(sourcePath));
     }
 
-    public void registerMenuEntry(URL sourcePath, String parentMenu)
-            throws IllegalStateException {
+    public void registerMenuEntry(URL sourcePath, String parentMenu) throws IllegalStateException {
         for (Menu m : menuBar.getMenus()) {
             if (m.getText().equals(parentMenu)) {
                 m.getItems().add(loadFxmlFromContext(sourcePath));
                 return;
             }
         }
-        throw new IllegalStateException(
-                "Menu " + parentMenu + " was not found");
+        throw new IllegalStateException("Menu " + parentMenu + " was not found");
     }
 
     /**
@@ -590,8 +580,8 @@ public class RootLayoutController extends ViewController {
      */
     public List<Double> getSplitterPositions() {
         double[] vertical = mainSplitPane.getDividerPositions();
-        return Arrays.asList(vertical[0], leftPane.getDividerPositions()[0],
-                vertical[1], rightPane.getDividerPositions()[0]);
+        return Arrays.asList(vertical[0], leftPane.getDividerPositions()[0], vertical[1],
+                rightPane.getDividerPositions()[0]);
     }
 
     public List<ViewInformation> getViewInformations() {
@@ -610,20 +600,15 @@ public class RootLayoutController extends ViewController {
 
     @FXML
     private void handleSequentCssStylerAction() {
-        getMainApp().openNewWindow("Sequent CSS Styler",
-                "view/CssStylerView.fxml", true, true);
+        getMainApp().openNewWindow("Sequent CSS Styler", "view/CssStylerView.fxml", true, true);
     }
 
     @FXML
     private void openInNew() {
-        de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator()
-                .getSelectedNode();
+        de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator().getSelectedNode();
 
-        ViewInformation info = new ViewInformation(
-                node.serialNr() + ": " + node.name(),
-                StaticSequentViewController.class.getResource(
-                        "StaticSequentView.fxml"),
-                ViewPosition.CENTER, false);
+        ViewInformation info = new ViewInformation(node.serialNr() + ": " + node.name(),
+                StaticSequentViewController.class.getResource("StaticSequentView.fxml"), ViewPosition.CENTER, false);
 
         // if moved to other menu outside of RootLayoutController, swap the
         // following lines
@@ -636,8 +621,7 @@ public class RootLayoutController extends ViewController {
         info.setIsActive(true);
 
         Platform.runLater(() -> {
-            ((StaticSequentViewController) info.getController())
-                    .getSequentViewController().loadNodeToView(node);
+            ((StaticSequentViewController) info.getController()).getSequentViewController().loadNodeToView(node);
         });
     }
 }

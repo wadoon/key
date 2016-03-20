@@ -26,16 +26,26 @@
       				<Menu mnemonicParsing="false" text="File">
       					<items>
       						<MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open" />
+                        <Menu mnemonicParsing="false" text="Open Recent..." />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleSave" text="Save" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
       						<MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit" />
       					</items>
       				</Menu>
-      				<Menu mnemonicParsing="false" text="Edit">
-      					<items>
-      						<MenuItem mnemonicParsing="false" onAction="#handleSequentCssStylerAction" text="Sequent CSS Styler" />
+      				<Menu mnemonicParsing="false" text="Edit" />
+                  <Menu mnemonicParsing="false" text="Window">
+                    <items>
+                        <Menu fx:id="viewsMenu" mnemonicParsing="false" text="Show/Hide Views" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <Menu mnemonicParsing="false" text="Preferences">
+                           <items>
+            						<MenuItem mnemonicParsing="false" onAction="#handleSequentCssStylerAction" text="Edit Sequent Appearance (CSS-Styler)" />
+                           </items>
+                        </Menu>
       						<MenuItem mnemonicParsing="false" onAction="#openInNew" text="Open Node in new Sequent" />
-      					</items>
-      				</Menu>
-      				<Menu fx:id="viewsMenu" mnemonicParsing="false" text="Views" />
+                    </items>
+                  </Menu>
       				<Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
       					<items>
                         <CheckMenuItem fx:id="debugMode" mnemonicParsing="false" onAction="#handleDebugMode" selected="true" text="Debug Mode" />

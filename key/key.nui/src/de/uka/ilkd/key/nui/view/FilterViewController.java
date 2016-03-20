@@ -15,6 +15,7 @@ import de.uka.ilkd.key.nui.filter.FilterSelection;
 import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.PrintFilter.DisplayScope;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
+import de.uka.ilkd.key.nui.util.NUIConstants;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -24,6 +25,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT, defaultActive = false)
@@ -108,6 +110,12 @@ public class FilterViewController extends ViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        selectionFilterToggle.setStyle(
+                "-fx-background-image: url('" + NUIConstants.FILTER_MOUSE_ICON
+                        + "');" + "-fx-background-position: center center;"
+                        + "-fx-background-repeat: no-repeat;"
+                        + "-fx-background-size: contain;");
+
         // ui bindings
         searchText.disableProperty().bind(userRadio.selectedProperty().not());
         selectionFilterToggle.disableProperty()
