@@ -19,7 +19,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </BorderPane.margin>
                      <children>
-                        <Label text="Mode:" />
+                        <Label text="Filter by.." />
                         <GridPane>
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="80.0" />
@@ -32,14 +32,14 @@
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <TextField fx:id="searchText" alignment="TOP_LEFT" onAction="#handleApply" GridPane.columnIndex="1" />
-                              <RadioButton fx:id="userRadio" mnemonicParsing="false" text="Text">
+                              <TextField fx:id="searchText" alignment="TOP_LEFT" onAction="#handleApply" promptText="Enter text to filter by.." GridPane.columnIndex="1" />
+                              <RadioButton fx:id="userRadio" mnemonicParsing="false" text="..Text">
                                  <toggleGroup>
                                     <ToggleGroup fx:id="filterMode" />
                                  </toggleGroup>
                               </RadioButton>
-                              <RadioButton fx:id="selectionRadio" mnemonicParsing="false" text="Selection" toggleGroup="$filterMode" GridPane.rowIndex="1" />
-                              <Label alignment="BOTTOM_LEFT" text="Layout:" GridPane.halignment="LEFT" GridPane.rowIndex="2" />
+                              <RadioButton fx:id="selectionRadio" mnemonicParsing="false" text="..Selection" toggleGroup="$filterMode" GridPane.rowIndex="1" />
+                              <Label alignment="BOTTOM_LEFT" text="Mode:" GridPane.halignment="LEFT" GridPane.rowIndex="2" />
                               <ComboBox fx:id="filterModeBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                                  <children>

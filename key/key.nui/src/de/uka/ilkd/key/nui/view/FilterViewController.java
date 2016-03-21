@@ -27,6 +27,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 
@@ -288,5 +289,18 @@ public class FilterViewController extends ViewController {
 
     private void updateSelectionCount(int value) {
         selectionCount.setText("(selections: " + Integer.toString(value) + ")");
+    }
+    
+    @Override
+    public void setTooltips() {
+        invertFilter.setTooltip(new Tooltip("Inverts the filter. Text or selection entered will be unfiltered."));
+        useAstScope.setTooltip(new Tooltip("Filters based on the abstract syntax tree."));
+        useTextScope.setTooltip(new Tooltip("Filters based on the number of lines before and after the filtered text."));
+        Tooltip selectionTT = new Tooltip("To filter by selection, click this button first. \n"
+                + "Then make as many selections in the sequent as desired. \n"
+                + "Finally press 'Apply Filter' when done.");
+        selectionCount.setTooltip(selectionTT);
+        selectionFilterToggle.setTooltip(selectionTT);
+        filterModeBox.setTooltip(new Tooltip("Choose whether to minimize or fully collapse the unfiltered text."));
     }
 }
