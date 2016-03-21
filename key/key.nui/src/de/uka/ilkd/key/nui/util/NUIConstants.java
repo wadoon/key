@@ -32,7 +32,8 @@ public final class NUIConstants {
             + "This is due to WebBrowser Compability.";
     public final static String CSSSTYLER_OTHER_TT_TEMPLATE = "Edit ";
     public final static String CSSSTYLER_INHERITED_TT_TEMPLATE = "If this checkbox is checked, the property will be styled like the corresponding property defined in ";
-
+    
+    public final static String DEFAULT_CSS_PATH = "resources/css/sequentStyleDefault.css";
     public final static String DEFAULT_XML_PATH = "resources/xml/cssList.xml";
     public final static String KEY_WINDOW_ICON = "file:resources/images/key-color-icon-square.png";
     public final static String FILTER_MOUSE_ICON = "file:resources/images/mouse_icon.png";

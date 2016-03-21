@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import org.key_project.util.java.IOUtil;
 
@@ -15,16 +14,14 @@ public class CssFileHandler {
 
     private ArrayList<CssRule> parsedRules;
     private String css;
-    private String path = "";
-    private Preferences prefs;
-    private final static String PREFERENCE_KEY_PATH = "CSS_FILE_PATH";
+    private String path;
 
     private enum State {
         SELECTOR, PROPERTY, VALUE;
     }
 
     /**
-     * Constructs a CssFileHandler without file. Call loadCssFile to add the
+     * Constructs a CssFileHandler without a file. Call loadCssFile to add the
      * file afterwards.
      * 
      * @throws IOException
@@ -32,9 +29,25 @@ public class CssFileHandler {
     public CssFileHandler() throws IOException {
         css = "";
         parsedRules = new ArrayList<CssRule>();
-        prefs = Preferences.userNodeForPackage(this.getClass());
-        path = prefs.get(PREFERENCE_KEY_PATH, "");
-        loadCssFile();
+    }
+
+    /**
+     * Constructs a CssFileHandler with a file.
+     * 
+     * @param path
+     * @throws IOException
+     */
+    public CssFileHandler(String path) throws IOException {
+        this();
+        loadCssFile(path);
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     /**
@@ -44,25 +57,13 @@ public class CssFileHandler {
      *            path to the css file
      * @throws IOException
      */
-    public void loadCssFile() throws IOException {
+    public void loadCssFile(String path) throws IOException {
         File file = new File(path);
         if (file.exists() && !file.isDirectory()) {
             css = IOUtil.readFrom(new File(path)) + "\n";
-        }
-        else {
-            prefs.put(PREFERENCE_KEY_PATH, "");
-            css = NUIConstants.getDefaultSequentCss();
+            this.path = path;
         }
         parse();
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-        prefs.put(PREFERENCE_KEY_PATH, path);
-    }
-
-    public String getPath() {
-        return path;
     }
 
     /**
@@ -134,7 +135,7 @@ public class CssFileHandler {
     public void reset() {
         parsedRules.clear();
         try {
-            loadCssFile();
+            loadCssFile(path);
         }
         catch (Exception e) {
             System.err.println("Could not read CSS File");
@@ -147,18 +148,16 @@ public class CssFileHandler {
      */
     public void resetDefault() {
         String tmpPath = path;
-        path = "";
         parsedRules.clear();
         try {
-            loadCssFile();
+            loadCssFile(NUIConstants.DEFAULT_CSS_PATH);
             writeCssFile(tmpPath);
-
+            path = tmpPath;
         }
         catch (Exception e) {
             System.err.println("Could not Reset CSS to Default");
             e.printStackTrace();
         }
-        path = tmpPath;
     }
 
     /**
@@ -232,7 +231,8 @@ public class CssFileHandler {
                 }
                 case ',': {
                     if (selector.equals(""))
-                        System.err.println("Leading comma in selectors ignored.");
+                        System.err
+                                .println("Leading comma in selectors ignored.");
                     else
                         rule.addSelector(selector.trim());
                     selector = "";

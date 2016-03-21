@@ -30,8 +30,7 @@ public class Context {
      */
     public KeYMediator getKeYMediator() {
         if (mediator == null) {
-            userInterface = new MediatorUserInterface(
-                    statusManager, mainApp);
+            userInterface = new MediatorUserInterface(statusManager, mainApp);
             mediator = new KeYMediator(userInterface);
             userInterface.setMediator(mediator);
         }
@@ -92,7 +91,8 @@ public class Context {
     public CssFileHandler getCssFileHandler() {
         if (cssFileHandler == null)
             try {
-                cssFileHandler = new CssFileHandler();
+                cssFileHandler = new CssFileHandler(
+                        NUIConstants.DEFAULT_CSS_PATH);
             }
             catch (Exception e) {
                 System.err.println("Could not load CSS. No beauty for you!");
@@ -106,8 +106,7 @@ public class Context {
         if (xmlReader == null || cssFileHandler == null) {
             cssFileHandler = getCssFileHandler();
 
-            xmlReader = new XmlReader(
-                    NUIConstants.DEFAULT_XML_PATH,
+            xmlReader = new XmlReader(NUIConstants.DEFAULT_XML_PATH,
                     cssFileHandler.getParsedRules());
         }
         return xmlReader;

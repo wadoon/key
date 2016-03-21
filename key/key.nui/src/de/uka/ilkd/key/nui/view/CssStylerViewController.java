@@ -231,8 +231,7 @@ public class CssStylerViewController extends ViewController {
                         }
                         tf.setText(text);
                     }
-                    propertyValuePairMap.put(property,
-                            "inherit");
+                    propertyValuePairMap.put(property, "inherit");
                     updatePreview();
                     enableControls();
                 }
@@ -456,7 +455,8 @@ public class CssStylerViewController extends ViewController {
 
     @FXML
     private void handleSave() {
-        if (cssFileHandler.getPath().isEmpty()) {
+        if (cssFileHandler.getPath().isEmpty() || cssFileHandler.getPath()
+                .equals(NUIConstants.DEFAULT_CSS_PATH)) {
             handleSaveAs();
         }
         else {
@@ -480,13 +480,12 @@ public class CssStylerViewController extends ViewController {
         File file = makeFileChooser().showOpenDialog(getStage());
 
         if (file != null) {
-            cssFileHandler.setPath(file.getAbsolutePath());
-        }
-        try {
-            cssFileHandler.loadCssFile();
-        }
-        catch (Exception e) {
-            System.err.println("Could not load CSS File");
+            try {
+                cssFileHandler.loadCssFile(file.getAbsolutePath());
+            }
+            catch (Exception e) {
+                System.err.println("Could not load CSS File");
+            }
         }
         resetUI();
 
