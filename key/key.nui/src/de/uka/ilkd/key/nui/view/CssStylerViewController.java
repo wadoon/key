@@ -497,6 +497,11 @@ public class CssStylerViewController extends ViewController {
         fileChooser.getExtensionFilters().addAll(
                 new ExtensionFilter("CSS File", "*.css"),
                 new ExtensionFilter("All Files", "*.*"));
+
+        // Get Directory from CSSFile and set as Initial Directory
+        File initFile = new File(cssFileHandler.getPath());
+        fileChooser.setInitialDirectory(new File(initFile.getParent()));
+
         return fileChooser;
     }
 
