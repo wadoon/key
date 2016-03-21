@@ -251,7 +251,7 @@ public class MediatorUserInterface
 
         String defaultFileName = suggestDefaultFileName(proof, fileExtension);
         fileChooser.setInitialFileName(defaultFileName);
-        File file = fileChooser.showSaveDialog(null);
+        File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
         
         if (file == null) {
             statusManager.setStatus("No file name provided");

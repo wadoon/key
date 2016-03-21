@@ -286,7 +286,7 @@ public class RootLayoutController extends ViewController {
             fileChooser.setInitialDirectory(new File("../key.core.test/resources/testcase/join"));
         }
 
-        file = fileChooser.showOpenDialog(null);
+        file = fileChooser.showOpenDialog(mainPane.getScene().getWindow());
 
         if (file == null) {
             setStatus("No File Selected");
