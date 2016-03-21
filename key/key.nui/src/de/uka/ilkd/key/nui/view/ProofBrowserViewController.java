@@ -35,12 +35,13 @@ public class ProofBrowserViewController extends ViewController {
 
     private final static Image CLOSED_PROOF_IMAGE = new Image("file:resources/images/keyproved.gif");
     private final static Image OPEN_PROOF_IMAGE = new Image("file:resources/images/ekey-mono.gif");
-    private final static Image CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_IMAGE = new Image("file:resources/images/ekey-brackets.gif");
+    private final static Image CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_IMAGE = new Image(
+            "file:resources/images/ekey-brackets.gif");
     private final static TreeItem<String> PROOF_BROWSER_ROOT_NODE = new TreeItem<String>("Proofs");
     private HashMap<String, Proof> listOfProofs = new HashMap<String, Proof>();
     private Proof proof = null;
     private Node proofIcon;
-    
+
     @FXML
     private Button discardProofButton;
 
@@ -71,12 +72,15 @@ public class ProofBrowserViewController extends ViewController {
         public void changed(ObservableValue<? extends TreeItem<String>> observable, TreeItem<String> old_val,
                 TreeItem<String> new_val) {
             TreeItem<String> selectedItem = new_val;
+            if (selectedItem == null) {
+                return;
+            }
 
             if (selectedItem.equals(PROOF_BROWSER_ROOT_NODE) || !selectedItem.isLeaf()) {
                 discardProofButton.setDisable(true);
                 return;
             }
-            //discardProofButton.setDisable(false);
+            discardProofButton.setDisable(false);
             Proof p = listOfProofs.get(selectedItem.getValue());
             getContext().getKeYMediator().setProof(p);
         }
@@ -110,9 +114,11 @@ public class ProofBrowserViewController extends ViewController {
         ProofStatus ps = proof.mgt().getStatus();
         if (ps.getProofClosed()) {
             proofIcon = new ImageView(CLOSED_PROOF_IMAGE);
-        } else if (ps.getProofClosedButLemmasLeft()) {
+        }
+        else if (ps.getProofClosedButLemmasLeft()) {
             proofIcon = new ImageView(CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_IMAGE);
-        } else {
+        }
+        else {
             assert ps.getProofOpen();
             proofIcon = new ImageView(OPEN_PROOF_IMAGE);
         }
@@ -127,6 +133,9 @@ public class ProofBrowserViewController extends ViewController {
      *            The {@link Proof} to be added to the Proof Browser.
      */
     private void addProofToBrowser(Proof proof) {
+        if (proof == null) {
+            return;
+        }
         String proofName = proof.name().toString();
         listOfProofs.put(proofName, proof);
 
@@ -175,11 +184,23 @@ public class ProofBrowserViewController extends ViewController {
      */
     @FXML
     private void discardSelectedProof() {
-        int i = proofBrowserTreeView.getSelectionModel().getSelectedIndex() - 1;
-        if (i < 0) {
-            return;
+        TreeItem<String> selectedTreeItem = proofBrowserTreeView.getSelectionModel().getSelectedItem();
+        int indexOfParentNode = PROOF_BROWSER_ROOT_NODE.getChildren().indexOf(selectedTreeItem.getParent());
+        TreeItem<String> parentNode = PROOF_BROWSER_ROOT_NODE.getChildren().get(indexOfParentNode);
+        int indexOfSelectedTreeItem = parentNode.getChildren().indexOf(selectedTreeItem);
+
+        // remove HashMap Entry
+        listOfProofs.remove(selectedTreeItem.getValue());
+        // remove selected item
+        parentNode.getChildren().remove(indexOfSelectedTreeItem);
+
+        // if it is the only leaf for this node, remove the node as well
+        if (parentNode.isLeaf()) {
+            PROOF_BROWSER_ROOT_NODE.getChildren().remove(indexOfParentNode);
+            if (PROOF_BROWSER_ROOT_NODE.getChildren().indexOf(getContext().getKeYMediator().getSelectedProof()) > -1) {
+                proofBrowserTreeView.getSelectionModel().select(PROOF_BROWSER_ROOT_NODE.getChildren()
+                        .indexOf(getContext().getKeYMediator().getSelectedProof()));
+            }
         }
-        listOfProofs.remove(proofBrowserTreeView.getSelectionModel().getSelectedItem().getValue());
-        PROOF_BROWSER_ROOT_NODE.getChildren().remove(i);
     }
 }
