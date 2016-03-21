@@ -325,6 +325,7 @@ public class SequentViewController extends ViewController {
             notationInfo.refresh(services, true, false);
             checkBoxUnicode.setDisable(false);
         }
+        sequentChanged = true;
         printSequent();
         updateView();
     }
@@ -339,6 +340,8 @@ public class SequentViewController extends ViewController {
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         notationInfo.refresh(services, true, checkBoxUnicode.isSelected());
+        
+        sequentChanged = true;
         printSequent();
         updateView();
     }
