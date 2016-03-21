@@ -194,7 +194,7 @@ public class ProofBrowserViewController extends ViewController {
         // remove selected item
         parentNode.getChildren().remove(indexOfSelectedTreeItem);
 
-        // if it is the only leaf for this node, remove the node as well
+        // if its parentNode is now empty, remove it as well
         if (parentNode.isLeaf()) {
             PROOF_BROWSER_ROOT_NODE.getChildren().remove(indexOfParentNode);
             if (PROOF_BROWSER_ROOT_NODE.getChildren().indexOf(getContext().getKeYMediator().getSelectedProof()) > -1) {
