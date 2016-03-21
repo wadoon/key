@@ -24,7 +24,7 @@
          <children>
       		<MenuBar fx:id="menuBar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       			<menus>
-      				<Menu mnemonicParsing="false" text="File">
+      				<Menu mnemonicParsing="true" text="_File">
       					<items>
       						<MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open">
                            <accelerator>
@@ -46,7 +46,7 @@
                         </MenuItem>
       					</items>
       				</Menu>
-                  <Menu mnemonicParsing="false" text="Window">
+                  <Menu mnemonicParsing="true" text="_Window">
                     <items>
                         <Menu fx:id="viewsMenu" mnemonicParsing="false" text="Show/Hide Views" />
                         <SeparatorMenuItem mnemonicParsing="false" />
@@ -62,7 +62,7 @@
       						<MenuItem mnemonicParsing="false" onAction="#openInNew" text="Open Node in new Sequent" />
                     </items>
                   </Menu>
-      				<Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
+      				<Menu fx:id="helpMenu" mnemonicParsing="true" text="_Help">
       					<items>
                         <CheckMenuItem fx:id="debugMode" mnemonicParsing="false" onAction="#handleDebugMode" selected="true" text="Debug Mode" />
                         <MenuItem mnemonicParsing="false" onAction="#handleOnlineHelp" text="Online Help">
