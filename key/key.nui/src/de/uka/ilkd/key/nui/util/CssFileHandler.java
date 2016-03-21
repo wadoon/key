@@ -7,8 +7,11 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import org.key_project.util.java.IOUtil;
+
+import de.uka.ilkd.key.nui.Context;
 
 public class CssFileHandler {
 
@@ -48,6 +51,8 @@ public class CssFileHandler {
 
     public void setPath(String path) {
         this.path = path;
+        Preferences prefs = Preferences.userNodeForPackage(Context.class);
+        prefs.put(NUIConstants.PREFERENCES_CSSPATH_KEY, path);
     }
 
     /**
@@ -61,7 +66,7 @@ public class CssFileHandler {
         File file = new File(path);
         if (file.exists() && !file.isDirectory()) {
             css = IOUtil.readFrom(new File(path)) + "\n";
-            this.path = path;
+            setPath(path);
         }
         parse();
     }
@@ -152,7 +157,7 @@ public class CssFileHandler {
         try {
             loadCssFile(NUIConstants.DEFAULT_CSS_PATH);
             writeCssFile(tmpPath);
-            path = tmpPath;
+            setPath(tmpPath);
         }
         catch (Exception e) {
             System.err.println("Could not Reset CSS to Default");

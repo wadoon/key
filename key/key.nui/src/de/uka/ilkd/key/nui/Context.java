@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui;
 
+import java.util.prefs.Preferences;
+
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.nui.event.HandlerEvent;
@@ -91,8 +93,11 @@ public class Context {
     public CssFileHandler getCssFileHandler() {
         if (cssFileHandler == null)
             try {
-                cssFileHandler = new CssFileHandler(
+                Preferences prefs = Preferences
+                        .userNodeForPackage(this.getClass());
+                String path = prefs.get(NUIConstants.PREFERENCES_CSSPATH_KEY,
                         NUIConstants.DEFAULT_CSS_PATH);
+                cssFileHandler = new CssFileHandler(path);
             }
             catch (Exception e) {
                 System.err.println("Could not load CSS. No beauty for you!");
