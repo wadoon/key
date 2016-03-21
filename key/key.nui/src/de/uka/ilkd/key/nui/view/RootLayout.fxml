@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.input.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
@@ -25,22 +26,37 @@
       			<menus>
       				<Menu mnemonicParsing="false" text="File">
       					<items>
-      						<MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open" />
+      						<MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator>
+                        </MenuItem>
                         <fx:include fx:id="recentFileMenu" source="../view/menu/RecentFileMenu.fxml" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleSave" text="Save" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleSave" text="Save">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator>
+                        </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false" />
-      						<MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit" />
+      						<MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit">
+      						   <accelerator>
+                              <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator>
+                        </MenuItem>
       					</items>
       				</Menu>
-      				<Menu mnemonicParsing="false" text="Edit" />
                   <Menu mnemonicParsing="false" text="Window">
                     <items>
                         <Menu fx:id="viewsMenu" mnemonicParsing="false" text="Show/Hide Views" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <Menu mnemonicParsing="false" text="Preferences">
                            <items>
-            						<MenuItem mnemonicParsing="false" onAction="#handleSequentCssStylerAction" text="Edit Sequent Appearance (CSS-Styler)" />
+            						<MenuItem mnemonicParsing="false" onAction="#handleSequentCssStylerAction" text="Edit Sequent Appearance (CSS-Styler)">
+            						   <accelerator>
+                                    <KeyCodeCombination alt="UP" code="A" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+                                 </accelerator>
+                              </MenuItem>
                            </items>
                         </Menu>
       						<MenuItem mnemonicParsing="false" onAction="#openInNew" text="Open Node in new Sequent" />
@@ -49,7 +65,11 @@
       				<Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
       					<items>
                         <CheckMenuItem fx:id="debugMode" mnemonicParsing="false" onAction="#handleDebugMode" selected="true" text="Debug Mode" />
-      						<MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleOnlineHelp" text="Online Help">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="F1" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator></MenuItem>
+      						<MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About KeY" />
       					</items>
       				</Menu>
       			</menus>

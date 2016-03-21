@@ -4,6 +4,10 @@
 package de.uka.ilkd.key.nui.view;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,12 +15,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewObserver;
 import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.ViewSlot;
+import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.view.menu.RecentFileMenuController;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYConstants;
@@ -304,6 +310,31 @@ public class RootLayoutController extends ViewController {
         }
         else {
             setStatus("No proof loaded. Oops...");
+        }
+    }
+    
+    @FXML
+    private void handleOnlineHelp() {
+        if (MainApp.getKeyDesktop().supportsBrowse()) {
+            try {
+                Main.getKeyDesktop().browse(getURI());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    @SuppressWarnings("finally")
+    private static URI getURI() {
+        URI res = null;
+        try {
+            res = (new URL(NUIConstants.PROJECT_URL)).toURI();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } finally {
+            return res;
         }
     }
 

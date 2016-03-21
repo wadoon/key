@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui;
 
+import java.awt.Desktop;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,8 @@ import java.util.prefs.Preferences;
 
 import org.reflections.Reflections;
 
+import de.uka.ilkd.key.core.DefaultKeYDesktop;
+import de.uka.ilkd.key.core.KeYDesktop;
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
@@ -53,6 +56,17 @@ public class MainApp extends Application {
     private Reflections reflections = new Reflections("de.uka.ilkd.key");
     private Scene scene;
     boolean ctrlPressed = false;
+    
+    /**
+     * The {@link KeYDesktop} used by KeY. The default implementation is
+     * replaced in Eclipse. For this reason the {@link Desktop} should never
+     * be used directly.
+     */
+    private static KeYDesktop keyDesktop = new DefaultKeYDesktop();
+
+    public static KeYDesktop getKeyDesktop() {
+        return keyDesktop;
+    }
 
     @Override
     public void start(Stage primaryStage) {

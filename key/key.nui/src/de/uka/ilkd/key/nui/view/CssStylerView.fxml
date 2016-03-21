@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.input.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.geometry.*?>
 <?import java.lang.*?>
@@ -22,15 +23,27 @@
 		<MenuBar>
 			<menus>
 				<Menu text="File">
-					<MenuItem fx:id="menuOpen" onAction="#handleOpen" text="Open" />
+					<MenuItem fx:id="menuOpen" onAction="#handleOpen" text="Open">
+					 <accelerator>
+                     <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+               </MenuItem>
 					<SeparatorMenuItem />
-					<MenuItem fx:id="menuSave" disable="true" onAction="#handleSave" text="Save" />
+					<MenuItem fx:id="menuSave" disable="true" onAction="#handleSave" text="Save">
+					 <accelerator>
+                  <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+               </MenuItem>
 					<MenuItem fx:id="menuSaveAs" onAction="#handleSaveAs" text="Save As" />
 					<SeparatorMenuItem />
 					<MenuItem fx:id="menuReset" disable="true" onAction="#handleReset" text="Reset" />
 					<MenuItem fx:id="menuResetDefault" onAction="#handleResetDefault" text="Reset to Default" />
 					<SeparatorMenuItem />
-					<MenuItem onAction="#handleExit" text="Exit" />
+					<MenuItem onAction="#handleExit" text="Exit">
+					 <accelerator>
+                  <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+               </MenuItem>
 				</Menu>
 			</menus>
 		</MenuBar>
