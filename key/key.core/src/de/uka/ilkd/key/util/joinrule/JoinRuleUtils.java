@@ -30,7 +30,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -61,10 +60,8 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -1422,52 +1419,6 @@ public class JoinRuleUtils {
       }
 
       return new Pair<Sort, Name>(sort, name);
-   }
-
-   /**
-    * Parses an abstraction predicate. The parameter input should be a textual
-    * representation of a formula containing exactly one of the also supplied
-    * placeholders (but the contained placeholder may have multiple occurrences
-    * in the formula). The result is an abstraction predicate mapping terms of
-    * the type of the placeholder to the parsed predicate with the placeholder
-    * substituted by the argument term.
-    *
-    * @param input
-    *           The predicate to parse (contains exactly one placeholder).
-    * @return The parsed {@link AbstractionPredicate}.
-    * @throws ParserException
-    *            If there is a syntax error.
-    */
-   public static AbstractionPredicate parsePredicate(String input,
-         ArrayList<Pair<Sort, Name>> registeredPlaceholders, Services services)
-         throws ParserException {
-      DefaultTermParser parser = new DefaultTermParser();
-      Term formula =
-            parser.parse(new StringReader(input), Sort.FORMULA, services,
-                  services.getNamespaces(), services.getProof().abbreviations());
-
-      ImmutableSet<LocationVariable> containedLocVars =
-            JoinRuleUtils.getLocationVariables(formula, services);
-
-      int nrContainedPlaceholders = 0;
-      LocationVariable usedPlaceholder = null;
-      for (Pair<Sort, Name> placeholder : registeredPlaceholders) {
-         LocationVariable placeholderVariable =
-               (LocationVariable) services.getNamespaces().variables()
-                     .lookup(placeholder.second);
-
-         if (containedLocVars.contains(placeholderVariable)) {
-            nrContainedPlaceholders++;
-            usedPlaceholder = placeholderVariable;
-         }
-      }
-
-      if (nrContainedPlaceholders != 1) {
-         throw new RuntimeException(
-               "An abstraction predicate must contain exactly one placeholder.");
-      }
-
-      return AbstractionPredicate.create(formula, usedPlaceholder, services);
    }
 
    // /////////////////////////////////////////////////
