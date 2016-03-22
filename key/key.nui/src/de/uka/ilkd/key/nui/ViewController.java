@@ -11,10 +11,13 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 /**
- * This is the super class for every View Controller.
+ * This is the super class for every View Controller. Call
+ * {@link #initViewController(MainApp, Context)} when creating the view to bind
+ * the {@link MainApp} and the {@link Context} to it.
  * 
  * @author Nils Muzzulini
- *
+ * @author Benedikt Gross
+ * @version 1.0
  */
 public abstract class ViewController implements Initializable {
 
@@ -26,28 +29,46 @@ public abstract class ViewController implements Initializable {
         return mainApp;
     }
 
-    public void setMainApp(MainApp mainApp, Context context) {
+    /**
+     * This method must be called when the view is created. It is used to set
+     * the {@link MainApp}, the {@link Context} and initialize {@link Tooltip
+     * Tooltips}.
+     * 
+     * @param mainApp
+     * @param context
+     */
+    public void initViewController(MainApp mainApp, Context context) {
         this.mainApp = mainApp;
         this.context = context;
         initializeAfterLoadingFxml();
         setTooltips();
     }
 
+    /**
+     * @return {@link Context}
+     */
     public Context getContext() {
         return context;
     }
 
+    /**
+     * @return {@link Stage}
+     */
     public Stage getStage() {
         return stage;
     }
 
+    /**
+     * Set a {@link Stage} for this view.
+     * @param stage Stage to be set.
+     */
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
     public <T> Pair<T, ViewController> loadFxmlViewController(URL path) {
         Pair<T, ViewController> pair = KeyFxmlLoader.loadFxml(path);
-        pair.getValue().setMainApp(mainApp, context);
+        pair.getValue().initViewController(mainApp, context);
         return pair;
     }
 
@@ -77,9 +98,9 @@ public abstract class ViewController implements Initializable {
     }
 
     /**
-     * Virtual method to be implemented if needed. This function is called first
-     * when any {@link ViewController} is loaded.
+     * {@inheritDoc}
      */
+    @Override
     public void initialize(URL location, ResourceBundle resources) {
     }
 

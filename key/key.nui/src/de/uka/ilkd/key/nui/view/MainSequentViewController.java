@@ -23,7 +23,7 @@ public class MainSequentViewController extends ViewController {
 
     @Override
     public void initializeAfterLoadingFxml() {
-        sequentViewController.setMainApp(getMainApp(), getContext());
+        sequentViewController.initViewController(getMainApp(), getContext());
 
         KeYSelectionListener proofChangeListener = new KeYSelectionListener() {
             @Override

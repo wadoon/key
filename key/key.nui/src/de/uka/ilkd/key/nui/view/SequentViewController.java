@@ -233,7 +233,7 @@ public class SequentViewController extends ViewController {
         posTranslator = new PositionTranslator(
                 getContext().getCssFileHandler());
 
-        tacletInfoViewController.setMainApp(getMainApp(), getContext());
+        tacletInfoViewController.initViewController(getMainApp(), getContext());
     }
 
     /**
@@ -510,7 +510,7 @@ public class SequentViewController extends ViewController {
                         // Give the controller access to the main app.
                         TacletMenuController controller = loader
                                 .getController();
-                        controller.setMainApp(this.getMainApp(),
+                        controller.initViewController(this.getMainApp(),
                                 this.getContext());
                         controller.init(pos, this);
 

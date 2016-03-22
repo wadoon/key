@@ -166,7 +166,7 @@ public class ViewInformation extends Observable {
 
         // Give the controller access to the main app.
         ViewContextMenuController controller = loader.getController();
-        controller.setMainApp(parent.getMainApp(), parent.getContext());
+        controller.initViewController(parent.getMainApp(), parent.getContext());
         controller.setParentView(this);
         content.setOnShowing((event) -> {
             // TODO select current position

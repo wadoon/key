@@ -60,7 +60,7 @@ public class StaticSequentViewController extends ViewController {
 
     @Override
     public void initializeAfterLoadingFxml() {
-        sequentViewController.setMainApp(getMainApp(), getContext());
+        sequentViewController.initViewController(getMainApp(), getContext());
 
         mediator = getContext().getKeYMediator();
 

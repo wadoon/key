@@ -135,7 +135,7 @@ public class TacletMenuController extends ViewController {
         mediator = getContext().getKeYMediator();
         goal = mediator.getSelectedGoal();
         comp = new TacletAppComparator();
-        insertHiddenController.setMainApp(getMainApp(), getContext());
+        insertHiddenController.initViewController(getMainApp(), getContext());
     };
 
     /**

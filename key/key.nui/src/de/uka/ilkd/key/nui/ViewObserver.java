@@ -7,7 +7,7 @@ import de.uka.ilkd.key.nui.view.RootLayoutController;
 
 /**
  * @author Benedikt Gross
- *
+ * @version 1.0
  */
 public class ViewObserver implements Observer {
     private RootLayoutController container;
@@ -16,10 +16,14 @@ public class ViewObserver implements Observer {
         this.container = container;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void update(Observable observable, Object arg1) {
-        if (!(observable instanceof ViewInformation))
+        if (!(observable instanceof ViewInformation)) {
             return;
+        }
         boolean activeUpdated = (boolean) arg1;
 
         ViewInformation info = (ViewInformation) observable;

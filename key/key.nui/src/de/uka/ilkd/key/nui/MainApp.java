@@ -161,7 +161,7 @@ public class MainApp extends Application {
 
             // Give the controller access to the MainApp.
             RootLayoutController controller = loader.getController();
-            controller.setMainApp(this, new Context(this));
+            controller.initViewController(this, new Context(this));
             rootLayoutController = controller;
         }
         catch (Exception e) {
@@ -228,7 +228,7 @@ public class MainApp extends Application {
         stage.setResizable(resizable);
 
         ((ViewController) p.getValue()).setStage(stage);
-        ((ViewController) p.getValue()).setMainApp(this, rootLayoutController.getContext());
+        ((ViewController) p.getValue()).initViewController(this, rootLayoutController.getContext());
         return (ViewController) p.getValue();
     }
 
