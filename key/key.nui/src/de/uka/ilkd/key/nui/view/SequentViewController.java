@@ -227,11 +227,6 @@ public class SequentViewController extends ViewController {
             apply(eventArgs);
             updateView();
         });
-        getContext().getSequentHtmlChangedEvent().addHandler(eventArgs -> {
-            if (getContext().getKeYMediator().getSelectedProof() == null) {
-                clearWebView();
-            }
-        });
         getContext().getSelectModeActivateEvent()
                 .addHandler(this::selectModeActivated);
 
@@ -542,7 +537,7 @@ public class SequentViewController extends ViewController {
 
     }
     
-    private void clearWebView() {
+    protected void clearWebView() {
         sequentOptions.setDisable(true);
         tacletInfo.setDisable(true);
         textArea.setDisable(true);

@@ -28,6 +28,11 @@ public class MainSequentViewController extends ViewController {
         KeYSelectionListener proofChangeListener = new KeYSelectionListener() {
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
+                getContext().getSequentHtmlChangedEvent().addHandler(eventArgs -> {
+                    if (!getContext().getKeYMediator().ensureProofLoaded()) {
+                        sequentViewController.clearWebView();
+                    }
+                });
             }
 
             @Override
