@@ -72,9 +72,6 @@ public class ProofBrowserViewController extends ViewController {
         public void changed(ObservableValue<? extends TreeItem<String>> observable, TreeItem<String> old_val,
                 TreeItem<String> new_val) {
             TreeItem<String> selectedItem = new_val;
-            if (selectedItem == null) {
-                return;
-            }
 
             if (selectedItem.equals(PROOF_BROWSER_ROOT_NODE) || !selectedItem.isLeaf()) {
                 discardProofButton.setDisable(true);
@@ -188,19 +185,26 @@ public class ProofBrowserViewController extends ViewController {
         int indexOfParentNode = PROOF_BROWSER_ROOT_NODE.getChildren().indexOf(selectedTreeItem.getParent());
         TreeItem<String> parentNode = PROOF_BROWSER_ROOT_NODE.getChildren().get(indexOfParentNode);
         int indexOfSelectedTreeItem = parentNode.getChildren().indexOf(selectedTreeItem);
-
+        TreeItem<String> nextSibling = selectedTreeItem.nextSibling();
+        
         // remove HashMap Entry
         listOfProofs.remove(selectedTreeItem.getValue());
+        
         // remove selected item
         parentNode.getChildren().remove(indexOfSelectedTreeItem);
 
         // if its parentNode is now empty, remove it as well
         if (parentNode.isLeaf()) {
             PROOF_BROWSER_ROOT_NODE.getChildren().remove(indexOfParentNode);
-            if (PROOF_BROWSER_ROOT_NODE.getChildren().indexOf(getContext().getKeYMediator().getSelectedProof()) > -1) {
-                proofBrowserTreeView.getSelectionModel().select(PROOF_BROWSER_ROOT_NODE.getChildren()
-                        .indexOf(getContext().getKeYMediator().getSelectedProof()));
+            
+            // jump to next proof in browser
+            if (indexOfParentNode == 0 && PROOF_BROWSER_ROOT_NODE.getChildren().size() > 0) {
+                proofBrowserTreeView.getSelectionModel().select(PROOF_BROWSER_ROOT_NODE.getChildren().get(0).getChildren().get(0));
             }
+            
+        // select nextSibling if available
+        } else if (nextSibling != null) {
+            proofBrowserTreeView.getSelectionModel().select(nextSibling);
         }
     }
 }
