@@ -17,7 +17,7 @@ import org.w3c.dom.NodeList;
 import javafx.scene.control.TreeItem;
 
 /**
- * TODO add class comments
+ * reads the XML File defining the CSS Highlighting Classes and Descriptions
  * 
  * @author Maximilian Li
  * @version 1.0
@@ -31,26 +31,29 @@ public class XmlReader {
     private Map<String, Boolean> classEnabledMap = new HashMap<>();
 
     /**
-     * TODO add comments
+     * Constructor for the XMLReader
      * 
      * @param path
+     *            the filepath for the xml file
      * @param ruleList
+     *            the list of rules as read by the {@link CssFileHandler}
      */
     public XmlReader(String path, List<CssRule> ruleList) {
         inputFile = new File(path);
         for (CssRule rule : ruleList) {
             selectorList.addAll(rule.getSelectors());
         }
-        handleFile();
+        parseFile();
     }
 
     /**
-     * TODO add comments
+     * parses the XML File
      */
-    private void handleFile() {
+    private void parseFile() {
         try {
             // Make Reader
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory
+                    .newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(inputFile);
             doc.getDocumentElement().normalize();
@@ -59,7 +62,8 @@ public class XmlReader {
             // Make new TreeItem for CSSStylerView
             for (int i = 0; i < nList.getLength(); i++) {
                 Node node = nList.item(i);
-                TreeItem<String> categoryNode = new TreeItem<String>(((Element) node).getAttribute("text"));
+                TreeItem<String> categoryNode = new TreeItem<String>(
+                        ((Element) node).getAttribute("text"));
                 NodeList childList = node.getChildNodes();
 
                 // Build Maps for each Rule by Selector
@@ -67,22 +71,29 @@ public class XmlReader {
                     Node child = childList.item(j);
                     if (child.getNodeType() == Node.ELEMENT_NODE) {
                         Element elem = (Element) child;
-                        String selector = elem.getElementsByTagName("selector").item(0).getTextContent();
+                        String selector = elem.getElementsByTagName("selector")
+                                .item(0).getTextContent();
                         if (selectorList.contains(selector)) {
                             selectorList.remove(selector);
 
-                            String description = elem.getElementsByTagName("Description").item(0).getTextContent();
+                            String description = elem
+                                    .getElementsByTagName("Description").item(0)
+                                    .getTextContent();
 
                             descriptionMap.put(selector, description);
 
-                            String className = elem.getElementsByTagName("Class").item(0).getTextContent();
+                            String className = elem
+                                    .getElementsByTagName("Class").item(0)
+                                    .getTextContent();
 
                             classMap.put(className, selector.substring(1));
 
                             classEnabledMap.put(className,
-                                    elem.getElementsByTagName("enabled").item(0).getTextContent().equals("true"));
+                                    elem.getElementsByTagName("enabled").item(0)
+                                            .getTextContent().equals("true"));
 
-                            TreeItem<String> childNode = new TreeItem<String>(description);
+                            TreeItem<String> childNode = new TreeItem<String>(
+                                    description);
                             categoryNode.getChildren().add(childNode);
 
                         }
@@ -101,7 +112,8 @@ public class XmlReader {
         }
         TreeItem<String> otherNode = new TreeItem<String>("Other");
         for (int i = 0; i < selectorList.size(); i++) {
-            otherNode.getChildren().add(new TreeItem<String>(selectorList.get(i)));
+            otherNode.getChildren()
+                    .add(new TreeItem<String>(selectorList.get(i)));
         }
         treeRoot.getChildren().add(otherNode);
     }

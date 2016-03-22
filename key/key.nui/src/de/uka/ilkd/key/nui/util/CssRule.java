@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * TODO add class comment
+ * the Model for a CSS Rule
  * 
  * @author Victor Schuemmer
  * @version 1.0
@@ -60,8 +60,10 @@ public class CssRule {
      *             tab, newline)
      */
     public void addSelector(String selector) {
-        if (selector.contains(" ") || selector.contains("\n") || selector.contains("\t") || selector.isEmpty())
-            throw new IllegalArgumentException("Selector contains spacing or is empty.");
+        if (selector.contains(" ") || selector.contains("\n")
+                || selector.contains("\t") || selector.isEmpty())
+            throw new IllegalArgumentException(
+                    "Selector contains spacing or is empty.");
         this.selectors.add(selector);
     }
 
@@ -99,8 +101,10 @@ public class CssRule {
      *             tab, newline) or any argument is an empty String
      */
     public void putPropertyValuePair(String property, String value) {
-        if (property.contains(" ") || property.contains("\n") || property.contains("\t") || property.isEmpty())
-            throw new IllegalArgumentException("Property contains spacing or is empty.");
+        if (property.contains(" ") || property.contains("\n")
+                || property.contains("\t") || property.isEmpty())
+            throw new IllegalArgumentException(
+                    "Property contains spacing or is empty.");
         if (value.isEmpty())
             throw new IllegalArgumentException("Value is empty.");
         propertyValuePairs.put(property, value);
@@ -146,7 +150,8 @@ public class CssRule {
     }
 
     /**
-     * TODO add comments
+     * returns the selectors (HTML structures) this rule applies to as a String
+     * 
      * @return
      */
     public String selectorsAsString() {

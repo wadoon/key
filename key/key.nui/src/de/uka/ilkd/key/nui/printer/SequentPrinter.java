@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * TODO add class comment
+ * styles the SequentText as HTML Text
  * 
  * @author Maximilian Li
  * @author Victor Schuemmer
@@ -58,7 +58,8 @@ public class SequentPrinter {
      * @param context
      *            {@link Context}
      */
-    public SequentPrinter(CssFileHandler cssFileHandler, PositionTable posTable, Context context) {
+    public SequentPrinter(CssFileHandler cssFileHandler, PositionTable posTable,
+            Context context) {
         this.cssFileHandler = cssFileHandler;
         this.setPosTable(posTable);
         this.context = context;
@@ -80,7 +81,8 @@ public class SequentPrinter {
         // Iterate to Length+1 to Append CollapsedIndicator if all is hidden
         for (int i = 0; i < proofString.length() + 1; i++) {
             // Insert StyleTags at i
-            while (listPointer < tagList.size() && tagList.get(listPointer).first == i) {
+            while (listPointer < tagList.size()
+                    && tagList.get(listPointer).first == i) {
                 tag = tagList.get(listPointer).second;
                 sb.insert(i + offset, tag);
                 offset += tag.length();
@@ -104,17 +106,20 @@ public class SequentPrinter {
     }
 
     /**
-     * TODO comments
+     * gets the HighlightingRange from the InitialPositionTable for a Position
      * 
      * @param pos
-     * @return
+     *            the Position of the Term to be highlighted
+     * @return the Range of the Term
      */
     private Range getHighlightRange(PosInOccurrence pos) {
         if (!(posTable instanceof InitialPositionTable)) {
-            throw new AssertionError("Unexpected type (should be InitialPositionTable: " + posTable);
+            throw new AssertionError(
+                    "Unexpected type (should be InitialPositionTable: "
+                            + posTable);
         }
-        ImmutableList<Integer> path = ((InitialPositionTable) posTable).pathForPosition(pos,
-                new IdentitySequentPrintFilter(sequent));
+        ImmutableList<Integer> path = ((InitialPositionTable) posTable)
+                .pathForPosition(pos, new IdentitySequentPrintFilter(sequent));
         return ((InitialPositionTable) posTable).rangeForPath(path);
     }
 
@@ -127,7 +132,8 @@ public class SequentPrinter {
     public void applyRuleAppHighlighting(RuleApp app) {
         if (app.posInOccurrence() != null) {
             Range r = getHighlightRange(app.posInOccurrence());
-            putStyleTags(r.start(), r.end(), HighlightType.RULEAPP, NUIConstants.RULE_APP_TAG);
+            putStyleTags(r.start(), r.end(), HighlightType.RULEAPP,
+                    NUIConstants.RULE_APP_TAG);
         }
 
         if (app instanceof TacletApp) {
@@ -144,7 +150,8 @@ public class SequentPrinter {
      *            highlighted.
      */
     private void highlightIfFormulas(TacletApp tapp) {
-        final ImmutableList<IfFormulaInstantiation> ifs = tapp.ifFormulaInstantiations();
+        final ImmutableList<IfFormulaInstantiation> ifs = tapp
+                .ifFormulaInstantiations();
         if (ifs == null) {
             return;
         }
@@ -153,15 +160,17 @@ public class SequentPrinter {
                 continue;
             }
             final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
-            final PosInOccurrence pos = new PosInOccurrence(inst.getConstrainedFormula(), PosInTerm.getTopLevel(),
+            final PosInOccurrence pos = new PosInOccurrence(
+                    inst.getConstrainedFormula(), PosInTerm.getTopLevel(),
                     inst.inAntec());
             Range r = getHighlightRange(pos);
-            putStyleTags(r.start(), r.end(), HighlightType.RULEAPP, NUIConstants.IF_FORMULA_TAG);
+            putStyleTags(r.start(), r.end(), HighlightType.RULEAPP,
+                    NUIConstants.IF_FORMULA_TAG);
         }
     }
 
     /**
-     * TODO comments
+     * highlights if Instances
      * 
      * @param bapp
      */
@@ -169,7 +178,8 @@ public class SequentPrinter {
         final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
         for (PosInOccurrence pio : ifs) {
             Range r = getHighlightRange(pio);
-            putStyleTags(r.start(), r.end(), HighlightType.RULEAPP, NUIConstants.IF_INST_TAG);
+            putStyleTags(r.start(), r.end(), HighlightType.RULEAPP,
+                    NUIConstants.IF_INST_TAG);
         }
     }
 
@@ -182,16 +192,20 @@ public class SequentPrinter {
      */
     public void applyMouseHighlighting(Range range) {
         removeMouseHighlighting();
-        putStyleTags(range.start(), range.end(), HighlightType.MOUSE, NUIConstants.MOUSE_TAG);
+        putStyleTags(range.start(), range.end(), HighlightType.MOUSE,
+                NUIConstants.MOUSE_TAG);
     }
 
     /**
-     * TODO update comments Styles the text according to given filter.
+     * Styles the text according to given filter.
      * 
      * @param indicesOfUnfilteredLines
+     *            a List of Lines that should not be filtered out
      * @param layout
+     *            the FilterLayout
      */
-    public void applyFilter(ArrayList<Integer> indicesOfUnfilteredLines, FilterLayout layout) {
+    public void applyFilter(ArrayList<Integer> indicesOfUnfilteredLines,
+            FilterLayout layout) {
         // remove old Filter styling
         removeFilter();
         // get line information
@@ -214,7 +228,8 @@ public class SequentPrinter {
                 default:
                     // Add collapsed indicator if collapsed Block ends, or the
                     // last line is reached
-                    if (indicesOfUnfilteredLines.contains(i + 1) || i == lines.length - 1) {
+                    if (indicesOfUnfilteredLines.contains(i + 1)
+                            || i == lines.length - 1) {
                         filterCollapseIndicator.add(styleEnd);
                     }
                     collapseLine(styleStart, styleEnd);
@@ -225,7 +240,8 @@ public class SequentPrinter {
         }
 
         // Append CollapsedIndicator if all is hidden
-        if ((indicesOfUnfilteredLines == null || indicesOfUnfilteredLines.isEmpty())
+        if ((indicesOfUnfilteredLines == null
+                || indicesOfUnfilteredLines.isEmpty())
                 && layout == FilterLayout.Collapse) {
             filterCollapseIndicator.add(proofString.length());
         }
@@ -240,7 +256,8 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void collapseLine(int lineStart, int lineEnd) {
-        putStyleTags(lineStart, lineEnd, HighlightType.FILTER, NUIConstants.FILTER_COLLAPSED_TAG);
+        putStyleTags(lineStart, lineEnd, HighlightType.FILTER,
+                NUIConstants.FILTER_COLLAPSED_TAG);
     }
 
     /**
@@ -252,7 +269,8 @@ public class SequentPrinter {
      *            endIndex of line
      */
     private void minimizeLine(int lineStart, int lineEnd) {
-        putStyleTags(lineStart, lineEnd, HighlightType.FILTER, NUIConstants.FILTER_MINIMIZED_TAG);
+        putStyleTags(lineStart, lineEnd, HighlightType.FILTER,
+                NUIConstants.FILTER_MINIMIZED_TAG);
     }
 
     /**
@@ -274,7 +292,8 @@ public class SequentPrinter {
      * @param tag
      *            the opening tag constant
      */
-    private void putOpenTag(int index, HighlightType highlightType, String tag) {
+    private void putOpenTag(int index, HighlightType highlightType,
+            String tag) {
         dictionary.putOpenTag(index, highlightType, tag);
     }
 
@@ -291,7 +310,8 @@ public class SequentPrinter {
      * @param tag
      *            the opening tag constant
      */
-    private void putStyleTags(int start, int end, HighlightType type, String tag) {
+    private void putStyleTags(int start, int end, HighlightType type,
+            String tag) {
         putOpenTag(start, type, tag);
         putCloseTag(end, type);
     }
@@ -338,7 +358,8 @@ public class SequentPrinter {
                     while (matcher.find()) {
                         result.add(matcher.start());
                         // Check all occurrences
-                        putStyleTags(matcher.start(), matcher.end(), HighlightType.SEARCH,
+                        putStyleTags(matcher.start(), matcher.end(),
+                                HighlightType.SEARCH,
                                 NUIConstants.HIGHLIGHTED_TAG);
                     }
                 }
@@ -350,9 +371,11 @@ public class SequentPrinter {
             else {
                 // Find indices of all matches. Put in Map. Put in ArrayList for
                 // removal
-                for (int i = -1; (i = proofString.indexOf(searchString, i + 1)) != -1;) {
+                for (int i = -1; (i = proofString.indexOf(searchString,
+                        i + 1)) != -1;) {
                     result.add(i);
-                    putStyleTags(i, i + searchString.length(), HighlightType.SEARCH, NUIConstants.HIGHLIGHTED_TAG);
+                    putStyleTags(i, i + searchString.length(),
+                            HighlightType.SEARCH, NUIConstants.HIGHLIGHTED_TAG);
                 }
             }
         }
@@ -411,14 +434,18 @@ public class SequentPrinter {
      */
     private void applySyntaxHighlighting() {
         Map<String, String> classMap = context.getXmlReader().getClassMap();
-        Map<String, Boolean> classEnabledMap = context.getXmlReader().getClassEnabledMap();
+        Map<String, Boolean> classEnabledMap = context.getXmlReader()
+                .getClassEnabledMap();
 
         if (!(posTable instanceof InitialPositionTable)) {
-            throw new AssertionError("Unexpected type (should be InitialPositionTable: " + posTable);
+            throw new AssertionError(
+                    "Unexpected type (should be InitialPositionTable: "
+                            + posTable);
         }
         InitialPositionTable initPos = (InitialPositionTable) posTable;
 
-        IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(sequent);
+        IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(
+                sequent);
 
         Class<? extends Object> lastClass = null;
         boolean openedTag = false;
@@ -428,7 +455,8 @@ public class SequentPrinter {
             PosInSequent pos = initPos.getPosInSequent(i, filter);
 
             // Close Tag on Whitespace, if it was opened before
-            if ((proofString.charAt(i) == ' ' || proofString.charAt(i) == '\n')) {
+            if ((proofString.charAt(i) == ' '
+                    || proofString.charAt(i) == '\n')) {
                 if (openedTag) {
                     putCloseTag(i, HighlightType.SYNTAX);
 
@@ -445,9 +473,11 @@ public class SequentPrinter {
                     Operator op = oc.subTerm().op();
                     String className = op.getClass().getSimpleName();
                     // Open First Tag
-                    if (lastClass == null && classMap.containsKey(className) && classEnabledMap.get(className)) {
+                    if (lastClass == null && classMap.containsKey(className)
+                            && classEnabledMap.get(className)) {
 
-                        putOpenTag(i, HighlightType.SYNTAX, classMap.get(className));
+                        putOpenTag(i, HighlightType.SYNTAX,
+                                classMap.get(className));
 
                         openedTag = true;
                         lastClass = op.getClass();
@@ -459,9 +489,11 @@ public class SequentPrinter {
                         putCloseTag(i, HighlightType.SYNTAX);
 
                         openedTag = false;
-                        if (classMap.containsKey(className) && classEnabledMap.get(className)) {
+                        if (classMap.containsKey(className)
+                                && classEnabledMap.get(className)) {
 
-                            putOpenTag(i, HighlightType.SYNTAX, classMap.get(className));
+                            putOpenTag(i, HighlightType.SYNTAX,
+                                    classMap.get(className));
                             lastClass = op.getClass();
                             openedTag = true;
                         }
@@ -471,7 +503,8 @@ public class SequentPrinter {
                             openedTag = false;
                             if (!classMap.containsKey(className)) {
                                 System.out.println("");
-                                System.out.println("The following Class does not exist in the ClassDictionary");
+                                System.out.println(
+                                        "The following Class does not exist in the ClassDictionary");
                                 System.out.println("EXPRESSION: " + op);
                                 System.out.println("CLASS: " + className);
                                 System.out.println("");
@@ -522,20 +555,24 @@ public class SequentPrinter {
     }
 
     /**
-     * TODO add comments
+     * applies the MouseSelection Visuals from the Filter
      * 
      * @param range
+     *            the Range for the Selection
      */
     public void applySelection(Range range) {
-        putStyleTags(range.start(), range.end(), HighlightType.SELECTION, NUIConstants.FILTER_SELECTION_TAG);
+        putStyleTags(range.start(), range.end(), HighlightType.SELECTION,
+                NUIConstants.FILTER_SELECTION_TAG);
     }
 
     /**
-     * TODO add comments
+     * removes the MouseSelection Visuals from the Filter
      * 
      * @param range
+     *            the Range for the Selection
      */
     public void removeSelection(Range range) {
-        dictionary.removeSingleStyleTag(range.start(), range.end(), HighlightType.SELECTION);
+        dictionary.removeSingleStyleTag(range.start(), range.end(),
+                HighlightType.SELECTION);
     }
 }

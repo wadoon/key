@@ -9,7 +9,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 /**
- * TODO add class comment
+ * Provides Functionalities to Translate a Pixel-Position to a Char in the
+ * ProofString and vice versa
  * 
  * @author Maximilian Li
  * @version 1.0
@@ -99,13 +100,15 @@ public class PositionTranslator {
             if (filterCollapsed) {
                 if (!unfilteredLines.contains(result)) {
                     if (unfilteredLines.contains(result + 1)) {
-                        yCoord -= Math.round(text.getLayoutBounds().getHeight());
+                        yCoord -= Math
+                                .round(text.getLayoutBounds().getHeight());
                     }
                     continue;
                 }
             }
             else {
-                if (!unfilteredLines.contains(result) && unfilteredLines.size() > 0) {
+                if (!unfilteredLines.contains(result)
+                        && unfilteredLines.size() > 0) {
                     text.setFont(minimizedFont);
                 }
                 else {
@@ -119,7 +122,8 @@ public class PositionTranslator {
             }
         }
         result -= collapsedLinesAdjustment;
-        if (yCoord > 0 || (filterCollapsed && unfilteredLines.size() > 0 && !unfilteredLines.contains(result))) {
+        if (yCoord > 0 || (filterCollapsed && unfilteredLines.size() > 0
+                && !unfilteredLines.contains(result))) {
             return -1;
         }
         return result;
@@ -143,7 +147,8 @@ public class PositionTranslator {
         // Generate Text Object with Font and Size for computing width
         Text text = new Text();
         // Adjust for minimized Filter
-        if (!filterCollapsed && !unfilteredLines.contains(line) && unfilteredLines.size() > 0) {
+        if (!filterCollapsed && !unfilteredLines.contains(line)
+                && unfilteredLines.size() > 0) {
             text.setFont(minimizedFont);
         }
         else {
@@ -197,17 +202,20 @@ public class PositionTranslator {
      */
     private void readCSS() {
         CssRule pre = cssHandler.getRule("pre");
-        CssRule minimized = cssHandler.getRule("." + NUIConstants.FILTER_MINIMIZED_TAG);
+        CssRule minimized = cssHandler
+                .getRule("." + NUIConstants.FILTER_MINIMIZED_TAG);
 
         font = pre.getValue("font-family");
         String fontSizeValue = pre.getValue("font-size");
 
         // FontSize Value ends with "..px"
-        fontSize = Integer.parseInt(fontSizeValue.substring(0, fontSizeValue.length() - 2));
+        fontSize = Integer.parseInt(
+                fontSizeValue.substring(0, fontSizeValue.length() - 2));
 
         fontSizeValue = minimized.getValue("font-size");
 
-        minimizedSize = Integer.parseInt(fontSizeValue.substring(0, fontSizeValue.length() - 2));
+        minimizedSize = Integer.parseInt(
+                fontSizeValue.substring(0, fontSizeValue.length() - 2));
 
         normalFont = new Font(font, fontSize);
         minimizedFont = new Font(font, minimizedSize);
@@ -262,14 +270,18 @@ public class PositionTranslator {
         }
         text.setText(longestLine);
 
-        return new Pair<Double, Double>((double) Math.round(text.getLayoutBounds().getWidth() + 50), height);
+        return new Pair<Double, Double>(
+                (double) Math.round(text.getLayoutBounds().getWidth() + 50),
+                height);
     }
 
     /**
-     * TODO add comments
+     * returns the Height for the char in the proofstring defined by its index
+     * position
      * 
      * @param index
-     * @return
+     *            the position of the char in the proofstring
+     * @return the Height in px
      */
     public Double getHeightForIndex(int index) {
         double height = 5.0;

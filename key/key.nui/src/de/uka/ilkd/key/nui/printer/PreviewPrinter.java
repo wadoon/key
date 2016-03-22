@@ -3,6 +3,8 @@
  */
 package de.uka.ilkd.key.nui.printer;
 
+import org.w3c.dom.css.CSSRule;
+
 import de.uka.ilkd.key.nui.util.CssRule;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 
@@ -17,6 +19,15 @@ public class PreviewPrinter {
             + "Use the controls to change certain settings. \n"
             + "All changes can be reverted by the 'Reset to Default' menu entry.";
 
+    /**
+     * prints the PreviewText with the CSSStyling
+     * 
+     * @param css
+     *            the complete CSS File
+     * @param rule
+     *            the {@link CSSRule} which shall be previewed
+     * @return a HTML Text with the defined styling applied
+     */
     public static String printPreview(String css, CssRule rule) {
         StringBuilder sb = new StringBuilder();
         String selector = rule.selectorsAsString();
