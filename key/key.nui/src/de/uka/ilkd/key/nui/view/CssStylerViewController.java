@@ -435,6 +435,8 @@ public class CssStylerViewController extends ViewController {
                     ButtonData.CANCEL_CLOSE);
 
             alert.getButtonTypes().setAll(saveExit, resetExit, cancel);
+            ((Button) alert.getDialogPane().lookupButton(saveExit))
+                    .setDefaultButton(true);
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == saveExit) {
