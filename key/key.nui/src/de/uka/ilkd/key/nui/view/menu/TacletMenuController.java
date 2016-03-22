@@ -111,25 +111,6 @@ public class TacletMenuController extends ViewController {
     private Goal goal;
     private PosInOccurrence occ;
 
-    public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
-            TacletAppComparator comp) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
-
-        List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
-
-        for (final TacletApp app : finds) {
-            list.add(app);
-        }
-
-        Collections.sort(list, comp);
-
-        for (final TacletApp app : list) {
-            result = result.prepend(app);
-        }
-
-        return result;
-    }
-
     @Override
     public void initializeAfterLoadingFxml() {
         mediator = getContext().getKeYMediator();
@@ -172,6 +153,7 @@ public class TacletMenuController extends ViewController {
                         .prepend(c.getRewriteTaclet(goal, occ)),
                 c.getNoFindTaclet(goal), builtInRules);
 
+        
         proofMacroMenuController.init(mediator, occ);
     }
 
@@ -197,11 +179,7 @@ public class TacletMenuController extends ViewController {
     }
 
     /**
-     * Creates the menu by adding all sub-menus and items.
-     * 
-     * @param find
-     * @param noFind
-     * @param builtInList
+     * Creates the menu by adding all submenus and items.
      */
     private void createTacletMenu(ImmutableList<TacletApp> find,
             ImmutableList<TacletApp> noFind,
@@ -227,6 +205,14 @@ public class TacletMenuController extends ViewController {
 
     }
 
+    /**
+     * Creates menu items for all given taclets. A submenu for insertion of
+     * hidden terms will be created if there are any, and rare rules will be in
+     * a 'More rules' submenu.
+     * 
+     * @param taclets
+     *            the list of taclets to create menu items for
+     */
     private void createMenuItems(ImmutableList<TacletApp> taclets) {
         int idx = 0;
         for (final TacletApp app : taclets) {
@@ -240,10 +226,13 @@ public class TacletMenuController extends ViewController {
                     mediator.getNotationInfo(), mediator.getServices());
             item.setOnAction(this::handleRuleApplication);
 
+            // Items for insertion of hidden terms appear in a submenu.
             if (insertHiddenController.isResponsible(item)) {
                 insertHiddenController.add(item);
             }
             else {
+                // If one of the sets contains the rule it is considered rare
+                // and moved to a 'More rules' submenu.
                 boolean rareRule = false;
                 for (RuleSet rs : taclet.getRuleSets()) {
                     if (CLUTTER_RULESETS.contains(rs.name()))
@@ -258,6 +247,7 @@ public class TacletMenuController extends ViewController {
                     rootMenu.getItems().add(idx++, item);
             }
         }
+        // Make submenus visible iff they are not empty.
         if (moreRules.getItems().size() > 0)
             moreRules.setVisible(true);
         if (!insertHiddenController.isEmpty())
@@ -265,6 +255,14 @@ public class TacletMenuController extends ViewController {
 
     }
 
+    /**
+     * Manages the visibility of all menu items dealing with abbreviations based
+     * on if the given term already is abbreviated and if the abbreviation is
+     * enabled.
+     * 
+     * @param t
+     *            the term to check if there already is an abbreviation of
+     */
     private void createAbbrevSection(Term t) {
         AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
         if (scm.containsTerm(t)) {
@@ -281,18 +279,33 @@ public class TacletMenuController extends ViewController {
         }
     }
 
-    public void handleRuleApplication(ActionEvent event) {
+    /**
+     * Handles the application of an 'ordinary' rule.
+     * 
+     * @param event
+     */
+    private void handleRuleApplication(ActionEvent event) {
         mediator.getUI().getProofControl().selectedTaclet(
                 ((TacletMenuItem) event.getSource()).getTaclet(), goal,
                 pos.getPosInOccurrence());
     }
 
+    /**
+     * Handles rule application for automode.
+     * 
+     * @param event
+     */
     @FXML
     private void handleFocussedRuleApplication(ActionEvent event) {
         mediator.getUI().getProofControl().startFocussedAutoMode(
                 pos.getPosInOccurrence(), mediator.getSelectedGoal());
     }
 
+    /**
+     * Handles action of the 'Copy to clipboard' menu item.
+     * 
+     * @param event
+     */
     @FXML
     private void handleCopyToClipboard(ActionEvent event) {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -302,6 +315,14 @@ public class TacletMenuController extends ViewController {
         clipboard.setContent(content);
     }
 
+    /**
+     * Checks whether a string is a valid term abbreviation (is not empty and
+     * only contains 0-9, a-z, A-Z and underscore (_)).
+     * 
+     * @param s
+     *            the string to check
+     * @return true iff the string is a valid term abbreviation
+     */
     private boolean validateAbbreviation(String s) {
         if (s == null || s.length() == 0)
             return false;
@@ -315,6 +336,11 @@ public class TacletMenuController extends ViewController {
         return true;
     }
 
+    /**
+     * Handles the creation of a term abbreviation.
+     * 
+     * @param event
+     */
     @FXML
     private void handleCreateAbbreviation(ActionEvent event) {
         if (occ.posInTerm() != null) {
@@ -322,11 +348,15 @@ public class TacletMenuController extends ViewController {
             final String term = oldTerm.length() > 200
                     ? oldTerm.substring(0, 200) : oldTerm;
             abbreviationDialog("Create Abbreviation",
-                    "Enter abbreviation for term: \n" + term + "\n", null, occ,
-                    false);
+                    "Enter abbreviation for term: \n" + term + "\n", null);
         }
     }
 
+    /**
+     * Handles the change of a term abbreviation.
+     * 
+     * @param event
+     */
     @FXML
     private void handleChangeAbbreviation(ActionEvent event) {
         if (occ.posInTerm() != null) {
@@ -334,13 +364,24 @@ public class TacletMenuController extends ViewController {
                     "Enter abbreviation for term: \n"
                             + occ.subTerm().toString(),
                     mediator.getNotationInfo().getAbbrevMap()
-                            .getAbbrev(occ.subTerm()).substring(1),
-                    occ, true);
+                            .getAbbrev(occ.subTerm()).substring(1));
         }
     }
 
+    /**
+     * Opens a dialog that requires the input of a term abbreviation and iff a
+     * valid abbreviation is given applies it.
+     * 
+     * @param header
+     *            the header text for the dialog
+     * @param message
+     *            the message of the dialog
+     * @param inputText
+     *            preset text for the input line. Can be used to pass an already
+     *            existing abbreviation to change.
+     */
     private void abbreviationDialog(String header, String message,
-            String inputText, PosInOccurrence occ, boolean change) {
+            String inputText) {
         TextInputDialog dialog = new TextInputDialog(inputText);
         dialog.setHeaderText(header);
         dialog.setContentText(message);
@@ -354,12 +395,12 @@ public class TacletMenuController extends ViewController {
                 }
                 else {
                     try {
-                        if (change)
-                            mediator.getNotationInfo().getAbbrevMap()
-                                    .changeAbbrev(occ.subTerm(), abbreviation);
+                        AbbrevMap abbrevMap = mediator.getNotationInfo()
+                                .getAbbrevMap();
+                        if (abbrevMap.containsTerm(occ.subTerm()))
+                            abbrevMap.changeAbbrev(occ.subTerm(), abbreviation);
                         else
-                            mediator.getNotationInfo().getAbbrevMap()
-                                    .put(occ.subTerm(), abbreviation, true);
+                            abbrevMap.put(occ.subTerm(), abbreviation, true);
                         parentController.forceRefresh();
                     }
                     catch (Exception e) {
@@ -372,6 +413,11 @@ public class TacletMenuController extends ViewController {
         });
     }
 
+    /**
+     * Handles the enable of a term abbreviation.
+     * 
+     * @param event
+     */
     @FXML
     private void handleEnableAbbreviation(ActionEvent event) {
         if (occ.posInTerm() != null) {
@@ -381,6 +427,11 @@ public class TacletMenuController extends ViewController {
         }
     }
 
+    /**
+     * Handles the disable of a term abbreviation.
+     * 
+     * @param event
+     */
     @FXML
     private void handleDisableAbbreviation(ActionEvent event) {
         if (occ.posInTerm() != null) {
@@ -390,4 +441,28 @@ public class TacletMenuController extends ViewController {
         }
     }
 
+    /**
+     * Sorts the TacletApps with the given TacletAppComparator.
+     * @param finds the list to sort (will not be changed)
+     * @param comp the comparator
+     * @return the sorted list
+     */
+    public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
+            TacletAppComparator comp) {
+        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
+
+        List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
+
+        for (final TacletApp app : finds) {
+            list.add(app);
+        }
+
+        Collections.sort(list, comp);
+
+        for (final TacletApp app : list) {
+            result = result.prepend(app);
+        }
+
+        return result;
+    }
 }
