@@ -12,7 +12,8 @@ import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * TODO add class comment
+ * Holds all the Highlighting Information used by the {@link SequentPrinter}
+ * 
  * @author Maximilian Li
  * @version 1.0
  */
@@ -24,6 +25,7 @@ public class PrintDictionary {
     private Map<Integer, Map<Integer, List<String>>> openMap = new HashMap<>();
     private Map<Integer, Map<Integer, List<String>>> closeMap = new HashMap<>();
 
+    // An additional Map holding the Indices to simplify deletion
     private Map<HighlightType, List<Integer>> indicesListMap = new HashMap<>();
 
     /**
@@ -46,7 +48,8 @@ public class PrintDictionary {
      * @param map
      *            the map to be inserted into
      */
-    private void putTag(int index, HighlightType type, String tag, Map<Integer, Map<Integer, List<String>>> map) {
+    private void putTag(int index, HighlightType type, String tag,
+            Map<Integer, Map<Integer, List<String>>> map) {
 
         if (map.get(index) == null) {
             // If the Map Entry does not exist, create new Entry and call itself
@@ -62,7 +65,8 @@ public class PrintDictionary {
         }
         // If Tag is empty, one entry shall be removed
         if (tag.isEmpty() && priorityMap.get(type.getPriority()).size() > 0) {
-            priorityMap.get(type.getPriority()).remove(priorityMap.get(type.getPriority()).size() - 1);
+            priorityMap.get(type.getPriority())
+                    .remove(priorityMap.get(type.getPriority()).size() - 1);
         }
         else {
             // If the Array entry is not null, the tag can be appended.
@@ -86,7 +90,8 @@ public class PrintDictionary {
      *            the style tag constant
      */
     public void putOpenTag(int index, HighlightType type, String tag) {
-        putTag(index, type, NUIConstants.OPEN_TAG_BEGIN.concat(tag).concat(NUIConstants.OPEN_TAG_END), openMap);
+        putTag(index, type, NUIConstants.OPEN_TAG_BEGIN.concat(tag)
+                .concat(NUIConstants.OPEN_TAG_END), openMap);
     }
 
     /**
@@ -222,8 +227,10 @@ public class PrintDictionary {
                             continue;
 
                         // Check for possible Overlap
-                        while (!tagStack.isEmpty() && tagStack.peek().first != j) {
-                            tagList.add(new Pair<Integer, String>(i, NUIConstants.CLOSING_TAG));
+                        while (!tagStack.isEmpty()
+                                && tagStack.peek().first != j) {
+                            tagList.add(new Pair<Integer, String>(i,
+                                    NUIConstants.CLOSING_TAG));
                             saveTagStack.push(tagStack.pop());
                         }
 
@@ -231,7 +238,8 @@ public class PrintDictionary {
                         tagStack.pop();
 
                         while (saveTagStack.size() > 0) {
-                            tagList.add(new Pair<Integer, String>(i, saveTagStack.peek().second));
+                            tagList.add(new Pair<Integer, String>(i,
+                                    saveTagStack.peek().second));
                             tagStack.push(saveTagStack.pop());
                         }
                     }
@@ -248,8 +256,10 @@ public class PrintDictionary {
                             continue;
 
                         // Correctly Prioritze even inside other spans
-                        while (!tagStack.isEmpty() && tagStack.peek().first > j) {
-                            tagList.add(new Pair<Integer, String>(i, NUIConstants.CLOSING_TAG));
+                        while (!tagStack.isEmpty()
+                                && tagStack.peek().first > j) {
+                            tagList.add(new Pair<Integer, String>(i,
+                                    NUIConstants.CLOSING_TAG));
                             saveTagStack.push(tagStack.pop());
                         }
 
@@ -258,7 +268,8 @@ public class PrintDictionary {
                         tagList.add(new Pair<Integer, String>(i, insertTag));
 
                         while (saveTagStack.size() > 0) {
-                            tagList.add(new Pair<Integer, String>(i, saveTagStack.peek().second));
+                            tagList.add(new Pair<Integer, String>(i,
+                                    saveTagStack.peek().second));
                             tagStack.push(saveTagStack.pop());
                         }
 

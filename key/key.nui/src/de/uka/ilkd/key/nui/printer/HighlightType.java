@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.nui.printer;
 
 /**
- * Use Unique values in incremental order. Value Correspond to ArrayPosition.
+ * Use Unique values in incremental order! Value Correspond to ArrayPosition.
  * Higher Value = Higher Priority.
  * 
  * @author Maximilian Li

@@ -14,9 +14,10 @@ import org.key_project.util.java.IOUtil;
 import de.uka.ilkd.key.nui.Context;
 
 /**
- * TODO add class comment
+ * reads and writes CSS files
  * 
- * @author
+ * @author Victor Schuemmer
+ * @author Maximilian Li
  * @version 1.0
  */
 public class CssFileHandler {
