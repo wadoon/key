@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.uka.ilkd.key.nui.util;
 
 import java.io.File;
@@ -20,8 +17,10 @@ import org.w3c.dom.NodeList;
 import javafx.scene.control.TreeItem;
 
 /**
+ * TODO add class comments
+ * 
  * @author Maximilian Li
- *
+ * @version 1.0
  */
 public class XmlReader {
     private File inputFile;
@@ -32,7 +31,10 @@ public class XmlReader {
     private Map<String, Boolean> classEnabledMap = new HashMap<>();
 
     /**
+     * TODO add comments
      * 
+     * @param path
+     * @param ruleList
      */
     public XmlReader(String path, List<CssRule> ruleList) {
         inputFile = new File(path);
@@ -42,51 +44,45 @@ public class XmlReader {
         handleFile();
     }
 
+    /**
+     * TODO add comments
+     */
     private void handleFile() {
         try {
-            //Make Reader
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory
-                    .newInstance();
+            // Make Reader
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(inputFile);
             doc.getDocumentElement().normalize();
             NodeList nList = doc.getElementsByTagName("TreeItem");
-            
-            //Make new TreeItem for CSSStylerView
+
+            // Make new TreeItem for CSSStylerView
             for (int i = 0; i < nList.getLength(); i++) {
                 Node node = nList.item(i);
-                TreeItem<String> categoryNode = new TreeItem<String>(
-                        ((Element) node).getAttribute("text"));
+                TreeItem<String> categoryNode = new TreeItem<String>(((Element) node).getAttribute("text"));
                 NodeList childList = node.getChildNodes();
-                
-                //Build Maps for each Rule by Selector
+
+                // Build Maps for each Rule by Selector
                 for (int j = 0; j < childList.getLength(); j++) {
                     Node child = childList.item(j);
                     if (child.getNodeType() == Node.ELEMENT_NODE) {
                         Element elem = (Element) child;
-                        String selector = elem.getElementsByTagName("selector")
-                                .item(0).getTextContent();
+                        String selector = elem.getElementsByTagName("selector").item(0).getTextContent();
                         if (selectorList.contains(selector)) {
                             selectorList.remove(selector);
 
-                            String description = elem
-                                    .getElementsByTagName("Description").item(0)
-                                    .getTextContent();
+                            String description = elem.getElementsByTagName("Description").item(0).getTextContent();
 
                             descriptionMap.put(selector, description);
 
-                            String className = elem
-                                    .getElementsByTagName("Class").item(0)
-                                    .getTextContent();
+                            String className = elem.getElementsByTagName("Class").item(0).getTextContent();
 
                             classMap.put(className, selector.substring(1));
 
                             classEnabledMap.put(className,
-                                    elem.getElementsByTagName("enabled").item(0)
-                                            .getTextContent().equals("true"));
+                                    elem.getElementsByTagName("enabled").item(0).getTextContent().equals("true"));
 
-                            TreeItem<String> childNode = new TreeItem<String>(
-                                    description);
+                            TreeItem<String> childNode = new TreeItem<String>(description);
                             categoryNode.getChildren().add(childNode);
 
                         }
@@ -96,15 +92,16 @@ public class XmlReader {
                 treeRoot.getChildren().add(categoryNode);
             }
 
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e) {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
         TreeItem<String> otherNode = new TreeItem<String>("Other");
         for (int i = 0; i < selectorList.size(); i++) {
-            otherNode.getChildren()
-                    .add(new TreeItem<String>(selectorList.get(i)));
+            otherNode.getChildren().add(new TreeItem<String>(selectorList.get(i)));
         }
         treeRoot.getChildren().add(otherNode);
     }
@@ -120,8 +117,8 @@ public class XmlReader {
     public Map<String, String> getClassMap() {
         return classMap;
     }
-    
-    public Map<String, Boolean> getClassEnabledMap(){
+
+    public Map<String, Boolean> getClassEnabledMap() {
         return classEnabledMap;
     }
 }

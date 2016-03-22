@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * TODO add class comment
  * 
  * @author Victor Schuemmer
+ * @version 1.0
  */
 public class CssRule {
 
@@ -14,9 +16,9 @@ public class CssRule {
     private HashMap<String, String> propertyValuePairs;
 
     /**
-     * Constructs an empty CssRule. Notice that a rule without selector is
-     * invalid in terms of CSS, so a selector must be given later with
-     * addSelector().
+     * Constructs an empty {@link CssRule}. Notice that a rule without selector
+     * is invalid in terms of CSS, so a selector must be given later with
+     * {@link #addSelector(String)}.
      * 
      * @param selector
      */
@@ -25,7 +27,7 @@ public class CssRule {
     }
 
     /**
-     * Constructs CssRule with given selector.
+     * Constructs {@link CssRule} with a given selector.
      * 
      * @param selector
      */
@@ -35,7 +37,7 @@ public class CssRule {
     }
 
     /**
-     * Constructs CssRule with given selectors.
+     * Constructs {@link CssRule} with a list of given selectors.
      * 
      * @param selectors
      *            List of selector Strings
@@ -58,10 +60,8 @@ public class CssRule {
      *             tab, newline)
      */
     public void addSelector(String selector) {
-        if (selector.contains(" ") || selector.contains("\n")
-                || selector.contains("\t") || selector.isEmpty())
-            throw new IllegalArgumentException(
-                    "Selector contains spacing or is empty.");
+        if (selector.contains(" ") || selector.contains("\n") || selector.contains("\t") || selector.isEmpty())
+            throw new IllegalArgumentException("Selector contains spacing or is empty.");
         this.selectors.add(selector);
     }
 
@@ -99,10 +99,8 @@ public class CssRule {
      *             tab, newline) or any argument is an empty String
      */
     public void putPropertyValuePair(String property, String value) {
-        if (property.contains(" ") || property.contains("\n")
-                || property.contains("\t") || property.isEmpty())
-            throw new IllegalArgumentException(
-                    "Property contains spacing or is empty.");
+        if (property.contains(" ") || property.contains("\n") || property.contains("\t") || property.isEmpty())
+            throw new IllegalArgumentException("Property contains spacing or is empty.");
         if (value.isEmpty())
             throw new IllegalArgumentException("Value is empty.");
         propertyValuePairs.put(property, value);
@@ -116,7 +114,6 @@ public class CssRule {
     }
 
     /**
-     * 
      * @param property
      *            the property String
      * @return the value String for the given property
@@ -134,6 +131,9 @@ public class CssRule {
         propertyValuePairs.remove(property);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(selectorsAsString());
@@ -145,6 +145,10 @@ public class CssRule {
         return sb.toString();
     }
 
+    /**
+     * TODO add comments
+     * @return
+     */
     public String selectorsAsString() {
         StringBuilder sb = new StringBuilder();
         sb.append(selectors.get(0));

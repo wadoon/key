@@ -1,12 +1,12 @@
-/**
- * 
- */
 package de.uka.ilkd.key.nui.util;
 
 /**
+ * Collection of constants used throughout the application.
+ * 
  * @author Maximilian Li
  * @author Victor Schuemmer
- *
+ * @author Nils Muzzulini
+ * @version 1.0
  */
 public final class NUIConstants {
     public final static String OPEN_TAG_BEGIN = "<span class=\"";
@@ -34,7 +34,7 @@ public final class NUIConstants {
     public final static String CSSSTYLER_INHERITED_TT_TEMPLATE = "If this checkbox is checked, the property will be styled like the corresponding property defined in ";
     
     public final static String PREFERENCES_CSSPATH_KEY = "cssPath";
-    
+
     public final static String DEFAULT_CSS_PATH = "resources/css/sequentStyleDefault.css";
     public final static String DEFAULT_XML_PATH = "resources/xml/cssList.xml";
     public final static String KEY_WINDOW_ICON = "file:resources/images/key-color-icon-square.png";
@@ -82,12 +82,4 @@ public final class NUIConstants {
     public static String getDefaultSequentCss() {
         return DEFAULT_SEQUENT_CSS;
     }
-
-    /**
-     * 
-     */
-    public NUIConstants() {
-        // TODO Auto-generated constructor stub
-    }
-
 }

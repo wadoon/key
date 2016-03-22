@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.uka.ilkd.key.nui.util;
 
 import java.util.ArrayList;
@@ -12,8 +9,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 /**
+ * TODO add class comment
+ * 
  * @author Maximilian Li
- *
+ * @version 1.0
  */
 public class PositionTranslator {
     private String[] lines;
@@ -27,8 +26,11 @@ public class PositionTranslator {
     private static Font minimizedFont;
 
     /**
-     * Creates a PositionTranslator Object, which is able to return the index of
-     * the char in the printed proofString under the mousepointer
+     * Creates a PositionTranslator Object which is able to return the index of
+     * the char in the printed proofString under the mouse pointer.
+     * 
+     * @param cssFileHandler
+     *            {@link CssFileHandler}
      */
     public PositionTranslator(CssFileHandler cssFileHandler) {
         cssHandler = cssFileHandler;
@@ -36,9 +38,10 @@ public class PositionTranslator {
     }
 
     /**
-     * Setter for the proofString
+     * Setter for the proofString.
      * 
      * @param proofString
+     *            proofString to be set
      */
     public void setProofString(String proofString) {
         lines = proofString.split("\n");
@@ -46,12 +49,12 @@ public class PositionTranslator {
     }
 
     /**
-     * returns the Character under the MousePointer
+     * Returns the {@link Character} under the mouse pointer.
      * 
      * @param event
      *            the mouse event
-     * @return if no char: -1; else index of the underlying char in the
-     *         proofstring.
+     * @return if no char: -1; else index of the underlying char in the proof
+     *         string.
      */
     public int getCharIdxUnderPointer(MouseEvent event) {
         this.readCSS();
@@ -76,7 +79,7 @@ public class PositionTranslator {
     }
 
     /**
-     * uses the Y-Coordinate of MouseEvent to compute underlying line
+     * Uses the Y-Coordinate of {@link MouseEvent} to compute underlying line.
      * 
      * @param yCoordinate
      *            the YCoordinate of the MouseEvent
@@ -96,15 +99,13 @@ public class PositionTranslator {
             if (filterCollapsed) {
                 if (!unfilteredLines.contains(result)) {
                     if (unfilteredLines.contains(result + 1)) {
-                        yCoord -= Math
-                                .round(text.getLayoutBounds().getHeight());
+                        yCoord -= Math.round(text.getLayoutBounds().getHeight());
                     }
                     continue;
                 }
             }
             else {
-                if (!unfilteredLines.contains(result)
-                        && unfilteredLines.size() > 0) {
+                if (!unfilteredLines.contains(result) && unfilteredLines.size() > 0) {
                     text.setFont(minimizedFont);
                 }
                 else {
@@ -118,21 +119,21 @@ public class PositionTranslator {
             }
         }
         result -= collapsedLinesAdjustment;
-        if (yCoord > 0 || (filterCollapsed && unfilteredLines.size() > 0
-                && !unfilteredLines.contains(result))) {
+        if (yCoord > 0 || (filterCollapsed && unfilteredLines.size() > 0 && !unfilteredLines.contains(result))) {
             return -1;
         }
         return result;
     }
 
     /**
-     * returns the idx of the char under the mousepointer relative to the line
+     * Returns the index of the {@link Character} under the mouse pointer
+     * relative to the line.
      * 
      * @param xCoordinate
      *            the x-value of the Mouse event
      * @param line
      *            the line in which the char is located
-     * @return the idx of the char inside of the given line
+     * @return the index of the char inside of the given line
      */
     private int getCharIdxInLine(double xCoordinate, int line) {
         // Adjust for left margin
@@ -142,8 +143,7 @@ public class PositionTranslator {
         // Generate Text Object with Font and Size for computing width
         Text text = new Text();
         // Adjust for minimized Filter
-        if (!filterCollapsed && !unfilteredLines.contains(line)
-                && unfilteredLines.size() > 0) {
+        if (!filterCollapsed && !unfilteredLines.contains(line) && unfilteredLines.size() > 0) {
             text.setFont(minimizedFont);
         }
         else {
@@ -171,13 +171,13 @@ public class PositionTranslator {
     }
 
     /**
-     * gets the Index of a specific Char in the proofString
+     * Gets the index of a specific {@link Character} in the proof string.
      * 
      * @param line
      *            the line of the char
      * @param charInLine
      *            the position of the char inside of the line
-     * @return returns the index of the char in proofstring
+     * @return returns the index of the char in proof string
      */
     private int getCharIndex(int line, int charPosInLine) {
         int idx = 0;
@@ -192,32 +192,29 @@ public class PositionTranslator {
     }
 
     /**
-     * reads the CSS information for HTML Styling from the CSSFileHandler
-     * {@link CssFileHandler}
+     * Reads the CSS information for HTML Styling from the
+     * {@link CssFileHandler}.
      */
     private void readCSS() {
         CssRule pre = cssHandler.getRule("pre");
-        CssRule minimized = cssHandler
-                .getRule("." + NUIConstants.FILTER_MINIMIZED_TAG);
+        CssRule minimized = cssHandler.getRule("." + NUIConstants.FILTER_MINIMIZED_TAG);
 
         font = pre.getValue("font-family");
         String fontSizeValue = pre.getValue("font-size");
 
         // FontSize Value ends with "..px"
-        fontSize = Integer.parseInt(
-                fontSizeValue.substring(0, fontSizeValue.length() - 2));
+        fontSize = Integer.parseInt(fontSizeValue.substring(0, fontSizeValue.length() - 2));
 
         fontSizeValue = minimized.getValue("font-size");
 
-        minimizedSize = Integer.parseInt(
-                fontSizeValue.substring(0, fontSizeValue.length() - 2));
+        minimizedSize = Integer.parseInt(fontSizeValue.substring(0, fontSizeValue.length() - 2));
 
         normalFont = new Font(font, fontSize);
         minimizedFont = new Font(font, minimizedSize);
     }
 
     /**
-     * gives Information on the Filtering to the PosTranslator
+     * Gives information on the filtering to the {@link PositionTranslator}.
      * 
      * @param lines
      *            the number of lines, which are not filtered out
@@ -240,8 +237,9 @@ public class PositionTranslator {
     }
 
     /**
-     * computes dimensions of the proofstring given to the PositionTranslator,
-     * if drawn with the Font and Size as defined in the CSS
+     * Computes dimensions of the proof string given to the
+     * {@link PositionTranslator}, if drawn with the Font and Size as defined in
+     * the CSS.
      * 
      * @return a Pair, with Pair.first = width and Pair.second = height
      */
@@ -264,11 +262,15 @@ public class PositionTranslator {
         }
         text.setText(longestLine);
 
-        return new Pair<Double, Double>(
-                (double) Math.round(text.getLayoutBounds().getWidth() + 50),
-                height);
+        return new Pair<Double, Double>((double) Math.round(text.getLayoutBounds().getWidth() + 50), height);
     }
 
+    /**
+     * TODO add comments
+     * 
+     * @param index
+     * @return
+     */
     public Double getHeightForIndex(int index) {
         double height = 5.0;
         int stringIndex = 0;
