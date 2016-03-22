@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.view.SequentViewController;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -31,12 +32,14 @@ import de.uka.ilkd.key.ui.MediatorProofControl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.stage.Stage;
 
 /**
  * 
@@ -153,7 +156,6 @@ public class TacletMenuController extends ViewController {
                         .prepend(c.getRewriteTaclet(goal, occ)),
                 c.getNoFindTaclet(goal), builtInRules);
 
-        
         proofMacroMenuController.init(mediator, occ);
     }
 
@@ -383,6 +385,11 @@ public class TacletMenuController extends ViewController {
     private void abbreviationDialog(String header, String message,
             String inputText) {
         TextInputDialog dialog = new TextInputDialog(inputText);
+
+        // Get the Stage and add KeY Icon.
+        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
+        dialog.setTitle("Abbreviation Dialog");
         dialog.setHeaderText(header);
         dialog.setContentText(message);
         Optional<String> result = dialog.showAndWait();
@@ -443,8 +450,11 @@ public class TacletMenuController extends ViewController {
 
     /**
      * Sorts the TacletApps with the given TacletAppComparator.
-     * @param finds the list to sort (will not be changed)
-     * @param comp the comparator
+     * 
+     * @param finds
+     *            the list to sort (will not be changed)
+     * @param comp
+     *            the comparator
      * @return the sorted list
      */
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
