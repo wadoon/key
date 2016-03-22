@@ -227,6 +227,11 @@ public class SequentViewController extends ViewController {
             apply(eventArgs);
             updateView();
         });
+        getContext().getSequentHtmlChangedEvent().addHandler(eventArgs -> {
+            if (getContext().getKeYMediator().getSelectedProof() == null) {
+                clearWebView();
+            }
+        });
         getContext().getSelectModeActivateEvent()
                 .addHandler(this::selectModeActivated);
 
@@ -306,6 +311,7 @@ public class SequentViewController extends ViewController {
 
         sequentOptions.setDisable(false);
         tacletInfo.setDisable(false);
+        textArea.setDisable(false);
     }
 
     /**
@@ -534,5 +540,12 @@ public class SequentViewController extends ViewController {
     public void enableTacletMenu(boolean enable) {
         enableTacletMenu = enable;
 
+    }
+    
+    private void clearWebView() {
+        sequentOptions.setDisable(true);
+        tacletInfo.setDisable(true);
+        textArea.setDisable(true);
+        webEngine.load("");
     }
 }

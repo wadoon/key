@@ -30,6 +30,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT, defaultActive = false)
 public class FilterViewController extends ViewController {
@@ -86,6 +87,9 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private AnchorPane filterContainer;
+    
+    @FXML
+    private VBox filterSettings;
 
     private FilterSelection filterSelection;
     private boolean suppressValueUpdate = false;
@@ -135,6 +139,7 @@ public class FilterViewController extends ViewController {
         filterModeBox.getItems().add(FilterLayout.Minimize);
         filterModeBox.getItems().add(FilterLayout.Collapse);
         applyButton.setDisable(true);
+        filterSettings.setDisable(true);
 
         currentFilter = new PrintFilter();
         loadCurrentFilterToUi();
@@ -146,10 +151,10 @@ public class FilterViewController extends ViewController {
                 .addKeYSelectionListener(new KeYSelectionListener() {
                     @Override
                     public void selectedProofChanged(KeYSelectionEvent e) {
-                        if (getContext().getKeYMediator()
-                                .getSelectedProof() != null) {
-                            applyButton.setDisable(false);
-                        }
+                        applyButton.setDisable(!getContext().getKeYMediator()
+                                .ensureProofLoaded());
+                        filterSettings.setDisable(!getContext().getKeYMediator()
+                                .ensureProofLoaded());
                     }
 
                     @Override

@@ -48,7 +48,6 @@ public class ProofBrowserViewController extends ViewController {
     @FXML
     private TreeView<String> proofBrowserTreeView;
 
-    // Listens for Proof or Node changes.
     private KeYSelectionListener proofChangeListener = new KeYSelectionListener() {
         @Override
         public void selectedProofChanged(KeYSelectionEvent event) {
@@ -198,7 +197,7 @@ public class ProofBrowserViewController extends ViewController {
             PROOF_BROWSER_ROOT_NODE.getChildren().remove(indexOfParentNode);
 
             // jump to next proof in browser
-            if (indexOfParentNode == 0 && PROOF_BROWSER_ROOT_NODE.getChildren().size() > 0) {
+            if (indexOfParentNode == 0 && !PROOF_BROWSER_ROOT_NODE.isLeaf()) {
                 proofBrowserTreeView.getSelectionModel()
                         .select(PROOF_BROWSER_ROOT_NODE.getChildren().get(0).getChildren().get(0));
             }
@@ -206,6 +205,10 @@ public class ProofBrowserViewController extends ViewController {
         // select nextSibling if available
         else if (nextSibling != null) {
             proofBrowserTreeView.getSelectionModel().select(nextSibling);
+        }
+        
+        if (PROOF_BROWSER_ROOT_NODE.isLeaf()) {
+            getContext().setSequentHtml("");
         }
     }
 }
