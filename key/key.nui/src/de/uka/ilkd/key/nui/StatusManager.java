@@ -3,15 +3,18 @@ package de.uka.ilkd.key.nui;
 import de.uka.ilkd.key.nui.event.HandlerEvent;
 
 /**
- * This class supplies managed access to the status-bar on the ui.
+ * This class supplies managed access to the status-bar on the UI.
+ * 
  * @author Benedikt Gross
- *
+ * @version 1.0
  */
 public class StatusManager {
     private HandlerEvent<String> statusUpdatedEvent = new HandlerEvent<String>();
 
     /**
      * An event that is fired each time a new status is set.
+     * 
+     * @return Status updated event.
      */
     public HandlerEvent<String> getStatusUpdatedEvent() {
         return statusUpdatedEvent;
@@ -20,7 +23,10 @@ public class StatusManager {
     private String status = null;
 
     /**
-     * Shows a status on the status-bar of the ui.
+     * Shows a status on the status-bar of the UI.
+     * 
+     * @param status
+     *            Status to be shown.
      */
     public void setStatus(String status) {
         if (status == null || this.status.equals(status))
@@ -30,8 +36,8 @@ public class StatusManager {
     }
 
     /**
-     * Removes the current status from the status-bar.
-     * (equivalent to setting a status with an empty string)
+     * Removes the current status from the status-bar. (equivalent to setting a
+     * status with an empty string).
      */
     public void clearStatus() {
         status = "";
@@ -40,6 +46,8 @@ public class StatusManager {
 
     /**
      * Returns the current status that is currently displayed in the status-bar.
+     * 
+     * @return Current status.
      */
     public String getStatus() {
         return status;

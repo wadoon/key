@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.nui;
 
-import java.awt.Desktop;
+import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +38,16 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
+/**
+ * The main entry point into the application.
+ * 
+ * @author Benedikt Gross
+ * @author Maximilian Li
+ * @author Victor Schuemmer
+ * @author Nils Muzzulini
+ * 
+ * @version 1.0
+ */
 public class MainApp extends Application {
 
     private static boolean isDebugView = false;
@@ -46,21 +56,32 @@ public class MainApp extends Application {
         return isDebugView;
     }
 
+    /**
+     * The applications primary {@link Stage}.
+     */
     private Stage primaryStage;
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    /**
+     * Root Layout for the application is a {@link BorderPane}.
+     */
     private BorderPane rootLayout;
     private RootLayoutController rootLayoutController;
+
     /**
-     * the string specifies the prefix for packages that should be scanned for
-     * annotations
+     * The {@link String} specifies the prefix for packages that should be
+     * scanned for {@link Annotation Annotations}.
      */
     private Reflections reflections = new Reflections("de.uka.ilkd.key");
     private Scene scene;
     boolean ctrlPressed = false;
-    
+
     /**
      * The {@link KeYDesktop} used by KeY. The default implementation is
-     * replaced in Eclipse. For this reason the {@link Desktop} should never
-     * be used directly.
+     * replaced in Eclipse.
      */
     private static KeYDesktop keyDesktop = new DefaultKeYDesktop();
 
@@ -68,6 +89,9 @@ public class MainApp extends Application {
         return keyDesktop;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -107,11 +131,11 @@ public class MainApp extends Application {
     }
 
     /**
-     * Initializes the root layout.
+     * Initializes the applications {@link MainApp#rootLayout root layout}.
      */
     public void initRootLayout() {
         try {
-            // Load root layout from fxml file.
+            // Load root layout from FXML file.
             FXMLLoader loader = new FXMLLoader();
             URL path = MainApp.class.getResource("view/RootLayout.fxml");
             if (path == null)
@@ -135,7 +159,7 @@ public class MainApp extends Application {
 
             primaryStage.setScene(scene);
 
-            // Give the controller access to the main app.
+            // Give the controller access to the MainApp.
             RootLayoutController controller = loader.getController();
             controller.setMainApp(this, new Context(this));
             rootLayoutController = controller;
@@ -150,7 +174,7 @@ public class MainApp extends Application {
     }
 
     /**
-     * Opens a new window and shows the view specified by given FXML in it. The
+     * Opens a new window and shows the view specified by its given FXML. The
      * CSS applied to the main window will also be applied to the new window.
      * 
      * @param title
@@ -170,7 +194,7 @@ public class MainApp extends Application {
     }
 
     /**
-     * Opens a new window and shows the view specified by given FXML in it. The
+     * Opens a new window and shows the view specified by its given FXML. The
      * CSS applied to the main window will also be applied to the new window.
      * 
      * @param title
@@ -288,7 +312,7 @@ public class MainApp extends Application {
 
     /**
      * Listens for a Window Close Request and prompts the user to confirm. Skips
-     * the dialog if ctrl is pressed while closing.
+     * the dialog if CTRL is pressed while closing.
      */
     private void setCloseWindowConfirmHandler() {
         scene.getWindow().setOnCloseRequest((event) -> {
@@ -313,7 +337,8 @@ public class MainApp extends Application {
     }
 
     /**
-     * Saves window settings and closes the main stage.
+     * Saves window {@link SessionSettings} and the recent files and closes the
+     * main stage.
      */
     private void saveAndClose() {
         SessionSettings settings = new SessionSettings();
@@ -329,6 +354,13 @@ public class MainApp extends Application {
         primaryStage.close();
     }
 
+    /**
+     * Scans for Views by {@link Annotation} and registers them in the
+     * {@link RootLayoutController}.
+     * 
+     * @param lastViewPositions
+     *            Saved view positions
+     */
     private void scanForViews(Map<String, SerializableViewInformation> lastViewPositions) {
         ViewObserver rootViewObserver = new ViewObserver(rootLayoutController);
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYView.class);
@@ -352,6 +384,10 @@ public class MainApp extends Application {
         }
     }
 
+    /**
+     * Scans for Menus by {@link Annotation} and registers them in the
+     * {@link RootLayoutController}.
+     */
     private void scanForMenus() {
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(KeYMenu.class);
         for (Class<?> c : annotated) {
@@ -369,14 +405,12 @@ public class MainApp extends Application {
     }
 
     /**
-     * Returns the main stage.
+     * This the ultimate entry point into the application.
      * 
-     * @return
+     * @param args
+     *            currently supported arguments: "-debug" and "-reset" to enable
+     *            the debug view and reset {@link SessionSettings} respectively.
      */
-    public Stage getPrimaryStage() {
-        return primaryStage;
-    }
-
     public static void main(String[] args) {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
