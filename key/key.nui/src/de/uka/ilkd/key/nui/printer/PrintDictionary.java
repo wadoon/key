@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.uka.ilkd.key.nui.printer;
 
 import java.util.ArrayList;
@@ -15,8 +12,9 @@ import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.util.Pair;
 
 /**
+ * TODO add class comment
  * @author Maximilian Li
- *
+ * @version 1.0
  */
 public class PrintDictionary {
     // Outer Map maps Index in ProofString to Styling Info Map
@@ -29,15 +27,15 @@ public class PrintDictionary {
     private Map<HighlightType, List<Integer>> indicesListMap = new HashMap<>();
 
     /**
-     * 
+     * Empty constructor.
      */
     public PrintDictionary() {
-        // TODO Auto-generated constructor stub
+        // TODO is the constructor needed?
     }
 
     /**
-     * inserts the tag into the given HashMap. Use only if you are sure you know
-     * what to do
+     * Inserts the tag into the given {@link HashMap}. Use only if you are sure
+     * you know what to do.
      * 
      * @param index
      *            position inside the proofstring
@@ -48,8 +46,7 @@ public class PrintDictionary {
      * @param map
      *            the map to be inserted into
      */
-    private void putTag(int index, HighlightType type, String tag,
-            Map<Integer, Map<Integer, List<String>>> map) {
+    private void putTag(int index, HighlightType type, String tag, Map<Integer, Map<Integer, List<String>>> map) {
 
         if (map.get(index) == null) {
             // If the Map Entry does not exist, create new Entry and call itself
@@ -65,8 +62,7 @@ public class PrintDictionary {
         }
         // If Tag is empty, one entry shall be removed
         if (tag.isEmpty() && priorityMap.get(type.getPriority()).size() > 0) {
-            priorityMap.get(type.getPriority())
-                    .remove(priorityMap.get(type.getPriority()).size() - 1);
+            priorityMap.get(type.getPriority()).remove(priorityMap.get(type.getPriority()).size() - 1);
         }
         else {
             // If the Array entry is not null, the tag can be appended.
@@ -79,27 +75,26 @@ public class PrintDictionary {
     }
 
     /**
-     * saves an opening tag (<span ...>) at the given position. Do not forget to
-     * add a closing Tag!
+     * Saves an opening tag (<span ...>) at the given position. Do not forget to
+     * add a closing tag!
      * 
      * @param index
-     *            the inseriton position
+     *            the insertion position
      * @param type
      *            the {@link HighlightType}
      * @param tag
      *            the style tag constant
      */
     public void putOpenTag(int index, HighlightType type, String tag) {
-        putTag(index, type, NUIConstants.OPEN_TAG_BEGIN.concat(tag)
-                .concat(NUIConstants.OPEN_TAG_END), openMap);
+        putTag(index, type, NUIConstants.OPEN_TAG_BEGIN.concat(tag).concat(NUIConstants.OPEN_TAG_END), openMap);
     }
 
     /**
-     * saves a closing tag (</span>) at the given position. Do not forget to add
-     * an opening Tag!
+     * Saves a closing tag (</span>) at the given position. Do not forget to add
+     * an opening tag!
      * 
      * @param index
-     *            the inseriton position
+     *            the insertion position
      * @param type
      *            the {@link HighlightType}
      */
@@ -108,7 +103,8 @@ public class PrintDictionary {
     }
 
     /**
-     * saves the given indices in the indicesListMap for easier deletion
+     * Saves the given indices in the {@link #indicesListMap} for easier
+     * deletion.
      * 
      * @param index
      *            the index to be saved
@@ -123,34 +119,41 @@ public class PrintDictionary {
     }
 
     /**
-     * removes all the opening tags at the given position for the
+     * Removes all the opening tags at the given position for the
      * {@link HighlightType}. Do not forget to remove the closing tags!
      * 
      * @param index
+     *            index to be removed
      * @param type
+     *            {@link HighlightType}
      */
     public void removeOpenTag(int index, HighlightType type) {
         putTag(index, type, "", openMap);
     }
 
     /**
-     * removes all the closing tags at the given position for the
+     * Removes all the closing tags at the given position for the
      * {@link HighlightType}. Do not forget to remove the opening tags!
      * 
      * @param index
+     *            index to be removed
      * @param type
+     *            {@link HighlightType}
      */
     public void removeCloseTag(int index, HighlightType type) {
         putTag(index, type, "", closeMap);
     }
 
     /**
-     * removes a Single Styling instance consisting of opening and closing tag
-     * for a specific type
+     * Removes a Single Styling instance consisting of opening and closing tag
+     * for a specific type.
      * 
      * @param start
+     *            start index
      * @param end
+     *            end index
      * @param type
+     *            {@link HighlightType}
      */
     public void removeSingleStyleTag(int start, int end, HighlightType type) {
         putTag(start, type, "", openMap);
@@ -158,9 +161,10 @@ public class PrintDictionary {
     }
 
     /**
-     * removes all the applied StyleTags for the given type
+     * Removes all the applied StyleTags for the given type.
      * 
      * @param type
+     *            {@link HighlightType}
      */
     public void removeAllTypeTags(HighlightType type) {
 
@@ -181,7 +185,7 @@ public class PrintDictionary {
     }
 
     /**
-     * clears all the information
+     * Clears all the information.
      */
     public void clear() {
         openMap.clear();
@@ -190,7 +194,7 @@ public class PrintDictionary {
     }
 
     /**
-     * @return a sorted List of Pairs, with the insertion index and the tag to
+     * @return A sorted List of Pairs, with the insertion index and the tag to
      *         be inserted. No offset has been computed.
      */
     // 2 separate LoopPhases for Tag Applying, to avoid self canceling and slim
@@ -218,10 +222,8 @@ public class PrintDictionary {
                             continue;
 
                         // Check for possible Overlap
-                        while (!tagStack.isEmpty()
-                                && tagStack.peek().first != j) {
-                            tagList.add(new Pair<Integer, String>(i,
-                                    NUIConstants.CLOSING_TAG));
+                        while (!tagStack.isEmpty() && tagStack.peek().first != j) {
+                            tagList.add(new Pair<Integer, String>(i, NUIConstants.CLOSING_TAG));
                             saveTagStack.push(tagStack.pop());
                         }
 
@@ -229,8 +231,7 @@ public class PrintDictionary {
                         tagStack.pop();
 
                         while (saveTagStack.size() > 0) {
-                            tagList.add(new Pair<Integer, String>(i,
-                                    saveTagStack.peek().second));
+                            tagList.add(new Pair<Integer, String>(i, saveTagStack.peek().second));
                             tagStack.push(saveTagStack.pop());
                         }
                     }
@@ -247,10 +248,8 @@ public class PrintDictionary {
                             continue;
 
                         // Correctly Prioritze even inside other spans
-                        while (!tagStack.isEmpty()
-                                && tagStack.peek().first > j) {
-                            tagList.add(new Pair<Integer, String>(i,
-                                    NUIConstants.CLOSING_TAG));
+                        while (!tagStack.isEmpty() && tagStack.peek().first > j) {
+                            tagList.add(new Pair<Integer, String>(i, NUIConstants.CLOSING_TAG));
                             saveTagStack.push(tagStack.pop());
                         }
 
@@ -259,8 +258,7 @@ public class PrintDictionary {
                         tagList.add(new Pair<Integer, String>(i, insertTag));
 
                         while (saveTagStack.size() > 0) {
-                            tagList.add(new Pair<Integer, String>(i,
-                                    saveTagStack.peek().second));
+                            tagList.add(new Pair<Integer, String>(i, saveTagStack.peek().second));
                             tagStack.push(saveTagStack.pop());
                         }
 

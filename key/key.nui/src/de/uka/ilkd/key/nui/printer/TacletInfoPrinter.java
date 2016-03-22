@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nui.printer;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -23,20 +24,26 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
 /**
- * Printer class for generating Strings containing information about applied rules.
- * Methods copied from {@link InnerNodeView} with minor adaptions. 
+ * Printer class for generating Strings containing information about applied
+ * rules. Methods copied from {@link InnerNodeView} with minor adaptions.
+ * 
  * @author Victor Schuemmer
+ * @version 1.0
  */
 public class TacletInfoPrinter {
-    
+
     /**
-     * Creates a String containing information about applied rules on the given node.
-     * @param mediator {@link KeYMediator}
-     * @param node {@link Node}
-     * @return String containing information about applied rules on the given node.
+     * Creates a String containing information about applied rules on the given
+     * node.
+     * 
+     * @param mediator
+     *            {@link KeYMediator}
+     * @param node
+     *            {@link Node}
+     * @return String containing information about applied rules on the given
+     *         node.
      */
-    public static String printTacletInfo(KeYMediator mediator,
-            Node node) {
+    public static String printTacletInfo(KeYMediator mediator, Node node) {
 
         RuleApp app = node.getAppliedRuleApp();
         StringBuilder s = new StringBuilder();
@@ -44,46 +51,51 @@ public class TacletInfoPrinter {
         if (app != null) {
             s.append("The following rule was applied on this node: \n\n");
             if (app.rule() instanceof Taclet) {
-                LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null),
-                        mediator.getNotationInfo(),
-                        mediator.getServices(),
-                        true);
+                LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), mediator.getNotationInfo(),
+                        mediator.getServices(), true);
                 logicPrinter.printTaclet((Taclet) (app.rule()));
                 s.append(logicPrinter);
-            } else {
+            }
+            else {
                 s.append(app.rule());
             }
 
             if (app instanceof TacletApp) {
                 TacletApp tapp = (TacletApp) app;
-                if (tapp.instantiations().getGenericSortInstantiations()
-                        != GenericSortInstantiations.EMPTY_INSTANTIATIONS) {
+                if (tapp.instantiations()
+                        .getGenericSortInstantiations() != GenericSortInstantiations.EMPTY_INSTANTIATIONS) {
                     s.append("\n\nWith sorts:\n");
                     s.append(tapp.instantiations().getGenericSortInstantiations());
                 }
 
                 StringBuffer sb = new StringBuffer("\n\n");
-                //TODO 
+                // TODO
                 writeTacletSchemaVariablesHelper(sb, tapp.taclet());
                 s.append(sb);
             }
-        } else {
+        }
+        else {
             s.append("No rule was applied on this node.");
         }
         return s.toString();
     }
-    
-    private static void writeTacletSchemaVariablesHelper(StringBuffer out,
-            final Taclet t) {
+
+    /**
+     * TODO add comments
+     * 
+     * @param out
+     * @param t
+     */
+    private static void writeTacletSchemaVariablesHelper(StringBuffer out, final Taclet t) {
         ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
 
-        for (final NewVarcond nvc: t.varsNew()) {
+        for (final NewVarcond nvc : t.varsNew()) {
             schemaVars = schemaVars.add(nvc.getSchemaVariable());
         }
 
-//        for (final NewDependingOn ndo : t.varsNewDependingOn()) {
-//            schemaVars = schemaVars.add(ndo.first());
-//        }
+        // for (final NewDependingOn ndo : t.varsNewDependingOn()) {
+        // schemaVars = schemaVars.add(ndo.first());
+        // }
 
         if (!schemaVars.isEmpty()) {
             out.append("\\schemaVariables {\n");
@@ -99,9 +111,14 @@ public class TacletInfoPrinter {
             out.append("}\n");
         }
     }
-    
-    private static void writeTacletSchemaVariable(StringBuffer out,
-            SchemaVariable schemaVar) {
+
+    /**
+     * TODO add comments
+     * 
+     * @param out
+     * @param schemaVar
+     */
+    private static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
         if (schemaVar instanceof ModalOperatorSV) {
             final ModalOperatorSV modalOpSV = (ModalOperatorSV) schemaVar;
             String sep = "";
@@ -111,37 +128,49 @@ public class TacletInfoPrinter {
                 sep = ", ";
             }
             out.append(" } ").append(modalOpSV.name());
-        } else if (schemaVar instanceof TermSV) {
+        }
+        else if (schemaVar instanceof TermSV) {
             out.append("\\term");
-        } else if (schemaVar instanceof FormulaSV) {
+        }
+        else if (schemaVar instanceof FormulaSV) {
             out.append("\\formula");
-        } else if (schemaVar instanceof UpdateSV) {
+        }
+        else if (schemaVar instanceof UpdateSV) {
             out.append("\\update");
-        } else if (schemaVar instanceof ProgramSV) {
+        }
+        else if (schemaVar instanceof ProgramSV) {
             out.append("\\program");
-        } else if (schemaVar instanceof VariableSV) {
+        }
+        else if (schemaVar instanceof VariableSV) {
             out.append("\\variables");
-        } else if (schemaVar instanceof SkolemTermSV) {
+        }
+        else if (schemaVar instanceof SkolemTermSV) {
             out.append("\\skolemTerm");
-        } else if (schemaVar instanceof TermLabelSV) {
+        }
+        else if (schemaVar instanceof TermLabelSV) {
             out.append("\\termlabel");
-        } else {
+        }
+        else {
             out.append("?");
         }
         writeSVModifiers(out, schemaVar);
 
         /*
-         * TODO: Add an explanation for the following if-statement.
-         * (Kai Wallisch 01/2015)
+         * TODO: Add an explanation for the following if-statement. (Kai
+         * Wallisch 01/2015)
          */
-        if (!(schemaVar instanceof FormulaSV
-                || schemaVar instanceof UpdateSV
-                || schemaVar instanceof TermLabelSV)) {
+        if (!(schemaVar instanceof FormulaSV || schemaVar instanceof UpdateSV || schemaVar instanceof TermLabelSV)) {
             out.append(" ").append(schemaVar.sort().declarationString());
         }
         out.append(" ").append(schemaVar.name());
     }
-    
+
+    /**
+     * TODO add comments
+     * 
+     * @param out
+     * @param sv
+     */
     private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {
         boolean started = false;
         if (sv.isRigid() && !(sv instanceof VariableSV)) {
@@ -154,7 +183,8 @@ public class TacletInfoPrinter {
         if (sv instanceof ProgramSV && ((ProgramSV) sv).isListSV()) {
             if (!started) {
                 out.append("[");
-            } else {
+            }
+            else {
                 out.append(", ");
             }
             out.append("list");
