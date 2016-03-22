@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
@@ -126,6 +127,7 @@ public class ViewInformation extends Observable {
         // header.setCenter(titleLabel);
         tab.setGraphic(titleLabel);
         tab.setContent(node);
+        tab.setTooltip(new Tooltip("Drag\u0026Drop or Right-Click to move Tab"));
 
         titleLabel.setOnDragDetected(event -> {
             if (event.getButton() != MouseButton.PRIMARY)
