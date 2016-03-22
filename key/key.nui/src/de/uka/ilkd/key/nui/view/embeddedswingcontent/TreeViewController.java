@@ -11,7 +11,7 @@ import de.uka.ilkd.key.nui.ViewPosition;
  * @author Nils Muzzulini
  *
  */
-@KeYView(title = "Tree", path = "TreeView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
+@KeYView(title = "Tree", path = "TreeView.fxml", accelerator = "CTRL + T", preferredPosition = ViewPosition.TOPRIGHT)
 public class TreeViewController extends ViewControllerSwingContent {
 
     @Override

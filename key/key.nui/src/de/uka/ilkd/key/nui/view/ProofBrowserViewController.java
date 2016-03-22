@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.nui.view;
 
-import java.net.URL;
 import java.util.HashMap;
-import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -30,7 +28,7 @@ import javafx.scene.image.ImageView;
  * @author Nils Muzzulini
  * @version 1.0
  */
-@KeYView(title = "Proofs", path = "ProofBrowserView.fxml", preferredPosition = ViewPosition.BOTTOMRIGHT)
+@KeYView(title = "Proofs", path = "ProofBrowserView.fxml", accelerator = "CTRL + P", preferredPosition = ViewPosition.BOTTOMRIGHT)
 public class ProofBrowserViewController extends ViewController {
 
     private final static Image CLOSED_PROOF_IMAGE = new Image("file:resources/images/keyproved.gif");
@@ -71,14 +69,18 @@ public class ProofBrowserViewController extends ViewController {
         public void changed(ObservableValue<? extends TreeItem<String>> observable, TreeItem<String> old_val,
                 TreeItem<String> new_val) {
             TreeItem<String> selectedItem = new_val;
-
-            if (selectedItem.equals(PROOF_BROWSER_ROOT_NODE) || !selectedItem.isLeaf()) {
+            if (selectedItem == null) {
+                return;
+            }
+            else if (selectedItem.equals(PROOF_BROWSER_ROOT_NODE) || !selectedItem.isLeaf()) {
                 discardProofButton.setDisable(true);
                 return;
             }
-            discardProofButton.setDisable(false);
-            Proof p = listOfProofs.get(selectedItem.getValue());
-            getContext().getKeYMediator().setProof(p);
+            else {
+                discardProofButton.setDisable(false);
+                Proof p = listOfProofs.get(selectedItem.getValue());
+                getContext().getKeYMediator().setProof(p);
+            }
         }
     };
 
@@ -86,20 +88,9 @@ public class ProofBrowserViewController extends ViewController {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        proofBrowserTreeView.setRoot(PROOF_BROWSER_ROOT_NODE);
-
-        // Attach the selection listener to the Proof Browser tree view.
-        Platform.runLater(() -> {
-            proofBrowserTreeView.getSelectionModel().selectedItemProperty().addListener(browserSelectionListener);
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void initializeAfterLoadingFxml() {
+        proofBrowserTreeView.setRoot(PROOF_BROWSER_ROOT_NODE);
+        proofBrowserTreeView.getSelectionModel().selectedItemProperty().addListener(browserSelectionListener);
         getContext().getKeYMediator().addKeYSelectionListener(proofChangeListener);
     }
 
@@ -107,6 +98,9 @@ public class ProofBrowserViewController extends ViewController {
      * Updates the image for a given proof.
      */
     private void updateProofIcon(Proof proof) {
+        if (proof == null) {
+            return;
+        }
         ProofStatus ps = proof.mgt().getStatus();
         if (ps.getProofClosed()) {
             proofIcon = new ImageView(CLOSED_PROOF_IMAGE);
@@ -206,7 +200,7 @@ public class ProofBrowserViewController extends ViewController {
         else if (nextSibling != null) {
             proofBrowserTreeView.getSelectionModel().select(nextSibling);
         }
-        
+
         if (PROOF_BROWSER_ROOT_NODE.isLeaf()) {
             getContext().setSequentHtml("");
         }

@@ -6,7 +6,7 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 
-@KeYView(title = "Debug", path = "DebugView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
+@KeYView(title = "Debug", path = "DebugView.fxml", accelerator = "CTRL + D", preferredPosition = ViewPosition.TOPRIGHT)
 public class DebugViewController extends ViewController {
 
     @FXML
