@@ -7,7 +7,6 @@ import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.nui.ViewController;
@@ -22,7 +21,7 @@ import javafx.scene.control.MenuItem;
  * anymore but a view controller. There is a field rootMenu to access the actual
  * menu.
  * 
- * @see ProofMacroMenu
+ * @see de.uka.ilkd.key.gui.ProofMacroMenu
  * @author Victor Schuemmer
  */
 public class ProofMacroMenuController extends ViewController {

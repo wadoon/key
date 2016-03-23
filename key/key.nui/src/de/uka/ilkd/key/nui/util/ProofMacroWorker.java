@@ -16,21 +16,25 @@ import de.uka.ilkd.key.util.Debug;
 import javafx.concurrent.Task;
 
 /**
- * The Class ProofMacroWorker is a swing worker for the application of proof
- * macros.
+ * Copied from ProofMacroWorker and adapted to JavaFX.
+ * <p>
+ * The Class ProofMacroWorker is a worker for the application of proof macros.
  *
- * It decouples proof macros from the GUI event thread. It registers with the
- * mediator to receive Stop-Button events
+ * It decouples {@link ProofMacro proof macros} from the GUI event thread. It
+ * registers with the {@link KeYMediator} to receive Stop-Button events.
+ * 
+ * @author Nils Muzzulini
+ * @see de.uka.ilkd.key.gui.ProofMacroWorker
  */
 public class ProofMacroWorker extends Task<Void> implements InterruptListener {
 
     /**
-     * This flag decides whether after a macro an open is selected or not.
-     * If the macro closed all goals under the current pio, selection remains
-     * where it was.
+     * This flag decides whether after a macro an open is selected or not. If
+     * the macro closed all goals under the current pio, selection remains where
+     * it was.
      */
-    private static final boolean SELECT_GOAL_AFTER_MACRO =
-            Boolean.parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
+    private static final boolean SELECT_GOAL_AFTER_MACRO = Boolean
+            .parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
 
     /**
      * The macro which is to be executed
@@ -50,9 +54,12 @@ public class ProofMacroWorker extends Task<Void> implements InterruptListener {
     /**
      * Instantiates a new proof macro worker.
      *
-     * @param macro the macro, not null
-     * @param mediator the mediator, not null
-     * @param posInOcc the position, possibly null
+     * @param macro
+     *            the macro, not null
+     * @param mediator
+     *            the mediator, not null
+     * @param posInOcc
+     *            the position, possibly null
      */
     public ProofMacroWorker(ProofMacro macro, KeYMediator mediator, PosInOccurrence posInOcc) {
         assert macro != null;
@@ -62,14 +69,21 @@ public class ProofMacroWorker extends Task<Void> implements InterruptListener {
         this.posInOcc = posInOcc;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void interruptionPerformed() {
         cancel(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void done() {
-        synchronized(macro) {
-            if(SELECT_GOAL_AFTER_MACRO) {
+        synchronized (macro) {
+            if (SELECT_GOAL_AFTER_MACRO) {
                 selectOpenGoalBelow();
             }
             mediator.setInteractive(true);
@@ -78,17 +92,16 @@ public class ProofMacroWorker extends Task<Void> implements InterruptListener {
         }
     }
 
-    /*
-     * Select a goal below the currently selected node.
-     * Does not do anything if that is not available.
-     * Only enabled goals are considered.
+    /**
+     * Select a goal below the currently selected node. Does not do anything if
+     * that is not available. Only enabled goals are considered.
      */
     private void selectOpenGoalBelow() {
         Node selectedNode = mediator.getSelectedNode();
         for (Goal g : selectedNode.proof().openEnabledGoals()) {
             Node n = g.node();
-            while(n != null) {
-                if(n == selectedNode) {
+            while (n != null) {
+                if (n == selectedNode) {
                     mediator.getSelectionModel().setSelectedGoal(g);
                     return;
                 }
@@ -97,25 +110,30 @@ public class ProofMacroWorker extends Task<Void> implements InterruptListener {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Void call() throws Exception {
         final ProverTaskListener ptl = mediator.getUI();
         Node selectedNode = mediator.getSelectedNode();
         Proof selectedProof = selectedNode.proof();
-        TaskFinishedInfo info =
-                ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
+        TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
         ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
         try {
-            synchronized(macro) {
+            synchronized (macro) {
                 info = macro.applyTo(mediator.getUI(), selectedNode, posInOcc, ptl);
             }
-        } catch (final InterruptedException exception) {
+        }
+        catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
             Debug.out(exception);
-        } catch (final Exception exception) {
+        }
+        catch (final Exception exception) {
             // This should actually never happen.
-            //ExceptionDialog.showDialog(MainWindow.getInstance(), exception);
-        } finally {
+            exception.printStackTrace();
+        }
+        finally {
             ptl.taskFinished(info);
         }
         return null;
