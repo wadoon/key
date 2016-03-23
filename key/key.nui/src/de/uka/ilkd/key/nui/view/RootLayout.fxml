@@ -18,119 +18,161 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.MenuItem?>
 
-<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.RootLayoutController">
+<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity"
+	minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
+	prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="de.uka.ilkd.key.nui.view.RootLayoutController">
 	<top>
-      <AnchorPane>
-         <children>
-      		<MenuBar fx:id="menuBar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-      			<menus>
-      				<Menu mnemonicParsing="true" text="_File">
-      					<items>
-      						<MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                           </accelerator>
-                        </MenuItem>
-                        <fx:include fx:id="recentFileMenu" source="../view/menu/RecentFileMenu.fxml" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleSave" text="Save">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                           </accelerator>
-                        </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false" />
-      						<MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit">
-      						   <accelerator>
-                              <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                           </accelerator>
-                        </MenuItem>
-      					</items>
-      				</Menu>
-                  <Menu mnemonicParsing="true" text="_Window">
-                    <items>
-                        <Menu fx:id="viewsMenu" mnemonicParsing="false" text="Show/Hide Views" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <Menu mnemonicParsing="false" text="Preferences">
-                           <items>
-            						<MenuItem mnemonicParsing="false" onAction="#handleSequentCssStylerAction" text="Edit Sequent Appearance (CSS-Styler)">
-            						   <accelerator>
-                                    <KeyCodeCombination alt="UP" code="A" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
-                                 </accelerator>
-                              </MenuItem>
-                           </items>
-                        </Menu>
-      						<MenuItem mnemonicParsing="false" onAction="#openInNew" text="Open Node in new Sequent" />
-                    </items>
-                  </Menu>
-      				<Menu fx:id="helpMenu" mnemonicParsing="true" text="_Help">
-      					<items>
-                        <CheckMenuItem fx:id="debugMode" mnemonicParsing="false" onAction="#handleDebugMode" selected="true" text="Debug Mode" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleOnlineHelp" text="Online Help">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="F1" control="UP" meta="UP" shift="UP" shortcut="UP" />
-                           </accelerator></MenuItem>
-      						<MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About KeY" />
-      					</items>
-      				</Menu>
-      			</menus>
-      		</MenuBar>
-            <ButtonBar fx:id="debugButtons" buttonMinWidth="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <buttons>
-                <Button mnemonicParsing="false" onAction="#loadDefaultProof" text="Load Default Proof" />
-                  <Button mnemonicParsing="false" onAction="#loadBigProof" text="Load Big Proof" />
-                  <Button mnemonicParsing="false" onAction="#loadSolvableProof" text="Load Solvable" />
-                  <Button mnemonicParsing="false" onAction="#loadUnsolvableProof" text="Load Unsolvable" />
-                  <Button mnemonicParsing="false" onAction="#loadProofSplitTest" text="Split Test" />
-                  <Button mnemonicParsing="false" onAction="#loadModelSearchVsBasicTest" text="ModelSearch vs Basic" />
-              </buttons>
-            </ButtonBar>
-         </children>
-      </AnchorPane>
+		<AnchorPane>
+			<children>
+				<MenuBar fx:id="menuBar" AnchorPane.bottomAnchor="0.0"
+					AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+					AnchorPane.topAnchor="0.0">
+					<menus>
+						<Menu mnemonicParsing="true" text="_File">
+							<items>
+								<MenuItem mnemonicParsing="false" onAction="#handleOpen"
+									text="Open">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="O"
+											control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+									</accelerator>
+								</MenuItem>
+								<fx:include fx:id="recentFileMenu" source="../view/menu/RecentFileMenu.fxml" />
+								<SeparatorMenuItem mnemonicParsing="false" />
+								<MenuItem mnemonicParsing="false" onAction="#handleSave"
+									text="Save">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="S"
+											control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+									</accelerator>
+								</MenuItem>
+								<SeparatorMenuItem mnemonicParsing="false" />
+								<MenuItem mnemonicParsing="false" onAction="#handleExit"
+									text="Exit">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="E"
+											control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+									</accelerator>
+								</MenuItem>
+							</items>
+						</Menu>
+						<Menu mnemonicParsing="true" text="_Window">
+							<items>
+								<Menu fx:id="viewsMenu" mnemonicParsing="false" text="Show/Hide Views" />
+								<SeparatorMenuItem mnemonicParsing="false" />
+								<Menu mnemonicParsing="false" text="Preferences">
+									<items>
+										<MenuItem mnemonicParsing="false"
+											onAction="#handleSequentCssStylerAction" text="Edit Sequent Appearance (CSS-Styler)">
+											<accelerator>
+												<KeyCodeCombination alt="UP" code="A"
+													control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+											</accelerator>
+										</MenuItem>
+									</items>
+								</Menu>
+								<MenuItem mnemonicParsing="false" onAction="#openInNew"
+									text="Open Node in new Sequent">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="T"
+											control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+									</accelerator>
+								</MenuItem>
+							</items>
+						</Menu>
+						<Menu fx:id="helpMenu" mnemonicParsing="true" text="_Help">
+							<items>
+								<CheckMenuItem fx:id="debugMode" mnemonicParsing="false"
+									onAction="#handleDebugMode" selected="true" text="Debug Mode" />
+								<MenuItem mnemonicParsing="false" onAction="#handleOnlineHelp"
+									text="Online Help">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="F1"
+											control="UP" meta="UP" shift="UP" shortcut="UP" />
+									</accelerator>
+								</MenuItem>
+								<MenuItem mnemonicParsing="false" onAction="#handleAbout"
+									text="About KeY" />
+							</items>
+						</Menu>
+					</menus>
+				</MenuBar>
+				<ButtonBar fx:id="debugButtons" buttonMinWidth="50.0"
+					AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
+					AnchorPane.topAnchor="0.0">
+					<buttons>
+						<Button mnemonicParsing="false" onAction="#loadDefaultProof"
+							text="Load Default Proof" />
+						<Button mnemonicParsing="false" onAction="#loadBigProof"
+							text="Load Big Proof" />
+						<Button mnemonicParsing="false" onAction="#loadSolvableProof"
+							text="Load Solvable" />
+						<Button mnemonicParsing="false" onAction="#loadUnsolvableProof"
+							text="Load Unsolvable" />
+						<Button mnemonicParsing="false" onAction="#loadProofSplitTest"
+							text="Split Test" />
+						<Button mnemonicParsing="false" onAction="#loadModelSearchVsBasicTest"
+							text="ModelSearch vs Basic" />
+					</buttons>
+				</ButtonBar>
+			</children>
+		</AnchorPane>
 	</top>
 	<center>
-      <SplitPane fx:id="mainSplitPane" dividerPositions="0.5, 0.5" BorderPane.alignment="CENTER">
-         <items>
-				<SplitPane fx:id="leftPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0">
+		<SplitPane fx:id="mainSplitPane" dividerPositions="0.5, 0.5"
+			BorderPane.alignment="CENTER">
+			<items>
+				<SplitPane fx:id="leftPane" dividerPositions="0.5"
+					orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0">
 					<items>
-                  <BorderPane fx:id="topLeft">
-                     <center>
-                        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-                     </center>
-                  </BorderPane>
-                  <BorderPane fx:id="bottomLeft">
-                     <center>
-                        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-                     </center>
-                  </BorderPane>
+						<BorderPane fx:id="topLeft">
+							<center>
+								<TabPane prefHeight="200.0" prefWidth="200.0"
+									tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+							</center>
+						</BorderPane>
+						<BorderPane fx:id="bottomLeft">
+							<center>
+								<TabPane prefHeight="200.0" prefWidth="200.0"
+									tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+							</center>
+						</BorderPane>
 					</items>
 				</SplitPane>
-            <BorderPane fx:id="center">
-               <center>
-                  <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-               </center>
-            </BorderPane>
-				<SplitPane fx:id="rightPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0">
+				<BorderPane fx:id="center">
+					<center>
+						<TabPane prefHeight="200.0" prefWidth="200.0"
+							tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+					</center>
+				</BorderPane>
+				<SplitPane fx:id="rightPane" dividerPositions="0.5"
+					orientation="VERTICAL" prefHeight="200.0" prefWidth="0.0">
 					<items>
-                  <BorderPane fx:id="topRight">
-                     <center>
-                        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-                     </center>
-                  </BorderPane>
-                  <BorderPane fx:id="bottomRight">
-                     <center>
-                        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-                     </center>
-                  </BorderPane>
+						<BorderPane fx:id="topRight">
+							<center>
+								<TabPane prefHeight="200.0" prefWidth="200.0"
+									tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+							</center>
+						</BorderPane>
+						<BorderPane fx:id="bottomRight">
+							<center>
+								<TabPane prefHeight="200.0" prefWidth="200.0"
+									tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+							</center>
+						</BorderPane>
 					</items>
 				</SplitPane>
-         </items>
-      </SplitPane>
+			</items>
+		</SplitPane>
 	</center>
-   <bottom>
-      <AnchorPane BorderPane.alignment="CENTER">
-         <children>
-            <Label fx:id="statusLabel" alignment="CENTER_LEFT" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-         </children>
-      </AnchorPane>
-   </bottom>
+	<bottom>
+		<AnchorPane BorderPane.alignment="CENTER">
+			<children>
+				<Label fx:id="statusLabel" alignment="CENTER_LEFT"
+					AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="3.0"
+					AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+			</children>
+		</AnchorPane>
+	</bottom>
 </BorderPane>
