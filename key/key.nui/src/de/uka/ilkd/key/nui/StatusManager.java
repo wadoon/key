@@ -37,8 +37,8 @@ public class StatusManager {
     }
 
     /**
-     * Removes the current status from the status-bar. (equivalent to setting a
-     * status with an empty string).
+     * Replaces the current status on the status bar to show a hint about using
+     * KeY.
      */
     public void resetStatus() {
         status = "Hint: " + TipOfTheDay.get();
