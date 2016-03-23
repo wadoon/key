@@ -36,7 +36,7 @@ public final class TipOfTheDay {
     private static String[] getTipsFromFile() {
         try {
             String res = IOUtil.readFrom(new File(NUIConstants.TIPS_OF_THE_DAY_PATH));
-            return res.split("\n");
+            return res.split("[\r?\n]+");
         }
         catch (IOException e) {
             return new String[] { "" };
