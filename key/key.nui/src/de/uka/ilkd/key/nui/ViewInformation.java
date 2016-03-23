@@ -145,7 +145,6 @@ public class ViewInformation extends Observable {
 
         titleLabel.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
-
                 loadViewContextMenu(parent).show(titleLabel, Side.TOP, event.getX(), event.getY());
         });
 
@@ -164,12 +163,11 @@ public class ViewInformation extends Observable {
             return null;
         }
 
-        // Give the controller access to the main app.
         ViewContextMenuController controller = loader.getController();
         controller.initViewController(parent.getMainApp(), parent.getContext());
         controller.setParentView(this);
         content.setOnShowing((event) -> {
-            // TODO select current position
+            controller.selectPosition();
         });
         return content;
     }

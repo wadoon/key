@@ -5,13 +5,26 @@ import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewPosition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckMenuItem;
 
 public class ViewContextMenuController extends ViewController {
 
     private ViewInformation viewInformation;
 
+    @FXML
+    CheckMenuItem topLeft;
+    @FXML
+    CheckMenuItem topRight;
+    @FXML
+    CheckMenuItem bottomLeft;
+    @FXML
+    CheckMenuItem bottomRight;
+    @FXML
+    CheckMenuItem center;
+
     /**
-     * The view this context menu belongs to. 
+     * The view this context menu belongs to.
+     * 
      * @param view
      */
     public void setParentView(ViewInformation view) {
@@ -41,5 +54,26 @@ public class ViewContextMenuController extends ViewController {
     @FXML
     private void handleCenter(ActionEvent event) {
         viewInformation.setCurrentPosition(ViewPosition.CENTER);
+    }
+
+    public void selectPosition() {
+        getCheckMenuItem(viewInformation.getCurrentPosition()).setSelected(true);
+    }
+
+    public CheckMenuItem getCheckMenuItem(ViewPosition viewPosition) {
+        switch (viewPosition) {
+        case TOPLEFT:
+            return topLeft;
+        case TOPRIGHT:
+            return topRight;
+        case BOTTOMRIGHT:
+            return bottomRight;
+        case BOTTOMLEFT:
+            return bottomLeft;
+        case CENTER:
+            return center;
+        default:
+            return null;
+        }
     }
 }
