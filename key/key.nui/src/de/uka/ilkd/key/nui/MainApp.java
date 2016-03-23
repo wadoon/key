@@ -101,7 +101,7 @@ public class MainApp extends Application {
 
         // Set the application icon.
         this.primaryStage.getIcons()
-                .add(new Image(NUIConstants.KEY_WINDOW_ICON));
+                .add(new Image(NUIConstants.KEY_APPLICATION_WINDOW_ICON_PATH));
 
         SessionSettings settings = SessionSettings.loadLastSettings();
         boolean useBoundsSettings = settings != null
@@ -227,7 +227,7 @@ public class MainApp extends Application {
             ObservableList<String> additionalStylesheets) {
         Stage stage = new Stage();
         stage.setTitle(title);
-        stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
+        stage.getIcons().add(new Image(NUIConstants.KEY_APPLICATION_WINDOW_ICON_PATH));
 
         if (blockParent)
             stage.initModality(Modality.WINDOW_MODAL);
@@ -292,7 +292,7 @@ public class MainApp extends Application {
 
         // Get the Stage and add KeY Icon.
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
+        stage.getIcons().add(new Image(NUIConstants.KEY_APPLICATION_WINDOW_ICON_PATH));
 
         // FIXME Due to a bug in javafx (JDK-8087981) alerts do not
         // resize with content on several linux systems. Remove the

@@ -388,7 +388,7 @@ public class TacletMenuController extends ViewController {
 
         // Get the Stage and add KeY Icon.
         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(NUIConstants.KEY_WINDOW_ICON));
+        stage.getIcons().add(new Image(NUIConstants.KEY_APPLICATION_WINDOW_ICON_PATH));
         dialog.setTitle("Abbreviation Dialog");
         dialog.setHeaderText(header);
         dialog.setContentText(message);

@@ -98,7 +98,7 @@ public class FilterViewController extends ViewController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         selectionFilterToggle.setStyle(
-                "-fx-background-image: url('" + NUIConstants.FILTER_MOUSE_ICON
+                "-fx-background-image: url('" + NUIConstants.FILTER_MOUSE_ICON_PATH
                         + "');" + "-fx-background-position: center center;"
                         + "-fx-background-repeat: no-repeat;"
                         + "-fx-background-size: contain;");
