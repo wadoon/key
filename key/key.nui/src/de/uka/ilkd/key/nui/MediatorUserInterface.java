@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -282,13 +283,19 @@ public class MediatorUserInterface
     public File saveProof(Proof proof, String fileExtension) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save current Proof");
-        fileChooser.getExtensionFilters()
-                .addAll(new ExtensionFilter("Proof or Key Files",
-                        "*.proof", "*.key"),
+        fileChooser.getExtensionFilters().addAll(
+                new ExtensionFilter("Proof or Key Files", "*.proof", "*.key"),
                 new ExtensionFilter("All Files", "*.*"));
 
         String defaultFileName = suggestDefaultFileName(proof, fileExtension);
         fileChooser.setInitialFileName(defaultFileName);
+
+        File initDirectory = proof.getProofFile().getParentFile();
+        if (initDirectory == null) {
+            initDirectory = IOUtil.getHomeDirectory();
+        }
+        fileChooser.setInitialDirectory(initDirectory);
+
         File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
 
         if (file == null) {

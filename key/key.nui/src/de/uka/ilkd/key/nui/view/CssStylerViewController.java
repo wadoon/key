@@ -10,6 +10,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+import org.key_project.util.java.IOUtil;
+
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.printer.PreviewPrinter;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
@@ -532,18 +534,27 @@ public class CssStylerViewController extends ViewController {
                 new ExtensionFilter("CSS File", "*.css"),
                 new ExtensionFilter("All Files", "*.*"));
 
-        File initFile;
+        File initFile = null;
+        // Get Directory of current Proof and set as initial DirectoryChild
         Proof proof = getContext().getKeYMediator().getSelectedProof();
         if (proof != null) {
-            // Get Directory of current Proof and set as initial DirectoryChild
+
             initFile = proof.getProofFile();
         }
-        else {
-            // Get Directory from CSSFile and set as initial DirectoryChild
+        // Get Directory from CSSFile and set as initial DirectoryChild if there
+        // is no Proof Loaded or it has not been saved yet
+        if (initFile == null) {
             initFile = new File(cssFileHandler.getPath());
         }
 
-        fileChooser.setInitialDirectory(new File(initFile.getParent()));
+        // If the DefaultCSS is the currently loaded CSSFile, fallback to Home
+        // Directory
+        if (initFile.getAbsolutePath()
+                .contains(NUIConstants.DEFAULT_CSS_PATH)) {
+            initFile = IOUtil.getHomeDirectory();
+        }
+
+        fileChooser.setInitialDirectory(initFile.getParentFile());
 
         return fileChooser;
     }
