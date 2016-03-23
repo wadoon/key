@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import de.uka.ilkd.key.nui.event.HandlerEvent;
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Control;
@@ -24,9 +25,19 @@ public abstract class ViewController implements Initializable {
     private MainApp mainApp;
     private Context context;
     private Stage stage;
+    private HandlerEvent<String> titleUpdatedEvent = new HandlerEvent<>();
 
     public MainApp getMainApp() {
         return mainApp;
+    }
+
+    /**
+     * An event that is fired each time a new status is set.
+     * 
+     * @return Status updated event.
+     */
+    public HandlerEvent<String> getTitleUpdatedEvent() {
+        return titleUpdatedEvent;
     }
 
     /**
@@ -60,7 +71,9 @@ public abstract class ViewController implements Initializable {
 
     /**
      * Set a {@link Stage} for this view.
-     * @param stage Stage to be set.
+     * 
+     * @param stage
+     *            Stage to be set.
      */
     public void setStage(Stage stage) {
         this.stage = stage;

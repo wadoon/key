@@ -57,6 +57,7 @@ public class StaticSequentViewController extends ViewController {
     public void setGoal(Goal goal) {
         this.goal = goal;
     }
+    
 
     private int updateCounter = 0;
 
@@ -101,6 +102,7 @@ public class StaticSequentViewController extends ViewController {
                     // You cannot Counteract GoalChanges -> Exception!
                     updateCounter++;
                     if (updateCounter == 3) {
+                        getTitleUpdatedEvent().fire(node.serialNr() + ": " + node.name());
                         updateCounter = 0;
                         sequentViewController.setLastTacletActionID(-1);
                     }
@@ -112,6 +114,9 @@ public class StaticSequentViewController extends ViewController {
                                 .getOwnID()) {
                     sequentViewController.setLastTacletActionID(-1);
                 }
+                sequentViewController.enableTacletMenu(
+                        (mediator.getSelectedProof() == getProof())
+                                && (mediator.getSelectedGoal() == getGoal()));
             }
         };
 

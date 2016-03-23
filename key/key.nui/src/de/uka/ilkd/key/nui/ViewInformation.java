@@ -49,7 +49,7 @@ public class ViewInformation extends Observable {
     public String getTitle() {
         return title;
     }
-    
+
     private ViewPosition preferedPosition;
 
     public ViewPosition getPreferedPosition() {
@@ -76,13 +76,19 @@ public class ViewInformation extends Observable {
         return uiTab;
     }
 
+    public void setTabTitle(String t) {
+        title = t;
+        uiTab.setGraphic(makeTitleLabel(parent));
+    }
+
     private ViewController controller;
 
     public ViewController getController() {
         return controller;
     }
 
-    public ViewInformation(String title, URL pathToFxml, ViewPosition preferedPosition, boolean hasMenuItem) {
+    public ViewInformation(String title, URL pathToFxml,
+            ViewPosition preferedPosition, boolean hasMenuItem) {
         fxmlPath = pathToFxml;
         this.preferedPosition = preferedPosition;
         currentPosition = preferedPosition;
@@ -105,10 +111,15 @@ public class ViewInformation extends Observable {
         this.notifyObservers(true);
     }
 
+    private ViewController parent;
+
     public void loadUiTab(ViewController parent) {
-        Pair<Object, ViewController> pair = parent.loadFxmlViewController(getFxmlPath());
+        Pair<Object, ViewController> pair = parent
+                .loadFxmlViewController(getFxmlPath());
+        this.parent = parent;
         uiTab = createTab((Node) pair.getKey(), parent);
         controller = pair.getValue();
+        controller.getTitleUpdatedEvent().addHandler(this::setTabTitle);
     }
 
     /**
@@ -120,14 +131,19 @@ public class ViewInformation extends Observable {
      */
     private Tab createTab(Node node, ViewController parent) {
         Tab tab = new Tab();
-        String title = getTitle();
-        // t.setText(title);
-        Label titleLabel = new Label(title);
-        // BorderPane header = new BorderPane();
-        // header.setCenter(titleLabel);
-        tab.setGraphic(titleLabel);
+        tab.setGraphic(makeTitleLabel(parent));
         tab.setContent(node);
-        tab.setTooltip(new Tooltip("Drag\u0026Drop or Right-Click to move Tab"));
+        tab.setTooltip(
+                new Tooltip("Drag\u0026Drop or Right-Click to move Tab"));
+        tab.setOnCloseRequest(event -> {
+            this.setIsActive(false);
+        });
+
+        return tab;
+    }
+
+    private Label makeTitleLabel(ViewController parent) {
+        Label titleLabel = new Label(title);
 
         titleLabel.setOnDragDetected(event -> {
             if (event.getButton() != MouseButton.PRIMARY)
@@ -139,21 +155,19 @@ public class ViewInformation extends Observable {
             event.consume();
         });
 
-        tab.setOnCloseRequest(event -> {
-            this.setIsActive(false);
-        });
-
         titleLabel.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(parent).show(titleLabel, Side.TOP, event.getX(), event.getY());
+                loadViewContextMenu(parent).show(titleLabel, Side.TOP,
+                        event.getX(), event.getY());
         });
 
-        return tab;
+        return titleLabel;
     }
 
     private ContextMenu loadViewContextMenu(ViewController parent) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ViewContextMenuController.class.getResource("ViewContextMenu.fxml"));
+        loader.setLocation(ViewContextMenuController.class
+                .getResource("ViewContextMenu.fxml"));
         ContextMenu content;
         try {
             content = loader.load();
