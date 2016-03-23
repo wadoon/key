@@ -29,13 +29,6 @@ public class PrintDictionary {
     private Map<HighlightType, List<Integer>> indicesListMap = new HashMap<>();
 
     /**
-     * Empty constructor.
-     */
-    public PrintDictionary() {
-        // TODO is the constructor needed?
-    }
-
-    /**
      * Inserts the tag into the given {@link HashMap}. Use only if you are sure
      * you know what to do.
      * 

@@ -16,6 +16,9 @@ public enum HighlightType {
         priority = i;
     }
 
+    /**
+     * @return priority associated with the HighlightType
+     */
     public int getPriority() {
         return priority;
     }
