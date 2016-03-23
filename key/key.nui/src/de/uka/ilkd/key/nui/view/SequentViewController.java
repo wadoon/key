@@ -267,6 +267,7 @@ public class SequentViewController extends ViewController {
                     if (searchIndPointer == searchIndices.size()) {
                         return;
                     }
+                    // TODO sysout still needed?
                     System.out.println(searchedHeight);
                     searchedHeight = posTranslator.getHeightForIndex(
                             searchIndices.get(searchIndPointer));

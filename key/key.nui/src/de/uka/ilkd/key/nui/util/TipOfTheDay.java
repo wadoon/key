@@ -7,7 +7,7 @@ import java.util.Random;
 import org.key_project.util.java.IOUtil;
 
 /**
- * Parses hints stored in {@link NUIConstants#TIPS_OF_THE_DAY_PATH} and collects
+ * Parses hints stored in {@link NUIConstants#TIPS_OF_THE_DAY_PATH}, collects
  * them in an array and makes them available randomly.
  * 
  * @author Nils Muzzulini
@@ -28,7 +28,8 @@ public final class TipOfTheDay {
     }
 
     /**
-     * Reads strings from file and stores them in an array separated by a line break.
+     * Reads strings from file and stores them in an array separated by a line
+     * break.
      * 
      * @return Array of tips as strings separated by a line break
      */
