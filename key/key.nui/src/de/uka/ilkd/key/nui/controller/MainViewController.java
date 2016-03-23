@@ -9,6 +9,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
 
 import javax.swing.SwingUtilities;
 
@@ -19,6 +20,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.nui.TreeViewState;
 import de.uka.ilkd.key.nui.exceptions.ToggleGroupNotFoundException;
+import de.uka.ilkd.key.nui.logger.MyLogger;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeConverter;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeItem;
 import de.uka.ilkd.key.proof.Proof;
@@ -606,11 +608,12 @@ public class MainViewController extends NUIController implements Observer {
                     // set Loading = false to enable canceling
                     isLoadingProof.set(true);
 
+                    MyLogger.logger.log(Level.INFO,"Starte loading proof...");
+                    long startKeYEnvironment = System.nanoTime();
+                    
                     // important to initialize KeYEnvironment
                     final MainWindow mainWindow = MainWindow.getInstance();
                     mainWindow.setVisible(false);
-                    // load proof
-                    System.out.println("Start loading proof: " + proofFileName);
 
                     // Load proof
                     DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(
@@ -620,7 +623,7 @@ public class MainViewController extends NUIController implements Observer {
                     InitConfig initConfig = loader.getInitConfig();
                     keyEnvironment = new KeYEnvironment<>(
                             ui, initConfig, loader.getProof(),
-                            loader.getResult());
+                            loader.getResult());     
                     /*
                      * final KeYEnvironment<?> environment =
                      * KeYEnvironment.load( JavaProfile.getDefaultInstance(),
@@ -630,12 +633,18 @@ public class MainViewController extends NUIController implements Observer {
                      */
                     final Proof proof = keyEnvironment.getLoadedProof();
                     proof.setProofFile(proofFileName);
+                    
+                    MyLogger.logger.log(Level.INFO,"loading proof finished!");
+                    long endKeYEnvironment = System.nanoTime();
+                    MyLogger.logger.log(Level.INFO,"KeYEnvironment: " + (endKeYEnvironment-startKeYEnvironment)/1000000000);
 
-                    System.out.println("loading finished!");
-
+                    MyLogger.logger.log(Level.INFO,"start convert proof to fx tree");
+                    long startNUIProcessing = System.nanoTime();
                     // convert proof to fx tree
                     final ProofTreeItem fxtree = new ProofTreeConverter(proof)
                             .createFXProofTree();
+                    long endNUIProcessing = System.nanoTime();
+                    MyLogger.logger.log(Level.INFO,"NUIProcessing: " + (endNUIProcessing-startNUIProcessing)/1000000000);
 
                     // set Loading = false as you can no longer cancel
                     final boolean hasNotBeenCanceled = isLoadingProof

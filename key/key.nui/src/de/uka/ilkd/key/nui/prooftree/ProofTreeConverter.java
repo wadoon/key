@@ -3,7 +3,9 @@ package de.uka.ilkd.key.nui.prooftree;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
+import de.uka.ilkd.key.nui.logger.MyLogger;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -43,6 +45,7 @@ public class ProofTreeConverter {
      */
     public ProofTreeConverter(final Proof proof) {
         loadProofTree(proof);
+        MyLogger.logger.log(Level.INFO,"Constructor ProofTreeConverter finished!");
     }
 
     /**
@@ -53,6 +56,7 @@ public class ProofTreeConverter {
      *             in case that no proof was loaded before
      */
     public final ProofTreeItem createFXProofTree() {
+        MyLogger.logger.log(Level.INFO,"start createFXProofTree");
         if (nuiRoot == null) {
             throw new IllegalStateException("No proof loaded.");
         }
@@ -92,6 +96,8 @@ public class ProofTreeConverter {
     public final void loadProofTree(final Proof proof) {
         final Node pRoot = proof.root();
 
+        MyLogger.logger.log(Level.INFO,"loadProofTree()");
+        
         // Create a new branch node (as root node) and
         // assign the appropriate label
         nuiRoot = new NUIBranchNode(pRoot);
@@ -134,6 +140,7 @@ public class ProofTreeConverter {
      */
     private void addProofTreeToNUITree(final Node proofNode,
             final NUIBranchNode parent) {
+        MyLogger.logger.log(Level.FINE,"Node: "+ proofNode.name());
         final Proof proof = proofNode.proof();
         NUINode newNode;
         // Create NUI node -----------------------------------------------------
@@ -269,10 +276,11 @@ public class ProofTreeConverter {
      */
     private void convertNUITreeToFXTree(final NUIBranchNode nuiNode,
             final ProofTreeItem fxTreeNode) {
-
+        MyLogger.logger.log(Level.INFO,"start convertNUITreeToFXTree");
         // Convert child nodes recursively into TreeItem<Label> objects
         for (final NUINode child : nuiNode.getChildren()) {
-
+            MyLogger.logger.log(Level.FINE,"Node: " + child.getLabel().toString());
+            
             final ProofTreeItem fxNode = new ProofTreeItem(child);
             fxTreeNode.addChild(fxNode);
 
