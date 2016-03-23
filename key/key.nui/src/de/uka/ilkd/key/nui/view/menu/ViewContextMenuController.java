@@ -56,11 +56,23 @@ public class ViewContextMenuController extends ViewController {
         viewInformation.setCurrentPosition(ViewPosition.CENTER);
     }
 
+    /**
+     * Selects the {@link CheckMenuItem} associated with the current
+     * {@link ViewPosition}.
+     */
     public void selectPosition() {
         getCheckMenuItem(viewInformation.getCurrentPosition()).setSelected(true);
     }
 
-    public CheckMenuItem getCheckMenuItem(ViewPosition viewPosition) {
+    /**
+     * Returns the {@link CheckMenuItem} associated with a given
+     * {@link ViewPosition}.
+     * 
+     * @param viewPosition
+     *            viewPosition
+     * @return checkMenuItem
+     */
+    private CheckMenuItem getCheckMenuItem(ViewPosition viewPosition) {
         switch (viewPosition) {
         case TOPLEFT:
             return topLeft;
