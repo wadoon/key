@@ -6,21 +6,31 @@ import java.util.Random;
 
 import org.key_project.util.java.IOUtil;
 
+/**
+ * Parses hints stored in {@link NUIConstants#TIPS_OF_THE_DAY_PATH} and collects
+ * them in an array and makes them available randomly.
+ * 
+ * @author Nils Muzzulini
+ * @version 1.0
+ */
 public final class TipOfTheDay {
 
     private final static Random r = new Random();
     private final static String[] TIPS = getTipsFromFile();
 
     /**
-     * Randomly select a string
+     * Randomly select a string out of the TIPS array.
+     * 
+     * @return randomly selected tip
      */
     public static String get() {
         return TIPS[r.nextInt(TIPS.length)];
     }
 
     /**
-     * Reads strings from file.
-     * @return 
+     * Reads strings from file and stores them in an array separated by a line break.
+     * 
+     * @return Array of tips as strings separated by a line break
      */
     private static String[] getTipsFromFile() {
         try {
