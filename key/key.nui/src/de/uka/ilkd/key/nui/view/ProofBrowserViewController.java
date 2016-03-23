@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewPosition;
+import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import javafx.application.Platform;
@@ -31,10 +32,6 @@ import javafx.scene.image.ImageView;
 @KeYView(title = "Proofs", path = "ProofBrowserView.fxml", accelerator = "CTRL + P", preferredPosition = ViewPosition.BOTTOMRIGHT)
 public class ProofBrowserViewController extends ViewController {
 
-    private final static Image CLOSED_PROOF_IMAGE = new Image("file:resources/images/keyproved.gif");
-    private final static Image OPEN_PROOF_IMAGE = new Image("file:resources/images/ekey-mono.gif");
-    private final static Image CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_IMAGE = new Image(
-            "file:resources/images/ekey-brackets.gif");
     private final static TreeItem<String> PROOF_BROWSER_ROOT_NODE = new TreeItem<String>("Proofs");
     private HashMap<String, Proof> listOfProofs = new HashMap<String, Proof>();
     private Proof proof = null;
@@ -63,7 +60,10 @@ public class ProofBrowserViewController extends ViewController {
         }
     };
 
-    // Selection Listener that sets the selected Proof in the Mediator.
+    /**
+     * Listens for selections made in the proof browser. Sets the selected proof
+     * in the mediator.
+     */
     private ChangeListener<TreeItem<String>> browserSelectionListener = new ChangeListener<TreeItem<String>>() {
         @Override
         public void changed(ObservableValue<? extends TreeItem<String>> observable, TreeItem<String> old_val,
@@ -103,14 +103,14 @@ public class ProofBrowserViewController extends ViewController {
         }
         ProofStatus ps = proof.mgt().getStatus();
         if (ps.getProofClosed()) {
-            proofIcon = new ImageView(CLOSED_PROOF_IMAGE);
+            proofIcon = new ImageView(new Image(NUIConstants.CLOSED_PROOF_ICON_PATH));
         }
         else if (ps.getProofClosedButLemmasLeft()) {
-            proofIcon = new ImageView(CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_IMAGE);
+            proofIcon = new ImageView(new Image(NUIConstants.CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_ICON_PATH));
         }
         else {
             assert ps.getProofOpen();
-            proofIcon = new ImageView(OPEN_PROOF_IMAGE);
+            proofIcon = new ImageView(new Image(NUIConstants.OPEN_PROOF_ICON_PATH));
         }
     }
 

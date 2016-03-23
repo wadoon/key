@@ -283,8 +283,8 @@ public class MediatorUserInterface
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save current Proof");
         fileChooser.getExtensionFilters()
-                .addAll(new ExtensionFilter("Proofs, KeY or Java Files",
-                        "*.proof", "*.key", "*.java"),
+                .addAll(new ExtensionFilter("Proof or Key Files",
+                        "*.proof", "*.key"),
                 new ExtensionFilter("All Files", "*.*"));
 
         String defaultFileName = suggestDefaultFileName(proof, fileExtension);
