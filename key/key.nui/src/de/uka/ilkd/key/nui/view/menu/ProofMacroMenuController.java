@@ -8,10 +8,10 @@ import org.key_project.util.reflection.ClassLoaderUtil;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
-import de.uka.ilkd.key.gui.ProofMacroWorker;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.util.ProofMacroWorker;
 import de.uka.ilkd.key.proof.Node;
 import javafx.fxml.FXML;
 import javafx.scene.control.Menu;
@@ -88,7 +88,7 @@ public class ProofMacroMenuController extends ViewController {
             mediator.stopInterface(true);
             mediator.setInteractive(false);
             mediator.addInterruptedListener(worker);
-            worker.execute();
+            worker.run();
         });
 
         return menuItem;
