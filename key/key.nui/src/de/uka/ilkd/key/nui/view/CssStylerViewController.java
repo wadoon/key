@@ -46,9 +46,10 @@ import javafx.stage.FileChooser.ExtensionFilter;
  *
  */
 public class CssStylerViewController extends ViewController {
-    private LinkedHashMap<String, CssRule> ruleMap = new LinkedHashMap<>();
-    private String selected;
+
+    private XmlReader xmlReader;
     private CssFileHandler cssFileHandler;
+    private LinkedHashMap<String, CssRule> ruleMap = new LinkedHashMap<>();
     private HashMap<String, String> masterRules;
 
     private ObservableList<String> fontWeight = FXCollections
@@ -59,8 +60,7 @@ public class CssStylerViewController extends ViewController {
             .observableArrayList(Font.getFamilies());
 
     private TreeItem<String> rootItem;
-
-    private XmlReader xmlReader;
+    private String selected;
 
     private final static Tooltip COLOR_TT = new Tooltip(
             NUIConstants.CSSSTYLER_COLOR_TT_TEXT);
@@ -238,9 +238,12 @@ public class CssStylerViewController extends ViewController {
                 valueNode.setDisable(cbxInherited.isSelected());
             });
 
+            // Add all the new Controls to the Grid
             propValGrid.add(new Label(propertyLabel), 0, gridRow);
             propValGrid.add(valueNode, 1, gridRow);
             String selector = ruleMap.get(selected).selectorsAsString();
+
+            // Extra Rules fo General Settings and Collapsed Filter
             if (!(selector.equals(NUIConstants.MASTER_TAG) || selector
                     .equals("." + NUIConstants.FILTER_COLLAPSED_TAG))) {
                 propValGrid.add(cbxInherited, 2, gridRow);
@@ -397,31 +400,53 @@ public class CssStylerViewController extends ViewController {
         decollapseChildren(rootItem, tfSearch.getText());
     }
 
-    private void decollapseChildren(TreeItem<String> root,
+    /**
+     * decollapses all children of the tree, which contains the searchstring.
+     * This is done recursively
+     * 
+     * @param root
+     *            the root of the tree
+     * @param searchString
+     *            the string which should be searched for in the TreeItems
+     * @return boolean if a child of this root was decollapsed. used for the
+     *         recursion and collapsation of the root if no child fulfills the
+     *         criteria
+     */
+    private boolean decollapseChildren(TreeItem<String> root,
             String searchString) {
+        boolean found = false;
+        // Check valid String
         if (searchString == null || searchString.isEmpty()) {
-            return;
+            return found;
         }
-
+        // Check root itself
         if (root.getValue().toLowerCase(Locale.ENGLISH)
                 .contains(searchString.toLowerCase(Locale.ENGLISH))) {
-            root.setExpanded(true);
+            found = true;
         }
+        // Check all the Childs
         for (TreeItem<String> child : root.getChildren()) {
             if (child.isLeaf()) {
                 if (child.getValue().toLowerCase(Locale.ENGLISH)
                         .contains(searchString.toLowerCase(Locale.ENGLISH))) {
-                    root.setExpanded(true);
                     treeView.getSelectionModel().select(child);
+                    found = true;
                 }
             }
+            // Check GrandChilds recursively.
             else {
-                decollapseChildren(child, searchString);
+                found = found | decollapseChildren(child, searchString);
             }
         }
+        root.setExpanded(found);
+        return found;
     }
 
     @FXML
+    /**
+     * handles all the exit action. If a rule has been changed and the changes
+     * have not been saved, open an Alert.
+     */
     private void handleExit() {
         if (save.disabledProperty().get() == false) {
             Alert alert = getMainApp().createAlert("Confirm Exit",
@@ -468,7 +493,6 @@ public class CssStylerViewController extends ViewController {
 
     @FXML
     private void handleSaveAs() {
-
         File file = makeFileChooser().showSaveDialog(getStage());
 
         if (file != null) {
@@ -493,6 +517,12 @@ public class CssStylerViewController extends ViewController {
 
     }
 
+    /**
+     * constructs a FileChooser for CSS Files. The Parend Directory is the
+     * current CSS File location
+     * 
+     * @return
+     */
     private FileChooser makeFileChooser() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a CSS File");
@@ -507,6 +537,9 @@ public class CssStylerViewController extends ViewController {
         return fileChooser;
     }
 
+    /**
+     * interfaces to the {@link CssFileHandler} and catches its Exceptions
+     */
     private void writeToCss() {
         try {
             cssFileHandler.writeCssFile();
@@ -554,6 +587,9 @@ public class CssStylerViewController extends ViewController {
         reset.setDisable(false);
     }
 
+    /**
+     * disables all the buttons in the Bar
+     */
     private void disableControls() {
         menuSave.setDisable(true);
         menuReset.setDisable(true);
