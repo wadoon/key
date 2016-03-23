@@ -44,7 +44,8 @@ import javafx.stage.FileChooser.ExtensionFilter;
  * @version 1.0
  * @see UserInterfaceControl
  */
-public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl {
+public class MediatorUserInterface
+        extends AbstractMediatorUserInterfaceControl {
 
     private StatusManager statusManager;
     private KeYMediator mediator = null;
@@ -65,24 +66,29 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
      * {@inheritDoc}
      */
     @Override
-    public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
+    public void completeAndApplyTacletMatch(TacletInstantiationModel[] models,
+            Goal goal) {
 
         // models has to be passed via context, as the
         // TacletInstantiationViewController constructor can not be used. There
         // is no need to pass the goal anymore, as the controller can get it
         // directly from the KeYMediator.
         mainApp.getRootLayoutController().getContext().setCurrentModels(models);
-        mainApp.openNewWindow("Taclet Instantiation", "view/TacletInstantiationView.fxml", true, false,
-                FXCollections.observableArrayList("file:resources/css/tacletInstantiation.css"));
+        mainApp.openNewWindow("Taclet Instantiation",
+                "view/TacletInstantiationView.fxml", true, false,
+                FXCollections.observableArrayList(
+                        "file:resources/css/tacletInstantiation.css"));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app,
+            Goal goal, boolean forced) {
         if (getMediator().isInAutoMode()) {
-            return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
+            return AbstractProofControl.completeBuiltInRuleAppByDefault(app,
+                    goal, forced);
         }
         IBuiltInRuleApp result = app;
         for (InteractiveRuleApplicationCompletion compl : completions) {
@@ -132,7 +138,7 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
      */
     @Override
     public void reportStatus(Object sender, String status, int progress) {
-        statusManager.setStatus(status + " " + progress);
+        statusManager.setStatus(status);
     }
 
     /**
@@ -155,7 +161,8 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
      * {@inheritDoc}
      */
     @Override
-    public void reportException(Object sender, ProofOblInput input, Exception e) {
+    public void reportException(Object sender, ProofOblInput input,
+            Exception e) {
         throw new RuntimeException(e);
     }
 
@@ -194,7 +201,8 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
     @Override
     public void loadProblem(File file) {
         mainApp.getRootLayoutController().addRecentFile(file.getAbsolutePath());
-        getProblemLoader(file, null, null, null, getMediator()).runAsynchronously();
+        getProblemLoader(file, null, null, null, getMediator())
+                .runAsynchronously();
     }
 
     /**
@@ -204,8 +212,10 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
     public void notify(NotificationEvent event) {
         if (event instanceof ProofClosedNotificationEvent) {
             Platform.runLater(() -> {
-                mainApp.showAlert("Prove closed", "Proved.",
-                        getMediator().getSelectedProof().getStatistics().toString(), AlertType.INFORMATION);
+                mainApp.showAlert("Prove closed",
+                        "Proved.", getMediator().getSelectedProof()
+                                .getStatistics().toString(),
+                        AlertType.INFORMATION);
             });
         }
 
@@ -217,7 +227,8 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
     // TODO: remove unnecessary code - just copied from
     // WindowUserInterfaceController
     @Override
-    public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList,
+    public void loadingFinished(AbstractProblemLoader loader,
+            LoadedPOContainer poContainer, ProofAggregate proofList,
             ReplayResult result) throws ProblemLoaderException {
         super.loadingFinished(loader, poContainer, proofList, result);
         if (proofList != null) {
@@ -229,11 +240,15 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
                 else {
                     this.reportStatus(this, result.getStatus());
                 }
-                getMediator().getSelectionModel().setSelectedNode(result.getNode());
+                getMediator().getSelectionModel()
+                        .setSelectedNode(result.getNode());
                 if (result.hasErrors()) {
                     throw new ProblemLoaderException(loader,
-                            "Proof could only be loaded partially.\n" + "In summary " + result.getErrorList().size()
-                                    + " not loadable rule application(s) have been detected.\n" + "The first one:\n"
+                            "Proof could only be loaded partially.\n"
+                                    + "In summary "
+                                    + result.getErrorList().size()
+                                    + " not loadable rule application(s) have been detected.\n"
+                                    + "The first one:\n"
                                     + result.getErrorList().get(0).getMessage(),
                             result.getErrorList().get(0));
                 }
@@ -243,12 +258,14 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
                 // TODO (DS): Why is it then there? If this happens, we will
                 // get\\
                 // a NullPointerException just a line below...
-                getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());
+                getMediator().getSelectionModel()
+                        .setSelectedNode(loader.getProof().root());
             }
 
         }
         getMediator().resetNrGoalsClosedByHeuristics();
-        if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+        if (poContainer != null && poContainer
+                .getProofOblInput() instanceof KeYUserProblemFile) {
             ((KeYUserProblemFile) poContainer.getProofOblInput()).close();
         }
     }
@@ -265,8 +282,9 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
     public File saveProof(Proof proof, String fileExtension) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save current Proof");
-        fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter("Proofs, KeY or Java Files", "*.proof", "*.key", "*.java"),
+        fileChooser.getExtensionFilters()
+                .addAll(new ExtensionFilter("Proofs, KeY or Java Files",
+                        "*.proof", "*.key", "*.java"),
                 new ExtensionFilter("All Files", "*.*"));
 
         String defaultFileName = suggestDefaultFileName(proof, fileExtension);
@@ -279,7 +297,8 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
         }
 
         final String filename = file.getAbsolutePath();
-        ProofSaver saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+        ProofSaver saver = new ProofSaver(proof, filename,
+                KeYConstants.INTERNAL_VERSION);
         String errorMsg;
         try {
             errorMsg = saver.save();
@@ -292,7 +311,8 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
         }
         else {
             proof.setProofFile(file);
-            statusManager.setStatus("Proof saved in: " + file.getAbsolutePath());
+            statusManager
+                    .setStatus("Proof saved in: " + file.getAbsolutePath());
         }
         return file;
     }
@@ -301,8 +321,10 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
      * Suggests a default {@link File} name for a {@link Proof} to save: Its own
      * name. Also chooses the right file extension to complete naming.
      * 
-     * @param proof Proof to work with.
-     * @param fileExtension Default file extension.
+     * @param proof
+     *            Proof to work with.
+     * @param fileExtension
+     *            Default file extension.
      * @return Generated suggested file name.
      */
     private String suggestDefaultFileName(Proof proof, String fileExtension) {
@@ -314,18 +336,22 @@ public class MediatorUserInterface extends AbstractMediatorUserInterfaceControl 
         // Suggest default file name if required
         final String defaultName;
         if (selectedFile == null) {
-            defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
+            defaultName = MiscTools.toValidFileName(proof.name().toString())
+                    + fileExtension;
         }
-        else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
+        else if (selectedFile.getName().endsWith(".proof")
+                && fileExtension.equals(".proof")) {
             defaultName = selectedFile.getName();
         }
         else {
             String proofName = proof.name().toString();
             if (proofName.endsWith(".key")) {
-                proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
+                proofName = proofName.substring(0,
+                        proofName.lastIndexOf(".key"));
             }
             else if (proofName.endsWith(".proof")) {
-                proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
+                proofName = proofName.substring(0,
+                        proofName.lastIndexOf(".proof"));
             }
             defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
         }
