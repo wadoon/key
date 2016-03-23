@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.nui.util;
 
-import javafx.scene.image.Image;
-
 /**
  * Collection of constants used throughout the application.
  * 
@@ -53,10 +51,9 @@ public final class NUIConstants {
      */
     public final static String KEY_APPLICATION_WINDOW_ICON_PATH = "file:resources/images/key-color-icon-square.png";
     public final static String FILTER_MOUSE_ICON_PATH = "file:resources/images/mouse_icon.png";
-    public final static Image CLOSED_PROOF_ICON = new Image("file:resources/images/keyproved.gif");
-    public final static Image OPEN_PROOF_ICON = new Image("file:resources/images/ekey-mono.gif");
-    public final static Image CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_ICON = new Image(
-            "file:resources/images/ekey-brackets.gif");
+    public final static String CLOSED_PROOF_ICON_PATH = "file:resources/images/keyproved.gif";
+    public final static String OPEN_PROOF_ICON_PATH = "file:resources/images/ekey-mono.gif";
+    public final static String CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_ICON_PATH = "file:resources/images/ekey-brackets.gif";
 
     /**
      * Project URL

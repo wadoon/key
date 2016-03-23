@@ -19,6 +19,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
@@ -102,14 +103,14 @@ public class ProofBrowserViewController extends ViewController {
         }
         ProofStatus ps = proof.mgt().getStatus();
         if (ps.getProofClosed()) {
-            proofIcon = new ImageView(NUIConstants.CLOSED_PROOF_ICON);
+            proofIcon = new ImageView(new Image(NUIConstants.CLOSED_PROOF_ICON_PATH));
         }
         else if (ps.getProofClosedButLemmasLeft()) {
-            proofIcon = new ImageView(NUIConstants.CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_ICON);
+            proofIcon = new ImageView(new Image(NUIConstants.CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_ICON_PATH));
         }
         else {
             assert ps.getProofOpen();
-            proofIcon = new ImageView(NUIConstants.OPEN_PROOF_ICON);
+            proofIcon = new ImageView(new Image(NUIConstants.OPEN_PROOF_ICON_PATH));
         }
     }
 
