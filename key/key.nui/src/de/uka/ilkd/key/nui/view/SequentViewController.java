@@ -56,7 +56,7 @@ import javafx.scene.web.WebView;
  *
  */
 public class SequentViewController extends ViewController {
-
+    // For StaticSequentView Synchronization
     private static AtomicLong NEXT_ID = new AtomicLong(0);
     private final long OWN_ID = NEXT_ID.getAndIncrement();
     private static AtomicLong LAST_TACLET_ACTION_ID;
