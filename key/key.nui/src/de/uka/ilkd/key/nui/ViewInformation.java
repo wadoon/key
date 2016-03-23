@@ -164,7 +164,6 @@ public class ViewInformation extends Observable {
         }
 
         ViewContextMenuController controller = loader.getController();
-        controller.initViewController(parent.getMainApp(), parent.getContext());
         controller.setParentView(this);
         content.setOnShowing((event) -> {
             controller.selectPosition();
