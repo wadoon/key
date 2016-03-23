@@ -7,9 +7,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckMenuItem;
 
+/**
+ * Context menu for any {@link ViewInformation view} open in a tab.
+ * 
+ * @author Benedikt Gross
+ * @author Nils Muzzulini
+ * @version 1.0
+ */
 public class ViewContextMenuController extends ViewController {
-
-    private ViewInformation viewInformation;
 
     @FXML
     CheckMenuItem topLeft;
@@ -22,38 +27,40 @@ public class ViewContextMenuController extends ViewController {
     @FXML
     CheckMenuItem center;
 
+    private ViewInformation view;
+
     /**
-     * The view this context menu belongs to.
+     * The {@link ViewInformation view} this context menu belongs to.
      * 
      * @param view
      */
     public void setParentView(ViewInformation view) {
-        viewInformation = view;
+        this.view = view;
     }
 
     @FXML
     private void handleTopLeft(ActionEvent event) {
-        viewInformation.setCurrentPosition(ViewPosition.TOPLEFT);
+        view.setCurrentPosition(ViewPosition.TOPLEFT);
     }
 
     @FXML
     private void handleTopRight(ActionEvent event) {
-        viewInformation.setCurrentPosition(ViewPosition.TOPRIGHT);
+        view.setCurrentPosition(ViewPosition.TOPRIGHT);
     }
 
     @FXML
     private void handleBottomLeft(ActionEvent event) {
-        viewInformation.setCurrentPosition(ViewPosition.BOTTOMLEFT);
+        view.setCurrentPosition(ViewPosition.BOTTOMLEFT);
     }
 
     @FXML
     private void handleBottomRight(ActionEvent event) {
-        viewInformation.setCurrentPosition(ViewPosition.BOTTOMRIGHT);
+        view.setCurrentPosition(ViewPosition.BOTTOMRIGHT);
     }
 
     @FXML
     private void handleCenter(ActionEvent event) {
-        viewInformation.setCurrentPosition(ViewPosition.CENTER);
+        view.setCurrentPosition(ViewPosition.CENTER);
     }
 
     /**
@@ -61,7 +68,7 @@ public class ViewContextMenuController extends ViewController {
      * {@link ViewPosition}.
      */
     public void selectPosition() {
-        getCheckMenuItem(viewInformation.getCurrentPosition()).setSelected(true);
+        getCheckMenuItem(view.getCurrentPosition()).setSelected(true);
     }
 
     /**
@@ -69,7 +76,6 @@ public class ViewContextMenuController extends ViewController {
      * {@link ViewPosition}.
      * 
      * @param viewPosition
-     *            viewPosition
      * @return checkMenuItem
      */
     private CheckMenuItem getCheckMenuItem(ViewPosition viewPosition) {
