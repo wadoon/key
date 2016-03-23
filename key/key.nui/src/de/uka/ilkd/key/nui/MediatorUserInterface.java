@@ -3,10 +3,8 @@ package de.uka.ilkd.key.nui;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
-
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;

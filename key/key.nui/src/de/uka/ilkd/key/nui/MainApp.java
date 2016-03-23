@@ -8,9 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
 import org.reflections.Reflections;
-
 import de.uka.ilkd.key.core.DefaultKeYDesktop;
 import de.uka.ilkd.key.core.KeYDesktop;
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;

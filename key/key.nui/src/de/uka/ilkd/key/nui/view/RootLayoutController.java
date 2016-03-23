@@ -644,7 +644,7 @@ public class RootLayoutController extends ViewController {
     }
 
     @FXML
-    private void openInNew() {
+    private void openInNewSequentView() {
         de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator().getSelectedNode();
 
         ViewInformation info = new ViewInformation(node.serialNr() + ": " + node.name(),

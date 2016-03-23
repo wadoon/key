@@ -2,7 +2,6 @@ package de.uka.ilkd.key.nui;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-
 import de.uka.ilkd.key.nui.event.HandlerEvent;
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import javafx.fxml.Initializable;

@@ -72,7 +72,7 @@
 										</MenuItem>
 									</items>
 								</Menu>
-								<MenuItem mnemonicParsing="false" onAction="#openInNew"
+								<MenuItem mnemonicParsing="false" onAction="#openInNewSequentView"
 									text="Open Node in new Sequent">
 									<accelerator>
 										<KeyCodeCombination alt="UP" code="T"
