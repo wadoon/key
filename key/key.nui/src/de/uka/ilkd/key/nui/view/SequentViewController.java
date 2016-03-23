@@ -188,7 +188,7 @@ public class SequentViewController extends ViewController {
 
         if (enable) {
             textArea.setOnMouseMoved(this::handleTextAreaMouseMoved);
-            textArea.setOnMouseExited(this::handleTextAreaMouseClicked);
+            textArea.setOnMouseExited(this::handleTextAreaMouseExited);
         }
         else {
             textArea.setOnMouseMoved(null);
@@ -212,10 +212,10 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    private void handleTextAreaMouseClicked(MouseEvent event) {
+    private void handleTextAreaMouseExited(MouseEvent event) {
         this.printer.removeMouseHighlighting();
         this.updateView();
-        getContext().getStatusManager().clearStatus();
+        getContext().getStatusManager().resetStatus();
     }
 
     @Override

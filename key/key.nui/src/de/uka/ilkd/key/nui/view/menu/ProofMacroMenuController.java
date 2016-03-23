@@ -87,7 +87,8 @@ public class ProofMacroMenuController extends ViewController {
             mediator.stopInterface(true);
             mediator.setInteractive(false);
             mediator.addInterruptedListener(worker);
-            worker.run();
+            new Thread(worker).start();
+            //worker.run();
         });
 
         return menuItem;

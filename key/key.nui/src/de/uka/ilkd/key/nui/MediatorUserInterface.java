@@ -154,7 +154,7 @@ public class MediatorUserInterface
      */
     @Override
     public void resetStatus(Object sender) {
-        statusManager.clearStatus();
+        statusManager.resetStatus();
     }
 
     /**

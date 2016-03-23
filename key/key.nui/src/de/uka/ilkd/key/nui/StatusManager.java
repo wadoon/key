@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui;
 
 import de.uka.ilkd.key.nui.event.HandlerEvent;
+import de.uka.ilkd.key.nui.util.TipOfTheDay;
 
 /**
  * This class supplies managed access to the status-bar on the UI.
@@ -36,11 +37,11 @@ public class StatusManager {
     }
 
     /**
-     * Removes the current status from the status-bar. (equivalent to setting a
-     * status with an empty string).
+     * Replaces the current status on the status bar to show a hint about using
+     * KeY.
      */
-    public void clearStatus() {
-        status = "";
+    public void resetStatus() {
+        status = "Hint: " + TipOfTheDay.get();
         statusUpdatedEvent.fire(status);
     }
 
