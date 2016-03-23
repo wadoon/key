@@ -9,12 +9,14 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.printer.PreviewPrinter;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
 import de.uka.ilkd.key.nui.util.CssRule;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.util.XmlReader;
+import de.uka.ilkd.key.proof.Proof;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -530,8 +532,17 @@ public class CssStylerViewController extends ViewController {
                 new ExtensionFilter("CSS File", "*.css"),
                 new ExtensionFilter("All Files", "*.*"));
 
-        // Get Directory from CSSFile and set as Initial Directory
-        File initFile = new File(cssFileHandler.getPath());
+        File initFile;
+        Proof proof = getContext().getKeYMediator().getSelectedProof();
+        if (proof != null) {
+            // Get Directory of current Proof and set as initial DirectoryChild
+            initFile = proof.getProofFile();
+        }
+        else {
+            // Get Directory from CSSFile and set as initial DirectoryChild
+            initFile = new File(cssFileHandler.getPath());
+        }
+
         fileChooser.setInitialDirectory(new File(initFile.getParent()));
 
         return fileChooser;
