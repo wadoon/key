@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
@@ -56,6 +57,10 @@ import javafx.scene.web.WebView;
  */
 public class SequentViewController extends ViewController {
 
+    private static AtomicLong NEXT_ID = new AtomicLong(0);
+    private final long OWN_ID = NEXT_ID.getAndIncrement();
+    private static AtomicLong LAST_TACLET_ACTION_ID;
+
     private boolean sequentLoaded = false;
     private boolean sequentChanged = false;
     private SequentPrinter printer;
@@ -97,6 +102,21 @@ public class SequentViewController extends ViewController {
      * method.
      */
     public SequentViewController() {
+        if (LAST_TACLET_ACTION_ID == null) {
+            LAST_TACLET_ACTION_ID = new AtomicLong(-1);
+        }
+    }
+
+    public long getOwnID() {
+        return OWN_ID;
+    }
+
+    public long getLastTacletActionID() {
+        return LAST_TACLET_ACTION_ID.get();
+    }
+
+    public void setLastTacletActionID(long newValue) {
+        LAST_TACLET_ACTION_ID.set(newValue);
     }
 
     public void loadNodeToView(Node node) {
@@ -267,8 +287,6 @@ public class SequentViewController extends ViewController {
                     if (searchIndPointer == searchIndices.size()) {
                         return;
                     }
-                    // TODO sysout still needed?
-                    System.out.println(searchedHeight);
                     searchedHeight = posTranslator.getHeightForIndex(
                             searchIndices.get(searchIndPointer));
                 }
@@ -344,7 +362,7 @@ public class SequentViewController extends ViewController {
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         notationInfo.refresh(services, true, checkBoxUnicode.isSelected());
-        
+
         sequentChanged = true;
         printSequent();
         updateView();
@@ -521,6 +539,10 @@ public class SequentViewController extends ViewController {
                                 event.getScreenY());
 
                         enableMouseOver(false);
+
+                        // Used for StaticSequentView Synchro
+                        setLastTacletActionID(OWN_ID);
+
                         tacletMenu.setOnHiding(evt -> {
                             enableMouseOver(true);
                             tacletMenu = null;
@@ -539,7 +561,7 @@ public class SequentViewController extends ViewController {
         enableTacletMenu = enable;
 
     }
-    
+
     protected void clearWebView() {
         sequentOptions.setDisable(true);
         tacletInfo.setDisable(true);

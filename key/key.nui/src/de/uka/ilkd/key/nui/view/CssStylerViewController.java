@@ -428,7 +428,7 @@ public class CssStylerViewController extends ViewController {
                 .contains(searchString.toLowerCase(Locale.ENGLISH))) {
             found = true;
         }
-        // Check all the Childs
+        // Check all the Children
         for (TreeItem<String> child : root.getChildren()) {
             if (child.isLeaf()) {
                 if (child.getValue().toLowerCase(Locale.ENGLISH)
@@ -437,7 +437,7 @@ public class CssStylerViewController extends ViewController {
                     found = true;
                 }
             }
-            // Check GrandChilds recursively.
+            // Check Grandchildren recursively.
             else {
                 found = found | decollapseChildren(child, searchString);
             }
@@ -522,10 +522,8 @@ public class CssStylerViewController extends ViewController {
     }
 
     /**
-     * constructs a FileChooser for CSS Files. The Parend Directory is the
-     * current CSS File location
-     * 
-     * @return
+     * constructs a FileChooser for CSS Files.
+     * @return FileChooser
      */
     private FileChooser makeFileChooser() {
         FileChooser fileChooser = new FileChooser();
