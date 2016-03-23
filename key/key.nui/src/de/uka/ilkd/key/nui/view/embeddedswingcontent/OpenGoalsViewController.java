@@ -8,21 +8,24 @@ import de.uka.ilkd.key.nui.ViewControllerSwingContent;
 import de.uka.ilkd.key.nui.ViewPosition;
 
 /**
- * Embeds the Open Goals View from the old UI.
+ * Embeds the Open Goal View from the old UI.
  * 
  * @author Nils Muzzulini
- *
+ * @version 1.0
+ * @see GoalList
  */
 @KeYView(title = "Open Goals", path = "OpenGoalsView.fxml", preferredPosition = ViewPosition.TOPRIGHT)
 public class OpenGoalsViewController extends ViewControllerSwingContent {
 
     private JScrollPane openGoalsView;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void createSwingContent() {
         // set openGoalsView
         openGoalsView = new JScrollPane();
-        // GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
         GoalList goalList = new GoalList(getContext().getKeYMediator());
         openGoalsView.setViewportView(goalList);
 

@@ -6,10 +6,11 @@ import de.uka.ilkd.key.nui.ViewControllerSwingContent;
 import de.uka.ilkd.key.nui.ViewPosition;
 
 /**
- * Embeds the Tree View from the old UI.
+ * Embeds the {@link ProofTreeView Proof Tree View} from the old UI.
  * 
  * @author Nils Muzzulini
- *
+ * @version 1.0
+ * @see ProofTreeView
  */
 @KeYView(title = "Tree", path = "TreeView.fxml", accelerator = "CTRL + T", preferredPosition = ViewPosition.TOPRIGHT)
 public class TreeViewController extends ViewControllerSwingContent {

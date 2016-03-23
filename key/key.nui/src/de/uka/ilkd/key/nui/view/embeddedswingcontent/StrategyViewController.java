@@ -6,6 +6,13 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.util.embeddedswingcontent.AutoModeActionFX;
 import de.uka.ilkd.key.nui.util.embeddedswingcontent.StrategySelectionFX;
 
+/**
+ * Embeds the Strategy Selection from the old UI.
+ * 
+ * @author Nils Muzzulini
+ * @version 1.0
+ * @see de.uka.ilkd.key.gui.StrategySelectionView
+ */
 @KeYView(title = "Proof Search Strategy", path = "StrategyView.fxml", preferredPosition = ViewPosition.TOPLEFT)
 public class StrategyViewController extends ViewControllerSwingContent {
 
