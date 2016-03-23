@@ -215,7 +215,7 @@ public class SequentViewController extends ViewController {
     private void handleTextAreaMouseClicked(MouseEvent event) {
         this.printer.removeMouseHighlighting();
         this.updateView();
-        getContext().getStatusManager().clearStatus();
+        getContext().getStatusManager().resetStatus();
     }
 
     @Override

@@ -59,4 +59,9 @@ public final class NUIConstants {
      * Project URL
      */
     public final static String PROJECT_URL = "http://www.key-project.org/";
+    
+    /**
+     * Tips of the Day
+     */
+    public final static String TIPS_OF_THE_DAY_PATH = "resources/tipsOfTheDay";
 }
