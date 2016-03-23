@@ -286,10 +286,7 @@ public class RootLayoutController extends ViewController {
             fileChooser.setInitialDirectory(existDirectory);
         }
         else {
-            // TODO reset initial directory to "../" (changed for faster access
-            // to
-            // proofs for testing purposes)
-            fileChooser.setInitialDirectory(new File("../key.core.test/resources/testcase/join"));
+            fileChooser.setInitialDirectory(new File("../"));
         }
 
         file = fileChooser.showOpenDialog(mainPane.getScene().getWindow());
