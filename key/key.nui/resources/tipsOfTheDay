@@ -3,6 +3,6 @@ Run KeY with Parameter '-reset' to reset Session Settings.
 Pressing ALT when moving the cursor over a term shows some more information.
 Install an SMT solver to help KeY solve problems; CVC3, CVC4, Simplify, Yices, and Z3 are supported.
 In the mouse menu you can abbreviate terms.
-More help can be found online at http://key-project.org/
+More help can be found online at http://key-project.org/ (press F1 to open it in your default  web browser)
 Filter by selection works with as many selections as desired.
 Customize the appearance of a sequent with the new CSS-Styler (shortcut CTRL+SHIFT+A).
