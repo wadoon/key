@@ -54,8 +54,8 @@ import javafx.scene.web.WebView;
  * application. Only change this controller if the changes apply to all sequent
  * possible sequent views. If you want to create a specific sequent view, embed
  * this by embedding SequentView.fxml in your FXML file and creating a new
- * {@link ViewController}. For sample use see {@link MainSequentViewController} or
- * {@link StaticSequentViewController}.
+ * {@link ViewController}. For sample use see {@link MainSequentViewController}
+ * or {@link StaticSequentViewController}.
  * 
  * @author Maximilian Li
  * @author Victor Schuemmer
@@ -114,24 +114,39 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    //TODO add documentation
+    /**
+     * getter for the Unique ID of this SequentView
+     * 
+     * @return
+     */
     public long getOwnID() {
         return OWN_ID;
     }
 
-    //TODO add documentation
+    /**
+     * getter for the ID which triggered the last RuleApplication Action
+     * 
+     * @return
+     */
     public long getLastTacletActionID() {
         return LAST_TACLET_ACTION_ID.get();
     }
 
-    //TODO add documentation
+    /**
+     * setter for the ID which triggered the last RuleApplication Action
+     * 
+     * @param newValue
+     *            the new ID Value
+     */
     public void setLastTacletActionID(long newValue) {
         LAST_TACLET_ACTION_ID.set(newValue);
     }
 
     /**
      * Loads the sequent of the given {@link Node} to the sequent view.
-     * @param node the node to show the sequent of
+     * 
+     * @param node
+     *            the node to show the sequent of
      */
     public void loadNodeToView(Node node) {
         showSequent(node);
@@ -154,8 +169,8 @@ public class SequentViewController extends ViewController {
 
         updateView();
     }
-    
-    /** 
+
+    /**
      * @return the proof string shown in the sequent view
      */
     public String getProofString() {
@@ -218,7 +233,7 @@ public class SequentViewController extends ViewController {
     }
 
     // XXX kind of a hack
-    //TODO add documentation
+    // TODO add documentation
     private void enableMouseOver(boolean enable) {
         if (enable) {
             textArea.setOnMouseMoved(this::handleTextAreaMouseMoved);
@@ -230,7 +245,13 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    //TODO add documentation
+    /**
+     * handler for Mousemovement over the WebView Node. Will apply
+     * MouseoverHighlighting, or, if the ALT Key is held, print the Taclet Info
+     * into the statusbar
+     * 
+     * @param event
+     */
     private void handleTextAreaMouseMoved(MouseEvent event) {
         int pos = posTranslator.getCharIdxUnderPointer(event);
         Range range = this.abstractSyntaxTree.rangeForIndex(pos);
@@ -246,7 +267,12 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    //TODO add documentation
+    /**
+     * handler for when the Mouse Exits the WebView Node. Will remove all
+     * MouseoverHighlighting and remove TacletInfo from statusbar
+     * 
+     * @param event
+     */
     private void handleTextAreaMouseExited(MouseEvent event) {
         this.printer.removeMouseHighlighting();
         this.updateView();
@@ -422,7 +448,7 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    //TODO add documentation
+    // TODO add documentation
     private void updateHtml(String s) {
         webEngine = textArea.getEngine();
         webEngine.loadContent(s);
@@ -460,7 +486,7 @@ public class SequentViewController extends ViewController {
         updateHtml(this.printer.printProofString());
     }
 
-    //TODO add documentation
+    // TODO add documentation
     private void apply(FilterChangedEventArgs args) {
         if (!sequentLoaded)
             return;
@@ -487,7 +513,7 @@ public class SequentViewController extends ViewController {
     private FilterSelection filterSelection;
     private boolean enableTacletMenu;
 
-  //TODO add documentation
+    // TODO add documentation
     private void selectModeActivated(SelectModeEventArgs eventArgs) {
         if (getContext().getKeYMediator().getSelectedProof() == null)
             return;
@@ -497,7 +523,7 @@ public class SequentViewController extends ViewController {
         selectionModeIsActive = true;
     }
 
-    //TODO add documentation
+    // TODO add documentation
     public void finishSelectionMode(EmptyEventArgs args) {
         for (Range range : filterSelection.getSelection())
             this.printer.removeSelection(range);
@@ -506,7 +532,7 @@ public class SequentViewController extends ViewController {
         selectionModeIsActive = false;
     }
 
-    //TODO add documentation
+    // TODO add documentation
     private void handleWebViewClicked(MouseEvent event) {
         if (!sequentLoaded || event.getButton() != MouseButton.PRIMARY)
             return;
@@ -583,7 +609,9 @@ public class SequentViewController extends ViewController {
 
     /**
      * Enables or disables the taclet menu on the sequent view.
-     * @param enable true to enable, false to disable
+     * 
+     * @param enable
+     *            true to enable, false to disable
      */
     public void enableTacletMenu(boolean enable) {
         enableTacletMenu = enable;
