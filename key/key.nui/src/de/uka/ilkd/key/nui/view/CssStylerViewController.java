@@ -65,7 +65,8 @@ public class CssStylerViewController extends ViewController {
     private TreeItem<String> rootItem;
     private String selected;
 
-    // TODO move tooltips to tooltips method?
+    // Tooltip Constants, as they will be set dynamically on Control Creation in
+    // updateGrid() Method
     private final static Tooltip COLOR_TT = new Tooltip(
             NUIConstants.CSSSTYLER_COLOR_TT_TEXT);
     private final static Tooltip WEIGHT_TT = new Tooltip(
@@ -537,7 +538,7 @@ public class CssStylerViewController extends ViewController {
         // Get Directory of current Proof and set as initial DirectoryChild
         Proof proof = getContext().getKeYMediator().getSelectedProof();
         if (proof != null) {
-            initDirectory = proof.getProofFile().getParentFile();
+            initDirectory = proof.getProofFile();
         }
         // Get Directory from CSSFile and set as initial DirectoryChild if there
         // is no Proof Loaded or it has not been saved yet
@@ -550,6 +551,8 @@ public class CssStylerViewController extends ViewController {
             if (path.equals(NUIConstants.DEFAULT_CSS_PATH)) {
                 initDirectory = IOUtil.getHomeDirectory();
             }
+        }else{
+            initDirectory = initDirectory.getParentFile();
         }
         fileChooser.setInitialDirectory(initDirectory);
 

@@ -252,9 +252,12 @@ public class MediatorUserInterface
         String defaultFileName = suggestDefaultFileName(proof, fileExtension);
         fileChooser.setInitialFileName(defaultFileName);
 
-        File initDirectory = proof.getProofFile().getParentFile();
+        File initDirectory = proof.getProofFile();
         if (initDirectory == null) {
             initDirectory = IOUtil.getHomeDirectory();
+        }
+        else {
+            initDirectory = initDirectory.getParentFile();
         }
         fileChooser.setInitialDirectory(initDirectory);
 
