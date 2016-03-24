@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import de.uka.ilkd.key.nui.printer.SequentPrinter;
 import javafx.scene.control.TreeItem;
 
 /**
@@ -118,22 +119,43 @@ public class XmlReader {
         treeRoot.getChildren().add(otherNode);
     }
 
-    // TODO add documentation
+    /**
+     * a getter for the Tree consisting of the XML Structure and the Description
+     * Nodes
+     * 
+     * @return
+     */
     public TreeItem<String> getTree() {
         return treeRoot;
     }
 
-    // TODO add documentation
+    /**
+     * getter for a {@link Map} linking a {@link CssRule}'s selector to its XML
+     * Description
+     * 
+     * @return
+     */
     public Map<String, String> getDescriptionMap() {
         return descriptionMap;
     }
 
-    // TODO add documentation
+    /**
+     * getter for a {@link Map} linking a ClassName to its {@link CssRule}
+     * selector
+     * 
+     * @return
+     */
     public Map<String, String> getClassMap() {
         return classMap;
     }
 
-    // TODO add documentation
+    /**
+     * getter for a {@link Map} linking a ClassName to a {@link Boolean}
+     * indicating if it is enabled for SyntaxHighlighint by the
+     * {@link SequentPrinter}
+     * 
+     * @return
+     */
     public Map<String, Boolean> getClassEnabledMap() {
         return classEnabledMap;
     }

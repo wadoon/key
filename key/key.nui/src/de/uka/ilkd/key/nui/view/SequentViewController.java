@@ -54,8 +54,8 @@ import javafx.scene.web.WebView;
  * application. Only change this controller if the changes apply to all sequent
  * possible sequent views. If you want to create a specific sequent view, embed
  * this by embedding SequentView.fxml in your FXML file and creating a new
- * {@link ViewController}. For sample use see {@link MainSequentViewController} or
- * {@link StaticSequentViewController}.
+ * {@link ViewController}. For sample use see {@link MainSequentViewController}
+ * or {@link StaticSequentViewController}.
  * 
  * @author Maximilian Li
  * @author Victor Schuemmer
@@ -115,24 +115,35 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * A unique id of the squent view. This is used to manage multiple sequentviews due to staticsequentviews.
-     * This field is volatile.
+     * <<<<<<< HEAD A unique id of the squent view. This is used to manage
+     * multiple sequentviews due to staticsequentviews. This field is volatile.
+     * ======= getter for the Unique ID of this SequentView
+     * 
+     * @return >>>>>>> dce12851f5e67a90c337ed71e4d1278fefae781c
      */
     public long getOwnID() {
         return OWN_ID;
     }
 
     /**
-     * A unique id for the last triggered taclet-action.
-     * This field is volatile.
+     * <<<<<<< HEAD A unique id for the last triggered taclet-action. This field
+     * is volatile. ======= getter for the ID which triggered the last
+     * RuleApplication Action
+     * 
+     * @return >>>>>>> dce12851f5e67a90c337ed71e4d1278fefae781c
      */
     public long getLastTacletActionID() {
         return LAST_TACLET_ACTION_ID.get();
     }
 
     /**
-     * A unique id for the last triggered taclet-action.
-     * This field is volatile.
+     * <<<<<<< HEAD A unique id for the last triggered taclet-action. This field
+     * is volatile. ======= setter for the ID which triggered the last
+     * RuleApplication Action
+     * 
+     * @param newValue
+     *            the new ID Value >>>>>>>
+     *            dce12851f5e67a90c337ed71e4d1278fefae781c
      */
     public void setLastTacletActionID(long newValue) {
         LAST_TACLET_ACTION_ID.set(newValue);
@@ -140,7 +151,9 @@ public class SequentViewController extends ViewController {
 
     /**
      * Loads the sequent of the given {@link Node} to the sequent view.
-     * @param node the node to show the sequent of
+     * 
+     * @param node
+     *            the node to show the sequent of
      */
     public void loadNodeToView(Node node) {
         showSequent(node);
@@ -163,8 +176,8 @@ public class SequentViewController extends ViewController {
 
         updateView();
     }
-    
-    /** 
+
+    /**
      * @return the proof string shown in the sequent view
      */
     public String getProofString() {
@@ -228,7 +241,8 @@ public class SequentViewController extends ViewController {
 
     // XXX kind of a hack
     /**
-     * Used to enable or disable MouseMoved and MouseExited events for a short time.
+     * Used to enable or disable MouseMoved and MouseExited events for a short
+     * time.
      */
     private void enableMouseOver(boolean enable) {
         if (enable) {
@@ -242,7 +256,11 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * TextArea mouse moved. Triggers MouseHighlighting and if ALT is pressed prints a TermInfo to the status bar.
+     * handler for Mousemovement over the WebView Node. Will apply
+     * MouseoverHighlighting, or, if the ALT Key is held, print the Taclet Info
+     * into the statusbar
+     * 
+     * @param event
      */
     private void handleTextAreaMouseMoved(MouseEvent event) {
         int pos = posTranslator.getCharIdxUnderPointer(event);
@@ -260,7 +278,10 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * resets MouseHighlighting and the status bar if ALT is pressed.
+     * handler for when the Mouse Exits the WebView Node. Will remove all
+     * MouseoverHighlighting and remove TacletInfo from statusbar
+     * 
+     * @param event
      */
     private void handleTextAreaMouseExited(MouseEvent event) {
         this.printer.removeMouseHighlighting();
@@ -439,7 +460,9 @@ public class SequentViewController extends ViewController {
 
     /**
      * loads the completed new html document to the webview.
-     * @param s The full html code.
+     * 
+     * @param s
+     *            The full html code.
      */
     private void updateHtml(String s) {
         webEngine = textArea.getEngine();
@@ -479,7 +502,9 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * Applies a filter to the sequent view. This updates the {link: SequentPrinter} and {link: PositionTranslator}
+     * Applies a filter to the sequent view. This updates the {@link
+     * SequentPrinter} and {@link PositionTranslator}
+     * 
      * @param args
      */
     private void apply(FilterChangedEventArgs args) {
@@ -508,10 +533,13 @@ public class SequentViewController extends ViewController {
     private FilterSelection filterSelection;
     private boolean enableTacletMenu;
 
-   /**
-    * Triggers a filter selection on the SequentView. Registers a listener for {link: selectionModeFinishedEvent}.
-    * @param eventArgs an object that manages one selection workflow.
-    */
+    /**
+     * Triggers a filter selection on the SequentView. Registers a listener for
+     * {@link selectionModeFinishedEvent}.
+     * 
+     * @param eventArgs
+     *            an object that manages one selection workflow.
+     */
     private void selectModeActivated(SelectModeEventArgs eventArgs) {
         if (getContext().getKeYMediator().getSelectedProof() == null)
             return;
@@ -522,7 +550,8 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * Finished a selection action of the filter. Collects all selected ranges and resets the SequentView.
+     * Finished a selection action of the filter. Collects all selected ranges
+     * and resets the SequentView.
      */
     private void finishSelectionMode(EmptyEventArgs args) {
         for (Range range : filterSelection.getSelection())
@@ -533,7 +562,9 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * Logic for a click on the WebView. Fires TacletMenu and Filter/selectionMode actions. 
+     * Logic for a click on the WebView. Fires TacletMenu and
+     * Filter/selectionMode actions.
+     * 
      * @param event
      */
     private void handleWebViewClicked(MouseEvent event) {
@@ -612,7 +643,9 @@ public class SequentViewController extends ViewController {
 
     /**
      * Enables or disables the taclet menu on the sequent view.
-     * @param enable true to enable, false to disable
+     * 
+     * @param enable
+     *            true to enable, false to disable
      */
     public void enableTacletMenu(boolean enable) {
         enableTacletMenu = enable;

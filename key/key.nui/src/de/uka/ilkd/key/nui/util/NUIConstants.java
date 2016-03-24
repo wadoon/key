@@ -157,4 +157,9 @@ public final class NUIConstants {
      * Path to the 'Tips of the Day'
      */
     public final static String TIPS_OF_THE_DAY_PATH = "resources/tipsOfTheDay";
+    
+    /**
+     * The maximum number of recent files displayed in the recent file menu.
+     */
+    public static final int MAX_RECENT_FILES = 8;
 }

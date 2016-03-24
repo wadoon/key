@@ -109,7 +109,7 @@ public class ViewSlot {
     }
 
     /**
-     * TODO add documentation
+     * update the pastUsed field of the ViewSlot to the Current used value
      */
     public void updatePastUsed() {
         pastUsed = used;
@@ -120,7 +120,8 @@ public class ViewSlot {
     /**
      * TODO add documentation
      */
-    public static void setRegisterDrag(java.util.function.Consumer<Node> registerer) {
+    public static void setRegisterDrag(
+            java.util.function.Consumer<Node> registerer) {
         currentRegisterer = registerer;
     }
 }
