@@ -10,8 +10,8 @@ import org.key_project.util.java.IOUtil;
  * Parses hints stored in {@link NUIConstants#TIPS_OF_THE_DAY_PATH}, collects
  * them in an array and makes them available randomly.
  * <p>
- * To add or remove tips edit the above mentioned file. One line per tip and
- * make sure there is no empty lines.
+ * To add or remove tips edit the file at the above mentioned path. One line per
+ * tip and make sure there is no empty lines.
  * 
  * @author Nils Muzzulini
  * @version 1.0
