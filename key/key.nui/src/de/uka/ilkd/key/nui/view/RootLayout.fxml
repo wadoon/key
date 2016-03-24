@@ -38,7 +38,7 @@
 											control="DOWN" meta="UP" shift="UP" shortcut="UP" />
 									</accelerator>
 								</MenuItem>
-								<fx:include fx:id="recentFileMenu" source="../view/menu/RecentFileMenu.fxml" />
+								<fx:include fx:id="recentFileMenu" source="../view/menu/RecentFileMenuView.fxml" />
 								<SeparatorMenuItem mnemonicParsing="false" />
 								<MenuItem mnemonicParsing="false" onAction="#handleSave"
 									text="Save">

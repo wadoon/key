@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Observable;
 
-import de.uka.ilkd.key.nui.view.menu.ViewContextMenuController;
+import de.uka.ilkd.key.nui.view.menu.TabContextMenuController;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -24,6 +24,7 @@ import javafx.util.Pair;
  * 
  * @author Benedikt Gross
  * @author Victor Schuemmer
+ * @author Nils Muzzulini
  * @version 1.0
  */
 public class ViewInformation extends Observable {
@@ -46,7 +47,7 @@ public class ViewInformation extends Observable {
     private boolean hasMenuItem;
 
     /**
-     * @return true iff this view has a menu item to show and hide it.
+     * @return true if this view has a menu item to show and hide it.
      */
     public boolean hasMenuItem() {
         return hasMenuItem;
@@ -73,7 +74,7 @@ public class ViewInformation extends Observable {
     private ViewPosition preferredPosition;
 
     /**
-     * @return the preferred @{link ViewPosition} of the view
+     * @return the preferred {@link ViewPosition} of the view
      */
     public ViewPosition getPreferredPosition() {
         return preferredPosition;
@@ -90,7 +91,9 @@ public class ViewInformation extends Observable {
 
     /**
      * Sets the {@link ViewPosition} of the view to the new position.
-     * @param position the {@link ViewPosition} to set
+     * 
+     * @param position
+     *            the {@link ViewPosition} to set
      */
     public void setCurrentPosition(ViewPosition position) {
         if (currentPosition == position)
@@ -125,13 +128,16 @@ public class ViewInformation extends Observable {
 
     /**
      * The constructor.
-     * @param title The title of the view. This will be shown in the tab header.
-     * @param pathToFxml the path to the FXML file
-     * @param preferredPosition the preferred {@link ViewPosition}
+     * 
+     * @param title
+     *            The title of the view. This will be shown in the tab header.
+     * @param pathToFxml
+     *            the path to the FXML file
+     * @param preferredPosition
+     *            the preferred {@link ViewPosition}
      * @param hasMenuItem
      */
-    public ViewInformation(String title, URL pathToFxml,
-            ViewPosition preferredPosition, boolean hasMenuItem) {
+    public ViewInformation(String title, URL pathToFxml, ViewPosition preferredPosition, boolean hasMenuItem) {
         fxmlPath = pathToFxml;
         this.preferredPosition = preferredPosition;
         currentPosition = preferredPosition;
@@ -143,14 +149,17 @@ public class ViewInformation extends Observable {
     private boolean isActive = false;
 
     /**
-     * @return true iff the view is currently active
+     * @return true if the view is currently active
      */
     public boolean getIsActive() {
         return isActive;
     }
 
     /**
-     * TODO add documentation
+     * Make a view active or not active.
+     * 
+     * @param value
+     *            true if the view shall be active, else false
      */
     public void setIsActive(boolean value) {
         if (isActive == value)
@@ -162,9 +171,14 @@ public class ViewInformation extends Observable {
 
     private ViewController parent;
 
+    /**
+     * Creates and loads a {@link Tab} into the given {@link ViewController}.
+     * 
+     * @param parent
+     *            ViewController that the tab will be added to.
+     */
     public void loadUiTab(ViewController parent) {
-        Pair<Object, ViewController> pair = parent
-                .loadFxmlViewController(getFxmlPath());
+        Pair<Object, ViewController> pair = parent.loadFxmlViewController(getFxmlPath());
         this.parent = parent;
         uiTab = createTab((Node) pair.getKey(), parent);
         controller = pair.getValue();
@@ -172,9 +186,13 @@ public class ViewInformation extends Observable {
     }
 
     /**
+     * Creates a {@link Tab} with given {@link Node} as content, title as
+     * {@link Label}, also drag&drop functionality and a {@link Tooltip}.
      * 
      * @param node
+     *            the content of the tab
      * @param parent
+     *            parent controller that the tab should be added to
      * @return a tab with content node and title as label, also drag
      *         functionality
      */
@@ -182,8 +200,7 @@ public class ViewInformation extends Observable {
         Tab tab = new Tab();
         tab.setGraphic(makeTitleLabel(parent));
         tab.setContent(node);
-        tab.setTooltip(
-                new Tooltip("Drag\u0026Drop or Right-Click to move Tab"));
+        tab.setTooltip(new Tooltip("Drag\u0026Drop or Right-Click to move Tab"));
         tab.setOnCloseRequest(event -> {
             this.setIsActive(false);
         });
@@ -191,6 +208,14 @@ public class ViewInformation extends Observable {
         return tab;
     }
 
+    /**
+     * Makes a {@link Label} with {@link #title} as text. Also adds drag&drop
+     * functionality to it.
+     * 
+     * @param parent
+     *            parent controller
+     * @return title label
+     */
     private Label makeTitleLabel(ViewController parent) {
         Label titleLabel = new Label(title);
 
@@ -206,17 +231,22 @@ public class ViewInformation extends Observable {
 
         titleLabel.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(parent).show(titleLabel, Side.TOP,
-                        event.getX(), event.getY());
+                loadViewContextMenu().show(titleLabel, Side.TOP, event.getX(), event.getY());
         });
 
         return titleLabel;
     }
 
-    private ContextMenu loadViewContextMenu(ViewController parent) {
+    /**
+     * Create a {@link TabContextMenuController context menu} for each {@link Tab}
+     * containing the 5 {@link ViewPosition ViewPositions} and the current
+     * position of the selected tab.
+     * 
+     * @return the context menu
+     */
+    private ContextMenu loadViewContextMenu() {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ViewContextMenuController.class
-                .getResource("ViewContextMenu.fxml"));
+        loader.setLocation(TabContextMenuController.class.getResource("TabContextMenuView.fxml"));
         ContextMenu content;
         try {
             content = loader.load();
@@ -226,7 +256,7 @@ public class ViewInformation extends Observable {
             return null;
         }
 
-        ViewContextMenuController controller = loader.getController();
+        TabContextMenuController controller = loader.getController();
         controller.setParentView(this);
         content.setOnShowing((event) -> {
             controller.selectPosition();

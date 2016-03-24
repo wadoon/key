@@ -14,7 +14,7 @@ import javafx.scene.control.CheckMenuItem;
  * @author Nils Muzzulini
  * @version 1.0
  */
-public class ViewContextMenuController extends ViewController {
+public class TabContextMenuController extends ViewController {
 
     @FXML
     CheckMenuItem topLeft;

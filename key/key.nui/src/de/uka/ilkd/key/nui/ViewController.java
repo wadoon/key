@@ -36,9 +36,9 @@ public abstract class ViewController implements Initializable {
     }
 
     /**
-     * An event that is fired each time a new status is set.
+     * An event that is fired each time a new title is set.
      * 
-     * @return Status updated event.
+     * @return Title updated event.
      */
     public HandlerEvent<String> getTitleUpdatedEvent() {
         return titleUpdatedEvent;

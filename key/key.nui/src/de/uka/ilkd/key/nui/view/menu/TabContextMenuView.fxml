@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<ContextMenu xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.menu.ViewContextMenuController">
+<ContextMenu xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.menu.TabContextMenuController">
    <items>
       <CheckMenuItem fx:id="topLeft" mnemonicParsing="false" onAction="#handleTopLeft" text="Top Left" />
       <CheckMenuItem fx:id="topRight" mnemonicParsing="false" onAction="#handleTopRight" text="Top Right" />
