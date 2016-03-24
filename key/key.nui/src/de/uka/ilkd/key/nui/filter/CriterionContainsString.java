@@ -8,9 +8,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * A criteria that meets any line that contains the search text.
+ * A criterion that meets any line that contains the search text.
  * 
  * @author Benedikt Gross
+ * @version 1.0
  */
 public class CriterionContainsString implements Criterion<Integer> {
 
@@ -18,6 +19,7 @@ public class CriterionContainsString implements Criterion<Integer> {
     private String[] originalLines;
     private String proofString;
 
+    // TODO add documentation
     public CriterionContainsString(String searchText, String[] originalLines,
             String proofString) {
         if (searchText == null)
@@ -32,11 +34,11 @@ public class CriterionContainsString implements Criterion<Integer> {
     @Override
     public List<Integer> meetCriteria(List<Integer> lines) {
         List<Integer> list = new LinkedList<>();
-        if(searchText.isEmpty()){
+        if (searchText.isEmpty()) {
             list.addAll(lines);
             return list;
         }
-        
+
         Pattern p = Pattern.compile(Pattern.quote(searchText));
         Matcher matcher = p.matcher(proofString);
         while (matcher.find()) {

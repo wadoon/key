@@ -11,8 +11,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 
 /**
+ * ViewController for the area of a sequent view that shows information about
+ * applied taclets.
+ * 
  * @author Victor Schuemmer
- *
+ * @version 1.0
  */
 public class TacletInfoViewController extends ViewController {
 
@@ -32,7 +35,7 @@ public class TacletInfoViewController extends ViewController {
     }
 
     /**
-     * Display information about applied rules for the given node.
+     * Display information about applied rules for the given {@link Node}.
      * 
      * @param node
      */
@@ -42,7 +45,7 @@ public class TacletInfoViewController extends ViewController {
     };
 
     /**
-     * Display information about applied rules for the selected node in the
+     * Display information about applied rules for the selected {@link Node} in the
      * TreeView.
      */
     public void showTacletInfo() {

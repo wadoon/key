@@ -25,6 +25,9 @@ public abstract class ViewController implements Initializable {
     private Context context;
     private Stage stage;
 
+    /**
+     * @return the {@link MainApp}
+     */
     public MainApp getMainApp() {
         return mainApp;
     }

@@ -55,6 +55,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Nils Muzzulini
  * 
  * @see StrategySelectionView
+ * @version 1.0
  */
 public final class StrategySelectionFX extends JPanel {
     /**

@@ -48,6 +48,7 @@ import javafx.util.Callback;
  * A view for instantiation of taclets.
  * 
  * @author Victor Schuemmer
+ * @version 1.0
  */
 public class TacletInstantiationViewController extends ViewController {
 

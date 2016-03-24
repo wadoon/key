@@ -29,6 +29,7 @@ import javafx.collections.ObservableList;
  * handlers}.
  * 
  * @author Benedikt Gross
+ * @author Victor Schuemmer
  * @version 1.0
  */
 public class Context {

@@ -16,9 +16,6 @@ public class ViewObserver implements Observer {
         this.container = container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(Observable observable, Object arg1) {
         if (!(observable instanceof ViewInformation)) {

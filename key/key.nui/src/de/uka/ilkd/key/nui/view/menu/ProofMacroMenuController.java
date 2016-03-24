@@ -36,6 +36,7 @@ public class ProofMacroMenuController extends ViewController {
      */
     public static final Iterable<ProofMacro> REGISTERED_MACROS = ClassLoaderUtil.loadServices(ProofMacro.class);
     
+    //TODO add documentation
     public void init(KeYMediator mediator, PosInOccurrence posInOcc) {
         // Macros are grouped according to their category.
         // Store the sub menus in this map.

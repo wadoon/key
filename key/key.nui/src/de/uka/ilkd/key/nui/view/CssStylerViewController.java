@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.uka.ilkd.key.nui.view;
 
 import java.io.File;
@@ -45,9 +42,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
+ * ViewController for the CSS Styler window.
+ * 
  * @author Maximilian Li
  * @author Victor Schuemmer
- *
+ * @version 1.0
  */
 public class CssStylerViewController extends ViewController {
 
@@ -66,6 +65,7 @@ public class CssStylerViewController extends ViewController {
     private TreeItem<String> rootItem;
     private String selected;
 
+    // TODO move tooltips to tooltips method?
     private final static Tooltip COLOR_TT = new Tooltip(
             NUIConstants.CSSSTYLER_COLOR_TT_TEXT);
     private final static Tooltip WEIGHT_TT = new Tooltip(
@@ -523,6 +523,7 @@ public class CssStylerViewController extends ViewController {
 
     /**
      * constructs a FileChooser for CSS Files.
+     * 
      * @return FileChooser
      */
     private FileChooser makeFileChooser() {

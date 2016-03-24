@@ -8,6 +8,12 @@ import java.util.prefs.Preferences;
 import de.uka.ilkd.key.nui.util.SerializableViewInformation;
 import javafx.stage.Screen;
 
+/**
+ * Class for storage of window position, view position, layout etc.
+ * 
+ * @author Benedikt Gross
+ * @version 1.0
+ */
 public class SessionSettings {
 
     private static final int MinWidth = 300;
@@ -25,10 +31,22 @@ public class SessionSettings {
 
     private List<SerializableViewInformation> views = new LinkedList<>();
 
+    /**
+     * @return a list of all stored {@link SerializableViewInformation
+     *         SerializableViewInformations}
+     */
     public List<SerializableViewInformation> getViews() {
         return views;
     }
 
+    /**
+     * Sets the values to store as the {@link SerializableViewInformation
+     * SerializableViewInformations}.
+     * 
+     * @param viewInformations
+     *            the {@link SerializableViewInformation
+     *            SerializableViewInformations} to store.
+     */
     public void setViews(List<ViewInformation> viewInformations) {
         views = new LinkedList<>();
         for (ViewInformation view : viewInformations) {
@@ -38,20 +56,44 @@ public class SessionSettings {
 
     private List<Double> splitterPositions;
 
+    /**
+     * Sets the values to store as the position of all SplitPane dividers.
+     * 
+     * @param leftVertical
+     *            the relative position of the left of the two vertical dividers
+     * @param leftHorizontal
+     *            the relative position of the left of the two horizontal
+     *            dividers
+     * @param rightVertical
+     *            the relative position of the right of the two vertical
+     *            dividers
+     * @param rightHorizontal
+     *            the relative position of the right of the two horizontal
+     *            dividers
+     */
     public void setSplitterPositions(double leftVertical, double leftHorizontal,
             double rightVertical, double rightHorizontal) {
         splitterPositions = Arrays.asList(leftVertical, leftHorizontal,
                 rightVertical, rightHorizontal);
     }
 
+    /**
+     * Sets the values to store as the position of all SplitPane dividers if the
+     * given list is of size 4.
+     * 
+     * @param list
+     *            List of divider positions in the order: leftVertical,
+     *            leftHorizontal, rightVertical, rightHorizontal. Nothing will
+     *            happen is the given list is not of size 4.
+     */
     public void setSplitterPositions(List<Double> list) {
         if (list.size() == 4)
             splitterPositions = list;
     }
 
     /**
-     * size = 4 : left-vertical, left-horizontal, right-vertical,
-     * right-horizontal
+     * @return list of size 4 of relative devider positions: left-vertical,
+     *         left-horizontal, right-vertical, right-horizontal
      */
     public List<Double> getSplitterPositions() {
         return splitterPositions;
@@ -59,26 +101,51 @@ public class SessionSettings {
 
     private double windowX;
 
+    /**
+     * Sets the value to store as the window's x position.
+     * 
+     * @param value
+     *            the x position.
+     */
     public void setWindowX(double value) {
         windowX = value;
     }
 
+    /**
+     * @return the stored window's x position.
+     */
     public double getWindowX() {
         return windowX;
     }
 
     private double windowY;
 
+    /**
+     * Sets the value to store as the window's y position.
+     * 
+     * @param value
+     *            the y position.
+     */
     public void setWindowY(double value) {
         windowY = value;
     }
 
+    /**
+     * @return the stored window's y position
+     */
     public double getWindowY() {
         return windowY;
     }
 
     private double windowHeight;
 
+    /**
+     * Sets the value to store as the window's height or its min height,
+     * whatever is of greater value.
+     * 
+     * @param value
+     *            the window height.
+     */
     public void setWindowHeight(double value) {
         if (value >= MinHeight)
             windowHeight = value;
@@ -86,12 +153,22 @@ public class SessionSettings {
             windowHeight = MinHeight;
     }
 
+    /**
+     * @return the stored window height
+     */
     public double getWindowHeight() {
         return windowHeight;
     }
 
     private double windowWidth;
 
+    /**
+     * Sets the value to store as the window's width or its min width, whatever
+     * is of greater value.
+     * 
+     * @param value
+     *            the window width.
+     */
     public void setWindowWidth(double value) {
         if (value >= MinWidth)
             windowWidth = value;
@@ -100,6 +177,9 @@ public class SessionSettings {
 
     }
 
+    /**
+     * @return the stored window width
+     */
     public double getWindowWidth() {
         return windowWidth;
     }
@@ -116,11 +196,11 @@ public class SessionSettings {
             windowY = 0;
 
         // catch negative size, because bounds.contains does not handle this
-        if(windowHeight < 0 || windowWidth < 0){
+        if (windowHeight < 0 || windowWidth < 0) {
             boundsCorrupted = true;
             return;
         }
-        
+
         // get screens for x and y position (regardless of size)
         List<Screen> containers = Screen.getScreensForRectangle(windowX,
                 windowY, 1, 1);
@@ -137,6 +217,10 @@ public class SessionSettings {
         boundsCorrupted = true;
     }
 
+    /**
+     * Saves the current settings to preferences so it can be loaded when the
+     * application is started the next time.
+     */
     public void saveAsLast() {
         checkBounds();
         if (boundsCorrupted)
@@ -156,6 +240,9 @@ public class SessionSettings {
         prefs.put("views", viewBuilder.toString());
     }
 
+    /**
+     * @return the last saved SessionSettings 
+     */
     public static SessionSettings loadLastSettings() {
         try {
             SessionSettings settings = new SessionSettings();

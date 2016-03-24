@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.nui.filter;
 
 /**
- * A class that provides utility functionality for criteria.
+ * A class that provides utility functionality for criterion.
  * 
  * @author Benedikt Gross
- *
+ * @version 1.0
  */
 public class LineToPrintedProofPosition {
     /**
@@ -29,10 +29,10 @@ public class LineToPrintedProofPosition {
     }
 
     /**
-     * Get the position of the first not whitespace char in the string
+     * Get the position of the first non-whitespace char in the string.
      * 
-     * @param line
-     * @return
+     * @param line the string to check
+     * @return the position of the first non-whitespace character
      */
     public static int getFirstNonWhitespace(String line) {
         for (int notwhite = 0; notwhite < line.length(); notwhite++) {
@@ -51,7 +51,7 @@ public class LineToPrintedProofPosition {
      * @param lineIndex
      * @param originalLines
      *            The original document (printed sequent)
-     * @return
+     * @return 
      */
     public static int getCharIndex(int lineIndex, String[] originalLines) {
         int charIndex = 0;

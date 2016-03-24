@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * the Model for a CSS Rule
+ * The Model for a CSS Rule.
  * 
  * @author Victor Schuemmer
  * @version 1.0
@@ -135,9 +135,6 @@ public class CssRule {
         propertyValuePairs.remove(property);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(selectorsAsString());
@@ -149,10 +146,8 @@ public class CssRule {
         return sb.toString();
     }
 
-    /**
-     * returns the selectors (HTML structures) this rule applies to as a String
-     * 
-     * @return
+    /** 
+     * @return the selectors (HTML structures) this rule applies to as a String
      */
     public String selectorsAsString() {
         StringBuilder sb = new StringBuilder();

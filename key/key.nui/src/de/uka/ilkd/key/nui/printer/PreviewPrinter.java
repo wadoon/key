@@ -12,6 +12,7 @@ import de.uka.ilkd.key.nui.util.NUIConstants;
  * Provides a dummy text that can be printed with CSS as a preview.
  * 
  * @author Maximilian Li
+ * @version 1.0
  */
 public class PreviewPrinter {
     private final static String PREVIEW_TEXT = "This is a preview text.\n"

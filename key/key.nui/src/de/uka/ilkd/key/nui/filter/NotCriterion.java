@@ -3,31 +3,31 @@ package de.uka.ilkd.key.nui.filter;
 import java.util.List;
 
 /**
- * A generic criteria that meets the exact opposite of the child criteria
+ * A generic criteria that meets the exact opposite of the child criterion.
+ * 
  * @author Benedikt Gross
- *
+ * @version 1.0
  * @param <E>
  */
-public class NotCriterion<E> implements Criterion<E>
-{
-   private Criterion<E> criteria;
+public class NotCriterion<E> implements Criterion<E> {
+    private Criterion<E> criteria;
 
-   public NotCriterion(Criterion<E> childCriteria)
-   {
-      criteria = childCriteria;
-   }
-   
-   public List<E> meetCriteria(List<E> entities)
-   {
-      List<E> notCriteriaItems = criteria.meetCriteria(entities);
-      // ensure original list is not modified, otherwise compound Or will use an already filtered list
-      List<E> notEntities = entities;  
+    // TODO add documentation
+    public NotCriterion(Criterion<E> childCriteria) {
+        criteria = childCriteria;
+    }
 
-      for (E notCriteriaItem : notCriteriaItems)
-      {
-         notEntities.remove(notCriteriaItem);
-      }
+    // TODO add documentation
+    public List<E> meetCriteria(List<E> entities) {
+        List<E> notCriteriaItems = criteria.meetCriteria(entities);
+        // ensure original list is not modified, otherwise compound Or will use
+        // an already filtered list
+        List<E> notEntities = entities;
 
-      return notEntities;
-   }
+        for (E notCriteriaItem : notCriteriaItems) {
+            notEntities.remove(notCriteriaItem);
+        }
+
+        return notEntities;
+    }
 }

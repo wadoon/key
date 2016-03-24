@@ -34,6 +34,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Nils Muzzulini
  * 
  * @see AutoModeAction
+ * @version 1.0
  */
 public final class AutoModeActionFX extends AbstractAction {
 

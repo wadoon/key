@@ -6,17 +6,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.util.Pair;
 
 /**
- * TODO add class comments
+ * Loader for FXML files.
  * 
  * @author Benedikt Gross
  * @version 1.0
  */
 public class KeyFxmlLoader {
+
     /**
-     * TODO add comments
+     * Loads a FXML file and returns its root node and
+     * {@link de.uka.ilkd.key.nui.ViewController controller}.
      * 
      * @param path
-     * @return
+     *            the path to the FXML file
+     * @return pair of the root node and the ViewController of the loaded FXML
      */
     public static <T, C> Pair<T, C> loadFxml(URL path) {
         try {

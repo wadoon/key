@@ -32,6 +32,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * TODO add documentation
+ * 
+ * @author Benedikt Gross
+ * @version 1.0
+ */
 @KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT, defaultActive = false)
 public class FilterViewController extends ViewController {
 
@@ -87,7 +93,7 @@ public class FilterViewController extends ViewController {
 
     @FXML
     private AnchorPane filterContainer;
-    
+
     @FXML
     private VBox filterSettings;
 
@@ -97,11 +103,11 @@ public class FilterViewController extends ViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        selectionFilterToggle.setStyle(
-                "-fx-background-image: url('" + NUIConstants.FILTER_MOUSE_ICON_PATH
-                        + "');" + "-fx-background-position: center center;"
-                        + "-fx-background-repeat: no-repeat;"
-                        + "-fx-background-size: contain;");
+        selectionFilterToggle.setStyle("-fx-background-image: url('"
+                + NUIConstants.FILTER_MOUSE_ICON_PATH + "');"
+                + "-fx-background-position: center center;"
+                + "-fx-background-repeat: no-repeat;"
+                + "-fx-background-size: contain;");
         searchText.disableProperty().bind(userRadio.selectedProperty().not());
         selectionFilterToggle.disableProperty()
                 .bind(selectionRadio.selectedProperty().not());
@@ -295,17 +301,22 @@ public class FilterViewController extends ViewController {
     private void updateSelectionCount(int value) {
         selectionCount.setText("(selections: " + Integer.toString(value) + ")");
     }
-    
+
     @Override
     public void setTooltips() {
-        invertFilter.setTooltip(new Tooltip("Inverts the filter. Text or selection entered will be unfiltered."));
-        useAstScope.setTooltip(new Tooltip("Filters based on the abstract syntax tree."));
-        useTextScope.setTooltip(new Tooltip("Filters based on the number of lines before and after the filtered text."));
-        Tooltip selectionTT = new Tooltip("To filter by selection, click this button first. \n"
-                + "Then make as many selections in the sequent as desired. \n"
-                + "Finally press 'Apply Filter' when done.");
+        invertFilter.setTooltip(new Tooltip(
+                "Inverts the filter. Text or selection entered will be unfiltered."));
+        useAstScope.setTooltip(
+                new Tooltip("Filters based on the abstract syntax tree."));
+        useTextScope.setTooltip(new Tooltip(
+                "Filters based on the number of lines before and after the filtered text."));
+        Tooltip selectionTT = new Tooltip(
+                "To filter by selection, click this button first. \n"
+                        + "Then make as many selections in the sequent as desired. \n"
+                        + "Finally press 'Apply Filter' when done.");
         selectionCount.setTooltip(selectionTT);
         selectionFilterToggle.setTooltip(selectionTT);
-        filterModeBox.setTooltip(new Tooltip("Choose whether to minimize or fully collapse the unfiltered text."));
+        filterModeBox.setTooltip(new Tooltip(
+                "Choose whether to minimize or fully collapse the unfiltered text."));
     }
 }

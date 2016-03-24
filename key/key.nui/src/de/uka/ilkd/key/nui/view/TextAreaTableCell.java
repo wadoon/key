@@ -17,16 +17,19 @@ import javafx.util.converter.DefaultStringConverter;
  * loss.
  * 
  * @author Victor Schuemmer
+ * @version 1.0
  */
 public class TextAreaTableCell<S, T> extends TableCell<S, T> {
 
     private TextArea textArea;
     private StringConverter<T> converter;
 
+    //TODO add documentation
     public static <S> Callback<TableColumn<S, String>, TableCell<S, String>> forTableColumn() {
         return forTableColumn(new DefaultStringConverter());
     }
 
+    //TODO add documentation
     public static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forTableColumn(
             final StringConverter<T> converter) {
         return list -> new TextAreaTableCell<>(converter);
@@ -70,6 +73,7 @@ public class TextAreaTableCell<S, T> extends TableCell<S, T> {
         return textArea;
     }
 
+    //TODO add documentation
     public TextAreaTableCell(StringConverter<T> converter) {
         this.getStyleClass().add("text-area-table-cell");
         this.converter = converter;

@@ -84,9 +84,6 @@ public class ProofBrowserViewController extends ViewController {
         }
     };
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void initializeAfterLoadingFxml() {
         proofBrowserTreeView.setRoot(PROOF_BROWSER_ROOT_NODE);

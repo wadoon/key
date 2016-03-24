@@ -17,7 +17,7 @@ import org.w3c.dom.NodeList;
 import javafx.scene.control.TreeItem;
 
 /**
- * reads the XML File defining the CSS Highlighting Classes and Descriptions
+ * Reads the XML File defining the CSS Highlighting Classes and Descriptions.
  * 
  * @author Maximilian Li
  * @version 1.0
@@ -47,7 +47,7 @@ public class XmlReader {
     }
 
     /**
-     * parses the XML File
+     * Parses the XML File.
      */
     private void parseFile() {
         try {
@@ -118,18 +118,22 @@ public class XmlReader {
         treeRoot.getChildren().add(otherNode);
     }
 
+    // TODO add documentation
     public TreeItem<String> getTree() {
         return treeRoot;
     }
 
+    // TODO add documentation
     public Map<String, String> getDescriptionMap() {
         return descriptionMap;
     }
 
+    // TODO add documentation
     public Map<String, String> getClassMap() {
         return classMap;
     }
 
+    // TODO add documentation
     public Map<String, Boolean> getClassEnabledMap() {
         return classEnabledMap;
     }

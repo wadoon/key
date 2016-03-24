@@ -49,6 +49,7 @@ import javafx.stage.Stage;
  * 
  * @see TacletMenu
  * @author Victor Schuemmer
+ * @version 1.0
  */
 public class TacletMenuController extends ViewController {
 

@@ -30,10 +30,11 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * styles the SequentText as HTML Text
+ * Styles the SequentText as HTML Text.
  * 
  * @author Maximilian Li
  * @author Victor Schuemmer
+ * @version 1.0
  */
 public class SequentPrinter {
     private String proofString;
@@ -106,7 +107,7 @@ public class SequentPrinter {
     }
 
     /**
-     * gets the HighlightingRange from the InitialPositionTable for a Position
+     * Gets the {@link Range HighlightRange} from the {@link InitialPositionTable} for a Position.
      * 
      * @param pos
      *            the Position of the Term to be highlighted

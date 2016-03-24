@@ -57,11 +57,11 @@ public class MainApp extends Application {
         return isDebugView;
     }
 
-    /**
-     * The applications primary {@link Stage}.
-     */
     private Stage primaryStage;
 
+    /**
+     * @return The applications primary {@link Stage}.
+     */
     public Stage getPrimaryStage() {
         return primaryStage;
     }
@@ -80,19 +80,16 @@ public class MainApp extends Application {
     private Scene scene;
     boolean ctrlPressed = false;
 
-    /**
-     * The {@link KeYDesktop} used by KeY. The default implementation is
-     * replaced in Eclipse.
-     */
     private static KeYDesktop keyDesktop = new DefaultKeYDesktop();
 
+    /**
+     * @return The {@link KeYDesktop} used by KeY. The default implementation is
+     *         replaced in Eclipse.
+     */
     public static KeYDesktop getKeyDesktop() {
         return keyDesktop;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -180,6 +177,10 @@ public class MainApp extends Application {
         }
     }
 
+    /**
+     * @return the {@link RootLayoutController} that is responsible for the
+     *         applications layout
+     */
     public RootLayoutController getRootLayoutController() {
         return rootLayoutController;
     }
@@ -227,7 +228,8 @@ public class MainApp extends Application {
             ObservableList<String> additionalStylesheets) {
         Stage stage = new Stage();
         stage.setTitle(title);
-        stage.getIcons().add(new Image(NUIConstants.KEY_APPLICATION_WINDOW_ICON_PATH));
+        stage.getIcons()
+                .add(new Image(NUIConstants.KEY_APPLICATION_WINDOW_ICON_PATH));
 
         if (blockParent)
             stage.initModality(Modality.WINDOW_MODAL);
@@ -292,7 +294,8 @@ public class MainApp extends Application {
 
         // Get the Stage and add KeY Icon.
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(NUIConstants.KEY_APPLICATION_WINDOW_ICON_PATH));
+        stage.getIcons()
+                .add(new Image(NUIConstants.KEY_APPLICATION_WINDOW_ICON_PATH));
 
         // FIXME Due to a bug in javafx (JDK-8087981) alerts do not
         // resize with content on several linux systems. Remove the

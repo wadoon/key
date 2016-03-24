@@ -10,6 +10,7 @@ import javafx.scene.control.MenuItem;
  * A menu item with a TacletApp connected to it.
  * 
  * @author Victor Schuemmer
+ * @version 1.0
  */
 public class TacletMenuItem extends MenuItem {
 

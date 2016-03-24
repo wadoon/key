@@ -14,7 +14,7 @@ import org.key_project.util.java.IOUtil;
 import de.uka.ilkd.key.nui.Context;
 
 /**
- * reads and writes CSS files
+ * Reads and writes CSS files.
  * 
  * @author Victor Schuemmer
  * @author Maximilian Li
@@ -26,6 +26,11 @@ public class CssFileHandler {
     private String css;
     private String path;
 
+    /**
+     * States of the css parser.
+     * 
+     * @author Victor Schuemmer
+     */
     private enum State {
         SELECTOR, PROPERTY, VALUE;
     }
@@ -188,8 +193,8 @@ public class CssFileHandler {
     }
 
     /**
-     * Returns a List of CssRules parsed from the CSS file. List will be empty
-     * if no file was loaded.
+     * Returns a List of {@link CssRule CssRules} parsed from the CSS file. List
+     * will be empty if no file was loaded.
      * 
      * @return List of CssRules
      */
@@ -217,7 +222,7 @@ public class CssFileHandler {
     /**
      * Parses the loaded CSS and returns the rules.
      * 
-     * @return List of CssRules
+     * @return List of {@link CssRule CssRules}
      */
     private void parse() {
         CssRule rule = new CssRule();
@@ -251,7 +256,8 @@ public class CssFileHandler {
                 }
                 case ',': {
                     if (selector.equals(""))
-                        System.err.println("Leading comma in selectors ignored.");
+                        System.err
+                                .println("Leading comma in selectors ignored.");
                     else
                         rule.addSelector(selector.trim());
                     selector = "";

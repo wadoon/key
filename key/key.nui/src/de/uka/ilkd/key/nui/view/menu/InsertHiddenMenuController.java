@@ -21,6 +21,7 @@ import javafx.scene.control.Menu;
  * A menu for TacletMenuItems whose taclets insert hidden terms.
  * 
  * @author Victor Schuemmer
+ * @version 1.0
  */
 public class InsertHiddenMenuController extends ViewController {
 

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.uka.ilkd.key.nui.view;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -15,13 +12,22 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import javafx.fxml.FXML;
 
 /**
+ * This sequent view does not change when a node is selected in the tree. The
+ * displayed sequent only changes if a rule is applied directly in this sequent
+ * view.
+ * 
  * @author Victor Schuemmer
  * @author Maximilian Li
+ * @version 1.0
  */
 public class StaticSequentViewController extends ViewController {
     @FXML
     private SequentViewController sequentViewController;
 
+    /**
+     * @return the {@link SequentViewController controller} of the embedded
+     *         sequent view
+     */
     public SequentViewController getSequentViewController() {
         return sequentViewController;
     }
@@ -30,32 +36,29 @@ public class StaticSequentViewController extends ViewController {
 
     private Node node;
 
+    /**
+     * @return the current {@link Node} of this sequent view
+     */
     public Node getNode() {
         return node;
     }
-
-    public void setNode(Node node) {
-        this.node = node;
-    }
-
+    
     private Proof proof;
 
+    /**
+     * @return the current {@link Proof} of this sequent view
+     */
     public Proof getProof() {
         return proof;
     }
 
-    public void setProof(Proof proof) {
-        this.proof = proof;
-    }
-
     private Goal goal;
 
+    /**
+     * @return the current {@link Goal} of this sequent view
+     */
     public Goal getGoal() {
         return goal;
-    }
-
-    public void setGoal(Goal goal) {
-        this.goal = goal;
     }
 
     private int updateCounter = 0;
@@ -66,9 +69,9 @@ public class StaticSequentViewController extends ViewController {
 
         mediator = getContext().getKeYMediator();
 
-        setProof(mediator.getSelectedProof());
-        setGoal(mediator.getSelectedGoal());
-        setNode(mediator.getSelectedNode());
+        proof = mediator.getSelectedProof();
+        goal = mediator.getSelectedGoal();
+        node = mediator.getSelectedNode();
 
         KeYSelectionListener proofChangeListener = new KeYSelectionListener() {
             @Override
@@ -90,12 +93,12 @@ public class StaticSequentViewController extends ViewController {
                                 .getOwnID()
                         && (goal == mediator.getSelectedGoal()
                                 || updateCounter > 0)) {
-                    setProof(mediator.getSelectedProof());
-                    setGoal(mediator.getSelectedGoal());
-                    setNode(mediator.getSelectedNode());
+                    proof = mediator.getSelectedProof();
+                    goal = mediator.getSelectedGoal();
+                    node = mediator.getSelectedNode();
                     sequentViewController.loadNodeToView(node);
 
-                    // Appplying a Rule triggers 3 Update Steps. To let the
+                    // Applying a Rule triggers 3 Update Steps. To let the
                     // static SequentView update, use the stepCounter.\\
                     // Else it remains completely static or \\
                     // You cannot Counteract GoalChanges -> Exception!
@@ -115,6 +118,7 @@ public class StaticSequentViewController extends ViewController {
             }
         };
 
+        // TODO is this still needed?
         proof.addProofTreeListener(new ProofTreeListener() {
 
             @Override

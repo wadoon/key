@@ -50,10 +50,17 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
 /**
+ * ViewController for the sequent view that shows a sequent and may allow rule
+ * application. Only change this controller if the changes apply to all sequent
+ * possible sequent views. If you want to create a specific sequent view, embed
+ * this by embedding SequentView.fxml in your FXML file and creating a new
+ * {@link ViewController}. For sample use see {@link MainSequentViewController} or
+ * {@link StaticSequentViewController}.
+ * 
  * @author Maximilian Li
  * @author Victor Schuemmer
  * @author Nils Muzzulini
- *
+ * @version 1.0
  */
 public class SequentViewController extends ViewController {
     // For StaticSequentView Synchronization
@@ -107,18 +114,25 @@ public class SequentViewController extends ViewController {
         }
     }
 
+    //TODO add documentation
     public long getOwnID() {
         return OWN_ID;
     }
 
+    //TODO add documentation
     public long getLastTacletActionID() {
         return LAST_TACLET_ACTION_ID.get();
     }
 
+    //TODO add documentation
     public void setLastTacletActionID(long newValue) {
         LAST_TACLET_ACTION_ID.set(newValue);
     }
 
+    /**
+     * Loads the sequent of the given {@link Node} to the sequent view.
+     * @param node the node to show the sequent of
+     */
     public void loadNodeToView(Node node) {
         showSequent(node);
         tacletInfoViewController.showTacletInfo(node);
@@ -140,7 +154,10 @@ public class SequentViewController extends ViewController {
 
         updateView();
     }
-
+    
+    /** 
+     * @return the proof string shown in the sequent view
+     */
     public String getProofString() {
         return proofString;
     }
@@ -189,9 +206,6 @@ public class SequentViewController extends ViewController {
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setTooltips() {
         checkBoxRegexSearch
@@ -259,7 +273,7 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * initializes the Searchbox: registers all the Event behavior
+     * Initializes the search box: registers all the event behavior.
      */
     private void initializeSearchBox() {
         searchBox.setOnKeyReleased(event -> {
@@ -411,6 +425,9 @@ public class SequentViewController extends ViewController {
         webEngine.loadContent(s);
     }
 
+    /**
+     * Updates the view to show the current sequent.
+     */
     public void updateView() {
         // Redraw WebArea to use optimal Height. Called here as PosTranslater
         // needs to know the ProofString.
@@ -462,7 +479,7 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    boolean selectionModeIsActive = false;
+    private boolean selectionModeIsActive = false;
     private FilterSelection filterSelection;
     private boolean enableTacletMenu;
 
@@ -475,6 +492,7 @@ public class SequentViewController extends ViewController {
         selectionModeIsActive = true;
     }
 
+    //TODO add documentation
     public void finishSelectionMode(EmptyEventArgs args) {
         for (Range range : filterSelection.getSelection())
             this.printer.removeSelection(range);
@@ -557,11 +575,17 @@ public class SequentViewController extends ViewController {
         }
     }
 
+    /**
+     * Enables or disables the taclet menu on the sequent view.
+     * @param enable true to enable, false to disable
+     */
     public void enableTacletMenu(boolean enable) {
         enableTacletMenu = enable;
-
     }
 
+    /**
+     * Empties the web view.
+     */
     protected void clearWebView() {
         sequentOptions.setDisable(true);
         tacletInfo.setDisable(true);

@@ -10,7 +10,7 @@ import javafx.scene.text.Text;
 
 /**
  * Provides Functionalities to Translate a Pixel-Position to a Char in the
- * ProofString and vice versa
+ * ProofString and vice versa.
  * 
  * @author Maximilian Li
  * @version 1.0

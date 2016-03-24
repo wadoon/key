@@ -10,7 +10,7 @@ import java.util.Observable;
  * filtered lines.
  * 
  * @author Benedikt Gross
- *
+ * @version 1.0
  */
 public class PrintFilter extends Observable {
 
@@ -161,14 +161,14 @@ public class PrintFilter extends Observable {
     private FilterLayout filterLayout;
 
     /**
-     * The {link FilterLayout} of the current filter.
+     * The {@link FilterLayout} of the current filter.
      */
     public FilterLayout getFilterLayout() {
         return filterLayout;
     }
 
     /**
-     * The {link FilterLayout} of the current filter.
+     * The {@link FilterLayout} of the current filter.
      */
     public void setFilterLayout(FilterLayout value) {
         if (filterLayout == value)
@@ -177,6 +177,9 @@ public class PrintFilter extends Observable {
         notifyChanged();
     }
 
+    /**
+     * The constructor.
+     */
     public PrintFilter() {
         isUserCriteria = true;
         selections = new LinkedList<>();
@@ -186,6 +189,9 @@ public class PrintFilter extends Observable {
         scope = DisplayScope.None;
     }
 
+    /**
+     * @return a clone of this object
+     */
     public PrintFilter cloneFilter() {
         PrintFilter filter = new PrintFilter();
         filter.setSelections(this.selections);
@@ -205,8 +211,8 @@ public class PrintFilter extends Observable {
     }
 
     /**
-     * Indicates how lines that did not match a filter should be displayed (
-     * <b>hidden</b>).
+     * Indicates how lines that did not match any filter should be displayed as
+     * (<b>hidden</b>).
      * 
      * @author Benedikt Gross
      *

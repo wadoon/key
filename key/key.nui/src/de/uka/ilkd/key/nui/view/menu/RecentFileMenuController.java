@@ -20,6 +20,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
+/**
+ * TODO add documentation
+ * 
+ * @author Nils Muzzulini
+ * @version 1.0
+ */
 public class RecentFileMenuController extends ViewController {
     /**
      * The maximum number of recent files displayed.
@@ -64,7 +70,8 @@ public class RecentFileMenuController extends ViewController {
 
             @Override
             public void handle(ActionEvent event) {
-                mediator.getUI().loadProblem(new File(getAbsolutePath((MenuItem) event.getSource())));
+                mediator.getUI().loadProblem(new File(
+                        getAbsolutePath((MenuItem) event.getSource())));
             }
 
         };
@@ -86,7 +93,8 @@ public class RecentFileMenuController extends ViewController {
      */
     private void addToModelAndView(final String name) {
         // do not add quick save location to recent files
-        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH.endsWith(name))
+        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH
+                .endsWith(name))
             return;
 
         final RecentFileEntry entry = new RecentFileEntry(name);
@@ -100,9 +108,7 @@ public class RecentFileMenuController extends ViewController {
         }
     }
 
-    /**
-     *
-     */
+    // TODO add documentation
     public String getAbsolutePath(MenuItem item) {
         return recentFiles.get(item).getAbsolutePath();
     }
@@ -132,7 +138,8 @@ public class RecentFileMenuController extends ViewController {
             Debug.out("", i);
             Debug.out("item is ", menu.getItems().get(i));
             Debug.out("name is ", menu.getItems().get(i).getText());
-            if (recentFiles.get(menu.getItems().get(i)).getAbsolutePath().equals(name)) {
+            if (recentFiles.get(menu.getItems().get(i)).getAbsolutePath()
+                    .equals(name)) {
                 // this name has to be put at the first position
                 item = menu.getItems().get(i);
                 index = i;
@@ -146,7 +153,9 @@ public class RecentFileMenuController extends ViewController {
         }
         // if appropriate, remove the last entry.
         if (menu.getItems().size() == maxNumberOfEntries) {
-            removeFromModelAndView(menu.getItems().get(menu.getItems().size() - 1), menu.getItems().size() - 1);
+            removeFromModelAndView(
+                    menu.getItems().get(menu.getItems().size() - 1),
+                    menu.getItems().size() - 1);
         }
         addToModelAndView(name);
         // menu.setEnabled(menu.getItems().size() != 0);
@@ -199,7 +208,8 @@ public class RecentFileMenuController extends ViewController {
     public void store(Properties p) {
         // if there's nothing to store:
         for (int i = 0; i < menu.getItems().size(); i++) {
-            p.setProperty("RecentFile" + i, getAbsolutePath(menu.getItems().get(i)));
+            p.setProperty("RecentFile" + i,
+                    getAbsolutePath(menu.getItems().get(i)));
         }
     }
 
@@ -218,10 +228,12 @@ public class RecentFileMenuController extends ViewController {
             }
         }
         catch (FileNotFoundException ex) {
-            Debug.out("Could not read RecentFileList. Did not find file ", filename);
+            Debug.out("Could not read RecentFileList. Did not find file ",
+                    filename);
         }
         catch (IOException ioe) {
-            Debug.out("Could not read RecentFileList. Some IO Error occured ", ioe);
+            Debug.out("Could not read RecentFileList. Some IO Error occured ",
+                    ioe);
         }
         finally {
             try {
@@ -235,6 +247,7 @@ public class RecentFileMenuController extends ViewController {
         }
     }
 
+    // TODO add documentation
     public RecentFileEntry getMostRecent() {
         return mostRecentFile;
     }
@@ -259,7 +272,8 @@ public class RecentFileMenuController extends ViewController {
             p.store(fout, "recent files");
         }
         catch (IOException ex) {
-            System.err.println("Cound not write recentFileList due to " + ex.toString() + "::" + localRecentFiles);
+            System.err.println("Cound not write recentFileList due to "
+                    + ex.toString() + "::" + localRecentFiles);
         }
         finally {
             try {
@@ -279,23 +293,28 @@ public class RecentFileMenuController extends ViewController {
         }
     }
 
+    // TODO add documentation
     public static class RecentFileEntry {
 
         private String fileName;
         private String absolutePath;
 
+        // TODO add documentation
         public RecentFileEntry(String absolutePath) {
             this.absolutePath = absolutePath;
             int lastIndex = absolutePath.lastIndexOf(File.separatorChar);
 
             this.fileName = (lastIndex == -1 ? absolutePath
-                    : absolutePath.substring(lastIndex + 1, absolutePath.length()));
+                    : absolutePath.substring(lastIndex + 1,
+                            absolutePath.length()));
         }
 
+        // TODO add documentation
         public String getAbsolutePath() {
             return absolutePath;
         }
 
+        // TODO add documentation
         public String getFileName() {
             return fileName;
         }

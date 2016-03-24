@@ -12,7 +12,7 @@ import de.uka.ilkd.key.pp.Range;
  * selection operation.
  * 
  * @author Benedikt Gross
- *
+ * @version 1.0
  */
 public class FilterSelection {
 
@@ -50,9 +50,9 @@ public class FilterSelection {
     }
 
     /**
-     * Creates a criteria that represents all selections combined by OrCriteria
-     * and saves it in this instance. The created criteria can be accessed via
-     * getCriteria().
+     * Creates a criterion that represents all selections combined by
+     * {@link OrCriterion} and saves it in this instance. The created criterion
+     * can be accessed via getCriteria().
      * 
      * @param proofString
      */
@@ -71,7 +71,7 @@ public class FilterSelection {
     private List<String> resolvedSelection;
 
     /**
-     * Returns the criteria created by a previous call to createCriteria(). If
+     * Returns the criterion created by a previous call to createCriteria(). If
      * createCriteria was not called before null is returned.
      * 
      * @return
@@ -83,10 +83,8 @@ public class FilterSelection {
     private HandlerEvent<EmptyEventArgs> selectionModeFinishedEvent = new HandlerEvent<>();
 
     /**
-     * An event that is raised if the user aborts or closes the selection
+     * @return An event that is raised if the user aborts or closes the selection
      * "mode".
-     * 
-     * @return
      */
     public HandlerEvent<EmptyEventArgs> getSelectionModeFinishedEvent() {
         return selectionModeFinishedEvent;

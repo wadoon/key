@@ -10,9 +10,10 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Pair;
 
 /**
+ * TODO add documentation
  * 
  * @author Benedikt Gross
- *
+ * @version 1.0
  */
 public class CriterionAstScope implements Criterion<Integer> {
 
@@ -20,6 +21,7 @@ public class CriterionAstScope implements Criterion<Integer> {
     private InitialPositionTable positionTable;
     private String[] originalLines;
 
+    // TODO add documentation
     public CriterionAstScope(Criterion<Integer> criteria,
             InitialPositionTable positionTable, String[] originalLines) {
         this.criteria = criteria;

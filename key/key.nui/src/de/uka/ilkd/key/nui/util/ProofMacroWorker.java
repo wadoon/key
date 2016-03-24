@@ -25,6 +25,7 @@ import javafx.concurrent.Task;
  * 
  * @author Nils Muzzulini
  * @see de.uka.ilkd.key.gui.ProofMacroWorker
+ * @version 1.0
  */
 public class ProofMacroWorker extends Task<Void> implements InterruptListener {
 
@@ -68,18 +69,12 @@ public class ProofMacroWorker extends Task<Void> implements InterruptListener {
         this.mediator = mediator;
         this.posInOcc = posInOcc;
     }
-
-    /**
-     * {@inheritDoc}
-     */
+    
     @Override
     public void interruptionPerformed() {
         cancel(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void done() {
         synchronized (macro) {
@@ -110,9 +105,6 @@ public class ProofMacroWorker extends Task<Void> implements InterruptListener {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Void call() throws Exception {
         final ProverTaskListener ptl = mediator.getUI();

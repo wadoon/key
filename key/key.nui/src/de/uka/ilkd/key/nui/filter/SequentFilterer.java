@@ -8,15 +8,15 @@ import de.uka.ilkd.key.pp.InitialPositionTable;
 
 /**
  * A static class, used to apply a filter to a printed sequent. i.e. compiles a
- * filter and uses it to filter all lines based on the given {link PrintFilter}
+ * filter and uses it to filter all lines based on the given {@link PrintFilter}.
  * 
  * @author Benedikt Gross
- *
+ * @version 1.0
  */
 public class SequentFilterer {
 
     /**
-     * Applies a criteria to the proofString and returns all lines, that should
+     * Applies a criterion to the proofString and returns all lines, that should
      * be displayed to the user after filtering.
      * 
      * @param proofString
@@ -25,7 +25,7 @@ public class SequentFilterer {
      * @param filter
      *            The filter to be applied.
      * @param positionTable
-     *            A position table to provide access to the ast.
+     *            A position table to provide access to the AST.
      */
     public static List<Integer> applyFilter(String proofString,
             PrintFilter filter, InitialPositionTable positionTable) {
@@ -37,8 +37,8 @@ public class SequentFilterer {
     }
 
     /**
-     * Creates a criteria for filtering the sequent from all information that is
-     * stored in this {link PrintFilter} instance.
+     * Creates a criterion for filtering the sequent from all information that is
+     * stored in this {@link PrintFilter} instance.
      */
     private static Criterion<Integer> compileCriteria(PrintFilter filter,
             InitialPositionTable positionTable, String[] originalLines,

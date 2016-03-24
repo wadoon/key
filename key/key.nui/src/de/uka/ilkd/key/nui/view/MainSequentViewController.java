@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.uka.ilkd.key.nui.view;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -12,8 +9,12 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 
 /**
+ * ViewController for the main sequent view. This view resembles the sequent
+ * view of the old UI. It embeds a {@link SequentViewController} and updates it
+ * for various events.
+ * 
  * @author Victor Schuemmer
- *
+ * @version 1.0
  */
 @KeYView(title = "Main Sequent", path = "MainSequentView.fxml", accelerator = "CTRL + M", preferredPosition = ViewPosition.CENTER)
 public class MainSequentViewController extends ViewController {
@@ -28,7 +29,8 @@ public class MainSequentViewController extends ViewController {
         KeYSelectionListener proofChangeListener = new KeYSelectionListener() {
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
-                getContext().getSequentHtmlChangedEvent().addHandler(eventArgs -> {
+                getContext().getSequentHtmlChangedEvent()
+                        .addHandler(eventArgs -> {
                     if (!getContext().getKeYMediator().ensureProofLoaded()) {
                         sequentViewController.clearWebView();
                     }
@@ -41,7 +43,7 @@ public class MainSequentViewController extends ViewController {
                 Platform.runLater(() -> {
                     sequentViewController.loadNodeToView(
                             getContext().getKeYMediator().getSelectedNode());
-                                   });
+                });
             }
         };
 

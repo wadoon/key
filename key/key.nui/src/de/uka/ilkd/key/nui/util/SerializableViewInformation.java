@@ -15,24 +15,28 @@ public class SerializableViewInformation {
 
     private String fxmlUrl;
 
+    // TODO add documentation
     public String getFxmlUrl() {
         return fxmlUrl;
     }
 
     private boolean isactive;
 
+    // TODO add documentation
     public boolean getIsActibe() {
         return isactive;
     }
 
     private ViewPosition viewPosition;
 
+    // TODO add documentation
     public ViewPosition getViewPosition() {
         return viewPosition;
     }
 
     /**
      * TODO add comments
+     * 
      * @param view
      */
     public SerializableViewInformation(ViewInformation view) {
@@ -41,12 +45,14 @@ public class SerializableViewInformation {
         fxmlUrl = view.getFxmlPath().getPath();
     }
 
+    // TODO add documentation
     public String getSerialized() {
         return fxmlUrl + "," + viewPosition.toString() + "," + isactive;
     }
 
     /**
      * TODO add comments
+     * 
      * @param data
      */
     public SerializableViewInformation(String data) {

@@ -6,11 +6,11 @@ import java.util.function.Consumer;
 
 /**
  * Implementation of the Event pattern. If no parameter should be passed to the
- * event handlers, use EmptyEventArgs.
+ * event handlers, use {@link EmptyEventArgs}.
  * 
  * @author Benedikt Gross
- *
- * @param <T>
+ * @version 1.0
+ * @param <T> the type of the argument to pass
  */
 public class HandlerEvent<T> {
     private List<Consumer<T>> listeners = new LinkedList<>();
@@ -25,7 +25,7 @@ public class HandlerEvent<T> {
     }
 
     /**
-     * Removes an event handler from this event instance
+     * Removes an event handler from this event instance.
      * 
      * @param listener
      */
@@ -38,7 +38,7 @@ public class HandlerEvent<T> {
      * 
      * @param eventArgs
      *            An object that contains needed information for the event
-     *            handlers, or EmptyEventArgs if no information is needed.
+     *            handlers, or {@link EmptyEventArgs} if no information is needed.
      * 
      */
     public void fire(T eventArgs) {

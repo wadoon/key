@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * A criteria that adds X entities before and X entities after all entities left
- * over by its child criteria.
+ * A criterion that adds X entities before and X entities after all entities left
+ * over by its child criterion.
  * 
  * @author Benedikt Gross
- *
+ * @version 1.0
  */
 public class CriterionRange implements Criterion<Integer> {
 
@@ -20,9 +20,9 @@ public class CriterionRange implements Criterion<Integer> {
     private String[] originalLines;
 
     /**
-     * Instantiates a new range criterion
+     * Instantiates a new range criterion.
      * @param criteria
-     *            A distinct and ordered entity list
+     *            A distinct and ordered entity list.
      * @param before
      *            How many entities before a match should be added.
      * @param after

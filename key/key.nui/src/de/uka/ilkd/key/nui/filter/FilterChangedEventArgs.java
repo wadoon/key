@@ -5,7 +5,7 @@ package de.uka.ilkd.key.nui.filter;
  * any listener.
  * 
  * @author Benedikt Gross
- *
+ * @version 1.0
  */
 public class FilterChangedEventArgs {
 
@@ -16,9 +16,7 @@ public class FilterChangedEventArgs {
     }
 
     /**
-     * The new filter
-     * 
-     * @return
+     * @return the new filter
      */
     public PrintFilter getFilter() {
         return filter;

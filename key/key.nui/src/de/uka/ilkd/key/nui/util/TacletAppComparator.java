@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui.util;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -21,15 +22,14 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /**
- * TODO add class comments
+ * A comparator to compare {@link TacletApp TacletApps}. Copied from TacletMenu.
  * 
- * @author
+ * @author Victor Schuemmer
  * @version 1.0
  */
-// TODO Findbugs wants this class to also implement Serializable. discuss with
-// team.
-// FindBugs pattern: Pattern: SE_COMPARATOR_SHOULD_BE_SERIALIZABLE
-public class TacletAppComparator implements Comparator<TacletApp> {
+public class TacletAppComparator implements Comparator<TacletApp>, Serializable {
+
+    private static final long serialVersionUID = 5127654933484750886L;
 
     /**
      * TODO add comments

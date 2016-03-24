@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nui.printer;
 
-import de.uka.ilkd.key.gui.nodeviews.SequentViewInputListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -8,9 +7,10 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 /**
- * Printer for TermInfo, copied from {@link SequentViewInputListener}.
+ * Printer for TermInfo, copied from {@link de.uka.ilkd.key.gui.nodeviews.SequentViewInputListener SequentViewInputListener}.
  * 
  * @author Victor Schuemmer
+ * @version 1.0
  */
 public class TermInfoPrinter {
     /**

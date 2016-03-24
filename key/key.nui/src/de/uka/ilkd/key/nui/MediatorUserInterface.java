@@ -51,21 +51,33 @@ public class MediatorUserInterface
     private StatusManager statusManager;
     private KeYMediator mediator = null;
 
-    public void setMediator(KeYMediator value) {
-        mediator = value;
+    /**
+     * Sets the KeYMediator that is used to communicate with the backend.
+     * 
+     * @param mediator
+     *            the KeYMediator
+     */
+    public void setMediator(KeYMediator mediator) {
+        this.mediator = mediator;
     }
 
     private final LinkedList<InteractiveRuleApplicationCompletion> completions = new LinkedList<InteractiveRuleApplicationCompletion>();
     private MainApp mainApp;
 
+    /**
+     * The constructor.
+     * 
+     * @param statusManager
+     *            the {@link StatusManager} that is responsible for the status
+     *            line.
+     * @param mainApp
+     *            the {@link MainApp}
+     */
     public MediatorUserInterface(StatusManager statusManager, MainApp mainApp) {
         this.statusManager = statusManager;
         this.mainApp = mainApp;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void completeAndApplyTacletMatch(TacletInstantiationModel[] models,
             Goal goal) {
@@ -81,9 +93,6 @@ public class MediatorUserInterface
                         "file:resources/css/tacletInstantiation.css"));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app,
             Goal goal, boolean forced) {
@@ -101,9 +110,6 @@ public class MediatorUserInterface
         return (result != null && result.complete()) ? result : null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean selectProofObligation(InitConfig initConfig) {
         // TODO is this still needed?
@@ -111,94 +117,58 @@ public class MediatorUserInterface
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reportWarnings(ImmutableSet<PositionedString> warnings) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void progressStarted(Object sender) {
         mediator.stopInterface(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void progressStopped(Object sender) {
         mediator.startInterface(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reportStatus(Object sender, String status, int progress) {
         statusManager.setStatus(status);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reportStatus(Object sender, String status) {
         statusManager.setStatus(status);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void resetStatus(Object sender) {
         statusManager.resetStatus();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reportException(Object sender, ProofOblInput input,
             Exception e) {
         throw new RuntimeException(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setProgress(int progress) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setMaximum(int maximum) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void openExamples() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public KeYMediator getMediator() {
         return mediator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void loadProblem(File file) {
         mainApp.getRootLayoutController().addRecentFile(file.getAbsolutePath());
@@ -206,9 +176,6 @@ public class MediatorUserInterface
                 .runAsynchronously();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void notify(NotificationEvent event) {
         if (event instanceof ProofClosedNotificationEvent) {
@@ -222,9 +189,6 @@ public class MediatorUserInterface
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     // TODO: remove unnecessary code - just copied from
     // WindowUserInterfaceController
     @Override

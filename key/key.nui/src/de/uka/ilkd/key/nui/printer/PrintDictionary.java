@@ -12,15 +12,15 @@ import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * Holds all the Highlighting Information used by the {@link SequentPrinter}
+ * Holds all the Highlighting Information used by the {@link SequentPrinter}.
  * 
  * @author Maximilian Li
  * @version 1.0
  */
 public class PrintDictionary {
-    // Outer Map maps Index in ProofString to Styling Info Map
+    // Outer Map maps Index in ProofString to Styling Info Map.
     // Inner Map holds Styling Info separated for every Styling Case.
-    // It's Keys are defined in the HighlightType enumeration
+    // Its Keys are defined in the HighlightType enumeration.
     // List: List of all Tags
     private Map<Integer, Map<Integer, List<String>>> openMap = new HashMap<>();
     private Map<Integer, Map<Integer, List<String>>> closeMap = new HashMap<>();

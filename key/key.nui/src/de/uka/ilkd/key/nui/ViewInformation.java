@@ -18,10 +18,21 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.util.Pair;
 
+/**
+ * This class aggregates all information about a view, including its UI tab,
+ * FXML path, controller, menu item etc.
+ * 
+ * @author Benedikt Gross
+ * @author Victor Schuemmer
+ * @version 1.0
+ */
 public class ViewInformation extends Observable {
 
     private int id;
 
+    /**
+     * @return the unique (at least for this session) ID of this ViewInformation
+     */
     public int getId() {
         return id;
     }
@@ -34,34 +45,53 @@ public class ViewInformation extends Observable {
 
     private boolean hasMenuItem;
 
+    /**
+     * @return true iff this view has a menu item to show and hide it.
+     */
     public boolean hasMenuItem() {
         return hasMenuItem;
     }
 
     private URL fxmlPath;
 
+    /**
+     * @return the path to the FXML of the view
+     */
     public URL getFxmlPath() {
         return fxmlPath;
     }
 
     private String title;
 
+    /**
+     * @return the title of the view as displayed in the tab header
+     */
     public String getTitle() {
         return title;
     }
-    
-    private ViewPosition preferedPosition;
 
-    public ViewPosition getPreferedPosition() {
-        return preferedPosition;
+    private ViewPosition preferredPosition;
+
+    /**
+     * @return the preferred @{link ViewPosition} of the view
+     */
+    public ViewPosition getPreferredPosition() {
+        return preferredPosition;
     }
 
     private ViewPosition currentPosition;
 
+    /**
+     * @return the current {@link ViewPosition} of the view
+     */
     public ViewPosition getCurrentPosition() {
         return currentPosition;
     }
 
+    /**
+     * Sets the {@link ViewPosition} of the view to the new position.
+     * @param position the {@link ViewPosition} to set
+     */
     public void setCurrentPosition(ViewPosition position) {
         if (currentPosition == position)
             return;
@@ -72,20 +102,34 @@ public class ViewInformation extends Observable {
 
     private Tab uiTab = null;
 
+    /**
+     * @return the tab the view is shown in
+     */
     public Tab getUiTab() {
         return uiTab;
     }
 
     private ViewController controller;
 
+    /**
+     * @return the {@link ViewController} of the view
+     */
     public ViewController getController() {
         return controller;
     }
 
-    public ViewInformation(String title, URL pathToFxml, ViewPosition preferedPosition, boolean hasMenuItem) {
+    /**
+     * The constructor.
+     * @param title The title of the view. This will be shown in the tab header.
+     * @param pathToFxml the path to the FXML file
+     * @param preferredPosition the preferred {@link ViewPosition}
+     * @param hasMenuItem
+     */
+    public ViewInformation(String title, URL pathToFxml,
+            ViewPosition preferredPosition, boolean hasMenuItem) {
         fxmlPath = pathToFxml;
-        this.preferedPosition = preferedPosition;
-        currentPosition = preferedPosition;
+        this.preferredPosition = preferredPosition;
+        currentPosition = preferredPosition;
         this.title = title;
         this.hasMenuItem = hasMenuItem;
         id = getNextId();
@@ -93,10 +137,16 @@ public class ViewInformation extends Observable {
 
     private boolean isActive = false;
 
+    /**
+     * @return true iff the view is currently active
+     */
     public boolean getIsActive() {
         return isActive;
     }
 
+    /**
+     * TODO add documentation
+     */
     public void setIsActive(boolean value) {
         if (isActive == value)
             return;
@@ -105,8 +155,12 @@ public class ViewInformation extends Observable {
         this.notifyObservers(true);
     }
 
+    /**
+     * TODO add documentation
+     */
     public void loadUiTab(ViewController parent) {
-        Pair<Object, ViewController> pair = parent.loadFxmlViewController(getFxmlPath());
+        Pair<Object, ViewController> pair = parent
+                .loadFxmlViewController(getFxmlPath());
         uiTab = createTab((Node) pair.getKey(), parent);
         controller = pair.getValue();
     }
@@ -127,7 +181,8 @@ public class ViewInformation extends Observable {
         // header.setCenter(titleLabel);
         tab.setGraphic(titleLabel);
         tab.setContent(node);
-        tab.setTooltip(new Tooltip("Drag\u0026Drop or Right-Click to move Tab"));
+        tab.setTooltip(
+                new Tooltip("Drag\u0026Drop or Right-Click to move Tab"));
 
         titleLabel.setOnDragDetected(event -> {
             if (event.getButton() != MouseButton.PRIMARY)
@@ -145,7 +200,8 @@ public class ViewInformation extends Observable {
 
         titleLabel.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
-                loadViewContextMenu(parent).show(titleLabel, Side.TOP, event.getX(), event.getY());
+                loadViewContextMenu(parent).show(titleLabel, Side.TOP,
+                        event.getX(), event.getY());
         });
 
         return tab;
@@ -153,7 +209,8 @@ public class ViewInformation extends Observable {
 
     private ContextMenu loadViewContextMenu(ViewController parent) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ViewContextMenuController.class.getResource("ViewContextMenu.fxml"));
+        loader.setLocation(ViewContextMenuController.class
+                .getResource("ViewContextMenu.fxml"));
         ContextMenu content;
         try {
             content = loader.load();
