@@ -262,9 +262,11 @@ public class RecentFileMenuController extends ViewController {
         FileInputStream fin = null;
         FileOutputStream fout = null;
         Properties p = new Properties();
+        if (!localRecentFiles.getParentFile().exists()) {
+            System.out.println("Oops. No folder to save recentFileList to.");
+            return;
+        }
         try {
-            // creates a new file if it does not exist yet
-            localRecentFiles.createNewFile();
             fin = new FileInputStream(localRecentFiles);
             fout = new FileOutputStream(localRecentFiles);
             p.load(fin);
