@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.nui.filter.SelectModeEventArgs;
 import de.uka.ilkd.key.nui.filter.SequentFilterer;
 import de.uka.ilkd.key.nui.printer.SequentPrinter;
 import de.uka.ilkd.key.nui.printer.TermInfoPrinter;
+import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.util.PositionTranslator;
 import de.uka.ilkd.key.nui.view.menu.TacletMenuController;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -624,7 +626,13 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * Creates a {@link Runnable} to make search in its own thread possible.
+     * Creates a {@link Runnable} to make search in its own thread possible
+     * while providing an option to cancel the task in the thread before
+     * starting a new one.
+     * <p>
+     * It is also possible to delay the search by setting the desired delay time
+     * in milliseconds in
+     * {@link NUIConstants#SEQUENT_SEARCH_DELAY_IN_MILLISECONDS}
      * 
      * @author Nils Muzzulini
      * @version 1.0
@@ -655,11 +663,18 @@ public class SequentViewController extends ViewController {
             // the NEXT keypress, so we add a check to ensure that we still want
             // to perform the search when it gets executed:
             if (!cancelled) {
-                searchIndices = printer.applyFreetextSearch(searchTerm);
-                Platform.runLater(() -> {
-                    searchIndPointer = 0;
-                    updateView();
-                });
+                try {
+                    TimeUnit.MILLISECONDS.sleep(NUIConstants.SEQUENT_SEARCH_DELAY_IN_MILLISECONDS);
+                    searchIndices = printer.applyFreetextSearch(searchTerm);
+                    Platform.runLater(() -> {
+                        searchIndPointer = 0;
+                        updateView();
+                    });
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             }
         }
     }

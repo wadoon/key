@@ -20,7 +20,7 @@ import de.uka.ilkd.key.util.Pair;
  * @author Maximilian Li
  */
 class DictionaryFlattener {
-    private List<Pair<Integer, String>> flattenedTagList;
+    private List<Pair<Integer, String>> flattenedTagList = null;
     private Stack<Pair<Integer, String>> tagStack;
 
     /**
