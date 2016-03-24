@@ -1,4 +1,3 @@
-/*We recommend to only change this file using the KeY CSS Styler */ 
 pre {
 	background-color: #FFFFFF;
 	color: #000000;
@@ -55,8 +54,8 @@ pre {
 }
 .equality {
 	background-color: inherit;
-	color: #FF0000;
-	font-weight: inherit;
+	color: #4D66CC;
+	font-weight: bold;
 	font-style: inherit;
 }
 .function {
@@ -67,27 +66,27 @@ pre {
 }
 .locationVar {
 	background-color: inherit;
-	color: #0000FF;
-	font-weight: bold;
-	font-style: inherit;
-}
-.junctor {
-	background-color: inherit;
-	color: #0000FF;
+	color: #0413F6;
 	font-weight: bold;
 	font-style: italic;
 }
+.junctor {
+	background-color: inherit;
+	color: #4D66CC;
+	font-weight: bold;
+	font-style: inherit;
+}
 .logicVar {
 	background-color: inherit;
-	color: #008000;
-	font-weight: inherit;
+	color: #FF0000;
+	font-weight: bold;
 	font-style: inherit;
 }
 .quantifier {
 	background-color: inherit;
-	color: #ff3300;
-	font-weight: inherit;
-	font-style: inherit;
+	color: #FF0000;
+	font-weight: normal;
+	font-style: italic;
 }
 .sortDepFunc {
 	background-color: inherit;
@@ -102,26 +101,26 @@ pre {
 	font-style: inherit;
 }
 .observerFunc {
-	background-color: #008000;
-	color: inherit;
-	font-weight: inherit;
-	font-style: inherit;
+	background-color: inherit;
+	color: #FF0000;
+	font-weight: bold;
+	font-style: italic;
 }
 .elemUpdate {
 	background-color: inherit;
-	color: #FFFF00;
+	color: #4D66CC;
 	font-weight: bold;
 	font-style: inherit;
 }
 .formulaSV {
-	background-color: #808080;
-	color: #FFFF00;
+	background-color: inherit;
+	color: #B3661A;
 	font-weight: inherit;
 	font-style: inherit;
 }
 .ifExThenElse {
-	background-color: #008000;
-	color: #FF0000;
+	background-color: inherit;
+	color: #669966;
 	font-weight: bold;
 	font-style: inherit;
 }
@@ -132,98 +131,98 @@ pre {
 	font-style: inherit;
 }
 .modalOpSV {
-	background-color: #0000FF;
-	color: #FFFF00;
+	background-color: inherit;
+	color: #CC8033;
 	font-weight: bold;
 	font-style: inherit;
 }
 .progConst {
-	background-color: #000000;
+	background-color: inherit;
 	color: #FF0000;
 	font-weight: bold;
 	font-style: inherit;
 }
 .progMeth {
-	background-color: #000000;
+	background-color: inherit;
 	color: #008000;
 	font-weight: bold;
 	font-style: inherit;
 }
 .progSV {
-	background-color: #000000;
-	color: #FFFFFF;
+	background-color: inherit;
+	color: #336666;
 	font-weight: bold;
 	font-style: inherit;
 }
 .progVar {
-	background-color: #000000;
-	color: #2fedff;
+	background-color: inherit;
+	color: #4D66CC;
 	font-weight: bold;
 	font-style: inherit;
 }
 .schemaVarFactory {
-	background-color: #003fff;
-	color: #FF0000;
+	background-color: inherit;
+	color: #808080;
 	font-weight: inherit;
 	font-style: inherit;
 }
 .skolemTermSV {
-	background-color: #003fff;
-	color: #FF00FF;
+	background-color: inherit;
+	color: #B3B34D;
 	font-weight: bold;
 	font-style: inherit;
 }
 .substOp {
-	background-color: #808080;
-	color: #FF0000;
-	font-weight: inherit;
-	font-style: inherit;
+	background-color: inherit;
+	color: #4D66CC;
+	font-weight: bold;
+	font-style: italic;
 }
 .termLabelSV {
-	background-color: #808080;
-	color: #008000;
+	background-color: inherit;
+	color: #666600;
 	font-weight: inherit;
 	font-style: inherit;
 }
 .termSV {
-	background-color: #808080;
-	color: #0000FF;
+	background-color: inherit;
+	color: #B3B31A;
 	font-weight: inherit;
 	font-style: inherit;
 }
 .transformer {
-	background-color: #808080;
+	background-color: inherit;
 	color: #000000;
 	font-weight: inherit;
-	font-style: inherit;
+	font-style: italic;
 }
 .updateApp {
-	background-color: #FF00FF;
-	color: inherit;
+	background-color: inherit;
+	color: #FF6666;
 	font-weight: inherit;
 	font-style: inherit;
 }
 .updateJunc {
-	background-color: #FF00FF;
+	background-color: inherit;
 	color: #008000;
 	font-weight: inherit;
 	font-style: inherit;
 }
 .updateSV {
-	background-color: #FF00FF;
+	background-color: inherit;
 	color: #0000FF;
 	font-weight: bold;
 	font-style: inherit;
 }
 .varSV {
-	background-color: #996699;
+	background-color: inherit;
 	color: #000000;
-	font-weight: inherit;
-	font-style: inherit;
+	font-weight: bold;
+	font-style: italic;
 }
 .warySubstOp {
 	background-color: inherit;
-	color: #FF0000;
-	font-weight: inherit;
+	color: #4D66CC;
+	font-weight: bold;
 	font-style: italic;
 }
