@@ -322,6 +322,8 @@ public class SequentViewController extends ViewController {
             // Search
             formerSearchText = searchBox.getText();
 
+            // Cancel the last search before starting a new one in the same
+            // thread
             if (lastSearcher != null) {
                 lastSearcher.cancel();
             }
@@ -620,14 +622,28 @@ public class SequentViewController extends ViewController {
         webEngine.load("");
     }
 
+    /**
+     * Creates a {@link Runnable} to make search in its own thread possible.
+     * 
+     * @author Nils Muzzulini
+     * @version 1.0
+     */
     private class Searcher implements Runnable {
         private volatile boolean cancelled = false;
         private final String searchTerm;
 
+        /**
+         * Constructor takes the desired searchTerm as parameter.
+         * 
+         * @param searchTerm
+         */
         Searcher(String searchTerm) {
             this.searchTerm = searchTerm;
         }
 
+        /**
+         * Cancel this {@link Runnable}.
+         */
         public void cancel() {
             cancelled = true;
         }
