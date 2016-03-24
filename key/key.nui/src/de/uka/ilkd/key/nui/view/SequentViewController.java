@@ -114,17 +114,26 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    //TODO add documentation
+    /**
+     * A unique id of the squent view. This is used to manage multiple sequentviews due to staticsequentviews.
+     * This field is volatile.
+     */
     public long getOwnID() {
         return OWN_ID;
     }
 
-    //TODO add documentation
+    /**
+     * A unique id for the last triggered taclet-action.
+     * This field is volatile.
+     */
     public long getLastTacletActionID() {
         return LAST_TACLET_ACTION_ID.get();
     }
 
-    //TODO add documentation
+    /**
+     * A unique id for the last triggered taclet-action.
+     * This field is volatile.
+     */
     public void setLastTacletActionID(long newValue) {
         LAST_TACLET_ACTION_ID.set(newValue);
     }
@@ -218,7 +227,9 @@ public class SequentViewController extends ViewController {
     }
 
     // XXX kind of a hack
-    //TODO add documentation
+    /**
+     * Used to enable or disable MouseMoved and MouseExited events for a short time.
+     */
     private void enableMouseOver(boolean enable) {
         if (enable) {
             textArea.setOnMouseMoved(this::handleTextAreaMouseMoved);
@@ -230,7 +241,9 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    //TODO add documentation
+    /**
+     * TextArea mouse moved. Triggers MouseHighlighting and if ALT is pressed prints a TermInfo to the status bar.
+     */
     private void handleTextAreaMouseMoved(MouseEvent event) {
         int pos = posTranslator.getCharIdxUnderPointer(event);
         Range range = this.abstractSyntaxTree.rangeForIndex(pos);
@@ -246,7 +259,9 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    //TODO add documentation
+    /**
+     * resets MouseHighlighting and the status bar if ALT is pressed.
+     */
     private void handleTextAreaMouseExited(MouseEvent event) {
         this.printer.removeMouseHighlighting();
         this.updateView();
@@ -422,7 +437,10 @@ public class SequentViewController extends ViewController {
         }
     }
 
-    //TODO add documentation
+    /**
+     * loads the completed new html document to the webview.
+     * @param s The full html code.
+     */
     private void updateHtml(String s) {
         webEngine = textArea.getEngine();
         webEngine.loadContent(s);
@@ -460,7 +478,10 @@ public class SequentViewController extends ViewController {
         updateHtml(this.printer.printProofString());
     }
 
-    //TODO add documentation
+    /**
+     * Applies a filter to the sequent view. This updates the {link: SequentPrinter} and {link: PositionTranslator}
+     * @param args
+     */
     private void apply(FilterChangedEventArgs args) {
         if (!sequentLoaded)
             return;
@@ -487,7 +508,10 @@ public class SequentViewController extends ViewController {
     private FilterSelection filterSelection;
     private boolean enableTacletMenu;
 
-  //TODO add documentation
+   /**
+    * Triggers a filter selection on the SequentView. Registers a listener for {link: selectionModeFinishedEvent}.
+    * @param eventArgs an object that manages one selection workflow.
+    */
     private void selectModeActivated(SelectModeEventArgs eventArgs) {
         if (getContext().getKeYMediator().getSelectedProof() == null)
             return;
@@ -497,8 +521,10 @@ public class SequentViewController extends ViewController {
         selectionModeIsActive = true;
     }
 
-    //TODO add documentation
-    public void finishSelectionMode(EmptyEventArgs args) {
+    /**
+     * Finished a selection action of the filter. Collects all selected ranges and resets the SequentView.
+     */
+    private void finishSelectionMode(EmptyEventArgs args) {
         for (Range range : filterSelection.getSelection())
             this.printer.removeSelection(range);
         filterSelection.resolveSelection(proofString);
@@ -506,7 +532,10 @@ public class SequentViewController extends ViewController {
         selectionModeIsActive = false;
     }
 
-    //TODO add documentation
+    /**
+     * Logic for a click on the WebView. Fires TacletMenu and Filter/selectionMode actions. 
+     * @param event
+     */
     private void handleWebViewClicked(MouseEvent event) {
         if (!sequentLoaded || event.getButton() != MouseButton.PRIMARY)
             return;
