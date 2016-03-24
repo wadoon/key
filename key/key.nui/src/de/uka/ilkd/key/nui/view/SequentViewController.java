@@ -218,8 +218,8 @@ public class SequentViewController extends ViewController {
     }
 
     // XXX kind of a hack
+    //TODO add documentation
     private void enableMouseOver(boolean enable) {
-
         if (enable) {
             textArea.setOnMouseMoved(this::handleTextAreaMouseMoved);
             textArea.setOnMouseExited(this::handleTextAreaMouseExited);
@@ -230,8 +230,8 @@ public class SequentViewController extends ViewController {
         }
     }
 
+    //TODO add documentation
     private void handleTextAreaMouseMoved(MouseEvent event) {
-
         int pos = posTranslator.getCharIdxUnderPointer(event);
         Range range = this.abstractSyntaxTree.rangeForIndex(pos);
 
@@ -246,6 +246,7 @@ public class SequentViewController extends ViewController {
         }
     }
 
+    //TODO add documentation
     private void handleTextAreaMouseExited(MouseEvent event) {
         this.printer.removeMouseHighlighting();
         this.updateView();
@@ -421,6 +422,7 @@ public class SequentViewController extends ViewController {
         }
     }
 
+    //TODO add documentation
     private void updateHtml(String s) {
         webEngine = textArea.getEngine();
         webEngine.loadContent(s);
@@ -458,6 +460,7 @@ public class SequentViewController extends ViewController {
         updateHtml(this.printer.printProofString());
     }
 
+    //TODO add documentation
     private void apply(FilterChangedEventArgs args) {
         if (!sequentLoaded)
             return;
@@ -484,6 +487,7 @@ public class SequentViewController extends ViewController {
     private FilterSelection filterSelection;
     private boolean enableTacletMenu;
 
+  //TODO add documentation
     private void selectModeActivated(SelectModeEventArgs eventArgs) {
         if (getContext().getKeYMediator().getSelectedProof() == null)
             return;
@@ -502,6 +506,7 @@ public class SequentViewController extends ViewController {
         selectionModeIsActive = false;
     }
 
+    //TODO add documentation
     private void handleWebViewClicked(MouseEvent event) {
         if (!sequentLoaded || event.getButton() != MouseButton.PRIMARY)
             return;
