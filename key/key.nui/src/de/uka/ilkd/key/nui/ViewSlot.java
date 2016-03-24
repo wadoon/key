@@ -9,7 +9,9 @@ import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
 
 /**
- * This class represents a view slot at one of the five {@link ViewPosition ViewPositions}.
+ * This class represents a view slot at one of the five {@link ViewPosition
+ * ViewPositions}.
+ * 
  * @author Benedikt Gross
  * @author Victor Schuemmer
  * @author Maximilian Li
@@ -53,7 +55,9 @@ public class ViewSlot {
 
     /**
      * The constructor
-     * @param position the {@link ViewPositon} of the slot
+     * 
+     * @param position
+     *            the {@link ViewPositon} of the slot
      * @param pane
      */
     public ViewSlot(ViewPosition position, BorderPane pane) {
@@ -71,7 +75,9 @@ public class ViewSlot {
 
     /**
      * Adds the tab in the given {@link ViewInformation} to the slot.
-     * @param view the ViewInformation containing the tab to add
+     * 
+     * @param view
+     *            the ViewInformation containing the tab to add
      */
     public void addTab(ViewInformation view) {
         tabs.add(view);
@@ -87,7 +93,9 @@ public class ViewSlot {
 
     /**
      * Removes the tab in the given {@link ViewInformation} from the slot.
-     * @param view the ViewInformation containing the tab to remove
+     * 
+     * @param view
+     *            the ViewInformation containing the tab to remove
      */
     public void removeTab(ViewInformation view) {
         if (!((TabPane) uiPane.getCenter()).getTabs().contains(view.getUiTab()))
@@ -112,8 +120,7 @@ public class ViewSlot {
     /**
      * TODO add documentation
      */
-    public static void setRegisterDrag(
-            java.util.function.Consumer<Node> registerer) {
+    public static void setRegisterDrag(java.util.function.Consumer<Node> registerer) {
         currentRegisterer = registerer;
     }
 }

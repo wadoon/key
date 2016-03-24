@@ -6,12 +6,20 @@ import java.util.Observer;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 
 /**
+ * TODO add documentation
+ * 
  * @author Benedikt Gross
  * @version 1.0
  */
 public class ViewObserver implements Observer {
     private RootLayoutController container;
 
+    /**
+     * Use the constructor to set the {@link RootLayoutController}.
+     * 
+     * @param container
+     *            RootLayoutController
+     */
     public ViewObserver(RootLayoutController container) {
         this.container = container;
     }
