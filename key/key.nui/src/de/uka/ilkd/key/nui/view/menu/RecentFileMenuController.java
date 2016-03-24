@@ -21,7 +21,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
 /**
- * TODO add documentation
+ * A {@link Menu} filled with recently opened files.
  * 
  * @author Nils Muzzulini
  * @version 1.0
@@ -32,56 +32,57 @@ public class RecentFileMenuController extends ViewController {
      */
     private static final int MAX_RECENT_FILES = 8;
 
-    /** this is the maximal number of recent files. */
+    /**
+     * This is the modifiable maximum number of recent files.
+     */
     private int maxNumberOfEntries;
 
-    private EventHandler<ActionEvent> actionHandler;
+    /**
+     * Handles clicks on a menu item -> loads the file into the
+     * {@link KeYMediator}.
+     */
+    private EventHandler<ActionEvent> menuItemClickedEventHandler;
 
     @FXML
     private Menu menu;
 
     /**
-     * list of recent files
+     * List of recent files.
      */
     private HashMap<MenuItem, RecentFileEntry> recentFiles;
-
-    private RecentFileEntry mostRecentFile;
 
     /**
      * Create a new RecentFiles list.
      * 
-     * @param listener
-     *            the ActionListener that will be notified of the user clicked
-     *            on a recent file menu entry. The selected filename can be
-     *            determined with the ActionEvent's getSource() method, cast the
-     *            Object into a JMenuItem and call the getLabel() method.
-     * @param maxNumberOfEntries
-     *            the maximal number of items/entries in the recent file menu.
-     * @param p
-     *            a Properties object containing information about the recent
-     *            files to be displayed initially. Or <code>null</code> to use
-     *            no initial information.
+     * @param mediator
+     *            {@link KeYMediator} to load files into
      */
     public void init(final KeYMediator mediator) {
         this.maxNumberOfEntries = MAX_RECENT_FILES;
         this.recentFiles = new LinkedHashMap<MenuItem, RecentFileEntry>();
 
-        actionHandler = new EventHandler<ActionEvent>() {
+        menuItemClickedEventHandler = new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
-                mediator.getUI().loadProblem(new File(
-                        getAbsolutePath((MenuItem) event.getSource())));
+                mediator.getUI().loadProblem(new File(getAbsolutePath((MenuItem) event.getSource())));
             }
 
         };
 
-        menu.setDisable(menu.getItems().size() != 0);
+        menu.setDisable(menu.getItems().size() == 0);
 
         load(PathConfig.getRecentFileStorage());
     }
 
     /**
+     * Removes a {@link MenuItem} from the recent file menu.
+     * 
+     * @param item
+     *            MenuItem to be removed from the HashMap
+     * @param index
+     *            index of the MenuItem to be removed from the {@link Menu
+     *            recent file menu}
      */
     private void removeFromModelAndView(MenuItem item, int index) {
         recentFiles.remove(item);
@@ -89,32 +90,35 @@ public class RecentFileMenuController extends ViewController {
     }
 
     /**
-     * add file name to the menu
+     * Adds a file name to the {@link Menu} and the HashMap containing the
+     * {@link MenuItem MenuItems}.
+     * 
+     * @param name
+     *            name of the MenuItem
      */
     private void addToModelAndView(final String name) {
-        // do not add quick save location to recent files
-        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH
-                .endsWith(name))
-            return;
-
         final RecentFileEntry entry = new RecentFileEntry(name);
         if (new File(entry.getAbsolutePath()).exists()) {
             MenuItem item = new MenuItem(entry.getFileName());
-            // item.setToolTipText(entry.getAbsolutePath());
             recentFiles.put(item, entry);
             menu.getItems().add(0, item);
-            mostRecentFile = entry;
-            item.setOnAction(actionHandler);
+            item.setOnAction(menuItemClickedEventHandler);
         }
     }
 
-    // TODO add documentation
-    public String getAbsolutePath(MenuItem item) {
+    /**
+     * Returns the absolute path to the given {@link MenuItem}.
+     * 
+     * @param item
+     *            {@link MenuItem}
+     * @return absolute path to the MenuItem
+     */
+    private String getAbsolutePath(MenuItem item) {
         return recentFiles.get(item).getAbsolutePath();
     }
 
     /**
-     * call this method to add a new file to the beginning of the RecentFiles
+     * Call this method to add a new file to the beginning of the RecentFiles
      * list. If the name is already part of the list, it will be moved to the
      * first position. No more than a specified maximum number of names will be
      * allowed in the list, and additional names will be removed at the end.
@@ -138,8 +142,7 @@ public class RecentFileMenuController extends ViewController {
             Debug.out("", i);
             Debug.out("item is ", menu.getItems().get(i));
             Debug.out("name is ", menu.getItems().get(i).getText());
-            if (recentFiles.get(menu.getItems().get(i)).getAbsolutePath()
-                    .equals(name)) {
+            if (recentFiles.get(menu.getItems().get(i)).getAbsolutePath().equals(name)) {
                 // this name has to be put at the first position
                 item = menu.getItems().get(i);
                 index = i;
@@ -153,68 +156,51 @@ public class RecentFileMenuController extends ViewController {
         }
         // if appropriate, remove the last entry.
         if (menu.getItems().size() == maxNumberOfEntries) {
-            removeFromModelAndView(
-                    menu.getItems().get(menu.getItems().size() - 1),
-                    menu.getItems().size() - 1);
+            removeFromModelAndView(menu.getItems().get(menu.getItems().size() - 1), menu.getItems().size() - 1);
         }
         addToModelAndView(name);
-        // menu.setEnabled(menu.getItems().size() != 0);
+        menu.setDisable(menu.getItems().size() == 0);
     }
 
     /**
-     * specify the maximal number of recent files in the list. The default is
-     * MAX_RECENT_FILES
+     * Specify the maximum number of recent files in the list. The default is
+     * {@link #MAX_RECENT_FILES}.
+     * 
+     * @param max
+     *            the maximum number of recent files
      */
     public void setMaxNumberOfEntries(int max) {
+        // if maximum number of entries gets smaller, remove additional entries
         if (maxNumberOfEntries > max && menu.getItems().size() > max) {
             for (int i = menu.getItems().size() - 1; i > max; i--) {
                 menu.getItems().remove(i);
             }
-
         }
         this.maxNumberOfEntries = max;
-    }
-
-    /**
-     * the menu where the recent files are kept. If the user didn't specify one
-     * in the constructor, a new JMenu is created. It can be accessed via this
-     * method.
-     */
-    public Menu getMenu() {
-        return menu;
-    }
-
-    /**
-     * read the recent file names from the properties object. the property names
-     * are expected to be "RecentFile0" "RecentFile1" ...
-     */
-    public void load(Properties p) {
-        int i = maxNumberOfEntries;
-        String s;
-        do {
-            s = p.getProperty("RecentFile" + i);
-            if (s != null)
-                addRecentFile(s);
-            i--;
-        }
-        while (i >= 0);
     }
 
     /**
      * Put the names of the recent Files into the properties object. The
      * property names are "RecentFile0" "RecentFile1" ... The values are fully
      * qualified path names.
+     * 
+     * @param p
+     *            {@link Properties}
      */
-    public void store(Properties p) {
+    private void store(Properties p) {
         // if there's nothing to store:
         for (int i = 0; i < menu.getItems().size(); i++) {
-            p.setProperty("RecentFile" + i,
-                    getAbsolutePath(menu.getItems().get(i)));
+            p.setProperty("RecentFile" + i, getAbsolutePath(menu.getItems().get(i)));
         }
     }
 
-    /** read the recent files from the given properties file */
-    public final void load(String filename) {
+    /**
+     * Read the recent files from the given properties file.
+     * 
+     * @param filename
+     *            path to the {@link Properties} file
+     */
+    private final void load(String filename) {
         FileInputStream propStream = null;
         try {
             propStream = new FileInputStream(filename);
@@ -228,12 +214,10 @@ public class RecentFileMenuController extends ViewController {
             }
         }
         catch (FileNotFoundException ex) {
-            Debug.out("Could not read RecentFileList. Did not find file ",
-                    filename);
+            Debug.out("Could not read RecentFileList. Did not find file ", filename);
         }
         catch (IOException ioe) {
-            Debug.out("Could not read RecentFileList. Some IO Error occured ",
-                    ioe);
+            Debug.out("Could not read RecentFileList. Some IO Error occured ", ioe);
         }
         finally {
             try {
@@ -242,20 +226,18 @@ public class RecentFileMenuController extends ViewController {
                 }
             }
             catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Closing properties stream failed.");
             }
         }
     }
 
-    // TODO add documentation
-    public RecentFileEntry getMostRecent() {
-        return mostRecentFile;
-    }
-
     /**
-     * write the recent file names to the given properties file. the file will
+     * Write the recent file names to the given properties file. The file will
      * be read (if it exists) and then re-written so no information will be
      * lost.
+     * 
+     * @param filename
+     *            path to the {@link Properties} file
      */
     public void store(String filename) {
         File localRecentFiles = new File(filename);
@@ -274,8 +256,7 @@ public class RecentFileMenuController extends ViewController {
             p.store(fout, "recent files");
         }
         catch (IOException ex) {
-            System.err.println("Cound not write recentFileList due to "
-                    + ex.toString() + "::" + localRecentFiles);
+            System.err.println("Cound not write recentFileList due to " + ex.toString() + "::" + localRecentFiles);
         }
         finally {
             try {
@@ -295,28 +276,41 @@ public class RecentFileMenuController extends ViewController {
         }
     }
 
-    // TODO add documentation
+    /**
+     * Model of a recent file entry.
+     * 
+     * @author Nils Muzzulini
+     * @version 1.0
+     */
     public static class RecentFileEntry {
 
         private String fileName;
         private String absolutePath;
 
-        // TODO add documentation
+        /**
+         * Constructs a new recent file entry.
+         * 
+         * @param absolutePath
+         *            absolute path to the file entry
+         */
         public RecentFileEntry(String absolutePath) {
             this.absolutePath = absolutePath;
             int lastIndex = absolutePath.lastIndexOf(File.separatorChar);
 
             this.fileName = (lastIndex == -1 ? absolutePath
-                    : absolutePath.substring(lastIndex + 1,
-                            absolutePath.length()));
+                    : absolutePath.substring(lastIndex + 1, absolutePath.length()));
         }
 
-        // TODO add documentation
+        /**
+         * @return the absolute path to the file entry
+         */
         public String getAbsolutePath() {
             return absolutePath;
         }
 
-        // TODO add documentation
+        /**
+         * @return name of the file entry
+         */
         public String getFileName() {
             return fileName;
         }
