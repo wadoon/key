@@ -80,14 +80,16 @@ public class PrintDictionary {
      *            the {@link HighlightType}
      * @param tag
      *            the opening tag constant
+     * @return a boolean indicating if the insertion was successful
      */
-    protected void putStyleTags(int start, int end, HighlightType type,
+    protected boolean putStyleTags(int start, int end, HighlightType type,
             String tag) {
         if (start >= end) {
-            return;
+            return false;
         }
         putOpenTag(start, type, tag);
         putCloseTag(end, type);
+        return true;
     }
 
     /**

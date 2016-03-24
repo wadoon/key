@@ -93,6 +93,7 @@ class DictionaryFlattener {
                     tagStack.push(new Pair<Integer, String>(j, insertTag));
                 }
                 else {
+                    //TODO Throw Exception
                     tagStack.pop();
                 }
 
