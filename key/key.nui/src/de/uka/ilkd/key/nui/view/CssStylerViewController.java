@@ -548,6 +548,7 @@ public class CssStylerViewController extends ViewController {
 
         // If the DefaultCSS is the currently loaded CSSFile, fallback to Home
         // Directory
+        //TODO Fallback not Working
         if (initFile.getAbsolutePath()
                 .contains(NUIConstants.DEFAULT_CSS_PATH)) {
             initFile = IOUtil.getHomeDirectory();
