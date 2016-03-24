@@ -107,7 +107,7 @@ public class SequentViewController extends ViewController {
     private TacletInfoViewController tacletInfoViewController;
     private ContextMenu tacletMenu;
 
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     private Searcher lastSearcher = null;
 
     /**
@@ -319,7 +319,7 @@ public class SequentViewController extends ViewController {
                 return;
             }
 
-            // Search
+            // Save current search text
             formerSearchText = searchBox.getText();
 
             // Cancel the last search before starting a new one in the same
@@ -327,8 +327,9 @@ public class SequentViewController extends ViewController {
             if (lastSearcher != null) {
                 lastSearcher.cancel();
             }
+            // Start search in single thread
             lastSearcher = new Searcher(searchBox.getText());
-            executor.submit(lastSearcher);
+            singleThreadExecutor.submit(lastSearcher);
 
             event.consume();
         });
