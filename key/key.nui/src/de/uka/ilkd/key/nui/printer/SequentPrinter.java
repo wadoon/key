@@ -107,7 +107,8 @@ public class SequentPrinter {
     }
 
     /**
-     * Gets the {@link Range HighlightRange} from the {@link InitialPositionTable} for a Position.
+     * Gets the {@link Range HighlightRange} from the
+     * {@link InitialPositionTable} for a Position.
      * 
      * @param pos
      *            the Position of the Term to be highlighted
@@ -313,8 +314,7 @@ public class SequentPrinter {
      */
     private void putStyleTags(int start, int end, HighlightType type,
             String tag) {
-        putOpenTag(start, type, tag);
-        putCloseTag(end, type);
+        dictionary.putStyleTags(start, end, type, tag);
     }
 
     /**
@@ -365,6 +365,7 @@ public class SequentPrinter {
                     }
                 }
                 catch (RuntimeException e) {
+                    System.err.println("Incomplete Pattern");
                     return result;
                 }
 

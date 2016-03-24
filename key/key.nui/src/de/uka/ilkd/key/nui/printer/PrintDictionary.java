@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
 
 import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.util.Pair;
@@ -72,6 +69,28 @@ public class PrintDictionary {
     }
 
     /**
+     * Puts an opening tag at the start position and a closing one at the end
+     * position. Checks if start <= end.
+     * 
+     * @param start
+     *            start position inside the proof string
+     * @param end
+     *            end position inside the proof string
+     * @param type
+     *            the {@link HighlightType}
+     * @param tag
+     *            the opening tag constant
+     */
+    protected void putStyleTags(int start, int end, HighlightType type,
+            String tag) {
+        if (start >= end) {
+            return;
+        }
+        putOpenTag(start, type, tag);
+        putCloseTag(end, type);
+    }
+
+    /**
      * Saves an opening tag (<span ...>) at the given position. Do not forget to
      * add a closing tag!
      * 
@@ -82,7 +101,7 @@ public class PrintDictionary {
      * @param tag
      *            the style tag constant
      */
-    public void putOpenTag(int index, HighlightType type, String tag) {
+    protected void putOpenTag(int index, HighlightType type, String tag) {
         putTag(index, type, NUIConstants.OPEN_TAG_BEGIN.concat(tag)
                 .concat(NUIConstants.OPEN_TAG_END), openMap);
     }
@@ -96,7 +115,7 @@ public class PrintDictionary {
      * @param type
      *            the {@link HighlightType}
      */
-    public void putCloseTag(int index, HighlightType type) {
+    protected void putCloseTag(int index, HighlightType type) {
         putTag(index, type, NUIConstants.CLOSING_TAG, closeMap);
     }
 
@@ -195,81 +214,8 @@ public class PrintDictionary {
      * @return A sorted List of Pairs, with the insertion index and the tag to
      *         be inserted. No offset has been computed.
      */
-    // 2 separate LoopPhases for Tag Applying, to avoid self canceling and slim
-    // down amount of tags.
     public List<Pair<Integer, String>> getTagList() {
-        Set<Integer> keySet = new TreeSet<>();
-        keySet.addAll(openMap.keySet());
-        keySet.addAll(closeMap.keySet());
-        List<Pair<Integer, String>> tagList = new ArrayList<>();
-
-        Stack<Pair<Integer, String>> tagStack = new Stack<>();
-        Stack<Pair<Integer, String>> saveTagStack = new Stack<>();
-
-        List<String> insertTagList;
-
-        for (Integer i : keySet) {
-            // Apply Close Tags first
-            if (closeMap.containsKey(i)) {
-                for (int j = HighlightType.values().length - 1; j >= 0; j--) {
-                    insertTagList = closeMap.get(i).get(j);
-                    if (insertTagList == null)
-                        continue;
-                    for (String insertTag : insertTagList) {
-                        if (insertTag == null || insertTag.isEmpty())
-                            continue;
-
-                        // Check for possible Overlap
-                        while (!tagStack.isEmpty()
-                                && tagStack.peek().first != j) {
-                            tagList.add(new Pair<Integer, String>(i,
-                                    NUIConstants.CLOSING_TAG));
-                            saveTagStack.push(tagStack.pop());
-                        }
-
-                        tagList.add(new Pair<Integer, String>(i, insertTag));
-                        tagStack.pop();
-
-                        while (saveTagStack.size() > 0) {
-                            tagList.add(new Pair<Integer, String>(i,
-                                    saveTagStack.peek().second));
-                            tagStack.push(saveTagStack.pop());
-                        }
-                    }
-                }
-            }
-            // Apply OpenTags
-            if (openMap.containsKey(i)) {
-                for (int j = 0; j < HighlightType.values().length; j++) {
-                    insertTagList = openMap.get(i).get(j);
-                    if (insertTagList == null)
-                        continue;
-                    for (String insertTag : insertTagList) {
-                        if (insertTag == null || insertTag.isEmpty())
-                            continue;
-
-                        // Correctly Prioritze even inside other spans
-                        while (!tagStack.isEmpty()
-                                && tagStack.peek().first > j) {
-                            tagList.add(new Pair<Integer, String>(i,
-                                    NUIConstants.CLOSING_TAG));
-                            saveTagStack.push(tagStack.pop());
-                        }
-
-                        tagStack.push(new Pair<Integer, String>(j, insertTag));
-
-                        tagList.add(new Pair<Integer, String>(i, insertTag));
-
-                        while (saveTagStack.size() > 0) {
-                            tagList.add(new Pair<Integer, String>(i,
-                                    saveTagStack.peek().second));
-                            tagStack.push(saveTagStack.pop());
-                        }
-
-                    }
-                }
-            }
-        }
-        return tagList;
+        DictionaryFlattener flattener = new DictionaryFlattener();
+        return flattener.flatten(openMap, closeMap);
     }
 }
