@@ -106,7 +106,7 @@ public class SequentViewController extends ViewController {
     @FXML
     private TacletInfoViewController tacletInfoViewController;
     private ContextMenu tacletMenu;
-    
+
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private Searcher lastSearcher = null;
 
@@ -121,27 +121,25 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * A unique id of the squent view. This is used to manage
-     * multiple sequentviews due to staticsequentviews. This field is volatile.
+     * A unique id of the squent view. This is used to manage multiple
+     * sequentviews due to staticsequentviews. This field is volatile.
      */
     public long getOwnID() {
         return OWN_ID;
     }
 
     /**
-     * getter for the ID which triggered the last
-     * RuleApplication Action
+     * getter for the ID which triggered the last RuleApplication Action
      */
     public long getLastTacletActionID() {
         return LAST_TACLET_ACTION_ID.get();
     }
 
     /**
-     * setter for the ID which triggered the last
-     * RuleApplication Action
+     * setter for the ID which triggered the last RuleApplication Action
      * 
      * @param newValue
-     *            the new ID Value 
+     *            the new ID Value
      */
     public void setLastTacletActionID(long newValue) {
         LAST_TACLET_ACTION_ID.set(newValue);
@@ -156,8 +154,7 @@ public class SequentViewController extends ViewController {
     public void loadNodeToView(Node node) {
         showSequent(node);
         tacletInfoViewController.showTacletInfo(node);
-        notationInfo.refresh(services, checkBoxPrettySyntax.isSelected(),
-                checkBoxUnicode.isSelected());
+        notationInfo.refresh(services, checkBoxPrettySyntax.isSelected(), checkBoxUnicode.isSelected());
         useRegex();
         printSequent();
         RuleApp app = node.getAppliedRuleApp();
@@ -191,25 +188,19 @@ public class SequentViewController extends ViewController {
 
         sequentOptions.setDisable(true);
         sequentOptions.setExpanded(false);
-        sequentOptions.disabledProperty()
-                .addListener((observable, oldValue, newValue) -> {
-                    sequentOptions.getScene()
-                            .getAccelerators().put(
-                                    new KeyCodeCombination(KeyCode.F,
-                                            KeyCombination.CONTROL_DOWN),
-                                    () -> {
-                        if (sequentOptions.isExpanded()
-                                && !searchBox.isFocused()) {
-                            searchBox.requestFocus();
-                            return;
-                        }
-                        sequentOptions.setAnimated(false);
-                        sequentOptions
-                                .setExpanded(!sequentOptions.isExpanded());
-                        searchBox.requestFocus();
-                        sequentOptions.setAnimated(true);
-                    });
-                });
+        sequentOptions.disabledProperty().addListener((observable, oldValue, newValue) -> {
+            sequentOptions.getScene().getAccelerators()
+                    .put(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), () -> {
+                if (sequentOptions.isExpanded() && !searchBox.isFocused()) {
+                    searchBox.requestFocus();
+                    return;
+                }
+                sequentOptions.setAnimated(false);
+                sequentOptions.setExpanded(!sequentOptions.isExpanded());
+                searchBox.requestFocus();
+                sequentOptions.setAnimated(true);
+            });
+        });
 
         // Disable the standard context menu, as it only offers a page refresh,
         // which is not needed.
@@ -219,19 +210,15 @@ public class SequentViewController extends ViewController {
         textArea.setOnScroll(event -> {
             // Adjustment: Event.getDelta is absolute amount of pixels,
             // Scrollpane.getHvalue and .getVvalue relative from 0.0 to 1.0
-            this.scrollPane.setVvalue(this.scrollPane.getVvalue()
-                    - event.getDeltaY() / this.scrollPane.getHeight());
-            this.scrollPane.setHvalue(this.scrollPane.getHvalue()
-                    - event.getDeltaX() / this.scrollPane.getWidth());
+            this.scrollPane.setVvalue(this.scrollPane.getVvalue() - event.getDeltaY() / this.scrollPane.getHeight());
+            this.scrollPane.setHvalue(this.scrollPane.getHvalue() - event.getDeltaX() / this.scrollPane.getWidth());
         });
     }
 
     @Override
     public void setTooltips() {
-        checkBoxRegexSearch
-                .setTooltip(new Tooltip("Evaluate as regular expression."));
-        checkBoxPrettySyntax.setTooltip(
-                new Tooltip("If ticked, infix notations are used."));
+        checkBoxRegexSearch.setTooltip(new Tooltip("Evaluate as regular expression."));
+        checkBoxPrettySyntax.setTooltip(new Tooltip("If ticked, infix notations are used."));
         checkBoxUnicode.setTooltip(new Tooltip(
                 "If ticked, formulae are displayed with special Unicode characters (such as `\u22C0`) instead of the traditional ASCII ones. "
                         + "Only works in combination with pretty printing (see above)."));
@@ -268,10 +255,8 @@ public class SequentViewController extends ViewController {
         this.updateView();
 
         if (event.isAltDown()) {
-            getContext().getStatusManager()
-                    .setStatus(TermInfoPrinter.printTermInfo(sequent,
-                            (abstractSyntaxTree.getPosInSequent(pos,
-                                    new IdentitySequentPrintFilter(sequent)))));
+            getContext().getStatusManager().setStatus(TermInfoPrinter.printTermInfo(sequent,
+                    (abstractSyntaxTree.getPosInSequent(pos, new IdentitySequentPrintFilter(sequent)))));
         }
     }
 
@@ -298,11 +283,9 @@ public class SequentViewController extends ViewController {
             apply(eventArgs);
             updateView();
         });
-        getContext().getSelectModeActivateEvent()
-                .addHandler(this::selectModeActivated);
+        getContext().getSelectModeActivateEvent().addHandler(this::selectModeActivated);
 
-        posTranslator = new PositionTranslator(
-                getContext().getCssFileHandler());
+        posTranslator = new PositionTranslator(getContext().getCssFileHandler());
 
         tacletInfoViewController.initViewController(getMainApp(), getContext());
     }
@@ -314,13 +297,10 @@ public class SequentViewController extends ViewController {
         searchBox.setOnKeyReleased(event -> {
 
             // Jump to Next Search Highlight if Searchtext is not Changed
-            if (formerSearchText.equals(searchBox.getText())
-                    && event.getCode() == KeyCode.ENTER && searchIndices != null
-                    && searchIndices.size() > 0
-                    && sequentOptions.isExpanded()) {
+            if (formerSearchText.equals(searchBox.getText()) && event.getCode() == KeyCode.ENTER
+                    && searchIndices != null && searchIndices.size() > 0 && sequentOptions.isExpanded()) {
 
-                double searchedHeight = posTranslator
-                        .getHeightForIndex(searchIndices.get(searchIndPointer));
+                double searchedHeight = posTranslator.getHeightForIndex(searchIndices.get(searchIndPointer));
 
                 // While the Next Highlight is in a Collapsed Line, jump to next
                 // or return if it is the last line
@@ -329,8 +309,7 @@ public class SequentViewController extends ViewController {
                     if (searchIndPointer == searchIndices.size()) {
                         return;
                     }
-                    searchedHeight = posTranslator.getHeightForIndex(
-                            searchIndices.get(searchIndPointer));
+                    searchedHeight = posTranslator.getHeightForIndex(searchIndices.get(searchIndPointer));
                 }
 
                 // Scroll to the next Search Highlight
@@ -342,13 +321,13 @@ public class SequentViewController extends ViewController {
 
             // Search
             formerSearchText = searchBox.getText();
-            
+
             if (lastSearcher != null) {
                 lastSearcher.cancel();
             }
             lastSearcher = new Searcher(searchBox.getText());
             executor.submit(lastSearcher);
-            
+
             event.consume();
         });
     }
@@ -364,11 +343,9 @@ public class SequentViewController extends ViewController {
         services = proof.getServices();
         sequent = node.sequent();
 
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
-                services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        printer = new SequentPrinter(getContext().getCssFileHandler(),
-                abstractSyntaxTree, getContext());
+        printer = new SequentPrinter(getContext().getCssFileHandler(), abstractSyntaxTree, getContext());
         sequentChanged = true;
 
         sequentOptions.setDisable(false);
@@ -381,8 +358,7 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void usePrettySyntax() {
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
-                services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         if (!checkBoxPrettySyntax.isSelected()) {
             notationInfo.refresh(services, false, false);
@@ -404,8 +380,7 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void useUnicode() {
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
-                services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         notationInfo.refresh(services, true, checkBoxUnicode.isSelected());
 
@@ -427,8 +402,7 @@ public class SequentViewController extends ViewController {
      * webview. Use this after changes of the NotationInfo of the mediator.
      */
     public void forceRefresh() {
-        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
-                services);
+        logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo, services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         printSequent();
         updateView();
@@ -474,14 +448,12 @@ public class SequentViewController extends ViewController {
         // styling update.
         if (sequentChanged && sequentLoaded) {
             sequentChanged = false;
-            Pair<Double, Double> newDimensions = posTranslator
-                    .getProofDimensions();
+            Pair<Double, Double> newDimensions = posTranslator.getProofDimensions();
 
             // JavaFX 8 has MaxHeight 8192. If bigger, an error will occur.
             // Shall be patched in JDK9
             if (newDimensions.second > 8192) {
-                System.out.println("Proof might be too large with Size "
-                        + newDimensions.second);
+                System.out.println("Proof might be too large with Size " + newDimensions.second);
                 textArea.setPrefHeight(8192);
             }
             else {
@@ -496,8 +468,8 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * Applies a filter to the sequent view. This updates the {@link
-     * SequentPrinter} and {@link PositionTranslator}
+     * Applies a filter to the sequent view. This updates the
+     * {@link SequentPrinter} and {@link PositionTranslator}
      * 
      * @param args
      */
@@ -507,13 +479,11 @@ public class SequentViewController extends ViewController {
         lastFilter = args;
 
         ArrayList<Integer> lines = new ArrayList<Integer>(
-                SequentFilterer.applyFilter(proofString, args.getFilter(),
-                        abstractSyntaxTree));
+                SequentFilterer.applyFilter(proofString, args.getFilter(), abstractSyntaxTree));
 
         if (args.getFilter() != null) {
             printer.applyFilter(lines, args.getFilter().getFilterLayout());
-            posTranslator.applyFilter(lines,
-                    args.getFilter().getFilterLayout());
+            posTranslator.applyFilter(lines, args.getFilter().getFilterLayout());
         }
         else {
             // filter layout does not matter here, but can't be acquired from
@@ -538,8 +508,7 @@ public class SequentViewController extends ViewController {
         if (getContext().getKeYMediator().getSelectedProof() == null)
             return;
         filterSelection = eventArgs.getFilterSelection();
-        filterSelection.getSelectionModeFinishedEvent()
-                .addHandler(this::finishSelectionMode);
+        filterSelection.getSelectionModeFinishedEvent().addHandler(this::finishSelectionMode);
         selectionModeIsActive = true;
     }
 
@@ -596,25 +565,21 @@ public class SequentViewController extends ViewController {
                     Goal goal = mediator.getSelectedGoal();
                     if (goal != null) {
                         int idx = posTranslator.getCharIdxUnderPointer(event);
-                        PosInSequent pos = abstractSyntaxTree.getPosInSequent(
-                                idx, new IdentitySequentPrintFilter(sequent));
+                        PosInSequent pos = abstractSyntaxTree.getPosInSequent(idx,
+                                new IdentitySequentPrintFilter(sequent));
 
                         if (pos == null)
                             return;
 
                         FXMLLoader loader = new FXMLLoader();
-                        loader.setLocation(TacletMenuController.class
-                                .getResource("TacletMenuView.fxml"));
+                        loader.setLocation(TacletMenuController.class.getResource("TacletMenuView.fxml"));
                         tacletMenu = loader.load();
                         // Give the controller access to the main app.
-                        TacletMenuController controller = loader
-                                .getController();
-                        controller.initViewController(this.getMainApp(),
-                                this.getContext());
+                        TacletMenuController controller = loader.getController();
+                        controller.initViewController(this.getMainApp(), this.getContext());
                         controller.init(pos, this);
 
-                        tacletMenu.show(textArea, event.getScreenX(),
-                                event.getScreenY());
+                        tacletMenu.show(textArea, event.getScreenX(), event.getScreenY());
 
                         enableMouseOver(false);
 
@@ -654,28 +619,31 @@ public class SequentViewController extends ViewController {
         textArea.setDisable(true);
         webEngine.load("");
     }
-    
+
     private class Searcher implements Runnable {
         private volatile boolean cancelled = false;
         private final String searchTerm;
+
         Searcher(String searchTerm) {
-            this.searchTerm = searchTerm; 
+            this.searchTerm = searchTerm;
         }
 
         public void cancel() {
-           cancelled = true;
+            cancelled = true;
         }
 
         @Override
         public void run() {
-           // remember that there's no guarantee that this will execute before the NEXT keypress, so we add a check to ensure that we still want to perform the search when it gets executed:
-           if (!cancelled) {
-               searchIndices = printer.applyFreetextSearch(searchTerm);
-               Platform.runLater(() -> {
-                   searchIndPointer = 0;
-                   updateView();
-               });
-           }
+            // remember that there's no guarantee that this will execute before
+            // the NEXT keypress, so we add a check to ensure that we still want
+            // to perform the search when it gets executed:
+            if (!cancelled) {
+                searchIndices = printer.applyFreetextSearch(searchTerm);
+                Platform.runLater(() -> {
+                    searchIndPointer = 0;
+                    updateView();
+                });
+            }
         }
     }
 }
