@@ -121,35 +121,27 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * <<<<<<< HEAD A unique id of the squent view. This is used to manage
+     * A unique id of the squent view. This is used to manage
      * multiple sequentviews due to staticsequentviews. This field is volatile.
-     * ======= getter for the Unique ID of this SequentView
-     * 
-     * @return >>>>>>> dce12851f5e67a90c337ed71e4d1278fefae781c
      */
     public long getOwnID() {
         return OWN_ID;
     }
 
     /**
-     * <<<<<<< HEAD A unique id for the last triggered taclet-action. This field
-     * is volatile. ======= getter for the ID which triggered the last
+     * getter for the ID which triggered the last
      * RuleApplication Action
-     * 
-     * @return >>>>>>> dce12851f5e67a90c337ed71e4d1278fefae781c
      */
     public long getLastTacletActionID() {
         return LAST_TACLET_ACTION_ID.get();
     }
 
     /**
-     * <<<<<<< HEAD A unique id for the last triggered taclet-action. This field
-     * is volatile. ======= setter for the ID which triggered the last
+     * setter for the ID which triggered the last
      * RuleApplication Action
      * 
      * @param newValue
-     *            the new ID Value >>>>>>>
-     *            dce12851f5e67a90c337ed71e4d1278fefae781c
+     *            the new ID Value 
      */
     public void setLastTacletActionID(long newValue) {
         LAST_TACLET_ACTION_ID.set(newValue);
