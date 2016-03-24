@@ -533,28 +533,25 @@ public class CssStylerViewController extends ViewController {
                 new ExtensionFilter("CSS File", "*.css"),
                 new ExtensionFilter("All Files", "*.*"));
 
-        File initFile = null;
+        File initDirectory = null;
         // Get Directory of current Proof and set as initial DirectoryChild
         Proof proof = getContext().getKeYMediator().getSelectedProof();
         if (proof != null) {
-
-            initFile = proof.getProofFile();
+            initDirectory = proof.getProofFile().getParentFile();
         }
         // Get Directory from CSSFile and set as initial DirectoryChild if there
         // is no Proof Loaded or it has not been saved yet
-        if (initFile == null) {
-            initFile = new File(cssFileHandler.getPath());
-        }
+        if (initDirectory == null) {
+            String path = cssFileHandler.getPath();
+            initDirectory = new File(path).getParentFile();
 
-        // If the DefaultCSS is the currently loaded CSSFile, fallback to Home
-        // Directory
-        //TODO Fallback not Working
-        if (initFile.getAbsolutePath()
-                .contains(NUIConstants.DEFAULT_CSS_PATH)) {
-            initFile = IOUtil.getHomeDirectory();
+            // Fallback to HomeDir, if the currently loaded CSS is the Default
+            // CSS
+            if (path.equals(NUIConstants.DEFAULT_CSS_PATH)) {
+                initDirectory = IOUtil.getHomeDirectory();
+            }
         }
-
-        fileChooser.setInitialDirectory(initFile.getParentFile());
+        fileChooser.setInitialDirectory(initDirectory);
 
         return fileChooser;
     }
