@@ -307,6 +307,8 @@ public class MainApp extends Application {
         // usually would still trigger the default button (JavaFX default
         // behavior). As this led to confusion with some users, the following
         // code makes enter trigger the focused button instead.
+        // Note: The spacebar is the regular trigger to trigger a selected
+        // button in JavaFX.
         Platform.runLater(() -> dialogPane.getButtonTypes().stream()
                 .map(dialogPane::lookupButton).forEach(button -> button
                         .addEventHandler(KeyEvent.KEY_PRESSED, event -> {

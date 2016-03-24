@@ -8,7 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckMenuItem;
 
 /**
- * Context menu for any {@link ViewInformation view} open in a tab.
+ * Context menu for any {@link ViewInformation view} open in a tab. It contains
+ * five possible positions where the tab can be moved to.
  * 
  * @author Benedikt Gross
  * @author Nils Muzzulini
