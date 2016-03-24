@@ -683,6 +683,10 @@ public class RootLayoutController extends ViewController {
     private void openInNewSequentView() {
         de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator()
                 .getSelectedNode();
+        //XXX Workaround for NullPointerException
+        if(node==null){
+            return;
+        }
         
         ViewInformation info = new ViewInformation(
                 node.serialNr() + ": " + node.name(),
