@@ -13,7 +13,7 @@
 		<MenuItem mnemonicParsing="false" fx:id="noRules" visible="false"
 			text="No rules applicable." />
 
-                <fx:include fx:id="insertHidden" visible="false" source="InsertHiddenMenu.fxml" />
+                <fx:include fx:id="insertHidden" visible="false" source="InsertHiddenMenuView.fxml" />
 		<Menu fx:id="moreRules" visible="false" text="More rules" />
 
 		<SeparatorMenuItem />
@@ -21,7 +21,7 @@
 		<MenuItem mnemonicParsing="false" onAction="#handleFocussedRuleApplication"
 			text="Apply rules automatically here" />
 
-                <fx:include fx:id="proofMacroMenu" source="ProofMacroMenu.fxml" />
+                <fx:include fx:id="proofMacroMenu" source="ProofMacroMenuView.fxml" />
 		
 		<SeparatorMenuItem />
 

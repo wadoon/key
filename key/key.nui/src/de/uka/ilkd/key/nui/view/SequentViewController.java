@@ -545,7 +545,7 @@ public class SequentViewController extends ViewController {
 
                         FXMLLoader loader = new FXMLLoader();
                         loader.setLocation(TacletMenuController.class
-                                .getResource("TacletMenu.fxml"));
+                                .getResource("TacletMenuView.fxml"));
                         tacletMenu = loader.load();
                         // Give the controller access to the main app.
                         TacletMenuController controller = loader
