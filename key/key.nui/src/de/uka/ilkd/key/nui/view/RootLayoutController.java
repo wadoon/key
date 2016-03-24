@@ -625,6 +625,7 @@ public class RootLayoutController extends ViewController {
 
     /**
      * TODO add documentation
+     * 
      * @param sourcePath
      */
     public void registerMenu(URL sourcePath) {
@@ -633,8 +634,7 @@ public class RootLayoutController extends ViewController {
                 loadFxmlFromContext(sourcePath));
     }
 
-
-    //TODO add documentation
+    // TODO add documentation
     public void registerMenuEntry(URL sourcePath, String parentMenu)
             throws IllegalStateException {
         for (Menu m : menuBar.getMenus()) {
@@ -648,9 +648,8 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * TODO enhance documentation
-     * size = 4 : left-vertical, left-horizontal, right-vertical,
-     * right-horizontal
+     * TODO enhance documentation size = 4 : left-vertical, left-horizontal,
+     * right-vertical, right-horizontal
      */
     public List<Double> getSplitterPositions() {
         double[] vertical = mainSplitPane.getDividerPositions();
@@ -658,16 +657,14 @@ public class RootLayoutController extends ViewController {
                 vertical[1], rightPane.getDividerPositions()[0]);
     }
 
-
-    //TODO add documentation
+    // TODO add documentation
     public List<ViewInformation> getViewInformations() {
         return new LinkedList<ViewInformation>(allViews.values());
     }
 
     /**
-     * TODO enhance documentation
-     * size = 4 : left-vertical, left-horizontal, right-vertical,
-     * right-horizontal
+     * TODO enhance documentation size = 4 : left-vertical, left-horizontal,
+     * right-vertical, right-horizontal
      */
     public void setSplitterPositions(List<Double> positions) {
         mainSplitPane.setDividerPositions(positions.get(0), positions.get(2));
@@ -682,10 +679,11 @@ public class RootLayoutController extends ViewController {
     }
 
     @FXML
-    private void openInNew() {
+
+    private void openInNewSequentView() {
         de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator()
                 .getSelectedNode();
-
+        
         ViewInformation info = new ViewInformation(
                 node.serialNr() + ": " + node.name(),
                 StaticSequentViewController.class.getResource(

@@ -2,7 +2,7 @@ package de.uka.ilkd.key.nui;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-
+import de.uka.ilkd.key.nui.event.HandlerEvent;
 import de.uka.ilkd.key.nui.util.KeyFxmlLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Control;
@@ -17,6 +17,8 @@ import javafx.util.Pair;
  * 
  * @author Nils Muzzulini
  * @author Benedikt Gross
+ * @author Victor Schuemmer
+ * @author Maximilian Li
  * @version 1.0
  */
 public abstract class ViewController implements Initializable {
@@ -24,12 +26,22 @@ public abstract class ViewController implements Initializable {
     private MainApp mainApp;
     private Context context;
     private Stage stage;
+    private HandlerEvent<String> titleUpdatedEvent = new HandlerEvent<>();
 
     /**
      * @return the {@link MainApp}
      */
     public MainApp getMainApp() {
         return mainApp;
+    }
+
+    /**
+     * An event that is fired each time a new status is set.
+     * 
+     * @return Status updated event.
+     */
+    public HandlerEvent<String> getTitleUpdatedEvent() {
+        return titleUpdatedEvent;
     }
 
     /**
@@ -63,18 +75,22 @@ public abstract class ViewController implements Initializable {
 
     /**
      * Set a {@link Stage} for this view.
-     * @param stage Stage to be set.
+     * 
+     * @param stage
+     *            Stage to be set.
      */
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
+    // TODO add documentation
     public <T> Pair<T, ViewController> loadFxmlViewController(URL path) {
         Pair<T, ViewController> pair = KeyFxmlLoader.loadFxml(path);
         pair.getValue().initViewController(mainApp, context);
         return pair;
     }
 
+    // TODO add documentation
     @SuppressWarnings("unchecked")
     public <T> T loadFxmlFromContext(URL path) {
         return (T) loadFxmlViewController(path).getKey();
@@ -100,9 +116,6 @@ public abstract class ViewController implements Initializable {
     public void viewReactivated() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
     }

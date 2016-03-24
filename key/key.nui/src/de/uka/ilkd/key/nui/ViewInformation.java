@@ -109,6 +109,11 @@ public class ViewInformation extends Observable {
         return uiTab;
     }
 
+    public void setTabTitle(String t) {
+        title = t;
+        uiTab.setGraphic(makeTitleLabel(parent));
+    }
+
     private ViewController controller;
 
     /**
@@ -155,14 +160,15 @@ public class ViewInformation extends Observable {
         this.notifyObservers(true);
     }
 
-    /**
-     * TODO add documentation
-     */
+    private ViewController parent;
+
     public void loadUiTab(ViewController parent) {
         Pair<Object, ViewController> pair = parent
                 .loadFxmlViewController(getFxmlPath());
+        this.parent = parent;
         uiTab = createTab((Node) pair.getKey(), parent);
         controller = pair.getValue();
+        controller.getTitleUpdatedEvent().addHandler(this::setTabTitle);
     }
 
     /**
@@ -174,15 +180,19 @@ public class ViewInformation extends Observable {
      */
     private Tab createTab(Node node, ViewController parent) {
         Tab tab = new Tab();
-        String title = getTitle();
-        // t.setText(title);
-        Label titleLabel = new Label(title);
-        // BorderPane header = new BorderPane();
-        // header.setCenter(titleLabel);
-        tab.setGraphic(titleLabel);
+        tab.setGraphic(makeTitleLabel(parent));
         tab.setContent(node);
         tab.setTooltip(
                 new Tooltip("Drag\u0026Drop or Right-Click to move Tab"));
+        tab.setOnCloseRequest(event -> {
+            this.setIsActive(false);
+        });
+
+        return tab;
+    }
+
+    private Label makeTitleLabel(ViewController parent) {
+        Label titleLabel = new Label(title);
 
         titleLabel.setOnDragDetected(event -> {
             if (event.getButton() != MouseButton.PRIMARY)
@@ -194,17 +204,13 @@ public class ViewInformation extends Observable {
             event.consume();
         });
 
-        tab.setOnCloseRequest(event -> {
-            this.setIsActive(false);
-        });
-
         titleLabel.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY)
                 loadViewContextMenu(parent).show(titleLabel, Side.TOP,
                         event.getX(), event.getY());
         });
 
-        return tab;
+        return titleLabel;
     }
 
     private ContextMenu loadViewContextMenu(ViewController parent) {

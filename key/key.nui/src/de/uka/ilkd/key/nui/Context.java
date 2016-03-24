@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nui;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.util.prefs.Preferences;
-
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
