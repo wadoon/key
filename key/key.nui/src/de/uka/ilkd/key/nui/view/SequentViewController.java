@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -33,6 +35,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Pair;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
@@ -103,6 +106,9 @@ public class SequentViewController extends ViewController {
     @FXML
     private TacletInfoViewController tacletInfoViewController;
     private ContextMenu tacletMenu;
+    
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private Searcher lastSearcher = null;
 
     /**
      * The constructor. The constructor is called before the initialize()
@@ -314,14 +320,6 @@ public class SequentViewController extends ViewController {
      */
     private void initializeSearchBox() {
         searchBox.setOnKeyReleased(event -> {
-            // Ignore Regex with "."
-            if (searchBox.getText().equals(".")
-                    && checkBoxRegexSearch.isSelected()) {
-                printer.applyFreetextSearch("");
-                updateView();
-                event.consume();
-                return;
-            }
 
             // Jump to Next Search Highlight if Searchtext is not Changed
             if (formerSearchText.equals(searchBox.getText())
@@ -352,9 +350,13 @@ public class SequentViewController extends ViewController {
 
             // Search
             formerSearchText = searchBox.getText();
-            searchIndices = printer.applyFreetextSearch(searchBox.getText());
-            searchIndPointer = 0;
-            updateView();
+            
+            if (lastSearcher != null) {
+                lastSearcher.cancel();
+            }
+            lastSearcher = new Searcher(searchBox.getText());
+            executor.submit(lastSearcher);
+            
             event.consume();
         });
     }
@@ -659,5 +661,29 @@ public class SequentViewController extends ViewController {
         tacletInfo.setDisable(true);
         textArea.setDisable(true);
         webEngine.load("");
+    }
+    
+    private class Searcher implements Runnable {
+        private volatile boolean cancelled = false;
+        private final String searchTerm;
+        Searcher(String searchTerm) {
+            this.searchTerm = searchTerm; 
+        }
+
+        public void cancel() {
+           cancelled = true;
+        }
+
+        @Override
+        public void run() {
+           // remember that there's no guarantee that this will execute before the NEXT keypress, so we add a check to ensure that we still want to perform the search when it gets executed:
+           if (!cancelled) {
+               searchIndices = printer.applyFreetextSearch(searchTerm);
+               Platform.runLater(() -> {
+                   searchIndPointer = 0;
+                   updateView();
+               });
+           }
+        }
     }
 }
