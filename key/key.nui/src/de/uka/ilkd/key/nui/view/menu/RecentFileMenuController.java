@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.nui.ViewController;
+import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;
 import javafx.event.ActionEvent;
@@ -27,15 +28,6 @@ import javafx.scene.control.MenuItem;
  * @version 1.0
  */
 public class RecentFileMenuController extends ViewController {
-    /**
-     * The maximum number of recent files displayed.
-     */
-    private static final int MAX_RECENT_FILES = 8;
-
-    /**
-     * This is the modifiable maximum number of recent files.
-     */
-    private int maxNumberOfEntries;
 
     /**
      * Handles clicks on a menu item -> loads the file into the
@@ -58,7 +50,6 @@ public class RecentFileMenuController extends ViewController {
      *            {@link KeYMediator} to load files into
      */
     public void init(final KeYMediator mediator) {
-        this.maxNumberOfEntries = MAX_RECENT_FILES;
         this.recentFiles = new LinkedHashMap<MenuItem, RecentFileEntry>();
 
         menuItemClickedEventHandler = new EventHandler<ActionEvent>() {
@@ -122,8 +113,6 @@ public class RecentFileMenuController extends ViewController {
      * list. If the name is already part of the list, it will be moved to the
      * first position. No more than a specified maximum number of names will be
      * allowed in the list, and additional names will be removed at the end.
-     * (set the maximum number with the {@link #setMaxNumberOfEntries(int i)}
-     * method).
      * 
      * @param name
      *            the name of the file.
@@ -155,28 +144,11 @@ public class RecentFileMenuController extends ViewController {
             removeFromModelAndView(item, index);
         }
         // if appropriate, remove the last entry.
-        if (menu.getItems().size() == maxNumberOfEntries) {
+        if (menu.getItems().size() == NUIConstants.MAX_RECENT_FILES) {
             removeFromModelAndView(menu.getItems().get(menu.getItems().size() - 1), menu.getItems().size() - 1);
         }
         addToModelAndView(name);
         menu.setDisable(menu.getItems().size() == 0);
-    }
-
-    /**
-     * Specify the maximum number of recent files in the list. The default is
-     * {@link #MAX_RECENT_FILES}.
-     * 
-     * @param max
-     *            the maximum number of recent files
-     */
-    public void setMaxNumberOfEntries(int max) {
-        // if maximum number of entries gets smaller, remove additional entries
-        if (maxNumberOfEntries > max && menu.getItems().size() > max) {
-            for (int i = menu.getItems().size() - 1; i > max; i--) {
-                menu.getItems().remove(i);
-            }
-        }
-        this.maxNumberOfEntries = max;
     }
 
     /**
