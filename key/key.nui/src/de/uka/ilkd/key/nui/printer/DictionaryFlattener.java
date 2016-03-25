@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.nui.printer;
 
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +20,7 @@ import de.uka.ilkd.key.util.Pair;
  * 
  * @author Maximilian Li
  */
-class DictionaryFlattener {
+public class DictionaryFlattener {
     private List<Pair<Integer, String>> flattenedTagList = null;
     private Stack<Pair<Integer, String>> tagStack;
 
@@ -93,8 +94,15 @@ class DictionaryFlattener {
                     tagStack.push(new Pair<Integer, String>(j, insertTag));
                 }
                 else {
-                    //TODO Throw Exception
-                    tagStack.pop();
+                    try {
+                        tagStack.pop();
+                    }
+                    catch (EmptyStackException e) {
+                        System.err.println("Could not make insertTagList.\n"
+                                + "This is caused by having incomplete Pairs of tags, \n"
+                                + "or trying to insert a tagPair, where the closeTag is before the openTag.");
+                    }
+
                 }
 
                 insertTagAndSaves(i, insertTag, saveTagStack);
