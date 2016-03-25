@@ -284,22 +284,6 @@ public class SequentPrinter {
     }
 
     /**
-     * To be used to add an opening <span class="..."> tag. Do not forget to
-     * call putCloseTag!
-     * 
-     * @param index
-     *            position inside the proof string
-     * @param highlightType
-     *            the {@link HighlightType}
-     * @param tag
-     *            the opening tag constant
-     */
-    private void putOpenTag(int index, HighlightType highlightType,
-            String tag) {
-        dictionary.putOpenTag(index, highlightType, tag);
-    }
-
-    /**
      * Puts an opening tag at the start position and a closing one at the end
      * position.
      * 
@@ -315,19 +299,6 @@ public class SequentPrinter {
     private void putStyleTags(int start, int end, HighlightType type,
             String tag) {
         dictionary.putStyleTags(start, end, type, tag);
-    }
-
-    /**
-     * To be used to add a closing </span> tag. Do not forget to call
-     * putOpenTag!
-     * 
-     * @param index
-     *            position inside the proof string
-     * @param highlightType
-     *            the {@link HighlightType}
-     */
-    private void putCloseTag(int index, HighlightType highlightType) {
-        dictionary.putCloseTag(index, highlightType);
     }
 
     /**
@@ -434,6 +405,7 @@ public class SequentPrinter {
     /**
      * Puts Syntax Styling Info in tagsAtIndex Map.
      */
+    // TODO: @Max: Refactor possible now?
     private void applySyntaxHighlighting() {
         Map<String, String> classMap = context.getXmlReader().getClassMap();
         Map<String, Boolean> classEnabledMap = context.getXmlReader()
@@ -450,7 +422,7 @@ public class SequentPrinter {
                 sequent);
 
         Class<? extends Object> lastClass = null;
-        boolean openedTag = false;
+        Pair<Integer, String> openedTag = null;
 
         // Iterate over String. Insert Tags according to class.
         for (int i = 0; i < proofString.length(); i++) {
@@ -459,10 +431,12 @@ public class SequentPrinter {
             // Close Tag on Whitespace, if it was opened before
             if ((proofString.charAt(i) == ' '
                     || proofString.charAt(i) == '\n')) {
-                if (openedTag) {
-                    putCloseTag(i, HighlightType.SYNTAX);
+                if (openedTag != null) {
+                    // putCloseTag(i, HighlightType.SYNTAX);
+                    putStyleTags(openedTag.first, i, HighlightType.SYNTAX,
+                            openedTag.second);
 
-                    openedTag = false;
+                    openedTag = null;
                     lastClass = null;
                 }
                 else
@@ -478,31 +452,34 @@ public class SequentPrinter {
                     if (lastClass == null && classMap.containsKey(className)
                             && classEnabledMap.get(className)) {
 
-                        putOpenTag(i, HighlightType.SYNTAX,
-                                classMap.get(className));
+                        // putOpenTag(i, HighlightType.SYNTAX,
+                        // classMap.get(className));
 
-                        openedTag = true;
+                        openedTag = new Pair<Integer, String>(i,
+                                classMap.get(className));
                         lastClass = op.getClass();
                     }
 
                     // If Class changed, close the existing Tag, open new one
                     else if (lastClass != null && lastClass != op.getClass()) {
 
-                        putCloseTag(i, HighlightType.SYNTAX);
+                        putStyleTags(openedTag.first, i, HighlightType.SYNTAX,
+                                openedTag.second);
 
-                        openedTag = false;
+                        openedTag = null;
                         if (classMap.containsKey(className)
                                 && classEnabledMap.get(className)) {
 
-                            putOpenTag(i, HighlightType.SYNTAX,
-                                    classMap.get(className));
+                            // putOpenTag(i, HighlightType.SYNTAX,
+                            // classMap.get(className));
                             lastClass = op.getClass();
-                            openedTag = true;
+                            openedTag = new Pair<Integer, String>(i,
+                                    classMap.get(className));
                         }
                         // Syso to let the user know the AST Class is unknown
                         else {
                             lastClass = null;
-                            openedTag = false;
+                            openedTag = null;
                             if (!classMap.containsKey(className)) {
                                 System.out.println("");
                                 System.out.println(

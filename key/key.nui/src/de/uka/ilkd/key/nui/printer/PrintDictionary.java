@@ -103,7 +103,7 @@ public class PrintDictionary {
      * @param tag
      *            the style tag constant
      */
-    protected void putOpenTag(int index, HighlightType type, String tag) {
+    private void putOpenTag(int index, HighlightType type, String tag) {
         putTag(index, type, NUIConstants.OPEN_TAG_BEGIN.concat(tag)
                 .concat(NUIConstants.OPEN_TAG_END), openMap);
     }
@@ -117,7 +117,7 @@ public class PrintDictionary {
      * @param type
      *            the {@link HighlightType}
      */
-    protected void putCloseTag(int index, HighlightType type) {
+    private void putCloseTag(int index, HighlightType type) {
         putTag(index, type, NUIConstants.CLOSING_TAG, closeMap);
     }
 
