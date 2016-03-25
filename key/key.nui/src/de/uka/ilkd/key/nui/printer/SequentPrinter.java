@@ -12,7 +12,6 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.nui.Context;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.nui.util.CssFileHandler;
@@ -403,9 +402,8 @@ public class SequentPrinter {
     }
 
     /**
-     * Puts Syntax Styling Info in tagsAtIndex Map.
+     * Puts Syntax Styling Info in {@link PrintDictionary}
      */
-    // TODO: @Max: Refactor possible now?
     private void applySyntaxHighlighting() {
         Map<String, String> classMap = context.getXmlReader().getClassMap();
         Map<String, Boolean> classEnabledMap = context.getXmlReader()
@@ -416,82 +414,54 @@ public class SequentPrinter {
                     "Unexpected type (should be InitialPositionTable: "
                             + posTable);
         }
-        InitialPositionTable initPos = (InitialPositionTable) posTable;
 
+        InitialPositionTable initPos = (InitialPositionTable) posTable;
         IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(
                 sequent);
 
-        Class<? extends Object> lastClass = null;
         Pair<Integer, String> openedTag = null;
 
         // Iterate over String. Insert Tags according to class.
         for (int i = 0; i < proofString.length(); i++) {
             PosInSequent pos = initPos.getPosInSequent(i, filter);
 
-            // Close Tag on Whitespace, if it was opened before
+            // On WhiteSpace: Continue or Complete Pair
             if ((proofString.charAt(i) == ' '
                     || proofString.charAt(i) == '\n')) {
-                if (openedTag != null) {
-                    // putCloseTag(i, HighlightType.SYNTAX);
+                if (openedTag != null) {                    
                     putStyleTags(openedTag.first, i, HighlightType.SYNTAX,
                             openedTag.second);
-
-                    openedTag = null;
-                    lastClass = null;
+                    
+                    openedTag = null;                    
                 }
-                else
-                    continue;
+                continue;
             }
-            // Check if there is a Class in AST for this pos
-            else if (pos != null) {
-                PosInOccurrence oc = pos.getPosInOccurrence();
-                if (oc != null && oc.posInTerm() != null) {
-                    Operator op = oc.subTerm().op();
-                    String className = op.getClass().getSimpleName();
-                    // Open First Tag
-                    if (lastClass == null && classMap.containsKey(className)
-                            && classEnabledMap.get(className)) {
+            // Check if there is a Class in AST for this position
+            if (pos == null) {
+                continue;
+            }
 
-                        // putOpenTag(i, HighlightType.SYNTAX,
-                        // classMap.get(className));
+            PosInOccurrence oc = pos.getPosInOccurrence();
+            if (oc == null || oc.posInTerm() == null) {
+                continue;
+            }
 
-                        openedTag = new Pair<Integer, String>(i,
-                                classMap.get(className));
-                        lastClass = op.getClass();
-                    }
+            String className = oc.subTerm().op().getClass().getSimpleName();
+            String classTag = classMap.get(className);
 
-                    // If Class changed, close the existing Tag, open new one
-                    else if (lastClass != null && lastClass != op.getClass()) {
+            // If Class changed, complete the pair
+            if (openedTag != null && !openedTag.second.equals(classTag)) {
 
-                        putStyleTags(openedTag.first, i, HighlightType.SYNTAX,
-                                openedTag.second);
-
-                        openedTag = null;
-                        if (classMap.containsKey(className)
-                                && classEnabledMap.get(className)) {
-
-                            // putOpenTag(i, HighlightType.SYNTAX,
-                            // classMap.get(className));
-                            lastClass = op.getClass();
-                            openedTag = new Pair<Integer, String>(i,
-                                    classMap.get(className));
-                        }
-                        // Syso to let the user know the AST Class is unknown
-                        else {
-                            lastClass = null;
-                            openedTag = null;
-                            if (!classMap.containsKey(className)) {
-                                System.out.println("");
-                                System.out.println(
-                                        "The following Class does not exist in the ClassDictionary");
-                                System.out.println("EXPRESSION: " + op);
-                                System.out.println("CLASS: " + className);
-                                System.out.println("");
-                            }
-                        }
-                    }
-
-                }
+                putStyleTags(openedTag.first, i, HighlightType.SYNTAX,
+                        openedTag.second);
+                
+                openedTag = null;
+            }
+            // Open First Tag
+            if (openedTag == null && classMap.containsKey(className)
+                    && classEnabledMap.get(className)) {
+                
+                openedTag = new Pair<Integer, String>(i, classTag);
             }
         }
     }
