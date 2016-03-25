@@ -1,11 +1,15 @@
-package de.uka.ilkd.key.proof.io;
+package de.uka.ilkd.key.proof.io.html;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
 
 /**
@@ -13,7 +17,7 @@ import java.util.Stack;
  * <p>
  * Created by weigl on 3/24/16.
  */
-public class HTMLSaver extends Runnable {
+public class HTMLSaver implements Runnable {
     Proof proof;
     File saveTo;
 
@@ -31,6 +35,7 @@ public class HTMLSaver extends Runnable {
     @Override
     public void run() {
         try {
+            System.out.println(saveTo.getAbsolutePath());
             pw = new PrintWriter(new BufferedWriter(new FileWriter(saveTo)));
 
             preamble("Test Proof"); //TODO add some useful name here
@@ -62,19 +67,36 @@ public class HTMLSaver extends Runnable {
         Stack<Node> queue = new Stack<>();
         queue.add(root);
 
-        while(!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             Node node = queue.pop();
             appendNode(node);
 
-
+            for (Node child : node)
+                queue.push(child);
         }
     }
 
     private void appendNode(Node node) {
         String txt = getText("node.html");
-        pw.format(
-                txt, node.hashCode(), node.sequent()
-        );
+        pw.format(txt, node.hashCode(), SequentHTMLPrinter.print(node.sequent()), navigationNodeBar(node));
+    }
+
+    private String navigationNodeBar(Node node) {
+        String s = "";
+        if (!node.root()) {
+            int parentId = node.parent().hashCode();
+            s = String.format("<a href=\"#%d\">Parent</a> |", parentId);
+        }
+
+        Optional<String> children = node.children().stream()
+                .map((Node n) ->
+                        String.format("<a href=\"#%d\">Child: %s</a>", node.hashCode(), node.name()))
+                .reduce((a, b) -> a + " | " + b);
+
+        if (children.isPresent())
+            return s +  children.get();
+        else
+            return s;
     }
 
     private void gatherInformation() {
@@ -103,8 +125,22 @@ public class HTMLSaver extends Runnable {
     }
 
     public static final void main(String argv[]) {
-        ProofSaver
+        ConsoleUserInterfaceControl control = new ConsoleUserInterfaceControl(false, true);
 
+        File file = new File("key.ui/examples/standard_key/prop_log/contraposition.auto.proof");
+
+
+        final ProblemLoader pl =
+                new ProblemLoader(file, null, null, null,
+                        AbstractProfile.getDefaultProfile(), false, control.getMediator(), true, null, control);
+        pl.runSynchronously();
+
+        Proof p = pl.getProof();
+
+        System.out.println(p);
+
+        HTMLSaver s = new HTMLSaver(p, new File("proof.html"));
+        s.run();
     }
 
 }

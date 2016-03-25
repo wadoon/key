@@ -32,7 +32,10 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public class Node  {
+/**
+ * weigl 2016-03-24: add {@link Iterable} interface for use in foreach loops.
+ */
+public class Node implements Iterable<Node>  {
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
     private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";
@@ -356,11 +359,14 @@ public class Node  {
 	return new NodeIterator(leaves().iterator());
     }
 
+
+
     /** returns an iterator for the direct children of this node.
      */
     public Iterator<Node> childrenIterator() {
 	return new NodeIterator(children.iterator());
     }
+
 
     /** returns an iterator for all nodes in the subtree.
      */
@@ -651,6 +657,13 @@ public class Node  {
      */
     public Iterator<Node> iterator() {
         return childrenIterator();
+    }
+
+    /**
+     * weigl 2016-03-24: Read-only access to children for use of Streaming-API
+     */
+    public List<Node> children() {
+        return Collections.unmodifiableList(children);
     }
 
     // inner iterator class

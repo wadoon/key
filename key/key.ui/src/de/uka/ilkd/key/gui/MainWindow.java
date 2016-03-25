@@ -212,6 +212,11 @@ public final class MainWindow extends JFrame  {
     /** action for opening a KeY file */
     private OpenFileAction openFileAction;
 
+    /**
+     * action for saveing a key file as html
+     */
+    private SaveAsHtmlAction saveAsHtmlAction;
+
     /** action for opening an example */
     private OpenExampleAction openExampleAction;
 
@@ -413,6 +418,7 @@ public final class MainWindow extends JFrame  {
         openMostRecentFileAction  = new OpenMostRecentFileAction(this);
         editMostRecentFileAction  = new EditMostRecentFileAction(this);
         saveFileAction            = new SaveFileAction(this);
+        saveAsHtmlAction          = new SaveAsHtmlAction(this);
         quickSaveAction           = new QuickSaveAction(this);
         quickLoadAction           = new QuickLoadAction(this);
         proofManagementAction     = new ProofManagementAction(this);
@@ -668,6 +674,7 @@ public final class MainWindow extends JFrame  {
         fileMenu.add(openMostRecentFileAction);
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
+        fileMenu.add(saveAsHtmlAction);
         fileMenu.add(quickSaveAction);
         fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();

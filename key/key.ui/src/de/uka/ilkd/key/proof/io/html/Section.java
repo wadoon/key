@@ -1,0 +1,8 @@
+package de.uka.ilkd.key.proof.io.html;
+
+/**
+ * Created by weigl on 3/24/16.
+ */
+public enum Section {
+    SEPARATOR, SPECIAL_VARIABLE, VARIABLE, OPERATOR, TYPE_NAME, SEQUENT, ANTECEDENT, SUCCEDENT, SEQUENT_FORMULA, RIGID, EMPTY, KEYWORD, RECURSIVE_JAVA_BLOCK, TERM
+}

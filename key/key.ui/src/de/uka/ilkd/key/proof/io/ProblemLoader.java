@@ -97,7 +97,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
            final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, message,
                    getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
                    (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
-           ptl.taskFinished(tfi);
+ //weigl: this exit save html main          ptl.taskFinished(tfi);
        }
    }
 

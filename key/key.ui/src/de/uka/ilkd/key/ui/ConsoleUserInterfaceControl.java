@@ -174,7 +174,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                if (verbosity > Verbosity.SILENT)
                    System.out.println("Number of open goals after loading: " +
                            openGoals);
-               System.exit(0);
+               //System.exit(0); //weigl: change this for testing
            }
            ProblemLoader problemLoader = (ProblemLoader) info.getSource();
            if(problemLoader.hasProofScript()) {
