@@ -201,7 +201,11 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	    readProblem();
 	}
         try {
+        	long start = System.nanoTime();
+        	System.out.println("Proof Reuse: start");
             lastParser.proof(prl);
+            long end = System.nanoTime();
+            System.out.println("Proof Reuse Time (" + name() + "):" + (end - start)/1000000 + "ms");
         } catch(antlr.ANTLRException e) {
             throw new ProofInputException(e);
         }
