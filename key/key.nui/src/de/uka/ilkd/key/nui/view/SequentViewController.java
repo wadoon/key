@@ -224,6 +224,7 @@ public class SequentViewController extends ViewController {
         checkBoxUnicode.setTooltip(new Tooltip(
                 "If ticked, formulae are displayed with special Unicode characters (such as `\u22C0`) instead of the traditional ASCII ones. "
                         + "Only works in combination with pretty printing (see above)."));
+        searchBox.setTooltip(new Tooltip("Search starts on keypress, press 'Enter' to scroll to the next result."));
     }
 
     // XXX kind of a hack
@@ -296,7 +297,12 @@ public class SequentViewController extends ViewController {
      * Initializes the search box: registers all the event behavior.
      */
     private void initializeSearchBox() {
+        // Don't allow regex search for "."
         searchBox.setOnKeyReleased(event -> {
+            if (searchBox.getText().equals(".") && checkBoxRegexSearch.isSelected()) {
+                event.consume();
+                return;
+            }
 
             // Jump to Next Search Highlight if Searchtext is not Changed
             if (formerSearchText.equals(searchBox.getText()) && event.getCode() == KeyCode.ENTER
@@ -400,6 +406,7 @@ public class SequentViewController extends ViewController {
     @FXML
     private void useRegex() {
         printer.setUseRegex(checkBoxRegexSearch.isSelected());
+        searchBox.requestFocus();
     }
 
     /**
