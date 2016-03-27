@@ -192,7 +192,7 @@ public class SequentViewController extends ViewController {
         sequentOptions.setExpanded(false);
         sequentOptions.disabledProperty().addListener((observable, oldValue, newValue) -> {
             sequentOptions.getScene().getAccelerators()
-                    .put(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), () -> {
+                    .put(new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN), () -> {
                 if (sequentOptions.isExpanded() && !searchBox.isFocused()) {
                     searchBox.requestFocus();
                     return;
