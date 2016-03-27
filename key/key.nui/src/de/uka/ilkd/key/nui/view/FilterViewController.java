@@ -18,6 +18,7 @@ import de.uka.ilkd.key.nui.filter.PrintFilter;
 import de.uka.ilkd.key.nui.filter.PrintFilter.DisplayScope;
 import de.uka.ilkd.key.nui.filter.PrintFilter.FilterLayout;
 import de.uka.ilkd.key.nui.util.NUIConstants;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -100,6 +101,7 @@ public class FilterViewController extends ViewController {
     private FilterSelection filterSelection;
     private boolean suppressValueUpdate = false;
     private boolean suppressUsedFilterUpdates = false;
+    private boolean ongoingSelection = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -139,11 +141,12 @@ public class FilterViewController extends ViewController {
             currentFilter.setFilterLayout(new_val);
         });
         userRadio.selectedProperty().addListener(this::userRadioChanged);
+        selectionRadio.selectedProperty().addListener(this::selectionRadioChanged);
         applyButton.selectedProperty().addListener(event -> handleApply());
 
         // default data
-        filterModeBox.getItems().add(FilterLayout.Minimize);
         filterModeBox.getItems().add(FilterLayout.Collapse);
+        filterModeBox.getItems().add(FilterLayout.Minimize);
         applyButton.setDisable(true);
         filterSettings.setDisable(true);
 
@@ -157,10 +160,14 @@ public class FilterViewController extends ViewController {
                 .addKeYSelectionListener(new KeYSelectionListener() {
                     @Override
                     public void selectedProofChanged(KeYSelectionEvent e) {
-                        applyButton.setDisable(!getContext().getKeYMediator()
-                                .ensureProofLoaded());
-                        filterSettings.setDisable(!getContext().getKeYMediator()
-                                .ensureProofLoaded());
+                        Platform.runLater(() -> {
+                            applyButton.setDisable(!getContext()
+                                    .getKeYMediator().ensureProofLoaded());
+                            filterSettings.setDisable(!getContext()
+                                    .getKeYMediator().ensureProofLoaded());
+                            if (ongoingSelection)
+                                finishSelection();
+                        });
                     }
 
                     @Override
@@ -187,8 +194,7 @@ public class FilterViewController extends ViewController {
     @FXML
     private void handleApply() {
         if (applyButton.isSelected()) {
-            if (filterSelection != null) {
-                selectionFilterToggle.setSelected(false);
+            if (ongoingSelection) {
                 finishSelection();
             }
             getContext().setCurrentFilter(currentFilter);
@@ -207,24 +213,26 @@ public class FilterViewController extends ViewController {
             applyButton.setDisable(true);
             getContext().setCurrentFilter(null);
             filterSelection = new FilterSelection();
-            currentFilter.setIsUserCriteria(false);
+            ongoingSelection = true;
             getContext().activateSelectMode(filterSelection);
         }
         else {
-            applyButton.setDisable(false);
-            suppressUsedFilterUpdates = false;
             finishSelection();
             updateUsedFilter();
         }
     }
 
     private void userRadioChanged(Object sender) {
-        if (filterSelection != null) {
-            selectionFilterToggle.setSelected(false);
+        if (ongoingSelection) {
             finishSelection();
         }
-        updateSelectionCount(0);
         currentFilter.setIsUserCriteria(true);
+        if (applyButton.isSelected())
+            getContext().setCurrentFilter(currentFilter);
+    }
+    
+    private void selectionRadioChanged(Object sender) {
+        currentFilter.setIsUserCriteria(false);
         if (applyButton.isSelected())
             getContext().setCurrentFilter(currentFilter);
     }
@@ -241,6 +249,7 @@ public class FilterViewController extends ViewController {
         linesBefore.setValue(currentFilter.getBefore());
         linesAfter.setValue(currentFilter.getAfter());
         filterModeBox.setValue(currentFilter.getFilterLayout());
+        updateSelectionCount(0);
         switch (currentFilter.getScope()) {
         case AST:
             useAstScope.setSelected(true);
@@ -268,12 +277,21 @@ public class FilterViewController extends ViewController {
     }
 
     private void finishSelection() {
-        filterSelection.getSelectionModeFinishedEvent()
-                .fire(EmptyEventArgs.get());
-        List<String> resolvedSelection = filterSelection.getResolvedSelection();
-        currentFilter.setSelections(resolvedSelection);
-        filterSelection = null;
-        updateSelectionCount(resolvedSelection.size());
+        if (ongoingSelection) {
+            ongoingSelection = false;
+            suppressUsedFilterUpdates = false;
+            filterSelection.getSelectionModeFinishedEvent()
+                    .fire(EmptyEventArgs.get());
+            List<String> resolvedSelection = filterSelection
+                    .getResolvedSelection();
+            currentFilter.setSelections(resolvedSelection);
+            updateSelectionCount(resolvedSelection.size());
+            filterSelection = null;
+
+            if (selectionFilterToggle.isSelected())
+                selectionFilterToggle.setSelected(false);
+            applyButton.setDisable(false);
+        }
     }
 
     private void updateRangeValue(Slider slider, Spinner<Integer> spinner,
