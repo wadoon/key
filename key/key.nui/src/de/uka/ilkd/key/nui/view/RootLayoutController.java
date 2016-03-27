@@ -184,12 +184,18 @@ public class RootLayoutController extends ViewController {
         recentFileMenuController.init(getContext().getKeYMediator());
     };
 
-    // TODO add documentation
+    /**
+     * Adds a {@link File} to the recently opened menu.
+     * 
+     * @param absolutePath absolute path to the file
+     */
     public void addRecentFile(String absolutePath) {
         recentFileMenuController.addRecentFile(absolutePath);
     }
 
-    // TODO add documentation
+    /**
+     * @return {@link RecentFileMenuController}
+     */
     public RecentFileMenuController getRecentFiles() {
         return recentFileMenuController;
     }
