@@ -35,7 +35,7 @@
 									text="Open">
 									<accelerator>
 										<KeyCodeCombination alt="UP" code="O"
-											control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+											control="UP" meta="UP" shift="UP" shortcut="DOWN" />
 									</accelerator>
 								</MenuItem>
 								<fx:include fx:id="recentFileMenu" source="../view/menu/RecentFileMenuView.fxml" />
@@ -44,7 +44,7 @@
 									text="Save">
 									<accelerator>
 										<KeyCodeCombination alt="UP" code="S"
-											control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+											control="UP" meta="UP" shift="UP" shortcut="DOWN" />
 									</accelerator>
 								</MenuItem>
 								<SeparatorMenuItem mnemonicParsing="false" />
@@ -52,7 +52,7 @@
 									text="Exit">
 									<accelerator>
 										<KeyCodeCombination alt="UP" code="E"
-											control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+											control="UP" meta="UP" shift="UP" shortcut="DOWN" />
 									</accelerator>
 								</MenuItem>
 							</items>
@@ -67,7 +67,7 @@
 											onAction="#handleSequentCssStylerAction" text="Edit Sequent Appearance (CSS-Styler)">
 											<accelerator>
 												<KeyCodeCombination alt="UP" code="A"
-													control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+													control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
 											</accelerator>
 										</MenuItem>
 									</items>
@@ -76,7 +76,7 @@
 									text="Open Node in new Sequent">
 									<accelerator>
 										<KeyCodeCombination alt="UP" code="T"
-											control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+											control="UP" meta="UP" shift="UP" shortcut="DOWN" />
 									</accelerator>
 								</MenuItem>
 							</items>

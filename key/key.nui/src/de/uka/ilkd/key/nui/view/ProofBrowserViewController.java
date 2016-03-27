@@ -29,7 +29,7 @@ import javafx.scene.image.ImageView;
  * @author Nils Muzzulini
  * @version 1.0
  */
-@KeYView(title = "Proofs", path = "ProofBrowserView.fxml", accelerator = "CTRL + P", preferredPosition = ViewPosition.BOTTOMRIGHT)
+@KeYView(title = "Proofs", path = "ProofBrowserView.fxml", accelerator = "SHORTCUT + P", preferredPosition = ViewPosition.BOTTOMRIGHT)
 public class ProofBrowserViewController extends ViewController {
 
     private final static TreeItem<String> PROOF_BROWSER_ROOT_NODE = new TreeItem<String>("Proofs");

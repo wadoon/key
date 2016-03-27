@@ -25,13 +25,13 @@
 				<Menu text="File">
 					<MenuItem fx:id="menuOpen" onAction="#handleOpen" text="Open">
 					 <accelerator>
-                     <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                 </accelerator>
                </MenuItem>
 					<SeparatorMenuItem />
 					<MenuItem fx:id="menuSave" disable="true" onAction="#handleSave" text="Save">
 					 <accelerator>
-                  <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                  <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                 </accelerator>
                </MenuItem>
 					<MenuItem fx:id="menuSaveAs" onAction="#handleSaveAs" text="Save As" />
@@ -41,7 +41,7 @@
 					<SeparatorMenuItem />
 					<MenuItem onAction="#handleExit" text="Exit">
 					 <accelerator>
-                  <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                  <KeyCodeCombination alt="UP" code="E" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                 </accelerator>
                </MenuItem>
 				</Menu>

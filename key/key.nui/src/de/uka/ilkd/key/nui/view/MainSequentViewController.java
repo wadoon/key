@@ -16,7 +16,7 @@ import javafx.fxml.FXML;
  * @author Victor Schuemmer
  * @version 1.0
  */
-@KeYView(title = "Main Sequent", path = "MainSequentView.fxml", accelerator = "CTRL + M", preferredPosition = ViewPosition.CENTER)
+@KeYView(title = "Main Sequent", path = "MainSequentView.fxml", accelerator = "SHORTCUT + M", preferredPosition = ViewPosition.CENTER)
 public class MainSequentViewController extends ViewController {
 
     @FXML
