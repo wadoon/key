@@ -29,9 +29,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Pane;
 
 /**
  * TODO add documentation
@@ -87,16 +85,16 @@ public class FilterViewController extends ViewController {
     private RadioButton useNone;
 
     @FXML
-    private GridPane resultRangeText;
+    private Pane resultRangeText;
 
     @FXML
     private Label selectionCount;
 
     @FXML
-    private AnchorPane filterContainer;
+    private Pane filterContainer;
 
     @FXML
-    private VBox filterSettings;
+    private Pane filterSettings;
 
     private FilterSelection filterSelection;
     private boolean suppressValueUpdate = false;
@@ -141,8 +139,10 @@ public class FilterViewController extends ViewController {
             currentFilter.setFilterLayout(new_val);
         });
         userRadio.selectedProperty().addListener(this::userRadioChanged);
-        selectionRadio.selectedProperty().addListener(this::selectionRadioChanged);
-        applyButton.selectedProperty().addListener(event -> handleApply());
+        selectionRadio.selectedProperty()
+                .addListener(this::selectionRadioChanged);
+        applyButton.selectedProperty()
+                .addListener(event -> handleApplyIsSelectedChanged());
 
         // default data
         filterModeBox.getItems().add(FilterLayout.Collapse);
@@ -192,16 +192,18 @@ public class FilterViewController extends ViewController {
     }
 
     @FXML
-    private void handleApply() {
+    private void handleApplyIsSelectedChanged() {
         if (applyButton.isSelected()) {
             if (ongoingSelection) {
                 finishSelection();
             }
-            getContext().setCurrentFilter(currentFilter);
+            updateUsedFilter();
+            applyButton.setText("Remove Filter");
         }
         else {
             getContext().setCurrentFilter(null);
             updateSelectionCount(0);
+            applyButton.setText("Apply Filter");
         }
     }
 
@@ -219,6 +221,7 @@ public class FilterViewController extends ViewController {
         else {
             finishSelection();
             updateUsedFilter();
+            applyButton.setSelected(true);
         }
     }
 
@@ -230,7 +233,7 @@ public class FilterViewController extends ViewController {
         if (applyButton.isSelected())
             getContext().setCurrentFilter(currentFilter);
     }
-    
+
     private void selectionRadioChanged(Object sender) {
         currentFilter.setIsUserCriteria(false);
         if (applyButton.isSelected())

@@ -8,128 +8,120 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.control.SpinnerValueFactory?>
 
-<AnchorPane fx:id="filterContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="353.0" prefWidth="277.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
-   <children>
-      <VBox fx:id="filterSettings" AnchorPane.bottomAnchor="37.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <BorderPane>
-               <center>
-                  <VBox>
-                     <BorderPane.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </BorderPane.margin>
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.nui.view.FilterViewController">
+   <content>
+      <BorderPane fx:id="filterContainer">
+         <bottom>
+            <VBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
+               <children>
+                  <ToggleButton fx:id="applyButton" mnemonicParsing="false" prefWidth="98.0" style="-fx-font-weight: bold;" text="Apply Filter">
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </ToggleButton>
+               </children>
+            </VBox>
+         </bottom>
+         <center>
+            <AnchorPane fx:id="filterSettings" BorderPane.alignment="CENTER">
+               <children>
+                  <Label layoutX="5.0" layoutY="5.0" text="Filter by.." />
+                  <GridPane layoutX="5.0" layoutY="22.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="22.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="80.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+                        <ColumnConstraints />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
                      <children>
-                        <Label text="Filter by.." />
-                        <GridPane>
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="80.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="186.0" minWidth="10.0" prefWidth="185.0" />
-                              <ColumnConstraints />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
+                        <TextField fx:id="searchText" alignment="TOP_LEFT" promptText="Enter text to filter by.." GridPane.columnIndex="1" />
+                        <RadioButton fx:id="userRadio" mnemonicParsing="false" text="..Text">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="filterMode" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="selectionRadio" mnemonicParsing="false" text="..Selection" toggleGroup="$filterMode" GridPane.rowIndex="1" />
+                        <Label alignment="BOTTOM_LEFT" text="Mode:" GridPane.halignment="LEFT" GridPane.rowIndex="2" />
+                        <ComboBox fx:id="filterModeBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <children>
-                              <TextField fx:id="searchText" alignment="TOP_LEFT" onAction="#handleApply" promptText="Enter text to filter by.." GridPane.columnIndex="1" />
-                              <RadioButton fx:id="userRadio" mnemonicParsing="false" text="..Text">
+                              <ToggleButton fx:id="selectionFilterToggle" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#handleSelectionFilterToggled" prefHeight="38.0" prefWidth="41.0">
+                                 <padding>
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                 </padding>
+                              </ToggleButton>
+                              <Label fx:id="selectionCount" maxHeight="1.7976931348623157E308" text="(selections: 0)">
+                                 <HBox.margin>
+                                    <Insets left="5.0" />
+                                 </HBox.margin>
+                              </Label>
+                           </children>
+                        </HBox>
+                     </children>
+                  </GridPane>
+                  <TitledPane layoutX="5.0" layoutY="125.0" text="Result expansion" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="125.0">
+                     <content>
+                        <VBox>
+                           <children>
+                              <RadioButton fx:id="useNone" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="No expansion">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin>
                                  <toggleGroup>
-                                    <ToggleGroup fx:id="filterMode" />
+                                    <ToggleGroup fx:id="resultRange" />
                                  </toggleGroup>
                               </RadioButton>
-                              <RadioButton fx:id="selectionRadio" mnemonicParsing="false" text="..Selection" toggleGroup="$filterMode" GridPane.rowIndex="1" />
-                              <Label alignment="BOTTOM_LEFT" text="Mode:" GridPane.halignment="LEFT" GridPane.rowIndex="2" />
-                              <ComboBox fx:id="filterModeBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <RadioButton fx:id="useTextScope" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="Use text lines" toggleGroup="$resultRange" />
+                              <GridPane fx:id="resultRangeText">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="NEVER" maxWidth="93.0" minWidth="10.0" prefWidth="47.0" />
+                                  <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="126.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.0" minWidth="10.0" prefWidth="70.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
                                  <children>
-                                    <ToggleButton fx:id="selectionFilterToggle" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#handleSelectionFilterToggled" prefHeight="38.0" prefWidth="41.0">
-                                       <padding>
-                                          <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                       </padding>
-                                    </ToggleButton>
-                                    <Label fx:id="selectionCount" maxHeight="1.7976931348623157E308" text="(selections: 0)">
-                                       <HBox.margin>
-                                          <Insets left="5.0" />
-                                       </HBox.margin>
-                                    </Label>
+                                    <Label text="After:" GridPane.rowIndex="1" />
+                                    <Slider fx:id="linesAfter" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Slider fx:id="linesBefore" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" />
+                                    <Label text="Before:" />
+                                    <Spinner fx:id="beforeNumber" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                                       <valueFactory>
+                                       <SpinnerValueFactory.IntegerSpinnerValueFactory amountToStepBy="1" max="100" min="0" />
+                                       </valueFactory>
+                                    </Spinner>
+                                    <Spinner fx:id="afterNumber" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                       <valueFactory>
+                                       <SpinnerValueFactory.IntegerSpinnerValueFactory amountToStepBy="1" max="100" min="0" />
+                                       </valueFactory>
+                                    </Spinner>
                                  </children>
-                              </HBox>
+                                 <padding>
+                                    <Insets left="25.0" />
+                                 </padding>
+                              </GridPane>
+                              <RadioButton fx:id="useAstScope" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="Use term scope" toggleGroup="$resultRange" />
+                              <CheckBox fx:id="invertFilter" mnemonicParsing="false" onAction="#hanldeInvertChanged" text="Invert Filter">
+                                 <VBox.margin>
+                                    <Insets left="25.0" />
+                                 </VBox.margin>
+                              </CheckBox>
                            </children>
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </GridPane>
-                        <TitledPane text="Result expansion">
-                           <VBox.margin>
-                              <Insets bottom="5.0" top="5.0" />
-                           </VBox.margin>
-                           <content>
-                              <VBox>
-                                 <children>
-                                    <RadioButton fx:id="useNone" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="No expansion">
-                                       <VBox.margin>
-                                          <Insets bottom="5.0" />
-                                       </VBox.margin>
-                                       <toggleGroup>
-                                          <ToggleGroup fx:id="resultRange" />
-                                       </toggleGroup>
-                                    </RadioButton>
-                                    <RadioButton fx:id="useTextScope" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="Use text lines" toggleGroup="$resultRange" />
-                                    <GridPane fx:id="resultRangeText">
-                                      <columnConstraints>
-                                        <ColumnConstraints hgrow="NEVER" maxWidth="93.0" minWidth="10.0" prefWidth="47.0" />
-                                        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="126.0" />
-                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.0" minWidth="10.0" prefWidth="70.0" />
-                                      </columnConstraints>
-                                      <rowConstraints>
-                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                      </rowConstraints>
-                                       <children>
-                                          <Label text="After:" GridPane.rowIndex="1" />
-                                          <Slider fx:id="linesAfter" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                          <Slider fx:id="linesBefore" blockIncrement="2.0" max="20.0" GridPane.columnIndex="1" />
-                                          <Label text="Before:" />
-                                          <Spinner fx:id="beforeNumber" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
-                                             <valueFactory>
-                                             <SpinnerValueFactory.IntegerSpinnerValueFactory amountToStepBy="1" max="100" min="0" />
-                                             </valueFactory>
-                                          </Spinner>
-                                          <Spinner fx:id="afterNumber" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-                                             <valueFactory>
-                                             <SpinnerValueFactory.IntegerSpinnerValueFactory amountToStepBy="1" max="100" min="0" />
-                                             </valueFactory>
-                                          </Spinner>
-                                       </children>
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </GridPane>
-                                    <RadioButton fx:id="useAstScope" mnemonicParsing="false" onAction="#handleScopeSelectionChanged" text="Use term scope" toggleGroup="$resultRange" />
-                                    <CheckBox fx:id="invertFilter" mnemonicParsing="false" onAction="#hanldeInvertChanged" text="Invert Filter">
-                                       <VBox.margin>
-                                          <Insets left="25.0" />
-                                       </VBox.margin>
-                                    </CheckBox>
-                                 </children>
-                              </VBox>
-                           </content>
-                        </TitledPane>
-                     </children>
-                  </VBox>
-               </center>
-            </BorderPane>
-         </children>
-      </VBox>
-      <HBox alignment="CENTER" prefHeight="35.0" prefWidth="277.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0">
-         <children>
-            <ToggleButton fx:id="applyButton" mnemonicParsing="false" style="-fx-font-weight: bold;" text="Apply Filter">
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-            </ToggleButton>
-         </children>
-      </HBox>
-   </children>
-</AnchorPane>
+                        </VBox>
+                     </content>
+                  </TitledPane>
+               </children>
+               <BorderPane.margin>
+                  <Insets bottom="5.0" />
+               </BorderPane.margin>
+            </AnchorPane>
+         </center>
+      </BorderPane>
+   </content>
+</ScrollPane>
