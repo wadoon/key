@@ -21,6 +21,7 @@ import de.uka.ilkd.key.nui.ViewPosition;
 import de.uka.ilkd.key.nui.ViewSlot;
 import de.uka.ilkd.key.nui.util.NUIConstants;
 import de.uka.ilkd.key.nui.view.menu.RecentFileMenuController;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.UnicodeHelper;
@@ -187,7 +188,8 @@ public class RootLayoutController extends ViewController {
     /**
      * Adds a {@link File} to the recently opened menu.
      * 
-     * @param absolutePath absolute path to the file
+     * @param absolutePath
+     *            absolute path to the file
      */
     public void addRecentFile(String absolutePath) {
         recentFileMenuController.addRecentFile(absolutePath);
@@ -689,11 +691,12 @@ public class RootLayoutController extends ViewController {
     private void openInNewSequentView() {
         de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator()
                 .getSelectedNode();
-        //XXX Workaround for NullPointerException
-        if(node==null){
+        Goal goal = getContext().getKeYMediator().getSelectedGoal();
+        // XXX Workaround for NullPointerException
+        if (node == null) {
             return;
         }
-        
+
         ViewInformation info = new ViewInformation(
                 node.serialNr() + ": " + node.name(),
                 StaticSequentViewController.class.getResource(
@@ -712,7 +715,7 @@ public class RootLayoutController extends ViewController {
 
         Platform.runLater(() -> {
             ((StaticSequentViewController) info.getController())
-                    .getSequentViewController().loadNodeToView(node);
+                    .getSequentViewController().loadNodeToView(goal, node);
         });
     }
 }

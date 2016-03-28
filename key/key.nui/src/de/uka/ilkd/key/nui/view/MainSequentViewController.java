@@ -42,6 +42,7 @@ public class MainSequentViewController extends ViewController {
                 // execute ui update on javafx thread
                 Platform.runLater(() -> {
                     sequentViewController.loadNodeToView(
+                            getContext().getKeYMediator().getSelectedGoal(),
                             getContext().getKeYMediator().getSelectedNode());
                 });
             }

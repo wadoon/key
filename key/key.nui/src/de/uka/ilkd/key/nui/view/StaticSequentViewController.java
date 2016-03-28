@@ -42,7 +42,7 @@ public class StaticSequentViewController extends ViewController {
     public Node getNode() {
         return node;
     }
-    
+
     private Proof proof;
 
     /**
@@ -77,8 +77,7 @@ public class StaticSequentViewController extends ViewController {
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 sequentViewController.enableTacletMenu(
-                        (mediator.getSelectedProof() == getProof())
-                                && (mediator.getSelectedGoal() == getGoal()));
+                        (mediator.getSelectedProof() == getProof()));
             }
 
             @Override
@@ -96,7 +95,7 @@ public class StaticSequentViewController extends ViewController {
                     proof = mediator.getSelectedProof();
                     goal = mediator.getSelectedGoal();
                     node = mediator.getSelectedNode();
-                    sequentViewController.loadNodeToView(node);
+                    sequentViewController.loadNodeToView(goal, node);
 
                     // Applying a Rule triggers 3 Update Steps. To let the
                     // static SequentView update, use the stepCounter.\\
@@ -104,7 +103,8 @@ public class StaticSequentViewController extends ViewController {
                     // You cannot Counteract GoalChanges -> Exception!
                     updateCounter++;
                     if (updateCounter == 3) {
-                        getTitleUpdatedEvent().fire(node.serialNr() + ": " + node.name());
+                        getTitleUpdatedEvent()
+                                .fire(node.serialNr() + ": " + node.name());
                         updateCounter = 0;
                         sequentViewController.setLastTacletActionID(-1);
                     }
@@ -117,8 +117,7 @@ public class StaticSequentViewController extends ViewController {
                     sequentViewController.setLastTacletActionID(-1);
                 }
                 sequentViewController.enableTacletMenu(
-                        (mediator.getSelectedProof() == getProof())
-                                && (mediator.getSelectedGoal() == getGoal()));
+                        (mediator.getSelectedProof() == getProof()));
             }
         };
 
@@ -151,7 +150,7 @@ public class StaticSequentViewController extends ViewController {
                     while (node.subtreeIterator().hasNext()) {
                         target = node.subtreeIterator().next();
                     }
-                    sequentViewController.loadNodeToView(target);
+                    sequentViewController.loadNodeToView(goal, target);
                 }
             }
 

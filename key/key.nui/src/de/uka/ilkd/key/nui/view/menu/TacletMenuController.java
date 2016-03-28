@@ -118,7 +118,6 @@ public class TacletMenuController extends ViewController {
     @Override
     public void initializeAfterLoadingFxml() {
         mediator = getContext().getKeYMediator();
-        goal = mediator.getSelectedGoal();
         comp = new TacletAppComparator();
         insertHiddenController.initViewController(getMainApp(), getContext());
     };
@@ -135,12 +134,13 @@ public class TacletMenuController extends ViewController {
      * @throws IllegalArgumentException
      *             when pos is null
      */
-    public void init(PosInSequent pos, ViewController parentController)
-            throws IllegalArgumentException {
+    public void init(PosInSequent pos, Goal goal,
+            ViewController parentController) throws IllegalArgumentException {
         if (pos == null)
             throw new IllegalArgumentException(
                     "Argument pos must not be null.");
         this.pos = pos;
+        this.goal = goal;
 
         if (parentController instanceof SequentViewController) {
             this.parentController = (SequentViewController) parentController;
@@ -288,6 +288,8 @@ public class TacletMenuController extends ViewController {
      * @param event
      */
     private void handleRuleApplication(ActionEvent event) {
+        // Synchronization for StaticSequentView
+        parentController.setLastTacletActionID(parentController.getOwnID());
         mediator.getUI().getProofControl().selectedTaclet(
                 ((TacletMenuItem) event.getSource()).getTaclet(), goal,
                 pos.getPosInOccurrence());
@@ -300,8 +302,10 @@ public class TacletMenuController extends ViewController {
      */
     @FXML
     private void handleFocussedRuleApplication(ActionEvent event) {
-        mediator.getUI().getProofControl().startFocussedAutoMode(
-                pos.getPosInOccurrence(), mediator.getSelectedGoal());
+        // Synchronization for StaticSequentView
+        parentController.setLastTacletActionID(parentController.getOwnID());
+        mediator.getUI().getProofControl()
+                .startFocussedAutoMode(pos.getPosInOccurrence(), goal);
     }
 
     /**
@@ -389,7 +393,8 @@ public class TacletMenuController extends ViewController {
 
         // Get the Stage and add KeY Icon.
         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(NUIConstants.KEY_APPLICATION_WINDOW_ICON_PATH));
+        stage.getIcons()
+                .add(new Image(NUIConstants.KEY_APPLICATION_WINDOW_ICON_PATH));
         dialog.setTitle("Abbreviation Dialog");
         dialog.setHeaderText(header);
         dialog.setContentText(message);
