@@ -73,6 +73,9 @@ public class SequentViewController extends ViewController {
     private final long OWN_ID = NEXT_ID.getAndIncrement();
     private static volatile AtomicLong LAST_TACLET_ACTION_ID;
 
+    // For UniCode/PrettySyntax Synchro
+    private static List<SequentViewController> ALL_SEQUENTVIEWERS = new ArrayList<>();
+
     private boolean sequentLoaded = false;
     private boolean sequentChanged = false;
     private SequentPrinter printer;
@@ -113,12 +116,13 @@ public class SequentViewController extends ViewController {
     private ExecutorService singleThreadExecutor = Executors
             .newSingleThreadExecutor();
     private Searcher lastSearcher = null;
-    
+
     /**
      * Generates a {@link KeyEvent#KEY_RELEASED "Key Released"} event without a
      * key actually being released.
      */
-    KeyEvent keyReleasedEvent = new KeyEvent(KeyEvent.KEY_RELEASED, null, null, null, false, false, false, false);
+    KeyEvent keyReleasedEvent = new KeyEvent(KeyEvent.KEY_RELEASED, null, null,
+            null, false, false, false, false);
 
     /**
      * The constructor. The constructor is called before the initialize()
@@ -128,6 +132,7 @@ public class SequentViewController extends ViewController {
         if (LAST_TACLET_ACTION_ID == null) {
             LAST_TACLET_ACTION_ID = new AtomicLong(-1);
         }
+        ALL_SEQUENTVIEWERS.add(this);
     }
 
     /**
@@ -400,14 +405,22 @@ public class SequentViewController extends ViewController {
     }
 
     /**
-     * Enables/Disables Pretty Syntax.
+     * Enables/Disables Pretty Syntax on all SequentViews.
      */
     @FXML
     private void usePrettySyntax() {
+        for (SequentViewController svc : ALL_SEQUENTVIEWERS) {
+            svc.activePrettySyntax(checkBoxPrettySyntax.isSelected());
+        }
+    }
+    /**
+     * Enables/Disables Pretty Syntax on this specific.
+     */
+    private void activePrettySyntax(boolean b) {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        if (!checkBoxPrettySyntax.isSelected()) {
+        if (!b) {
             notationInfo.refresh(services, false, false);
             checkBoxUnicode.setSelected(false);
             checkBoxUnicode.setDisable(true);
@@ -416,21 +429,35 @@ public class SequentViewController extends ViewController {
             notationInfo.refresh(services, true, false);
             checkBoxUnicode.setDisable(false);
         }
+        checkBoxPrettySyntax.setSelected(b);
+
         sequentChanged = true;
         printSequent();
         updateView();
     }
 
-    /**
-     * 
-     * Enables/Disables Unicode.
+    /** 
+     * Enables/Disables Unicode on all SequentViews.
+     * @param b
      */
     @FXML
     private void useUnicode() {
+        for (SequentViewController svc : ALL_SEQUENTVIEWERS) {
+            svc.activateUnicode(checkBoxUnicode.isSelected());
+        }
+    }
+    /**
+     * /**
+     * Enables/Disables Pretty Syntax on all SequentViews.
+     * @param b
+     */
+    private void activateUnicode(boolean b) {
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
-        notationInfo.refresh(services, true, checkBoxUnicode.isSelected());
+        notationInfo.refresh(services, true, b);
+
+        checkBoxUnicode.setSelected(b);
 
         sequentChanged = true;
         printSequent();
@@ -710,7 +737,8 @@ public class SequentViewController extends ViewController {
         @Override
         public void run() {
             try {
-                TimeUnit.MILLISECONDS.sleep(NUIConstants.SEQUENT_SEARCH_DELAY_IN_MILLISECONDS);
+                TimeUnit.MILLISECONDS.sleep(
+                        NUIConstants.SEQUENT_SEARCH_DELAY_IN_MILLISECONDS);
             }
             catch (InterruptedException e) {
                 e.printStackTrace();
