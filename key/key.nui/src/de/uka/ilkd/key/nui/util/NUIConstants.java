@@ -167,5 +167,5 @@ public final class NUIConstants {
      * The delay in milliseconds (1000 milliseconds = 1 second) for the sequent
      * search to start searching after the last key pressed.
      */
-    public final static long SEQUENT_SEARCH_DELAY_IN_MILLISECONDS = 0;
+    public final static long SEQUENT_SEARCH_DELAY_IN_MILLISECONDS = 0L;
 }
