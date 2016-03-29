@@ -6,7 +6,10 @@ import java.util.Observer;
 import de.uka.ilkd.key.nui.view.RootLayoutController;
 
 /**
- * TODO add documentation
+ * This observer manages updates from {@link ViewInformation} objects stored inside a {@link RootlayoutController} and:
+ *  - the selected state of the corresponding menuitem
+ *  - if a view is displayed or hidden
+ *  - position updates ({@link ViewPosition}) of the corresponding ViewInformation
  * 
  * @author Benedikt Gross
  * @version 1.0

@@ -83,16 +83,21 @@ public abstract class ViewController implements Initializable {
         this.stage = stage;
     }
 
-    // TODO add documentation
+    /**
+     * Load an fxml file with the same mainApp and context of this object.
+     */
     public <T> Pair<T, ViewController> loadFxmlViewController(URL path) {
         Pair<T, ViewController> pair = KeyFxmlLoader.loadFxml(path);
         pair.getValue().initViewController(mainApp, context);
         return pair;
     }
 
-    // TODO add documentation
+    /**
+     * Load an fxml file with the same mainApp and context of this object.
+     */
     @SuppressWarnings("unchecked")
     public <T> T loadFxmlFromContext(URL path) {
+        //SuppressWarnings: the type is always T at runtime, just not at compile time.
         return (T) loadFxmlViewController(path).getKey();
     }
 

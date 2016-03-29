@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 /**
  * {@link Annotation} to easily add new menus to the main menu.
  * <p>
- * TODO explain how to add menus
- * 
+ * To add a new menu, use this annotation on a class that derives from ViewController and it will be automatically added to the menu bar.
+ *  
  * @author Benedikt Gross
  * @version 1.0
  */
@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface KeYMenu {
     /**
-     * Path to the FXML.
+     * Path to the FXML containing a Menu as root node.
      */
     String path();
 

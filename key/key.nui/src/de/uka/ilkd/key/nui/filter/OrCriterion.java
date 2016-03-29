@@ -13,13 +13,15 @@ public class OrCriterion<E> implements Criterion<E> {
     private Criterion<E> _criteria;
     private Criterion<E> _otherCriteria;
 
-    // TODO add documentation
+    /**
+     * Combines the two criteria to a union of the two.
+     */
     public OrCriterion(Criterion<E> criteria, Criterion<E> otherCriteria) {
         _criteria = criteria;
         _otherCriteria = otherCriteria;
     }
 
-    // TODO add documentation
+    @Override
     public List<E> meetCriteria(List<E> entities) {
         List<E> firstCriteriaItems = _criteria.meetCriteria(entities);
         List<E> otherCriteriaItems = _otherCriteria.meetCriteria(entities);

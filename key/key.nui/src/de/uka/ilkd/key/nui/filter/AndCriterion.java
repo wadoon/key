@@ -13,13 +13,15 @@ public class AndCriterion<E> implements Criterion<E> {
     private Criterion<E> _criteria;
     private Criterion<E> _otherCriteria;
 
-    // TODO add documentation
+    /**
+     * Combines the two criteria to an intersection of the two.
+     */
     public AndCriterion(Criterion<E> criteria, Criterion<E> otherCriteria) {
         _criteria = criteria;
         _otherCriteria = otherCriteria;
     }
 
-    // TODO add documentation
+    @Override
     public List<E> meetCriteria(List<E> entities) {
         List<E> result = _criteria.meetCriteria(entities);
         // If it returns 1 is because only 1 met the criterion
