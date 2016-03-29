@@ -69,7 +69,6 @@ public class TacletInfoPrinter {
                 }
 
                 StringBuffer sb = new StringBuffer("\n\n");
-                // TODO
                 writeTacletSchemaVariablesHelper(sb, tapp.taclet());
                 s.append(sb);
             }
@@ -80,12 +79,6 @@ public class TacletInfoPrinter {
         return s.toString();
     }
 
-    /**
-     * TODO add comments
-     * 
-     * @param out
-     * @param t
-     */
     private static void writeTacletSchemaVariablesHelper(StringBuffer out, final Taclet t) {
         ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
 
@@ -112,12 +105,6 @@ public class TacletInfoPrinter {
         }
     }
 
-    /**
-     * TODO add comments
-     * 
-     * @param out
-     * @param schemaVar
-     */
     private static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
         if (schemaVar instanceof ModalOperatorSV) {
             final ModalOperatorSV modalOpSV = (ModalOperatorSV) schemaVar;
@@ -165,12 +152,6 @@ public class TacletInfoPrinter {
         out.append(" ").append(schemaVar.name());
     }
 
-    /**
-     * TODO add comments
-     * 
-     * @param out
-     * @param sv
-     */
     private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {
         boolean started = false;
         if (sv.isRigid() && !(sv instanceof VariableSV)) {

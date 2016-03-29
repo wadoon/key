@@ -22,21 +22,17 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /**
- * A comparator to compare {@link TacletApp TacletApps}. Copied from TacletMenu.
+ * A comparator to compare {@link TacletApp TacletApps}. Copied from
+ * {@link de.uka.ilkd.key.gui.nodeviews.TacletMenu TacletMenu}.
  * 
  * @author Victor Schuemmer
  * @version 1.0
  */
-public class TacletAppComparator implements Comparator<TacletApp>, Serializable {
+public class TacletAppComparator
+        implements Comparator<TacletApp>, Serializable {
 
     private static final long serialVersionUID = 5127654933484750886L;
 
-    /**
-     * TODO add comments
-     * 
-     * @param c
-     * @return
-     */
     private static int countFormulaSV(TacletSchemaVariableCollector c) {
         int formulaSV = 0;
         Iterator<SchemaVariable> it = c.varIterator();
@@ -57,14 +53,16 @@ public class TacletAppComparator implements Comparator<TacletApp>, Serializable 
      * @param l
      * @return
      */
-    private static int measureGoalComplexity(ImmutableList<TacletGoalTemplate> l) {
+    private static int measureGoalComplexity(
+            ImmutableList<TacletGoalTemplate> l) {
         int result = 0;
         Iterator<TacletGoalTemplate> it = l.iterator();
         while (it.hasNext()) {
             TacletGoalTemplate gt = it.next();
             if (gt instanceof RewriteTacletGoalTemplate) {
                 if (((RewriteTacletGoalTemplate) gt).replaceWith() != null) {
-                    result += ((RewriteTacletGoalTemplate) gt).replaceWith().depth();
+                    result += ((RewriteTacletGoalTemplate) gt).replaceWith()
+                            .depth();
                 }
             }
             if (!gt.sequent().isEmpty()) {
@@ -99,9 +97,6 @@ public class TacletAppComparator implements Comparator<TacletApp>, Serializable 
         }.getCounter();
     }
 
-    /**
-     * TODO add comments
-     */
     public int compare(TacletApp o1, TacletApp o2) {
         LinkedHashMap<String, Integer> map1 = score(o1);
         LinkedHashMap<String, Integer> map2 = score(o2);
@@ -112,7 +107,8 @@ public class TacletAppComparator implements Comparator<TacletApp>, Serializable 
             String s2 = it2.next().getKey();
             if (!s1.equals(s2))
                 throw new IllegalStateException(
-                        "A decision should have been made on a higher level ( " + s1 + "<->" + s2 + ")");
+                        "A decision should have been made on a higher level ( "
+                                + s1 + "<->" + s2 + ")");
             int v1 = map1.get(s1);
             int v2 = map2.get(s2);
             // the order will be reversed when the list is sorted
@@ -128,8 +124,8 @@ public class TacletAppComparator implements Comparator<TacletApp>, Serializable 
      * A score is a list of named values (comparable lexicographically). Smaller
      * value means the taclet should be higher on the list offered to the user.
      * Two scores need not contain the same named criteria, but the scoring
-     * scheme must force a decision before the first divergence point.
-     * TODO finish comment
+     * scheme must force a decision before the first divergence point. TODO
+     * finish comment
      * 
      * @param o1
      * @return
@@ -144,8 +140,9 @@ public class TacletAppComparator implements Comparator<TacletApp>, Serializable 
         boolean calc = false;
         for (RuleSet rs : taclet1.getRuleSets()) {
             String s = rs.name().toString();
-            if (s.equals("simplify_literals") || s.equals("concrete") || s.equals("update_elim")
-                    || s.equals("replace_known_left") || s.equals("replace_known_right"))
+            if (s.equals("simplify_literals") || s.equals("concrete")
+                    || s.equals("update_elim") || s.equals("replace_known_left")
+                    || s.equals("replace_known_right"))
                 calc = true;
         }
         map.put("calc", calc ? -1 : 1);

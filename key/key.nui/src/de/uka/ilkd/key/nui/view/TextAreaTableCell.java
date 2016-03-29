@@ -24,12 +24,18 @@ public class TextAreaTableCell<S, T> extends TableCell<S, T> {
     private TextArea textArea;
     private StringConverter<T> converter;
 
-    //TODO add documentation
+    /**
+     * @return factory method to create a TextAreaTableCell<S, String>, where S
+     *         is the underlying model of the table.
+     */
     public static <S> Callback<TableColumn<S, String>, TableCell<S, String>> forTableColumn() {
         return forTableColumn(new DefaultStringConverter());
     }
 
-    //TODO add documentation
+    /**
+     * @return factory method to create a TextAreaTableCell<S, T>, where S
+     *         is the underlying model of the table.
+     */
     public static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forTableColumn(
             final StringConverter<T> converter) {
         return list -> new TextAreaTableCell<>(converter);
@@ -73,7 +79,13 @@ public class TextAreaTableCell<S, T> extends TableCell<S, T> {
         return textArea;
     }
 
-    //TODO add documentation
+    /**
+     * Constructs a TextAreaTableCell with the given {@link StringConverter<T>}
+     * 
+     * @param converter
+     *            StringConverter to convert a string from the table to the
+     *            model backing the table.
+     */
     public TextAreaTableCell(StringConverter<T> converter) {
         this.getStyleClass().add("text-area-table-cell");
         this.converter = converter;

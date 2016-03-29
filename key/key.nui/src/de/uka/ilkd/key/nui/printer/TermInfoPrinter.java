@@ -7,17 +7,25 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 /**
- * Printer for TermInfo, copied from {@link de.uka.ilkd.key.gui.nodeviews.SequentViewInputListener SequentViewInputListener}.
+ * Printer for TermInfo, copied from
+ * {@link de.uka.ilkd.key.gui.nodeviews.SequentViewInputListener
+ * SequentViewInputListener}.
  * 
  * @author Victor Schuemmer
  * @version 1.0
  */
 public class TermInfoPrinter {
     /**
-     * TODO add comments
+     * Creates an info string for the term at the given {@link PosInSequent
+     * position} in the given {@link Sequent}.
+     * 
      * @param sequent
+     *            the sequent the position refers to
      * @param pos
-     * @return
+     *            the position of the term to describe
+     * @return An info string containing operator, sort and hash of the term or
+     *         null, if the {@link PosInOccurrence} of the given position is
+     *         null.
      */
     public static String printTermInfo(Sequent sequent, PosInSequent pos) {
         String info = null;
@@ -27,10 +35,12 @@ public class TermInfoPrinter {
             if (occ != null) {
                 t = occ.subTerm();
                 String tOpClassString = t.op().getClass().toString();
-                String operator = tOpClassString.substring(tOpClassString.lastIndexOf('.') + 1);
+                String operator = tOpClassString
+                        .substring(tOpClassString.lastIndexOf('.') + 1);
                 // The hash code is displayed here since sometimes terms with
                 // equal string representation are still different.
-                info = operator + ", Sort: " + t.sort() + ", Hash: " + t.hashCode();
+                info = operator + ", Sort: " + t.sort() + ", Hash: "
+                        + t.hashCode();
 
                 info += ProofSaver.posInOccurrence2Proof(sequent, occ);
             }

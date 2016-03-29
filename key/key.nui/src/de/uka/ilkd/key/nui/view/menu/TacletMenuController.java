@@ -134,6 +134,7 @@ public class TacletMenuController extends ViewController {
      * @throws IllegalArgumentException
      *             when pos is null
      */
+    // XXX any possibility to get rid of this?
     public void init(PosInSequent pos, Goal goal,
             ViewController parentController) throws IllegalArgumentException {
         if (pos == null)
@@ -156,8 +157,9 @@ public class TacletMenuController extends ViewController {
                 removeRewrites(c.getFindTaclet(goal, occ))
                         .prepend(c.getRewriteTaclet(goal, occ)),
                 c.getNoFindTaclet(goal), builtInRules);
-
-        proofMacroMenuController.init(mediator, occ);
+        
+        proofMacroMenuController.initViewController(getMainApp(), getContext());
+        proofMacroMenuController.init(occ);
     }
 
     /**
