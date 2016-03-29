@@ -179,8 +179,9 @@ public class FilteringHandler {
         if (dataModel.getLoadedTreeViewState() != null) {
             dataModel.getLoadedTreeViewState().getTreeItem().filter(
                     // reduces all active filters to one
-                    getActiveFilters().stream().reduce(new FilterShowAll(), (firstFilter,
-                            secondFilter) -> new FilterCombineAND(firstFilter, secondFilter)));
+                    getActiveFilters().stream().reduce(new FilterShowAll(),
+                            (firstFilter, secondFilter) -> new FilterCombineAND(
+                                    firstFilter, secondFilter)));
         }
     }
 
@@ -232,9 +233,11 @@ public class FilteringHandler {
          *            the .jar file
          * @return A SimpleImmutableEntry containing a List&lt;URL&gt; and a
          *         List&lt;String&gt;
+         * @throws MalformedURLException
          * @throws IOException
          *             Rethrow this as a runtime exception.
          */
+
         @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
         private SimpleImmutableEntry<List<URL>, List<String>> getFilterFilesInJar(
                 final File jarFile) throws IOException {
@@ -248,8 +251,11 @@ public class FilteringHandler {
                     listOfURLs.add(new File(fileName).toURI().toURL());
                     listOfFileNames.add(
                             fileName.substring(fileName.lastIndexOf('/') + 1, fileName.length()));
+
                 }
+
             }
+           
             return new SimpleImmutableEntry<>(listOfURLs, listOfFileNames);
         }
 
@@ -271,6 +277,7 @@ public class FilteringHandler {
             if (files == null) {
                 throw new MalformedURLException("Could not load filter files");
             }
+
             for (final File file : files) {
                 if (file.isFile() && file.getName().matches(".*(.class)")) {
                     final URL urlClassFile = file.toURI().toURL();
@@ -289,8 +296,8 @@ public class FilteringHandler {
          */
         public SimpleImmutableEntry<List<URL>, List<String>> getFilterFiles() {
             // path of the jar file
-            final File jarFile = new File(
-                    getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+            final File jarFile = new File(getClass().getProtectionDomain()
+                    .getCodeSource().getLocation().getPath());
             try {
                 if (jarFile.isFile()) { // Run with JAR file
                     return getFilterFilesInJar(jarFile);
@@ -300,6 +307,7 @@ public class FilteringHandler {
             catch (IOException e) {
                 throw new IllegalStateException(
                         "An IO Exception occured when trying to load filter rules.", e);
+
             }
         }
     }
@@ -349,7 +357,8 @@ public class FilteringHandler {
                     }
                 }
             }
-            catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            catch (ClassNotFoundException | InstantiationException
+                    | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }

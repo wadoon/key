@@ -136,6 +136,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
                    // catch exception if something has been thrown in the meantime
                    message = exception;
                } finally {
+                   System.out.println("Proof loaded in " + runTime/1000000000 + " seconds");
                    fireTaskFinished(runTime, message);
                }
            }

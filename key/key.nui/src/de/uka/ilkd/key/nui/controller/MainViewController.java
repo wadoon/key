@@ -50,6 +50,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
+import java.util.logging.Level;
+import de.uka.ilkd.key.nui.logger.MyLogger;
+
+
 /**
  * Controller for the main GUI which is displayed when the program was started.
  *
@@ -659,13 +663,28 @@ public class MainViewController extends NUIController implements Observer {
             @Override
             public Void call() throws InterruptedException {
 
+                
+                
+                
+                long startKeYEnvironment = Integer.MIN_VALUE;
+                
+                
+                
                 try {
                     // set Loading = false to enable canceling
                     isLoadingProof.set(true);
-
+                    
+                    
+                    
+                    MyLogger.logger.log(Level.INFO,"Starte loading proof...");
+                    startKeYEnvironment = System.nanoTime();
+                    
+                    
+                    
                     // important to initialize KeYEnvironment
                     final MainWindow mainWindow = MainWindow.getInstance();
                     mainWindow.setVisible(false);
+
 
                     // Load proof
                     final DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(
@@ -699,11 +718,28 @@ public class MainViewController extends NUIController implements Observer {
 
                 final Proof proof = keyEnvironment.getLoadedProof();
                 proof.setProofFile(proofFileName);
-
+                
+                
+                
+                MyLogger.logger.log(Level.INFO,"loading proof finished!");
+                long endKeYEnvironment = System.nanoTime();
+                MyLogger.logger.log(Level.INFO,"KeYEnvironment: " + (endKeYEnvironment-startKeYEnvironment)/1000000000);
+                MyLogger.logger.log(Level.INFO,"start convert proof to fx tree");
+                long startNUIProcessing = System.nanoTime();
+                
+                
+                
                 // convert proof to fx tree
                 final ProofTreeItem fxtree = new ProofTreeConverter(proof)
                         .createFXProofTree();
-
+                
+                
+                
+                long endNUIProcessing = System.nanoTime();
+                MyLogger.logger.log(Level.INFO,"NUIProcessing: " + (endNUIProcessing-startNUIProcessing)/1000000000);
+                
+                
+                
                 // set Loading = false as you can no longer cancel
                 final boolean hasNotBeenCanceled = isLoadingProof
                         .compareAndSet(true, false);

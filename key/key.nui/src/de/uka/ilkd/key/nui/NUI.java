@@ -11,6 +11,8 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+
 import de.uka.ilkd.key.nui.controller.ControllerAnnotation;
 import de.uka.ilkd.key.nui.controller.MainViewController;
 import de.uka.ilkd.key.nui.controller.MainViewController.Place;
@@ -19,6 +21,7 @@ import de.uka.ilkd.key.nui.controller.TreeViewController;
 import de.uka.ilkd.key.nui.exceptions.ComponentNotFoundException;
 import de.uka.ilkd.key.nui.exceptions.ControllerNotFoundException;
 import de.uka.ilkd.key.nui.exceptions.ToggleGroupNotFoundException;
+import de.uka.ilkd.key.nui.logger.MyLogger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -377,7 +380,16 @@ public class NUI extends Application {
     @Override
     public final void start(final Stage stage) {
         try {
+            MyLogger.setup();
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        try {
+            MyLogger.logger.log(Level.INFO,"Starte Inizialisierung");
             initializeNUI();
+            MyLogger.logger.log(Level.INFO,"Inizialisierung beendet");
         }
         catch (IOException | ComponentNotFoundException | ControllerNotFoundException e2) {
             e2.printStackTrace();
