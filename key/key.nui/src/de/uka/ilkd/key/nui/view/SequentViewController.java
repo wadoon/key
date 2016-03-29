@@ -48,6 +48,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebEngine;
@@ -112,6 +113,12 @@ public class SequentViewController extends ViewController {
     private ExecutorService singleThreadExecutor = Executors
             .newSingleThreadExecutor();
     private Searcher lastSearcher = null;
+    
+    /**
+     * Generates a {@link KeyEvent#KEY_RELEASED "Key Released"} event without a
+     * key actually being released.
+     */
+    KeyEvent keyReleasedEvent = new KeyEvent(KeyEvent.KEY_RELEASED, null, null, null, false, false, false, false);
 
     /**
      * The constructor. The constructor is called before the initialize()
@@ -436,6 +443,7 @@ public class SequentViewController extends ViewController {
     @FXML
     private void useRegex() {
         printer.setUseRegex(checkBoxRegexSearch.isSelected());
+        searchBox.fireEvent(keyReleasedEvent);
         searchBox.requestFocus();
     }
 
