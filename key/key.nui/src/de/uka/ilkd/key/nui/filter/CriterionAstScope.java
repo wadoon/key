@@ -10,7 +10,8 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * TODO add documentation
+ * A criterion that expands the result for already met entities up using hit
+ * AST-Elements.
  * 
  * @author Benedikt Gross
  * @version 1.0
@@ -21,7 +22,18 @@ public class CriterionAstScope implements Criterion<Integer> {
     private InitialPositionTable positionTable;
     private String[] originalLines;
 
-    // TODO add documentation
+    /**
+     * Creates a criterion that expands the result for already met entities up
+     * using hit AST-Elements.
+     * 
+     * @param criteria
+     *            Any criterion or combination of criteria.
+     * @param positionTable
+     *            Access to the AST
+     * @param originalLines
+     *            The unchanged document split by line-breaks. This is used to
+     *            calculate positions.
+     */
     public CriterionAstScope(Criterion<Integer> criteria,
             InitialPositionTable positionTable, String[] originalLines) {
         this.criteria = criteria;

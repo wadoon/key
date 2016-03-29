@@ -19,7 +19,17 @@ public class CriterionContainsString implements Criterion<Integer> {
     private String[] originalLines;
     private String proofString;
 
-    // TODO add documentation
+    /**
+     * A criterion that meets any line that contains the search text.
+     * 
+     * @param searchText
+     *            The text filtered for.
+     * @param originalLines
+     *            The unchanged document split by line-breaks. This is used to
+     *            calculate positions.
+     * @param proofString
+     *            The unchanged printed proof string (before adding html tags).
+     */
     public CriterionContainsString(String searchText, String[] originalLines,
             String proofString) {
         if (searchText == null)

@@ -6,38 +6,48 @@ import de.uka.ilkd.key.nui.ViewInformation;
 import de.uka.ilkd.key.nui.ViewPosition;
 
 /**
- * TODO add class comment
+ * Stores all information needed to save or restore a {@link ViewInformation} in
+ * value types.
  * 
- * @author
+ * @author Benedikt Gross
  * @version 1.0
  */
 public class SerializableViewInformation {
 
     private String fxmlUrl;
 
-    // TODO add documentation
+    /**
+     * Returns the url to the fxml used for this object.
+     * 
+     * @return
+     */
     public String getFxmlUrl() {
         return fxmlUrl;
     }
 
     private boolean isactive;
 
-    // TODO add documentation
+    /**
+     * Returns true if the view was active the last time.
+     */
     public boolean getIsActibe() {
         return isactive;
     }
 
     private ViewPosition viewPosition;
 
-    // TODO add documentation
+    /**
+     * Returns the {@link ViewPosition} the view was in the last time.
+     */
     public ViewPosition getViewPosition() {
         return viewPosition;
     }
 
     /**
-     * TODO add comments
+     * Creates a serializable version of the passed {@link ViewInformation}.
      * 
      * @param view
+     *            The {@link ViewInformation} that is to be serialized.
      */
     public SerializableViewInformation(ViewInformation view) {
         viewPosition = view.getCurrentPosition();
@@ -45,15 +55,17 @@ public class SerializableViewInformation {
         fxmlUrl = view.getFxmlPath().getPath();
     }
 
-    // TODO add documentation
+    /**
+     * Returns a string representation of this object. The values are separated
+     * by commas.
+     */
     public String getSerialized() {
         return fxmlUrl + "," + viewPosition.toString() + "," + isactive;
     }
 
     /**
-     * TODO add comments
-     * 
-     * @param data
+     * Recreates a {@link SerializableViewInformation} from its string
+     * representation.
      */
     public SerializableViewInformation(String data) {
         String[] dataArr = data.split(",");

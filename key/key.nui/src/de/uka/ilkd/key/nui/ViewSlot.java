@@ -33,7 +33,7 @@ public class ViewSlot {
     }
 
     /**
-     * TODO add documentation
+     * Returns the container in which the view is loaded (from fxml).
      */
     public BorderPane getUiPane() {
         return uiPane;
@@ -118,7 +118,8 @@ public class ViewSlot {
     private static java.util.function.Consumer<Node> currentRegisterer;
 
     /**
-     * TODO add documentation
+     * Sets a consumer that is executed on every {@link TabPane}.
+     * This is intended to provide access for drag-drop handlers.
      */
     public static void setRegisterDrag(
             java.util.function.Consumer<Node> registerer) {

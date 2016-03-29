@@ -12,12 +12,14 @@ import java.util.List;
 public class NotCriterion<E> implements Criterion<E> {
     private Criterion<E> criteria;
 
-    // TODO add documentation
+    /**
+     * Negates any criterion. I.e. meets all entities the childCriteria did not.
+     */
     public NotCriterion(Criterion<E> childCriteria) {
         criteria = childCriteria;
     }
 
-    // TODO add documentation
+    @Override
     public List<E> meetCriteria(List<E> entities) {
         List<E> notCriteriaItems = criteria.meetCriteria(entities);
         // ensure original list is not modified, otherwise compound Or will use

@@ -393,8 +393,6 @@ public class RootLayoutController extends ViewController {
         for (MenuItem item : items) {
             if (item.getText().equals(title)) {
                 if (item instanceof CheckMenuItem) {
-                    // TODO: prevent triggering selected. not critical since the
-                    // observer also handles that
                     ((CheckMenuItem) item).setSelected(active);
                 }
                 break;
@@ -403,10 +401,11 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * TODO add documentation
+     * Registers a {@link ViewInformation} as a view for this {@link RootLayoutController}.
+     * Instead of calling this, the {@link KeYView} annotation should be used.
      * 
-     * @param info
-     * @param accelerator
+     * @param info The ViewInformation object that will be used for this view.
+     * @param accelerator The shortcut used for the menuitem.
      */
     public void registerView(ViewInformation info, String accelerator) {
         allViews.put(info.getId(), info);
@@ -453,7 +452,6 @@ public class RootLayoutController extends ViewController {
      * @param view
      */
     public void hideView(ViewInformation view) {
-        // XXX: workaround
         loop: for (ViewSlot slot : viewSlots.values()) {
             for (ViewInformation info : slot.getTabs()) {
                 if (info == view) {
@@ -501,10 +499,8 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * TODO add documentation
-     * 
-     * @param node
-     * @return
+     * Returns the {@link ViewPosition} of the passed node if it is a Pane used in a {@link ViewSlot}.
+     * Used for Drag-Drop actions.
      */
     public ViewPosition getTabPosition(Node node) {
         for (ViewSlot slot : viewSlots.values()) {
@@ -516,9 +512,7 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * TODO add documentation
-     * 
-     * @param node
+     * Returns the {@link ViewPosition} of the passed node if it is a Pane used in a {@link ViewSlot}.
      * @return ViewPosition where the given node is currently placed.
      */
     public ViewPosition getViewPosition(Node node) {
@@ -632,9 +626,8 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * TODO add documentation
-     * 
-     * @param sourcePath
+     * Loads and adds a menu from the given url to the menu-bar.
+     * Instead of calling this, the {@link KeYMenu} annotation should be used.
      */
     public void registerMenu(URL sourcePath) {
         // add additional menus right before the "Help" entry
@@ -642,7 +635,10 @@ public class RootLayoutController extends ViewController {
                 loadFxmlFromContext(sourcePath));
     }
 
-    // TODO add documentation
+    /**
+     * Loads and adds a menu from the given url as a menu-item to the parentMenu.
+     * Instead of calling this, the {@link KeYMenu} annotation should be used.
+     */
     public void registerMenuEntry(URL sourcePath, String parentMenu)
             throws IllegalStateException {
         for (Menu m : menuBar.getMenus()) {
@@ -656,7 +652,8 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * TODO enhance documentation size = 4 : left-vertical, left-horizontal,
+     * Position of the splitters separating the four available spaces views can put in.
+     * size = 4 : left-vertical, left-horizontal,
      * right-vertical, right-horizontal
      */
     public List<Double> getSplitterPositions() {
@@ -665,13 +662,16 @@ public class RootLayoutController extends ViewController {
                 vertical[1], rightPane.getDividerPositions()[0]);
     }
 
-    // TODO add documentation
+    /**
+     * Returns a list of all {@link ViewInformation} used in this object.
+     */
     public List<ViewInformation> getViewInformations() {
         return new LinkedList<ViewInformation>(allViews.values());
     }
 
     /**
-     * TODO enhance documentation size = 4 : left-vertical, left-horizontal,
+     * Position of the splitters separating the four available spaces views can put in.
+     * size = 4 : left-vertical, left-horizontal,
      * right-vertical, right-horizontal
      */
     public void setSplitterPositions(List<Double> positions) {
@@ -687,7 +687,6 @@ public class RootLayoutController extends ViewController {
     }
 
     @FXML
-
     private void openInNewSequentView() {
         de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator()
                 .getSelectedNode();

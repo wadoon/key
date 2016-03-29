@@ -32,7 +32,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 
 /**
- * TODO add documentation
+ * The view for a filter on the {@link SequentView}
  * 
  * @author Benedikt Gross
  * @version 1.0
@@ -103,11 +103,14 @@ public class FilterViewController extends ViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // style
         selectionFilterToggle.setStyle("-fx-background-image: url('"
                 + NUIConstants.FILTER_MOUSE_ICON_PATH + "');"
                 + "-fx-background-position: center center;"
                 + "-fx-background-repeat: no-repeat;"
                 + "-fx-background-size: contain;");
+        
+        // ui trigger
         searchText.disableProperty().bind(userRadio.selectedProperty().not());
         selectionFilterToggle.disableProperty()
                 .bind(selectionRadio.selectedProperty().not());
@@ -225,6 +228,9 @@ public class FilterViewController extends ViewController {
         }
     }
 
+    /**
+     * Handler for userRadio selectedProperty changes.
+     */
     private void userRadioChanged(Object sender) {
         if (ongoingSelection) {
             finishSelection();
@@ -234,12 +240,18 @@ public class FilterViewController extends ViewController {
             getContext().setCurrentFilter(currentFilter);
     }
 
+    /**
+    * Handler for selectionRadio selectedProperty changes.
+    */
     private void selectionRadioChanged(Object sender) {
         currentFilter.setIsUserCriteria(false);
         if (applyButton.isSelected())
             getContext().setCurrentFilter(currentFilter);
     }
 
+    /**
+     * Updates the UI to match the currentFilter.
+     */
     private void loadCurrentFilterToUi() {
         if (currentFilter.getIsUserCriteria()) {
             searchText.setText(currentFilter.getSearchText());
@@ -273,12 +285,18 @@ public class FilterViewController extends ViewController {
         });
     }
 
+    /**
+     * Apply a filter or raise a filter change if suppressUsedfilterUpdates is not set.
+     */
     private void updateUsedFilter() {
         if (applyButton.isSelected() && !suppressUsedFilterUpdates) {
             getContext().setCurrentFilter(currentFilter);
         }
     }
 
+    /**
+     * Completes a selection operation and cleans up the selection UI state (e.g. disables).
+     */
     private void finishSelection() {
         if (ongoingSelection) {
             ongoingSelection = false;
@@ -297,6 +315,9 @@ public class FilterViewController extends ViewController {
         }
     }
 
+    /*
+     * Syncs the range sliders with the corresponding textboxes and labels vice versa.
+     */
     private void updateRangeValue(Slider slider, Spinner<Integer> spinner,
             Consumer<Integer> setAction) {
         if (suppressValueUpdate)
@@ -319,6 +340,9 @@ public class FilterViewController extends ViewController {
         setAction.accept(nval);
     }
 
+    /**
+     * Updates the "selections" label with the given value.
+     */
     private void updateSelectionCount(int value) {
         selectionCount.setText("(selections: " + Integer.toString(value) + ")");
     }
