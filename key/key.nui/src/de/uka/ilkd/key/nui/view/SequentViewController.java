@@ -701,22 +701,22 @@ public class SequentViewController extends ViewController {
 
         @Override
         public void run() {
+            try {
+                TimeUnit.MILLISECONDS.sleep(NUIConstants.SEQUENT_SEARCH_DELAY_IN_MILLISECONDS);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             // remember that there's no guarantee that this will execute before
             // the NEXT keypress, so we add a check to ensure that we still want
             // to perform the search when it gets executed:
             if (!cancelled) {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(
-                            NUIConstants.SEQUENT_SEARCH_DELAY_IN_MILLISECONDS);
-                    searchIndices = printer.applyFreetextSearch(searchTerm);
-                    Platform.runLater(() -> {
-                        searchIndPointer = 0;
-                        updateView();
-                    });
-                }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                searchIndices = printer.applyFreetextSearch(searchTerm);
+                Platform.runLater(() -> {
+                    searchIndPointer = 0;
+                    updateView();
+                });
 
             }
         }

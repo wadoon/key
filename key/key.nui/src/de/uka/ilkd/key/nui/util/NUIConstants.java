@@ -164,8 +164,8 @@ public final class NUIConstants {
     public static final int MAX_RECENT_FILES = 8;
 
     /**
-     * The delay in milliseconds for the sequent search to start searching after
-     * the last key pressed.
+     * The delay in milliseconds (1000 milliseconds = 1 second) for the sequent
+     * search to start searching after the last key pressed.
      */
     public final static long SEQUENT_SEARCH_DELAY_IN_MILLISECONDS = 0;
 }
