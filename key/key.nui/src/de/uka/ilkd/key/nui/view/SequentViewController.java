@@ -386,8 +386,12 @@ public class SequentViewController extends ViewController {
             }
             // Start search in single thread
             lastSearcher = new Searcher(searchBox.getText());
-            singleThreadExecutor.submit(lastSearcher);
-
+          //  singleThreadExecutor.submit(lastSearcher);
+            searchIndices = printer.applyFreetextSearch(searchBox.getText());
+            Platform.runLater(() -> {
+                searchIndPointer = 0;
+                updateView();
+            });
             event.consume();
         });
     }
@@ -775,7 +779,10 @@ public class SequentViewController extends ViewController {
                         NUIConstants.SEQUENT_SEARCH_DELAY_IN_MILLISECONDS);
             }
             catch (InterruptedException e) {
+                //TODO: disable this output if not in DEBUG mode
+                // since thread interrupts can not occur without explicit call
                 e.printStackTrace();
+                return;
             }
 
             // remember that there's no guarantee that this will execute before
