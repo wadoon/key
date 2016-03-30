@@ -148,6 +148,10 @@ public final class NUIConstants {
      */
     public final static String CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_ICON_PATH = "file:resources/images/ekey-brackets.gif";
 
+    /*
+     * Miscellaneous
+     */
+    
     /**
      * Project URL
      */
