@@ -40,16 +40,27 @@ public class MainSequentViewController extends ViewController {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 // execute ui update on javafx thread
-                Platform.runLater(() -> {
-                    sequentViewController.loadNodeToView(
-                            getContext().getKeYMediator().getSelectedGoal(),
-                            getContext().getKeYMediator().getSelectedNode());
-                });
+                showSequent();
             }
         };
 
         getContext().getKeYMediator()
                 .addKeYSelectionListener(proofChangeListener);
+
+        if (getContext().getKeYMediator().ensureProofLoaded()) {
+            showSequent();
+        }
+    }
+
+    /**
+     * loads the currently selected Sequent into the SequentView
+     */
+    private void showSequent() {
+        Platform.runLater(() -> {
+            sequentViewController.loadNodeToView(
+                    getContext().getKeYMediator().getSelectedGoal(),
+                    getContext().getKeYMediator().getSelectedNode());
+        });
     }
 
 }

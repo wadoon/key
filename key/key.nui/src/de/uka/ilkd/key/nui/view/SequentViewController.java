@@ -214,6 +214,12 @@ public class SequentViewController extends ViewController {
         sequentOptions.setExpanded(false);
         sequentOptions.disabledProperty()
                 .addListener((observable, oldValue, newValue) -> {
+                    // Workaround for Exception, when MainSequentView is closed
+                    // and Proof opened
+                    if (sequentOptions.getScene() == null) {
+                        return;
+                    }
+
                     sequentOptions.getScene()
                             .getAccelerators().put(
                                     new KeyCodeCombination(KeyCode.F,
