@@ -64,8 +64,6 @@ public class RootLayoutController extends ViewController {
     private static final String STATUSWELCOMETEXT = KeYConstants.COPYRIGHT
             + "\nKeY is free Software and comes with ABSOLUTELY NO WARRANTY";
 
-    private static final double RELATIVE_VIEW_WIDTH = 0.2;
-
     private HashMap<ViewPosition, ViewSlot> viewSlots = new HashMap<>();
     private HashMap<Integer, ViewInformation> allViews = new HashMap<>();
     private File file;
@@ -533,8 +531,7 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Resizes the {@link SplitPane}s which build the main frame. TODO needs to
-     * be redone, as it currently is kind of a hack.
+     * Resizes the {@link SplitPane}s which build the main frame.
      */
     public void resize() {
         ViewSlot topLeft = viewSlots.get(ViewPosition.TOPLEFT);
@@ -544,12 +541,14 @@ public class RootLayoutController extends ViewController {
         double[] dividerPositions = mainSplitPane.getDividerPositions();
         double leftDivider = leftPane.getDividerPositions()[0];
         double rightDivider = rightPane.getDividerPositions()[0];
+        double relativeViewWidth = 0.2;
+        double relativeViewHeight = 0.4;
 
         // If topLeft has changed
         if (topLeft.getUsed() != topLeft.getPastUsed()) {
             if (!bottomLeft.getUsed()) {
                 if (topLeft.getUsed()) {
-                    mainSplitPane.setDividerPosition(0, RELATIVE_VIEW_WIDTH);
+                    mainSplitPane.setDividerPosition(0, relativeViewWidth);
                     leftPane.setDividerPositions(1.0);
                 }
                 else {
@@ -558,7 +557,7 @@ public class RootLayoutController extends ViewController {
             }
             else {
                 if (topLeft.getUsed()) {
-                    leftPane.setDividerPositions(0.5);
+                    leftPane.setDividerPositions(relativeViewHeight);
                 }
                 else {
                     leftPane.setDividerPositions(0.0);
@@ -570,7 +569,7 @@ public class RootLayoutController extends ViewController {
         if (bottomLeft.getUsed() != bottomLeft.getPastUsed()) {
             if (!topLeft.getUsed()) {
                 if (bottomLeft.getUsed()) {
-                    mainSplitPane.setDividerPosition(0, RELATIVE_VIEW_WIDTH);
+                    mainSplitPane.setDividerPosition(0, relativeViewWidth);
                     leftPane.setDividerPositions(0.0);
                 }
                 else {
@@ -579,7 +578,7 @@ public class RootLayoutController extends ViewController {
             }
             else {
                 if (bottomLeft.getUsed()) {
-                    leftPane.setDividerPositions(0.5);
+                    leftPane.setDividerPositions(relativeViewHeight);
                 }
                 else {
                     leftPane.setDividerPositions(1.0);
@@ -591,8 +590,7 @@ public class RootLayoutController extends ViewController {
         if (topRight.getUsed() != topRight.getPastUsed()) {
             if (!bottomRight.getUsed()) {
                 if (topRight.getUsed()) {
-                    mainSplitPane.setDividerPosition(1,
-                            1 - RELATIVE_VIEW_WIDTH);
+                    mainSplitPane.setDividerPosition(1, 1 - relativeViewWidth);
                     rightPane.setDividerPositions(1.0);
                 }
                 else {
@@ -601,7 +599,7 @@ public class RootLayoutController extends ViewController {
             }
             else {
                 if (topRight.getUsed()) {
-                    rightPane.setDividerPositions(0.5);
+                    rightPane.setDividerPositions(relativeViewHeight);
                 }
                 else {
                     rightPane.setDividerPositions(0.0);
@@ -613,8 +611,7 @@ public class RootLayoutController extends ViewController {
         if (bottomRight.getUsed() != bottomRight.getPastUsed()) {
             if (!topRight.getUsed()) {
                 if (bottomRight.getUsed()) {
-                    mainSplitPane.setDividerPosition(1,
-                            1 - RELATIVE_VIEW_WIDTH);
+                    mainSplitPane.setDividerPosition(1, 1 - relativeViewWidth);
                     rightPane.setDividerPositions(0.0);
                 }
                 else {
@@ -623,7 +620,7 @@ public class RootLayoutController extends ViewController {
             }
             else {
                 if (bottomRight.getUsed()) {
-                    rightPane.setDividerPositions(0.5);
+                    rightPane.setDividerPositions(relativeViewHeight);
                 }
                 else {
                     rightPane.setDividerPositions(1.0);
