@@ -209,6 +209,8 @@ public class SequentViewController extends ViewController {
         tacletInfo.setDisable(true);
         tacletInfo.setExpanded(false);
         enableTacletMenu(true);
+        scrollPane.pseudoClassStateChanged(
+                PseudoClass.getPseudoClass("sequent"), true);
 
         sequentOptions.setDisable(true);
         sequentOptions.setExpanded(false);
