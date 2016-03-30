@@ -697,6 +697,9 @@ public class RootLayoutController extends ViewController {
 
     @FXML
     private void openInNewSequentView() {
+        if (!getContext().getKeYMediator().ensureProofLoaded()) {
+            return;
+        }
         de.uka.ilkd.key.proof.Node node = getContext().getKeYMediator()
                 .getSelectedNode();
         Goal goal = getContext().getKeYMediator().getSelectedGoal();
