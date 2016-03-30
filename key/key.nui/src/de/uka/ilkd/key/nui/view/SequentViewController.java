@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
@@ -75,6 +76,8 @@ public class SequentViewController extends ViewController {
 
     // For UniCode/PrettySyntax Synchro
     private static List<SequentViewController> ALL_SEQUENTVIEWERS = new ArrayList<>();
+    private static AtomicBoolean PRETTY_SYNTAX = new AtomicBoolean(true);
+    private static AtomicBoolean USE_UNICODE = new AtomicBoolean(false);
 
     private boolean sequentLoaded = false;
     private boolean sequentChanged = false;
@@ -172,6 +175,7 @@ public class SequentViewController extends ViewController {
     public void loadNodeToView(Goal goal, Node node) {
         this.goal = goal;
         showSequent(node);
+
         tacletInfoViewController.showTacletInfo(node);
         notationInfo.refresh(services, checkBoxPrettySyntax.isSelected(),
                 checkBoxUnicode.isSelected());
@@ -324,6 +328,7 @@ public class SequentViewController extends ViewController {
                 getContext().getCssFileHandler());
 
         tacletInfoViewController.initViewController(getMainApp(), getContext());
+        initializeCheckBoxes();
     }
 
     /**
@@ -409,59 +414,82 @@ public class SequentViewController extends ViewController {
      */
     @FXML
     private void usePrettySyntax() {
+        PRETTY_SYNTAX.set(checkBoxPrettySyntax.isSelected());
         for (SequentViewController svc : ALL_SEQUENTVIEWERS) {
-            svc.activePrettySyntax(checkBoxPrettySyntax.isSelected());
+            svc.activePrettySyntax();
         }
     }
+
     /**
      * Enables/Disables Pretty Syntax on this specific.
      */
-    private void activePrettySyntax(boolean b) {
+    private void activePrettySyntax() {
+        boolean b = PRETTY_SYNTAX.get();
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         if (!b) {
             notationInfo.refresh(services, false, false);
-            checkBoxUnicode.setSelected(false);
-            checkBoxUnicode.setDisable(true);
         }
         else {
             notationInfo.refresh(services, true, false);
-            checkBoxUnicode.setDisable(false);
         }
-        checkBoxPrettySyntax.setSelected(b);
+
+        initializeCheckBoxes();
 
         sequentChanged = true;
         printSequent();
         updateView();
     }
 
-    /** 
+    /**
      * Enables/Disables Unicode on all SequentViews.
-     * @param b
      */
     @FXML
     private void useUnicode() {
+        USE_UNICODE.set(checkBoxUnicode.isSelected());
         for (SequentViewController svc : ALL_SEQUENTVIEWERS) {
-            svc.activateUnicode(checkBoxUnicode.isSelected());
+            svc.activateUnicode();
         }
     }
+
     /**
-     * /**
      * Enables/Disables Pretty Syntax on all SequentViews.
-     * @param b
      */
-    private void activateUnicode(boolean b) {
+    private void activateUnicode() {
+        boolean b = USE_UNICODE.get();
         logicPrinter = new LogicPrinter(new ProgramPrinter(), notationInfo,
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         notationInfo.refresh(services, true, b);
 
-        checkBoxUnicode.setSelected(b);
+        initializeCheckBoxes();
 
         sequentChanged = true;
         printSequent();
         updateView();
+    }
+
+    /**
+     * initializes the PrettySyntax/Unicode Checkboxes
+     */
+    private void initializeCheckBoxes() {
+        boolean useUnicode = USE_UNICODE.get();
+        boolean prettySyntax = PRETTY_SYNTAX.get();
+
+        if (!prettySyntax) {
+            USE_UNICODE.set(false);
+            checkBoxUnicode.setSelected(false);
+            checkBoxUnicode.setDisable(true);
+            checkBoxPrettySyntax.setSelected(prettySyntax);
+            return;
+        }
+        else {
+            checkBoxPrettySyntax.setSelected(prettySyntax);
+            checkBoxUnicode.setDisable(false);
+        }
+
+        checkBoxUnicode.setSelected(useUnicode);
     }
 
     /**

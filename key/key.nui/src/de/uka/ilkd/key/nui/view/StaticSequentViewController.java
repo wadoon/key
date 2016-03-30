@@ -82,14 +82,14 @@ public class StaticSequentViewController extends ViewController {
 
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
+                long lastActionID = sequentViewController
+                        .getLastTacletActionID();
                 // Only Update the StaticSequentView, if the ProofUpdate was
                 // triggered within the same StaticSequentView itself and
                 // the Goal is the same OR a GoalChange was triggered by the
                 // RuleApplication in the StaticSequentView itself\\
                 // (= updateCounter > 0)
-                if (sequentViewController
-                        .getLastTacletActionID() == sequentViewController
-                                .getOwnID()
+                if (lastActionID == sequentViewController.getOwnID()
                         && (goal == mediator.getSelectedGoal()
                                 || updateCounter > 0)) {
                     proof = mediator.getSelectedProof();
@@ -111,9 +111,7 @@ public class StaticSequentViewController extends ViewController {
                 }
                 // If LastAction was registered, but no Change Applied, remove
                 // LastAction
-                else if (sequentViewController
-                        .getLastTacletActionID() == sequentViewController
-                                .getOwnID()) {
+                else if (lastActionID == sequentViewController.getOwnID()) {
                     sequentViewController.setLastTacletActionID(-1);
                 }
                 sequentViewController.enableTacletMenu(
