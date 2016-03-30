@@ -62,12 +62,6 @@
 	</TreeItem>
 	<TreeItem text="Operators">
 		<CSSRule>
-			<selector>.elemUpdate</selector>
-			<Description>Elementary Update</Description>
-			<Class>ElementaryUpdate</Class>
-			<enabled>true</enabled>
-		</CSSRule>
-		<CSSRule>
 			<selector>.equality</selector>
 			<Description>Equality Term</Description>
 			<Class>Equality</Class>
@@ -198,20 +192,26 @@
 	</TreeItem>
 	<TreeItem text="Update">
 		<CSSRule>
+			<selector>.elemUpdate</selector>
+			<Description>Update Elementary</Description>
+			<Class>ElementaryUpdate</Class>
+			<enabled>true</enabled>
+		</CSSRule>
+		<CSSRule>
 			<selector>.updateApp</selector>
-			<Description>Application Update</Description>
+			<Description>Update Application</Description>
 			<Class>UpdateApplication</Class>
 			<enabled>true</enabled>
 		</CSSRule>
 		<CSSRule>
 			<selector>.updateJunc</selector>
-			<Description>Junctor Update</Description>
+			<Description>Update Junctor</Description>
 			<Class>UpdateJunctor</Class>
 			<enabled>true</enabled>
 		</CSSRule>
 		<CSSRule>
 			<selector>.updateSV</selector>
-			<Description>Schema Variable Update</Description>
+			<Description>Update Schema Variable</Description>
 			<Class>UpdateSV</Class>
 			<enabled>true</enabled>
 		</CSSRule>

@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.nui.KeYMenu;
+import de.uka.ilkd.key.nui.KeYView;
 import de.uka.ilkd.key.nui.MainApp;
 import de.uka.ilkd.key.nui.ViewController;
 import de.uka.ilkd.key.nui.ViewInformation;
@@ -61,6 +63,8 @@ public class RootLayoutController extends ViewController {
             "file:resources/images/key-color-transparent-background.png");
     private static final String STATUSWELCOMETEXT = KeYConstants.COPYRIGHT
             + "\nKeY is free Software and comes with ABSOLUTELY NO WARRANTY";
+
+    private static final double RELATIVE_VIEW_WIDTH = 0.2;
 
     private HashMap<ViewPosition, ViewSlot> viewSlots = new HashMap<>();
     private HashMap<Integer, ViewInformation> allViews = new HashMap<>();
@@ -401,11 +405,14 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Registers a {@link ViewInformation} as a view for this {@link RootLayoutController}.
-     * Instead of calling this, the {@link KeYView} annotation should be used.
+     * Registers a {@link ViewInformation} as a view for this
+     * {@link RootLayoutController}. Instead of calling this, the
+     * {@link KeYView} annotation should be used.
      * 
-     * @param info The ViewInformation object that will be used for this view.
-     * @param accelerator The shortcut used for the menuitem.
+     * @param info
+     *            The ViewInformation object that will be used for this view.
+     * @param accelerator
+     *            The shortcut used for the menuitem.
      */
     public void registerView(ViewInformation info, String accelerator) {
         allViews.put(info.getId(), info);
@@ -499,8 +506,8 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Returns the {@link ViewPosition} of the passed node if it is a Pane used in a {@link ViewSlot}.
-     * Used for Drag-Drop actions.
+     * Returns the {@link ViewPosition} of the passed node if it is a Pane used
+     * in a {@link ViewSlot}. Used for Drag-Drop actions.
      */
     public ViewPosition getTabPosition(Node node) {
         for (ViewSlot slot : viewSlots.values()) {
@@ -512,7 +519,9 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Returns the {@link ViewPosition} of the passed node if it is a Pane used in a {@link ViewSlot}.
+     * Returns the {@link ViewPosition} of the passed node if it is a Pane used
+     * in a {@link ViewSlot}.
+     * 
      * @return ViewPosition where the given node is currently placed.
      */
     public ViewPosition getViewPosition(Node node) {
@@ -524,8 +533,8 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Resizes the splitpanes which build the main frame. TODO needs to be
-     * redone, as it currently is kind of a hack.
+     * Resizes the {@link SplitPane}s which build the main frame. TODO needs to
+     * be redone, as it currently is kind of a hack.
      */
     public void resize() {
         ViewSlot topLeft = viewSlots.get(ViewPosition.TOPLEFT);
@@ -540,7 +549,7 @@ public class RootLayoutController extends ViewController {
         if (topLeft.getUsed() != topLeft.getPastUsed()) {
             if (!bottomLeft.getUsed()) {
                 if (topLeft.getUsed()) {
-                    mainSplitPane.setDividerPosition(0, 0.3);
+                    mainSplitPane.setDividerPosition(0, RELATIVE_VIEW_WIDTH);
                     leftPane.setDividerPositions(1.0);
                 }
                 else {
@@ -561,7 +570,7 @@ public class RootLayoutController extends ViewController {
         if (bottomLeft.getUsed() != bottomLeft.getPastUsed()) {
             if (!topLeft.getUsed()) {
                 if (bottomLeft.getUsed()) {
-                    mainSplitPane.setDividerPosition(0, 0.3);
+                    mainSplitPane.setDividerPosition(0, RELATIVE_VIEW_WIDTH);
                     leftPane.setDividerPositions(0.0);
                 }
                 else {
@@ -582,7 +591,8 @@ public class RootLayoutController extends ViewController {
         if (topRight.getUsed() != topRight.getPastUsed()) {
             if (!bottomRight.getUsed()) {
                 if (topRight.getUsed()) {
-                    mainSplitPane.setDividerPosition(1, 0.7);
+                    mainSplitPane.setDividerPosition(1,
+                            1 - RELATIVE_VIEW_WIDTH);
                     rightPane.setDividerPositions(1.0);
                 }
                 else {
@@ -603,7 +613,8 @@ public class RootLayoutController extends ViewController {
         if (bottomRight.getUsed() != bottomRight.getPastUsed()) {
             if (!topRight.getUsed()) {
                 if (bottomRight.getUsed()) {
-                    mainSplitPane.setDividerPosition(1, 0.7);
+                    mainSplitPane.setDividerPosition(1,
+                            1 - RELATIVE_VIEW_WIDTH);
                     rightPane.setDividerPositions(0.0);
                 }
                 else {
@@ -626,8 +637,8 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Loads and adds a menu from the given url to the menu-bar.
-     * Instead of calling this, the {@link KeYMenu} annotation should be used.
+     * Loads and adds a menu from the given url to the menu-bar. Instead of
+     * calling this, the {@link KeYMenu} annotation should be used.
      */
     public void registerMenu(URL sourcePath) {
         // add additional menus right before the "Help" entry
@@ -636,8 +647,9 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Loads and adds a menu from the given url as a menu-item to the parentMenu.
-     * Instead of calling this, the {@link KeYMenu} annotation should be used.
+     * Loads and adds a menu from the given url as a menu-item to the
+     * parentMenu. Instead of calling this, the {@link KeYMenu} annotation
+     * should be used.
      */
     public void registerMenuEntry(URL sourcePath, String parentMenu)
             throws IllegalStateException {
@@ -652,9 +664,9 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Position of the splitters separating the four available spaces views can put in.
-     * size = 4 : left-vertical, left-horizontal,
-     * right-vertical, right-horizontal
+     * Position of the splitters separating the four available spaces views can
+     * put in. size = 4 : left-vertical, left-horizontal, right-vertical,
+     * right-horizontal
      */
     public List<Double> getSplitterPositions() {
         double[] vertical = mainSplitPane.getDividerPositions();
@@ -670,9 +682,9 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Position of the splitters separating the four available spaces views can put in.
-     * size = 4 : left-vertical, left-horizontal,
-     * right-vertical, right-horizontal
+     * Position of the splitters separating the four available spaces views can
+     * put in. size = 4 : left-vertical, left-horizontal, right-vertical,
+     * right-horizontal
      */
     public void setSplitterPositions(List<Double> positions) {
         mainSplitPane.setDividerPositions(positions.get(0), positions.get(2));
