@@ -403,6 +403,9 @@ public class MainApp extends Application {
         for (Class<?> c : annotated) {
             KeYView annot = c.getAnnotation(KeYView.class);
 
+            if(!isDebugView && annot.isDebugView())
+                continue;
+            
             URL fxmlUrl = c.getResource(annot.path());
             ViewPosition pos = annot.preferredPosition();
             SerializableViewInformation sv = lastViewPositions

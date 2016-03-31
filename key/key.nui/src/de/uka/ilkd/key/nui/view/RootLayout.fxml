@@ -83,8 +83,6 @@
 						</Menu>
 						<Menu fx:id="helpMenu" mnemonicParsing="true" text="_Help">
 							<items>
-								<CheckMenuItem fx:id="debugMode" mnemonicParsing="false"
-									onAction="#handleDebugMode" selected="true" text="Debug Mode" />
 								<MenuItem mnemonicParsing="false" onAction="#handleOnlineHelp"
 									text="Online Help">
 									<accelerator>
@@ -98,24 +96,6 @@
 						</Menu>
 					</menus>
 				</MenuBar>
-				<ButtonBar fx:id="debugButtons" buttonMinWidth="50.0"
-					AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
-					AnchorPane.topAnchor="0.0">
-					<buttons>
-						<Button mnemonicParsing="false" onAction="#loadDefaultProof"
-							text="Load Default Proof" />
-						<Button mnemonicParsing="false" onAction="#loadBigProof"
-							text="Load Big Proof" />
-						<Button mnemonicParsing="false" onAction="#loadSolvableProof"
-							text="Load Solvable" />
-						<Button mnemonicParsing="false" onAction="#loadUnsolvableProof"
-							text="Load Unsolvable" />
-						<Button mnemonicParsing="false" onAction="#loadProofSplitTest"
-							text="Split Test" />
-						<Button mnemonicParsing="false" onAction="#loadModelSearchVsBasicTest"
-							text="ModelSearch vs Basic" />
-					</buttons>
-				</ButtonBar>
 			</children>
 		</AnchorPane>
 	</top>

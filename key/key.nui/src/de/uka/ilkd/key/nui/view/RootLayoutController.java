@@ -32,7 +32,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -110,10 +109,6 @@ public class RootLayoutController extends ViewController {
     private RecentFileMenuController recentFileMenuController;
     @FXML
     private Label statusLabel;
-    @FXML
-    private ButtonBar debugButtons;
-    @FXML
-    private CheckMenuItem debugMode;
 
     /**
      * The constructor
@@ -172,12 +167,6 @@ public class RootLayoutController extends ViewController {
 
         statusLabel.setGraphic(new ImageView(STATUSLOGO));
         statusLabel.setText(STATUSWELCOMETEXT);
-
-        if (!MainApp.isDebugView()) {
-            debugButtons.setOpacity(0);
-            debugButtons.setDisable(true);
-            debugMode.setSelected(false);
-        }
     }
 
     @Override
@@ -273,18 +262,6 @@ public class RootLayoutController extends ViewController {
     private void loadUnsolvableProof() {
         getContext().getKeYMediator().getUI().loadProblem(new File(
                 "resources/proofs/IndistinguishablePathConditions.twoJoins.proof"));
-    }
-
-    @FXML
-    private void handleDebugMode() {
-        if (debugMode.isSelected()) {
-            debugButtons.setOpacity(100.00);
-            debugButtons.setDisable(false);
-        }
-        else {
-            debugButtons.setOpacity(0);
-            debugButtons.setDisable(true);
-        }
     }
 
     /**

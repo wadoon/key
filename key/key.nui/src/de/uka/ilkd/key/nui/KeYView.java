@@ -45,4 +45,6 @@ public @interface KeYView {
      * Indicates, if the view is active with default settings.
      */
     boolean defaultActive() default true;
+    
+    boolean isDebugView() default false;
 }
