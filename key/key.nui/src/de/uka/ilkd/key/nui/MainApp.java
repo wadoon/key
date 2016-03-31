@@ -49,12 +49,6 @@ import javafx.util.Pair;
  */
 public class MainApp extends Application {
 
-    private static boolean isDebugView = false;
-
-    public static boolean isDebugView() {
-        return isDebugView;
-    }
-
     private Stage primaryStage;
 
     /**
@@ -402,7 +396,7 @@ public class MainApp extends Application {
         for (Class<?> c : annotated) {
             KeYView annot = c.getAnnotation(KeYView.class);
 
-            if(!isDebugView && annot.isDebugView())
+            if(annot.isDebugView())
                 continue;
             
             URL fxmlUrl = c.getResource(annot.path());
@@ -456,9 +450,6 @@ public class MainApp extends Application {
     public static void main(String[] args) {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
-            case "debug":
-                isDebugView = true;
-                break;
             case "reset":
                 System.out.println(
                         "'reset' paramter found -> resetting preferences");
