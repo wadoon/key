@@ -38,6 +38,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Pair;
 import javafx.application.Platform;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
@@ -209,6 +210,8 @@ public class SequentViewController extends ViewController {
         tacletInfo.setDisable(true);
         tacletInfo.setExpanded(false);
         enableTacletMenu(true);
+        scrollPane.pseudoClassStateChanged(
+                PseudoClass.getPseudoClass("sequent"), true);
 
         sequentOptions.setDisable(true);
         sequentOptions.setExpanded(false);
@@ -386,12 +389,8 @@ public class SequentViewController extends ViewController {
             }
             // Start search in single thread
             lastSearcher = new Searcher(searchBox.getText());
-          //  singleThreadExecutor.submit(lastSearcher);
-            searchIndices = printer.applyFreetextSearch(searchBox.getText());
-            Platform.runLater(() -> {
-                searchIndPointer = 0;
-                updateView();
-            });
+            singleThreadExecutor.submit(lastSearcher);
+
             event.consume();
         });
     }
@@ -739,6 +738,11 @@ public class SequentViewController extends ViewController {
         textArea.setDisable(true);
         webEngine.load("");
     }
+    
+    @Override
+    public void onCloseRequest() {
+        singleThreadExecutor.shutdownNow();
+    }
 
     /**
      * Creates a {@link Runnable} to make search in its own thread possible
@@ -779,10 +783,7 @@ public class SequentViewController extends ViewController {
                         NUIConstants.SEQUENT_SEARCH_DELAY_IN_MILLISECONDS);
             }
             catch (InterruptedException e) {
-                //TODO: disable this output if not in DEBUG mode
-                // since thread interrupts can not occur without explicit call
                 e.printStackTrace();
-                return;
             }
 
             // remember that there's no guarantee that this will execute before

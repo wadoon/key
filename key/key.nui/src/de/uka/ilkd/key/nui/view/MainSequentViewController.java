@@ -63,4 +63,8 @@ public class MainSequentViewController extends ViewController {
         });
     }
 
+    @Override
+    public void onCloseRequest() {
+        sequentViewController.onCloseRequest();
+    }
 }

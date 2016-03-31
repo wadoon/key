@@ -155,5 +155,10 @@ public class StaticSequentViewController extends ViewController {
 
         mediator.addKeYSelectionListener(proofChangeListener);
     }
+    
+    @Override
+    public void onCloseRequest() {
+        sequentViewController.onCloseRequest();
+    }
 
 }

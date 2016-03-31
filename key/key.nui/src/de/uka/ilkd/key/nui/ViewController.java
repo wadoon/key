@@ -97,7 +97,8 @@ public abstract class ViewController implements Initializable {
      */
     @SuppressWarnings("unchecked")
     public <T> T loadFxmlFromContext(URL path) {
-        //SuppressWarnings: the type is always T at runtime, just not at compile time.
+        // SuppressWarnings: the type is always T at runtime, just not at
+        // compile time.
         return (T) loadFxmlViewController(path).getKey();
     }
 
@@ -133,5 +134,13 @@ public abstract class ViewController implements Initializable {
      * {@link Tooltip} for the desired {@link Control}.
      */
     public void setTooltips() {
+    }
+
+    /**
+     * Virtual method. Implement this in a subclass to execute
+     * {@link ViewController} specific code on stage close request.
+     */
+    public void onCloseRequest() {
+
     }
 }
