@@ -56,13 +56,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
  * @version 1.0
  */
 public class RootLayoutController extends ViewController {
-
-    private static final int MAXMENUENTRIES = 8;
-    private static final Image STATUSLOGO = new Image(
-            "file:resources/images/key-color-transparent-background.png");
-    private static final String STATUSWELCOMETEXT = KeYConstants.COPYRIGHT
-            + "\nKeY is free Software and comes with ABSOLUTELY NO WARRANTY";
-
+    
     private HashMap<ViewPosition, ViewSlot> viewSlots = new HashMap<>();
     private HashMap<Integer, ViewInformation> allViews = new HashMap<>();
     private File file;
@@ -165,8 +159,8 @@ public class RootLayoutController extends ViewController {
         viewSlots.put(ViewPosition.TOPRIGHT,
                 new ViewSlot(ViewPosition.TOPRIGHT, topRight));
 
-        statusLabel.setGraphic(new ImageView(STATUSLOGO));
-        statusLabel.setText(STATUSWELCOMETEXT);
+        statusLabel.setGraphic(new ImageView(new Image(NUIConstants.STATUSLOGO)));
+        statusLabel.setText(NUIConstants.STATUSWELCOMETEXT);
     }
 
     @Override
@@ -348,7 +342,7 @@ public class RootLayoutController extends ViewController {
                 item.setAccelerator(KeyCombination.valueOf(accelerator));
 
             // make overflow menu "Others" if items exceed max
-            if (viewsMenu.getItems().size() < MAXMENUENTRIES) {
+            if (viewsMenu.getItems().size() < NUIConstants.MAX_ENTRIES_IN_VIEW_MENU) {
                 viewsMenu.getItems().add(item);
             }
             else {

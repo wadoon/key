@@ -2,6 +2,8 @@ package de.uka.ilkd.key.nui.util;
 
 import org.w3c.dom.css.CSSRule;
 
+import de.uka.ilkd.key.util.KeYConstants;
+
 /**
  * Collection of constants used throughout the application.
  * 
@@ -147,11 +149,15 @@ public final class NUIConstants {
      * The path to the proof icon in brackets.
      */
     public final static String CLOSED_PROOF_BUT_OPEN_LEMMAS_LEFT_ICON_PATH = "file:resources/images/ekey-brackets.gif";
+    /**
+     * The path to the logo displayed in the status bar.
+     */
+    public final static String STATUSLOGO = "file:resources/images/key-color-transparent-background.png";
 
     /*
      * Miscellaneous
      */
-    
+
     /**
      * Project URL
      */
@@ -168,8 +174,22 @@ public final class NUIConstants {
     public static final int MAX_RECENT_FILES = 8;
 
     /**
+     * The maximum number of entries in the Show/Hide View menu. If this number
+     * is exceeded a submenu named "Other" will be created where the rest of the
+     * entries will be nested under.
+     */
+    public static final int MAX_ENTRIES_IN_VIEW_MENU = 8;
+
+    /**
      * The delay in milliseconds (1000 milliseconds = 1 second) for the sequent
      * search to start searching after the last key pressed.
      */
     public final static long SEQUENT_SEARCH_DELAY_IN_MILLISECONDS = 0L;
+
+    /**
+     * The standard text shown in the status bar when the application is first
+     * loaded.
+     */
+    public static final String STATUSWELCOMETEXT = KeYConstants.COPYRIGHT
+            + "\nKeY is free Software and comes with ABSOLUTELY NO WARRANTY";
 }
