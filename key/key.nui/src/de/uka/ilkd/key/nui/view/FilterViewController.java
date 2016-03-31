@@ -37,7 +37,7 @@ import javafx.scene.layout.Pane;
  * @author Benedikt Gross
  * @version 1.0
  */
-@KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT, defaultActive = false)
+@KeYView(title = "Filter", path = "FilterView.fxml", preferredPosition = ViewPosition.BOTTOMLEFT)
 public class FilterViewController extends ViewController {
 
     private PrintFilter currentFilter;
