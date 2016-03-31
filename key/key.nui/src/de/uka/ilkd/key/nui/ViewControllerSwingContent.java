@@ -50,6 +50,7 @@ public abstract class ViewControllerSwingContent extends ViewController {
 
     @Override
     public void viewReactivated() {
+        // explicitly reactivate Swingcontent
         createSwingContent();
     }
 
