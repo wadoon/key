@@ -134,4 +134,8 @@ public abstract class ViewController implements Initializable {
      */
     public void setTooltips() {
     }
+    
+    public void onCloseRequest(){
+        
+    }
 }

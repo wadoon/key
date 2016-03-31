@@ -738,6 +738,11 @@ public class SequentViewController extends ViewController {
         textArea.setDisable(true);
         webEngine.load("");
     }
+    
+    @Override
+    public void onCloseRequest() {
+        singleThreadExecutor.shutdownNow();
+    }
 
     /**
      * Creates a {@link Runnable} to make search in its own thread possible
