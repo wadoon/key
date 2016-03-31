@@ -159,15 +159,15 @@ public class FilterViewController extends ViewController {
 
     @Override
     public void initializeAfterLoadingFxml() {
+        // this is needed if the view was closed when a proof was loaded
+        updateDisableState();
+        
         getContext().getKeYMediator()
                 .addKeYSelectionListener(new KeYSelectionListener() {
                     @Override
                     public void selectedProofChanged(KeYSelectionEvent e) {
                         Platform.runLater(() -> {
-                            applyButton.setDisable(!getContext()
-                                    .getKeYMediator().ensureProofLoaded());
-                            filterSettings.setDisable(!getContext()
-                                    .getKeYMediator().ensureProofLoaded());
+                            updateDisableState();
                             if (ongoingSelection)
                                 finishSelection();
                         });
@@ -179,6 +179,13 @@ public class FilterViewController extends ViewController {
                 });
     };
 
+    private void updateDisableState(){
+        applyButton.setDisable(!getContext()
+                .getKeYMediator().ensureProofLoaded());
+        filterSettings.setDisable(!getContext()
+                .getKeYMediator().ensureProofLoaded());
+    }
+    
     @FXML
     private void hanldeInvertChanged() {
         currentFilter.setInvert(invertFilter.isSelected());
