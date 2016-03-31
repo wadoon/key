@@ -378,6 +378,7 @@ public class MainApp extends Application {
                 .store(PathConfig.getRecentFileStorage());
         System.out.println("Where we go from here is a choice I leave to you.");
         primaryStage.close();
+        Platform.exit();
     }
 
     /**

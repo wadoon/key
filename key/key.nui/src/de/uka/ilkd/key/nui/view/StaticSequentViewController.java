@@ -61,8 +61,6 @@ public class StaticSequentViewController extends ViewController {
         return goal;
     }
 
-    private int updateCounter = 0;
-
     @Override
     public void initializeAfterLoadingFxml() {
         sequentViewController.initViewController(getMainApp(), getContext());
@@ -82,44 +80,11 @@ public class StaticSequentViewController extends ViewController {
 
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
-                long lastActionID = sequentViewController
-                        .getLastTacletActionID();
-                // Only Update the StaticSequentView, if the ProofUpdate was
-                // triggered within the same StaticSequentView itself and
-                // the Goal is the same OR a GoalChange was triggered by the
-                // RuleApplication in the StaticSequentView itself\\
-                // (= updateCounter > 0)
-                if (lastActionID == sequentViewController.getOwnID()
-                        && (goal == mediator.getSelectedGoal()
-                                || updateCounter > 0)) {
-                    proof = mediator.getSelectedProof();
-                    goal = mediator.getSelectedGoal();
-                    node = mediator.getSelectedNode();
-                    sequentViewController.loadNodeToView(goal, node);
-
-                    // Applying a Rule triggers 3 Update Steps. To let the
-                    // static SequentView update, use the stepCounter.\\
-                    // Else it remains completely static or \\
-                    // You cannot Counteract GoalChanges -> Exception!
-                    updateCounter++;
-                    if (updateCounter == 3) {
-                        getTitleUpdatedEvent()
-                                .fire(node.serialNr() + ": " + node.name());
-                        updateCounter = 0;
-                        sequentViewController.setLastTacletActionID(-1);
-                    }
-                }
-                // If LastAction was registered, but no Change Applied, remove
-                // LastAction
-                else if (lastActionID == sequentViewController.getOwnID()) {
-                    sequentViewController.setLastTacletActionID(-1);
-                }
                 sequentViewController.enableTacletMenu(
                         (mediator.getSelectedProof() == getProof()));
             }
         };
 
-        // TODO is this still needed?
         proof.addProofTreeListener(new ProofTreeListener() {
 
             @Override
@@ -143,6 +108,7 @@ public class StaticSequentViewController extends ViewController {
 
             @Override
             public void proofGoalsChanged(ProofTreeEvent e) {
+                System.out.println("PROOF GOAL CHANGED");
                 if (e.getGoal() == goal) {
                     Node target = node;
                     while (node.subtreeIterator().hasNext()) {
@@ -154,14 +120,26 @@ public class StaticSequentViewController extends ViewController {
 
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
+                if (sequentViewController
+                        .getLastTacletActionID() == sequentViewController
+                                .getOwnID()
+                        && mediator.getSelectedProof() == proof) {
+
+                    goal = e.getGoals().head();
+                    node = goal.node();
+                    proof = mediator.getSelectedProof();
+                    sequentViewController.loadNodeToView(goal, node);
+                    sequentViewController.setLastTacletActionID(-1);
+
+                    getTitleUpdatedEvent()
+                            .fire(node.serialNr() + ": " + node.name());
+                    sequentViewController.enableTacletMenu(
+                            mediator.getSelectedProof() == proof);
+                }
             }
 
             @Override
             public void proofGoalRemoved(ProofTreeEvent e) {
-                if (e.getGoal() == goal) {
-                    sequentViewController.enableTacletMenu(false);
-                    mediator.removeKeYSelectionListener(proofChangeListener);
-                }
             }
 
             @Override
