@@ -88,6 +88,11 @@ public class ViewSlot {
         pastUsed = used;
         used = true;
 
+        view.getController().getCloseSelfEvent().addHandler(e -> {
+            this.removeTab(view);
+        });
+
+        view.getController().viewReactivated();
         container.getSelectionModel().select(view.getUiTab());
     }
 
@@ -106,6 +111,7 @@ public class ViewSlot {
             pastUsed = used;
             used = false;
         }
+        view.getController().viewSuspended();
     }
 
     /**
@@ -118,8 +124,8 @@ public class ViewSlot {
     private static java.util.function.Consumer<Node> currentRegisterer;
 
     /**
-     * Sets a consumer that is executed on every {@link TabPane}.
-     * This is intended to provide access for drag-drop handlers.
+     * Sets a consumer that is executed on every {@link TabPane}. This is
+     * intended to provide access for drag-drop handlers.
      */
     public static void setRegisterDrag(
             java.util.function.Consumer<Node> registerer) {

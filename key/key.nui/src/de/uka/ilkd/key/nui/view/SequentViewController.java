@@ -738,10 +738,19 @@ public class SequentViewController extends ViewController {
         textArea.setDisable(true);
         webEngine.load("");
     }
-    
+
     @Override
     public void onCloseRequest() {
         singleThreadExecutor.shutdownNow();
+    }
+
+    @Override
+    public void viewReactivated() {
+        // If the executor was shutDown due to tabClosing, start it again
+        if (singleThreadExecutor.isShutdown()
+                || singleThreadExecutor.isTerminated()) {
+            singleThreadExecutor = Executors.newSingleThreadExecutor();
+        }
     }
 
     /**

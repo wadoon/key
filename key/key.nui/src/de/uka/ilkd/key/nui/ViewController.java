@@ -27,6 +27,7 @@ public abstract class ViewController implements Initializable {
     private Context context;
     private Stage stage;
     private HandlerEvent<String> titleUpdatedEvent = new HandlerEvent<>();
+    private HandlerEvent<String> closeSelfEvent = new HandlerEvent<>();
 
     /**
      * @return the {@link MainApp}
@@ -42,6 +43,10 @@ public abstract class ViewController implements Initializable {
      */
     public HandlerEvent<String> getTitleUpdatedEvent() {
         return titleUpdatedEvent;
+    }
+    
+    public HandlerEvent<String> getCloseSelfEvent() {
+        return closeSelfEvent;
     }
 
     /**
@@ -141,6 +146,5 @@ public abstract class ViewController implements Initializable {
      * {@link ViewController} specific code on stage close request.
      */
     public void onCloseRequest() {
-
     }
 }

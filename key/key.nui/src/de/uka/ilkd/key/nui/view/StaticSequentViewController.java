@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 
 /**
@@ -61,6 +62,8 @@ public class StaticSequentViewController extends ViewController {
         return goal;
     }
 
+    private boolean isPruned = false;
+
     @Override
     public void initializeAfterLoadingFxml() {
         sequentViewController.initViewController(getMainApp(), getContext());
@@ -97,18 +100,26 @@ public class StaticSequentViewController extends ViewController {
 
             @Override
             public void proofPruned(ProofTreeEvent e) {
-                // TODO what happens in this if case?
-                if (e.getNode().find(node)) {
+                if (isPruned) {
+                    isPruned = false;
+                    Platform.runLater(() -> {
+                        getCloseSelfEvent().fire(null);
+                    });
+
                 }
             }
 
             @Override
             public void proofIsBeingPruned(ProofTreeEvent e) {
+                if (e.getNode().find(node)) {
+                    sequentViewController.enableTacletMenu(false);
+                    mediator.removeKeYSelectionListener(proofChangeListener);
+                    isPruned = true;
+                }
             }
 
             @Override
             public void proofGoalsChanged(ProofTreeEvent e) {
-                System.out.println("PROOF GOAL CHANGED");
                 if (e.getGoal() == goal) {
                     Node target = node;
                     while (node.subtreeIterator().hasNext()) {
@@ -128,13 +139,9 @@ public class StaticSequentViewController extends ViewController {
                     goal = e.getGoals().head();
                     node = goal.node();
                     proof = mediator.getSelectedProof();
-                    sequentViewController.loadNodeToView(goal, node);
-                    sequentViewController.setLastTacletActionID(-1);
 
-                    getTitleUpdatedEvent()
-                            .fire(node.serialNr() + ": " + node.name());
-                    sequentViewController.enableTacletMenu(
-                            mediator.getSelectedProof() == proof);
+                    sequentViewController.setLastTacletActionID(-1);
+                    updateView();
                 }
             }
 
@@ -155,10 +162,32 @@ public class StaticSequentViewController extends ViewController {
 
         mediator.addKeYSelectionListener(proofChangeListener);
     }
-    
+
     @Override
     public void onCloseRequest() {
         sequentViewController.onCloseRequest();
     }
 
+    @Override
+    public void viewSuspended() {
+        sequentViewController.onCloseRequest();
+    }
+
+    @Override
+    public void viewReactivated() {
+        sequentViewController.viewReactivated();
+    }
+
+    /**
+     * loads new SequentContent Changes Name enables/disables TacletMenu
+     * depending on ProofStatus
+     */
+    private void updateView() {
+        getTitleUpdatedEvent().fire(node.serialNr() + ": " + node.name());
+
+        sequentViewController
+                .enableTacletMenu(mediator.getSelectedProof() == proof);
+
+        sequentViewController.loadNodeToView(goal, node);
+    }
 }
