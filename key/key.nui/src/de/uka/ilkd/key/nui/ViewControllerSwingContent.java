@@ -48,6 +48,11 @@ public abstract class ViewControllerSwingContent extends ViewController {
         stackPane.getChildren().add(swingNode);
     }
 
+    @Override
+    public void viewReactivated() {
+        createSwingContent();
+    }
+
     /**
      * Embeds Swing content into a StackPane inside the view.
      * <p>
