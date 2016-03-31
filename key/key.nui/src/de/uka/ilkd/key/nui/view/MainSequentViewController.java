@@ -35,6 +35,8 @@ public class MainSequentViewController extends ViewController {
                         sequentViewController.clearWebView();
                     }
                 });
+                //XXX: workaround to fix problems related to a closed treeview and multiple loaded proofs
+                showSequent();
             }
 
             @Override
