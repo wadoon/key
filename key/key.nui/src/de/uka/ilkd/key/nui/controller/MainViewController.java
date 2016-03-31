@@ -657,6 +657,7 @@ public class MainViewController extends NUIController implements Observer {
 
             @Override
             public Void call() throws InterruptedException {
+                long startTime = System.nanoTime();
 
                 try {
                     // set Loading = false to enable canceling
@@ -665,7 +666,7 @@ public class MainViewController extends NUIController implements Observer {
                     // important to initialize KeYEnvironment
                     final MainWindow mainWindow = MainWindow.getInstance();
                     mainWindow.setVisible(false);
-
+                    
                     // Load proof
                     final DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(null);
                     final AbstractProblemLoader loader = ui.load(null, proofFileName, null, null,
@@ -694,10 +695,19 @@ public class MainViewController extends NUIController implements Observer {
 
                 final Proof proof = keyEnvironment.getLoadedProof();
                 proof.setProofFile(proofFileName);
+                
+                long endTime = System.nanoTime();
+                
+                System.out.println("KeyEnv: "+ (endTime-startTime)/1000000);
 
+                long startTree = System.nanoTime();
+                
                 // convert proof to fx tree
                 final ProofTreeItem fxtree = new ProofTreeConverter(proof).createFXProofTree();
 
+                long endTree = System.nanoTime();
+                
+                System.out.println("Tree :" + (endTree-startTree)/1000000);
                 // set Loading = false as you can no longer cancel
                 final boolean hasNotBeenCanceled = isLoadingProof.compareAndSet(true, false);
 
