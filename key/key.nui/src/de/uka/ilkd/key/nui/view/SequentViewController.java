@@ -526,6 +526,9 @@ public class SequentViewController extends ViewController {
                 services);
         abstractSyntaxTree = logicPrinter.getInitialPositionTable();
         printSequent();
+        if (lastFilter != null) {
+            apply(lastFilter);
+        }
         updateView();
     }
 
