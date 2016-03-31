@@ -210,61 +210,6 @@ public class RootLayoutController extends ViewController {
     }
 
     /**
-     * Loads a default closed proof.
-     */
-    @FXML
-    private void loadDefaultProof() {
-        getContext().getKeYMediator().getUI()
-                .loadProblem(new File("resources/proofs/gcd.closed.proof"));
-    }
-
-    /**
-     * Loads a large sample open proof.
-     */
-    @FXML
-    private void loadBigProof() {
-        getContext().getKeYMediator().getUI().loadProblem(
-                new File("resources/SampleProof/sampleProof.proof"));
-    }
-
-    /**
-     * Loads a simple key file to test proof splitting.
-     */
-    @FXML
-    private void loadProofSplitTest() {
-        getContext().getKeYMediator().getUI()
-                .loadProblem(new File("resources/proofs/testSplit.key"));
-    }
-
-    /**
-     * Loads a simple key file to test model search vs basic arithmetic
-     * treatment.
-     */
-    @FXML
-    private void loadModelSearchVsBasicTest() {
-        getContext().getKeYMediator().getUI().loadProblem(
-                new File("resources/proofs/testModelSearchVsBasic.key"));
-    }
-
-    /**
-     * Loads an open solvable proof.
-     */
-    @FXML
-    private void loadSolvableProof() {
-        getContext().getKeYMediator().getUI().loadProblem(new File(
-                "resources/proofs/IndistinguishablePathConditions.proof"));
-    }
-
-    /**
-     * Loads an open unsolvable proof.
-     */
-    @FXML
-    private void loadUnsolvableProof() {
-        getContext().getKeYMediator().getUI().loadProblem(new File(
-                "resources/proofs/IndistinguishablePathConditions.twoJoins.proof"));
-    }
-
-    /**
      * Exits the program on Click.
      */
     @FXML
