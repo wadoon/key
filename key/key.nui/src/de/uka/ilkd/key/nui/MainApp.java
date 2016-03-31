@@ -366,10 +366,12 @@ public class MainApp extends Application {
      */
     private void saveAndClose() {
         // call onCloseRequest on all views to let them free their resources.
-        for(ViewInformation info:rootLayoutController.getViewInformations()){
-            info.getController().onCloseRequest();
+        for (ViewInformation info : rootLayoutController
+                .getViewInformations()) {
+            if (info != null && info.getController() != null)
+                info.getController().onCloseRequest();
         }
-        
+
         SessionSettings settings = new SessionSettings();
         settings.setWindowX(primaryStage.getX());
         settings.setWindowY(primaryStage.getY());

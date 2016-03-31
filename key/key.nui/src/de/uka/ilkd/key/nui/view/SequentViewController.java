@@ -448,6 +448,9 @@ public class SequentViewController extends ViewController {
 
         sequentChanged = true;
         printSequent();
+        if (lastFilter != null) {
+            apply(lastFilter);
+        }
         updateView();
     }
 
@@ -476,6 +479,9 @@ public class SequentViewController extends ViewController {
 
         sequentChanged = true;
         printSequent();
+        if (lastFilter != null) {
+            apply(lastFilter);
+        }
         updateView();
     }
 
