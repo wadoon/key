@@ -13,7 +13,13 @@ import javafx.scene.layout.StackPane;
  * class. The corresponding FXML file needs to be created as is JavaFX standard.
  * Its root {@link Pane} should be a {@link BorderPane}.
  * <p>
- * <b>Note:</b> {@link #createSwingContent()} is the only method that needs to
+ * <b>Note 1:</b> Since Swing Content is not always perfectly compatible with
+ * JavaFX content, the resizing of those JavaFX components embedding Swing
+ * coomponents will not always work as desired. The components might have to be
+ * refreshed manually, for example by dragging the tab around if it comes to
+ * unexpected resizing behaviour.
+ * <p>
+ * <b>Note 2:</b> {@link #createSwingContent()} is the only method that needs to
  * be implemented. Currently it needs to set the {@link SwingNode} using
  * {@link #getSwingNode()}.
  * <p>
