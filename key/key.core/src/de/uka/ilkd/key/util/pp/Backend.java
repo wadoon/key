@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.util.pp;
 
+import de.uka.ilkd.key.pp.FaceType;
+
+import java.io.IOException;
+
 /**
  * The backend for a {@link Layouter}.  An object satisfying this
  * interface can act as a receiver for the layed out text produced by
@@ -24,36 +28,79 @@ package de.uka.ilkd.key.util.pp;
  * Layouter} are actually known to be in HTML, {@link
  * #measure(String)} can return the size of the text, not including
  * markup.
- *
+ * <p>
  * <P>There is currently no provision to handle proportional fonts,
  * and there might never be.
  *
  * @author Martin Giese
  * @see Layouter
- *
  */
 
 public interface Backend {
-    /** Append a String <code>s</code> to the output.  <code>s</code> 
-     * contains no newlines. */
+    /**
+     * Append a String <code>s</code> to the output.  <code>s</code>
+     * contains no newlines.
+     */
     void print(String s) throws java.io.IOException;
 
-    /** Start a new line. */
+    /**
+     * Start a new line.
+     */
     void newLine() throws java.io.IOException;
 
-    /** Closes this backend */
+    /**
+     * Closes this backend
+     */
     void close() throws java.io.IOException;
 
-    /** Flushes any buffered output */
+    /**
+     * Flushes any buffered output
+     */
     void flush() throws java.io.IOException;
 
-    /** Gets called to record a <code>mark()</code> call in the input. */
+    /**
+     * Gets called to record a <code>mark()</code> call in the input.
+     */
     void mark(Object o);
 
-    /** Returns the available space per line */
+    /**
+     *
+     * @return
+     */
+    int count();
+
+    /**
+     * Returns the available space per line
+     */
     int lineWidth();
 
-    /** Returns the space required to print the String <code>s</code> */
+    /**
+     * Returns the space required to print the String <code>s</code>
+     */
     int measure(String s);
+
+    /**
+     * @param ft
+     * @return
+     */
+    int startRegion(FaceType ft);
+
+    /**
+     * @return
+     */
+    int endRegion();
+
+
+    /**
+     * @param str
+     * @param faceType
+     */
+    default Backend print(String str, FaceType faceType)
+            throws IOException {
+        startRegion(faceType);
+        print(str);
+        endRegion();
+        return this;
+    }
 
 }

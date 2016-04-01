@@ -170,6 +170,7 @@ public class LogicPrinter {
 
         try {
 			p.printSemisequent(s);
+            p.backend.close();
 		} catch (IOException e) {
 			return s.toString();
 		}

@@ -133,7 +133,7 @@ public class InvariantConfigurator {
 
 
             //Creates a new Printer, pretty Syntax cannot be parsed up to now!
-            /* private final LogicPrinter printer = new LogicPrinter(
+            /* private final LogicHTMLPrinter printer = new LogicHTMLPrinter(
                     new ProgramPrinter(sw), null, Main.getInstance().mediator()
                             .getServices());*/
             private JTabbedPane inputPane;

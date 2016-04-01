@@ -27,7 +27,7 @@ import java.io.Writer;
  */
 
 @Deprecated
-public class WriterBackend implements Backend {
+public class WriterBackend extends AbstractBackend {
 
     protected Writer out;
     protected int lineWidth;

@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.proof.io.html;
 
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -7,10 +14,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Saves a Proof in a proper readable format.
@@ -94,7 +98,7 @@ public class HTMLSaver implements Runnable {
                 .reduce((a, b) -> a + " | " + b);
 
         if (children.isPresent())
-            return s +  children.get();
+            return s + children.get();
         else
             return s;
     }
@@ -125,6 +129,8 @@ public class HTMLSaver implements Runnable {
     }
 
     public static final void main(String argv[]) {
+
+
         ConsoleUserInterfaceControl control = new ConsoleUserInterfaceControl(false, true);
 
         File file = new File("key.ui/examples/standard_key/prop_log/contraposition.auto.proof");

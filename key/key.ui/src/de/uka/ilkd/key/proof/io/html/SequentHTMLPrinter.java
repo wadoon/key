@@ -1,10 +1,14 @@
 package de.uka.ilkd.key.proof.io.html;
 
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 
 import java.io.StringWriter;
+import java.util.HashMap;
 
 import static de.uka.ilkd.key.proof.io.html.Section.*;
 
@@ -42,8 +46,8 @@ public class SequentHTMLPrinter implements Visitor {
         for (SequentFormula sf : ss.asList()) {
             writer.div(SEQUENT_FORMULA);
             //print(sf);
-            writer.append(
-                    LogicPrinter.quickPrintSemisequent(ss, null)
+
+            writer.append(""
             );
             writer.end();
         }
@@ -62,7 +66,7 @@ public class SequentHTMLPrinter implements Visitor {
 
         StringWriter sw = new StringWriter();
         ProgramPrinter pp = new ProgramPrinter(sw);
-        //LogicPrinter lp = new LogicPrinter(pp, new NotationInfo(), new Services(Profile));
+        //LogicHTMLPrinter lp = new LogicHTMLPrinter(pp, new NotationInfo(), new Services(Profile));
         /*
         JavaBlock javaBlock = formula.javaBlock();
         if (!javaBlock.isEmpty()) {

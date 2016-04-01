@@ -19,7 +19,7 @@ package de.uka.ilkd.key.util.pp;
  * the number of characters written by this so far.  
  * The method {@link #getString()} gets the output written so far.
  */
-public class StringBackend implements Backend {
+public class StringBackend extends  AbstractBackend {
     protected StringBuffer out;
     protected int initOutLength;
     protected int lineWidth;
