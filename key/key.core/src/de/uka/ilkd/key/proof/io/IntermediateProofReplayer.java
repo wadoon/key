@@ -299,12 +299,9 @@ public class IntermediateProofReplayer {
                                     || partnerNodesInfo.size() < joinAppInterm
                                             .getNrPartners()) {
                                 // In case of an exception happening during the
-                                // replay process, it can happen that the queue
-                                // is
-                                // empty when reaching this point. Then, we may
-                                // not
-                                // add the join node to the end of the queue
-                                // since
+                                // replay process, it can happen that the queue is
+                                // empty when reaching this point. Then, we may not
+                                // add the join node to the end of the queue since
                                 // this will result in non-termination.
 
                                 if (queue.isEmpty()) {
@@ -444,7 +441,6 @@ public class IntermediateProofReplayer {
                                 // polling
                             }
                             catch (BuiltInConstructionException e) {
-                                skipBranch = 1;
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                         + appInterm.getLineNr() + ", goal "
                                         + currGoal.node().serialNr()
@@ -452,7 +448,6 @@ public class IntermediateProofReplayer {
                                         + NOT_APPLICABLE, e);
                             }
                             catch (RuntimeException e) {
-                                skipBranch = 1;
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                         + appInterm.getLineNr() + ", goal "
                                         + currGoal.node().serialNr()
@@ -460,7 +455,6 @@ public class IntermediateProofReplayer {
                                         + NOT_APPLICABLE, e);
                             }
                             catch (AssertionError e) {
-                                skipBranch = 1;
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                         + appInterm.getLineNr() + ", goal "
                                         + currGoal.node().serialNr()
@@ -672,7 +666,6 @@ public class IntermediateProofReplayer {
                     builtinIfInsts = builtinIfInsts.append(ifInst);
                 }
                 catch (RuntimeException e) {
-                    skipBranch = 1;
                     reportError(
                             ERROR_LOADING_PROOF_LINE + "Line "
                                     + currInterm.getLineNr() + ", goal "
@@ -680,7 +673,6 @@ public class IntermediateProofReplayer {
                                     + ruleName + NOT_APPLICABLE, e);
                 }
                 catch (AssertionError e) {
-                    skipBranch = 1;
                     reportError(
                             ERROR_LOADING_PROOF_LINE + "Line "
                                     + currInterm.getLineNr() + ", goal "
