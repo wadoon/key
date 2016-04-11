@@ -125,7 +125,7 @@
 	</target>
 
 	<!-- Definition of target COMPILE -->
-	<target name="compile" description="Compile all source files into the build directory.">
+	<target name="compile" depends="copy" description="Compile all source files into the build directory.">
 		<mkdir dir="${build.dir}" />
 		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" source="1.8" target="1.8" deprecation="off" debug="on" depend="${build.depend}" optimize="off">
 			<!-- <exclude name="**/guitests/*.java" /> -->
