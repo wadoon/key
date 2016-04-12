@@ -1772,7 +1772,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         | INDEXOF)
          => result = sequence    
 
-   |   (ORDOMEGA
+   |   ( ORDOMEGA
       | ORDONE
       | ORDZERO
       | ORDADD

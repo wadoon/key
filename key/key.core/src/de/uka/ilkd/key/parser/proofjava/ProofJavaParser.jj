@@ -1,8 +1,7 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+//                         Universitaet Koblenz-Landau, Germany//                         Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
@@ -477,6 +476,7 @@ TOKEN :
 | < NATIVE: "native" >
 | < NEW: "new" >
 | < NULL: "null" >
+| < ORD: "\\ord" >
 | < PACKAGE: "package">
 | < PRIVATE: "private" >
 | < PROTECTED: "protected" >
@@ -1989,6 +1989,7 @@ TypeReference PrimitiveType() :
   | "double"
   | "\\locset"
   | "\\seq"
+  | "\\ord"
   | "\\free"
   | "\\map"
   )

@@ -57,6 +57,7 @@ import recoder.service.DefaultCrossReferenceSourceInfo;
 import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
+import de.uka.ilkd.key.java.recoderext.adt.DefaultOrdLiteral;
 import de.uka.ilkd.key.java.recoderext.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
 import de.uka.ilkd.key.util.Debug;
@@ -135,6 +136,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                 return EmptySetLiteral.INSTANCE;
             } else if ("\\seq".equals(type.getName())) {
                 return EmptySeqLiteral.INSTANCE;
+            } else if ("\\ord".equals(type.getName())) {
+                return DefaultOrdLiteral.INSTANCE;
             } else if ("\\set".equals(type.getName())) {
                 return new DLEmbeddedExpression("emptySet",
                         Collections.<Expression>emptyList());

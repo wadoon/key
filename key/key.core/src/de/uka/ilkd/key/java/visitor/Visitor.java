@@ -45,6 +45,7 @@ import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.expression.literal.DefaultOrdLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -201,6 +202,8 @@ public interface Visitor {
     void performActionOnBooleanLiteral(BooleanLiteral x);
     
     void performActionOnEmptySetLiteral(EmptySetLiteral x);
+
+   void performActionOnDefaultOrdLiteral(DefaultOrdLiteral x);
         
     void performActionOnSingleton(Singleton x);    
     

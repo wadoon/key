@@ -54,6 +54,7 @@ import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
+import de.uka.ilkd.key.java.expression.literal.DefaultOrdLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
@@ -1118,6 +1119,14 @@ public class PrettyPrinter {
         write(")");
         printFooter(x);
     }
+
+   public void printDefaultOrdLiteral(DefaultOrdLiteral x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("0");
+        printFooter(x);
+    }
+    
 
     public void printEmptySeqLiteral(EmptySeqLiteral x) throws java.io.IOException {
         printHeader(x);

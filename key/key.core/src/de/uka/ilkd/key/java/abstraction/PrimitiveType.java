@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
+import de.uka.ilkd.key.java.expression.literal.DefaultOrdLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -38,6 +39,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.OrdLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -79,6 +81,8 @@ public final class PrimitiveType implements Type {
 	new PrimitiveType("\\locset", EmptySetLiteral.LOCSET, LocSetLDT.NAME);
     public static final PrimitiveType JAVA_SEQ =
 	new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE, SeqLDT.NAME);
+    public static final PrimitiveType JAVA_ORD =
+    	new PrimitiveType("\\ord", DefaultOrdLiteral.INSTANCE, OrdLDT.NAME);
     public static final PrimitiveType JAVA_FREE_ADT =
             new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
     public static final PrimitiveType JAVA_MAP =

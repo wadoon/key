@@ -872,7 +872,7 @@ public class Recoder2KeY implements JavaReader {
         }
         
         // recoder changes the data location to some imaginary files
-        // undo this by setting the original locations
+         // undo this by setting the original locations
         for (recoder.java.CompilationUnit cu : cUnits) {
             cu.setDataLocation(cu.getOriginalDataLocation());
         }
@@ -1290,6 +1290,12 @@ public class Recoder2KeY implements JavaReader {
      *             always
      */
     public static void reportError(String message, Throwable t) {
+          System.out.println("reached reportError with message "+message); 
+          System.out.println("throwable is "+ t); 
+          java.io.StringWriter sw = new java.io.StringWriter();
+          java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+          t.printStackTrace(pw);
+          System.out.println(sw.toString());
         // Attention: this highly depends on Recoders exception messages!
 	Throwable cause = t;
 	if  (t instanceof ExceptionHandlerException) {
