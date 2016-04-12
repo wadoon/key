@@ -46,6 +46,7 @@ import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.expression.literal.DefaultOrdLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
@@ -292,6 +293,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     @Override
     public void performActionOnBooleanLiteral(BooleanLiteral x) {
 	doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnDefaultOrdLiteral(DefaultOrdLiteral x) {
+    doDefaultAction(x);
     }
     
     @Override

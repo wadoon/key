@@ -20,10 +20,12 @@ import recoder.java.expression.Literal;
 
 public final class DefaultOrdLiteral extends Literal {
     
+
     /**
      * 
      */
-    private static final long serialVersionUID = 0;
+    private static final long serialVersionUID = 2964838390428554860L;
+    
     public static final DefaultOrdLiteral INSTANCE = new DefaultOrdLiteral();
     
     @Override

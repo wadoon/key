@@ -36,6 +36,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
+import de.uka.ilkd.key.java.expression.literal.DefaultOrdLiteral;
 import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
 import de.uka.ilkd.key.java.expression.operator.BinaryAndAssignment;
 import de.uka.ilkd.key.java.expression.operator.BinaryNot;
@@ -1299,7 +1300,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);	
     }
     
-
     @Override
     public void performActionOnSeqSingleton(SeqSingleton x) {
         DefaultAction def = new DefaultAction(x) {

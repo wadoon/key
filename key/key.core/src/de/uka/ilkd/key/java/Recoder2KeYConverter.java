@@ -67,6 +67,7 @@ import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.expression.literal.DefaultOrdLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
@@ -822,6 +823,10 @@ public class Recoder2KeYConverter {
         return booleanLit.getValue() ?
                new BooleanLiteral(collectComments(booleanLit), positionInfo(booleanLit), true) :
                new BooleanLiteral(collectComments(booleanLit), positionInfo(booleanLit), false);
+    }
+    
+    public DefaultOrdLiteral convert(de.uka.ilkd.key.java.recoderext.adt.DefaultOrdLiteral e) {
+        return DefaultOrdLiteral.INSTANCE;
     }
 
 
