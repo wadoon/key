@@ -92,6 +92,11 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
 import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdOnat;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdAdd;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdExp;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdMax;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdTimes;
 import de.uka.ilkd.key.java.reference.ArrayLengthReference;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -1330,6 +1335,56 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);        
     } 
+
+   @Override
+    public void performActionOnOrdOnat(OrdOnat x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new OrdOnat(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+
+   @Override
+    public void performActionOnOrdAdd(OrdAdd x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new OrdAdd(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+
+    @Override
+    public void performActionOnOrdExp(OrdExp x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new OrdExp(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+
+   @Override
+    public void performActionOnOrdMax(OrdMax x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new OrdMax(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+
+   @Override
+    public void performActionOnOrdTimes(OrdTimes x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new OrdTimes(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
     
     @Override
     public void performActionOnDLEmbeddedExpression(final DLEmbeddedExpression x) {

@@ -1211,6 +1211,57 @@ public class PrettyPrinter {
         printFooter(x);
     }          
     
+    public void printOrdOnat(de.uka.ilkd.key.java.expression.operator.adt.OrdOnat x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\onat", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+
+    public void printOrdAdd(de.uka.ilkd.key.java.expression.operator.adt.OrdAdd x) throws java.io.IOException {
+       printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "+", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+
+   public void printOrdExp(de.uka.ilkd.key.java.expression.operator.adt.OrdExp x) throws java.io.IOException {
+       printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\ord_exp", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+
+
+    public void printOrdMax(de.uka.ilkd.key.java.expression.operator.adt.OrdMax x) throws java.io.IOException {
+       printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\ord_max", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+
+     public void printOrdTimes(de.uka.ilkd.key.java.expression.operator.adt.OrdTimes x) throws java.io.IOException {
+         printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "*", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+
     public void printDLEmbeddedExpression(
             DLEmbeddedExpression x) throws IOException {
         printHeader(x);

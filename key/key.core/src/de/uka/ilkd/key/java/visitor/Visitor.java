@@ -111,6 +111,11 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
 import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdOnat;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdAdd;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdExp;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdMax;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdTimes;
 import de.uka.ilkd.key.java.reference.ArrayLengthReference;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -203,8 +208,8 @@ public interface Visitor {
     
     void performActionOnEmptySetLiteral(EmptySetLiteral x);
 
-   void performActionOnDefaultOrdLiteral(DefaultOrdLiteral x);
-        
+    void performActionOnDefaultOrdLiteral(DefaultOrdLiteral x);
+
     void performActionOnSingleton(Singleton x);    
     
     void performActionOnSetUnion(SetUnion x);
@@ -228,6 +233,16 @@ public interface Visitor {
     void performActionOnSeqSub(SeqSub x);
     
     void performActionOnSeqReverse(SeqReverse x);
+
+    void performActionOnOrdOnat(OrdOnat x);
+
+    void performActionOnOrdAdd(OrdAdd x);
+
+    void performActionOnOrdExp(OrdExp x);
+
+    void performActionOnOrdMax(OrdMax x);
+
+    void performActionOnOrdTimes(OrdTimes x);
     
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
