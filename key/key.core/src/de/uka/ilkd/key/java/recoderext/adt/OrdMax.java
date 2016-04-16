@@ -14,35 +14,46 @@
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
-import recoder.java.SourceVisitor;
-import recoder.java.expression.Literal;
 
 
-public final class EmptySeqLiteral extends Literal {
-    
+public class OrdMax extends ADTPrefixConstruct {
+
     /**
      * 
      */
-    private static final long serialVersionUID = 0;
-    public static final EmptySeqLiteral INSTANCE = new EmptySeqLiteral();
-    
-    @Override
-    public Expression deepClone() {
-	return this;
+    private static final long serialVersionUID = -5950638934821692317L;
+
+    public OrdMax(Expression lhs, Expression rhs) {
+	super(lhs, rhs);
+	makeParentRoleValid();
     }
+
+
+    protected OrdMax(OrdMax proto) {
+	super(proto);
+	makeParentRoleValid();
+    }
+    
 
     @Override    
-    public void accept(SourceVisitor v) {
+    public OrdMax deepClone() {
+	return new OrdMax(this);
+    }
+
+
+    @Override    
+    public int getArity() {
+	return 2;
     }
 
     
-    @Override
-    public Object getEquivalentJavaType() {
-	return null;
+    @Override    
+    public int getNotation() {
+	return PREFIX;
     }
     
     @Override
     public String toSource(){
-        return "\\seq_empty";
+        return "\\ord_max("+children.get(0).toSource()+","+children.get(1).toSource()+")";
     }
 }

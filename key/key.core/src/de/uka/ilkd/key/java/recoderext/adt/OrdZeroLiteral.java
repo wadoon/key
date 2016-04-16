@@ -18,13 +18,13 @@ import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
 
 
-public final class EmptySeqLiteral extends Literal {
+public final class OrdZeroLiteral extends Literal {
     
     /**
      * 
      */
     private static final long serialVersionUID = 0;
-    public static final EmptySeqLiteral INSTANCE = new EmptySeqLiteral();
+    public static final OrdZeroLiteral INSTANCE = new OrdZeroLiteral();
     
     @Override
     public Expression deepClone() {
@@ -43,6 +43,6 @@ public final class EmptySeqLiteral extends Literal {
     
     @Override
     public String toSource(){
-        return "\\seq_empty";
+        return "\\o_0";
     }
 }
