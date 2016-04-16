@@ -60,6 +60,9 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdOneLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdZeroLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdOmegaLiteral;
 import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
 import de.uka.ilkd.key.java.expression.operator.BinaryAndAssignment;
 import de.uka.ilkd.key.java.expression.operator.BinaryNot;
@@ -1261,6 +1264,28 @@ public class PrettyPrinter {
         write(")");
         printFooter(x);
     } 
+
+  public void printOrdOneLiteral(OrdOneLiteral x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("\\o_1");
+        printFooter(x);
+    }
+
+     public void printOrdZeroLiteral(OrdZeroLiteral x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("\\o_0");
+        printFooter(x);
+       }
+
+    public void printOrdOmegaLiteral(OrdOmegaLiteral x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("\\omega");
+        printFooter(x);
+       }
+
 
     public void printDLEmbeddedExpression(
             DLEmbeddedExpression x) throws IOException {

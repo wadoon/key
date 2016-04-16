@@ -56,6 +56,9 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdOneLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdZeroLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdOmegaLiteral;
 import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
 import de.uka.ilkd.key.java.expression.operator.BinaryAndAssignment;
 import de.uka.ilkd.key.java.expression.operator.BinaryNot;
@@ -387,6 +390,21 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     @Override
     public void performActionOnOrdTimes(OrdTimes x) {
+	doDefaultAction(x);
+    } 
+
+   @Override
+    public void performActionOnOrdOneLiteral(OrdOneLiteral x) {
+	doDefaultAction(x);
+    } 
+
+   @Override
+    public void performActionOnOrdZeroLiteral(OrdZeroLiteral x) {
+	doDefaultAction(x);
+    } 
+
+   @Override
+    public void performActionOnOrdOmegaLiteral(OrdOmegaLiteral x) {
 	doDefaultAction(x);
     } 
 

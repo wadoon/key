@@ -52,6 +52,9 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdOneLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdZeroLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdOmegaLiteral;
 import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
 import de.uka.ilkd.key.java.expression.operator.BinaryAndAssignment;
 import de.uka.ilkd.key.java.expression.operator.BinaryNot;
@@ -243,6 +246,12 @@ public interface Visitor {
     void performActionOnOrdMax(OrdMax x);
 
     void performActionOnOrdTimes(OrdTimes x);
+
+    void performActionOnOrdOneLiteral(OrdOneLiteral x);
+
+    void performActionOnOrdZeroLiteral(OrdZeroLiteral x);
+
+    void performActionOnOrdOmegaLiteral(OrdOmegaLiteral x);
     
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
