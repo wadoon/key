@@ -97,6 +97,9 @@ import de.uka.ilkd.key.java.expression.operator.adt.OrdAdd;
 import de.uka.ilkd.key.java.expression.operator.adt.OrdExp;
 import de.uka.ilkd.key.java.expression.operator.adt.OrdMax;
 import de.uka.ilkd.key.java.expression.operator.adt.OrdTimes;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLess;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLeq;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLim;
 import de.uka.ilkd.key.java.reference.ArrayLengthReference;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -1386,6 +1389,36 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);	
     }
     
+    @Override
+    public void performActionOnOrdLess(OrdLess x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new OrdLess(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+
+    @Override
+    public void performActionOnOrdLeq(OrdLeq x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new OrdLeq(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+
+   @Override
+    public void performActionOnOrdLim(OrdLim x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new OrdLim(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+
     @Override
     public void performActionOnDLEmbeddedExpression(final DLEmbeddedExpression x) {
         DefaultAction def = new DefaultAction(x) {

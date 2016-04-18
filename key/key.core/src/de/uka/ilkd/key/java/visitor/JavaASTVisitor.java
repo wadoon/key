@@ -123,6 +123,9 @@ import de.uka.ilkd.key.java.expression.operator.adt.OrdAdd;
 import de.uka.ilkd.key.java.expression.operator.adt.OrdExp;
 import de.uka.ilkd.key.java.expression.operator.adt.OrdMax;
 import de.uka.ilkd.key.java.expression.operator.adt.OrdTimes;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLess;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLeq;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLim;
 import de.uka.ilkd.key.java.reference.ArrayLengthReference;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -392,6 +395,22 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnOrdTimes(OrdTimes x) {
 	doDefaultAction(x);
     } 
+
+   @Override
+    public void performActionOnOrdLess(OrdLess x) {
+	doDefaultAction(x);
+    } 
+
+   @Override
+    public void performActionOnOrdLeq(OrdLeq x) {
+	doDefaultAction(x);
+    } 
+
+   @Override
+    public void performActionOnOrdLim(OrdLim x) {
+	doDefaultAction(x);
+    } 
+
 
    @Override
     public void performActionOnOrdOneLiteral(OrdOneLiteral x) {

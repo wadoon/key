@@ -119,6 +119,9 @@ import de.uka.ilkd.key.java.expression.operator.adt.OrdAdd;
 import de.uka.ilkd.key.java.expression.operator.adt.OrdExp;
 import de.uka.ilkd.key.java.expression.operator.adt.OrdMax;
 import de.uka.ilkd.key.java.expression.operator.adt.OrdTimes;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLess;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLeq;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLim;
 import de.uka.ilkd.key.java.reference.ArrayLengthReference;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -253,6 +256,12 @@ public interface Visitor {
 
     void performActionOnOrdOmegaLiteral(OrdOmegaLiteral x);
     
+    void performActionOnOrdLess(OrdLess x);
+
+    void performActionOnOrdLeq(OrdLeq x);
+
+   void performActionOnOrdLim(OrdLim x);
+
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
     void performActionOnStringLiteral(StringLiteral x); 

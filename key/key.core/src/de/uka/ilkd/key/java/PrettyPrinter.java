@@ -1265,6 +1265,36 @@ public class PrettyPrinter {
         printFooter(x);
     } 
 
+   public void printOrdLess(de.uka.ilkd.key.java.expression.operator.adt.OrdLess x) throws java.io.IOException {
+         printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\ord_less", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+
+     public void printOrdLeq(de.uka.ilkd.key.java.expression.operator.adt.OrdLeq x) throws java.io.IOException {
+         printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\ord_leq", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+
+  public void printOrdLim(de.uka.ilkd.key.java.expression.operator.adt.OrdLim x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\ord_lim", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+
   public void printOrdOneLiteral(OrdOneLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
