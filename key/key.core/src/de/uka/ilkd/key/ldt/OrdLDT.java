@@ -19,14 +19,17 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
+import de.uka.ilkd.key.java.expression.literal.OrdOneLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdZeroLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdOmegaLiteral;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdOnat;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdAdd;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdExp;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdMax;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdTimes;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLess;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLeq;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLim;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -40,49 +43,38 @@ public final class OrdLDT extends LDT {
     
     public static final Name NAME = new Name("Ord");
 
-    //  public name constants
-    //  copied from SeqLDT.java, not clear if need here
-    //  public static final Name SEQGET_NAME = new Name("seqGet");
-
-    //getters
-    //   private final SortDependingFunction seqGet;
-    //  private final Function seqLen;
-    // private final Function seqIndexOf; 
-    
-    //the following fields cache the symbols from ord.key. 
-    private final Function o_0;
-    private final Function o_1;
-    private final Function omega;
-    private final Function ord_add;
-    private final Function ord_times ;
-    private final Function ord_exp;
-    private final Function ord_max;
-    private final Function onat;
-    private final Function ord_less;
-    private final Function ord_leq;
-    private final Function ord_lim;
-    private final Function ord_sup;
-
-
-    //-------------------------------------------------------------------------
-    // constructor for class OrdLDT
-    //-------------------------------------------------------------------------
+     //getters
    
-    // names in green have to be the same as in ord.key 
+    private final Function ordLess;
+    private final Function ordLeq;
+    private final Function ordLim;
+  
+    // constructors
+    private final Function ord0;
+    private final Function ord1;
+    private final Function omega;
+    private final Function ordAdd;
+    private final Function ordTimes ;
+    private final Function ordExp;
+    private final Function ordMax;
+    private final Function onat;
+    private final Function ordSup;
+   
+ 
     public OrdLDT(TermServices services) {
 	super(NAME, services);
-        o_0           = addFunction(services, "o_0");
-        o_1           = addFunction(services, "o_1");
-        omega         = addFunction(services, "omega");
-        ord_add       = addFunction(services, "oadd");
-        ord_times     = addFunction(services, "otimes");
-        ord_exp       = addFunction(services, "oexp");
-        ord_max       = addFunction(services, "omax");
-        ord_leq       = addFunction(services, "oleq");
-        onat    	= addFunction(services, "onat");
-        ord_less      = addFunction(services, "olt");
-        ord_lim	      = addFunction(services, "lim");
-        ord_sup	      = addFunction(services, "osup");
+        ord0           = addFunction(services, "ord0");
+        ord1           = addFunction(services, "ord1");
+        omega          = addFunction(services, "omega");
+        ordAdd         = addFunction(services, "ordAdd");
+        ordTimes       = addFunction(services, "ordTimes");
+        ordExp         = addFunction(services, "ordExp");
+        ordMax         = addFunction(services, "ordMax");
+        ordLeq         = addFunction(services, "ordLeq");
+        onat           = addFunction(services, "onat");
+        ordLess        = addFunction(services, "ordLess");
+        ordLim	       = addFunction(services, "ordLim");
+        ordSup	       = addFunction(services, "ordSup");
 
     }
     
@@ -90,59 +82,52 @@ public final class OrdLDT extends LDT {
     // public interface
     //-------------------------------------------------------------------------   
 
+   public Function getOrd0() {
+	  return ord0;   }
 
-   public Function getZero() {
-	  return o_0;   }
-
-   public Function getOne() {
-	  return o_1;   }
+   public Function getOrd1() {
+	  return ord1;   }
 
    public Function getOmega() {
 	  return omega;   }
 
-   public Function getAdd() {
-	return ord_add;
+   public Function getOrdAdd() {
+	return ordAdd;
     }    
     
-   public Function getTimes() {
-	return ord_times;
+   public Function getOrdTimes() {
+	return ordTimes;
     }  
 
-   public Function getExp() {
-	return ord_exp;
+   public Function getOrdExp() {
+	return ordExp;
     }  
 
-   public Function getMax() {
-	return ord_max;
+   public Function getOrdMax() {
+	return ordMax;
     }  
  
-   public Function getLeq() {
-	return ord_leq;
+   public Function getOrdLeq() {
+	return ordLeq;
     }  
  
    public Function getOnat() {
 	return onat;
     }  
 
-   public Function getLess() {
-	return ord_less;
+   public Function getOrdLess() {
+	return ordLess;
     }  
 
-  public Function getLim() {
-	return ord_lim;
+  public Function getOrdLim() {
+	return ordLim;
     }  
  
-  public Function getSup() {
-	return ord_sup;
+  public Function getOrdSup() {
+	return ordSup;
     }  
 
 
-    //-------------------------------------------------------------------------
-    // I did not understand what "isResponsible" is good for.
-    // Supplied trivial overrides   (PHS)
-    //-------------------------------------------------------------------------   
-
-  
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
                                  Term[] subs, 
@@ -167,55 +152,63 @@ public final class OrdLDT extends LDT {
 	    			 Term sub, 
 	    			 TermServices services, 
 	    			 ExecutionContext ec) {
-	// 	return op instanceof SeqSingleton
-	//       || op instanceof SeqConcat
-	//	       || op instanceof SeqSub
-	//       || op instanceof SeqReverse
-	//       || op instanceof SeqIndexOf
-	//       || op instanceof SeqGet
-	//       || op instanceof SeqLength;
-	return true;
-    }
+	 	return 
+		 (op instanceof OrdOnat
+	       || op instanceof OrdExp
+	       || op instanceof OrdAdd
+	       || op instanceof OrdMax
+	       || op instanceof OrdTimes
+	       || op instanceof OrdLess
+	       || op instanceof OrdLeq
+	       || op instanceof OrdLim);
+               }
 
-
-
-    //-------------------------------------------------------------------------
-    // The following overwrites are also a mistery to me.
-    // Tried to pacify the compiler   (PHS)
-    //-------------------------------------------------------------------------  
- 
-
-
-       @Override
+        @Override
     public Term translateLiteral(Literal lit, Services services) {
-    // 	assert lit instanceof DefaultOrdLiteral;
-    	return services.getTermBuilder().func(o_0);
-       }
-    
+     	assert (    lit instanceof OrdOneLiteral
+                ||  lit instanceof OrdZeroLiteral
+		||  lit instanceof OrdOmegaLiteral);
 
+	if(lit instanceof OrdOneLiteral) {
+	    return services.getTermBuilder().func(ord1);
+	}  else if(lit instanceof OrdZeroLiteral) {
+	    return services.getTermBuilder().func(ord0);
+	}  else if(lit instanceof OrdOmegaLiteral) {
+	    return services.getTermBuilder().func(omega);
+	}
+	assert false;
+	return null;
+       }
+  
       @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, 
 	    			   Services serv, 
 	    			   ExecutionContext ec) {
-	  /*	if(op instanceof SeqSingleton) {
-	    return seqSingleton;
-	} else if(op instanceof SeqConcat) {
-	    return seqConcat;
-	} else if(op instanceof SeqSub) {
-	    return seqSub;
-	} else if(op instanceof SeqReverse) {
-	    return seqReverse;
-	} else if(op instanceof SeqIndexOf) {
-	    return seqIndexOf;
-	} else if(op instanceof SeqGet){
-	    return seqGet;
-	} else if(op instanceof SeqLength){
-	    return seqLen;
-	    } */
+	   if(op instanceof OrdOnat) {
+	    return onat;
+   }  else if(op instanceof OrdAdd) {
+	    return ordAdd;
+	} else if(op instanceof OrdExp) {
+	    return ordExp;
+	} else if(op instanceof OrdMax) {
+	    return ordMax;
+	} else if(op instanceof OrdTimes) {
+	    return ordTimes;
+	} else if(op instanceof OrdLess){
+	    return ordLess;
+	} else if(op instanceof OrdLeq){
+	    return ordLeq;
+	} else if(op instanceof OrdLim){
+	    return ordLim;
+	    } 
 	assert false;
 	return null;
 	}  
 
+  //-------------------------------------------------------------------------
+    // The following overwrite is still  a mistery to me.
+    // Tried to pacify the compiler   (PHS)
+    //-------------------------------------------------------------------------  
     
        @Override
     public boolean hasLiteralFunction(Function f) {
@@ -226,14 +219,17 @@ public final class OrdLDT extends LDT {
     
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-	//	if(t.op().equals(seqEmpty)) {
-	//    return EmptySeqLiteral.INSTANCE;
-	//}
-	//assert false;
+       if(t.op().equals(ord0)) {
+	   return OrdZeroLiteral.INSTANCE;
+       } else if(t.op().equals(ord1)) {
+          return OrdOneLiteral.INSTANCE;
+       } else if(t.op().equals(omega)) {
+          return OrdOmegaLiteral.INSTANCE;
+       }
+	assert false;
 	return null;
-	}  
-    
-    
+    } 
+
     @Override
     public final Type getType(Term t) {
 	assert false;

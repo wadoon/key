@@ -2124,11 +2124,11 @@ public class TermBuilder {
   
 
     public Term o_0() {
-       return func(services.getTypeConverter().getOrdLDT().getZero());
+       return func(services.getTypeConverter().getOrdLDT().getOrd0());
     }
 
     public Term o_1() {
-        return func(services.getTypeConverter().getOrdLDT().getOne());
+        return func(services.getTypeConverter().getOrdLDT().getOrd1());
     }
 
     public Term omega() {
@@ -2137,23 +2137,23 @@ public class TermBuilder {
 
 
    public Term oadd(Term a, Term b) {
-	    return func(services.getTypeConverter().getOrdLDT().getAdd(),a,b);
+	    return func(services.getTypeConverter().getOrdLDT().getOrdAdd(),a,b);
     }
 
    public Term otimes(Term a, Term b) {
-	    return func(services.getTypeConverter().getOrdLDT().getTimes(),a,b);
+	    return func(services.getTypeConverter().getOrdLDT().getOrdTimes(),a,b);
     }
 
     public Term oexp(Term a, Term b) {
-	    return func(services.getTypeConverter().getOrdLDT().getExp(),a,b);
+	    return func(services.getTypeConverter().getOrdLDT().getOrdExp(),a,b);
     }
 
    public Term omax(Term a, Term b) {
-	    return func(services.getTypeConverter().getOrdLDT().getLeq(),a,b);
+	    return func(services.getTypeConverter().getOrdLDT().getOrdLeq(),a,b);
     }
 
     public Term oleq(Term a, Term b) {
-	    return func(services.getTypeConverter().getOrdLDT().getMax(),a,b);
+	    return func(services.getTypeConverter().getOrdLDT().getOrdMax(),a,b);
     }
 
     public Term onat(Term a) {
@@ -2161,11 +2161,11 @@ public class TermBuilder {
     }
 
    public Term olt(Term a, Term b) {
-	    return func(services.getTypeConverter().getOrdLDT().getLess(),a,b);
+	    return func(services.getTypeConverter().getOrdLDT().getOrdLess(),a,b);
     }
 
     public Term lim(Term a) {
-	    return func(services.getTypeConverter().getOrdLDT().getLim(),a);
+	    return func(services.getTypeConverter().getOrdLDT().getOrdLim(),a);
     }
  
    // method for ord_sup needs to be added
