@@ -63,18 +63,18 @@ public final class OrdLDT extends LDT {
  
     public OrdLDT(TermServices services) {
 	super(NAME, services);
-        ord0           = addFunction(services, "ord0");
-        ord1           = addFunction(services, "ord1");
+        ord0           = addFunction(services, "o_0");
+        ord1           = addFunction(services, "o_1");
         omega          = addFunction(services, "omega");
-        ordAdd         = addFunction(services, "ordAdd");
-        ordTimes       = addFunction(services, "ordTimes");
-        ordExp         = addFunction(services, "ordExp");
-        ordMax         = addFunction(services, "ordMax");
-        ordLeq         = addFunction(services, "ordLeq");
+        ordAdd         = addFunction(services, "oadd");
+        ordTimes       = addFunction(services, "otimes");
+        ordExp         = addFunction(services, "oexp");
+        ordMax         = addFunction(services, "omax");
+        ordLeq         = addFunction(services, "oleq");
         onat           = addFunction(services, "onat");
-        ordLess        = addFunction(services, "ordLess");
-        ordLim	       = addFunction(services, "ordLim");
-        ordSup	       = addFunction(services, "ordSup");
+        ordLess        = addFunction(services, "olt");
+        ordLim	       = addFunction(services, "lim");
+        ordSup	       = addFunction(services, "osup");
 
     }
     

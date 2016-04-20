@@ -71,6 +71,9 @@ import de.uka.ilkd.key.java.expression.literal.DefaultOrdLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdOmegaLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdOneLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdZeroLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -135,6 +138,14 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
 import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdAdd;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdExp;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLeq;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLess;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdLim;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdMax;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdOnat;
+import de.uka.ilkd.key.java.expression.operator.adt.OrdTimes;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.reference.ArrayReference;
@@ -440,7 +451,9 @@ public class Recoder2KeYConverter {
 
         Debug.assertTrue(result instanceof ProgramElement || result == null,
                 "the result is not a ProgramElement but", result);
-
+	//	System.out.println("****");
+	//System.out.println("callConvert returns ="+result.toString()); 
+        //System.out.println("****");
         return result;
 
     }
@@ -690,6 +703,7 @@ public class Recoder2KeYConverter {
      *             for various reasons
      */
     private Class<?> getKeYClass(Class<? extends recoder.java.JavaProgramElement> recoderClass) {
+        
         String className = getKeYName(recoderClass);
         try {
             return Class.forName(className); // Classes are always in this component; ClassLoaderUtil#getClassforName(String) does not need to be used.
@@ -718,11 +732,15 @@ public class Recoder2KeYConverter {
      * @return String containing the KeY-Classname
      */
     private String getKeYName(Class<? extends recoder.java.JavaProgramElement> recoderClass) {
+        System.out.println("****");
+	System.out.println("reached getKeYName with recoderClass ="+recoderClass.toString()); 
         final String prefix ="de.uka.ilkd.key.";
         final String recoderClassName = recoderClass.getName();
         if (recoderClassName.startsWith("recoder.")) {
             return prefix+recoderClassName.substring(RECODER_PREFIX_LENGTH);
         } else if (recoderClassName.startsWith(prefix+"java.recoderext.")) {
+               	System.out.println("returns "+recoderClassName.replaceAll("recoderext\\.", ""));
+           	System.out.println("****");
             return recoderClassName.replaceAll("recoderext\\.", "");
         } else {
             assert false : "Unexpected class prefix: "+recoderClassName;
@@ -825,8 +843,8 @@ public class Recoder2KeYConverter {
                new BooleanLiteral(collectComments(booleanLit), positionInfo(booleanLit), false);
     }
     
-    public DefaultOrdLiteral convert(de.uka.ilkd.key.java.recoderext.adt.DefaultOrdLiteral e) {
-        return DefaultOrdLiteral.INSTANCE;
+    public OrdZeroLiteral convert(de.uka.ilkd.key.java.recoderext.adt.OrdZeroLiteral e) {
+        return OrdZeroLiteral.INSTANCE;
     }
 
 

@@ -20,12 +20,14 @@ import recoder.java.expression.Literal;
 
 public final class OrdZeroLiteral extends Literal {
     
+            
     /**
      * 
      */
     private static final long serialVersionUID = 0;
     public static final OrdZeroLiteral INSTANCE = new OrdZeroLiteral();
-    
+
+
     @Override
     public Expression deepClone() {
 	return this;
