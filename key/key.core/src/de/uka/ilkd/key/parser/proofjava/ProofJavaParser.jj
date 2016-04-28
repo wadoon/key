@@ -223,7 +223,7 @@ public class ProofJavaParser {
     static void addMultiLineComment(Token tok) {
         addComment(factory.createComment(tok.image), tok);
     }
-
+ 
     static void addDocComment(Token tok) {
         addComment(factory.createDocComment(tok.image), tok);
     }
@@ -3246,6 +3246,12 @@ Expression ADTConstructor() :
         final Expression third = new SeqSub(expr, factory.createPlus(expr2,one), factory.createMinus(new SeqLength(expr),one));
         result = new SeqConcat(first, new SeqConcat(second, third));
         setPrefixInfo(result);
+    }
+    |
+    "\\ord_add" "(" expr = Expression() "," result = Expression() ")"
+    { 
+      result = new OrdAdd(expr,result);
+      setPrefixInfo(result);
     }
     )
     {

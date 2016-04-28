@@ -21,10 +21,10 @@ public class OrdAdd extends ADTPrefixConstruct {
     /**
      * 
      */
-    private static final long serialVersionUID = -5950638934821692317L;
+    private static final long serialVersionUID = 0;
 
     public OrdAdd(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
+      	super(lhs, rhs);
 	makeParentRoleValid();
     }
 

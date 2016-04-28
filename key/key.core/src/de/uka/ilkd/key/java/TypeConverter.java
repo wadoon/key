@@ -527,6 +527,8 @@ public final class TypeConverter {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
     	} else if (t1 == PrimitiveType.JAVA_SEQ && t2 == PrimitiveType.JAVA_SEQ) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        }  else if (t1 == PrimitiveType.JAVA_ORD && t2 == PrimitiveType.JAVA_ORD) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_ORD);
     	} else if (type1.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
             return type1;
     	} else if (type2.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
@@ -560,6 +562,8 @@ public final class TypeConverter {
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
 	else if (t1 == PrimitiveType.JAVA_SEQ)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+	else if (t1 == PrimitiveType.JAVA_ORD)
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_ORD);
 	else if (t1 == PrimitiveType.JAVA_BIGINT)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 	else if (t1 == PrimitiveType.JAVA_REAL)

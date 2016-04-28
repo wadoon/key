@@ -24,8 +24,8 @@ public class SeqConcat extends ADTPrefixConstruct {
     private static final long serialVersionUID = -5950638934821692317L;
 
     public SeqConcat(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
-	makeParentRoleValid();
+ 	super(lhs, rhs);
+   	makeParentRoleValid();
     }
 
 

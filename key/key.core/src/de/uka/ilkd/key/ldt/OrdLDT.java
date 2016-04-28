@@ -42,10 +42,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class OrdLDT extends LDT {
     
     public static final Name NAME = new Name("Ord");
-
+ 
      //getters
-   
-    private final Function ordLess;
+ 
+     private final Function ordLess;
     private final Function ordLeq;
     private final Function ordLim;
   
@@ -81,6 +81,8 @@ public final class OrdLDT extends LDT {
     //-------------------------------------------------------------------------
     // public interface
     //-------------------------------------------------------------------------   
+
+
 
    public Function getOrd0() {
 	  return ord0;   }

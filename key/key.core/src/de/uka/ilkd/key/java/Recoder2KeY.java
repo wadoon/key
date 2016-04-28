@@ -1290,7 +1290,7 @@ public class Recoder2KeY implements JavaReader {
      *             always
      */
     public static void reportError(String message, Throwable t) {
-          System.out.println("reached reportError with message "+message); 
+	   System.out.println("reached reportError with message "+message); 
           System.out.println("throwable is "+ t); 
           java.io.StringWriter sw = new java.io.StringWriter();
           java.io.PrintWriter pw = new java.io.PrintWriter(sw);
