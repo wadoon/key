@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.DefaultOrdLiteral;
+import de.uka.ilkd.key.java.expression.literal.OrdZeroLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -82,7 +83,7 @@ public final class PrimitiveType implements Type {
     public static final PrimitiveType JAVA_SEQ =
 	new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE, SeqLDT.NAME);
     public static final PrimitiveType JAVA_ORD =
-    	new PrimitiveType("\\ord", DefaultOrdLiteral.INSTANCE, OrdLDT.NAME);
+    	new PrimitiveType("\\ord", OrdZeroLiteral.INSTANCE, OrdLDT.NAME);
     public static final PrimitiveType JAVA_FREE_ADT =
             new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
     public static final PrimitiveType JAVA_MAP =

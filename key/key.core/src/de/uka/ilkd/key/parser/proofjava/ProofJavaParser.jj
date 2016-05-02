@@ -2808,6 +2808,21 @@ Expression ADTGetter() :
     {
         result = new SeqGet(expr, result);
     }
+    |
+    "\\ord_lim" "(" expr = Expression() ")"
+    { 
+      result = new OrdLim(expr);
+    }
+   |
+    "\\ord_less" "(" expr = Expression() "," result = Expression() ")"
+    { 
+      result = new OrdLess(expr,result);
+    }
+    |
+    "\\ord_leq" "(" expr = Expression() "," result = Expression() ")"
+    { 
+      result = new OrdLeq(expr,result);
+    }
     )
     {
         checkConstruction(result);
@@ -3248,17 +3263,42 @@ Expression ADTConstructor() :
         setPrefixInfo(result);
     }
     |
+    "\\onat" "(" expr = Expression() ")"
+    { 
+      result = new OrdOnat(expr);
+      setPrefixInfo(result);
+    }
+    |
     "\\ord_add" "(" expr = Expression() "," result = Expression() ")"
     { 
       result = new OrdAdd(expr,result);
       setPrefixInfo(result);
     }
+    |
+    "\\ord_times" "(" expr = Expression() "," result = Expression() ")"
+    { 
+      result = new OrdTimes(expr,result);
+      setPrefixInfo(result);
+    }
+    |
+    "\\ord_exp" "(" expr = Expression() "," result = Expression() ")"
+    { 
+      result = new OrdExp(expr,result);
+      setPrefixInfo(result);
+    }
+    |
+    "\\ord_max" "(" expr = Expression() "," result = Expression() ")"
+    { 
+      result = new OrdMax(expr,result);
+      setPrefixInfo(result);
+    }
+   
     )
     {
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
-  }
+     }
 }
 
 Expression GeneralEscapeExpression() :
@@ -3415,6 +3455,9 @@ Literal Literal() :
 | result = NullLiteral()
 | result = EmptySetLiteral()
 | result = EmptySeqLiteral()
+| result = OrdOmegaLiteral()
+| result = OrdZeroLiteral()
+| result = OrdOneLiteral()
 | result = EmptyMapLiteral()
 
 )
@@ -3480,6 +3523,45 @@ EmptySeqLiteral EmptySeqLiteral() :
       result = EmptySeqLiteral.INSTANCE;
       setPrefixInfo(result);
       return result;
+  }
+}
+
+OrdOmegaLiteral OrdOmegaLiteral() :
+{
+    OrdOmegaLiteral result;
+}
+{
+   "\\omega"
+  {
+   result = OrdOmegaLiteral.INSTANCE;
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+OrdZeroLiteral OrdZeroLiteral() :
+{
+    OrdZeroLiteral result;
+}
+{
+   "\\o_0"
+  {
+   result = OrdZeroLiteral.INSTANCE;
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+OrdOneLiteral OrdOneLiteral() :
+{
+    OrdOneLiteral result;
+}
+{
+   "\\o_1"
+  {
+   result = OrdOneLiteral.INSTANCE;
+    setPostfixInfo(result);
+    return result;
   }
 }
 
