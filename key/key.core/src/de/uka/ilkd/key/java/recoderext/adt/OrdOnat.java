@@ -18,11 +18,12 @@ import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 /**
- * @since 1.7.2118
- * @author bruns
+ * 
+ * @author phs
  *
  */
-public class OrdOnat extends Operator {
+public class OrdOnat extends   ADTPrefixConstruct {
+    // public class OrdOnat extends   operator {
 
     private static final long serialVersionUID = 0;
 
