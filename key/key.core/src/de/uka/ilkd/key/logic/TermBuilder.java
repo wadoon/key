@@ -2149,11 +2149,11 @@ public class TermBuilder {
     }
 
    public Term omax(Term a, Term b) {
-	    return func(services.getTypeConverter().getOrdLDT().getOrdLeq(),a,b);
+	    return func(services.getTypeConverter().getOrdLDT().getOrdMax(),a,b);
     }
 
     public Term oleq(Term a, Term b) {
-	    return func(services.getTypeConverter().getOrdLDT().getOrdMax(),a,b);
+	    return func(services.getTypeConverter().getOrdLDT().getOrdLeq(),a,b);
     }
 
     public Term onat(Term a) {
