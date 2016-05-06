@@ -188,7 +188,7 @@ public final class OrdLDT extends LDT {
 	    			   ExecutionContext ec) {
 	   if(op instanceof OrdOnat) {
 	    return onat;
-   }  else if(op instanceof OrdAdd) {
+        }  else if(op instanceof OrdAdd) {
 	    return ordAdd;
 	} else if(op instanceof OrdExp) {
 	    return ordExp;

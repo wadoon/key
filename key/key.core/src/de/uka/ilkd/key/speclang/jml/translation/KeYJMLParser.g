@@ -1775,6 +1775,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
    |   ( ORDOMEGA
       | ORDONE
       | ORDZERO
+      | (LPAREN (ORD) quantifiedvardecls SEMI)
       | ORDADD
       | ORDTIMES 
       | ORDEXP
@@ -2156,6 +2157,10 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
         |   SEQ
             {
                 type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SEQ);
+            }
+        |   ORD
+            {
+                type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_ORD);
             }
         | FREE { type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_FREE_ADT); }
 	)
