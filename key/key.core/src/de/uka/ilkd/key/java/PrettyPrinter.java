@@ -1227,9 +1227,11 @@ public class PrettyPrinter {
     public void printOrdAdd(de.uka.ilkd.key.java.expression.operator.adt.OrdAdd x) throws java.io.IOException {
        printHeader(x);
         writeInternalIndentation(x);
-        writeToken(0, "+", x);
+        writeToken(0, "\\ord_add", x);
         write("(");
         writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
         write(")");
         printFooter(x);
     } 
@@ -1240,6 +1242,8 @@ public class PrettyPrinter {
         writeToken(0, "\\ord_exp", x);
         write("(");
         writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
         write(")");
         printFooter(x);
     } 
@@ -1251,6 +1255,8 @@ public class PrettyPrinter {
         writeToken(0, "\\ord_max", x);
         write("(");
         writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
         write(")");
         printFooter(x);
     } 
@@ -1258,9 +1264,11 @@ public class PrettyPrinter {
      public void printOrdTimes(de.uka.ilkd.key.java.expression.operator.adt.OrdTimes x) throws java.io.IOException {
          printHeader(x);
         writeInternalIndentation(x);
-        writeToken(0, "*", x);
+        writeToken(0, "\\ord_times", x);
         write("(");
         writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
         write(")");
         printFooter(x);
     } 
@@ -1271,6 +1279,8 @@ public class PrettyPrinter {
         writeToken(0, "\\ord_less", x);
         write("(");
         writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
         write(")");
         printFooter(x);
     } 
@@ -1281,6 +1291,8 @@ public class PrettyPrinter {
         writeToken(0, "\\ord_leq", x);
         write("(");
         writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
         write(")");
         printFooter(x);
     } 
