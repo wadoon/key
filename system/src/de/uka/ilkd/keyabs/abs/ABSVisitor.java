@@ -97,4 +97,8 @@ public interface ABSVisitor extends ProgramVisitor {
 
 	void performActionOnABSNegExp(ABSNegExp x);
 
+	void performActionOnABSPatternVar(ABSPatternVar x);
+
+	void performActionOnABSPatternVarUse(ABSPatternVarUse x);
+
 }

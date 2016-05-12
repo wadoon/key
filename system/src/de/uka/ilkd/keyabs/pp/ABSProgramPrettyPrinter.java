@@ -425,24 +425,6 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
 	            e.printStackTrace();
 	        }		
 	}
-/*	
-	@Override
-	public void performActionOnABSPatternVar(ABSPatternVar x) {
-		  try {
-	            lp.printABSPatternVar(x);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }		
-	}
-	
-	@Override
-	public void performActionOnABSPatternVarUse(ABSPatternVarUse x) {
-		  try {
-	            lp.printABSPatternVarUse(x);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }		
-	}*/
 	
 	@Override
 	public void performActionOnABSUnderscorePattern(ABSUnderscorePattern x) {
@@ -469,5 +451,23 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        }		
+	}
+
+	@Override
+	public void performActionOnABSPatternVar(ABSPatternVar x) {
+		  try {
+	            lp.printABSPatternVar(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }				
+	}
+
+	@Override
+	public void performActionOnABSPatternVarUse(ABSPatternVarUse x) {
+		  try {
+	            lp.printABSPatternVarUse(x);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }				
 	}
 }

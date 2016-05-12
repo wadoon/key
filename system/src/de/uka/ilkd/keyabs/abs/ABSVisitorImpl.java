@@ -305,4 +305,16 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     public void performActionOnABSUnderscorePattern(ABSUnderscorePattern x) {
     	doDefaultAction(x);
     }
+    
+    @Override
+    public void performActionOnABSPatternVar(ABSPatternVar x) {
+    	doDefaultAction(x);
+    }
+
+	@Override
+	public void performActionOnABSPatternVarUse(ABSPatternVarUse x) {
+    	doDefaultAction(x);
+	}
+
+    
 }
