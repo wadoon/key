@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.util.IOForwarder;
  * @author Kai Wallisch
  *
  */
+@SuppressWarnings("serial")
 public abstract class ForkedTestFileRunner implements Serializable {
 
    private static final String FORK_TIMEOUT_KEY = "forkTimeout";
@@ -47,26 +47,28 @@ public abstract class ForkedTestFileRunner implements Serializable {
     * Converts a {@link Serializable} object into a byte array and stores it in
     * a file at given location.
     */
-   private static void writeObject(Path path, Serializable s)
-         throws IOException {
-
-        try(ObjectOutputStream objectOutputStream =
-                new ObjectOutputStream(Files.newOutputStream(path))) {
-            objectOutputStream.writeObject(s);
+    public static void writeObject(Path path, Serializable s) {
+        try {
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(Files.newOutputStream(path))) {
+                objectOutputStream.writeObject(s);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-   }
+    }
 
    /**
     * Converts contents of a file back into an object.
     */
-    private static <S> S readObject(Path path, Class<S> type) throws IOException,
-         ClassNotFoundException {
-        try(ObjectInputStream objectInputStream =
-                new ObjectInputStream(Files.newInputStream(path))) {
-            Object result = objectInputStream.readObject();
-            return type.cast(result);
+    private static <S> S readObject(Path path, Class<S> type) {
+        try {
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(Files.newInputStream(path))) {
+                return type.cast(objectInputStream.readObject());
+            }
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
         }
-   }
+    }
 
    /**
     * Process a single {@link TestFile} in a separate subprocess.
@@ -151,41 +153,31 @@ public abstract class ForkedTestFileRunner implements Serializable {
         return Arrays.asList(array);
    }
 
-   public static void main(String[] args) throws IOException {
-      /*
-       * Check for existence of temp dir before entering try-catch block.
-       * Throwables occuring in this block are written to temp dir, so its
-       * existence needs to be confirmed beforehand.
-       */
-      Path tempDirectory = Paths.get(args[0]);
-      if (!tempDirectory.toFile().exists()) {
-         throw new Error("RunAllProofs temporary directory does not exist: "
-               + tempDirectory);
-      }
+    public static void main(String[] args) throws IOException {
+        /*
+         * Check for existence of temp dir before entering try-catch block.
+         * Throwables occuring in this block are written to temp dir, so its
+         * existence needs to be confirmed beforehand.
+         */
+        Path tempDirectory = Paths.get(args[0]);
+        if (!tempDirectory.toFile().exists()) {
+            throw new Error("RunAllProofs temporary directory does not exist: " + tempDirectory);
+        }
 
-      try {
-            TestFile[] testFiles =
-                    ForkedTestFileRunner.readObject(
-                            getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
+        try {
+            TestFile[] testFiles = ForkedTestFileRunner.readObject(getLocationOfSerializedTestFiles(tempDirectory),
+                    TestFile[].class);
             installTimeoutWatchdog(testFiles[0].getSettings(), tempDirectory);
-         ArrayList<TestResult> testResults = new ArrayList<>();
-         for (TestFile testFile : testFiles) {
-            testResults.add(testFile.runKey());
-         }
-         writeObject(getLocationOfSerializedTestResults(tempDirectory),
+            ArrayList<TestResult> testResults = new ArrayList<>();
+            for (TestFile testFile : testFiles) {
+                testResults.add(testFile.runKey());
+            }
+            writeObject(getLocationOfSerializedTestResults(tempDirectory),
                     testResults.toArray(new TestResult[testResults.size()]));
         } catch (Throwable t) {
-          try {
-         writeObject(getLocationOfSerializedException(tempDirectory), t);
-          } catch (NotSerializableException e) {
-              // There are cases when exceptions refer to objects that cannot be serialized ...
-              // then save the stacktrace at least
-              Exception subst = new Exception(t.getMessage());
-              subst.setStackTrace(t.getStackTrace());
-              writeObject(getLocationOfSerializedException(tempDirectory), subst);
-          }
-      }
-   }
+            writeObject(getLocationOfSerializedException(tempDirectory), t);
+        }
+    }
 
     /**
      * Launches a timeout-thread acting as a watchdog over this forked instance.

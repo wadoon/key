@@ -27,6 +27,14 @@ import static de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection
   public Object recoverFromMismatchedSet(IntStream input, RecognitionException e, BitSet follow) throws RecognitionException {
     throw e;
   }
+  
+  /*
+   * This method just calls a constructor. We need this method so we can call a different constructor
+   * in a parser subclass.
+   */
+  public TestFile getTestFile(TestProperty testProperty, String path, ProofCollectionSettings settings) {
+    return new TestFile(testProperty, path, settings);
+  }
 }
 
 @rulecatch {
@@ -123,7 +131,7 @@ testFile[ProofCollectionSettings settings]  returns [TestFile file]
     ':'? // double colon is optional (doesn't hurt if omitted)
     path = valueDeclaration
     {
-        file = new TestFile(testProperty, path, settings);
+        file = getTestFile(testProperty, path, settings);
     }
 ;
 

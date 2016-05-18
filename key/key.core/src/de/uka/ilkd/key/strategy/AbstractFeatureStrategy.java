@@ -439,7 +439,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return btManager;
     }
 
-    public final void instantiateApp ( RuleApp              app,
+    public void instantiateApp ( RuleApp              app,
                                        PosInOccurrence      pio,
                                        Goal                 goal,
                                        RuleAppCostCollector collector ) {

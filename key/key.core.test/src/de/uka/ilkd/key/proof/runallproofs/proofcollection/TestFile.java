@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -11,14 +13,12 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.FileProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
-
-import static org.junit.Assert.*;
 
 /**
  * Data structure for .key-files that will be tested during
@@ -175,15 +175,7 @@ public class TestFile implements Serializable {
             return getRunAllProofsTestResult(true, settings);
          }
 
-         // Run KeY prover.
-         if(script == null) {
-             // auto mode
-         env.getProofControl().startAndWaitForAutoMode(loadedProof);
-         } else {
-             // ... script
-             ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-             pse.execute(env.getUi(), env.getLoadedProof());
-         }
+         autoMode(env, loadedProof, script);
 
          success = (testProperty == TestProperty.PROVABLE) == loadedProof
                .closed();
@@ -201,15 +193,7 @@ public class TestFile implements Serializable {
           * Testing proof reloading now. Saving and reloading proof only in case
           * it was closed and test property is PROVABLE.
           */
-         if (settings.reloadEnabled()
-               && (testProperty == TestProperty.PROVABLE) && success) {
-            // Save the available proof to a temporary file.
-            loadedProof.saveToFile(proofFile);
-            reloadProof(proofFile);
-            if(verbose) {
-                System.err.println("... success: reloaded.");
-            }
-         }
+         reload(verbose, proofFile, loadedProof, success);
       }
       catch (Throwable t) {
          if(verbose) {
@@ -229,12 +213,41 @@ public class TestFile implements Serializable {
       return getRunAllProofsTestResult(success, settings);
    }
 
+    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success)
+            throws IOException, Exception {
+        if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
+            // Save the available proof to a temporary file.
+            loadedProof.saveToFile(proofFile);
+            reloadProof(proofFile);
+            if (verbose) {
+                System.err.println("... success: reloaded.");
+            }
+        }
+    }
+
+    /**
+     * By overriding this method we can change the way how we invoke automode,
+     * for instance if we want to use a different strategy.
+     */
+    protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
+            Pair<String, Location> script) throws Exception {
+        // Run KeY prover.
+        if (script == null) {
+            // auto mode
+            env.getProofControl().startAndWaitForAutoMode(loadedProof);
+        } else {
+            // ... script
+            ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+            pse.execute(env.getUi(), env.getLoadedProof());
+        }
+    }
+
    /*
     * has resemblances with KeYEnvironment.load ...
     */
    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(File keyFile) throws ProblemLoaderException, ProofInputException {
        DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
-       AbstractProblemLoader loader = ui.load(null, keyFile, null, null, null, null, false);
+       FileProblemLoader loader = ui.load(null, keyFile, null, null, null, null, false);
        InitConfig initConfig = loader.getInitConfig();
        KeYEnvironment<DefaultUserInterfaceControl> env =
                new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig,

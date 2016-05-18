@@ -65,7 +65,8 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.proof.io.FileProblemLoader;
+import de.uka.ilkd.key.proof.io.FileProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -335,7 +336,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     * {@inheritDoc}
     */
    @Override
-   public AbstractProblemLoader load(Profile profile,
+   public FileProblemLoader load(Profile profile,
                                     File file,
                                     List<File> classPath,
                                     File bootClassPath,
@@ -480,7 +481,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       }
         getMediator().resetNrGoalsClosedByHeuristics();
         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-            ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+            ((KeYUserProblemFile)poContainer.getProofOblInput()).closeLexerStream();
         }
    }
    
@@ -531,7 +532,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       if (makeMainWindowVisible && !main.isVisible()) {
           main.setVisible(true);
       }
-      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
+      FileProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
    }

@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.proof.init.InitConfig;
 
 public class ParserConfig {
 
@@ -32,6 +33,9 @@ public class ParserConfig {
 	this.nss      = nss;
     }
 
+    public ParserConfig(InitConfig initConfig) {
+        this(initConfig.getServices(), initConfig.namespaces());
+    }
 
     public Services services() {
 	return services;

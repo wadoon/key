@@ -89,8 +89,6 @@ public class InitConfig {
     private Map<Name, Taclet> activatedTacletCache = null;
     
     
-    private String originalKeYFileName;
-    
     private ProofSettings settings;    
 
 
@@ -434,7 +432,6 @@ public class InitConfig {
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.setTaclets(taclets);
-        ic.originalKeYFileName = originalKeYFileName;
         ic.justifInfo = justifInfo.copy();
         return ic;
     }

@@ -28,14 +28,14 @@ import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.init.Profile;
 
 /**
- * This class extends the functionality of the {@link AbstractProblemLoader}. It
+ * This class extends the functionality of the {@link FileProblemLoader}. It
  * allows to do the loading process as {@link SwingWorker3} {@link Thread} and
  * it opens the proof obligation browser it is not possible to instantiate a
  * proof configured by the opened file.
  *
  * @author Martin Hentschel
  */
-public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename in MultiThreadProblemLoader analog to SingleThreadProblemLoader because it uses multiple Threads (UI and SwingWorker)?
+public final class ProblemLoader extends FileProblemLoader { // TODO: Rename in MultiThreadProblemLoader analog to SingleThreadProblemLoader because it uses multiple Threads (UI and SwingWorker)?
 
    private final ProverTaskListener ptl;
    

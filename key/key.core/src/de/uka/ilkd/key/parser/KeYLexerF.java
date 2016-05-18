@@ -38,6 +38,10 @@ public class KeYLexerF extends KeYLexer {
     public KeYLexerF(String formula, String fileName) {
         super(getStream(new ANTLRStringStream(formula), fileName));
     }
+    
+    public KeYLexerF(String formula) {
+        super(new ANTLRStringStream(formula));
+    }
 
     /*
      * Use this to set stream name before sending it to super constructor.

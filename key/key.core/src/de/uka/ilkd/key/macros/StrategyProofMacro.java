@@ -130,9 +130,9 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             for (final Goal openGoal : proof.openGoals()) {
                 AutomatedRuleApplicationManager manager = openGoal.getRuleAppManager();
                 // touch the manager only if necessary
-                if(manager.getDelegate() != null) {
-                    while(manager.getDelegate() != null) {
-                        manager = manager.getDelegate();
+                if(manager instanceof FocussedRuleApplicationManager) {
+                    while(manager instanceof FocussedRuleApplicationManager) {
+                        manager = ((FocussedRuleApplicationManager) manager).getDelegate();
                     }
                     manager.clearCache();
                     openGoal.setRuleAppManager(manager);

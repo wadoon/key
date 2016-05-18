@@ -44,8 +44,11 @@ public final class ProblemLoaderException extends Exception {
         if (getMessage() != null)
             sb = sb.append(getMessage());
         sb = sb.append(" (");
-        if (origin == null) sb = sb.append("unknown origin");
-        else sb = sb.append("file: ").append(origin.getFile());
+        if (origin instanceof FileProblemLoader) {
+            sb = sb.append("file: ").append(((FileProblemLoader) origin).getFile());
+        } else {
+            sb = sb.append("unknown origin");
+        }
         if (getCause() != null) {
             sb = sb.append("; caused by: ");
             sb = sb.append(getCause());

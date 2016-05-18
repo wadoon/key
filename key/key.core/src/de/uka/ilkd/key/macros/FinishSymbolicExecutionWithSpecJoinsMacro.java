@@ -167,9 +167,9 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                         .getRuleAppManager();
 
                 // Touch the manager only if necessary.
-                if (manager.getDelegate() != null) {
-                    while (manager.getDelegate() != null) {
-                        manager = manager.getDelegate();
+                if (manager instanceof FocussedRuleApplicationManager) {
+                    while (manager instanceof FocussedRuleApplicationManager) {
+                        manager = ((FocussedRuleApplicationManager) manager).getDelegate();
                     }
                     manager.clearCache();
                     openGoal.setRuleAppManager(manager);

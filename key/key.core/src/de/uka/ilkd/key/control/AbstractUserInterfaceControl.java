@@ -33,11 +33,13 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.proof.io.FileProblemLoader;
+import de.uka.ilkd.key.proof.io.FileProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.proof.io.SingleThreadProblemLoaderFactory;
+import de.uka.ilkd.key.proof.io.StringProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 
 /**
@@ -196,37 +198,50 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
         }
     }
     
+    private <T extends AbstractProblemLoader> T load(SingleThreadProblemLoaderFactory<T> factory) throws ProblemLoaderException {
+        return factory.load();
+    }
+    
+    public FileProblemLoader load(final File file, final List<File> classPath, final File bootClassPath,
+            final List<File> includes) throws ProblemLoaderException {
+        final ProblemLoaderControl control = this;
+        return load(new SingleThreadProblemLoaderFactory<FileProblemLoader>() {
+            @Override
+            public FileProblemLoader createProblemLoader() {
+                return new FileProblemLoader(file, classPath, bootClassPath, includes, control);
+            }
+        });
+    }
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile,
-                                     File file,
-                                     List<File> classPath,
-                                     File bootClassPath,
-                                     List<File> includes,
-                                     Properties poPropertiesToForce,
-                                     boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
-       AbstractProblemLoader loader = null;
-       try {
-          loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes, profile, forceNewProfileOfNewProofs,
-                                                 this, false, poPropertiesToForce);
-          loader.load();
-          return loader;
-       }
-       catch(ProblemLoaderException e) {
-           if (loader != null && loader.getProof() != null) {
-               loader.getProof().dispose();
-           }
-           // rethrow that exception
-           throw e;
-       }
-       catch (Throwable e) {
-           if (loader != null && loader.getProof() != null) {
-               loader.getProof().dispose();
-           }
-           throw new ProblemLoaderException(loader, e);
-       }
+    public FileProblemLoader load(final Profile profile,
+            final File file,
+            final List<File> classPath,
+            final File bootClassPath,
+            final List<File> includes,
+            final Properties poPropertiesToForce,
+            final boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+        final ProblemLoaderControl control = this;
+        return load(new SingleThreadProblemLoaderFactory<FileProblemLoader>() {
+            @Override
+            public FileProblemLoader createProblemLoader() {
+                return new FileProblemLoader(file, classPath, bootClassPath, includes, profile,
+                        forceNewProfileOfNewProofs, control, poPropertiesToForce);
+            }
+        });
+    }
+    
+    public StringProblemLoader load(final String problem) throws ProblemLoaderException {
+        final ProblemLoaderControl control = this;
+        return load(new SingleThreadProblemLoaderFactory<StringProblemLoader>() {
+            @Override
+            public StringProblemLoader createProblemLoader() {
+                return new StringProblemLoader(problem, control);
+            }
+        });
     }
 
     /**

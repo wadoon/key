@@ -623,19 +623,19 @@ public abstract class AbstractProofControl implements ProofControl {
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-           for (final Goal goal : proof.openGoals()) {
-              // remove any filtering rule app managers that are left in the proof
-              // goals
-              if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
-                  final AutomatedRuleApplicationManager focusManager
-                          = (AutomatedRuleApplicationManager) goal.getRuleAppManager();
-                  goal.setRuleAppManager(null);
-                  final AutomatedRuleApplicationManager realManager
-                          = focusManager.getDelegate();
-                  realManager.clearCache();
-                  goal.setRuleAppManager(realManager);
-              }
-          }
+            for (final Goal goal : proof.openGoals()) {
+                // remove any filtering rule app managers that are left in the
+                // proof goals
+                final AutomatedRuleApplicationManager manager =
+                        (AutomatedRuleApplicationManager) goal.getRuleAppManager();
+                if (manager instanceof FocussedRuleApplicationManager) {
+                    goal.setRuleAppManager(null);
+                    final AutomatedRuleApplicationManager realManager =
+                            ((FocussedRuleApplicationManager) manager).getDelegate();
+                    realManager.clearCache();
+                    goal.setRuleAppManager(realManager);
+                }
+            }
         }
     }
 }

@@ -56,6 +56,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -76,7 +77,7 @@ import de.uka.ilkd.key.util.Triple;
  * <b>There is no need to change this class to change the available
  * settings!</b> The only thing to be done is to modify the available
  * {@link StrategySettingsDefinition} in
- * {@link JavaCardDLStrategy.Factory#getSettingsDefinition()}.
+ * {@link JavaCardDLStrategyFactory#getSettingsDefinition()}.
  * </p>
  * <p>
  * As future work this class should not show a fixed content defined by

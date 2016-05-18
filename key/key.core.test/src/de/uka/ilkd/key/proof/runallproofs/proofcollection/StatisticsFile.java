@@ -1,6 +1,12 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +26,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
  * This class must be immutable because it is part of
  * {@link ProofCollectionSettings}, which is immutable as well.
  */
+@SuppressWarnings("serial")
 public class StatisticsFile implements Serializable {
 
    private final File statisticsFile;

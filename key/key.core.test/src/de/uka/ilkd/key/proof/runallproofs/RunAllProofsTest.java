@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,14 +25,13 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
-import org.junit.AfterClass;
 import org.junit.Test;
 import org.key_project.util.java.IOUtil;
 
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 
 /**
  * <p>
@@ -89,6 +87,8 @@ public class RunAllProofsTest {
    public static final File EXAMPLE_DIR;
 
    public static final File KEY_CORE_TEST;
+   
+   public static final File RUNALLPROOFS_DIR;
 
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
 
@@ -101,6 +101,8 @@ public class RunAllProofsTest {
       KEY_HOME = IOUtil.getProjectRoot(RunAllProofsTest.class).getParentFile();
       EXAMPLE_DIR = new File(KEY_HOME, "key.ui" + File.separator + "examples");
       KEY_CORE_TEST = new File(KEY_HOME, "key.core.test");
+      RUNALLPROOFS_DIR = new File(KEY_CORE_TEST, "testresults" + File.separator + "runallproofs");
+      RUNALLPROOFS_DIR.mkdirs();
    }
 
    private static void assertDirectoryExists(File dir) {
@@ -150,7 +152,7 @@ public class RunAllProofsTest {
      *             file
      */
 
-   public static Collection<Object[]> data(ProofCollection proofCollection) throws IOException {
+   public static List<RunAllProofsTestUnit[]> data(ProofCollection proofCollection) throws IOException {
       assertDirectoryExists(KEY_HOME);
       assertDirectoryExists(KEY_CORE_TEST);
       assertDirectoryExists(EXAMPLE_DIR);
@@ -159,7 +161,7 @@ public class RunAllProofsTest {
        * Create list of constructor parameters that will be returned by this
        * method. Suitable constructor is automatically determined by JUnit.
        */
-      Collection<Object[]> data = new LinkedList<Object[]>();
+      List<RunAllProofsTestUnit[]> data = new LinkedList<>();
       List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
       for (RunAllProofsTestUnit unit : units) {
          data.add(new RunAllProofsTestUnit[] { unit });
@@ -168,22 +170,44 @@ public class RunAllProofsTest {
       return data;
    }
 
-   /**
-    * Uses {@link ProofCollectionParser} to parse the given file and returns a
-    * parse result that is received from main parser entry point.
-    */
-   public static ProofCollection parseIndexFile(final String index) throws IOException {
-      File automaticJAVADL = new File(EXAMPLE_DIR, index);
-      CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
-      ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
-      TokenStream tokenStream = new CommonTokenStream(lexer);
-      ProofCollectionParser parser = new ProofCollectionParser(tokenStream);
-      try {
-         return parser.parserEntryPoint();
-      } catch (RecognitionException e) {
-         String msg = parser.getErrorMessage(e, parser.getTokenNames());
-         throw new IOException("Cannot parse " + automaticJAVADL +
-                               " at line " + e.line + ": " + msg, e);
-      }
-   }
+    /**
+     * Uses {@link ProofCollectionParser} to parse the given file and returns a
+     * parse result that is received from main parser entry point.
+     */
+    public static ProofCollection parseIndexFile(String index) throws IOException {
+        return parseIndexFile(index, new Function<TokenStream, ProofCollectionParser>() {
+            @Override
+            public ProofCollectionParser apply(TokenStream t) {
+                return new ProofCollectionParser(t);
+            }
+        });
+    }
+    
+    /**
+     * Saves settings to runallproofs directory so that they can be accessed after runallproofs
+     * run.
+     */
+    private static void saveSettings(ProofCollection collection) {
+        File settingsLocation = new File(RUNALLPROOFS_DIR, "settings.serialized");
+        ForkedTestFileRunner.writeObject(settingsLocation.toPath(), collection.getSettings());
+    }
+
+    public static ProofCollection parseIndexFile(final String index,
+            Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
+        File automaticJAVADL = new File(EXAMPLE_DIR, index);
+        CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
+        ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
+        TokenStream tokenStream = new CommonTokenStream(lexer);
+        ProofCollectionParser parser;
+        parser = stream2Parser.apply(tokenStream);
+        try {
+            ProofCollection result = parser.parserEntryPoint();
+            saveSettings(result);
+            return result;
+        } catch (RecognitionException e) {
+            String msg = parser.getErrorMessage(e, parser.getTokenNames());
+            throw new IOException("Cannot parse " + automaticJAVADL + " at line " + e.line + ": " + msg, e);
+        }
+    }
+
 }
