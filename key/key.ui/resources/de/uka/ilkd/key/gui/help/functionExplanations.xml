@@ -160,6 +160,19 @@ seqDef is related to the lambda operator in lambda calculus.
 <entry key="seq/seqNPermInv">Takes a sequence of naturals (zero included) and treats it as a permutation. The resulting sequence is the inverse permutation of the original one.</entry>
 <entry key="seq/array2seq">Convert a Java array to a JavaDL sequence.</entry>
 
+<entry key="ord/ordLess">Binary Boolean function. ordLess(a,b) is true if a is strictly less than b in the standard ordering of ordinals.</entry>
+<entry key="ord/ordLeq">Binary Boolean function. ordLeq(a,b) is true if a is less or equal to b in the standard ordering of ordinals. </entry>
+<entry key="ord/ordLim">Unary Boolean function. Lim(a) is true if a is a limit ordinal.</entry>
+<entry key="ord/ord0">Constant symbol for the ordinal 0.</entry>
+<entry key="ord/ord1">Constant symbol for the ordinal 1.</entry>
+<entry key="ord/omega">Constant symbol for the first infinite ordinal.</entry>
+<entry key="ord/ordAdd">Ordinal addition.</entry>
+<entry key="ord/ordTimes">Ordinal Multiplication. </entry>
+<entry key="ord/ordExp">Ordinal exponentiation. exp(a,b) = a to the power of b.</entry>
+<entry key="ord/ordMax">Binary functions, returns the maximum of its arguments.</entry>
+<entry key="ord/onat">Embeds positive integers (including 0) into the ordinal data type. For neagtive arguments onat is undefined (underspecified)</entry>
+<entry key="ord/ordSup">Not yet parsable.</entry>
+
 <entry key="pair/pair">Return the (unique) ordered pair of two specified elements.</entry>
 <entry key="pair/first">Return the first element of an ordered pair.</entry>
 <entry key="pair/second">Return the second element of an ordered pair.</entry>
