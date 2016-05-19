@@ -1,8 +1,6 @@
 \documentclass[11pt]{article}
 
-\title{Extending JML\\By New Data Types}
-
-\date{\today}
+\title{Extending JML\\By New Data Types}\date{\today}
 
 \author{Peter.~H.~Schmitt}
 
@@ -346,6 +344,12 @@ First include all the new files you created in the directory\\
 \verb+ public Type getType(Expression expr)+ appropriately.
 It seems that only constructor  symbols need to be included.
 
+\section{User Interface}
+You may also want to add a description of the functions of your new data type to the Info
+tab in the user interface. This is done by adding to the xml- file
+\verb+functionExplanations.xml+
+in the directory \\
+\verb+gitKeY/key/key/key.ui/resources/de/uka/ilkd/key/gui/help+.
 
 \section{Find the Error}
 To find the possible error when KeY fails to load I have added the following piece of code
