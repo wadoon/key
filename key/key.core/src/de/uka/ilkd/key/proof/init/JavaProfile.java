@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.ApplyEqualityRule;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -127,6 +128,7 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(BlockContractRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(getOneStepSimpilifier())
+                                   .prepend(ApplyEqualityRule.INSTANCE)
                                    .prepend(QueryExpand.INSTANCE)
                                    .prepend(JoinRule.INSTANCE);
   

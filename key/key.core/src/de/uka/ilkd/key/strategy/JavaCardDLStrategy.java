@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
+import de.uka.ilkd.key.rule.ApplyEqualityRule;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -56,6 +57,7 @@ import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
+import de.uka.ilkd.key.strategy.feature.ConstFeature;
 import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
@@ -276,6 +278,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 // splitF,
                 // strengthenConstraints,
                 AgeFeature.INSTANCE, oneStepSimplificationF, joinRuleF,
+                applyEqualityFeature(),
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature,
                 ifMatchedF, dispatcher);
@@ -309,6 +312,23 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
         return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    private Feature applyEqualityFeature() {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(ApplyEqualityRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter,
+                new Feature() {
+
+                    @Override
+                    public RuleAppCost compute(RuleApp app,
+                            PosInOccurrence pos, Goal goal) {
+                        if(ApplyEqualityRule.INSTANCE.canApply(goal, app)) {
+                            return NumberRuleAppCost.create(-4000);
+                        } else {
+                            return TopRuleAppCost.INSTANCE;
+                        }
+                    }});
     }
 
     private Feature setupJoinRule() {
@@ -614,7 +634,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 "limitObserver",
                 add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-200)));
 
-        if (programsToRight)
+        if (programsToRight) {
             bindRuleSet(
                     d,
                     "boxDiamondConv",
@@ -624,8 +644,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                             FindPrefixRestrictionFeature.PositionModifier.ALLOW_UPDATE_AS_PARENT,
                                             FindPrefixRestrictionFeature.PrefixChecker.ANTEC_POLARITY),
                                     longConst(-1000)));
-        else
+        } else {
             bindRuleSet(d, "boxDiamondConv", inftyConst());
+        }
 
         bindRuleSet(d, "cut", not(isInstantiated("cutFormula")));
 
@@ -979,14 +1000,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             final String userTacletsProbs =
                     strategyProperties.getProperty(StrategyProperties
                             .USER_TACLETS_OPTIONS_KEY(i));
-            if (StrategyProperties.USER_TACLETS_LOW.equals(userTacletsProbs))
+            if (StrategyProperties.USER_TACLETS_LOW.equals(userTacletsProbs)) {
                 bindRuleSet(d, "userTaclets" + i, 10000);
-            else if (StrategyProperties.USER_TACLETS_HIGH
-                    .equals(userTacletsProbs))
+            } else if (StrategyProperties.USER_TACLETS_HIGH
+                    .equals(userTacletsProbs)) {
                 bindRuleSet(d, "userTaclets" + i, -50);
-            else
+            } else {
                 bindRuleSet(d, "userTaclets" + i, inftyConst());
         }
+    }
     }
 
     private void setupSystemInvariantSimp(RuleSetDispatchFeature d) {
@@ -1039,12 +1061,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private Feature allowQuantifierSplitting() {
         if (StrategyProperties.QUANTIFIERS_INSTANTIATE
                 .equals(strategyProperties
-                        .getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY)))
+                        .getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY))) {
             return longConst(0);
+        }
         if (StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS
                 .equals(strategyProperties
-                        .getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY)))
+                        .getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY))) {
             return sequentContainsNoPrograms();
+        }
         return inftyConst();
     }
 
@@ -1091,14 +1115,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private Feature allowSplitting(ProjectionToTerm focus) {
-        if (normalSplitting())
+        if (normalSplitting()) {
             return longConst(0);
+        }
 
         if (StrategyProperties.SPLITTING_DELAYED.equals(strategyProperties
-                .getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY)))
+                .getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY))) {
             return or(
                     applyTF(focus, ContainsExecutableCodeTermFeature.PROGRAMS),
                     sequentContainsNoPrograms());
+        }
 
         // else: SPLITTING_OFF
         return applyTF(focus, ContainsExecutableCodeTermFeature.PROGRAMS);
@@ -1277,6 +1303,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 d,
                 "apply_equations",
                 SumFeature.createSum(new Feature[] {
+                        ConstFeature.createConst(TopRuleAppCost.INSTANCE),
                         ifZero(applyTF(FocusProjection.create(0), tf.intF),
                                 add(applyTF(FocusProjection.create(0),
                                         tf.monomial), ScaleFeature
@@ -1637,10 +1664,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "inEqSimp_forNormalisation", -1100);
         bindRuleSet(d, "inEqSimp_special_nonLin", -1400);
 
-        if (arithNonLinInferences())
+        if (arithNonLinInferences()) {
             bindRuleSet(d, "inEqSimp_nonLin", IN_EQ_SIMP_NON_LIN_COST);
-        else
+        } else {
             bindRuleSet(d, "inEqSimp_nonLin", inftyConst());
+        }
 
         // polynomial division, simplification of fractions and mods
         bindRuleSet(d, "polyDivision", POLY_DIVISION_COST);
@@ -1908,7 +1936,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer gcd = new TermBuffer();
 
         final Feature instantiateDivs;
-        if (roundingUp)
+        if (roundingUp) {
             instantiateDivs =
                     add(instantiate("elimGcdLeftDiv",
                             DividePolynomialsProjection.createRoundingUp(gcd,
@@ -1917,7 +1945,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                     DividePolynomialsProjection
                                             .createRoundingUp(gcd,
                                                     instOf("elimGcdRight"))));
-        else
+        } else {
             instantiateDivs =
                     add(instantiate("elimGcdLeftDiv",
                             DividePolynomialsProjection.createRoundingDown(gcd,
@@ -1926,6 +1954,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                     DividePolynomialsProjection
                                             .createRoundingDown(gcd,
                                                     instOf("elimGcdRight"))));
+        }
 
         bindRuleSet(
                 d,
@@ -2242,8 +2271,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupSquaresAreNonNegative(d);
 
-        if (arithNonLinInferences())
+        if (arithNonLinInferences()) {
             setupInEqCaseDistinctions(d);
+    }
     }
 
     // For taclets that need instantiation, but where the instantiation is
@@ -2762,8 +2792,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final IntegerLDT numbers =
                 getServices().getTypeConverter().getIntegerLDT();
 
-        if (arithNonLinInferences())
+        if (arithNonLinInferences()) {
             setupMultiplyInequations(d, inftyConst());
+        }
 
         // these taclets are not supposed to be applied with metavariable
         // instantiations
@@ -2790,8 +2821,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "defOps_jdiv",
                 NonDuplicateAppModPositionFeature.INSTANCE);
 
-        if (arithNonLinInferences())
+        if (arithNonLinInferences()) {
             setupInEqCaseDistinctionsApproval(d);
+        }
 
         bindRuleSet(d, "inReachableStateImplication",
                 NonDuplicateAppModPositionFeature.INSTANCE);
@@ -2972,7 +3004,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      */
     public final RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal) {
-        return costComputationF.compute(app, pio, goal);
+        RuleAppCost result = costComputationF.compute(app, pio, goal);
+        System.out.println(app.rule().displayName() + " " + result);
+        return result;
     }
 
     /**
