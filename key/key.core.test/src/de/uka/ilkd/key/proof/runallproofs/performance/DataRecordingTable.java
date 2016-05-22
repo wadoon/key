@@ -64,7 +64,7 @@ public class DataRecordingTable implements AutoCloseable {
      * Write a row to the table file. Column entries are specified via map,
      * which maps: columnName -> columnValue
      */
-    public void writeRow(Object[] lineData) {
+    public void writeRow(Object... lineData) {
         if (lineData.length != columns.length) {
             throw new RuntimeException("Incorrect number of column values specified.\n" + "Expected: " + columns.length
                     + "\n" + "Actual number of columns specified: " + lineData.length);

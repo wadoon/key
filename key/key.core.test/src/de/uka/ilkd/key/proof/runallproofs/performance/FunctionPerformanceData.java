@@ -53,7 +53,7 @@ public class FunctionPerformanceData {
         if (table == null) {
             try {
                 File ruleDataLocation = new File(dataDir, ruleName + ".data");
-                String[] columns = new String[]{"nodeId", "astCount", "proofTreeDepth", "numberInvocations", "     duration", "averageTimePerInvocation"};
+                String[] columns = new String[]{"nodeId", "astCount", "proofTreeDepth", "numberInvocations", "         duration", "averageTimePerInvocation"};
                 String description = "Profiling data for rule " + ruleName;
                 table = new DataRecordingTable(ruleDataLocation, columns, description);
                 tables.put(ruleName, table);
@@ -73,8 +73,8 @@ public class FunctionPerformanceData {
                 RuleData ruleData = entry.getValue();
                 int invocations = ruleData.numberInvocations;
                 long duration = ruleData.duration;
-                getTable(entry.getKey(), tables).writeRow(new Object[] { node.id, node.astDepth, node.proofTreeDepth,
-                        invocations, duration, ((double) duration) / ((double) invocations) });
+                getTable(entry.getKey(), tables).writeRow(node.id, node.astDepth, node.proofTreeDepth,
+                        invocations, duration, ((double) duration) / ((double) invocations));
             }
         }
         for (DataRecordingTable table : tables.values()) {

@@ -82,7 +82,7 @@ public class RuleIndependentData {
         String description = "Percentages of how much time computeCost() and instantiateApp() take "
                 + "in overall applyStrategy() execution.";
         try (DataRecordingTable table = new DataRecordingTable(percentageOverTimeFile, columns, description)) {
-            table.writeRow(new Object[] { System.currentTimeMillis(), ccPercentage, iaPercentage });
+            table.writeRow(System.currentTimeMillis(), ccPercentage, iaPercentage);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
