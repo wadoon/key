@@ -77,7 +77,7 @@ public class DataRecordingTable implements AutoCloseable {
         StringBuilder line = new StringBuilder(" ");
 
         for (int i = 0; i < lineData.length; i++) {
-            line.append(String.format(" %1$" + columns[i].length(), lineData[i]));
+            line.append(String.format(" %1$" + columns[i].length() + "s", lineData[i]));
         }
 
         w.println(line);
