@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +16,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
@@ -39,6 +41,11 @@ public class ProofCollectionSettings implements Serializable {
    private static final String TEMP_DIR = "tempDir";
    private static final String RUN_ONLY_ON = "runOnlyOn";
    private static final String DIRECTORY = "directory";
+   
+   /**
+    * The time at which the corresponding runallproofs run has been started.
+    */
+   public final Date runStart;
 
    /**
     * File in which the present {@link ProofCollectionSettings} were declared.
@@ -122,7 +129,9 @@ public class ProofCollectionSettings implements Serializable {
     * parameters with no parent settings.
     */
    ProofCollectionSettings(String proofCollectionFileLocation,
-         List<Entry<String, String>> entries) {
+         List<Entry<String, String>> entries, Date runStart) {
+      this.runStart = runStart;
+
       /*
        * Determine source proof collection file from string location.
        */
@@ -158,6 +167,8 @@ public class ProofCollectionSettings implements Serializable {
     */
    public ProofCollectionSettings(ProofCollectionSettings parentSettings,
          List<Entry<String, String>> entries) {
+      this.runStart = parentSettings.runStart;
+
       /*
        * Use source proof collection from parent settings.
        */

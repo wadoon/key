@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Properties;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-
 /**
  * The purpose of this class is to write rule-independent data to the
  * filesystem, that is obtained from a {@link DataRecordingStrategy} run.
@@ -17,20 +15,22 @@ public class RuleIndependentData {
 
     private static final String APPLY_STRATEGY_DURATION = "applyStrategyDuration";
 
-    private final File ruleIndependentDataLocation;
+    private final File ruleIndependentDataDir;
 
-    private final Properties ruleIndependentData = new Properties();
+    private final File totalTimesFile;
 
-    private RuleIndependentData(File profilingDataDir) {
-        ruleIndependentDataLocation = new File(profilingDataDir,
-                "ruleIndependentData.properties");
+    private final Properties totalTimesData = new Properties();
+
+    private RuleIndependentData(ProfilingDirectories directories) {
+        ruleIndependentDataDir = directories.ruleIndependentDataDir;
+        totalTimesFile = new File(ruleIndependentDataDir, "totaltimes.properties");
 
         /*
-         * Load previous rule independent data from file, if it exists.
+         * Load previous totaltimes from filesystem.
          */
-        if (ruleIndependentDataLocation.exists()) {
-            try (Reader r = new FileReader(ruleIndependentDataLocation)) {
-                ruleIndependentData.load(r);
+        if (totalTimesFile.exists()) {
+            try (Reader r = new FileReader(totalTimesFile)) {
+                totalTimesData.load(r);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -38,13 +38,13 @@ public class RuleIndependentData {
     }
 
     private long get(String key) {
-        return Long.parseLong(ruleIndependentData.getProperty(key, 0 + ""));
+        return Long.parseLong(totalTimesData.getProperty(key, 0 + ""));
     }
 
     private void add(String key, long l) {
         long value = get(key);
         value += l;
-        ruleIndependentData.setProperty(key, value + "");
+        totalTimesData.setProperty(key, value + "");
     }
 
     private void addTotalDurationAndInvocations(String functionName,
@@ -64,9 +64,9 @@ public class RuleIndependentData {
         /*
          * Update data in file: ruleIndependentData.properties
          */
-        try (FileOutputStream ruleIndependentDataStream = new FileOutputStream(
-                ruleIndependentDataLocation);) {
-            ruleIndependentData.store(ruleIndependentDataStream,
+        try (FileOutputStream totalTimesOutputStream = new FileOutputStream(
+                totalTimesFile)) {
+            totalTimesData.store(totalTimesOutputStream,
                     "Performance Test Total Durations (and Invocations)");
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -75,16 +75,14 @@ public class RuleIndependentData {
         /*
          * Update data in file: PercentageOverTime.data
          */
-        File percentageOverTimeFile = new File(
-                RunAllProofsTest.RUNALLPROOFS_DIR, "PercentageOverTime.data");
-        try (DataRecordingTable table = new DataRecordingTable(
-                percentageOverTimeFile, new String[] {
-                        "System.currentTimeMillis()", "computeCostPercentage",
-                        "instantiateAppPercentage" },
-                "Percentages of how much time computeCost() and instantiateApp() take "
-                        + "in overall applyStrategy() execution.");) {
-            table.writeRow(new Object[] { System.currentTimeMillis(),
-                    ccPercentage, iaPercentage });
+        File percentageOverTimeFile = new File(ruleIndependentDataDir, "PercentageOverTime.data");
+        String[] columns = new String[] {
+                "System.currentTimeMillis()", "computeCostPercentage",
+                "instantiateAppPercentage" };
+        String description = "Percentages of how much time computeCost() and instantiateApp() take "
+                + "in overall applyStrategy() execution.";
+        try (DataRecordingTable table = new DataRecordingTable(percentageOverTimeFile, columns, description)) {
+            table.writeRow(new Object[] { System.currentTimeMillis(), ccPercentage, iaPercentage });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -99,7 +97,7 @@ public class RuleIndependentData {
         double b = get(APPLY_STRATEGY_DURATION);
         String key = functionName + "Duration_PERCENTAGE";
         int percentage = (int) (100 * a / b);
-        ruleIndependentData.setProperty(key, percentage + "%");
+        totalTimesData.setProperty(key, percentage + "%");
         return percentage;
     }
 
@@ -109,7 +107,7 @@ public class RuleIndependentData {
      */
     public static void updateData(long applyStrategyDuration,
             DataRecordingStrategy dataRecordingStrategy) {
-        RuleIndependentData t = new RuleIndependentData(dataRecordingStrategy.dataRecordingTestFile.profilingDataDir);
+        RuleIndependentData t = new RuleIndependentData(dataRecordingStrategy.dataRecordingTestFile.directories);
 
         t.add("applyStrategyInvocations", 1);
         t.add(APPLY_STRATEGY_DURATION, applyStrategyDuration);

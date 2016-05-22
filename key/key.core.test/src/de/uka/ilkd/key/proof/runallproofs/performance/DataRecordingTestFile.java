@@ -12,14 +12,10 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.util.Pair;
 
 @SuppressWarnings("serial")
-class DataRecordingTestFile extends TestFile {
+class DataRecordingTestFile extends TestFile<ProfilingDirectories> {
 
-    final File profilingDataDir;
-
-    public DataRecordingTestFile(TestProperty testProperty, String path, ProofCollectionSettings settings,
-            File dataDir) {
-        super(testProperty, path, settings);
-        this.profilingDataDir = dataDir;
+    public DataRecordingTestFile(TestProperty testProperty, String path, ProofCollectionSettings settings) {
+        super(testProperty, path, settings, new ProfilingDirectories(settings.runStart));
     }
 
     @Override

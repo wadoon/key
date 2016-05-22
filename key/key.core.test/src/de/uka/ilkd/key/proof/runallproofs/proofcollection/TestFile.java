@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.FileProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -29,13 +30,15 @@ import de.uka.ilkd.key.util.Pair;
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class TestFile implements Serializable {
+public class TestFile<Directories extends RunAllProofsDirectories> implements Serializable {
 
    private static final long serialVersionUID = 7779439078807127045L;
 
    private final TestProperty testProperty;
    private final String path;
    private final ProofCollectionSettings settings;
+   
+   public final Directories directories;
 
    /**
     * In order to ensure that the implementation is independent of working
@@ -80,12 +83,20 @@ public class TestFile implements Serializable {
       return ret;
    }
 
-   public TestFile(TestProperty testProperty, String path,
-         ProofCollectionSettings settings) {
-      this.path = path;
-      this.testProperty = testProperty;
-      this.settings = settings;
-   }
+    protected TestFile(TestProperty testProperty, String path,
+            ProofCollectionSettings settings, Directories directories) {
+        this.path = path;
+        this.testProperty = testProperty;
+        this.settings = settings;
+        this.directories = directories;
+    }
+
+    public static TestFile<RunAllProofsDirectories> createInstance(
+            TestProperty testProperty, String path,
+            ProofCollectionSettings settings) {
+        return new TestFile<RunAllProofsDirectories>(testProperty, path,
+                settings, new RunAllProofsDirectories(settings.runStart));
+    }
 
    /**
     * Returns a {@link File} object that points to the .key file that will be

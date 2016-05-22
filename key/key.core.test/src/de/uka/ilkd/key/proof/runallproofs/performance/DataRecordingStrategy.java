@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
+import java.io.File;
 import java.io.IOException;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -10,6 +11,9 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 
+/**
+ * Modification of {@link JavaCardDLStrategy} so that profiling data gets collected during strategy run.
+ */
 class DataRecordingStrategy extends JavaCardDLStrategy {
 
     final FunctionPerformanceData computeCostData;
@@ -20,12 +24,12 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     DataRecordingStrategy(Proof proof, DataRecordingTestFile dataRecordingTestFile) throws IOException {
         super(proof);
         this.dataRecordingTestFile = dataRecordingTestFile;
-        computeCostData = new FunctionPerformanceData(
-                RunAllProofsTestWithComputeCostProfiling.computeCostDataDir(dataRecordingTestFile.profilingDataDir),
-                dataRecordingTestFile);
-        instantiateAppData = new FunctionPerformanceData(
-                RunAllProofsTestWithComputeCostProfiling.instantiateAppDataDir(dataRecordingTestFile.profilingDataDir),
-                dataRecordingTestFile);
+
+        File computeCostDataDir = dataRecordingTestFile.directories.computeCostDataDir;
+        computeCostData = new FunctionPerformanceData(computeCostDataDir, dataRecordingTestFile);
+
+        File instantiateAppDataDir = dataRecordingTestFile.directories.instantiateAppDataDir;
+        instantiateAppData = new FunctionPerformanceData(instantiateAppDataDir, dataRecordingTestFile);
     }
 
     @Override

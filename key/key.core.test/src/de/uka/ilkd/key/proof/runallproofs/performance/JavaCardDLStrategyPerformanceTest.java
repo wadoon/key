@@ -11,7 +11,7 @@ import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.strategy.Strategy;
 
 public class JavaCardDLStrategyPerformanceTest {
@@ -134,7 +134,7 @@ public class JavaCardDLStrategyPerformanceTest {
 
     @Test
     public void test() throws ProblemLoaderException, IOException {
-        File plotDataDir = new File(RunAllProofsTest.KEY_CORE_TEST, "testresults" + File.separator + "plot");
+        File plotDataDir = new File(RunAllProofsDirectories.KEY_CORE_TEST, "testresults" + File.separator + "plot");
         plotDataDir.mkdirs();
         try (FileWriter writer = new FileWriter(new File(plotDataDir, "data.csv"))) {
             printLine(writer, col1, col2, col3);
@@ -165,7 +165,7 @@ public class JavaCardDLStrategyPerformanceTest {
     }
 
     private void runScript(File plotDataDir, String scriptName) throws IOException {
-        File script = new File(RunAllProofsTest.KEY_CORE_TEST,
+        File script = new File(RunAllProofsDirectories.KEY_CORE_TEST,
                 "resources" + File.separator + "plotscripts" + File.separator + scriptName);
         ProcessBuilder pb = new ProcessBuilder(script.getAbsolutePath());
         pb.directory(plotDataDir);

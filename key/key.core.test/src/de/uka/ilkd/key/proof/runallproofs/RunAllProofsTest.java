@@ -26,7 +26,6 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 import org.junit.Test;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
@@ -77,39 +76,10 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
  * @see ListRunAllProofsTestCases
  */
 public class RunAllProofsTest {
-   /**
-    * The path to the KeY repository. Configurable via system property
-    * {@code key.home}.
-    */
-   public static final File KEY_HOME;
-
-   public static final File EXAMPLE_DIR;
-
-   public static final File KEY_CORE_TEST;
-   
-   public static final File RUNALLPROOFS_DIR;
 
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
 
    public static final String IGNORE_KEY = "ignore";
-
-   /**
-    * Computes the constant values.
-    */
-   static {
-      KEY_HOME = IOUtil.getProjectRoot(RunAllProofsTest.class).getParentFile();
-      EXAMPLE_DIR = new File(KEY_HOME, "key.ui" + File.separator + "examples");
-      KEY_CORE_TEST = new File(KEY_HOME, "key.core.test");
-      RUNALLPROOFS_DIR = new File(KEY_CORE_TEST, "testresults" + File.separator + "runallproofs");
-      RUNALLPROOFS_DIR.mkdirs();
-   }
-
-   private static void assertDirectoryExists(File dir) {
-      if (!dir.exists()) {
-         throw new RuntimeException("Cannot run tests, directory " + dir
-               + " does not exist.");
-      }
-   }
 
    private final RunAllProofsTestUnit unit;
 
@@ -152,9 +122,6 @@ public class RunAllProofsTest {
      */
 
    public static List<RunAllProofsTestUnit[]> data(ProofCollection proofCollection) throws IOException {
-      assertDirectoryExists(KEY_HOME);
-      assertDirectoryExists(KEY_CORE_TEST);
-      assertDirectoryExists(EXAMPLE_DIR);
 
       /*
        * Create list of constructor parameters that will be returned by this
@@ -184,7 +151,7 @@ public class RunAllProofsTest {
 
     public static ProofCollection parseIndexFile(final String index,
             Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
-        File automaticJAVADL = new File(EXAMPLE_DIR, index);
+        File automaticJAVADL = new File(RunAllProofsDirectories.EXAMPLE_DIR, index);
         CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
         ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
         TokenStream tokenStream = new CommonTokenStream(lexer);

@@ -2,7 +2,6 @@ package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -31,47 +30,17 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 @RunWith(Parameterized.class)
 public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
-    /**
-     * Directory in which the data obtained from profiling is written to.
-     */
-    private static File profilingDataDir;
-
-    /**
-     * Note: It is correct that this method takes the data directory as
-     * parameter. Runallproofs subprocesses might use a different value than
-     * local variable {@link #profilingDataDir}.
-     */
-    static File instantiateAppDataDir(File profilingDataDir) {
-        File instantiateAppDataDir = new File(profilingDataDir, "instantiateApp");
-        instantiateAppDataDir.mkdirs();
-        return instantiateAppDataDir;
-    }
-
-    /**
-     * Note: It is correct that this method takes the data directory as
-     * parameter. Runallproofs subprocesses might use a different value than
-     * local variable {@link #profilingDataDir}.
-     */
-    static File computeCostDataDir(File dataDir) {
-        File computeCostDataDir = new File(dataDir, "computeCost");
-        computeCostDataDir.mkdirs();
-        return computeCostDataDir;
-    }
+    private static ProfilingDirectories directories;
 
     /**
      * Note: This static initialisation block should only be executed once for
-     * each {@link RunAllProofsTestWithComputeCostProfiling} run. his can easily
+     * each {@link RunAllProofsTestWithComputeCostProfiling} run. This can easily
      * be broken since fork mode of runallproofs re-executes static
      * initialisation blocks in each created subprocess. Be aware of that in
      * case you intend to change or move this block.
      */
-    static void initDataDir() {
-        SimpleDateFormat format = new SimpleDateFormat("dd.MMM_yyyy____HH:mm:ss");
-        Date resultdate = new Date(System.currentTimeMillis());
-        String date = format.format(resultdate);
-        profilingDataDir = new File(RunAllProofsTest.RUNALLPROOFS_DIR,
-                "profilingData-" + date);
-        profilingDataDir.mkdirs();
+    static void initDirectories(Date runStart) {
+        directories = new ProfilingDirectories(runStart);
     }
 
     public RunAllProofsTestWithComputeCostProfiling(RunAllProofsTestUnit unit) {
@@ -80,15 +49,15 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     @Parameters(name = "{0}")
     public static List<RunAllProofsTestUnit[]> data() throws Exception {
-        initDataDir();
         ProofCollection proofCollection = parseIndexFile("index/automaticJAVADL.txt",
                 new Function<TokenStream, ProofCollectionParser>() {
                     @Override
                     public ProofCollectionParser apply(TokenStream t) {
-                        return new DataRecordingParser(t, profilingDataDir);
+                        return new DataRecordingParser(t);
                     }
                 });
         proofCollection.getSettings().getStatisticsFile().setUp();
+        initDirectories(proofCollection.getSettings().runStart);
         return data(proofCollection);
     }
 
@@ -106,8 +75,8 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     @AfterClass
     public static void createPlots() throws IOException {
-        createPlots(computeCostDataDir(profilingDataDir));
-        createPlots(instantiateAppDataDir(profilingDataDir));
+        createPlots(directories.computeCostDataDir);
+        createPlots(directories.instantiateAppDataDir);
     }
 
     public static void createPlots(File dataDir) throws IOException {
