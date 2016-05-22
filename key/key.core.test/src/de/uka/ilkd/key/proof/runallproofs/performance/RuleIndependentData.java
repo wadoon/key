@@ -17,13 +17,14 @@ public class RuleIndependentData {
 
     private static final String APPLY_STRATEGY_DURATION = "applyStrategyDuration";
 
-    private final File ruleIndependentDataLocation = new File(
-            RunAllProofsTestWithComputeCostProfiling.PROFILING_DIR,
-            "ruleIndependentData.properties");
+    private final File ruleIndependentDataLocation;
 
     private final Properties ruleIndependentData = new Properties();
 
-    private RuleIndependentData() {
+    private RuleIndependentData(File profilingDataDir) {
+        ruleIndependentDataLocation = new File(profilingDataDir,
+                "ruleIndependentData.properties");
+
         /*
          * Load previous rule independent data from file, if it exists.
          */
@@ -106,9 +107,9 @@ public class RuleIndependentData {
      * Updates {@link RuleIndependentData} after by adding data obtained from
      * {@link DataRecordingStrategy}.
      */
-    public static void update(long applyStrategyDuration,
+    public static void updateData(long applyStrategyDuration,
             DataRecordingStrategy dataRecordingStrategy) {
-        RuleIndependentData t = new RuleIndependentData();
+        RuleIndependentData t = new RuleIndependentData(dataRecordingStrategy.dataRecordingTestFile.profilingDataDir);
 
         t.add("applyStrategyInvocations", 1);
         t.add(APPLY_STRATEGY_DURATION, applyStrategyDuration);

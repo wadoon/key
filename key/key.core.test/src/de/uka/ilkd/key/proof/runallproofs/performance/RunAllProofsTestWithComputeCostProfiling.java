@@ -31,17 +31,18 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 @RunWith(Parameterized.class)
 public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
-    private static File dataDir;
-    
-    public static final File PROFILING_DIR = new File(RunAllProofsTest.RUNALLPROOFS_DIR, "profilingData");
+    /**
+     * Directory in which the data obtained from profiling is written to.
+     */
+    private static File profilingDataDir;
 
     /**
      * Note: It is correct that this method takes the data directory as
      * parameter. Runallproofs subprocesses might use a different value than
-     * local variable {@link #dataDir}.
+     * local variable {@link #profilingDataDir}.
      */
-    static File instantiateAppDataDir(File dataDir) {
-        File instantiateAppDataDir = new File(dataDir, "instantiateApp");
+    static File instantiateAppDataDir(File profilingDataDir) {
+        File instantiateAppDataDir = new File(profilingDataDir, "instantiateApp");
         instantiateAppDataDir.mkdirs();
         return instantiateAppDataDir;
     }
@@ -49,7 +50,7 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
     /**
      * Note: It is correct that this method takes the data directory as
      * parameter. Runallproofs subprocesses might use a different value than
-     * local variable {@link #dataDir}.
+     * local variable {@link #profilingDataDir}.
      */
     static File computeCostDataDir(File dataDir) {
         File computeCostDataDir = new File(dataDir, "computeCost");
@@ -68,9 +69,9 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
         SimpleDateFormat format = new SimpleDateFormat("dd.MMM_yyyy____HH:mm:ss");
         Date resultdate = new Date(System.currentTimeMillis());
         String date = format.format(resultdate);
-        dataDir = new File(RunAllProofsTest.KEY_CORE_TEST,
-                "testresults" + File.separator + "runallproofs" + File.separator + "performanceStatistics-" + date);
-        dataDir.mkdirs();
+        profilingDataDir = new File(RunAllProofsTest.RUNALLPROOFS_DIR,
+                "profilingData-" + date);
+        profilingDataDir.mkdirs();
     }
 
     public RunAllProofsTestWithComputeCostProfiling(RunAllProofsTestUnit unit) {
@@ -84,7 +85,7 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
                 new Function<TokenStream, ProofCollectionParser>() {
                     @Override
                     public ProofCollectionParser apply(TokenStream t) {
-                        return new DataRecordingParser(t, dataDir);
+                        return new DataRecordingParser(t, profilingDataDir);
                     }
                 });
         proofCollection.getSettings().getStatisticsFile().setUp();
@@ -105,13 +106,12 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     @AfterClass
     public static void createPlots() throws IOException {
-        createPlots(computeCostDataDir(dataDir));
-        createPlots(instantiateAppDataDir(dataDir));
+        createPlots(computeCostDataDir(profilingDataDir));
+        createPlots(instantiateAppDataDir(profilingDataDir));
     }
 
     public static void createPlots(File dataDir) throws IOException {
         for (File ruleData : dataDir.listFiles()) {
-
             String ruleName = ruleData.getAbsolutePath();
             // /.../rulename.data -> /.../rulename [remove file ending]
             ruleName = ruleName.substring(0, ruleName.length() - 5);
@@ -120,8 +120,6 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
             ProcessBuilder pb = new ProcessBuilder("gnuplot", "-e", "ruledatalocation='" + ruleName + "'",
                     plotScript.getAbsolutePath());
             pb.inheritIO();
-            // System.err.println("Plotting: " + dataDir.getName() + " " +
-            // ruleData.getName());
             pb.start();
         }
     }

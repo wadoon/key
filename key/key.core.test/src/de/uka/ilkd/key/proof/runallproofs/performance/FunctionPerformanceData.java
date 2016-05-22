@@ -66,7 +66,7 @@ public class FunctionPerformanceData {
         return writer;
     }
 
-    public void saveCollectedData() {
+    public void updateData() {
         Map<String, PrintWriter> writers = new HashMap<>();
         Collection<NodeData> nodeData = nodeId2NodeData.values();
         for (NodeData node : nodeData) {

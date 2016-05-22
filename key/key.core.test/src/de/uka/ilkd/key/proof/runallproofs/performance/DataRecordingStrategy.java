@@ -15,13 +15,16 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     final FunctionPerformanceData computeCostData;
     final FunctionPerformanceData instantiateAppData;
 
+    final DataRecordingTestFile dataRecordingTestFile;
+
     DataRecordingStrategy(Proof proof, DataRecordingTestFile dataRecordingTestFile) throws IOException {
         super(proof);
+        this.dataRecordingTestFile = dataRecordingTestFile;
         computeCostData = new FunctionPerformanceData(
-                RunAllProofsTestWithComputeCostProfiling.computeCostDataDir(dataRecordingTestFile.dataDir),
+                RunAllProofsTestWithComputeCostProfiling.computeCostDataDir(dataRecordingTestFile.profilingDataDir),
                 dataRecordingTestFile);
         instantiateAppData = new FunctionPerformanceData(
-                RunAllProofsTestWithComputeCostProfiling.instantiateAppDataDir(dataRecordingTestFile.dataDir),
+                RunAllProofsTestWithComputeCostProfiling.instantiateAppDataDir(dataRecordingTestFile.profilingDataDir),
                 dataRecordingTestFile);
     }
 
@@ -43,9 +46,9 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     void saveCollectedData(long applyStrategyDuration) {
-        computeCostData.saveCollectedData();
-        instantiateAppData.saveCollectedData();
-        RuleIndependentData.update(applyStrategyDuration, this);
+        computeCostData.updateData();
+        instantiateAppData.updateData();
+        RuleIndependentData.updateData(applyStrategyDuration, this);
     }
 
 }
