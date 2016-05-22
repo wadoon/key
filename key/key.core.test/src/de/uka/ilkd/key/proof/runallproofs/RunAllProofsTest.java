@@ -28,7 +28,6 @@ import org.antlr.runtime.TokenStream;
 import org.junit.Test;
 import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
@@ -182,15 +181,6 @@ public class RunAllProofsTest {
             }
         });
     }
-    
-    /**
-     * Saves settings to runallproofs directory so that they can be accessed after runallproofs
-     * run.
-     */
-    private static void saveSettings(ProofCollection collection) {
-        File settingsLocation = new File(RUNALLPROOFS_DIR, "settings.serialized");
-        ForkedTestFileRunner.writeObject(settingsLocation.toPath(), collection.getSettings());
-    }
 
     public static ProofCollection parseIndexFile(final String index,
             Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
@@ -201,9 +191,7 @@ public class RunAllProofsTest {
         ProofCollectionParser parser;
         parser = stream2Parser.apply(tokenStream);
         try {
-            ProofCollection result = parser.parserEntryPoint();
-            saveSettings(result);
-            return result;
+            return parser.parserEntryPoint();
         } catch (RecognitionException e) {
             String msg = parser.getErrorMessage(e, parser.getTokenNames());
             throw new IOException("Cannot parse " + automaticJAVADL + " at line " + e.line + ": " + msg, e);

@@ -45,7 +45,7 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     void saveCollectedData(long applyStrategyDuration) {
         computeCostData.saveCollectedData();
         instantiateAppData.saveCollectedData();
-        TotalTimes.update(applyStrategyDuration, this);
+        RuleIndependentData.update(applyStrategyDuration, this);
     }
 
 }

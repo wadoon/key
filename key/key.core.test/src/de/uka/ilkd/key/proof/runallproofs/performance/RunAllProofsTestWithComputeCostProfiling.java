@@ -32,6 +32,8 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     private static File dataDir;
+    
+    public static final File PROFILING_DIR = new File(RunAllProofsTest.RUNALLPROOFS_DIR, "profilingData");
 
     /**
      * Note: It is correct that this method takes the data directory as

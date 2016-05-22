@@ -47,7 +47,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
     * Converts a {@link Serializable} object into a byte array and stores it in
     * a file at given location.
     */
-    public static void writeObject(Path path, Serializable s) {
+    private static void writeObject(Path path, Serializable s) {
         try {
             try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(Files.newOutputStream(path))) {
                 objectOutputStream.writeObject(s);
