@@ -2,16 +2,16 @@ package de.uka.ilkd.key.proof.runallproofs.performance;
 
 public class RuleData {
 
-    int numberInvocationsForRule = 1;
-    long totalRuleTime;
+    int numberInvocations = 1;
+    long duration;
 
     public RuleData(long computeCostDuration) {
-        this.totalRuleTime = computeCostDuration;
+        this.duration = computeCostDuration;
     }
 
     public void addDuration(long duration) {
-        numberInvocationsForRule++;
-        totalRuleTime += duration;
+        numberInvocations++;
+        this.duration += duration;
     }
 
 }

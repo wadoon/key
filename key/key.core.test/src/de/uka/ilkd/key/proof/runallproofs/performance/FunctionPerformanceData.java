@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,42 +48,41 @@ public class FunctionPerformanceData {
         totalDuration += duration;
     }
 
-    private PrintWriter getWriter(String ruleName, Map<String, PrintWriter> writers) {
-        PrintWriter writer = writers.get(ruleName);
-        if (writer == null) {
+    private DataRecordingTable getTable(String ruleName, Map<String, DataRecordingTable> tables) {
+        DataRecordingTable table = tables.get(ruleName);
+        if (table == null) {
             try {
-                writer = new PrintWriter(new FileOutputStream(new File(dataDir, ruleName + ".data"),
-                        true /* append = true */));
-                writers.put(ruleName, writer);
-                writer.append("# " + dataRecordingTestFile.getKeYFile().getName() + "\n");
+                File ruleDataLocation = new File(dataDir, ruleName + ".data");
+                String[] columns = new String[]{"nodeId", "astCount", "proofTreeDepth", "numberInvocations", "     duration", "averageTimePerInvocation"};
+                String description = "Profiling data for rule " + ruleName;
+                table = new DataRecordingTable(ruleDataLocation, columns, description);
+                tables.put(ruleName, table);
+                table.writeComment("# " + dataRecordingTestFile.getKeYFile().getName() + "\n");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            writer.append("# nodeId astCount proofTreeDepth computCostInvocations computeCostDuration ccAvg\n");
         }
-        return writer;
+        return table;
     }
 
     public void updateData() {
-        Map<String, PrintWriter> writers = new HashMap<>();
+        Map<String, DataRecordingTable> tables = new HashMap<>();
         Collection<NodeData> nodeData = nodeId2NodeData.values();
         for (NodeData node : nodeData) {
             for (Entry<String, RuleData> entry : node.ruleName2RuleData.entrySet()) {
-                StringBuffer sb = new StringBuffer();
-                sb.append(node.id + " ");
-                sb.append(node.astDepth + " ");
-                sb.append(node.proofTreeDepth + " ");
                 RuleData ruleData = entry.getValue();
-                int ccInvoc = ruleData.numberInvocationsForRule;
-                long ccDur = ruleData.totalRuleTime;
-                sb.append(ccInvoc + " ");
-                sb.append(ccDur + " ");
-                sb.append(((double) ccDur) / ((double) ccInvoc) + "\n");
-                getWriter(entry.getKey(), writers).append(sb.toString());
+                int invocations = ruleData.numberInvocations;
+                long duration = ruleData.duration;
+                getTable(entry.getKey(), tables).writeRow(new Object[] { node.id, node.astDepth, node.proofTreeDepth,
+                        invocations, duration, ((double) duration) / ((double) invocations) });
             }
         }
-        for (PrintWriter writer : writers.values()) {
-            writer.close();
+        for (DataRecordingTable table : tables.values()) {
+            try {
+                table.close();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
