@@ -65,9 +65,9 @@ public class Node  {
     private boolean              closed              = false;
 
     /** contains non-logical content, used for user feedback */
-    private final NodeInfo             nodeInfo;
+    private NodeInfo             nodeInfo;
 
-    private final int                  serialNr;
+    private final int            serialNr;
 
     private int                  siblingNr = -1;
 
@@ -150,6 +150,10 @@ public class Node  {
 
     public void clearNameCache() {
         cachedName = null;
+    }
+
+    void clearNodeInfo() {
+        this.nodeInfo = new NodeInfo(this);
     }
 
     public NameRecorder getNameRecorder() {
@@ -260,6 +264,10 @@ public class Node  {
      */
     public boolean root() {
 	return parent==null;
+    }
+
+    public Statistics statistics() {
+        return new Statistics(this);
     }
 
     /**
@@ -672,29 +680,37 @@ public class Node  {
      * @author bruns
      */
     private static class SubtreeIterator implements Iterator<Node> {
+        private final Node root;
         private Node n;
         private boolean atRoot = true; // special handle
 
         private SubtreeIterator(Node root) {
             assert root != null;
-            n = root;
+            this.n = root;
+            this.root = root;
         }
 
-        private static Node nextSibling(Node m) {
+        private Node nextSibling(Node m) {
             Node p = m.parent;
-            while (p != null) {
+            while (p != null && m != root) {
                 final int c = p.childrenCount();
                 final int x = p.getChildNr(m);
-                if (x+1 < c) return p.child(x+1);
-                m = p; p = m.parent;
+                if (x + 1 < c) {
+                    final Node result = p.child(x + 1);
+                    return result != root ? result : null;
+                }
+                m = p;
+                p = m.parent;
             }
             return null;
         }
 
         @Override
-        public boolean hasNext(){
-            if (atRoot) return true;
-            if (!n.leaf()) return true;
+        public boolean hasNext() {
+            if (atRoot)
+                return true;
+            if (!n.leaf())
+                return true;
             return nextSibling(n) != null;
         }
 
@@ -706,14 +722,16 @@ public class Node  {
             }
             if (n.leaf()) {
                 Node s = nextSibling(n);
-                if (s != null) n = s;
-            } else n = n.child(0);
+                if (s != null)
+                    n = s;
+            } else
+                n = n.child(0);
             return n;
         }
-        
+
         public void remove() {
-            throw new UnsupportedOperationException("Changing the proof tree " +
-                    "structure this way is not allowed.");
+            throw new UnsupportedOperationException("Changing the proof tree "
+                    + "structure this way is not allowed.");
         }
     }
 }

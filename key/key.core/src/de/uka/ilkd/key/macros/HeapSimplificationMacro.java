@@ -35,6 +35,11 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
     }
 
     @Override
+    public String getScriptCommandName() {
+        return "simp-heap";
+    }
+
+    @Override
     public String getDescription() {
         return "This macro performs simplification of Heap and LocSet terms.\n"
                     +"It applies simplification rules (including the \"unoptimized\" select rules), "
@@ -129,6 +134,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "intersectAllFieldsFreshLocs",
         "disjointWithSingleton1",
         "disjointWithSingleton2",
+        "sortsDisjointModuloNull",
         
         "createdInHeapWithSingleton",
         "createdInHeapWithAllFields",

@@ -184,7 +184,7 @@ public class InfFlowContractAppFeature implements Feature {
         assert app.ifFormulaInstantiations().size() >= 1 :
                 "Featureis only applicable to rules with at least one assumes.";
 
-        final SequentFormula focusFor = pos.constrainedFormula();
+        final SequentFormula focusFor = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
         final SequentFormula assumesFor =
                 app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
@@ -244,16 +244,17 @@ public class InfFlowContractAppFeature implements Feature {
         if (!app.ifInstsComplete()) {
             return NumberRuleAppCost.getZeroCost();
         }
-        
-        if (app.ifFormulaInstantiations().size() < 1 ||
-            !isInfFlowProof(goal.proof()) ||
-            duplicateFindTaclet(app, pos, goal)) {
+
+        if (!isInfFlowProof(goal.proof())
+                || app.ifFormulaInstantiations() == null
+                || app.ifFormulaInstantiations().size() < 1
+                || duplicateFindTaclet(app, pos, goal)) {
             return TopRuleAppCost.INSTANCE;
         }
 
         // only relate the n-th called method in execution A with the n-th
         // called method in execution B automatically
-        final SequentFormula focusFor = pos.constrainedFormula();
+        final SequentFormula focusFor = pos.sequentFormula();
         final SequentFormula assumesFor =
                 app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 

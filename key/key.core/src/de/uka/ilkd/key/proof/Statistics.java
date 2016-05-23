@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,12 +35,15 @@ public class Statistics {
     public final int dependencyContractApps;
     public final int operationContractApps;
     public final int loopInvApps;
-    public final long autoModeTimeInNano;
-    public final long timeInNano;
-    public final float timePerStepInNano;
+    public final long autoModeTimeInMillis;
+    public final long timeInMillis;
+    public final float timePerStepInMillis;
 
     private List<Pair<String, String>> summaryList =
                     new ArrayList<Pair<String, String>>(14);
+    
+    private final HashMap<String, Integer> interactiveAppsDetails =
+            new HashMap<String, Integer>();
 
     protected Statistics(int nodes,
                        int branches,
@@ -52,9 +56,9 @@ public class Statistics {
                        int dependencyContractApps,
                        int operationContractApps,
                        int loopInvApps,
-                       long autoModeTimeInNano,
-                       long timeInNano,
-                       float timePerStepInNano) {
+                       long autoModeTimeInMillis,
+                       long timeInMillis,
+                       float timePerStepInMillis) {
         this.nodes = nodes;
         this.branches = branches;
         this.interactiveSteps = interactiveSteps;
@@ -66,9 +70,9 @@ public class Statistics {
         this.dependencyContractApps = dependencyContractApps;
         this.operationContractApps = operationContractApps;
         this.loopInvApps = loopInvApps;
-        this.autoModeTimeInNano = autoModeTimeInNano;
-        this.timeInNano = timeInNano/1000000;
-        this.timePerStepInNano = timePerStepInNano;
+        this.autoModeTimeInMillis = autoModeTimeInMillis;
+        this.timeInMillis = timeInMillis;
+        this.timePerStepInMillis = timePerStepInMillis;
     }
 
     static Statistics create(Statistics side, long creationTime) {
@@ -83,13 +87,17 @@ public class Statistics {
                                   side.dependencyContractApps,
                                   side.operationContractApps,
                                   side.loopInvApps,
-                                  side.autoModeTimeInNano,
-                                  System.nanoTime() - creationTime,
-                                  side.timePerStepInNano);
+                                  side.autoModeTimeInMillis,
+                                  System.currentTimeMillis() - creationTime,
+                                  side.timePerStepInMillis);
     }
 
     Statistics(Proof proof) {
-        final Iterator<Node> it = proof.root().subtreeIterator();
+        this(proof.root());
+    }
+
+    Statistics(Node startNode) {
+        final Iterator<Node> it = startNode.subtreeIterator();
 
         int tmpNodes = 0; // proof nodes
         int tmpBranches = 1; // proof branches
@@ -113,11 +121,21 @@ public class Statistics {
 
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 tmpInteractive++;
+
+                final String ruleAppName =
+                        node.getAppliedRuleApp().rule().name().toString();
+
+                if (!interactiveAppsDetails.containsKey(ruleAppName)) {
+                    interactiveAppsDetails.put(ruleAppName, 1);
+                }
+                else {
+                    interactiveAppsDetails.put(ruleAppName,
+                            interactiveAppsDetails.get(ruleAppName) + 1);
+                }
             }
 
             final RuleApp ruleApp = node.getAppliedRuleApp();
             if (ruleApp != null) {
-
                 if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
                     tmpOss++;
                     final Protocol protocol =
@@ -158,11 +176,11 @@ public class Statistics {
         this.dependencyContractApps = tmpDep;
         this.operationContractApps = tmpContr;
         this.loopInvApps = tmpInv;
-        this.autoModeTimeInNano = proof.getAutoModeTime();
-        this.timeInNano = (System.nanoTime() - proof.creationTime);
-        timePerStepInNano = nodes<=1? .0f: (autoModeTimeInNano/(float)(nodes-1));
+        this.autoModeTimeInMillis = startNode.proof().getAutoModeTime();
+        this.timeInMillis = (System.currentTimeMillis() - startNode.proof().creationTime);
+        timePerStepInMillis = nodes<=1? .0f: (autoModeTimeInMillis/(float)(nodes-1));
 
-        generateSummary(proof);
+        generateSummary(startNode.proof());
     }
 
     private void generateSummary(Proof proof) {
@@ -173,7 +191,7 @@ public class Statistics {
             sideProofs = ((InfFlowProof) proof).hasSideProofs();
             if (sideProofs) {
                 final long autoTime = proof.getAutoModeTime()
-                        + ((InfFlowProof)proof).getSideProofStatistics().autoModeTimeInNano;
+                        + ((InfFlowProof)proof).getSideProofStatistics().autoModeTimeInMillis;
                 final SideProofStatistics side = ((InfFlowProof) proof).getSideProofStatistics().add(this).setAutoModeTime(autoTime);
                 stat = Statistics.create(side, proof.creationTime);
             } 
@@ -188,24 +206,20 @@ public class Statistics {
                         stat.interactiveSteps));
         
         
-        final long time = sideProofs ? stat.autoModeTimeInNano : proof.getAutoModeTime();
+        final long time = sideProofs ? stat.autoModeTimeInMillis : proof.getAutoModeTime();
         
         summaryList.add(new Pair<String, String>("Automode time",
-                        EnhancedStringBuffer.formatTime(time/1000000).toString()));
-        if (time >= 10000000000L) {
-            summaryList.add(new Pair<String, String>("Automode time", "" +
-                            (time/1000000) +
-                            "ms"));
+                        EnhancedStringBuffer.formatTime(time).toString()));
+        if (time >= 10000L) {
+            summaryList.add(new Pair<String, String>("Automode time", time + "ms"));
         }
         if (stat.nodes > 0) {
-            String avgTime = "" + (stat.timePerStepInNano/1000000);
+            String avgTime = "" + (stat.timePerStepInMillis);
             // round to 3 digits after point
             int i = avgTime.indexOf('.')+4;
             if (i > avgTime.length()) i = avgTime.length();
             avgTime = avgTime.substring(0,i);
-            summaryList.add(new Pair<String, String>("Avg. time per step", "" +
-                            avgTime +
-                            "ms"));
+            summaryList.add(new Pair<String, String>("Avg. time per step", "" + avgTime + "ms"));
         }
 
         summaryList.add(new Pair<String, String>("Rule applications", ""));
@@ -230,6 +244,10 @@ public class Statistics {
 
     public List<Pair<String, String>> getSummary() {
         return summaryList;
+    }
+    
+    public HashMap<String, Integer> getInteractiveAppsDetails() {
+        return interactiveAppsDetails;
     }
 
     @Override

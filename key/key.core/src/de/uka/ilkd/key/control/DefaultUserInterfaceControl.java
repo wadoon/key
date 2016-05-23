@@ -41,7 +41,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     * Constructor.
     */
    public DefaultUserInterfaceControl() {
-      proofControl = new DefaultProofControl(this);
+      proofControl = new DefaultProofControl(this, this);
    }
 
    /**
@@ -49,7 +49,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     * @param customization An optional {@link RuleCompletionHandler}.
     */
    public DefaultUserInterfaceControl(RuleCompletionHandler customization) {
-      proofControl = new DefaultProofControl(this, customization);
+      proofControl = new DefaultProofControl(this, this, customization);
    }
    
    /**
@@ -67,7 +67,11 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig) {
       //TODO: Find out why the proof has to be registered. This method should just return null and do nothing.
       initConfig.getServices().getSpecificationRepository().registerProof(proofOblInput, proofList.getFirstProof());
-      return null;
+
+      // This has to be done to prive the proofList with the environment object.
+      final ProofEnvironment env = new ProofEnvironment(initConfig);
+      env.registerProof(proofOblInput, proofList);
+      return env;
    }
 
    /**

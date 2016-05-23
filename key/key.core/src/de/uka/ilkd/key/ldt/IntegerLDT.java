@@ -282,6 +282,8 @@ public final class IntegerLDT extends LDT {
     //internal methods
     //-------------------------------------------------------------------------
     
+
+
     private boolean isNumberLiteral(Function f) {
         char c = f.name().toString().charAt(0);
         return (c-'0'>=0) && (c-'0'<=9);
@@ -451,7 +453,7 @@ public final class IntegerLDT extends LDT {
         } else if (op instanceof LessOrEquals) {
             return getLessOrEquals();
         } else if (op instanceof Divide) {
-            return isLong ? getJavaDivLong() : (isBigint ? getDiv() : getJavaDivInt());
+            return isLong ? getJavaDivLong() : (isBigint ? getJDivision() : getJavaDivInt());
         } else if (op instanceof Times) {
             return isLong ? getJavaMulLong() : (isBigint ? getMul() : getJavaMulInt());
         } else if (op instanceof Plus) {
@@ -459,7 +461,7 @@ public final class IntegerLDT extends LDT {
         } else if (op instanceof Minus) {
             return isLong ? getJavaSubLong() : (isBigint ? getSub() : getJavaSubInt());
         } else if (op instanceof Modulo) {
-            return isBigint ? getMod() : getJavaMod();
+            return isBigint ? getJModulo() : getJavaMod();
         } else if (op instanceof ShiftLeft) {
             return isLong ? getJavaShiftLeftLong() : getJavaShiftLeftInt();
         } else if (op instanceof ShiftRight) {
@@ -735,7 +737,32 @@ public final class IntegerLDT extends LDT {
     public Function getModuloLong() {       
         return modJlong;
     }
-    
+
+    /** maps an integer back into long range */
+    public Function getArithModuloLong() {       
+        return modJlong;
+    }
+
+    /** maps an integer back into int range */
+    public Function getArithModuloInt() {
+        return moduloInt;
+    }
+
+    /** maps an integer back into long range */
+    public Function getArithModuloShort() {
+        return moduloShort;
+    }
+
+    /** maps an integer back into byte range */
+    public Function getArithModuloByte() {
+        return moduloByte;
+    }
+
+    /** maps an integer back into char range */
+    public Function getArithModuloChar() {
+        return moduloChar;
+    }
+
     /**
      * returns the function symbol interpreted as the Java addition on 
      * int (or promotabel to int) operators, i.e. this addition performs a modulo 

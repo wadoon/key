@@ -357,6 +357,14 @@ public class OutputStreamProofSaver {
         	tree.append(" (joinId \"");
         	tree.append(joinApp.getJoinNode().serialNr());
             tree.append("\")");
+
+            if (joinApp.getDistinguishingFormula() != null) {
+                tree.append(" (distFormula \"");
+                tree.append(escapeCharacters(printAnything(
+                        joinApp.getDistinguishingFormula(),
+                        proof.getServices(), false).toString()));
+                tree.append("\")");
+            }
         }
         
         if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {
@@ -428,7 +436,7 @@ public class OutputStreamProofSaver {
     public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
         if (pos == null) return "";
         return " (formula \""+seq.formulaNumberInSequent(pos.isInAntec(),
-                pos.constrainedFormula())+"\")"+
+                pos.sequentFormula())+"\")"+
                 posInTerm2Proof(pos.posInTerm());
     }
 
