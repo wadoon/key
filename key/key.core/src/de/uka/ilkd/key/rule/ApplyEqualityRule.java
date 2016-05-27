@@ -1,14 +1,17 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -25,27 +28,99 @@ import de.uka.ilkd.key.util.Pair;
 
 public class ApplyEqualityRule implements BuiltInRule {
 
+    private static class ReplacementMap {
+
+        private static final PosInTerm PIO_TOP_LEVEL = PosInTerm.getTopLevel();
+        private static final PosInTerm PIO_RHS = PIO_TOP_LEVEL.down(1);
+        private Map<Term, List<PosInOccurrence>> map;
+        private final Term trueConst;
+        private final Term falseConst;
+
+        public ReplacementMap(Services services) {
+            trueConst = services.getTermBuilder().tt();
+            falseConst = services.getTermBuilder().ff();
+        }
+
+        public Term lookup(Term t, PosInOccurrence avoid) {
+            List<PosInOccurrence> pios = map.get(t);
+            if(pios == null) {
+                return null;
+            }
+
+            for (PosInOccurrence pio : pios) {
+                // do not apply onto the formula itself
+                if(pio.topLevel().equals(avoid)) {
+                    continue;
+                }
+
+                if(pio.isTopLevel()) {
+                    return pio.isInAntec() ? trueConst : falseConst;
+                } else {
+                    return pio.subTerm();
+                }
+            }
+            return null;
+        }
+
+        public void scan(Sequent seq) {
+
+            map = new HashMap<Term, List<PosInOccurrence>>();
+
+            for (SequentFormula sequentFormula : seq.antecedent()) {
+                Term formula = sequentFormula.formula();
+                Operator op = formula.op();
+                if(op == Equality.EQUALS) {
+                    add(formula.sub(0), new PosInOccurrence(sequentFormula, PIO_RHS, true));
+                }
+                add(formula, new PosInOccurrence(sequentFormula, PIO_TOP_LEVEL, true));
+            }
+
+            for (SequentFormula sequentFormula : seq.succedent()) {
+                Term formula = sequentFormula.formula();
+                add(formula, new PosInOccurrence(sequentFormula, PIO_TOP_LEVEL, false));
+            }
+
+        }
+
+        private void add(Term term, PosInOccurrence pio) {
+             List<PosInOccurrence> list = map.get(term);
+             if(list == null) {
+                 list = new LinkedList<>();
+                 map.put(term, list);
+             }
+             list.add(pio);
+        }
+
+    }
+
+
     private static final Name NAME = new Name("ApplyEquality");
 
     public static final ApplyEqualityRule INSTANCE = new ApplyEqualityRule();
 
+    private final Map<Sequent, ReplacementMap> eqTableCache = new LRUCache<>(10);
+
+    private final Map<Pair<Goal, PosInOccurrence>, Term> appCache = new LRUCache<>(300);
+
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
 
-        Pair<PosInOccurrence, Term> appl = applyTo(goal, ruleApp.posInOccurrence());
+        Term appl = applyTo(goal, ruleApp.posInOccurrence());
         if(appl == null) {
             throw new RuleAbortException("Cannot apply that rule any longer");
         }
 
         ImmutableList<Goal> result = goal.split(1);
         Goal newGoal = result.head();
-        newGoal.changeFormula(new SequentFormula(appl.second), appl.first);
+        newGoal.changeFormula(new SequentFormula(appl), ruleApp.posInOccurrence());
+
+        DefaultBuiltInRuleApp birRuleApp = (DefaultBuiltInRuleApp)ruleApp;
 
         return result;
     }
 
     public boolean canApply(Goal goal, RuleApp ruleApp) {
-        Pair<PosInOccurrence, Term> appl = applyTo(goal, ruleApp.posInOccurrence());
+        Object appl = applyTo(goal, ruleApp.posInOccurrence());
         return appl != null;
     }
 
@@ -65,7 +140,7 @@ public class ApplyEqualityRule implements BuiltInRule {
             return false;
         }
 
-        return true;
+        return pio.isTopLevel();
     }
 
     @Override
@@ -73,41 +148,46 @@ public class ApplyEqualityRule implements BuiltInRule {
         return false;
     }
 
-    private Pair<PosInOccurrence, Term> applyTo(Goal goal, PosInOccurrence pio) {
+    private Term applyTo(Goal goal, PosInOccurrence pio) {
 
         Sequent seq = goal.sequent();
 
-//        if(appCache.containsKey(seq)) {
-//            return appCache.get(seq);
-//        }
-
-        Pair<PosInOccurrence, Term> result = null;
-
-        Services services = goal.proof().getServices();
-        Map<Term, Term> table = buildEqTable(seq, pio, services);
-        if(!table.isEmpty()) {
-            result = scanEquality(seq, pio, table, services);
+        if(appCache.containsKey(new Pair<>(goal, pio))) {
+            return appCache.get(seq);
         }
 
-//        appCache.put(seq, result);
+        Term result = null;
+
+        Services services = goal.proof().getServices();
+        ReplacementMap table = buildEqTable(seq, services);
+        result = scanEquality(seq, pio, table, services);
+
+//        appCache.put(new Pair<>(goal, pio), result);
         return result;
     }
 
-    private Pair<PosInOccurrence, Term> scanEquality(Sequent seq, PosInOccurrence pio, Map<Term, Term> table, Services services) {
+    private Term scanEquality(Sequent seq, PosInOccurrence pio,
+                ReplacementMap table, Services services) {
 
         SequentFormula sequentFormula  = pio.sequentFormula();
         Term term = sequentFormula.formula();
-        Term newTerm = replaceRecursive(term, table, services);
+
+        Term newTerm = replaceRecursive(term, table, services, pio);
+
+
         if(newTerm != term) {
-            return new Pair<PosInOccurrence, Term>(pio, newTerm);
+            return newTerm;
         }
 
         return null;
     }
 
-    private Term replaceRecursive(Term t, Map<Term, Term> table, Services services) {
-        Term lookup = table.get(t);
+    private Term replaceRecursive(Term t, ReplacementMap table, Services services,
+            PosInOccurrence avoid) {
+        Term lookup = table.lookup(t, avoid);
         if(lookup != null) {
+
+            // since we iterate over this term, == can be used here!
             if(t.sort() != lookup.sort()) {
                 lookup = services.getTermBuilder().cast(t.sort(), lookup);
             }
@@ -124,7 +204,7 @@ public class ApplyEqualityRule implements BuiltInRule {
         boolean changed = false;
         for (int i = 0; i < children.size(); i++) {
             Term oldChild = children.get(i);
-            Term newChild = replaceRecursive(oldChild, table, services);
+            Term newChild = replaceRecursive(oldChild, table, services, avoid);
             newChildren[i] = newChild;
             if(newChild != oldChild) {
                 changed = true;
@@ -138,33 +218,18 @@ public class ApplyEqualityRule implements BuiltInRule {
         }
     }
 
-    private Map<Term, Term> buildEqTable(Sequent seq, PosInOccurrence pio, Services services) {
-        Map<Term, Term> result = new HashMap<Term, Term>();
+    private ReplacementMap buildEqTable(Sequent seq, Services services) {
 
-        Term trueConst = services.getTermBuilder().tt();
-        Term falseConst = services.getTermBuilder().ff();
-        SequentFormula exclude = pio.sequentFormula();
+        ReplacementMap result = eqTableCache.get(seq);
+        if (result != null) {
+            return result;
 
-        for (SequentFormula sequentFormula : seq.antecedent()) {
-            if(sequentFormula == exclude) {
-                continue;
-            }
-            Term formula = sequentFormula.formula();
-            Operator op = formula.op();
-            if(op == Equality.EQUALS) {
-                result.put(formula.sub(0), formula.sub(1));
-            }
-            result.put(formula, trueConst);
         }
 
-        for (SequentFormula sequentFormula : seq.succedent()) {
-            if(sequentFormula == exclude) {
-                continue;
-            }
-            Term formula = sequentFormula.formula();
-            result.put(formula, falseConst);
-        }
+        result = new ReplacementMap(services);
+        result.scan(seq);
 
+//        eqTableCache.put(seq, result);
         return result;
     }
 
@@ -173,4 +238,8 @@ public class ApplyEqualityRule implements BuiltInRule {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 
+    @Override
+    public String toString() {
+        return NAME.toString();
+    }
 }
