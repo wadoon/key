@@ -971,41 +971,41 @@ public final class UseOperationContractRule implements BuiltInRule {
                      tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
 
 
-        //create "Exceptional Post" branch
-        final StatementBlock excPostSB
-            = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
-        JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term originalExcPost = tb.apply(anonUpdate,
-                                              tb.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
-                                                      TermLabelManager.instantiateLabels(termLabelState, services, 
-                                                              ruleApp.posInOccurrence(), this, ruleApp,
-                                                              excPostGoal, "ExceptionalPostModality",
-                                                              null, inst.mod,
-                                                              new ImmutableArray<Term>(
-                                                                      inst.progPost.sub(0)),
-                                                              null, excJavaBlock, inst.progPost.getLabels())), null);
-        final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
-        excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
-                	       true,
-                	       false);
-        excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
-        	                  ruleApp.posInOccurrence());
-        excPostGoal.addFormula(new SequentFormula(excPostAssumption),
-        	               true,
-        	               false);
-
-
-
-        //create "Null Reference" branch
-        if(nullGoal != null) {
-            final Term actualSelfNotNull
-            	= tb.not(tb.equals(inst.actualSelf, tb.NULL()));
-            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, 
-        					               actualSelfNotNull,
-        					               null)),
-        	                   ruleApp.posInOccurrence());
-        }
-        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, nullGoal, null, null);
+//        //create "Exceptional Post" branch
+//        final StatementBlock excPostSB
+//            = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
+//        JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
+//        final Term originalExcPost = tb.apply(anonUpdate,
+//                                              tb.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
+//                                                      TermLabelManager.instantiateLabels(termLabelState, services, 
+//                                                              ruleApp.posInOccurrence(), this, ruleApp,
+//                                                              excPostGoal, "ExceptionalPostModality",
+//                                                              null, inst.mod,
+//                                                              new ImmutableArray<Term>(
+//                                                                      inst.progPost.sub(0)),
+//                                                              null, excJavaBlock, inst.progPost.getLabels())), null);
+//        final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
+//        excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
+//                	       true,
+//                	       false);
+//        excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
+//        	                  ruleApp.posInOccurrence());
+//        excPostGoal.addFormula(new SequentFormula(excPostAssumption),
+//        	               true,
+//        	               false);
+//
+//
+//
+//        //create "Null Reference" branch
+//        if(nullGoal != null) {
+//            final Term actualSelfNotNull
+//            	= tb.not(tb.equals(inst.actualSelf, tb.NULL()));
+//            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, 
+//        					               actualSelfNotNull,
+//        					               null)),
+//        	                   ruleApp.posInOccurrence());
+//        }
+//        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, nullGoal, null, null);
 
 
 
