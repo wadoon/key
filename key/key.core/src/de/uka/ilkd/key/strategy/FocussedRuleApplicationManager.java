@@ -92,6 +92,10 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
 	return delegate.peekNext();
     } 
 
+    public RuleAppCost peekCost() {
+        return delegate.peekCost();
+    }
+
     public RuleApp next () {
         final RuleApp app = delegate.next ();
         onlyModifyFocussedFormula = false;

@@ -60,4 +60,6 @@ public interface AutomatedRuleApplicationManager extends NewRuleListener {
      */
     AutomatedRuleApplicationManager getDelegate();
 
+    RuleAppCost peekCost();
+
 }

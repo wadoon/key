@@ -1269,6 +1269,58 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer equation = new TermBuffer();
         final TermBuffer left = new TermBuffer(), right = new TermBuffer();
 
+        Feature apply_select_eq = add(isInstantiated("s"),
+                isInstantiated("t1"),
+                or(applyTF(
+                        "s",
+                        rec(any(), SimplifiedSelectTermFeature
+                                .create(heapLDT))),
+                        add(NoSelfApplicationFeature.INSTANCE,
+                                applyTF("t1",
+                                        IsSelectSkolemConstantTermFeature.INSTANCE))));
+
+        Feature apply_eq = SumFeature.createSum(new Feature[] {
+                ifZero(applyTF(FocusProjection.create(0), tf.intF),
+                        add(applyTF(FocusProjection.create(0),
+                                tf.monomial), ScaleFeature
+                                .createScaled(FindRightishFeature
+                                        .create(numbers), 5.0))),
+                ifZero(MatchedIfFeature.INSTANCE,
+                        add(CheckApplyEqFeature.INSTANCE,
+                                let(equation,
+                                        AssumptionProjection.create(0),
+                                        add(not(applyTF(equation,
+                                                ff.update)),
+                                        // there might be updates in
+                                        // front of the assumption
+                                        // formula; in this case we wait
+                                        // until the updates have
+                                        // been applied
+                                                let(left,
+                                                        sub(equation, 0),
+                                                        let(right,
+                                                                sub(equation,
+                                                                        1),
+                                                                ifZero(applyTF(
+                                                                        left,
+                                                                        tf.intF),
+                                                                        add(applyTF(
+                                                                                left,
+                                                                                tf.nonNegOrNonCoeffMonomial),
+                                                                                applyTF(right,
+                                                                                        tf.polynomial),
+                                                                                MonomialsSmallerThanFeature
+                                                                                        .create(right,
+                                                                                                left,
+                                                                                                numbers)),
+                                                                        TermSmallerThanFeature
+                                                                                .create(right,
+                                                                                        left)))))))),
+                longConst(-4000), EqNonDuplicateAppFeature.INSTANCE });
+
+        this.externalApplyEqFeature = SumFeature.createSum(apply_eq, apply_select_eq);
+
+
         // applying equations less deep/less leftish in terms/formulas is
         // preferred
         // this is important for reducing polynomials (start with the biggest

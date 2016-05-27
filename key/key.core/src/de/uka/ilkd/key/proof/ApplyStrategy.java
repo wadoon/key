@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
+import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
@@ -415,7 +416,11 @@ public class ApplyStrategy {
         // Look for the strategy ...
         RuleApp               app = null;
         Goal                  g;
+        ApplyEqualityEngine eqEngine = null;
         while ( ( g = goalChooser.getNextGoal () ) != null ) {
+            if(eqEngine == null) {
+                eqEngine = new ApplyEqualityEngine(g.indexOfTaclets(), g.proof().getServices());
+            }
             if (!stopCondition.isGoalAllowed(maxApplications, timeout, proof,
                                              goalChooser, time, countApplied, g)) {
                return new SingleRuleApplicationInfo(
@@ -423,6 +428,7 @@ public class ApplyStrategy {
                                                               goalChooser, time, countApplied, g),
                        g, null);
             }
+            RuleAppCost cost = g.getRuleAppManager().peekCost();
             app = g.getRuleAppManager().next();
             //Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
             if(app == null) {
@@ -430,6 +436,8 @@ public class ApplyStrategy {
                 app = g.getRuleAppManager().next();
             }
             //<-------
+
+            app = eqEngine.consider(g, cost, app);
 
             if (app == null) {
                 if (stopAtFirstNonClosableGoal) {

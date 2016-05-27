@@ -142,4 +142,8 @@ public final class Immutables {
         return result;
     }
 
+    public static <T> ImmutableList<T> singletonList(T arg) {
+        return ImmutableSLList.<T>nil().prepend(arg);
+    }
+
 }
