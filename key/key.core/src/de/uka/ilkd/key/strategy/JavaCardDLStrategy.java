@@ -156,6 +156,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     protected final StrategyProperties strategyProperties;
+    public Feature externalApplyEqFeature;
 
     protected JavaCardDLStrategy(Proof p_proof,
             StrategyProperties strategyProperties) {
