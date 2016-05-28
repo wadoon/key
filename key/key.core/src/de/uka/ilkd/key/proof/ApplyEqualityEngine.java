@@ -176,14 +176,17 @@ public class ApplyEqualityEngine {
                         new PosInOccurrence(sf, PosInTerm.getTopLevel().down(0), true);
 
                 // now iterate over all formulas in the sequent.
+                int i = 0;
                 for (SequentFormula tocheck : seq) {
+                    i++;
+
                     if(tocheck == sf) {
                         continue;
                     }
                     // And find the lhs of the equation in there (via caches)
                     ImmutableList<PosInOccurrence> hits = findOccurrences(lhs,
                             new PosInOccurrence(tocheck, PosInTerm.getTopLevel(),
-                                    seq.numberInAntec(no)));
+                                    seq.numberInAntec(i)));
                     for (PosInOccurrence hit : hits) {
                         // and add rule applications
                         if(!hit.equals(lhsPIO)) {
