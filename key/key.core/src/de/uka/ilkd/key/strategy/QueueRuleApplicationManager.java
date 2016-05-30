@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
@@ -42,6 +43,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
     private ImmutableHeap<RuleAppContainer> secQueue    = null;
     
+    private final GeneralFindTacletAppManager generalMan =
+            new EqualityFindTacletManager();
+
     /** rule apps that have been deferred during the last call
      * of <code>next</code>, but that could be still relevant */
     private ImmutableList<RuleAppContainer> workingList = null;
@@ -161,7 +165,11 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
         switch ( target ) {
         case PRIMARY_QUEUE:
+            if(generalMan.isResponsible(c)) {
+                generalMan.add(c);
+            } else {
             queue = queue.insert ( c );
+            }
             break;
         case SECONDARY_QUEUE:
             secQueue = secQueue.insert ( c );
@@ -228,6 +236,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         
         ensureNextRuleAppExistsHelp ();
         
+        Iterable<RuleAppContainer> list = generalMan.getMatchingRuleApps(goal);
+        queue = queue.insert(list.iterator());
+
 //        System.out.println("Queue size: " + queue.size());
 //        System.out.println("Secondary queue size: " + secQueue.size());
 //        System.out.println("Working list size: " + workingList.size());
