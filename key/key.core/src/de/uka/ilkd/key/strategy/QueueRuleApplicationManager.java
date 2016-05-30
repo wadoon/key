@@ -42,8 +42,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     private ImmutableHeap<RuleAppContainer> queue       = null;
 
     private ImmutableHeap<RuleAppContainer> secQueue    = null;
-    
-    private final GeneralFindTacletAppManager generalMan =
+
+    private GeneralFindTacletAppManager generalMan =
             new EqualityFindTacletManager();
 
     /** rule apps that have been deferred during the last call
@@ -58,9 +58,10 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     private long nextRuleTime;
     private RuleAppCost nextRuleAppCost = null;
 
-  
+
     public void setGoal ( Goal p_goal ) {
     	goal = p_goal;
+    	generalMan.setGoal(p_goal);
     }
 
 
@@ -71,17 +72,20 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         queue       = null;
         secQueue    = null;
         workingList = null;
+        generalMan.clear();
         TacletAppContainer.ifInstCache.reset(null);
         clearNextRuleApp ();
     }
-    
-    
+
+
     /**
      * Add all rules to the heap that are not reported via the <code>RuleListener</code>
      * connection
      */
     private void ensureQueueExists() {
-        if ( queue != null ) return;
+        if ( queue != null ) {
+            return;
+        }
 
         if ( getGoal () == null ) {
             clearCache ();
@@ -100,6 +104,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                   .reportAutomatedRuleApps ( getGoal ().getRuleAppManager (),
                                              getServices () );
         //        printQueue(queue);
+
     }
 
 
@@ -109,15 +114,16 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
         //System.out.println ( "Rule added: " + rule + "\n");
-        
+
         	//ensureQueueExists ();
 
-        if ( queue == null )
+        if ( queue == null ) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
             return;
-        
-        final Iterator<RuleAppContainer> iterator = 
+        }
+
+        final Iterator<RuleAppContainer> iterator =
                 new SingletonIterator<RuleAppContainer>(RuleAppContainer.createAppContainer
         	           ( rule, pos, getGoal (), getStrategy () ) );
         ensureQueueExists();
@@ -130,20 +136,21 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
-        if ( queue == null )
+        if ( queue == null ) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
             return;
+        }
 
-        final ImmutableList<RuleAppContainer> containers = 
-                RuleAppContainer.createAppContainers( rules, pos, getGoal (), getStrategy () );        
-        ensureQueueExists();        
+        final ImmutableList<RuleAppContainer> containers =
+                RuleAppContainer.createAppContainers( rules, pos, getGoal (), getStrategy () );
+        ensureQueueExists();
         for (RuleAppContainer rac : containers) {
             push ( new SingletonIterator<RuleAppContainer>(rac),  PRIMARY_QUEUE );
         }
     }
-    
-    
+
+
 
     /**
      * Add a number of new rule apps to the heap
@@ -160,19 +167,20 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * infinitely expensive
      */
     private void push (RuleAppContainer c, int target) {
-        if ( c.getCost () instanceof TopRuleAppCost )
+        if ( c.getCost () instanceof TopRuleAppCost ) {
             return;
+        }
 
         switch ( target ) {
         case PRIMARY_QUEUE:
+            queue = queue.insert ( c );
+            break;
+        case SECONDARY_QUEUE:
             if(generalMan.isResponsible(c)) {
                 generalMan.add(c);
             } else {
-            queue = queue.insert ( c );
-            }
-            break;
-        case SECONDARY_QUEUE:
             secQueue = secQueue.insert ( c );
+            }
             break;
         case WORKING_LIST:
             workingList = workingList.prepend(c);
@@ -203,10 +211,10 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     public RuleApp next() {
         ensureNextRuleAppExists ();
-        
+
         final RuleApp res = nextRuleApp;
-        clearNextRuleApp ();        
-        
+        clearNextRuleApp ();
+
     	return res;
     }
 
@@ -218,54 +226,57 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     private void ensureNextRuleAppExists () {
         ensureQueueExists ();
 
+        Iterable<RuleAppContainer> list = generalMan.getMatchingRuleApps(goal);
+        secQueue = secQueue.insert(list.iterator());
+
         final long currentTime = getGoal ().getTime ();
         if ( currentTime != nextRuleTime ) {
             clearNextRuleApp ();
             nextRuleTime = currentTime;
         }
-        
-        if ( nextRuleApp != null ) return;
-        
+
+        if ( nextRuleApp != null ) {
+            return;
+        }
+
         final RuleAppIndex index = getGoal ().ruleAppIndex ();
         index.fillCache ();
-        
+
 //        printQueue(queue);
 //        printQueue(secQueue);
-            
+
         createFurtherApps ();
-        
+
         ensureNextRuleAppExistsHelp ();
-        
-        Iterable<RuleAppContainer> list = generalMan.getMatchingRuleApps(goal);
-        queue = queue.insert(list.iterator());
 
 //        System.out.println("Queue size: " + queue.size());
 //        System.out.println("Secondary queue size: " + secQueue.size());
 //        System.out.println("Working list size: " + workingList.size());
 
         queue = queue.insert ( secQueue );
-        secQueue = ImmutableLeftistHeap.<RuleAppContainer>nilHeap();        
+        secQueue = ImmutableLeftistHeap.<RuleAppContainer>nilHeap();
     }
 
 
-    
+
     private void ensureNextRuleAppExistsHelp () {
-        final BooleanContainer secondaryQueueUsed = new BooleanContainer ();        
+        final BooleanContainer secondaryQueueUsed = new BooleanContainer ();
         clearNextRuleApp ();
-        
+
         while ( nextRuleApp == null && ( !queue.isEmpty() || !secQueue.isEmpty() ) ) {
             final RuleAppContainer c = getMinRuleApp ( secondaryQueueUsed );
 //            printContainer ( "considering rule ", c );
 
             nextRuleApp = c.completeRuleApp(getGoal(), getStrategy());
-            
+
             if(nextRuleApp == null && c instanceof BuiltInRuleAppContainer) {
         	//XXX
 	    } else if ( nextRuleApp == null ) {
-                if ( !secondaryQueueUsed.val () )
+                if ( !secondaryQueueUsed.val () ) {
                     createFurtherRuleApps ( c, true );
-                else
+                } else {
                     push ( c, WORKING_LIST );
+                }
             } else {
                 nextRuleAppCost = c.getCost ();
 
@@ -276,7 +287,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                 workingList = ImmutableSLList.<RuleAppContainer>nil();
                 push ( c, WORKING_LIST );
             }
-            
+
 //            if (res != null) {
 //                printContainer ( "selected rule ", c );
 //            }
@@ -311,7 +322,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return priC;
         }
     }
-    
+
     /**
      * Call the method <code>createFurtherApps</code> for all elements of
      * the list <code>consideredRecently</code>, and clear the list. The new
@@ -320,18 +331,20 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     private void createFurtherApps () {
     	final Iterator<RuleAppContainer> it = workingList.iterator();
     	workingList = ImmutableSLList.<RuleAppContainer>nil();
-    
-        while ( it.hasNext() )
+
+        while ( it.hasNext() ) {
             createFurtherRuleApps ( it.next (), true );
+        }
     }
 
 
     private void createFurtherRuleApps (RuleAppContainer app, boolean secondary) {
+        assert secondary = true;
         push ( app.createFurtherApps ( getGoal (), getStrategy () ).iterator (),
                secondary ? SECONDARY_QUEUE : PRIMARY_QUEUE );
     }
 
-    
+
     /**
      * The goal this manager belongs to
      */
@@ -360,14 +373,15 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     	res.queue                   = queue;
         res.secQueue                = secQueue;
     	res.workingList             = workingList;
+    	res.generalMan              = generalMan.clone();
     	return res;
     }
-    
+
     void printQueue(ImmutableHeap<RuleAppContainer> p_queue) {
         Iterator<RuleAppContainer> it = p_queue.sortedIterator();
-        
+
         System.out.println("---- start of queue ----");
-        
+
         int n = 0;
         while (it.hasNext ()) {
             n++;
@@ -376,7 +390,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             final String prefix = n + ") ";
             printContainer ( prefix, container );
         }
-        
+
         System.out.println("---- end of queue ----");
     }
 
@@ -386,7 +400,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         final RuleApp ruleApp = container.getRuleApp ();
         String message = prefix + ruleApp.rule ().name ()
                 + " with cost " + container.getCost ();
-        
+
         if ( ruleApp instanceof TacletApp ) {
             TacletApp tacletApp = (TacletApp) ruleApp;
             if ( !tacletApp.ifInstsComplete() ) {
@@ -396,7 +410,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                 message = message + " (incomplete)";
             }
         }
-        
+
         System.out.println ( message );
     }
 

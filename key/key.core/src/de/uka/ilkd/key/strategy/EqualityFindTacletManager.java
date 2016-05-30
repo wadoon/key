@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 public class EqualityFindTacletManager implements GeneralFindTacletAppManager {
@@ -23,16 +22,21 @@ public class EqualityFindTacletManager implements GeneralFindTacletAppManager {
     private final Map<Term, ImmutableList<RuleAppContainer>> table =
             new LinkedHashMap<>();
 
+    private Goal goal;
+
     @Override
     public boolean isResponsible(RuleAppContainer c) {
-        return c.getRuleApp().rule().name().equals(EQ_NAME) &&
-                c.getRuleApp().posInOccurrence() != null;
+        boolean equals = c.getRuleApp().rule().name().equals(EQ_NAME);
+        if(equals) {
+            return c instanceof FindTacletAppContainer;
+        }
+        return false;
     }
 
     @Override
     public void add(RuleAppContainer c) {
-        TacletApp tacApp = (TacletApp)c.getRuleApp();
-        PosInOccurrence pio = tacApp.posInOccurrence();
+        FindTacletAppContainer findCntainer = (FindTacletAppContainer)c;
+        PosInOccurrence pio = findCntainer.getPosInOccurrence(goal);
         Term term = pio.subTerm();
         ImmutableList<RuleAppContainer> list = table.get(term);
         if(list == null) {
@@ -60,6 +64,24 @@ public class EqualityFindTacletManager implements GeneralFindTacletAppManager {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public void setGoal(Goal goal) {
+        this.goal = goal;
+    }
+
+    @Override
+    public void clear() {
+        table.clear();
+    }
+
+    @Override
+    public EqualityFindTacletManager clone() {
+        EqualityFindTacletManager result = new EqualityFindTacletManager();
+        result.table.putAll(table);
+        result.goal = goal;
         return result;
     }
 
