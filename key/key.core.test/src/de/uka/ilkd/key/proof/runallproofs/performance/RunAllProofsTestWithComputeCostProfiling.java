@@ -49,7 +49,7 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     @Parameters(name = "{0}")
     public static List<RunAllProofsTestUnit[]> data() throws Exception {
-        ProofCollection proofCollection = parseIndexFile("index/automaticJAVADL.txt",
+        ProofCollection proofCollection = parseIndexFile("index/applyEq.txt",
                 new Function<TokenStream, ProofCollectionParser>() {
                     @Override
                     public ProofCollectionParser apply(TokenStream t) {
