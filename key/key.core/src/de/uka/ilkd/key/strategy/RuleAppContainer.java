@@ -47,7 +47,19 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 
     @Override
     public final int compareTo(RuleAppContainer o) {
-	return cost.compareTo ( o.cost );
+        int result = cost.compareTo(o.cost);
+        if (result == 0) {
+            /*
+             * Both containers have same costs. We want determinism, so we include some
+             * additional information in the comparison. Determinism is important so that
+             * strategy behaviour stays consistent in different circumstances.
+             */
+            result = getRuleApp().rule().name().compareTo(o.getRuleApp().rule().name());
+            if (result == 0) {
+                result = getRuleApp().toString().compareTo(o.getRuleApp().toString());
+            }
+        }
+        return result;
     }
 
     /**
