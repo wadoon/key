@@ -34,8 +34,8 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     /**
      * Note: This static initialisation block should only be executed once for
-     * each {@link RunAllProofsTestWithComputeCostProfiling} run. This can easily
-     * be broken since fork mode of runallproofs re-executes static
+     * each {@link RunAllProofsTestWithComputeCostProfiling} run. This can
+     * easily be broken since fork mode of runallproofs re-executes static
      * initialisation blocks in each created subprocess. Be aware of that in
      * case you intend to change or move this block.
      */
@@ -86,10 +86,15 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
             ruleName = ruleName.substring(0, ruleName.length() - 5);
 
             // gnuplot -e "ruledatalocation=' /.../rulename'" plot2png.sh
+            System.out.println("Plotting data for rule: " + ruleData.getName().split(".data")[0]);
             ProcessBuilder pb = new ProcessBuilder("gnuplot", "-e", "ruledatalocation='" + ruleName + "'",
                     plotScript.getAbsolutePath());
             pb.inheritIO();
-            pb.start();
+            try {
+                pb.start().waitFor();
+            } catch (InterruptedException e) {
+                System.out.println("InterruptedException: " + e.getMessage());
+            }
         }
     }
 
