@@ -179,7 +179,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             secQueue = secQueue.insert ( c );
             break;
         case WORKING_LIST:
-            if(Boolean.getBoolean("key.xxx") && generalMan.isResponsible(c)) {
+            if(generalMan.isResponsible(c)) {
                 generalMan.add(c);
             } else {
             workingList = workingList.prepend(c);
