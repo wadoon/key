@@ -15,8 +15,9 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 
+import org.key_project.common.core.logic.op.SVSubstitute;
+
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 
 /**
  *  A source element is a piece of syntax. It does not necessarily have

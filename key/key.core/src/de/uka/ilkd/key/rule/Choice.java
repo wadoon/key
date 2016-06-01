@@ -11,15 +11,14 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 
-public class Choice implements Named {
+import de.uka.ilkd.key.util.Pair;
 
-    private final Name name;
-    private final String category;
+public class Choice extends Pair<Name, String> implements Named {
 
     /** 
      * creates a choice object with name <category>:<choice>.
@@ -30,41 +29,22 @@ public class Choice implements Named {
     
 
     public Choice(Name name, String category){
-	this.name = name;
-	// .intern() crucial for correct equals
-	this.category = category.intern();       
+        super(name, category);
     }
 
     
     @Override
     public Name name(){
-	return name;
+        return first;
     }
 
     public String category(){
-	return category;
-    }
-
-    
-    @Override
-    public boolean equals(Object o) {
-	if (!(o instanceof Choice)) {
-	    return false;
-	}
-	final Choice c = (Choice)o;
-	return category == c.category && name.equals(c.name);
-	    
-    }
-
-    
-    @Override
-    public int hashCode() {
-	return name.hashCode()*37;
+        return second;
     }
 
 
     @Override
     public String toString(){
-	return name.toString();
+        return first.toString();
     }
 }

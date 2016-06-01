@@ -16,5 +16,5 @@ package de.uka.ilkd.key.java;
 
 public interface SchemaJavaReader extends JavaReader{
 
-    void setSVNamespace(de.uka.ilkd.key.logic.Namespace ns);
+    void setSVNamespace(org.key_project.common.core.logic.Namespace ns);
 }

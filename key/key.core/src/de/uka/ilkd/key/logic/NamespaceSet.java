@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.Namespace;
 import org.key_project.util.collection.ImmutableSet;
 
 public class NamespaceSet {

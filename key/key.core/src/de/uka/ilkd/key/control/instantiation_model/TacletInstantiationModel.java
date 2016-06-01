@@ -16,11 +16,11 @@ package de.uka.ilkd.key.control.instantiation_model;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.key_project.common.core.logic.Namespace;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
