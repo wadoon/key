@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 /**
  * <p>
  * A {@link TermLabelMerger} is used by
- * {@link TermLabelManager#mergeLabels(Services, de.uka.ilkd.key.logic.SequentChangeInfo)}
+ * {@link TermLabelManager#mergeLabels(Services, org.key_project.common.core.logic.SequentChangeInfo)}
  * to merge {@link TermLabel}s in case a {@link SequentFormula} was 
  * rejected to be added to the resulting {@link Sequent}.
  * </p>

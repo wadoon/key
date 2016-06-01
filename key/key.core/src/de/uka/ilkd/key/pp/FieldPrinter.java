@@ -33,7 +33,7 @@ class FieldPrinter {
      * object.(package.class::field)
      *
      * Remark: This method is declared static because it is also used in method
-     * {@link StorePrinter#printStoreOnFieldConstant(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, boolean) }
+     * {@link StorePrinter#printStoreOnFieldConstant(org.key_project.common.core.logic.Term, org.key_project.common.core.logic.Term, org.key_project.common.core.logic.Term, org.key_project.common.core.logic.Term, boolean) }
      */
     protected String getPrettySyntaxForFieldConstant(Term objectTerm,
             Term fieldTerm) {

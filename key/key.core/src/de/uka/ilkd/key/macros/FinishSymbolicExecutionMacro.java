@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;

@@ -36,11 +36,11 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
+import org.key_project.common.core.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;

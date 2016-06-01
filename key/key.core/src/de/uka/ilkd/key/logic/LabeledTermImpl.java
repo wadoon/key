@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;

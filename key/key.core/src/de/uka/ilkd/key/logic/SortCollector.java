@@ -38,7 +38,7 @@ public class SortCollector extends DefaultVisitor {
 	}	
 	
 	/* (non-Javadoc)
-	 * @see de.uka.ilkd.key.logic.DefaultVisitor#visit(de.uka.ilkd.key.logic.Term)
+	 * @see org.key_project.common.core.logic.DefaultVisitor#visit(org.key_project.common.core.logic.Term)
 	 */
 	@Override
 	public void visit(Term visited) {

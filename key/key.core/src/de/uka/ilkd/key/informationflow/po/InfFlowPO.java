@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.informationflow.po;
 
-import de.uka.ilkd.key.logic.Named;
+import org.key_project.common.core.logic.Named;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 

@@ -11,7 +11,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
 /**
- * Tests the conditional values provided by {@link IExecutionNode#getVariables(de.uka.ilkd.key.logic.Term)}.
+ * Tests the conditional values provided by {@link IExecutionNode#getVariables(org.key_project.common.core.logic.Term)}.
  * @author Martin Hentschel
  */
 public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase {

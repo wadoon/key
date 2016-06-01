@@ -20,14 +20,14 @@ import java.util.Iterator;
 import javax.swing.table.AbstractTableModel;
 
 import org.antlr.runtime.RecognitionException;
+import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInProgram;

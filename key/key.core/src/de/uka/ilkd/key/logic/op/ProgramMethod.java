@@ -123,7 +123,7 @@ public final class ProgramMethod extends ObserverFunction
     // in a direct way
    
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getMethodDeclaration()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getMethodDeclaration()
     */
    @Override
    public MethodDeclaration getMethodDeclaration() {
@@ -131,7 +131,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterType(int)
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getParameterType(int)
     */
     @Override
    public KeYJavaType getParameterType(int i) {
@@ -139,7 +139,7 @@ public final class ProgramMethod extends ObserverFunction
     }
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getBody()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getBody()
     */
    @Override
    public StatementBlock getBody() {
@@ -247,7 +247,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isConstructor()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#isConstructor()
     */
     @Override
    public boolean isConstructor(){
@@ -255,7 +255,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isModel()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#isModel()
     */
     @Override
    public boolean isModel() {
@@ -271,7 +271,7 @@ public final class ProgramMethod extends ObserverFunction
     }
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isVoid()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#isVoid()
     */
    @Override
    public boolean isVoid(){
@@ -312,7 +312,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getReturnType()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getReturnType()
     */
     @Override
    public KeYJavaType getReturnType() {
@@ -333,7 +333,7 @@ public final class ProgramMethod extends ObserverFunction
     }   
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getProgramElementName()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getProgramElementName()
     */
    @Override
    public ProgramElementName getProgramElementName() {
@@ -341,7 +341,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
    /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getUniqueName()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getUniqueName()
     */
    @Override
    public String getUniqueName() {
@@ -354,7 +354,7 @@ public final class ProgramMethod extends ObserverFunction
     } // Included HashCode to make IF-Predicates unique and still reproducible
 
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getFullName()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getFullName()
     */
    @Override
    public String getFullName() {
@@ -362,7 +362,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getName()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getName()
     */
    @Override
    public String getName() {
@@ -370,7 +370,7 @@ public final class ProgramMethod extends ObserverFunction
     }
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isAbstract()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#isAbstract()
     */
    @Override
    public boolean isAbstract() {
@@ -378,7 +378,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isImplicit()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#isImplicit()
     */
    @Override
    public boolean isImplicit(){
@@ -386,7 +386,7 @@ public final class ProgramMethod extends ObserverFunction
     }
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isNative()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#isNative()
     */
    @Override
    public boolean isNative() {
@@ -394,7 +394,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isFinal()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#isFinal()
     */
    @Override
    public boolean isFinal() {
@@ -402,7 +402,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#isSynchronized()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#isSynchronized()
     */
    @Override
    public boolean isSynchronized() {
@@ -410,7 +410,7 @@ public final class ProgramMethod extends ObserverFunction
     }
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getThrown()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getThrown()
     */
    @Override
    public Throws getThrown() {
@@ -418,7 +418,7 @@ public final class ProgramMethod extends ObserverFunction
     }
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterDeclarationAt(int)
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getParameterDeclarationAt(int)
     */
    @Override
    public ParameterDeclaration getParameterDeclarationAt(int index) {
@@ -426,7 +426,7 @@ public final class ProgramMethod extends ObserverFunction
     }
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getVariableSpecification(int)
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getVariableSpecification(int)
     */
     @Override
    public VariableSpecification getVariableSpecification(int index) {
@@ -434,7 +434,7 @@ public final class ProgramMethod extends ObserverFunction
     }
      
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterDeclarationCount()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getParameterDeclarationCount()
     */
    @Override
    public int getParameterDeclarationCount() {
@@ -442,7 +442,7 @@ public final class ProgramMethod extends ObserverFunction
     }
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameters()
+    * @see org.key_project.common.core.logic.op.IProgramMethod#getParameters()
     */
    @Override
    public ImmutableArray<ParameterDeclaration> getParameters() {

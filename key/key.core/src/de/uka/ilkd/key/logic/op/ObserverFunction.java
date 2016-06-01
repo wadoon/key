@@ -113,7 +113,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
     //-------------------------------------------------------------------------
         
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IObserverFunction#getType()
+    * @see org.key_project.common.core.logic.op.IObserverFunction#getType()
     */
     @Override
    public final KeYJavaType getType() {
@@ -122,7 +122,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
     
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IObserverFunction#getContainerType()
+    * @see org.key_project.common.core.logic.op.IObserverFunction#getContainerType()
     */
     @Override
    public final KeYJavaType getContainerType() {
@@ -131,7 +131,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
     
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IObserverFunction#isStatic()
+    * @see org.key_project.common.core.logic.op.IObserverFunction#isStatic()
     */
     @Override
     public final boolean isStatic() {
@@ -140,7 +140,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
     
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.IObserverFunction#getStateCount()
+     * @see org.key_project.common.core.logic.op.IObserverFunction#getStateCount()
      */
     @Override
     public int getStateCount() {
@@ -153,7 +153,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
 	}
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IObserverFunction#getNumParams()
+    * @see org.key_project.common.core.logic.op.IObserverFunction#getNumParams()
     */
     @Override
    public final int getNumParams() {
@@ -162,7 +162,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
     
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IObserverFunction#getParamType(int)
+    * @see org.key_project.common.core.logic.op.IObserverFunction#getParamType(int)
     */
     @Override
    public final KeYJavaType getParamType(int i) {
@@ -171,7 +171,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
     
     
     /* (non-Javadoc)
-    * @see de.uka.ilkd.key.logic.op.IObserverFunction#getParamTypes()
+    * @see org.key_project.common.core.logic.op.IObserverFunction#getParamTypes()
     */
     @Override
    public final ImmutableArray<KeYJavaType> getParamTypes() {

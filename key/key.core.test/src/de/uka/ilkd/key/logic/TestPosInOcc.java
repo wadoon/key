@@ -14,6 +14,9 @@
 package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
+
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;

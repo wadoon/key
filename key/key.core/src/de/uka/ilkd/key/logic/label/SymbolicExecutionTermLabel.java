@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.logic.label;
 
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 
 /**

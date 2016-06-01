@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 

@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Named;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.antlr.runtime.RecognitionException;
@@ -37,8 +39,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;

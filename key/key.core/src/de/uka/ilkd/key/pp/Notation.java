@@ -28,7 +28,7 @@ import de.uka.ilkd.key.util.Debug;
 /**
  * Encapsulate the concrete syntax used to print a term. The {@link
  * NotationInfo} class associates a Notation with every {@link
- * de.uka.ilkd.key.logic.op.Operator}. The various inner classes of this class
+ * org.key_project.common.core.logic.op.Operator}. The various inner classes of this class
  * represent different kinds of concrete syntax, like prefix, infix, postfix,
  * function style, attribute style, etc.
  */

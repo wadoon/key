@@ -62,6 +62,7 @@ options {
   import org.key_project.util.collection.ImmutableList;
   import org.key_project.util.collection.ImmutableSLList;
   import org.key_project.util.collection.ImmutableSet;
+  import org.key_project.common.core.logic.*;
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;

@@ -18,9 +18,11 @@
 package de.uka.ilkd.key.rule;
 
 import junit.framework.TestCase;
+
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;

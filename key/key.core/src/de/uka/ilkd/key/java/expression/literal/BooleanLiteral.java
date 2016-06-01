@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.logic.Name;
 
 
 /**

@@ -2,7 +2,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.common.core.logic.Name;
 
 public class MetaShiftLeft extends MetaShift {
 

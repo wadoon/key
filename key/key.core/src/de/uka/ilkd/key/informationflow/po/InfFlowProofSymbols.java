@@ -5,11 +5,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
+import org.key_project.common.core.logic.Named;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;

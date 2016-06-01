@@ -65,7 +65,7 @@ public class ProgramVariablesMatchVisitor extends SimultaneousJavaASTVisitor {
      * @see
      * de.uka.ilkd.key.util.joinrule.SimultaneousJavaASTVisitor#visit(de.uka
      * .ilkd.key.logic.op.ProgramVariable,
-     * de.uka.ilkd.key.logic.op.ProgramVariable)
+     * org.key_project.common.core.logic.op.ProgramVariable)
      */
     @Override
     public void visit(ProgramVariable x1, ProgramVariable x2) {
@@ -85,7 +85,7 @@ public class ProgramVariablesMatchVisitor extends SimultaneousJavaASTVisitor {
      * @see
      * de.uka.ilkd.key.util.joinrule.SimultaneousJavaASTVisitor#visit(de.uka
      * .ilkd.key.logic.op.ProgramVariable,
-     * de.uka.ilkd.key.logic.op.ProgramVariable)
+     * org.key_project.common.core.logic.op.ProgramVariable)
      */
     @Override
     public void visit(LocationVariable x1, LocationVariable x2) {

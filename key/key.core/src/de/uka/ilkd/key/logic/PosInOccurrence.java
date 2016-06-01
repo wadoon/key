@@ -80,7 +80,7 @@ public final class PosInOccurrence {
      * creates a new PosInOccurrence that has exactly the same state as this
      * object except the PosInTerm is new and walked down the specified
      * subterm, as specified in method down of 
-     * {@link de.uka.ilkd.key.logic.PosInTerm}.
+     * {@link org.key_project.common.core.logic.PosInTerm}.
      */
     public PosInOccurrence down(int i) {
 	return new PosInOccurrence(sequentFormula, posInTerm.down(i), inAntec);

@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
  * For the moment, this is used to distinguish implicit specifications from explicit ones
  * and '&' from '&&' (logical and shortcut 'and') as well as '|' from '||' (logical and
  * shortcut 'or').
- * Cf. {@link de.uka.ilkd.key.logic.TermImpl} and {@link de.uka.ilkd.key.logic.LabeledTermImpl}.
+ * Cf. {@link org.key_project.common.core.logic.TermImpl} and {@link org.key_project.common.core.logic.LabeledTermImpl}.
  *
  * @author Michael Kirsten
  */

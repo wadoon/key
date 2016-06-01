@@ -30,7 +30,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  * 
  * This class is used to encapsulate knowledge about the internal term 
  * structures.
- * See {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to 
+ * See {@link org.key_project.common.core.logic.TermBuilder} for more convenient methods to 
  * create terms. 
  */
 public final class TermFactory {

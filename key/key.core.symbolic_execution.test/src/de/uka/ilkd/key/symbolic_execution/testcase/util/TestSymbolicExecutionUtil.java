@@ -16,11 +16,12 @@ package de.uka.ilkd.key.symbolic_execution.testcase.util;
 import java.io.File;
 import java.util.HashMap;
 
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -36,7 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase {
    /**
-    * Tests {@link SymbolicExecutionUtil#improveReadability(de.uka.ilkd.key.logic.Term)}
+    * Tests {@link SymbolicExecutionUtil#improveReadability(org.key_project.common.core.logic.Term)}
     */
    public void testImproveReadability() throws ProblemLoaderException {
       KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/readability/InnerAndAnonymousTypeTest.java"), null, null, null);

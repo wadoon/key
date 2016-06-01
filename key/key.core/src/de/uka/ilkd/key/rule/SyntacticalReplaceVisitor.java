@@ -13,7 +13,7 @@
 
 /**
  * visitor for <t> execPostOrder </t> of
- * {@link de.uka.ilkd.key.logic.Term}. Called with that method
+ * {@link org.key_project.common.core.logic.Term}. Called with that method
  * on a term, the visitor builds a new term replacing SchemaVariables with their
  * instantiations that are given as a SVInstantiations object.
  */

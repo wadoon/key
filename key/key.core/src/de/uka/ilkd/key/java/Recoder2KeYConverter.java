@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
+import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Named;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -174,8 +176,6 @@ import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
@@ -1599,7 +1599,7 @@ public class Recoder2KeYConverter {
 
     /**
      * converts a recoder method reference. A
-     * de.uka.ilkd.key.logic.op.ProgramMethod is created replacing the method
+     * org.key_project.common.core.logic.op.ProgramMethod is created replacing the method
      * reference.
      *
      * @param mr

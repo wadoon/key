@@ -16,6 +16,7 @@ package de.uka.ilkd.key.macros;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -42,7 +43,6 @@ import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;

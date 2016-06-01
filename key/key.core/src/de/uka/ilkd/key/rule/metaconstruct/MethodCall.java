@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -41,7 +42,6 @@ import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;

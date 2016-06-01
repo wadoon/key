@@ -33,7 +33,7 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
     }
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.NoPosTacletApp#setupMatchConditions(de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.Constraint)
+     * @see de.uka.ilkd.key.rule.NoPosTacletApp#setupMatchConditions(org.key_project.common.core.logic.PosInOccurrence, de.uka.ilkd.key.java.Services, org.key_project.common.core.logic.Constraint)
      */
     @Override
     protected MatchConditions setupMatchConditions (PosInOccurrence pos,

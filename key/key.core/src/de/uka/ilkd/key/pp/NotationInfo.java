@@ -31,7 +31,7 @@ import de.uka.ilkd.key.util.UnicodeHelper;
  * <p> 
  * Stores the mapping from operators to {@link Notation}s.  Each 
  * {@link Notation} represents the concrete syntax for some 
- * {@link de.uka.ilkd.key.logic.op.Operator}.  The {@link LogicPrinter}
+ * {@link org.key_project.common.core.logic.op.Operator}.  The {@link LogicPrinter}
  * asks the NotationInfo to find out which Notation to use for a given term.
  * <p>
  * The Notation associated with an operator might change.  New Notations can

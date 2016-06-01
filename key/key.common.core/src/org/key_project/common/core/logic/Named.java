@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic;
 
 /**
  * This interface has to be implemented by all logic signature elements, which

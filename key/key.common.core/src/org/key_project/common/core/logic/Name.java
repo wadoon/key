@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic;
 
 /**
  * A Name object is created to represent the name of an object which usually

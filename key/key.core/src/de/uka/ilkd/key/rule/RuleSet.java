@@ -18,8 +18,8 @@
  */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
+import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Named;
 public class RuleSet implements Named {
     /** name of the heuristic */
     private Name name;

@@ -14,7 +14,9 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariable;

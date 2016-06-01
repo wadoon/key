@@ -35,7 +35,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
      * @parm children an ExtList with the children. May
      * include: 
      * 	a TypeReference (as a reference to the return type), 
-     * 	a de.uka.ilkd.key.logic.ProgramElementName (as Name of the
+     * 	a org.key_project.common.core.logic.ProgramElementName (as Name of the
      * 		method),
      * 	several ParameterDeclaration (as parameters of the declared
      * 		method), 

@@ -99,7 +99,7 @@ public class VMTacletMatcher implements TacletMatcher {
     
 
     /** (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.util.Iterator, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.util.Iterator, org.key_project.common.core.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
     @Override
     public final IfMatchResult matchIf (   Iterable<IfFormulaInstantiation> p_toMatch,

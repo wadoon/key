@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;

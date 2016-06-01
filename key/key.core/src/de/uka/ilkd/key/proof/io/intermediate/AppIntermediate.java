@@ -13,9 +13,8 @@
 
 package de.uka.ilkd.key.proof.io.intermediate;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.logic.Name;
 
 /**
  * Represents an intermediate rule / taclet application.

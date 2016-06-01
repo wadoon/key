@@ -16,8 +16,9 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.key_project.common.core.logic.Name;
+
 import junit.framework.TestCase;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;

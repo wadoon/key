@@ -61,7 +61,7 @@ public class MethodDeclaration extends JavaDeclaration
      *      Method declaration.
      * @param children an ExtList of children.  May
      * include: a TypeReference (as a reference to the return type), a
-     * de.uka.ilkd.key.logic.ProgramElementName (as Name of the method),
+     * org.key_project.common.core.logic.ProgramElementName (as Name of the method),
      * several ParameterDeclaration (as parameters of the declared method), a
      * StatementBlock (as body of the declared method), several Modifier 
      * (taken as modifiers of the declaration), a Comment

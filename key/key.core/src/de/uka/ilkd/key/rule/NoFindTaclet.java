@@ -13,13 +13,13 @@
 
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;

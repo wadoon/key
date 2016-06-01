@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Named;
 
 public class Choice implements Named {
 

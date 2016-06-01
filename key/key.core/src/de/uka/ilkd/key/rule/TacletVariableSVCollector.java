@@ -26,7 +26,7 @@ public class TacletVariableSVCollector extends TacletSchemaVariableCollector {
 
     /**
      * visits term t in post order 
-     * ({@link Term#execPostOrder(de.uka.ilkd.key.logic.Visitor)})
+     * ({@link Term#execPostOrder(org.key_project.common.core.logic.Visitor)})
      * and collects all bound schema variables 
      * @param t the Term to be visited (<code>t</code> must not be <code>null</code>  
      */  

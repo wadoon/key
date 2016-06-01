@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 /**

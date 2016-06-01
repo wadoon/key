@@ -13,9 +13,8 @@
 
 package de.uka.ilkd.key.rule.label;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.logic.Name;
 
 /**
  * Instances of this class provides functionality only if a supported
