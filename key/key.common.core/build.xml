@@ -48,6 +48,7 @@
 
    <property name="lib.dir" value="${basedir}/../key.core/lib"/>
 
+   <mkdir dir="${gen.dir}"/>
    <mkdir dir="${build.dir}"/>
 
 

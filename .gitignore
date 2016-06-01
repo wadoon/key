@@ -26,3 +26,4 @@ smt-solvers
 
 *.serialized
 **/testresults/**
+key/key.common.core/bin/**
