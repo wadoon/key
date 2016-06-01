@@ -39,6 +39,7 @@
 				<pathelement location="${ext.dir}/antlr.jar"/>
 				<pathelement location="${ext.dir}/recoderKey.jar"/>
 				<pathelement location="${basedir}/../key.util/bin/"/>
+            <pathelement location="${basedir}/../key.common.core/bin/"/>
 			</classpath>
 		</javac>
 		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false">

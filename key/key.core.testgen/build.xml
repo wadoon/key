@@ -31,6 +31,7 @@
 		       optimize="off">
 			<classpath>
 				<pathelement path="${basedir}/../key.core/bin/"/>
+            <pathelement path="${basedir}/../key.common.core/bin"/>
 				<pathelement path="${basedir}/../key.util/bin/"/>
 				<pathelement location="${lib.dir}/antlr.jar"/>
 				<pathelement location="${lib.dir}/recoderKey.jar"/>
