@@ -412,15 +412,11 @@ public class ApplyStrategy {
     private synchronized SingleRuleApplicationInfo
                             applyAutomaticRule (final IGoalChooser goalChooser,
                                                 final IStopCondition stopCondition,
-                                                boolean stopAtFirstNonClosableGoal) {
+                                                boolean stopAtFirstNonClosableGoal, ApplyEqualityEngine eqEngine) {
         // Look for the strategy ...
         RuleApp               app = null;
         Goal                  g;
-        ApplyEqualityEngine eqEngine = null;
         while ( ( g = goalChooser.getNextGoal () ) != null ) {
-            if(eqEngine == null) {
-                eqEngine = new ApplyEqualityEngine(g.indexOfTaclets(), g.proof().getServices());
-            }
             if (!stopCondition.isGoalAllowed(maxApplications, timeout, proof,
                                              goalChooser, time, countApplied, g)) {
                return new SingleRuleApplicationInfo(
@@ -472,8 +468,12 @@ public class ApplyStrategy {
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof,
                                                           goalChooser, time, countApplied, srInfo);
 
+            // hacky ...
+            RuleAppIndex ruleAppIndex = proof.openGoals().head().ruleAppIndex();
+            ApplyEqualityEngine eqEngine =
+                    new ApplyEqualityEngine(ruleAppIndex.tacletIndex(), proof.getServices());
             while (!shouldStop) {
-                srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonCloseableGoal);
+                srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonCloseableGoal, eqEngine);
                 if (!srInfo.isSuccess()) {
                     return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(),
                                                  System.currentTimeMillis()-time, countApplied,
