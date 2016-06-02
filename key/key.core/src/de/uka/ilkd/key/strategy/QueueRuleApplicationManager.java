@@ -43,7 +43,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * of <code>next</code>, but that could be still relevant */
     private ImmutableList<RuleAppContainer> workingList = null;
 
-    public static enum QueueType {
+    static enum QueueType {
         PRIMARY_QUEUE, SECONDARY_QUEUE, WORKING_LIST
     }
 
