@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import java.lang.ref.WeakReference;
 
+import org.key_project.common.core.logic.DLSort;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -90,7 +91,7 @@ public final class NullSort implements Sort  {
     
     
     @Override
-    public boolean extendsTrans(Sort sort) {
+    public boolean extendsTrans(DLSort sort) {
 	return sort == this
 	       || sort == Sort.ANY
 	       || sort.extendsTrans(objectSort);

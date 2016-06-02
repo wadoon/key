@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import org.key_project.common.core.logic.DLSort;
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -55,7 +56,7 @@ public abstract class AbstractSort implements Sort {
 
     
     @Override    
-    public final boolean extendsTrans(Sort sort) {
+    public final boolean extendsTrans(DLSort sort) {
         if(sort == this) {
             return true;
         } else if(this == Sort.FORMULA || this == Sort.UPDATE) {

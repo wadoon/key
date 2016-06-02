@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import org.key_project.common.core.logic.DLSort;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.util.collection.ImmutableSet;
@@ -22,7 +23,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 
-public interface Sort extends Named {
+public interface Sort extends DLSort, Named {
     
     /**
      * Formulas are represented as "terms" of this sort.
@@ -59,11 +60,6 @@ public interface Sort extends Named {
      */
     ImmutableSet<Sort> extendsSorts(Services services); 
 
-    /**
-     * Tells whether the given sort is a reflexive, transitive subsort of this 
-     * sort.
-     */
-    boolean extendsTrans(Sort s);
     
     /**
      * Tells whether this sort has no exact elements.
