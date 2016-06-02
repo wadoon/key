@@ -316,8 +316,7 @@ public class ApplyEqualityEngine {
      * @return the rule app cost
      */
     private RuleAppCost computeCosts(Goal goal, RuleApp ra, PosInOccurrence pos) {
-        JavaCardDLStrategy jstrategy = (JavaCardDLStrategy) goal.proof().getActiveStrategy();
-        return jstrategy.externalApplyEqFeature.compute(ra, pos, goal);
+        return goal.getGoalStrategy().computeCost(ra, pos, goal);
     }
 
 }

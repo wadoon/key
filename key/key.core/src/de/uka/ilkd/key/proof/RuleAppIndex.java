@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.proof.rulefilter.AllButEqualityRuleSetTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.NotRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -80,7 +81,7 @@ public final class RuleAppIndex  {
 	autoMode                  = false;
 
 	automatedTacletAppIndex.setRuleFilter 
-	    ( AnyRuleSetTacletFilter.INSTANCE );
+	    ( AllButEqualityRuleSetTacletFilter.INSTANCE );
 	interactiveTacletAppIndex.setRuleFilter 
 	    ( new NotRuleFilter ( AnyRuleSetTacletFilter.INSTANCE ) );
 	
