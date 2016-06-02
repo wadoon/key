@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -13,7 +15,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**

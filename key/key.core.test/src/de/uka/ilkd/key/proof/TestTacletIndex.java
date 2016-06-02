@@ -16,8 +16,6 @@ package de.uka.ilkd.key.proof;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -39,6 +37,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 
 public class TestTacletIndex extends TestCase{   

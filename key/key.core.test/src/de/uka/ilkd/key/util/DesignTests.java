@@ -21,13 +21,12 @@ import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.logic.Term;
+import junit.framework.TestCase;
 
 
 /** 

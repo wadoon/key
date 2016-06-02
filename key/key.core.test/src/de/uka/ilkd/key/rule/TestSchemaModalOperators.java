@@ -17,8 +17,6 @@
 package de.uka.ilkd.key.rule;
 
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -50,6 +48,7 @@ import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import junit.framework.TestCase;
 
 
 

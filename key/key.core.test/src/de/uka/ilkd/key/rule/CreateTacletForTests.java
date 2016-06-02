@@ -17,8 +17,6 @@ package de.uka.ilkd.key.rule;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
@@ -44,6 +42,7 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
+import junit.framework.TestCase;
 
 
 /** 

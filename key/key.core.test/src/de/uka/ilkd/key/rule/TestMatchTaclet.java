@@ -18,8 +18,6 @@ package de.uka.ilkd.key.rule;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
@@ -51,6 +49,7 @@ import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 
 public class TestMatchTaclet extends TestCase {

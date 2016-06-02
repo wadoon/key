@@ -11,29 +11,15 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.DLSort;
+import org.key_project.common.core.logic.DLTerm;
+import org.key_project.common.core.logic.DLVisitor;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-
-
-/**
- * The objects of this class represent logical variables,
- * used e.g. for quantification.
+/** 
+ * This interface represents the variables that can be recognized 
+ * by one of the parsers. 
  */
-public final class LogicVariable extends AbstractSortedOperator 
-    implements QuantifiableVariable {
-
-    public LogicVariable(Name name, Sort sort) {
-	super(name, sort, true);
-	assert sort != Sort.FORMULA;
-	assert sort != Sort.UPDATE;
-    }
-    
-    
-    @Override
-    public String toString() {
-	return name() + ":" + sort();
-    }
+public interface DLParsableVariable<S extends DLSort, T extends DLTerm<S, ? extends DLVisitor<T>>> extends DLSortedOperator<S, T> {
 }

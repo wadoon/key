@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -34,6 +32,7 @@ import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
 
 /** class tests the term factory
 */

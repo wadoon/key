@@ -5,8 +5,6 @@ package de.uka.ilkd.key.rule.join;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -25,6 +23,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.util.ProofStarter;
+import junit.framework.TestCase;
 
 /**
  * Test suite for the join rule.

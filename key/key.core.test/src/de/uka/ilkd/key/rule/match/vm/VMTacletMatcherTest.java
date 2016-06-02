@@ -2,8 +2,6 @@ package de.uka.ilkd.key.rule.match.vm;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.common.core.logic.Name;
@@ -16,6 +14,7 @@ import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 public class VMTacletMatcherTest extends TestCase {
 

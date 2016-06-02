@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.logic.Term;
@@ -26,6 +24,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import junit.framework.TestCase;
 
 public class TestDropEffectlessElementary extends TestCase {
 

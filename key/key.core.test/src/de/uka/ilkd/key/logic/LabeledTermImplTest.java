@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -22,6 +20,7 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
 
 public class LabeledTermImplTest extends TestCase {
 

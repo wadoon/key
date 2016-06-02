@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.logic.op;
 
-
 /**
  * This interface represents the root of a schema variable hierarchy to be
  * express termstructures that match on logical terms. Schema variables

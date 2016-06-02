@@ -17,12 +17,12 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 /**
  * This {@link TestCase} tests the parallel usage of {@link KeYParser}

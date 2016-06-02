@@ -17,8 +17,6 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -47,6 +45,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 
 

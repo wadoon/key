@@ -21,13 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;

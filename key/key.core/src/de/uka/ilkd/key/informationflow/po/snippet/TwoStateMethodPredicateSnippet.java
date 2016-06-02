@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;

@@ -98,8 +98,8 @@ class TermImpl implements Term {
     //------------------------------------------------------------------------- 
     
    
-   private void determineFreeVars() {
-	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
+    private void determineFreeVars() {
+        freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
         
         if(op instanceof QuantifiableVariable) {
             freeVars = freeVars.add((QuantifiableVariable) op);

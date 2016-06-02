@@ -20,8 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -62,6 +60,7 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 /**
  * Tests {@link TermLabelManager}

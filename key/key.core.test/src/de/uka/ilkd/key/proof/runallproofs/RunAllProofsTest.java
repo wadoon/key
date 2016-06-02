@@ -26,14 +26,12 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
-import org.junit.AfterClass;
 import org.junit.Test;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 
 /**
  * <p>

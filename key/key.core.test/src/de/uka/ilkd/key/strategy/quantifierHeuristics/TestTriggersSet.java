@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
 
@@ -33,6 +31,7 @@ import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletAppIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
 
 
 //most Code are copyed from Logic.TestUpdateFactory

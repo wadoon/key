@@ -16,7 +16,6 @@
  */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import junit.framework.TestCase;
 
 public class TestProgramMetaConstructs extends TestCase {
 

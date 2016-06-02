@@ -11,18 +11,20 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
+import org.key_project.common.core.logic.DLOperator;
+import org.key_project.common.core.logic.DLSort;
+import org.key_project.common.core.logic.DLTerm;
+import org.key_project.common.core.logic.DLVisitor;
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.Term;
 
 
 /** 
  * Abstract operator class offering some common functionality.
  */
-abstract class AbstractOperator implements Operator {
+public abstract class AbstractOperator<S extends DLSort, T extends DLTerm<S, ? extends DLVisitor<T>>> implements DLOperator<S, T> {
     
     private final Name name;
     private final int arity;
@@ -31,9 +33,9 @@ abstract class AbstractOperator implements Operator {
     
     
     protected AbstractOperator(Name name, 
-	    		       int arity, 
-	    		       ImmutableArray<Boolean> whereToBind,
-	    		       boolean isRigid) {
+	    		               int arity, 
+	    		               ImmutableArray<Boolean> whereToBind,
+	    		               boolean isRigid) {
 	assert name != null;
 	assert arity >= 0;
 	assert whereToBind == null || whereToBind.size() == arity;	
@@ -90,11 +92,11 @@ abstract class AbstractOperator implements Operator {
      * Allows subclasses to impose custom demands on what constitutes a 
      * valid term using the operator represented by the subclass. 
      */
-    protected abstract boolean additionalValidTopLevel(Term term);
+    protected abstract boolean additionalValidTopLevel(T term);
     
     
     @Override
-    public boolean validTopLevel(Term term) {
+    public boolean validTopLevel(T term) {
 	if(arity != term.arity()
 	   || arity != term.subs().size()
 	   || (whereToBind == null) != term.boundVars().isEmpty()) {

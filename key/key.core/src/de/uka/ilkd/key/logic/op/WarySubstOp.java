@@ -35,8 +35,7 @@ public final class WarySubstOp extends SubstOp {
 
     @Override
     public Term apply ( Term term, TermServices services ) {
-	QuantifiableVariable v=term.varsBoundHere(1).get(0);
-	WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0), services);
+	WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(term.varsBoundHere(1).get(0), term.sub(0), services);
 	return cfSubst.apply(term.sub(1));
     }
 }

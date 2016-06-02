@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * All symbols acting as members of a term e.g. logical operators, predicates, 
  * functions, variables etc. have to implement this interface.  
  */
-public interface Operator extends DLOperator<Term>, Named, SVSubstitute {
+public interface Operator extends DLOperator<Sort, Term>, Named, SVSubstitute {
     
 
     /**
@@ -36,10 +36,4 @@ public interface Operator extends DLOperator<Term>, Named, SVSubstitute {
     Sort sort(ImmutableArray<Term> terms);
     
     
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    boolean validTopLevel(Term term);
 }

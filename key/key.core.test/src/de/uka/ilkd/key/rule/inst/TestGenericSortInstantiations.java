@@ -15,8 +15,6 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -33,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
 
 public class TestGenericSortInstantiations extends TestCase {
 

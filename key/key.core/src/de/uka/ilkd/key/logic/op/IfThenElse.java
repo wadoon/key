@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.AbstractOperator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * This singleton class implements a general conditional operator 
  * <tt>\if (phi) \then (t1) \else (t2)</tt>.
  */
-public final class IfThenElse extends AbstractOperator {
+public final class IfThenElse extends AbstractOperator<Sort, Term> implements Operator {
     
     public static final IfThenElse IF_THEN_ELSE = new IfThenElse();
     

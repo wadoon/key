@@ -17,8 +17,6 @@
  */
 package de.uka.ilkd.key.rule;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
@@ -46,6 +44,7 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import junit.framework.TestCase;
 
 
 public class TestCollisionResolving extends TestCase {

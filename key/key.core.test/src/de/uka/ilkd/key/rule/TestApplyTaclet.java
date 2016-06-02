@@ -15,8 +15,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -45,6 +43,7 @@ import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import junit.framework.TestCase;
 
 
 /** 

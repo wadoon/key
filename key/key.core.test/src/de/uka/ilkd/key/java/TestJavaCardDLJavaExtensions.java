@@ -15,9 +15,9 @@ package de.uka.ilkd.key.java;
 
 import java.io.File;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 public class TestJavaCardDLJavaExtensions extends TestCase {
 

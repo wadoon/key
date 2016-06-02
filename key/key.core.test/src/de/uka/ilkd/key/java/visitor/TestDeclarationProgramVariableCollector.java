@@ -18,11 +18,11 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Named;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
 
 public class TestDeclarationProgramVariableCollector  extends TestCase {
 

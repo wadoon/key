@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -23,6 +21,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
 
 public class TestSemisequent extends TestCase {
     

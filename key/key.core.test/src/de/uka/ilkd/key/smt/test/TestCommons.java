@@ -18,8 +18,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -40,6 +38,7 @@ import de.uka.ilkd.key.smt.SMTTestSettings;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 /**
  * Use this class for testing SMT: It provides a mechanism to load proofs and

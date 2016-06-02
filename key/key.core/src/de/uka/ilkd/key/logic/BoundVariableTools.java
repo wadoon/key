@@ -146,7 +146,7 @@ public class BoundVariableTools {
                 originalTerm.varsBoundHere ( i );
 
             final QuantifiableVariable[] newVars =
-                new QuantifiableVariable [oldVars.size ()];
+                new QuantifiableVariable[oldVars.size ()];
             if ( resolveCollisions ( oldVars, newVars, criticalVars ) ) {
                 changed = true;
                 newBoundVars[i] = new ImmutableArray<QuantifiableVariable> ( newVars );
@@ -255,7 +255,7 @@ public class BoundVariableTools {
         unifyVariableArrays (ImmutableArray<QuantifiableVariable> ar0,
                              ImmutableArray<QuantifiableVariable> ar1,
                              Map<QuantifiableVariable, QuantifiableVariable> variableRenaming) {
-        final QuantifiableVariable[] res = new QuantifiableVariable [ar0.size()];
+        final QuantifiableVariable[] res = new QuantifiableVariable[ar0.size()];
         for ( int i = 0; i != ar0.size (); ++i ) {
             QuantifiableVariable pv0 = ar0.get ( i );            
             if ( variableRenaming.containsKey ( pv0 ) )

@@ -55,11 +55,12 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * currently supported: {@link Term#execPostOrder(Visitor)} and
  * {@link Term#execPreOrder(Visitor)}. 
  */
-public interface Term extends DLTerm<Visitor>, SVSubstitute, Sorted {
+public interface Term extends DLTerm<Sort, Visitor>, SVSubstitute, Sorted {
     
     /** 
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
      */
+    @Override
     public Operator op();
     
     /**
@@ -71,6 +72,7 @@ public interface Term extends DLTerm<Visitor>, SVSubstitute, Sorted {
     /**
      * The subterms.
      */
+    @Override
     public ImmutableArray<Term> subs();
         
     /** 
@@ -82,12 +84,13 @@ public interface Term extends DLTerm<Visitor>, SVSubstitute, Sorted {
      /**
      * The logical variables bound by the top level operator.
      */
+    @Override
     public ImmutableArray<QuantifiableVariable> boundVars();
-
     /**
      * The logical variables bound by the top level operator for the nth 
      * subterm.
      */
+    @Override
     public ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
     
     /**
@@ -105,6 +108,7 @@ public interface Term extends DLTerm<Visitor>, SVSubstitute, Sorted {
     /** 
      * The set of free quantifiable variables occurring in this term.
      */
+    @Override
     public ImmutableSet<QuantifiableVariable> freeVars();
     
     
@@ -113,7 +117,7 @@ public interface Term extends DLTerm<Visitor>, SVSubstitute, Sorted {
      * @return true iff the given Term has the same values in
      * operator, sort, arity, varsBoundHere and javaBlock as this object
      * modulo bound renaming
-     */  
+     */
     public boolean equalsModRenaming(Term o);  
     
     /**

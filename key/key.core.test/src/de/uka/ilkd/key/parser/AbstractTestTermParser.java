@@ -5,11 +5,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import org.antlr.runtime.RecognitionException;
 import org.key_project.common.core.logic.Name;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -27,6 +24,7 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 /**
  * Class providing methods for parser tests.

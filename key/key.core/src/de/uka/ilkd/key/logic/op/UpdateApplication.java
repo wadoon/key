@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.AbstractOperator;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Term;
@@ -24,7 +25,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Singleton class defining a binary operator {u}t that applies updates u to
  * terms, formulas, or other updates t. 
  */
-public final class UpdateApplication extends AbstractOperator {
+public final class UpdateApplication extends AbstractOperator<Sort, Term> implements Operator {
     
     public static final UpdateApplication UPDATE_APPLICATION 
     	= new UpdateApplication();

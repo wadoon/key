@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.AbstractOperator;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Term;
@@ -26,7 +27,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * operators. Currently, only the subclass <code>WarySubstOp</code> is used
  * and accessible through the key parser.
  */
-public abstract class SubstOp extends AbstractOperator {
+public abstract class SubstOp extends AbstractOperator<Sort, Term> implements Operator {
     
     protected SubstOp(Name name) {
 	super(name, 2, new Boolean[]{false, true}, true);
@@ -59,9 +60,7 @@ public abstract class SubstOp extends AbstractOperator {
 	if(term.varsBoundHere(1).size() != 1) { 
 	    return false;
 	}
-	Sort substSort = term.sub(0).sort();
-	Sort varSort = term.varsBoundHere(1).get(0).sort();       
-	return substSort.extendsTrans(varSort);
+	return term.sub(0).sort().extendsTrans(term.varsBoundHere(1).get(0).sort());
     }
 
     

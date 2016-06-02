@@ -15,12 +15,12 @@ package de.uka.ilkd.key.logic;
 
 import java.io.File;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 public class TestTermBuilder extends TestCase {
 

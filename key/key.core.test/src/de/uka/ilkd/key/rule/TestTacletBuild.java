@@ -15,8 +15,6 @@ package de.uka.ilkd.key.rule;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -35,6 +33,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 /**
  * class tests the building of Taclets in TacletBuilders, especially the

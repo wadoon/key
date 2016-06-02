@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
+import junit.framework.TestCase;
 
 public class TestGenericRemovingLemmaGenerator extends TestCase {
 

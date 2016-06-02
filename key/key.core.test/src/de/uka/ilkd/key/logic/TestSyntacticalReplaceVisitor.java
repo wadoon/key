@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.java.Services;
@@ -29,6 +27,7 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import junit.framework.TestCase;
 
 public class TestSyntacticalReplaceVisitor extends TestCase {
     

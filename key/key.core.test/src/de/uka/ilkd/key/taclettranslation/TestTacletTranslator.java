@@ -16,8 +16,6 @@ package de.uka.ilkd.key.taclettranslation;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -29,6 +27,7 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Choice;
 import de.uka.ilkd.key.rule.Taclet;
+import junit.framework.TestCase;
 
 public class TestTacletTranslator extends TestCase {
 

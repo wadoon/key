@@ -16,8 +16,6 @@ package de.uka.ilkd.key.proof;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
@@ -27,6 +25,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
 
 /** class tests the goal, especially the split and set back mechanism. */
 

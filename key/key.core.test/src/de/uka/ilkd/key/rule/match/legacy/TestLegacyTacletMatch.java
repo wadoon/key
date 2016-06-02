@@ -18,8 +18,6 @@ package de.uka.ilkd.key.rule.match.legacy;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
@@ -36,6 +34,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 
 public class TestLegacyTacletMatch extends TestCase {

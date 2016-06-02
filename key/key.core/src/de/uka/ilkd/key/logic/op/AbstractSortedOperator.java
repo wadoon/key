@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.AbstractOperator;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Sorted;
@@ -25,8 +26,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /** 
  * Abstract sorted operator class offering some common functionality.
  */
-public abstract class AbstractSortedOperator extends AbstractOperator 
-                                      implements SortedOperator, Sorted {
+public abstract class AbstractSortedOperator extends AbstractOperator<Sort, Term> 
+                                      implements SortedOperator, Operator, Sorted {
 
     private static final ImmutableArray<Sort> EMPTY_SORT_LIST 
     	= new ImmutableArray<Sort>();

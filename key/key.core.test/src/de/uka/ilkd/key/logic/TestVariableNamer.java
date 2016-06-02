@@ -15,8 +15,6 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
@@ -48,6 +46,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
+import junit.framework.TestCase;
 
 
 public class TestVariableNamer extends TestCase {

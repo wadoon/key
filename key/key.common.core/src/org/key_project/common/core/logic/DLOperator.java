@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableArray;
  * All symbols acting as members of a term e.g. logical operators, predicates, 
  * functions, variables etc. have to implement this interface.  
  */
-public interface DLOperator<T extends DLTerm<? extends DLVisitor<T>>> extends Named, SVSubstitute {
+public interface DLOperator<S extends DLSort, T extends DLTerm<S, ? extends DLVisitor<T>>> extends Named, SVSubstitute {
     
     /**
      * the arity of this operator  

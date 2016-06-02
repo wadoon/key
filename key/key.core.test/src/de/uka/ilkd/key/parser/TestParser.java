@@ -16,13 +16,12 @@ package de.uka.ilkd.key.parser;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import junit.framework.TestCase;
 
 public class TestParser extends TestCase {
     /**

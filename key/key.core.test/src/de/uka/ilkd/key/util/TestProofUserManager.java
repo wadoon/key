@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.util;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -23,7 +21,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.util.ProofUserManager;
+import junit.framework.TestCase;
 
 /**
  * Tests for {@link ProofUserManager}.

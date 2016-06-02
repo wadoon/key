@@ -16,8 +16,6 @@ package de.uka.ilkd.key.parser;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
@@ -49,6 +47,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import junit.framework.TestCase;
 
 /** class tests the parser for Taclets
 */

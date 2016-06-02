@@ -17,8 +17,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Stack;
 
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.util.collection.ImmutableSLList;
@@ -41,6 +39,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import junit.framework.TestCase;
 
 public class TestClashFreeSubst extends TestCase {
 

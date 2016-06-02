@@ -16,12 +16,12 @@ package de.uka.ilkd.key.util;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import junit.framework.TestCase;
 
 /**
  * Tests for {@link NodePreorderIterator}.
