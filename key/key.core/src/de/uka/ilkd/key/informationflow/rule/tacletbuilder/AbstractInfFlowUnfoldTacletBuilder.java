@@ -227,8 +227,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             Term origTerm = origVarsIt.next();
             Term svTerm = schemaVarsIt.next();
             if (origTerm != null && svTerm != null) {
-                assert svTerm.sort().equals(origTerm.sort()) ||
-                       svTerm.sort().extendsSorts().contains(origTerm.sort()) :
+                assert svTerm.sort().extendsTrans(origTerm.sort()) :
                         "mismatch of sorts: orignal term " + origTerm +
                         ", sort " + origTerm.sort() +
                         "; replacement term" + svTerm + ", sort " +

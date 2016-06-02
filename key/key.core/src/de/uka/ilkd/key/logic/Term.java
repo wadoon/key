@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.DLTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.util.collection.ImmutableArray;
@@ -54,7 +55,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * currently supported: {@link Term#execPostOrder(Visitor)} and
  * {@link Term#execPreOrder(Visitor)}. 
  */
-public interface Term extends SVSubstitute, Sorted {
+public interface Term extends DLTerm<Visitor>, SVSubstitute, Sorted {
     
     /** 
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
@@ -75,8 +76,9 @@ public interface Term extends SVSubstitute, Sorted {
     /** 
      * The <code>n</code>-th direct subterm.
      */
+    @Override
     public Term sub(int n);
-        
+            
      /**
      * The logical variables bound by the top level operator.
      */
@@ -93,10 +95,6 @@ public interface Term extends SVSubstitute, Sorted {
      */
     public JavaBlock javaBlock();
     
-    /**
-     * The arity of the term.   
-     * */
-    public int arity();
     
     /**
      * The sort of the term.
@@ -104,35 +102,11 @@ public interface Term extends SVSubstitute, Sorted {
     @Override
     public Sort sort();    
     
-    /**
-     * The nesting depth of this term.
-     */
-    public int depth();
-    
-    /**
-     * Whether all operators in this term are rigid.
-     */
-    public boolean isRigid();
-    
     /** 
      * The set of free quantifiable variables occurring in this term.
      */
     public ImmutableSet<QuantifiableVariable> freeVars();
     
-    /** 
-     * The visitor is handed through till the bottom of the tree and
-     * then it walks upwards, while at each upstep the method visit of
-     * the visitor is called.
-     * @param visitor the Visitor
-     */
-    public void execPostOrder(Visitor visitor);
-
-    /** 
-     * The visitor walks downwards the tree, while at each downstep the method 
-     * visit of the visitor is called.
-     * @param visitor the Visitor
-     */
-    public void execPreOrder(Visitor visitor);
     
     /**
      * Compares if two terms are equal modulo bound renaming

@@ -11,25 +11,21 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic;
 
-import org.key_project.common.core.logic.DLVisitor;
-
-public interface Visitor extends DLVisitor<Term> {
+public interface DLVisitor<T> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      * @param visited The currently visited {@link Term}.
      * @return {@code true} visit sub tree, {@code false} skip sub tree.
      */
-    @Override
-    public abstract boolean visitSubtree(Term visited);
+    public boolean visitSubtree(T visited);
    
     /**
      * the entry method for the visitor pattern
      * @param visited the Term to be visited
      */
-    @Override
-    public abstract void visit(Term visited);
+    public abstract void visit(T visited);
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term
@@ -39,8 +35,8 @@ public interface Visitor extends DLVisitor<Term> {
      * when the visitor behaviour depends on informations bound to subtrees.
      * @param subtreeRoot root of the subtree which the visitor enters.
      */
-    @Override
-    public abstract void subtreeEntered(Term subtreeRoot);
+
+    public void subtreeEntered(T subtreeRoot);
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term
@@ -50,6 +46,6 @@ public interface Visitor extends DLVisitor<Term> {
      * when the visitor behaviour depends on informations bound to subtrees.
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
-    @Override
-    public abstract void subtreeLeft(Term subtreeRoot);
+
+    public void subtreeLeft(T subtreeRoot);
 }
