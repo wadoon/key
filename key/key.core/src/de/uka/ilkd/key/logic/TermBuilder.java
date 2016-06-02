@@ -394,6 +394,16 @@ public class TermBuilder {
     public Term var(LogicVariable v) {
         return tf.createTerm(v);
     }
+    
+    public Term var(LocationVariable v) {
+//  if(v.isMember()) {
+//      throw new TermCreationException(
+//          "Cannot create term for \"member\" "
+//          + "program variable \"" + v + "\". Use field symbols "
+//          + "like your mother told you!");
+//  }
+        return tf.createTerm(v);
+    }
 
 
     public Term var(ProgramVariable v) {

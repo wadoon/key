@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractOperator;
+import org.key_project.common.core.logic.op.DLAbstractSortedOperator;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Sorted;
@@ -26,33 +26,20 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /** 
  * Abstract sorted operator class offering some common functionality.
  */
-public abstract class AbstractSortedOperator extends AbstractOperator<Sort, Term> 
-                                      implements SortedOperator, Operator, Sorted {
-
-    private static final ImmutableArray<Sort> EMPTY_SORT_LIST 
-    	= new ImmutableArray<Sort>();
-
-    private final Sort sort;
-    private final ImmutableArray<Sort> argSorts;
-
+public abstract class AbstractSortedOperator extends DLAbstractSortedOperator<Sort,Term> 
+                                      implements SortedOperator, Sorted {
 
     protected AbstractSortedOperator(Name name,
-	    			     ImmutableArray<Sort> argSorts,
+	    			         ImmutableArray<Sort> argSorts,
 	    		             Sort sort,
 	    		             ImmutableArray<Boolean> whereToBind,
 	    		             boolean isRigid) {
-	super(name, 
-	      argSorts == null ? 0 : argSorts.size(), 
-              whereToBind, 
-              isRigid);
-	assert sort != null;
-	this.argSorts = argSorts == null ? EMPTY_SORT_LIST : argSorts;
-	this.sort = sort;
+        super(name, argSorts, sort, whereToBind, isRigid);
     }
     
     
     protected AbstractSortedOperator(Name name,
-	    			     Sort[] argSorts,
+	    			        Sort[] argSorts,
 	    		             Sort sort,
 	    		             Boolean[] whereToBind,
 	    		             boolean isRigid) {
@@ -65,7 +52,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator<Sort, Term
     
     
     protected AbstractSortedOperator(Name name,
-	    			     ImmutableArray<Sort> argSorts,
+	    			         ImmutableArray<Sort> argSorts,
 	    		             Sort sort,
 	    		             boolean isRigid) {
 	this(name, argSorts, sort, null, isRigid);
@@ -73,7 +60,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator<Sort, Term
     
     
     protected AbstractSortedOperator(Name name,
-	    			     Sort[] argSorts,
+	    			         Sort[] argSorts,
 	    		             Sort sort,
 	    		             boolean isRigid) {
 	this(name, new ImmutableArray<Sort>(argSorts), sort, null, isRigid);
@@ -87,12 +74,6 @@ public abstract class AbstractSortedOperator extends AbstractOperator<Sort, Term
     }    
     
 
-    @Override
-    public final Sort sort(ImmutableArray<Term> terms) {
-	return sort;
-    }
-    
-    
     /**
      * checks if a given Term could be subterm (at the at'th subterm
      * position) of a term with this function at its top level. The
@@ -132,23 +113,5 @@ public abstract class AbstractSortedOperator extends AbstractOperator<Sort, Term
 	    }
 	}
 	return additionalValidTopLevel2(term);
-    }
-    
-    
-    @Override    
-    public final Sort argSort(int i) {
-	return argSorts.get(i);
-    }
-    
-    
-    @Override
-    public final ImmutableArray<Sort> argSorts() {
-	return argSorts;
-    }
-    
-    
-    @Override
-    public final Sort sort() {
-	return sort;
     }
 }
