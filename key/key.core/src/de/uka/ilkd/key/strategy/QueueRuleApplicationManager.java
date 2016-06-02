@@ -304,7 +304,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     }
 
     private Strategy getStrategy () {
-    	return getGoal().getGoalStrategy();
+    	return goal.getGoalStrategy();
     }
 
     public AutomatedRuleApplicationManager copy () {
