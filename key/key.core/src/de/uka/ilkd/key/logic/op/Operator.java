@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.common.core.logic.DLOperator;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.util.collection.ImmutableArray;
@@ -25,46 +26,20 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * All symbols acting as members of a term e.g. logical operators, predicates, 
  * functions, variables etc. have to implement this interface.  
  */
-public interface Operator extends Named, SVSubstitute {
-    
-    /**
-     * the arity of this operator  
-     */
-    int arity();
+public interface Operator extends DLOperator<Term>, Named, SVSubstitute {
     
 
     /**
-     * Determines the sort of the {@link Term} if it would be created using this
-     * Operator as top level operator and the given terms as sub terms. The
-     * assumption that the constructed term would be allowed is not checked.
-     * @param terms an array of Term containing the subterms of a (potential)
-     * term with this operator as top level operator
-     * @return sort of the term with this operator as top level operator of the
-     * given substerms
+     * {@inheritDoc}
      */
+    @Override
     Sort sort(ImmutableArray<Term> terms);
     
     
-    /**
-     * Tells whether the operator binds variables at the n-th subterm.
-     */
-    boolean bindVarsAt(int n);
-    
     
     /**
-     * Tells whether the operator is rigid.
+     * {@inheritDoc}
      */
-    boolean isRigid();      
-    
-    
-    /**
-     * Checks whether the top level structure of the given @link Term
-     * is syntactically valid, given the assumption that the top level
-     * operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal
-     * is NOT checked.  
-     * @return true iff the top level structure of
-     * the {@link Term} is valid.
-     */
+    @Override
     boolean validTopLevel(Term term);
 }
