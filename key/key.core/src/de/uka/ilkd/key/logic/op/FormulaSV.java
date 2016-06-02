@@ -14,8 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 
 
 /** 
@@ -28,7 +27,7 @@ public final class FormulaSV extends AbstractSV {
      * @param isRigid true iff this SV may only match rigid formulas
      */
     FormulaSV(Name name, boolean isRigid) {
-	super(name, Sort.FORMULA, isRigid, true);
+	super(name, SpecialSorts.FORMULA, isRigid, true);
     }
     
     @Override

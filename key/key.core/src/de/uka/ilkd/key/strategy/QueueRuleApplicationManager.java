@@ -15,11 +15,7 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableHeap;
-import org.key_project.util.collection.ImmutableLeftistHeap;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.SingletonIterator;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;

@@ -17,8 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.common.util.URI;
@@ -40,6 +38,8 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+
+import junit.framework.TestCase;
 
 /**
  * Tests for {@link GraphitiUtil}.

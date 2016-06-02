@@ -15,10 +15,11 @@ package de.uka.ilkd.key.gui.utilities;
 
 import java.io.StringReader;
 
+import org.key_project.common.core.logic.SpecialSorts;
+
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -51,7 +52,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector{
            return NO_USER_INPUT;
        }
        
-       if(term.sort() != Sort.FORMULA){
+       if(term.sort() != SpecialSorts.FORMULA){
            return "Not a formula.";
        }
        return null;

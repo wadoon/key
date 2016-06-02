@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.*;
+
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 

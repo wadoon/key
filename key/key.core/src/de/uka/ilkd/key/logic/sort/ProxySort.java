@@ -13,7 +13,9 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import org.key_project.common.core.logic.AbstractSort;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -24,6 +26,6 @@ public class ProxySort extends AbstractSort {
     }
 
     public ProxySort(Name name) {
-        this(name, DefaultImmutableSet.<Sort>nil());
+        this(name, DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil());
     }
 }

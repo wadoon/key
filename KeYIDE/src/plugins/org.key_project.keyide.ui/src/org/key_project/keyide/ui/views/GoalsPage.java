@@ -21,12 +21,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.*;
 
 /**
  * The {@link IGoalsPage} which is returned by the active {@link KeYEditor}. The

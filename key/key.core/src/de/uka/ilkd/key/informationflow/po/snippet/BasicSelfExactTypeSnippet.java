@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 /**
@@ -33,11 +32,11 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
         KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
         Term result = d.tb.tt();
         if (forClass != null) {
-            final Sort contractSort = forClass.getSort();
+            final org.key_project.common.core.logic.Sort contractSort = forClass.getSort();
             result = (poVars.pre.self == null || pm.isConstructor())
                     ? d.tb.tt() : d.tb.exactInstance(contractSort, poVars.pre.self);
         } else if (d.get(BasicSnippetData.Key.LOOP_INVARIANT_TERM) != null) {
-            final Sort loopInvSort= pm.sort();
+            final org.key_project.common.core.logic.Sort loopInvSort= pm.sort();
             result = (poVars.pre.self == null || pm.isConstructor())
                     ? d.tb.tt() : d.tb.exactInstance(loopInvSort, poVars.pre.self);
         }

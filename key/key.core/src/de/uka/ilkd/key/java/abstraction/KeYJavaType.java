@@ -15,10 +15,11 @@ package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Comparator;
 
+import org.key_project.common.core.logic.Sort;
+
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -30,7 +31,7 @@ import de.uka.ilkd.key.util.MiscTools;
 public class KeYJavaType implements Type {
 
     /** Special return "type" for void methods. */
-    public static final KeYJavaType VOID_TYPE = new KeYJavaType(null,Sort.ANY);
+    public static final KeYJavaType VOID_TYPE = new KeYJavaType(null, null);
 
     /** the AST type */
     private Type javaType=null;

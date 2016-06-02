@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.common.core.logic.op.SortedOperator;
+
 /** 
  * Operators implementing this interface may stand for
  * locations as well. This means e.g. occur as top level operators on the 

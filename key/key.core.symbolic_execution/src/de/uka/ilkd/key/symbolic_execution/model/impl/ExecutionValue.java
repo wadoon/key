@@ -28,7 +28,6 @@ import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -140,7 +139,7 @@ public class ExecutionValue extends AbstractExecutionValue {
          final Services services = getServices();
          Term value = getValue();
          if (value != null && !isValueUnknown()) { // Don't show children of unknown values
-            Sort valueSort = value.sort();
+            org.key_project.common.core.logic.Sort valueSort = value.sort();
             if (valueSort != services.getJavaInfo().getNullType().getSort()) {
                KeYJavaType keyType = services.getJavaInfo().getKeYJavaType(valueSort);
                if (keyType != null) { // Can be null, e.g. if Sort is the Sort of Heap

@@ -1,30 +1,16 @@
 package de.uka.ilkd.key.smt.testgen;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.macros.TestGenMacro;
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -36,12 +22,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.Debug;

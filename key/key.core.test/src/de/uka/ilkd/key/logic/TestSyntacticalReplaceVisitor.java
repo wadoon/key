@@ -14,13 +14,13 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
@@ -65,11 +65,11 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	SchemaVariable v=(SchemaVariable)rw.sub(0).sub(1)
 	    .varsBoundHere(1).get(0);
 
-	Sort s=u.sort();
+	org.key_project.common.core.logic.Sort s=u.sort();
 
 	LogicVariable x=new LogicVariable(new Name("x"), s);
 	LogicVariable y=new LogicVariable(new Name("y"), s);
-	Function p=new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
+	Function p=new Function(new Name("p"), SpecialSorts.FORMULA, new org.key_project.common.core.logic.Sort[]{s});
 
 	Term t_x=TB.tf().createTerm(x);
 	Term t_px=TB.tf().createTerm(p, new Term[]{t_x}, null, null);

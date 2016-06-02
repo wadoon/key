@@ -13,11 +13,12 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.op.Junctor;
+
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;

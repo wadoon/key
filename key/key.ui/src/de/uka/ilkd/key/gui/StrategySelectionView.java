@@ -13,11 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -29,19 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -59,11 +43,7 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
-import de.uka.ilkd.key.strategy.definition.IDefaultStrategyPropertiesFactory;
-import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
-import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
-import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
+import de.uka.ilkd.key.strategy.definition.*;
 import de.uka.ilkd.key.util.Triple;
 
 /**

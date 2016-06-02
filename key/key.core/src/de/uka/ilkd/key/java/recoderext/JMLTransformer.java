@@ -13,53 +13,29 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
 import recoder.io.DataLocation;
-import recoder.java.Comment;
-import recoder.java.CompilationUnit;
-import recoder.java.Declaration;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
+import recoder.java.*;
 import recoder.java.SourceElement.Position;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.InterfaceDeclaration;
-import recoder.java.declaration.LocalVariableDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.statement.EmptyStatement;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLFieldDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
 /**

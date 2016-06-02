@@ -11,11 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.sort;
+package org.key_project.common.core.logic;
 
 import java.util.Iterator;
 
-import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -108,28 +107,28 @@ public final class GenericSort extends AbstractSort {
      *
      * Use "GenericSortInstantiations" instead
      */
-    public boolean isPossibleInstantiation ( Sort p_s ) {
+    public boolean isPossibleInstantiation ( Sort p_s, TermServices services ) {
 	return
-	    p_s != Sort.FORMULA &&
+	    p_s != services.getFormulaSort() &&
 	    ( oneOf.isEmpty() || oneOf.contains ( p_s ) ) &&
-	    checkNonGenericSupersorts ( p_s );
+	    checkNonGenericSupersorts ( p_s, services );
     }
 
     /**
      * @return true iff "p_s" is subsort of every non-generic
      * supersort of this sort
      */
-    protected boolean checkNonGenericSupersorts ( Sort p_s ) {
-	Iterator<Sort> it =  extendsSorts().iterator ();
+    protected boolean checkNonGenericSupersorts ( Sort p_s , TermServices services) {
+	Iterator<? extends Sort> it =  services.getDirectSuperSorts(this).iterator ();
 	Sort           ss;
 
 	while ( it.hasNext () ) {
 	    ss = it.next ();
 	    if ( ss instanceof GenericSort ) {
-		if ( !((GenericSort)ss).checkNonGenericSupersorts ( p_s ) )
+		if ( !((GenericSort)ss).checkNonGenericSupersorts ( p_s, services ) )
 		    return false;
 	    } else {
-		if ( !p_s.extendsTrans ( ss ) )
+		if ( !p_s.extendsTrans ( ss, services ) )
 		    return false;
 	    }
 	}

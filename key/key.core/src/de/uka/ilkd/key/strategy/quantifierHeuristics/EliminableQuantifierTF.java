@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;

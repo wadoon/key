@@ -1,30 +1,20 @@
 package de.uka.ilkd.key.testgen.oracle;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
@@ -157,7 +147,7 @@ public class OracleGenerator {
 		Sort s = c.sort();
 		
 		Sort nullSort = services.getJavaInfo().getNullType().getSort();
-		Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
+		org.key_project.common.core.logic.Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
 		Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
 		Sort boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
 		
@@ -165,7 +155,7 @@ public class OracleGenerator {
 			return false;
 		}
 		
-		if(s.extendsTrans(objSort) || s.equals(intSort) || s.equals(boolSort)){
+		if(s.extendsTrans(objSort, services) || s.equals(intSort) || s.equals(boolSort)){
 			return true;
 		}
 		
@@ -197,10 +187,10 @@ public class OracleGenerator {
 		
 		List<OracleVariable> result = new LinkedList<OracleVariable>();
 		
-		Sort allIntSort = createSetSort("Integer");
-		Sort allBoolSort = createSetSort("Boolean");
-		Sort allObjSort = createSetSort("java.lang.Object");
-		Sort oldMapSort = new SortImpl(new Name("Map<Object,Object>"));
+		org.key_project.common.core.logic.Sort allIntSort = createSetSort("Integer");
+		org.key_project.common.core.logic.Sort allBoolSort = createSetSort("Boolean");
+		org.key_project.common.core.logic.Sort allObjSort = createSetSort("java.lang.Object");
+		org.key_project.common.core.logic.Sort oldMapSort = new SortImpl(new Name("Map<Object,Object>"));
 		
 		OracleVariable allInts = new OracleVariable(TestCaseGenerator.ALL_INTS, allIntSort);
 		OracleVariable allBools = new OracleVariable(TestCaseGenerator.ALL_BOOLS, allBoolSort);
@@ -237,7 +227,7 @@ public class OracleGenerator {
 		
 	}
 	
-	private Sort createSetSort(String inner){
+	private org.key_project.common.core.logic.Sort createSetSort(String inner){
 		String name = "Set<"+inner+">";
 		return new SortImpl(new Name(name));
 	}
@@ -433,7 +423,7 @@ public class OracleGenerator {
 	    	
 	    	if(fun instanceof SortDependingFunction){
 	    		SortDependingFunction sdf  = (SortDependingFunction) fun;
-	    		Sort s = sdf.getSortDependingOn();
+	    		org.key_project.common.core.logic.Sort s = sdf.getSortDependingOn();
 	    		
 	    		
 	    		OracleTerm arg = generateOracle(term.sub(0), initialSelect);
@@ -498,7 +488,7 @@ public class OracleGenerator {
 		}else{
 	        methodName = pm.getName(); 
 		}
-		Sort returnType = pm.getReturnType().getSort();
+		org.key_project.common.core.logic.Sort returnType = pm.getReturnType().getSort();
 		
 		List<OracleVariable> args = new LinkedList<OracleVariable>();
 		
@@ -539,7 +529,7 @@ public class OracleGenerator {
 		value = createLocationString(heapTerm, objTerm, fieldName, object.sort(), term.sort(), initialSelect);		
 		
 		if(!initialSelect && isPreHeap(heapTerm)){
-			if(term.sort().extendsTrans(services.getJavaInfo().getJavaLangObject().getSort())){
+			if(term.sort().extendsTrans(services.getJavaInfo().getJavaLangObject().getSort(), services)){
 				return new OracleConstant(TestCaseGenerator.OLDMap+".get("+value+")", term.sort());
 			}
 		}		
@@ -612,7 +602,7 @@ public class OracleGenerator {
 		return "sub"+varNum;
 	}
 	
-	private String getSortInvName(Sort s){
+	private String getSortInvName(org.key_project.common.core.logic.Sort s){
 		String sortName = s.name().toString();
 		sortName = sortName.replace(".", "");
 		
@@ -621,7 +611,7 @@ public class OracleGenerator {
 		return methodName;
 	}
 	
-	private OracleMethod createDummyInvariant(Sort s){
+	private OracleMethod createDummyInvariant(org.key_project.common.core.logic.Sort s){
 		String methodName = getSortInvName(s);
 		
 		List<OracleVariable> args = new LinkedList<OracleVariable>();
@@ -635,7 +625,7 @@ public class OracleGenerator {
 		
 	}
 	
-	private OracleMethod createInvariantMethod(Sort s, boolean initialSelect){		
+	private OracleMethod createInvariantMethod(org.key_project.common.core.logic.Sort s, boolean initialSelect){		
 		
 		String methodName = getSortInvName(s);
 		
@@ -685,7 +675,7 @@ public class OracleGenerator {
 
 	private String getSetName(Sort s){
 		
-		if(s.equals(Sort.FORMULA)){
+		if(s.equals(SpecialSorts.FORMULA)){
 			return TestCaseGenerator.ALL_BOOLS;
 		}
 		else if(s.equals(services.getTypeConverter().getIntegerLDT().targetSort())){

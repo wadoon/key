@@ -13,12 +13,14 @@
 
 package de.uka.ilkd.key.rule.inst;
 
+import org.key_project.common.core.logic.GenericSort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.SortDependingFunction;
+
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -108,8 +110,8 @@ public abstract class GenericSortCondition {
 	}
 
 	if ( !( s0 instanceof GenericSort ) 
-	       || s1 == Sort.FORMULA 
-	       || s1 == Sort.UPDATE)
+	       || s1 == SpecialSorts.FORMULA 
+	       || s1 == SpecialSorts.UPDATE)
 	    return null;
 
 	final GenericSort gs = (GenericSort) s0;

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import de.uka.ilkd.key.gui.InfoView;
+
 /**
  * An instance of this class loads several XML files, whose contents are
  * displayed in {@link InfoView}.

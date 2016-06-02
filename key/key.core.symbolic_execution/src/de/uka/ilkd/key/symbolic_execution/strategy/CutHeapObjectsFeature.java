@@ -16,13 +16,13 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.Junctor;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;

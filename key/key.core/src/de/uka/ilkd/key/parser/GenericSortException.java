@@ -16,7 +16,6 @@ package de.uka.ilkd.key.parser;
 import org.antlr.runtime.RecognitionException;
 
 import antlr.Token;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 public class GenericSortException extends RecognitionException {
     /**
@@ -25,11 +24,11 @@ public class GenericSortException extends RecognitionException {
     private static final long serialVersionUID = 7887443025957191925L;
     String cat;
     String filename;
-    Sort   sort;
+    org.key_project.common.core.logic.Sort   sort;
     String reason;
     
     public GenericSortException(String cat, String reason,
-				Sort sort, Token t, String filename) {
+				org.key_project.common.core.logic.Sort sort, Token t, String filename) {
 	this.cat      = cat;
 	this.reason   = reason;
 	this.filename = filename;
@@ -38,7 +37,7 @@ public class GenericSortException extends RecognitionException {
 	this.charPositionInLine   = t.getColumn();
     }
 
-    public GenericSortException(String cat, String reason, Sort sort, 
+    public GenericSortException(String cat, String reason, org.key_project.common.core.logic.Sort sort, 
 			    String filename, int line, int column) {
 	this.cat      = cat;
 	this.reason   = reason;

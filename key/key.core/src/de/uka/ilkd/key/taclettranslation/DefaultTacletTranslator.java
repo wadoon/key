@@ -15,20 +15,15 @@ package de.uka.ilkd.key.taclettranslation;
 
 
 
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.AntecTaclet;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.SuccTaclet;
-import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -195,7 +190,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
 	    } else if(taclet instanceof RewriteTaclet){
 		    RewriteTaclet rwTaclet = (RewriteTaclet)taclet;
-		    if (rwTaclet.find().sort().equals(Sort.FORMULA)) {
+		    if (rwTaclet.find().sort().equals(SpecialSorts.FORMULA)) {
 		        int polarity = getPolarity(rwTaclet);
 			list = list.append(translateReplaceAndAddFormula(
 			         template, find, polarity, services));

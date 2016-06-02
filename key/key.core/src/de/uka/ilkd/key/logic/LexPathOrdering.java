@@ -14,22 +14,18 @@
 package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.Sort;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  *
@@ -259,7 +255,9 @@ public class LexPathOrdering implements TermOrdering {
         if ( "boolean".equals ( sName ) ) res = 20000;
         if ( s instanceof NullSort ) return 30000;
 
-        for (Sort sort : s.extendsSorts()) res = Math.max(res, getSortDepth(sort));
+        for (Sort sort : s.extendsSorts()) { 
+            res = Math.max(res, getSortDepth(sort));
+        }
 
         return res + 1;
     }

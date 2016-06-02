@@ -9,7 +9,6 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -82,7 +81,7 @@ public abstract class AbstractCommand implements ProofScriptCommand {
         return null;
     }
 
-    final protected static Term toTerm(Proof proof, Map<String, Object> state, String string, Sort sort) throws ParserException, ScriptException {
+    final protected static Term toTerm(Proof proof, Map<String, Object> state, String string, org.key_project.common.core.logic.Sort sort) throws ParserException, ScriptException {
 
         AbbrevMap abbrMap = (AbbrevMap)state.get(ABBREV_KEY);
         if(abbrMap == null) {
@@ -95,10 +94,10 @@ public abstract class AbstractCommand implements ProofScriptCommand {
         return formula;
     }
 
-    final protected static Sort toSort(Proof proof, Map<String, Object> state, String string) throws ParserException, ScriptException {
+    final protected static org.key_project.common.core.logic.Sort toSort(Proof proof, Map<String, Object> state, String string) throws ParserException, ScriptException {
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
-        Sort sort = (Sort) services.getNamespaces().sorts().lookup(string);
+        org.key_project.common.core.logic.Sort sort = (org.key_project.common.core.logic.Sort) services.getNamespaces().sorts().lookup(string);
         return sort;
     }
 

@@ -19,12 +19,8 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left

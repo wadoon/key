@@ -1,16 +1,12 @@
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -23,30 +19,12 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.reference.ArrayReference;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -517,7 +495,7 @@ public abstract class AbstractSlicer {
                }
                if (!resultTerms.isEmpty()) {
                   // Create predicate which will be used in formulas to store the value interested in.
-                  Function newPredicate = new Function(new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, new ImmutableArray<Sort>(resultSorts));
+                  Function newPredicate = new Function(new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder().newName("ResultPredicate")), SpecialSorts.FORMULA, new ImmutableArray<Sort>(resultSorts));
                   // Create formula which contains the value interested in.
                   Term newTerm = sideProofEnv.getServicesForEnvironment().getTermBuilder().func(newPredicate, resultTerms.toArray(new Term[resultTerms.size()]));
 
@@ -571,7 +549,7 @@ public abstract class AbstractSlicer {
                }
                if (!resultTerms.isEmpty()) {
                   // Create predicate which will be used in formulas to store the value interested in.
-                  Function newPredicate = new Function(new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, new ImmutableArray<Sort>(resultSorts));
+                  Function newPredicate = new Function(new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder().newName("ResultPredicate")), SpecialSorts.FORMULA, new ImmutableArray<Sort>(resultSorts));
                   // Create formula which contains the value interested in.
                   TermBuilder tb = sideProofEnv.getServicesForEnvironment().getTermBuilder();
                   Term newTerm = tb.func(newPredicate, resultTerms.toArray(new Term[resultTerms.size()]));

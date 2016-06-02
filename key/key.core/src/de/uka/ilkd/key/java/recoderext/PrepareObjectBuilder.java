@@ -18,20 +18,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
 import recoder.java.Identifier;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.FieldSpecification;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.Modifier;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Protected;
 import recoder.java.reference.MethodReference;
@@ -41,7 +35,6 @@ import recoder.java.reference.ThisReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Creates the preparation method for pre-initilizing the object fields

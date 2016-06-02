@@ -22,12 +22,7 @@ import org.key_project.common.core.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.ScopeDefiningElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -42,7 +37,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposer;
 import de.uka.ilkd.key.proof.Node;
@@ -391,7 +385,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                            ImmutableList<String> previousProposals) {
         ProgramElementName result = null;
 
-        Sort svSort = sv.sort();
+        org.key_project.common.core.logic.Sort svSort = sv.sort();
         if(svSort == ProgramSVSort.VARIABLE) {
             if(basename == null || "".equals(basename)) {
                 basename = DEFAULT_BASENAME;
@@ -531,7 +525,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 					       PosInProgram posOfDeclaration) {
 	boolean result = true;
 
-	Sort svSort = sv.sort();
+	org.key_project.common.core.logic.Sort svSort = sv.sort();
 	if(svSort == ProgramSVSort.VARIABLE) {
 	    result = isUniqueInProgram(name,
 				       getProgramFromPIO(posOfFind),

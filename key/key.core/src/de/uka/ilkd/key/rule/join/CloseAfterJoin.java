@@ -23,6 +23,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -33,11 +38,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
@@ -198,7 +199,7 @@ public class CloseAfterJoin implements BuiltInRule {
         final Name predicateSymbName = new Name(tb.newName("P"));
 
         final Function predicateSymb = new Function(predicateSymbName,
-                Sort.FORMULA, new ImmutableArray<Sort>(argSorts));
+                SpecialSorts.FORMULA, new ImmutableArray<Sort>(argSorts));
 
         services.getNamespaces().functions().add(predicateSymb);
 

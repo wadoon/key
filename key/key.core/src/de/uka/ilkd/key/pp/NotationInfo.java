@@ -16,7 +16,12 @@ package de.uka.ilkd.key.pp;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.key_project.common.core.logic.Operator;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -24,7 +29,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
 
@@ -210,7 +214,7 @@ public final class NotationInfo {
 	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_MODALITY));
 	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 	
-	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
+	tbl.put(org.key_project.common.core.logic.Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
 	tbl.put(TermLabel.class, new Notation.LabelNotation("<<", ">>", PRIORITY_LABEL));
 	return tbl;
     }

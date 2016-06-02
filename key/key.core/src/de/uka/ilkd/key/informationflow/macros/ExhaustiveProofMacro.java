@@ -28,11 +28,7 @@ import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.ProofMacroListener;
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 
 /**

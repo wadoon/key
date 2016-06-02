@@ -17,20 +17,12 @@
  */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Expression;
@@ -39,32 +31,9 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.Choice;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -466,7 +435,7 @@ public class TacletGenerator {
     	final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
 
         final Term axiomSatisfiable;
-        if (target.sort() == Sort.FORMULA) {
+        if (target.sort() == SpecialSorts.FORMULA) {
             axiomSatisfiable = TB.or(OpReplacer.replace(targetTerm, TB.tt(),
                                                         schemaRepresents.term, services.getTermFactory()),
                                      OpReplacer.replace(targetTerm, TB.ff(),
@@ -662,7 +631,7 @@ public class TacletGenerator {
 
         SchemaVariable modalitySV = SchemaVariableFactory.createModalOperatorSV(
                                         new Name("#allModal_sv"),
-                                        Sort.FORMULA,
+                                        SpecialSorts.FORMULA,
                                         DefaultImmutableSet.<Modality>nil().add(Modality.DIA).add(Modality.BOX).add(Modality.DIA_TRANSACTION).add(Modality.BOX_TRANSACTION));
         SchemaVariable postSV = SchemaVariableFactory.createFormulaSV(new Name("#post_sv"));
 
@@ -1050,7 +1019,7 @@ public class TacletGenerator {
     	final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
 
     	final Term axiomSatisfiable;
-        if (target.sort() == Sort.FORMULA) {
+        if (target.sort() == SpecialSorts.FORMULA) {
             axiomSatisfiable =
                     TB.or(OpReplacer.replace(targetTerm, TB.tt(), schemaAxiom, services.getTermFactory()),
                           OpReplacer.replace(targetTerm, TB.ff(), schemaAxiom, services.getTermFactory()));

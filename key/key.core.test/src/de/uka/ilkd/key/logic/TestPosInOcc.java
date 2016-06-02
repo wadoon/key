@@ -14,10 +14,10 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
 
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 import junit.framework.TestCase;
@@ -37,10 +37,10 @@ public class TestPosInOcc extends TestCase {
     }
     
     public void testIterator () {
-	Sort sort1=new SortImpl(new Name("S1"));
+	org.key_project.common.core.logic.Sort sort1=new SortImpl(new Name("S1"));
 	LogicVariable x=new LogicVariable(new Name("x"),sort1);  
-	Function f=new Function(new Name("f"),sort1,new Sort[]{sort1});
-	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});
+	Function f=new Function(new Name("f"),sort1,new org.key_project.common.core.logic.Sort[]{sort1});
+	Function p=new Function(new Name("p"),SpecialSorts.FORMULA,new org.key_project.common.core.logic.Sort[]{sort1});
 
 	
 	Term terms[] = new Term [ 3 ];
@@ -91,15 +91,15 @@ public class TestPosInOcc extends TestCase {
 
     
     public void testReplaceConstrainedFormula () {
-        Sort sort1 = new SortImpl ( new Name ( "S1" ) );
+        org.key_project.common.core.logic.Sort sort1 = new SortImpl ( new Name ( "S1" ) );
         LogicVariable x = new LogicVariable ( new Name ( "x" ), sort1 );        
-        Function c = new Function ( new Name ( "c" ), sort1, new Sort[] {} );
+        Function c = new Function ( new Name ( "c" ), sort1, new org.key_project.common.core.logic.Sort[] {} );
         Function f = new Function ( new Name ( "f" ),
                                     sort1,
-                                    new Sort[] { sort1 } );
+                                    new org.key_project.common.core.logic.Sort[] { sort1 } );
         Function p = new Function ( new Name ( "p" ),
-                                    Sort.FORMULA,
-                                    new Sort[] { sort1 } );
+                                    SpecialSorts.FORMULA,
+                                    new org.key_project.common.core.logic.Sort[] { sort1 } );
 
         Term terms[] = new Term[3];
         terms[0] = TB.var( x );

@@ -1,15 +1,9 @@
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IntIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -38,7 +32,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
             PosInOccurrence posOfFind,
             IntIterator it,
             MatchConditions mc,
-            Sort maxSort,
+            org.key_project.common.core.logic.Sort maxSort,
             Goal goal,
             Services services,
             RuleApp ruleApp) {
@@ -48,7 +42,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
             final Term[] subs = new Term[term.arity()];
             term.subs().arraycopy(0, subs, 0, term.arity());
 
-            final Sort newMaxSort = TermHelper.getMaxSort(term, indexOfNextSubTerm, services);
+            final org.key_project.common.core.logic.Sort newMaxSort = TermHelper.getMaxSort(term, indexOfNextSubTerm, services);
             subs[indexOfNextSubTerm] = replace(term.sub(indexOfNextSubTerm), with,
                     termLabelState,
                     labelHint,

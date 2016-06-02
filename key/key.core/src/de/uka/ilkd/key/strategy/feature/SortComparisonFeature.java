@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
@@ -42,8 +41,8 @@ public class SortComparisonFeature extends BinaryFeature {
     }
     
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {        
-        final Sort sort1 = s1.toTerm(app, pos, goal).sort();
-        final Sort sort2 = s2.toTerm(app, pos, goal).sort();
+        final org.key_project.common.core.logic.Sort sort1 = s1.toTerm(app, pos, goal).sort();
+        final org.key_project.common.core.logic.Sort sort2 = s2.toTerm(app, pos, goal).sort();
 
         return compare(sort1, sort2);       
     }
@@ -52,7 +51,7 @@ public class SortComparisonFeature extends BinaryFeature {
      * @param sort1
      * @param sort2
      */
-    protected boolean compare(final Sort sort1, final Sort sort2) {
+    protected boolean compare(final org.key_project.common.core.logic.Sort sort1, final org.key_project.common.core.logic.Sort sort2) {
         switch (comparator) {
         case SUBSORT : 
             return sort1.extendsTrans(sort2);

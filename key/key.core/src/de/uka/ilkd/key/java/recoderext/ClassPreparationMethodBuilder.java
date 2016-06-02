@@ -17,17 +17,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldSpecification;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.expression.literal.BooleanLiteral;
@@ -36,7 +32,6 @@ import recoder.java.reference.FieldReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Each class is prepared before it is initialised. The preparation of

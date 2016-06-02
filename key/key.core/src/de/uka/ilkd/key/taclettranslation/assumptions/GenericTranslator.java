@@ -18,6 +18,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.key_project.common.core.logic.GenericSort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -28,14 +34,9 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
@@ -89,9 +90,9 @@ class GenericTranslator {
                 // instantiateGeneric(term,collectGenerics(term),sorts,t,conditions);
         }
 
-        private boolean sameHierachyBranch(Sort sort1, Sort sort2) {
+        private boolean sameHierachyBranch(Sort sort1, Sort sort2, Services services) {
 
-                return sort1.extendsTrans(sort2) || sort2.extendsTrans(sort1);
+                return sort1.extendsTrans(sort2, services) || sort2.extendsTrans(sort1, services);
         }
 
         /**
@@ -162,7 +163,7 @@ class GenericTranslator {
                                 if (func.getSortDependingOn().equals(generic)) {
                                         if (instantiation.extendsTrans(services
                                                         .getJavaInfo()
-                                                        .nullSort())) {
+                                                        .nullSort(), services)) {
                                                 return null;
                                         }
                                         func = func.getInstanceFor(
@@ -175,7 +176,7 @@ class GenericTranslator {
 
                                                         if (!sameHierachyBranch(
                                                                         func.getSortDependingOn(),
-                                                                        subTerms[i].sort())) {
+                                                                        subTerms[i].sort(), services)) {
                                                                 // don't
                                                                 // instantiate
                                                                 // casts, that
@@ -250,7 +251,7 @@ class GenericTranslator {
                         TacletConditions conditions) {
 
                 return !((inst instanceof GenericSort)
-                                || (inst.equals(Sort.ANY))
+                                || (inst.equals(SpecialSorts.ANY))
                                 || (conditions.containsIsReferenceCondition(generic) > 0 && !AssumptionGenerator
                                                 .isReferenceSort(inst, services))
                                 || (conditions.containsNotAbstractInterfaceCondition(generic) && AssumptionGenerator

@@ -29,12 +29,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.*;
 
 public final class AutoModeAction extends MainWindowAction {
 

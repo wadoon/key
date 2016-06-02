@@ -19,23 +19,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
-import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.settings.*;
 import de.uka.ilkd.key.smt.SolverType;
 
 public class SMTSettingsModel extends DefaultTreeModel {

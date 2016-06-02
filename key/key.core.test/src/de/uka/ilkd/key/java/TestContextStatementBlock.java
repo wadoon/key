@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.java;
 
+import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.TacletForTests;
 import junit.framework.TestCase;

@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -27,7 +29,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
@@ -76,8 +77,8 @@ public final class ContractAxiom extends ClassAxiom {
         assert name != null;
         assert kjt != null;
         assert target != null;
-        assert originalPre.sort() == Sort.FORMULA;
-        assert originalPost.sort() == Sort.FORMULA;
+        assert originalPre.sort() == SpecialSorts.FORMULA;
+        assert originalPost.sort() == SpecialSorts.FORMULA;
         assert (selfVar == null) == target.isStatic();
         this.name = name;
         this.target = target;

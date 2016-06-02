@@ -14,8 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 
 
 /** 
@@ -31,10 +30,10 @@ public final class TermSV extends AbstractSV {
      * @param isStrict boolean indicating if the schema variable is declared as 
      * strict forcing exact type match
      */    
-    TermSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {	
+    TermSV(Name name, org.key_project.common.core.logic.Sort sort, boolean isRigid, boolean isStrict) {	
         super(name, sort, isRigid, isStrict);
-        assert sort != Sort.FORMULA;
-        assert sort != Sort.UPDATE;
+        assert sort != SpecialSorts.FORMULA;
+        assert sort != SpecialSorts.UPDATE;
     }
     
     @Override

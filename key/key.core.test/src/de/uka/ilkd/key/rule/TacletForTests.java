@@ -21,28 +21,23 @@ import java.io.StringReader;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.RuleCollection;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -184,8 +179,8 @@ public class TacletForTests {
 	return (SchemaVariable)getVariables().lookup(new Name(name));
     }
 
-    public static Sort sortLookup(String name) {
-	return (Sort)getSorts().lookup(new Name(name));
+    public static org.key_project.common.core.logic.Sort sortLookup(String name) {
+	return (org.key_project.common.core.logic.Sort)getSorts().lookup(new Name(name));
     }
 
     public static Term parseTerm(String termstr, Services services) {

@@ -13,22 +13,18 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import recoder.io.DataLocation;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import recoder.io.DataLocation;
 
 /**
  * This is a special {@link FileCollection} which allows to retrieve the

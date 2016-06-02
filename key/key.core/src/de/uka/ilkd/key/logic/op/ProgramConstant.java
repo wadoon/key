@@ -57,7 +57,7 @@ public final class ProgramConstant extends ProgramVariable {
 
 
     @Override
-    public Operator rename(Name name) {
+    public ProgramConstant rename(Name name) {
         return new ProgramConstant(new ProgramElementName(name.toString()),
                                    getKeYJavaType(), getContainerType(),
                                    isStatic(), compileTimeConstant);

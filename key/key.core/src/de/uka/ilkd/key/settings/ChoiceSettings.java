@@ -13,16 +13,7 @@
 
 package de.uka.ilkd.key.settings;
 
-import java.util.EventObject;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;

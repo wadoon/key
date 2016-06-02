@@ -8,6 +8,9 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -16,10 +19,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
@@ -78,7 +79,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         Function pred = (Function) functionNS.lookup(name);
 
         if (pred == null) {
-            pred = new Function(name, Sort.FORMULA, argSorts);
+            pred = new Function(name, SpecialSorts.FORMULA, argSorts);
             services.getNamespaces().functions().addSafely(pred);
         }
         return pred;

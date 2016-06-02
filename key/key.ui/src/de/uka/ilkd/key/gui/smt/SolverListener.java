@@ -14,19 +14,8 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.*;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -42,15 +31,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 public class SolverListener implements SolverLauncherListener {

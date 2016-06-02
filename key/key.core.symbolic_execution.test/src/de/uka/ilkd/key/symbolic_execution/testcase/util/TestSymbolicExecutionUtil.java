@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.HashMap;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.LogicVariable;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -24,8 +25,6 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
@@ -43,7 +42,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
       KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/readability/InnerAndAnonymousTypeTest.java"), null, null, null);
       Services services = environment.getServices();
       IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-      Sort intSort = integerLDT.targetSort();
+      org.key_project.common.core.logic.Sort intSort = integerLDT.targetSort();
       final TermBuilder TB = services.getTermBuilder();
       // Create test terms
       Term a = TB.var(new LogicVariable(new Name("a"), intSort));

@@ -19,6 +19,9 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
+import org.key_project.common.core.logic.GenericSort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -26,10 +29,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
@@ -199,7 +199,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
 
                 if (usedSorts.size() > 0) {
                         toStore += "\\sorts{\n\n";
-                        for (Sort sort : usedFormulaSorts) {
+                        for (org.key_project.common.core.logic.Sort sort : usedFormulaSorts) {
                                 String name = "";
                                 // TODO: uncomment
                                 // if(sort instanceof ArraySortImpl){
@@ -277,7 +277,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
 
         }
 
-        public boolean eventInstantiationFailure(GenericSort dest, Sort sort,
+        public boolean eventInstantiationFailure(GenericSort dest, org.key_project.common.core.logic.Sort sort,
                         Taclet t, Term term) {
                 /*
                  * String s = ""; s += "taclet: " + t.name()+"\n"; s += "term: "

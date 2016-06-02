@@ -11,17 +11,36 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.logic.op;
-
-import org.key_project.common.core.logic.DLSort;
-import org.key_project.common.core.logic.DLTerm;
-import org.key_project.common.core.logic.DLVisitor;
-
-/** 
- * This interface represents the variables that can be bound
- * (by quantifiers or other binding operators).
+/**
+ * 
  */
-public interface DLQuantifiableVariable<S extends DLSort> extends DLParsableVariable<S> {
+package org.key_project.common.core.logic;
 
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * @author mihai
+ *
+ */
+public class SortCollector<T extends DLTerm<DLVisitor<T>>> extends DefaultVisitor<T> {	
+	
+	private Set<Sort> sorts;	
+
+	public SortCollector() {
+		sorts = new HashSet<Sort>();
+	}
+	
+	public Set<Sort> getSorts() {
+		return sorts;
+	}	
+	
+	/* (non-Javadoc)
+	 * @see org.key_project.common.core.logic.DefaultVisitor#visit(org.key_project.common.core.logic.Term)
+	 */
+	@Override
+	public void visit(T visited) {
+		sorts.add(visited.sort());
+	}	
 
 }

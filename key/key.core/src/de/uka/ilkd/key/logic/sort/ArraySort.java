@@ -16,7 +16,7 @@ package de.uka.ilkd.key.logic.sort;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -69,15 +69,15 @@ public final class ArraySort extends AbstractSort {
     //internal methods
     //------------------------------------------------------------------------- 
 
-    private static ImmutableSet<Sort> getArraySuperSorts(Sort elemSort, 
+    private static ImmutableSet<Sort> getArraySuperSorts(org.key_project.common.core.logic.Sort elemSort, 
 	    						 Sort objectSort, 
 	    						 Sort cloneableSort,
 	    						 Sort serializableSort){
-	ImmutableSet<Sort> result = DefaultImmutableSet.<Sort>nil();
+	ImmutableSet<Sort> result = DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil();
 	
 	ImmutableSet<Sort> elemDirectSuperSorts = elemSort.extendsSorts();
-	if(elemDirectSuperSorts.equals(DefaultImmutableSet.<Sort>nil()
-		                                          .add(Sort.ANY))) {
+	if(elemDirectSuperSorts.equals(DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil()
+		                                          .add(SpecialSorts.ANY))) {
 	    result = result.add(objectSort)
 	                   .add(cloneableSort)
 	                   .add(serializableSort);    
@@ -153,7 +153,7 @@ public final class ArraySort extends AbstractSort {
     /** 
      * returns elemSort([])^n.
      */
-    public static Sort getArraySortForDim(Sort elemSort,
+    public static org.key_project.common.core.logic.Sort getArraySortForDim(Sort elemSort,
 	    				  Type elemType,
 	    				  int n,
 	    				  Sort objectSort, 

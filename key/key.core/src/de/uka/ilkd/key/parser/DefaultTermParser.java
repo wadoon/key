@@ -19,12 +19,12 @@ import java.io.Reader;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.Sort;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
 
@@ -89,7 +89,7 @@ public final class DefaultTermParser {
                                 scm);
 
 	    final Term result = parser.term();
-	    if (sort != null &&  ! result.sort().extendsTrans(sort))
+	    if (sort != null &&  ! result.sort().extendsTrans(sort, services))
 	        throw new ParserException("Expected sort "+sort+", but parser returns sort "+result.sort()+".", null);
         return result;
         } catch (RecognitionException re) {

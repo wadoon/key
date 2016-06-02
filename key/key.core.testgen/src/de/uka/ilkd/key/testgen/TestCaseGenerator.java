@@ -1,20 +1,11 @@
 package de.uka.ilkd.key.testgen;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -26,13 +17,10 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -723,7 +711,7 @@ public class TestCaseGenerator {
             // the actual class of the field
             Function func = (Function)t.op();
             String name = func.name().toString();
-            Sort sort = func.sort();
+            org.key_project.common.core.logic.Sort sort = func.sort();
             HeapLDT hLDT = services.getTypeConverter().getHeapLDT();
             if(sort==hLDT.getFieldSort()){
                 String fieldSort = HeapLDT.getClassName(func);
@@ -1050,7 +1038,7 @@ public class TestCaseGenerator {
 		return type;
 	}
 
-	private String getDummyClassNameFor(Sort sort) {
+	private String getDummyClassNameFor(org.key_project.common.core.logic.Sort sort) {
 		final JavaInfo jinfo = services.getJavaInfo();
 		final KeYJavaType kjt = jinfo.getKeYJavaType(sort);
 		return kjt.getName() + DummyPostfix;

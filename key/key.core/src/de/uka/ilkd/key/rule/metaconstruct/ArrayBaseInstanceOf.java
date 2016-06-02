@@ -17,14 +17,13 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -48,9 +47,9 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
         final Term array = term.sub(0);
         final Term element = term.sub(1);
 
-        final Sort arraySort;
+        final org.key_project.common.core.logic.Sort arraySort;
         if(array.op() instanceof SortDependingFunction
-           && ((SortDependingFunction)array.op()).getKind().equals(Sort.EXACT_INSTANCE_NAME)) {
+           && ((SortDependingFunction)array.op()).getKind().equals(org.key_project.common.core.logic.Sort.EXACT_INSTANCE_NAME)) {
             arraySort = ((SortDependingFunction) array.op()).getSortDependingOn();
         } else {
             arraySort = array.sort();
@@ -58,7 +57,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
         assert arraySort instanceof ArraySort;
 
-        final Sort arrayElementSort = ((ArraySort) arraySort).elementSort();
+        final org.key_project.common.core.logic.Sort arrayElementSort = ((ArraySort) arraySort).elementSort();
 
         Function instanceofSymbol
             =  arrayElementSort.getInstanceofSymbol(services);

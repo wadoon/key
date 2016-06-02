@@ -15,15 +15,15 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
 
+import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -122,11 +122,11 @@ public class ProofObligationCreator {
                         collectUserDefinedSymbols(sub, userDefinedSymbols);
                 }  
                 if(term.op() instanceof SortedOperator){
-                        Sort sort = ((SortedOperator)term.op()).sort();
+                        org.key_project.common.core.logic.Sort sort = ((SortedOperator)term.op()).sort();
                         userDefinedSymbols.addSort(sort);
                         
                         if(term.op() instanceof Function){
-                                if(sort == Sort.FORMULA){
+                                if(sort == SpecialSorts.FORMULA){
                                      userDefinedSymbols.addPredicate(term.op());
                                 }else{
                                      userDefinedSymbols.addFunction(term.op());  
@@ -152,7 +152,7 @@ public class ProofObligationCreator {
                 Term formula = tacletFormula.getFormula(initConfig.getServices());
                 String name = "Taclet: " + taclet.name().toString();
                 
-                UserDefinedSymbols userDefinedSymbols = new UserDefinedSymbols(symbolsForAxioms);
+                UserDefinedSymbols userDefinedSymbols = new UserDefinedSymbols(symbolsForAxioms, initConfig.getServices());
                 
                 collectUserDefinedSymbols(formula, userDefinedSymbols);
                 userDefinedSymbols.replaceGenericByProxySorts();

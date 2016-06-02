@@ -13,30 +13,18 @@
 
 package de.uka.ilkd.key.taclettranslation.lemma;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Named;
-import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -66,18 +54,19 @@ public class UserDefinedSymbols {
         final ImmutableSet<Taclet> axioms;
         private final NamespaceSet referenceNamespaces;
         private String ruleHeader = null;
+        private TermServices services;
 
 
         public UserDefinedSymbols(NamespaceSet referenceNamespaces,
-                        ImmutableSet<Taclet> axioms) {
+                        ImmutableSet<Taclet> axioms, TermServices services) {
                 super();
                 this.referenceNamespaces = referenceNamespaces;
                 this.parent = null;
                 this.axioms = axioms;
-          
+                this.services = services;
         }
 
-        public UserDefinedSymbols(UserDefinedSymbols parent) {
+        public UserDefinedSymbols(UserDefinedSymbols parent, TermServices services) {
                 this.parent = parent;
                 this.axioms = parent.axioms;
                 this.referenceNamespaces = parent.referenceNamespaces;
@@ -116,16 +105,16 @@ public class UserDefinedSymbols {
     
 
         public void addSort(Named symbol) {
-                if (symbol != Sort.FORMULA) {
-                        Sort sort = (Sort) symbol;
-                        if(!(sort instanceof NullSort)){
-                                for(Sort parentSort : sort.extendsSorts()){
-                                        addSort(parentSort);
-                                }
-                       }
-                        addUserDefiniedSymbol(symbol, usedExtraSorts,
-                                        referenceNamespaces.sorts());
+            if (symbol != services.getFormulaSort()) {
+                Sort sort = (Sort) symbol;
+                if(!(sort instanceof NullSort)){
+                    for(Sort parentSort : services.getDirectSuperSorts(sort)) {
+                        addSort(parentSort);
+                    }
                 }
+                addUserDefiniedSymbol(symbol, usedExtraSorts,
+                        referenceNamespaces.sorts());
+            }
         }
 
         public void addVariable(Named symbol) {
@@ -196,7 +185,7 @@ public class UserDefinedSymbols {
             for (Named sort : usedExtraSorts) {
                 if (sort instanceof GenericSort) {
                     GenericSort genSort = (GenericSort) sort;
-                    ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts());
+                    ProxySort proxySort = new ProxySort(genSort.name(), services.getDirectSuperSorts(genSort));
                     result.add(proxySort);
                 } else {
                     result.add(sort);
@@ -285,11 +274,11 @@ public class UserDefinedSymbols {
                 for(Named symbol : sorts){
                         result.append(symbol.name());
                         Sort sort = (Sort) symbol;
-                        if(!sort.extendsSorts().isEmpty()){
+                        if(!services.getDirectSuperSorts(sort).isEmpty()){
                              String res = "\\extends ";
                              boolean extendsAtLeastOneSort = false;
-                             for(Sort sortParent : sort.extendsSorts()){
-                                     if(sortParent !=    Sort.ANY){
+                             for(Sort sortParent : services.getDirectSuperSorts(sort)){
+                                     if(sortParent != services.getAnySort()){
                                              res += sortParent.name()+", ";
                                              extendsAtLeastOneSort = true;
                                      }

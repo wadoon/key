@@ -13,18 +13,18 @@
 
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.logic.DefaultVisitor;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;

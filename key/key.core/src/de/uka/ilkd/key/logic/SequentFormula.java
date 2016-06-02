@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 
 
 /** 
@@ -36,7 +36,7 @@ public class SequentFormula {
      * @param term a Term of sort Sort.FORMULA
      */ 
     public SequentFormula(Term term) {
-	if (term.sort() != Sort.FORMULA) {
+	if (term.sort() != SpecialSorts.FORMULA) {
 	    throw new RuntimeException("A Term instead of a formula: " + term);
 	}
 	this.term = term;	

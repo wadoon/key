@@ -13,11 +13,7 @@
 
 package de.uka.ilkd.key.gui.utilities;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.*;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;

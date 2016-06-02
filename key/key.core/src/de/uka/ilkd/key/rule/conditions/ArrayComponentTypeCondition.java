@@ -22,7 +22,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -63,7 +62,7 @@ public final class ArrayComponentTypeCondition
 			 SVInstantiations svInst,
 			 Services services) {
         if (var != this.var) return true;
-        Sort s = null;
+        org.key_project.common.core.logic.Sort s = null;
 	if (candidate instanceof Term) {
 	    s = ((Term)candidate).sort();
 	} else if (candidate instanceof Expression) {
@@ -76,7 +75,7 @@ public final class ArrayComponentTypeCondition
 	if (s==null || !(s instanceof ArraySort)) {
 	    return false;
 	}
-	return !(((ArraySort)s).elementSort().extendsTrans(services.getJavaInfo().objectSort())) ^ checkReferenceType;
+	return !(((ArraySort)s).elementSort().extendsTrans(services.getJavaInfo().objectSort(), services)) ^ checkReferenceType;
     }
 
     

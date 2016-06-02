@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import org.key_project.common.core.logic.Sort;
+
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -37,7 +38,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
    /**
     * The {@link Sort} of the uncaught exception.
     */
-   private Sort exceptionSort;
+   private org.key_project.common.core.logic.Sort exceptionSort;
 
    /**
     * The {@link TerminationKind}.
@@ -111,7 +112,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
     * @return {@code true} exceptional termination, {@code false} normal termination.
     */
    protected boolean isExceptionalTermination() {
-      Sort sort = getExceptionSort();
+      org.key_project.common.core.logic.Sort sort = getExceptionSort();
       return sort != null && !(sort instanceof NullSort);
    }
 
@@ -119,7 +120,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
     * {@inheritDoc}
     */
    @Override
-   public Sort getExceptionSort() {
+   public org.key_project.common.core.logic.Sort getExceptionSort() {
       if (exceptionSort == null) {
          exceptionSort = SymbolicExecutionUtil.lazyComputeExceptionSort(getProofNode(), exceptionVariable);
       }

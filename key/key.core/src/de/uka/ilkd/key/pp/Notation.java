@@ -16,21 +16,16 @@ package de.uka.ilkd.key.pp;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -234,7 +229,7 @@ public abstract class Notation {
 	    assert t.op() == UpdateApplication.UPDATE_APPLICATION;
 	    final Operator targetOp = UpdateApplication.getTarget(t).op();
 	    final int assTarget 
-	    = (t.sort() == Sort.FORMULA 
+	    = (t.sort() == SpecialSorts.FORMULA 
 		    ? (targetOp.arity() == 1 ? 60 : 85) 
 			    : 110);
 
@@ -285,7 +280,7 @@ public abstract class Notation {
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
 	    QuantifiableVariable v = instQV(t, sp, 1);
-	    final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1)
+	    final int assTarget = (t.sort() == SpecialSorts.FORMULA ? (t.sub(1)
 		    .op() == Equality.EQUALS ? 75 : 60) : 110);
 	    sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1),
 		    assTarget);

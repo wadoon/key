@@ -14,24 +14,12 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.*;
 
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ObjectUtil;

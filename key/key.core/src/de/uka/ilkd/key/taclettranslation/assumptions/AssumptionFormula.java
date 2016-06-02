@@ -15,8 +15,9 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Collection;
 
+import org.key_project.common.core.logic.TermServices;
+
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;

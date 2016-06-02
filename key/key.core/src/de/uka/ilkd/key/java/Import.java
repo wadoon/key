@@ -15,11 +15,7 @@ package de.uka.ilkd.key.java;
 
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.PackageReferenceContainer;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
-import de.uka.ilkd.key.java.reference.TypeReferenceInfix;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 /**
  *  Import.

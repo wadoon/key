@@ -13,16 +13,11 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.LoopInitializer;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.SourceVisitor;
-import recoder.java.StatementContainer;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import recoder.java.*;
 import recoder.java.expression.Literal;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class ExpressionSVWrapper extends Literal implements Expression, 
     LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix {

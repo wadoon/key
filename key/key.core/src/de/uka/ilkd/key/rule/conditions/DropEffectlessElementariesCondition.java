@@ -15,17 +15,12 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Set;
 
+import org.key_project.common.core.logic.TermServices;
 import org.key_project.common.core.logic.op.SVSubstitute;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;

@@ -13,12 +13,13 @@
 
 package de.uka.ilkd.key.logic.util;
 
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.SortedOperator;
+
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -44,8 +45,8 @@ public class TermHelper {
      * @param services the Services object
      * @return the maximal sort allowed at the i-th position
      */
-    public static Sort getMaxSort(Term term, int i, TermServices services) {     
-        if (term.sub(i).sort() == Sort.FORMULA) return Sort.FORMULA;
+    public static org.key_project.common.core.logic.Sort getMaxSort(Term term, int i, TermServices services) {     
+        if (term.sub(i).sort() == SpecialSorts.FORMULA) return SpecialSorts.FORMULA;
         
         if (term.op() instanceof IfThenElse && i > 0) {
             return term.sort();
@@ -60,11 +61,11 @@ public class TermHelper {
      * @param services the Services object
      * @return the maximal sort allowed at argument <tt>i</tt>
      */
-    private static Sort getMaxSortHelper(final Operator op, 
+    private static org.key_project.common.core.logic.Sort getMaxSortHelper(final Operator op, 
 	    				 int i, 
-	    				 Sort maxSortDefault,
+	    				 org.key_project.common.core.logic.Sort maxSortDefault,
 	    				 TermServices services) {
-        final Sort newMaxSort;
+        final org.key_project.common.core.logic.Sort newMaxSort;
         if (op instanceof SortedOperator) {
             newMaxSort = ((SortedOperator)op).argSort(i);
         } else {                        

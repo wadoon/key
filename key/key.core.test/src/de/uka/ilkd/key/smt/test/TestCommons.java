@@ -19,24 +19,16 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.junit.Assert;
+import org.key_project.common.core.logic.TermServices;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SMTTestSettings;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.TestCase;
 

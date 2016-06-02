@@ -15,20 +15,15 @@ package de.uka.ilkd.key.logic;
 
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.*;
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -39,31 +34,9 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IfExThenElse;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
-import de.uka.ilkd.key.logic.op.WarySubstOp;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -82,7 +55,7 @@ import de.uka.ilkd.key.util.Pair;
  * want to be sure that the term looks exactly as you built it, you
  * will have to use the TermFactory.</p>
  */
-public class TermBuilder {
+public class TermBuilder implements DLTermBuilder<Term> {
 
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
@@ -147,7 +120,7 @@ public class TermBuilder {
     //naming
     //-------------------------------------------------------------------------
 
-    public String shortBaseName(Sort s) {
+    public String shortBaseName(org.key_project.common.core.logic.Sort s) {
     String result = s.name().toString();
     int index = result.lastIndexOf(".");
     if(index == -1) {
@@ -192,7 +165,7 @@ public class TermBuilder {
      * Returns an available name constructed by affixing a counter to a self-
      * chosen base name for the passed sort.
      */
-    public String newName(Sort sort) {
+    public String newName(org.key_project.common.core.logic.Sort sort) {
         return newName(shortBaseName(sort));
     }
 
@@ -376,7 +349,7 @@ public class TermBuilder {
      * in the namespaces.
      */
     public LocationVariable heapAtPreVar(String baseName,
-                                         Sort sort,
+                                         org.key_project.common.core.logic.Sort sort,
                                          boolean makeNameUnique) {
         assert sort != null;
         if(makeNameUnique) {
@@ -518,7 +491,7 @@ public class TermBuilder {
         }
     }
 
-    public Term cast(Sort s, Term t) {
+    public Term cast(org.key_project.common.core.logic.Sort s, Term t) {
     return tf.createTerm(s.getCastSymbol(services), t);
     }
 
@@ -558,7 +531,7 @@ public class TermBuilder {
      * Removes universal quantifiers from a formula.
      */
     public Term open(Term formula) {
-    assert formula.sort() == Sort.FORMULA;
+    assert formula.sort() == SpecialSorts.FORMULA;
     if(formula.op() == Quantifier.ALL) {
         return open(formula.sub(0));
     } else {
@@ -813,7 +786,7 @@ public class TermBuilder {
      * the sorts involved
      */
     public Term equals(Term t1, Term t2) {
-        if(t1.sort() == Sort.FORMULA) {
+        if(t1.sort() == SpecialSorts.FORMULA) {
             if(t1.op() == Junctor.TRUE) {
                 return t2;
             } else if(t2.op() == Junctor.TRUE) {
@@ -857,13 +830,13 @@ public class TermBuilder {
     }
 
 
-    public Term instance(Sort s, Term t) {
+    public Term instance(org.key_project.common.core.logic.Sort s, Term t) {
     return equals(func(s.getInstanceofSymbol(services), t),
               TRUE());
     }
 
 
-    public Term exactInstance(Sort s, Term t) {
+    public Term exactInstance(org.key_project.common.core.logic.Sort s, Term t) {
     return equals(func(s.getExactInstanceofSymbol(services), t),
               TRUE());
     }
@@ -926,13 +899,13 @@ public class TermBuilder {
      */
     public Term convertToFormula(Term a) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
-        if (a.sort() == Sort.FORMULA) {
+        if (a.sort() == SpecialSorts.FORMULA) {
             return a;
         } else if (a.sort() == booleanLDT.targetSort()) {
             // special case where a is the result of convertToBoolean
             if (a.op() == IfThenElse.IF_THEN_ELSE) {
                 assert a.arity() == 3;
-                assert a.sub(0).sort() == Sort.FORMULA;
+                assert a.sub(0).sort() == SpecialSorts.FORMULA;
                 if (a.sub(1).op() == booleanLDT.getTrueConst() && a.sub(2).op() == booleanLDT.getFalseConst())
                     return a.sub(0);
                 else if (a.sub(1).op() == booleanLDT.getFalseConst() && a.sub(2).op() == booleanLDT.getTrueConst())
@@ -950,7 +923,7 @@ public class TermBuilder {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
         if (a.sort() == booleanLDT.targetSort()) {
             return a;
-        } else if (a.sort() == Sort.FORMULA) {
+        } else if (a.sort() == SpecialSorts.FORMULA) {
             // special case where a is the result of convertToFormula
             if (a.op() == Equality.EQUALS && a.sub(1).op() == booleanLDT.getTrueConst() ) {
                 return a.sub(0);
@@ -1005,9 +978,9 @@ public class TermBuilder {
 
 
     public Term parallel(Term u1, Term u2) {
-    if(u1.sort() != Sort.UPDATE) {
+    if(u1.sort() != SpecialSorts.UPDATE) {
         throw new TermCreationException("Not an update: " + u1);
-    } else if(u2.sort() != Sort.UPDATE) {
+    } else if(u2.sort() != SpecialSorts.UPDATE) {
         throw new TermCreationException("Not an update: " + u2);
     }
     if(u1.op() == UpdateJunctor.SKIP) {
@@ -1102,7 +1075,7 @@ public class TermBuilder {
     }
 
     public Term apply(Term update, Term target, ImmutableArray<TermLabel> labels) {
-        if(update.sort() != Sort.UPDATE) {
+        if(update.sort() != SpecialSorts.UPDATE) {
             throw new TermCreationException("Not an update: " + update);
         } else if(update.op() == UpdateJunctor.SKIP) {
             return target;
@@ -1556,16 +1529,16 @@ public class TermBuilder {
 
     // The template of the well-definedness transformer for terms.
     public static final Transformer WD_ANY =
-            new Transformer(new Name("wd"), Sort.ANY);
+            new Transformer(new Name("wd"), SpecialSorts.ANY);
 
     // The template of the well-definedness transformer for formulas.
     public static final Transformer WD_FORMULA =
-            new Transformer(new Name("WD"), Sort.FORMULA);
+            new Transformer(new Name("WD"), SpecialSorts.FORMULA);
 
     public Term wd(Term t) {
         if(t.op() == Junctor.FALSE || t.op() == Junctor.TRUE) {
             return tt();
-        } else if (t.sort().equals(Sort.FORMULA)) {
+        } else if (t.sort().equals(SpecialSorts.FORMULA)) {
             return func(Transformer.getTransformer(WD_FORMULA, services), t);
         } else {
             return func(Transformer.getTransformer(WD_ANY, services), t);
@@ -1657,7 +1630,7 @@ public class TermBuilder {
     }
 
 
-    public Term select(Sort asSort, Term h, Term o, Term f) {
+    public Term select(org.key_project.common.core.logic.Sort asSort, Term h, Term o, Term f) {
     return func(services.getTypeConverter().getHeapLDT().getSelect(
             asSort,
             services),
@@ -1668,13 +1641,13 @@ public class TermBuilder {
      * Get the select expression for a location variabe
      * representing the field.
      */
-    public Term select(Sort asSort, Term h, Term o, LocationVariable field) {
+    public Term select(org.key_project.common.core.logic.Sort asSort, Term h, Term o, LocationVariable field) {
         final Function f = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
         return select(asSort, h, o, func(f));
     }
 
 
-    public Term dot(Sort asSort, Term o, Term f) {
+    public Term dot(org.key_project.common.core.logic.Sort asSort, Term o, Term f) {
         return select(asSort, getBaseHeap(), o, f);
     }
 
@@ -1682,27 +1655,27 @@ public class TermBuilder {
         return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
-    public Term dot(Sort asSort, Term o, Function f) {
-    final Sort fieldSort
+    public Term dot(org.key_project.common.core.logic.Sort asSort, Term o, Function f) {
+    final org.key_project.common.core.logic.Sort fieldSort
         = services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort
                ? dot(asSort, o, func(f))
                : func(f, getBaseHeap(), o);
     }
     
-    public Term dot (Sort asSort, Term o, LocationVariable field) {
+    public Term dot (org.key_project.common.core.logic.Sort asSort, Term o, LocationVariable field) {
         final Function f = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
         return dot(asSort, o, f);
     }
 
 
-    public Term staticDot(Sort asSort, Term f) {
+    public Term staticDot(org.key_project.common.core.logic.Sort asSort, Term f) {
         return dot(asSort, NULL(), f);
     }
 
 
-    public Term staticDot(Sort asSort, Function f) {
-    final Sort fieldSort
+    public Term staticDot(org.key_project.common.core.logic.Sort asSort, Function f) {
+    final org.key_project.common.core.logic.Sort fieldSort
         = services.getTypeConverter().getHeapLDT().getFieldSort();
     return f.sort() == fieldSort
            ? staticDot(asSort, func(f))
@@ -1798,7 +1771,7 @@ public class TermBuilder {
                     "("+ref+"["+idx+"])");
         }
 
-        final Sort elementSort;
+        final org.key_project.common.core.logic.Sort elementSort;
         if(ref.sort() instanceof ArraySort) {
             elementSort = ((ArraySort) ref.sort()).elementSort();
         } else {
@@ -1843,7 +1816,7 @@ public class TermBuilder {
     }
 
 
-    public Term classPrepared(Sort classSort) {
+    public Term classPrepared(org.key_project.common.core.logic.Sort classSort) {
         final TypeConverter tc = services.getTypeConverter();
         return equals(staticDot(tc.getBooleanLDT().targetSort(),
                 tc.getHeapLDT().getClassPrepared(classSort,
@@ -1851,7 +1824,7 @@ public class TermBuilder {
                         TRUE());
     }
 
-    public Term classInitialized(Sort classSort) {
+    public Term classInitialized(org.key_project.common.core.logic.Sort classSort) {
         final TypeConverter tc = services.getTypeConverter();
         return equals(staticDot(tc.getBooleanLDT().targetSort(),
                 tc.getHeapLDT().getClassInitialized(classSort,
@@ -1859,7 +1832,7 @@ public class TermBuilder {
                         TRUE());
     }
 
-    public Term classInitializationInProgress(Sort classSort) {
+    public Term classInitializationInProgress(org.key_project.common.core.logic.Sort classSort) {
         final TypeConverter tc = services.getTypeConverter();
         return equals(staticDot(tc.getBooleanLDT().targetSort(),
                 tc.getHeapLDT()
@@ -1869,7 +1842,7 @@ public class TermBuilder {
     }
 
 
-    public Term classErroneous(Sort classSort) {
+    public Term classErroneous(org.key_project.common.core.logic.Sort classSort) {
         final TypeConverter tc = services.getTypeConverter();
         return equals(staticDot(tc.getBooleanLDT().targetSort(),
                 tc.getHeapLDT().getClassErroneous(classSort,
@@ -1917,11 +1890,11 @@ public class TermBuilder {
     public Term reachableValue(Term h,
                                Term t,
                                KeYJavaType kjt) {
-        assert t.sort().extendsTrans(kjt.getSort()) || t.sort() instanceof ProgramSVSort;
+        assert t.sort().extendsTrans(kjt.getSort(), services) || t.sort() instanceof ProgramSVSort;
         final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
         final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-        if (s.extendsTrans(services.getJavaInfo().objectSort())) {
+        if (s.extendsTrans(services.getJavaInfo().objectSort(), services)) {
             return orSC(equals(t, NULL()), created(h, t));
         } else if(s.equals(setLDT.targetSort())) {
             return createdInHeap(t, h);
@@ -1945,8 +1918,8 @@ public class TermBuilder {
 
     public Term frame(Term heapTerm, Map<Term,Term> normalToAtPre,
                   Term mod) {
-        final Sort objectSort = services.getJavaInfo().objectSort();
-        final Sort fieldSort = services.getTypeConverter()
+        final org.key_project.common.core.logic.Sort objectSort = services.getJavaInfo().objectSort();
+        final org.key_project.common.core.logic.Sort fieldSort = services.getTypeConverter()
                 .getHeapLDT()
                 .getFieldSort();
 
@@ -1977,11 +1950,11 @@ public class TermBuilder {
                         modAtPre),
                         and(not(equals(objVarTerm, NULL())),
                                 not(createdAtPre)),
-                                equals(select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
+                                equals(select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : SpecialSorts.ANY,
                                         heapTerm,
                                         objVarTerm,
                                         fieldVarTerm),
-                                        select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
+                                        select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : SpecialSorts.ANY,
                                                 or.replace(heapTerm),
                                                 objVarTerm,
                                                 fieldVarTerm))));
@@ -1994,8 +1967,8 @@ public class TermBuilder {
      * @see #frame(Term, Map, Term)
      */
     public Term frameStrictlyEmpty(Term heapTerm, Map<Term,Term> normalToAtPre) {
-        final Sort objectSort = services.getJavaInfo().objectSort();
-        final Sort fieldSort = services.getTypeConverter()
+        final org.key_project.common.core.logic.Sort objectSort = services.getJavaInfo().objectSort();
+        final org.key_project.common.core.logic.Sort fieldSort = services.getTypeConverter()
                 .getHeapLDT()
                 .getFieldSort();
 
@@ -2017,11 +1990,11 @@ public class TermBuilder {
         boolean permissionHeap = heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
 
         return all(quantVars,
-                equals(select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
+                equals(select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : SpecialSorts.ANY,
                         heapTerm,
                         objVarTerm,
                         fieldVarTerm),
-                        select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
+                        select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : SpecialSorts.ANY,
                                 or.replace(heapTerm),
                                 objVarTerm,
                                 fieldVarTerm)));
@@ -2069,7 +2042,7 @@ public class TermBuilder {
     //sequence operators
     //-------------------------------------------------------------------------
 
-    public Term seqGet(Sort asSort, Term s, Term idx) {
+    public Term seqGet(org.key_project.common.core.logic.Sort asSort, Term s, Term idx) {
         return func(services.getTypeConverter().getSeqLDT().getSeqGet(asSort, services),
                     s,
                     idx);
@@ -2202,7 +2175,7 @@ public class TermBuilder {
       * @return The {@link Term} {@link Sort}s.
       */
     public ImmutableList<Sort> getSorts(Iterable<Term> terms) {
-       ImmutableList<Sort> result = ImmutableSLList.<Sort>nil();
+       ImmutableList<Sort> result = ImmutableSLList.<org.key_project.common.core.logic.Sort>nil();
        for (Term t : terms) {
           result = result.append(t.sort());
        }

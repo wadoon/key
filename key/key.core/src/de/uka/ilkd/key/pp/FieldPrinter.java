@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.pp;
 
+import org.key_project.common.core.logic.op.Function;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.UnknownJavaTypeException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Common superclass of {@link StorePrinter} and {@link SelectPrinter}.
@@ -74,7 +74,7 @@ class FieldPrinter {
     private boolean isCanonicField(Term objectTerm,
             Term fieldTerm,
             JavaInfo javaInfo) {
-        Sort sort = objectTerm.sort();
+        org.key_project.common.core.logic.Sort sort = objectTerm.sort();
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
         String fieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(fieldName, kjt);

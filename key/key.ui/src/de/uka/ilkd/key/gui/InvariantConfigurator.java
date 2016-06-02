@@ -13,11 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.StringReader;
@@ -28,22 +24,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -53,7 +41,6 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -982,7 +969,7 @@ public class InvariantConfigurator {
                 // might throw parserException
 
                 result =  parser.parse(new StringReader(invariants.get(index)[INV_IDX].get(heap.toString())), 
-                        Sort.FORMULA, services, services.getNamespaces(), getAbbrevMap());
+                        SpecialSorts.FORMULA, services, services.getNamespaces(), getAbbrevMap());
 
                 return result;
             }
@@ -994,7 +981,7 @@ public class InvariantConfigurator {
             protected Term parseModifies(LocationVariable heap) throws ParserException {
                 Term result = null;
                 index = inputPane.getSelectedIndex();
-                final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
+                final org.key_project.common.core.logic.Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
                 result = parser.parse(
                         new StringReader(invariants.get(index)[MOD_IDX].get(heap.toString())), locSetSort,
                         services, services.getNamespaces(), getAbbrevMap());
@@ -1014,15 +1001,15 @@ public class InvariantConfigurator {
                 final String newObjectsAsString = invariants.get(index)[IF_OO_IDX].get(heap.toString());
                 // TODO: allow more than one term
                 preExps = parser.parse(
-                      new StringReader(preExpsAsString), Sort.ANY,
+                      new StringReader(preExpsAsString), SpecialSorts.ANY,
                       services, services.getNamespaces(), getAbbrevMap());
                 // TODO: allow more than one term
                 postExps = parser.parse(
-                      new StringReader(postExpsAsString), Sort.ANY,
+                      new StringReader(postExpsAsString), SpecialSorts.ANY,
                       services, services.getNamespaces(), getAbbrevMap());
                 // TODO: allow more than one term
                 newObjects = parser.parse(
-                      new StringReader(newObjectsAsString), Sort.ANY,
+                      new StringReader(newObjectsAsString), SpecialSorts.ANY,
                       services, services.getNamespaces(), getAbbrevMap());
                 ImmutableList<InfFlowSpec> result =
                     ImmutableSLList.<InfFlowSpec>nil()
@@ -1036,7 +1023,7 @@ public class InvariantConfigurator {
             protected Term parseVariant() throws ParserException {
                 Term result = null;
                 index = inputPane.getSelectedIndex();
-                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                final org.key_project.common.core.logic.Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 result = parser.parse(
                         new StringReader(invariants.get(index)[VAR_IDX].get(DEFAULT)), intSort,
                         services, services.getNamespaces(), getAbbrevMap());

@@ -18,22 +18,15 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.logic.InnerVariableNamer;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.proof.Counter;
-import de.uka.ilkd.key.proof.JavaModel;
-import de.uka.ilkd.key.proof.NameRecorder;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -45,7 +38,7 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  * include information on the underlying Java model and a converter to
  * transform Java program elements to logic (where possible) and back.
  */
-public class Services implements TermServices {
+public class Services implements TermServices<Term, JavaBlock> {
    /**
      * the proof
      */
@@ -395,4 +388,31 @@ public class Services implements TermServices {
       assert this.javaModel == null;
       this.javaModel = javaModel;
    }
+
+   @Override
+    public ImmutableSet<Sort> getDirectSuperSorts(Sort s) {
+        return ((Sort)s).extendsSorts(this);
+    }
+
+    @Override
+    public Sort getAnySort() {
+        return org.key_project.common.core.logic.SpecialSorts.ANY;
+    }
+    
+    @Override
+    public Sort getFormulaSort() {
+        return org.key_project.common.core.logic.SpecialSorts.FORMULA;
+    }
+
+
+    @Override
+    public Sort getUpdateSort() {
+        return org.key_project.common.core.logic.SpecialSorts.UPDATE;
+    }
+
+    @Override
+    public Sort getTermLabelSort() {
+        return org.key_project.common.core.logic.SpecialSorts.TERMLABEL;
+    }
+
 }

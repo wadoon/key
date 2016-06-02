@@ -13,12 +13,13 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -78,7 +79,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
     //internal methods
     //-------------------------------------------------------------------------
 
-    private static Sort[] getArgSorts(Sort heapSort,
+    private static org.key_project.common.core.logic.Sort[] getArgSorts(org.key_project.common.core.logic.Sort heapSort,
 	    			      KeYJavaType container, 
 	                              boolean isStatic, 
 	                              ImmutableArray<KeYJavaType> paramTypes,
@@ -86,7 +87,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
 	                              int stateCount) {
        final int arity = paramTypes.size() + stateCount*heapCount + (isStatic ? 0 : 1);
        
-       final Sort[] result = new Sort[arity];
+       final org.key_project.common.core.logic.Sort[] result = new org.key_project.common.core.logic.Sort[arity];
  
        int offset;
 
@@ -177,5 +178,6 @@ public class ObserverFunction extends Function implements IObserverFunction {
    public final ImmutableArray<KeYJavaType> getParamTypes() {
 	return paramTypes;
     }
+
 
 }

@@ -18,6 +18,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
+import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
@@ -28,7 +29,6 @@ import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.java.reference.TypeReference;
 import recoder.service.SourceInfo;
-import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 
 /**
  * Find out for a collection of Java files which referenced types are not defined

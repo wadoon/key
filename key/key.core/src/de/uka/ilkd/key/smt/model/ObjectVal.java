@@ -13,14 +13,9 @@
 
 package de.uka.ilkd.key.smt.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.Sort;
 /**
  * Represents an object inside a heap.
  * @author mihai

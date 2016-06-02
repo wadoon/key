@@ -16,8 +16,9 @@ package de.uka.ilkd.key.smt;
 
 import java.math.BigInteger;
 
+import org.key_project.common.core.logic.Operator;
+
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 
 /**

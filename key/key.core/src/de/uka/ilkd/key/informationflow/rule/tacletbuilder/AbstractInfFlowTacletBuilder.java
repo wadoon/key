@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -23,11 +24,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilderSchemaVarCollector;
@@ -66,7 +65,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
         t = unlabel(t);
         String svName = MiscTools.toValidVariableName(schemaPrefix +
                                                       t.toString()).toString();
-        Sort sort = t.sort();
+        org.key_project.common.core.logic.Sort sort = t.sort();
         Name name =
                 services.getVariableNamer().getTemporaryNameProposal(svName);
         return var(SchemaVariableFactory.createTermSV(name, sort));
@@ -81,7 +80,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
         }
         String svName =
                 MiscTools.toValidVariableName(schemaPrefix + v.name()).toString();
-        Sort sort = v.sort();
+        org.key_project.common.core.logic.Sort sort = v.sort();
         Name name =
                 services.getVariableNamer().getTemporaryNameProposal(svName);
         return SchemaVariableFactory.createVariableSV(name, sort);

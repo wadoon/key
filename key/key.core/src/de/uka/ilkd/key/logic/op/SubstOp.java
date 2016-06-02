@@ -14,12 +14,10 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractOperator;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.TermServices;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Standard first-order substitution operator, resolving clashes but not
@@ -27,41 +25,14 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * operators. Currently, only the subclass <code>WarySubstOp</code> is used
  * and accessible through the key parser.
  */
-public abstract class SubstOp extends AbstractOperator<Sort, Term> implements Operator {
+public abstract class SubstOp extends AbstractOperator implements Operator {
     
     protected SubstOp(Name name) {
 	super(name, 2, new Boolean[]{false, true}, true);
     }
     
 
-    /**
-     * @return sort of the second subterm or throws an
-     * IllegalArgumentException if the given term has no correct (2=) arity
-     */
-    @Override
-    public Sort sort(ImmutableArray<Term> terms) {
-	if(terms.size() == 2) {
-	    return terms.get(1).sort();
-	}
-	else throw new IllegalArgumentException("Cannot determine sort of "+
-						"invalid term (Wrong arity).");
-    }
-    
-
-    /**
-     * @return true iff the sort of the subterm 0 of the given term
-     * has the same sort as or a subsort of the variable to be substituted 
-     * and the
-     * term's arity is 2 and the numer of variables bound there is 0
-     * for the 0th subterm and 1 for the 1st subterm.
-     */
-    @Override    
-    protected boolean additionalValidTopLevel(Term term){
-	if(term.varsBoundHere(1).size() != 1) { 
-	    return false;
-	}
-	return term.sub(0).sort().extendsTrans(term.varsBoundHere(1).get(0).sort());
-    }
+  
 
     
     /**

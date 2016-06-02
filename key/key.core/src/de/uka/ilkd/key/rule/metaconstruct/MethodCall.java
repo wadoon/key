@@ -14,15 +14,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -33,22 +30,9 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -472,6 +456,6 @@ public class MethodCall extends ProgramTransformer {
     private boolean assignmentCompatible(Expression exp, Type type, Services services) {
         Sort expSort = exp.getKeYJavaType(services, execContext).getSort();
         Sort typeSort = ((KeYJavaType) type).getSort(); // was: services.getJavaInfo().getKeYJavaType(type);
-        return expSort.extendsTrans(typeSort);
+        return expSort.extendsTrans(typeSort, services);
     }
 }

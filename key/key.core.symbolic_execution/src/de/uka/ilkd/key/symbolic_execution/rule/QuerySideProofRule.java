@@ -17,34 +17,18 @@ import java.util.List;
 import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Triple;
@@ -151,7 +135,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
    protected boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
       if (pmTerm.op() instanceof IProgramMethod && pmTerm.freeVars().isEmpty()) {
          IProgramMethod pm = (IProgramMethod) pmTerm.op();
-         final Sort nullSort = goal.proof().getJavaInfo().nullSort();
+         final org.key_project.common.core.logic.Sort nullSort = goal.proof().getJavaInfo().nullSort();
          if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) &&
                  !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
              PIOPathIterator it = pio.iterator();

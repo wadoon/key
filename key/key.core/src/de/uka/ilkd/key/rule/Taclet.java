@@ -20,21 +20,16 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.Operator;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;

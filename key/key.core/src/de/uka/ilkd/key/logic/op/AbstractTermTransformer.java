@@ -17,36 +17,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.Sort;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.rule.metaconstruct.AddCast;
-import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;
-import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
-import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
-import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
-import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
-import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
-import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
-import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaAdd;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryAnd;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryOr;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryXOr;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaDiv;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaEqual;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGeq;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGreater;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLeq;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLess;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaMul;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaPow;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaShiftLeft;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaShiftRight;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaSub;
+import de.uka.ilkd.key.rule.metaconstruct.*;
+import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -124,7 +103,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     }
     
     
-    protected AbstractTermTransformer(Name name, int arity, Sort sort) {
+    protected AbstractTermTransformer(Name name, int arity, org.key_project.common.core.logic.Sort sort) {
 	super(name, createMetaSortArray(arity), sort, false);
 	name2metaop.put(name.toString(), this);	
     }

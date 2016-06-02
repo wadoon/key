@@ -17,8 +17,8 @@ import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 
 
 /**
@@ -39,7 +39,7 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     private ElementaryUpdate(UpdateableOperator lhs) {
 	super(new Name("elem-update(" + lhs + ")"), 
 	      new Sort[]{lhs.sort()}, 
-	      Sort.UPDATE,
+	      SpecialSorts.UPDATE,
 	      false);
 	this.lhs = lhs;
 	assert lhs.arity() == 0;

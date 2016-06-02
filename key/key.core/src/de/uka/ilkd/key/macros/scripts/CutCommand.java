@@ -3,11 +3,11 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.SpecialSorts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -30,7 +30,7 @@ public class CutCommand extends AbstractCommand {
         Term formula;
         try {
             String formString = args.get("#2");
-            formula = toTerm(proof, state, formString, Sort.FORMULA);
+            formula = toTerm(proof, state, formString, SpecialSorts.FORMULA);
         } catch (ParserException e) {
             throw new ScriptException(e);
         }

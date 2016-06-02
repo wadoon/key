@@ -12,19 +12,11 @@
 // 
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.tree.DefaultTreeModel;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;

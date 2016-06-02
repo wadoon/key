@@ -14,24 +14,22 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.Sorted;
 import org.key_project.common.core.logic.op.DLAbstractSortedOperator;
+import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.Sorted;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /** 
  * Abstract sorted operator class offering some common functionality.
  */
-public abstract class AbstractSortedOperator extends DLAbstractSortedOperator<Sort,Term> 
+public abstract class AbstractSortedOperator extends DLAbstractSortedOperator 
                                       implements SortedOperator, Sorted {
 
     protected AbstractSortedOperator(Name name,
 	    			         ImmutableArray<Sort> argSorts,
-	    		             Sort sort,
+	    		             org.key_project.common.core.logic.Sort sort,
 	    		             ImmutableArray<Boolean> whereToBind,
 	    		             boolean isRigid) {
         super(name, argSorts, sort, whereToBind, isRigid);
@@ -40,7 +38,7 @@ public abstract class AbstractSortedOperator extends DLAbstractSortedOperator<So
     
     protected AbstractSortedOperator(Name name,
 	    			        Sort[] argSorts,
-	    		             Sort sort,
+	    		             org.key_project.common.core.logic.Sort sort,
 	    		             Boolean[] whereToBind,
 	    		             boolean isRigid) {
 	this(name, 
@@ -53,7 +51,7 @@ public abstract class AbstractSortedOperator extends DLAbstractSortedOperator<So
     
     protected AbstractSortedOperator(Name name,
 	    			         ImmutableArray<Sort> argSorts,
-	    		             Sort sort,
+	    		             org.key_project.common.core.logic.Sort sort,
 	    		             boolean isRigid) {
 	this(name, argSorts, sort, null, isRigid);
     }    
@@ -61,57 +59,18 @@ public abstract class AbstractSortedOperator extends DLAbstractSortedOperator<So
     
     protected AbstractSortedOperator(Name name,
 	    			         Sort[] argSorts,
-	    		             Sort sort,
+	    		             org.key_project.common.core.logic.Sort sort,
 	    		             boolean isRigid) {
 	this(name, new ImmutableArray<Sort>(argSorts), sort, null, isRigid);
     }
     
     
     protected AbstractSortedOperator(Name name,
-	    		             Sort sort,
+	    		             org.key_project.common.core.logic.Sort sort,
 	    		             boolean isRigid) {
 	this(name, (ImmutableArray<Sort>) null, sort, null, isRigid);
     }    
     
 
-    /**
-     * checks if a given Term could be subterm (at the at'th subterm
-     * position) of a term with this function at its top level. The
-     * validity of the given subterm is NOT checked.  
-     * @param at theposition of the term where this method should check 
-     * the validity.  
-     * @param possibleSub the subterm to be ckecked.
-     * @return true iff the given term can be subterm at the indicated
-     * position
-     */
-    private boolean possibleSub(int at, Term possibleSub) {
-	final Sort s = possibleSub.sort();
-
-	return s == AbstractTermTransformer.METASORT
-	       || s instanceof ProgramSVSort
-	       || argSort(at) == AbstractTermTransformer.METASORT
-	       || argSort(at) instanceof ProgramSVSort
-	       || s.extendsTrans(argSort(at));
-    }
-    
-    
-    /**
-     * Allows subclasses to impose custom demands on what constitutes a 
-     * valid term using the operator represented by the subclass. The
-     * default implementation here does not impose any such demands.
-     */    
-    protected boolean additionalValidTopLevel2(Term term) {
-	return true;
-    }
-    
-    
-    @Override
-    protected final boolean additionalValidTopLevel(Term term) {
-	for(int i = 0, n = arity(); i < n; i++) {
-            if(!possibleSub(i, term.sub(i))) { 
-		return false;
-	    }
-	}
-	return additionalValidTopLevel2(term);
-    }
+  
 }

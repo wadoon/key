@@ -14,8 +14,8 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 
 
 /**
@@ -36,13 +36,13 @@ public final class UpdateJunctor extends AbstractSortedOperator {
     private static Sort[] createUpdateSortArray(int arity) {
 	Sort[] result = new Sort[arity];
 	for(int i = 0; i < arity; i++) {
-	    result[i] = Sort.UPDATE;
+	    result[i] = SpecialSorts.UPDATE;
 	}
 	return result;
     }
     
     
     private UpdateJunctor(Name name, int arity) {
-	super(name, createUpdateSortArray(arity), Sort.UPDATE, false);
+	super(name, createUpdateSortArray(arity), SpecialSorts.UPDATE, false);
     } 
 }

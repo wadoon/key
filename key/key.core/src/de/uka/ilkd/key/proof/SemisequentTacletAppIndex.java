@@ -15,19 +15,10 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;

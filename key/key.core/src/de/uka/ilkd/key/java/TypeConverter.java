@@ -17,78 +17,34 @@ package de.uka.ilkd.key.java;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.service.ConstantEvaluator;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.NullType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
-import de.uka.ilkd.key.java.expression.operator.BinaryNot;
-import de.uka.ilkd.key.java.expression.operator.BinaryOr;
-import de.uka.ilkd.key.java.expression.operator.BinaryXOr;
-import de.uka.ilkd.key.java.expression.operator.Conditional;
-import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.expression.operator.Divide;
-import de.uka.ilkd.key.java.expression.operator.Equals;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.Minus;
-import de.uka.ilkd.key.java.expression.operator.Modulo;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.NotEquals;
-import de.uka.ilkd.key.java.expression.operator.Plus;
-import de.uka.ilkd.key.java.expression.operator.PostDecrement;
-import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.java.expression.operator.PreDecrement;
-import de.uka.ilkd.key.java.expression.operator.PreIncrement;
-import de.uka.ilkd.key.java.expression.operator.ShiftLeft;
-import de.uka.ilkd.key.java.expression.operator.ShiftRight;
-import de.uka.ilkd.key.java.expression.operator.Times;
-import de.uka.ilkd.key.java.expression.operator.TypeCast;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.reference.ArrayReference;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MetaClassReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.reference.VariableReference;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.MapLDT;
-import de.uka.ilkd.key.ldt.PermissionLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+import recoder.service.ConstantEvaluator;
 
 public final class TypeConverter {
 
@@ -276,7 +232,7 @@ public final class TypeConverter {
 	    			boolean exact) {
         Term result = self;
         LocationVariable inst;
-        while(!exact && !context.getSort().extendsTrans(s)
+        while(!exact && !context.getSort().extendsTrans(s, services)
               || exact && !context.getSort().equals(s)){
             inst = (LocationVariable)
                     services.getJavaInfo().getAttribute(
@@ -368,7 +324,7 @@ public final class TypeConverter {
 	final KeYJavaType type = ((TypeReference)io.getChildAt(1)).
 	    getKeYJavaType();
 	final Term obj = convertToLogicElement(io.getChildAt(0), ec);
-	final Sort s = type.getSort();
+	final org.key_project.common.core.logic.Sort s = type.getSort();
 	final Function instanceOfSymbol = s.getInstanceofSymbol(services);
 
 	// in JavaDL S::instance(o) is also true if o (for reference types S)
@@ -570,7 +526,7 @@ public final class TypeConverter {
     }
 
 
-    public Sort getPrimitiveSort(Type t) {
+    public org.key_project.common.core.logic.Sort getPrimitiveSort(Type t) {
 	return services.getJavaInfo().getKeYJavaType(t).getSort();
     }
 
@@ -658,7 +614,7 @@ public final class TypeConverter {
                 SortDependingFunction castFunction =
                         SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
                 if(sdf.isSimilar(castFunction)) {
-                    Sort s = sdf.getSortDependingOn();
+                    org.key_project.common.core.logic.Sort s = sdf.getSortDependingOn();
                     KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
                     if(kjt != null) {
                         children.add(new TypeRef(kjt));
@@ -673,7 +629,7 @@ public final class TypeConverter {
 
     public KeYJavaType getKeYJavaType(Term t) {
 	KeYJavaType result = null;
-	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
+	if(t.sort().extendsTrans(services.getJavaInfo().objectSort(), services)) {
 	    result = services.getJavaInfo().getKeYJavaType(t.sort());
 	} else if(t.op() instanceof Function) {
 	    for(LDT ldt : models) {
@@ -775,7 +731,7 @@ public final class TypeConverter {
 	    }
 	} else if (from instanceof ArrayType) {
 	    if (to instanceof ClassType) {
-                final Sort toSort = getKeYJavaType ( to ).getSort();
+                final org.key_project.common.core.logic.Sort toSort = getKeYJavaType ( to ).getSort();
 		return services.getJavaInfo().isAJavaCommonSort(toSort);
 	    } else if (to instanceof ArrayType) {
 		return isWidening((ArrayType)from, (ArrayType)to);
@@ -792,7 +748,7 @@ public final class TypeConverter {
 
 	if ( a instanceof ClassType || a == null ) {
 	    return
-		from.getSort ().extendsTrans ( to.getSort () ) ||
+		from.getSort ().extendsTrans ( to.getSort (), services ) ||
 		( a == NullType.JAVA_NULL &&
 		  b instanceof ArrayType );
 	} else {
@@ -868,7 +824,7 @@ public final class TypeConverter {
 
 	if ( a instanceof ClassType || a == null ) {
 	    return
-		to.getSort ().extendsTrans ( from.getSort () ) ||
+		to.getSort ().extendsTrans ( from.getSort (), services ) ||
 		( from == services.
 		  getJavaInfo().getJavaLangObject () &&
 		  a instanceof ArrayType );

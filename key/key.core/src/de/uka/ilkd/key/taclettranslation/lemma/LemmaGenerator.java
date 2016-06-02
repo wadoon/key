@@ -16,8 +16,9 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.key_project.common.core.logic.TermServices;
+
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;

@@ -14,8 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 
 /**
  * Schema variable that is instantiated with logical variables.
@@ -28,7 +27,7 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
      * @param name the Name of the SchemaVariable
      * @param sort the Sort of the SchemaVariable and the matched type     
      */
-    VariableSV(Name name, Sort sort) {
+    VariableSV(Name name, org.key_project.common.core.logic.Sort sort) {
 	super(name, sort, true, false); 	
     }
 

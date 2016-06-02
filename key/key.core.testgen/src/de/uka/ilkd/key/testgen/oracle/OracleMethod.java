@@ -2,7 +2,6 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import java.util.List;
 
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 
 public class OracleMethod {
@@ -13,7 +12,7 @@ public class OracleMethod {
 
 	private String body;
 	
-	private Sort returnType;
+	private org.key_project.common.core.logic.Sort returnType;
 
 	public OracleMethod(String methodName, List<OracleVariable> args,
 			String body) {
@@ -24,7 +23,7 @@ public class OracleMethod {
 	}
 	
 	public OracleMethod(String methodName, List<OracleVariable> args,
-			String body, Sort sort) {
+			String body, org.key_project.common.core.logic.Sort sort) {
 		super();
 		this.methodName = methodName;
 		this.args = args;

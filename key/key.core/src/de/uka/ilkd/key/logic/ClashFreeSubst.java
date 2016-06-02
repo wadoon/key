@@ -13,13 +13,14 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.DefaultVisitor;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 public class ClashFreeSubst {
     protected QuantifiableVariable v;

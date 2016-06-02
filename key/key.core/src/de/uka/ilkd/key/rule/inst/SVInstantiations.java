@@ -16,13 +16,10 @@ package de.uka.ilkd.key.rule.inst;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -31,11 +28,9 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -540,7 +535,7 @@ public class SVInstantiations {
     * @param updateApplicationlabels the TermLabels attached to the application operator term 
     */
     public SVInstantiations addUpdate(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
-	assert update.sort() == Sort.UPDATE;
+	assert update.sort() == SpecialSorts.UPDATE;
         return new SVInstantiations(map, interesting(), updateContext
                 .append(new UpdateLabelPair(update, updateApplicationlabels)),
                 getGenericSortInstantiations(), getGenericSortConditions());

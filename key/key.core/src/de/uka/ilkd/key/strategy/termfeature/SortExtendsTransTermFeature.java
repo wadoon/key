@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -24,13 +23,13 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class SortExtendsTransTermFeature extends BinaryTermFeature {
     
-    private final Sort sort;
+    private final org.key_project.common.core.logic.Sort sort;
 
-    public static TermFeature create(Sort sort) {
+    public static TermFeature create(org.key_project.common.core.logic.Sort sort) {
         return new SortExtendsTransTermFeature ( sort );
     }
     
-    private SortExtendsTransTermFeature(Sort sort) {
+    private SortExtendsTransTermFeature(org.key_project.common.core.logic.Sort sort) {
         this.sort = sort;
     }
     

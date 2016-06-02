@@ -13,17 +13,17 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.DefaultVisitor;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /** 
  * Visitor traversing a term and collecting all variables that occur bound.
  * The visitor implements also a continuation on sequents, traversing all of
  * the formulas occuring in the sequent.
  */
-public class BoundVarsVisitor extends DefaultVisitor{
+public class BoundVarsVisitor extends DefaultVisitor<Term>{
   
     private ImmutableSet<QuantifiableVariable> bdVars =
 	DefaultImmutableSet.<QuantifiableVariable>nil();  

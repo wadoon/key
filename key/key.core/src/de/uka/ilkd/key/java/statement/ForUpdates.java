@@ -20,11 +20,7 @@ package de.uka.ilkd.key.java.statement;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 public class ForUpdates extends JavaNonTerminalProgramElement

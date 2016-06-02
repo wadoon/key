@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;

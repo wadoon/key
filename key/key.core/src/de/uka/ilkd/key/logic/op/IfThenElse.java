@@ -13,55 +13,50 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractOperator;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.common.core.logic.*;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
  * This singleton class implements a general conditional operator 
  * <tt>\if (phi) \then (t1) \else (t2)</tt>.
  */
-public final class IfThenElse extends AbstractOperator<Sort, Term> implements Operator {
+public final class IfThenElse extends AbstractOperator implements Operator {
     
     public static final IfThenElse IF_THEN_ELSE = new IfThenElse();
     
         
     private IfThenElse () {
-	super(new Name("if-then-else"), 3, true);
+        super(new Name("if-then-else"), 3, true);
     }
     
     
-    private Sort getCommonSuperSort(Sort s1, Sort s2) {
-        if(s1 == Sort.FORMULA) {
-            assert s2 == Sort.FORMULA: "Sorts FORMULA and "+s2+" are incompatible.";
-            return Sort.FORMULA;
-        } else if(s1.extendsTrans(s2)) {
+    private org.key_project.common.core.logic.Sort getCommonSuperSort(org.key_project.common.core.logic.Sort s1, org.key_project.common.core.logic.Sort s2, TermServices services) {
+        if(s1 == SpecialSorts.FORMULA) {
+            assert s2 == SpecialSorts.FORMULA: "Sorts FORMULA and "+s2+" are incompatible.";
+            return SpecialSorts.FORMULA;
+        } else if(s1.extendsTrans(s2, services)) {
             return s2;
-        } else if(s2.extendsTrans(s1)) {
+        } else if(s2.extendsTrans(s1, services)) {
             return s1;
         } else if(s1 instanceof NullSort || s2 instanceof NullSort) {
-            return Sort.ANY;
+            return SpecialSorts.ANY;
         } else {
-            Sort result = Sort.ANY;
-            final ImmutableSet<Sort> set1 = s1.extendsSorts();
-            final ImmutableSet<Sort> set2 = s2.extendsSorts();
+            org.key_project.common.core.logic.Sort result = SpecialSorts.ANY;
+            final ImmutableSet<Sort> set1 = services.getDirectSuperSorts(s1);
+            final ImmutableSet<Sort> set2 = services.getDirectSuperSorts(s2);
             assert set1 != null : "null for sort: " + s1;
             assert set2 != null : "null for sort: " + s2;
             
             for(final Sort sort1 : set1) {
                 if(set2.contains(sort1)) {
-                    if(result == Sort.ANY) {
+                    if(result == SpecialSorts.ANY) {
                         result = sort1;
                     } else {
                         // not uniquely determinable
-                        return Sort.ANY;
+                        return SpecialSorts.ANY;
                     }
                 } 
             }
@@ -71,31 +66,5 @@ public final class IfThenElse extends AbstractOperator<Sort, Term> implements Op
     }        
 
     
-    @Override
-    public Sort sort(ImmutableArray<Term> terms) {
-        final Sort s2 = terms.get(1).sort();
-        final Sort s3 = terms.get(2).sort();
-        if(s2 instanceof ProgramSVSort
-             || s2 == AbstractTermTransformer.METASORT ) { 
-            return s3; 
-        } else if(s3 instanceof ProgramSVSort
-        	  || s3 == AbstractTermTransformer.METASORT ) {
-            return s2;
-        } else {           
-            return getCommonSuperSort(s2, s3);
-        }
-    }
-    
-
-    @Override
-    protected boolean additionalValidTopLevel(Term term) {
-        final Sort s0 = term.sub(0).sort();
-        final Sort s1 = term.sub(1).sort();
-        final Sort s2 = term.sub(2).sort();
-        
-        return s0 == Sort.FORMULA
-               && (s1 == Sort.FORMULA) == (s2 == Sort.FORMULA)
-               && s1 != Sort.UPDATE 
-               && s2 != Sort.UPDATE;
-    }
+  
 }

@@ -1,18 +1,13 @@
 package de.uka.ilkd.key.symbolic_execution;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -21,21 +16,8 @@ import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -477,7 +459,7 @@ public abstract class AbstractUpdateExtractor {
          }
       }
       else {
-         Sort sort = heapLDT.getSortOfSelect(term.op());
+         org.key_project.common.core.logic.Sort sort = heapLDT.getSortOfSelect(term.op());
          if (sort != null) {
             collectLocationsFromHeapTerms(term.sub(1), term.sub(2), heapLDT, toFill, objectsToIgnore);
          }
@@ -561,12 +543,12 @@ public abstract class AbstractUpdateExtractor {
          param.setValueTermIndexInStatePredicate(++argumentIndex);
       }
       Term[] arguments = argumentsList.toArray(new Term[argumentsList.size()]);
-      Sort[] sorts = new Sort[arguments.length];
+      org.key_project.common.core.logic.Sort[] sorts = new org.key_project.common.core.logic.Sort[arguments.length];
       for (int i = 0; i < sorts.length; i++) {
          sorts[i] = arguments[i].sort();
       }
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(getServices().getTermBuilder().newName("LayoutPredicate")), Sort.FORMULA, sorts);
+      Function newPredicate = new Function(new Name(getServices().getTermBuilder().newName("LayoutPredicate")), SpecialSorts.FORMULA, sorts);
       // Create formula which contains the value interested in.
       Term newTerm = getServices().getTermBuilder().func(newPredicate, arguments);
       return newTerm;

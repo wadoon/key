@@ -21,37 +21,23 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
+import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
+import de.uka.ilkd.key.parser.proofjava.ParseException;
+import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.convenience.TreeWalker;
 import recoder.io.ProjectSettings;
 import recoder.io.PropertyNames;
-import recoder.java.Comment;
-import recoder.java.CompilationUnit;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.JavaProgramFactory;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SingleLineComment;
+import recoder.java.*;
 import recoder.java.SourceElement.Position;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.reference.MethodReference;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.VariableReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
-import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
-import de.uka.ilkd.key.parser.proofjava.ParseException;
-import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 
 public class ProofJavaProgramFactory extends JavaProgramFactory {
     

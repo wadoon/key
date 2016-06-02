@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.Sort;
 import org.key_project.common.core.logic.op.SVSubstitute;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -134,7 +134,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                 // If one of the extended types is a subtype to sndSort, then so
                 // is the proxy sort.
                 assert proxy1;
-                for (Sort extSort : fstSort.extendsSorts()) {
+                for (Sort extSort : services.getDirectSuperSorts(fstSort)) {
                     if(extSort.extendsTrans(sndSort)) {
                         return true;
                     }
@@ -147,7 +147,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                 // If one of the extended types is a subtype to sndSort, then so
                 // is the proxy sort.
                 assert proxy1;
-                for (Sort extSort : fstSort.extendsSorts()) {
+                for (Sort extSort : services.getDirectSuperSorts(fstSort)) {
                     if(extSort != sndSort && extSort.extendsTrans(sndSort)) {
                         return true;
                     }

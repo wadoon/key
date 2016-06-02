@@ -1,47 +1,51 @@
 package org.key_project.common.core.logic.op;
 
-import org.key_project.common.core.logic.DLSort;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort ;
 import org.key_project.util.collection.ImmutableArray;
 
-public abstract class DLAbstractSortedOperator<S extends DLSort>
-        extends DLAbstractOperator implements DLSortedOperator<S> {
+public abstract class DLAbstractSortedOperator
+extends DLAbstractOperator implements SortedOperator {
 
-    @SuppressWarnings("rawtypes")
-    protected static final ImmutableArray<?> EMPTY_SORT_LIST = new ImmutableArray();
-    protected final S sort;
-    protected final ImmutableArray<S> argSorts;
+    protected static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<Sort>();
+    protected final Sort sort;
+    protected final ImmutableArray<Sort> argSorts;
 
-    @SuppressWarnings("unchecked")
     protected DLAbstractSortedOperator(Name name,
-            ImmutableArray<S> argSorts,
-            S sort,
+            ImmutableArray<Sort> argSorts,
+            Sort sort,
             ImmutableArray<Boolean> whereToBind,
             boolean isRigid) {
-        
+
         super(name, argSorts == null ? 0 : argSorts.size(), 
-                    whereToBind, 
-                    isRigid);
+                whereToBind, 
+                isRigid);
         assert sort != null;
-        this.argSorts = (ImmutableArray<S>) 
+        this.argSorts = (ImmutableArray<Sort>) 
                 (argSorts == null ? EMPTY_SORT_LIST : argSorts);
         this.sort = sort;
     }
 
 
+    protected DLAbstractSortedOperator(Name name, Sort[] createFormulaSortArray,
+            Sort sort, boolean b) {
+        this(name, createFormulaSortArray == null ? null : new ImmutableArray<Sort>(createFormulaSortArray), sort, null, b);
+    }
+
+
     @Override
-    public final S argSort(int i) {
-    return argSorts.get(i);
+    public final Sort argSort (int i) {
+        return argSorts.get(i);
     }
 
     @Override
-    public final ImmutableArray<S> argSorts() {
-    return argSorts;
+    public final ImmutableArray<Sort> argSorts() {
+        return argSorts;
     }
 
     @Override
-    public final S sort() {
-    return sort;
+    public final Sort sort() {
+        return sort;
     }
 
 }

@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
+import org.key_project.common.core.logic.op.Junctor;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;

@@ -13,11 +13,7 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
-import org.antlr.runtime.MismatchedTokenException;
-import org.antlr.runtime.NoViableAltException;
-import org.antlr.runtime.Parser;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
+import org.antlr.runtime.*;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;

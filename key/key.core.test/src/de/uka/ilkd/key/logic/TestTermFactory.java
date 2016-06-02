@@ -15,6 +15,12 @@ package de.uka.ilkd.key.logic;
 
 import org.junit.Assert;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
@@ -22,14 +28,9 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 import junit.framework.TestCase;
@@ -40,28 +41,28 @@ public class TestTermFactory extends TestCase {
     
 
     private Term et1;
-    private Sort sort1  = new SortImpl(new Name("S1"));
-    private Sort sort2  = new SortImpl(new Name("S2"));
-    private Sort sort3  = new SortImpl(new Name("S3"));
-    private Sort osort1 = new SortImpl(new Name("os1"));
+    private org.key_project.common.core.logic.Sort sort1  = new SortImpl(new Name("S1"));
+    private org.key_project.common.core.logic.Sort sort2  = new SortImpl(new Name("S2"));
+    private org.key_project.common.core.logic.Sort sort3  = new SortImpl(new Name("S3"));
+    private org.key_project.common.core.logic.Sort osort1 = new SortImpl(new Name("os1"));
     private Sort osort2 = new SortImpl(new Name("os2"), osort1);
     private Sort osort3 = new SortImpl(new Name("os3"), osort1);
-    private Sort osort4 = new SortImpl(new Name("os4"), 
-						  DefaultImmutableSet.<Sort>nil()
+    private org.key_project.common.core.logic.Sort osort4 = new SortImpl(new Name("os4"), 
+						  DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil()
 						  .add(osort2).add(osort3), false);
     
-    Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  
+    Function p=new Function(new Name("p"),SpecialSorts.FORMULA,new org.key_project.common.core.logic.Sort[]{sort1});  
         //p(:S1):BOOL
     LogicVariable x=new LogicVariable(new Name("x"),sort1);  //x:S1
-    Function q=new Function(new Name("q"),Sort.FORMULA,
-			    new Sort[]{new SortImpl(new Name("Whatever"))}); 
+    Function q=new Function(new Name("q"),SpecialSorts.FORMULA,
+			    new org.key_project.common.core.logic.Sort[]{new SortImpl(new Name("Whatever"))}); 
         //q(:Whatever):BOOL
     LogicVariable z=new LogicVariable(new Name("z"),sort1); //z:S1
-    Function r=new Function(new Name("r"),Sort.FORMULA,new Sort[]{sort1, sort2});
+    Function r=new Function(new Name("r"),SpecialSorts.FORMULA,new org.key_project.common.core.logic.Sort[]{sort1, sort2});
         //r(:S1, :S2):BOOL
     LogicVariable y=new LogicVariable(new Name("y"),sort3); //y:S3
     LogicVariable w=new LogicVariable(new Name("w"),sort2); //w:S2
-    Function f=new Function(new Name("f"),sort1, new Sort[]{sort3}); 
+    Function f=new Function(new Name("f"),sort1, new org.key_project.common.core.logic.Sort[]{sort3}); 
         // f(:S3):S1
 
     LogicVariable v1=new LogicVariable(new Name("v1"), osort1);
@@ -69,7 +70,7 @@ public class TestTermFactory extends TestCase {
     LogicVariable v3=new LogicVariable(new Name("v3"), osort3);
     LogicVariable v4=new LogicVariable(new Name("v4"), osort4);
 
-    Function g=new Function(new Name("g"), osort3, new Sort[]{osort2, osort1});
+    Function g=new Function(new Name("g"), osort3, new org.key_project.common.core.logic.Sort[]{osort2, osort1});
    private TermBuilder TB;
    private TermFactory tf;
 
@@ -287,18 +288,18 @@ public class TestTermFactory extends TestCase {
     public void testSubSortsSubst() {
 	Term t = tf.createTerm(g, new Term[]{tf.createTerm(v2), 
 				             tf.createTerm(v1)});
-	Function c=new Function(new Name("c"), osort2, new Sort[0]);
+	Function c=new Function(new Name("c"), osort2, new org.key_project.common.core.logic.Sort[0]);
 	Term st = TB.subst(WarySubstOp.SUBST, v2, 
 					    tf.createTerm(c), t);
-	c=new Function(new Name("c"), osort4, new Sort[0]);
+	c=new Function(new Name("c"), osort4, new org.key_project.common.core.logic.Sort[0]);
 	st = TB.subst(WarySubstOp.SUBST, v2, 
 					    tf.createTerm(c), t);
-	c=new Function(new Name("c"), osort3, new Sort[0]);
+	c=new Function(new Name("c"), osort3, new org.key_project.common.core.logic.Sort[0]);
 	st = TB.subst(WarySubstOp.SUBST, v1, 
 					    tf.createTerm(c), t);
 	Exception exc=new Exception();
 	try {
-	    c=new Function(new Name("c"), osort1, new Sort[0]);
+	    c=new Function(new Name("c"), osort1, new org.key_project.common.core.logic.Sort[0]);
 	    st = TB.subst(WarySubstOp.SUBST, v2, 
 					    tf.createTerm(c), t);
 	} catch (TermCreationException e) {
@@ -307,7 +308,7 @@ public class TestTermFactory extends TestCase {
 	assertTrue(exc instanceof TermCreationException);
 	exc=new Exception();
 	try {
-	    c=new Function(new Name("c"), osort3, new Sort[0]);
+	    c=new Function(new Name("c"), osort3, new org.key_project.common.core.logic.Sort[0]);
 	    st = TB.subst(WarySubstOp.SUBST, v2, 
 					   tf.createTerm(c), t);
 	    

@@ -13,40 +13,25 @@
 
 package de.uka.ilkd.key.java;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Constructor;
-import recoder.java.CompilationUnit;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Method;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import recoder.abstraction.ClassType;
+import recoder.abstraction.Constructor;
+import recoder.java.CompilationUnit;
 
 public class KeYProgModelInfo{
 

@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.testgen.oracle;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-
 public class OracleVariable implements OracleTerm {
 	
 	private String name;
 	
-	private Sort sort;
+	private org.key_project.common.core.logic.Sort sort;
 	
-	public OracleVariable(String name, Sort sort) {
+	public OracleVariable(String name, org.key_project.common.core.logic.Sort sort) {
 		this.name = name;
 		this.sort = sort;
 	}
@@ -17,7 +15,7 @@ public class OracleVariable implements OracleTerm {
 		return name;
 	}
 	
-	public Sort getSort(){
+	public org.key_project.common.core.logic.Sort getSort(){
 		return sort;
 	}
 	

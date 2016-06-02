@@ -13,12 +13,7 @@
 
 package de.uka.ilkd.key.taclettranslation.lemma;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;

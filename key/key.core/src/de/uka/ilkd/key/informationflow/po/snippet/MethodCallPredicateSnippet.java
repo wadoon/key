@@ -4,13 +4,13 @@
  */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
+import org.key_project.common.core.logic.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -32,10 +32,10 @@ class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
     }
 
     @Override
-    protected Sort[] generateContApplArgumentSorts(
+    protected org.key_project.common.core.logic.Sort[] generateContApplArgumentSorts(
             ImmutableList<Term> termList, IProgramMethod pm) {
 
-        Sort[] argSorts = new Sort[termList.size()];
+        org.key_project.common.core.logic.Sort[] argSorts = new org.key_project.common.core.logic.Sort[termList.size()];
         ImmutableArray<Sort> pmSorts = pm.argSorts();
 
         int i = 0;

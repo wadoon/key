@@ -14,19 +14,20 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 import junit.framework.TestCase;
@@ -39,23 +40,23 @@ public class TestTerm extends TestCase {
     private TermFactory tf;
 
     private Sort sort1=new SortImpl(new Name("S1"));
-    private Sort sort2=new SortImpl(new Name("S2"));
-    private Sort sort3=new SortImpl(new Name("S3"));
+    private org.key_project.common.core.logic.Sort sort2=new SortImpl(new Name("S2"));
+    private org.key_project.common.core.logic.Sort sort3=new SortImpl(new Name("S3"));
     	
 
-    Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  
+    Function p=new Function(new Name("p"),SpecialSorts.FORMULA,new org.key_project.common.core.logic.Sort[]{sort1});  
         //p(:S1):BOOL
     LogicVariable x=new LogicVariable(new Name("x"),sort1);  //x:S1
-    Function q=new Function(new Name("q"),Sort.FORMULA,
-			    new Sort[]{new SortImpl(new Name("Whatever"))}); 
+    Function q=new Function(new Name("q"),SpecialSorts.FORMULA,
+			    new org.key_project.common.core.logic.Sort[]{new SortImpl(new Name("Whatever"))}); 
         //q(:Whatever):BOOL
     LogicVariable z=new LogicVariable(new Name("z"),sort1); //z:S1
     LogicVariable zz=new LogicVariable(new Name("zz"),sort1); //zz:S1
-    Function r=new Function(new Name("r"),Sort.FORMULA,new Sort[]{sort1, sort2});
+    Function r=new Function(new Name("r"),SpecialSorts.FORMULA,new org.key_project.common.core.logic.Sort[]{sort1, sort2});
         //r(:S1, :S2):BOOL
     LogicVariable y=new LogicVariable(new Name("y"),sort3); //y:S3
     LogicVariable w=new LogicVariable(new Name("w"),sort2); //w:S2
-    Function f=new Function(new Name("f"),sort1, new Sort[]{sort3}); 
+    Function f=new Function(new Name("f"),sort1, new org.key_project.common.core.logic.Sort[]{sort3}); 
         // f(:S3):S1
 
     ProgramVariable pv0=new LocationVariable

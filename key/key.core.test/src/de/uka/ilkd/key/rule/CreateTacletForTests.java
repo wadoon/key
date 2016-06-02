@@ -18,22 +18,18 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
@@ -50,7 +46,7 @@ import junit.framework.TestCase;
  */
 public class CreateTacletForTests extends TestCase {
 
-    Sort nat;
+    org.key_project.common.core.logic.Sort nat;
 
     public static AntecTaclet impleft;
     public static SuccTaclet impright;
@@ -85,7 +81,7 @@ public class CreateTacletForTests extends TestCase {
 
     static SchemaVariable b;
     static LogicVariable z;
-    static Sort sort1;
+    static org.key_project.common.core.logic.Sort sort1;
     static TermFactory tf;
 
     static NamespaceSet nss;
@@ -127,8 +123,8 @@ public class CreateTacletForTests extends TestCase {
 
     public void createNatTaclets() {
 	//decls for nat
-	func_0=new Function(new Name("zero"),nat,new Sort[]{});
-	func_eq=new Function(new Name("="),Sort.FORMULA,
+	func_0=new Function(new Name("zero"),nat,new org.key_project.common.core.logic.Sort[]{});
+	func_eq=new Function(new Name("="),SpecialSorts.FORMULA,
             nat,nat);
 	func_plus=new Function(new Name("+"),nat,nat,nat);
 	func_min1=new Function(new Name("pred"),nat, nat);
@@ -283,8 +279,8 @@ public class CreateTacletForTests extends TestCase {
 		   "}\n"
 		   );
 
-	sort1 = (Sort)nss.sorts().lookup(new Name("testSort1"));
-	nat = (Sort)nss.sorts().lookup(new Name("Nat"));
+	sort1 = (org.key_project.common.core.logic.Sort)nss.sorts().lookup(new Name("testSort1"));
+	nat = (org.key_project.common.core.logic.Sort)nss.sorts().lookup(new Name("Nat"));
 
 	b = (SchemaVariable)nss.variables().lookup(new Name("b"));
 
@@ -317,7 +313,7 @@ public class CreateTacletForTests extends TestCase {
 			       Semisequent.EMPTY_SEMISEQUENT.insert(0,cf2).semisequent()); 
 	
 	
-	func_p=new Function(new Name("P"),Sort.FORMULA,
+	func_p=new Function(new Name("P"),SpecialSorts.FORMULA,
             sort1);
 	nss.functions().add(func_p);
 

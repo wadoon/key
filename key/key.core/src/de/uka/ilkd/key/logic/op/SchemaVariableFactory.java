@@ -18,7 +18,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /** A factory class for different Schema Variables 
  */
@@ -34,7 +33,7 @@ public class SchemaVariableFactory {
      * @return the SchemaVariable
      */
     public static VariableSV createVariableSV(Name name,
-				              Sort sort) {
+				              org.key_project.common.core.logic.Sort sort) {
 	return new VariableSV(name, sort);
     }
 
@@ -50,7 +49,7 @@ public class SchemaVariableFactory {
      * @return the SchemaVariable
      */
     public static TermSV createTermSV(Name name,
-			              Sort sort,
+			              org.key_project.common.core.logic.Sort sort,
 			              boolean rigidness, 
                                       boolean strictSV) {
 	return new TermSV(name, sort, rigidness, strictSV);
@@ -63,13 +62,13 @@ public class SchemaVariableFactory {
       * @return the SchemaVariable
       */
     public static ModalOperatorSV createModalOperatorSV(Name name,
-            						Sort sort, 
+            						org.key_project.common.core.logic.Sort sort, 
             						ImmutableSet<Modality> modalities) {
 	return new ModalOperatorSV(name, modalities);
     }
 
     
-    public static TermSV createTermSV(Name name, Sort sort) {
+    public static TermSV createTermSV(Name name, org.key_project.common.core.logic.Sort sort) {
 	return createTermSV(name, sort, false, false);
     }
     
@@ -107,7 +106,7 @@ public class SchemaVariableFactory {
     /** 
      * creates a SchemaVariable representing a skolem term
      */
-    public static SkolemTermSV createSkolemTermSV(Name name, Sort s) {
+    public static SkolemTermSV createSkolemTermSV(Name name, org.key_project.common.core.logic.Sort s) {
 	return new SkolemTermSV(name, s);
     }
 

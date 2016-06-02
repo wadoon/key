@@ -13,11 +13,12 @@
 
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
+import org.key_project.common.core.logic.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
@@ -220,7 +221,7 @@ class TacletConditions {
 
     }
     
-    public boolean containsIsSubtypeRelation(Sort gen,Sort inst, TypeComparisonCondition.Mode mode){
+    public boolean containsIsSubtypeRelation(Sort gen,Sort inst, TypeComparisonCondition.Mode mode, Services services){
 	for(TypeComparisonCondition tcc : comparisionCondition){
 	    if(tcc.getMode() == mode){
 		if(tcc.getSecondResolver()  instanceof NonGenericSortResolver &&
@@ -229,10 +230,10 @@ class TacletConditions {
 		    GenericSortResolver first = (GenericSortResolver)tcc.getFirstResolver();
 		    if(first.getGenericSort().equals(gen)){
 			  Sort superType = ((NonGenericSortResolver)tcc.getSecondResolver()).getSort();   
-			  if(inst.extendsTrans(superType) && mode == Mode.NOT_IS_SUBTYPE){
+			  if(inst.extendsTrans(superType, services) && mode == Mode.NOT_IS_SUBTYPE){
 			     return false; 
 			  }
-			  if(!inst.extendsTrans(superType) && mode == Mode.IS_SUBTYPE){
+			  if(!inst.extendsTrans(superType, services) && mode == Mode.IS_SUBTYPE){
 			     return false; 
 			  }
 		    }

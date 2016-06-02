@@ -8,7 +8,9 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -20,11 +22,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -435,7 +435,7 @@ public class StateVars {
     private static Term buildMbyVar(String postfix,
                                     Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final Sort intSort =
+        final org.key_project.common.core.logic.Sort intSort =
                 services.getTypeConverter().getIntegerLDT().targetSort();
         String newName = tb.newName("mbyAtPre" + postfix);
         final Function mbyAtPreFunc =
@@ -466,8 +466,8 @@ public class StateVars {
                          Services services) {
         Namespace functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
-            assert f.sort() != Sort.UPDATE;
-            if (f.sort() == Sort.FORMULA) {
+            assert f.sort() != SpecialSorts.UPDATE;
+            if (f.sort() == SpecialSorts.FORMULA) {
                 functionNames.addSafely(f);
             } else {
                 functionNames.addSafely(f);

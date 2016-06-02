@@ -15,20 +15,18 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
+import org.key_project.common.core.logic.GenericSort;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import recoder.io.PathList;
-import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -40,27 +38,19 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.io.IProofFileParser;
-import de.uka.ilkd.key.proof.io.KeYFile;
-import de.uka.ilkd.key.proof.io.LDTInput;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
-import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
@@ -68,6 +58,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import recoder.io.PathList;
+import recoder.io.ProjectSettings;
 
 
 public final class ProblemInitializer {

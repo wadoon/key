@@ -23,22 +23,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;

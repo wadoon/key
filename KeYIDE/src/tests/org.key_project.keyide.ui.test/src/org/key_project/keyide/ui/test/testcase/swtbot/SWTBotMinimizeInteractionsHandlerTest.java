@@ -21,6 +21,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.junit.Test;
 import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.keyide.ui.handlers.MinimizeInteractionsHandler;
 import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 

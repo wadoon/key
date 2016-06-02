@@ -20,15 +20,12 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -58,7 +55,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @param sort The {@link Sort} to use.
     * @return The created constant.
     */
-   protected Function createResultConstant(Services services, Sort sort) {
+   protected Function createResultConstant(Services services, org.key_project.common.core.logic.Sort sort) {
       String functionName = services.getTermBuilder().newName("QueryResult");
       Function function = new Function(new Name(functionName), sort);
       services.getNamespaces().functions().addSafely(function);
@@ -71,8 +68,8 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @param sort The {@link Sort} to use.
     * @return The created result {@link Function}.
     */
-   protected Function createResultFunction(Services services, Sort sort) {
-      return new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, sort);
+   protected Function createResultFunction(Services services, org.key_project.common.core.logic.Sort sort) {
+      return new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), SpecialSorts.FORMULA, sort);
    }
    
    /**

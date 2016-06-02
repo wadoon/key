@@ -19,13 +19,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.op.Function;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 class SortWrapper {
-    private Sort sort;
+    private org.key_project.common.core.logic.Sort sort;
     private StringBuffer name;
     private StringBuffer predicateName;
     private LinkedList<SortWrapper> parentSorts = new LinkedList<SortWrapper>();
@@ -35,7 +36,7 @@ class SortWrapper {
 	        && getSort().extendsTrans(sw.getSort());
     }
 
-    public Sort getSort() {
+    public org.key_project.common.core.logic.Sort getSort() {
 	return sort;
     }
 
@@ -47,7 +48,7 @@ class SortWrapper {
 	return predicateName;
     }
 
-    public SortWrapper(Sort sort, StringBuffer name, StringBuffer predicateName) {
+    public SortWrapper(org.key_project.common.core.logic.Sort sort, StringBuffer name, StringBuffer predicateName) {
 	super();
 	this.sort = sort;
 	this.name = name;

@@ -19,6 +19,9 @@ package de.uka.ilkd.key.rule;
 import java.io.File;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -29,20 +32,9 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
@@ -352,13 +344,13 @@ public class TestMatchTaclet extends TestCase {
     //Assume A is a supersort of B. Then a term SV of sort A should match
     //a term of sort B. (assertNotNull)
     public void testWithSubSortsTermSV() {
-	Sort osort1=(Sort)TacletForTests.getSorts().lookup(new Name("Obj"));
+	org.key_project.common.core.logic.Sort osort1=(org.key_project.common.core.logic.Sort)TacletForTests.getSorts().lookup(new Name("Obj"));
 	Sort osort2=new SortImpl(new Name("os2"), osort1);
 	Sort osort3=new SortImpl(new Name("os3"), osort1);
-	Sort osort4=new SortImpl(new Name("os4"), 
-					       DefaultImmutableSet.<Sort>nil()
+	org.key_project.common.core.logic.Sort osort4=new SortImpl(new Name("os4"), 
+					       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil()
 					      .add(osort2).add(osort3), false);
-	Function v4=new Function(new Name("v4"), osort4, new Sort[0]);	
+	Function v4=new Function(new Name("v4"), osort4, new org.key_project.common.core.logic.Sort[0]);	
 	Term match=TB.tf().createTerm(v4);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_termSV").taclet();   
@@ -370,11 +362,11 @@ public class TestMatchTaclet extends TestCase {
     //Assume A is a supersort of B. Then a variable SV of sort A should _NOT_
     //match a logic variable of sort B. (assertNull)
     public void testWithSubSortsVariableSV() {
-	Sort osort1=(Sort)TacletForTests.getSorts().lookup(new Name("Obj"));
+	org.key_project.common.core.logic.Sort osort1=(org.key_project.common.core.logic.Sort)TacletForTests.getSorts().lookup(new Name("Obj"));
 	Sort osort2=new SortImpl(new Name("os2"), osort1);
 	Sort osort3=new SortImpl(new Name("os3"), osort1);
-	Sort osort4=new SortImpl(new Name("os4"), 
-					       DefaultImmutableSet.<Sort>nil()
+	org.key_project.common.core.logic.Sort osort4=new SortImpl(new Name("os4"), 
+					       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil()
 					      .add(osort2).add(osort3), false);	
 	Function aPred = (Function)TacletForTests.getFunctions().lookup(new Name("A"));
 	Term sub = TB.tf().createTerm(aPred);

@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.op.Operator;
+import org.key_project.common.core.logic.Operator;
 
 /**
  * This feature returns zero if and only if the focus of the given rule

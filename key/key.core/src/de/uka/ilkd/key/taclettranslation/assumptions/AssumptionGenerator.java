@@ -13,15 +13,12 @@
 
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.*;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -29,15 +26,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode;
@@ -179,7 +170,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         }
 
         static public boolean isReferenceSort(Sort sort, Services services) {
-                return (sort.extendsTrans(services.getJavaInfo().objectSort()) && !(sort instanceof NullSort));
+                return (sort.extendsTrans(services.getJavaInfo().objectSort(), services) && !(sort instanceof NullSort));
 
         }
 
@@ -287,12 +278,12 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                                                 || (!conditions.containsIsSubtypeRelation(
                                                                 genericTable[c],
                                                                 instTable[index],
-                                                                Mode.IS_SUBTYPE))
+                                                                Mode.IS_SUBTYPE, services))
 
                                                 || (!conditions.containsIsSubtypeRelation(
                                                                 genericTable[c],
                                                                 instTable[index],
-                                                                Mode.NOT_IS_SUBTYPE))
+                                                                Mode.NOT_IS_SUBTYPE, services))
 
                                                 || (!isReferenceSort(
                                                                 instTable[index],
@@ -316,8 +307,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                                                         genericTable[c2]) && instTable[index]
                                                         .equals(instTable[index2]))
                                                         || //
-                                                        (genericTable[c].extendsTrans(genericTable[c2]) && !instTable[index]
-                                                                        .extendsTrans(instTable[index2]))
+                                                        (genericTable[c].extendsTrans(genericTable[c2], services) && !instTable[index]
+                                                                        .extendsTrans(instTable[index2], services))
                                                         || (conditions.containsComparisionCondition(
                                                                         genericTable[c],
                                                                         genericTable[c2],
@@ -328,28 +319,28 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                                                                         genericTable[c],
                                                                         genericTable[c2],
                                                                         TypeComparisonCondition.Mode.IS_SUBTYPE) && !instTable[index]
-                                                                        .extendsTrans(instTable[index2]))
+                                                                        .extendsTrans(instTable[index2], services))
                                                         || (conditions.containsComparisionCondition(
                                                                         genericTable[c],
                                                                         genericTable[c2],
                                                                         TypeComparisonCondition.Mode.IS_SUBTYPE) && !instTable[index2]
-                                                                        .extendsTrans(instTable[index]))
+                                                                        .extendsTrans(instTable[index], services))
                                                         || (conditions.containsComparisionCondition(
                                                                         genericTable[c],
                                                                         genericTable[c2],
                                                                         TypeComparisonCondition.Mode.NOT_IS_SUBTYPE) && instTable[index]
-                                                                        .extendsTrans(instTable[index2]))
+                                                                        .extendsTrans(instTable[index2], services))
                                                         || (conditions.containsComparisionCondition(
                                                                         genericTable[c],
                                                                         genericTable[c2],
                                                                         TypeComparisonCondition.Mode.NOT_IS_SUBTYPE) && instTable[index2]
-                                                                        .extendsTrans(instTable[index]))
+                                                                        .extendsTrans(instTable[index], services))
                                                         || (genericTable[c]
-                                                                        .extendsTrans(genericTable[c2]) && !instTable[index]
-                                                                        .extendsTrans(instTable[index2]))
+                                                                        .extendsTrans(genericTable[c2], services) && !instTable[index]
+                                                                        .extendsTrans(instTable[index2], services))
                                                         || (genericTable[c2]
-                                                                        .extendsTrans(genericTable[c]) && !instTable[index2]
-                                                                        .extendsTrans(instTable[index]))
+                                                                        .extendsTrans(genericTable[c], services) && !instTable[index2]
+                                                                        .extendsTrans(instTable[index], services))
 
                                         ) {
                                                 referenceTable[r][0] = -1;
@@ -475,7 +466,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
                 // translate schema variables into logical variables
                 if (term.op() instanceof SchemaVariable) {
-                        if (!term.sort().equals(Sort.FORMULA)) {
+                        if (!term.sort().equals(SpecialSorts.FORMULA)) {
                                 term = tb.var(getLogicVariable(
                                                 term.op().name(), term.sort()));
 

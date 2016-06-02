@@ -27,13 +27,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.SMTSettingsModel;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
-import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.settings.*;
 
 
 /**

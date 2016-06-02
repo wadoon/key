@@ -14,12 +14,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Junctor;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -35,7 +35,7 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
 	public static final String name= "#ExpandQueries";
 
     public ExpandQueriesMetaConstruct() {
-    	super(new Name(name), 2, Sort.FORMULA);
+    	super(new Name(name), 2, SpecialSorts.FORMULA);
     }
 
 /** term.sub(0) is the term that possibly contains queries.

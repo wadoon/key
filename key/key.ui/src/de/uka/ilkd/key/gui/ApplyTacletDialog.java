@@ -15,25 +15,14 @@
 package de.uka.ilkd.key.gui;
 
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import org.key_project.common.core.logic.Named;

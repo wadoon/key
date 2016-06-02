@@ -22,24 +22,8 @@ import java.awt.event.MouseEvent;
 import java.util.EventObject;
 import java.util.Set;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTree;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellEditor;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellEditor;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-
-import org.key_project.util.collection.ImmutableSet;
+import javax.swing.*;
+import javax.swing.tree.*;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;

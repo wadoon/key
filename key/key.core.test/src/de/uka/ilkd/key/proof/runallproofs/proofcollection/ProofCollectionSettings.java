@@ -5,14 +5,8 @@ import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbs
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.util.LinkedHashMap;

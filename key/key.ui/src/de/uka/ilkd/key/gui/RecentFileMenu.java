@@ -15,11 +15,7 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

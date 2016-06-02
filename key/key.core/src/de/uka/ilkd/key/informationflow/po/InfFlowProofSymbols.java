@@ -5,26 +5,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
-import org.key_project.common.core.logic.Named;
-import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -470,7 +462,7 @@ public class InfFlowProofSymbols {
     }
 
     private ImmutableSet<Sort> getSorts() {
-        ImmutableSet<Sort> sorts = DefaultImmutableSet.<Sort>nil();
+        ImmutableSet<Sort> sorts = DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil();
         for (Pair<Sort, Boolean> s: this.sorts) {
             sorts = sorts.add(s.first);
         }
@@ -514,7 +506,7 @@ public class InfFlowProofSymbols {
     private LinkedList<Sort> removeArraySorts(LinkedList<Sort> sorts){
         Iterator<Sort> it = sorts.iterator();
         while (it.hasNext()) {
-            Sort s = it.next();
+            org.key_project.common.core.logic.Sort s = it.next();
             if (s instanceof ArraySort) {
                 it.remove();
             }
@@ -579,13 +571,13 @@ public class InfFlowProofSymbols {
         // bugfix (CS): array types need not to be added as sorts
         // (and they cannot be parsed...)
         sortsList = removeArraySorts(sortsList);
-        for (final Sort sort: sortsList) {
+        for (final org.key_project.common.core.logic.Sort sort: sortsList) {
             result.append(sort.name());
             if (!sort.extendsSorts().isEmpty()) {
                 String res = "\\extends ";
                 boolean extendsAtLeastOneSort = false;
-                for (final Sort sortParent : sort.extendsSorts()) {
-                    if (sortParent != Sort.ANY) {
+                for (final org.key_project.common.core.logic.Sort sortParent : sort.extendsSorts()) {
+                    if (sortParent != SpecialSorts.ANY) {
                         res += sortParent.name() + ", ";
                         extendsAtLeastOneSort = true;
                     }

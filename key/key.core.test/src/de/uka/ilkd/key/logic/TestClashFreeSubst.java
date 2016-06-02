@@ -17,21 +17,18 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Stack;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -126,7 +123,7 @@ public class TestClashFreeSubst extends TestCase {
 	return f;
     }
 
-    LogicVariable declareVar(String name,Sort sort) {
+    LogicVariable declareVar(String name,org.key_project.common.core.logic.Sort sort) {
 	LogicVariable v = new LogicVariable(new Name(name),sort);
 	nss.variables().add(v);
 	return v;

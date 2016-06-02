@@ -5,14 +5,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.util.ProofStarter;
 

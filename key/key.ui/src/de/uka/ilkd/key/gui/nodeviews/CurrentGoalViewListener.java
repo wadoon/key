@@ -14,12 +14,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Point;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceAdapter;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.InvalidDnDOperationException;
+import java.awt.dnd.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 

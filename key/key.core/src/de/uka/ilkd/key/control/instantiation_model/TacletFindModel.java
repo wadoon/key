@@ -23,51 +23,31 @@ import org.antlr.runtime.RecognitionException;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.IdDeclaration;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.InstantiationProposerCollection;
-import de.uka.ilkd.key.proof.MissingInstantiationException;
-import de.uka.ilkd.key.proof.MissingSortException;
-import de.uka.ilkd.key.proof.SVInstantiationException;
-import de.uka.ilkd.key.proof.SVInstantiationParserException;
-import de.uka.ilkd.key.proof.SVRigidnessException;
-import de.uka.ilkd.key.proof.SortMismatchException;
-import de.uka.ilkd.key.proof.VariableNameProposer;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.RigidnessException;
-import de.uka.ilkd.key.rule.inst.SortException;
+import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.util.Pair;
 
 
-public class TacletFindModel extends AbstractTableModel {
+public class TacletFindModel<NamespaceSet> extends AbstractTableModel {
 
     /**
      * 
@@ -391,7 +371,7 @@ public class TacletFindModel extends AbstractTableModel {
         final TermBuilder tb = services.getTermBuilder();
 	TacletApp      result = originalApp;
 	SchemaVariable sv     = null;
-	Sort           sort   = null;
+	org.key_project.common.core.logic.Sort           sort   = null;
 	int            irow   = 0;
 
         try {

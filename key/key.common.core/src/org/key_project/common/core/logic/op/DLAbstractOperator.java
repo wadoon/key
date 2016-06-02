@@ -13,15 +13,15 @@
 
 package org.key_project.common.core.logic.op;
 
-import org.key_project.common.core.logic.DLOperator;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Operator;
 import org.key_project.util.collection.ImmutableArray;
 
 
 /** 
  * Abstract operator class offering some common functionality.
  */
-public abstract class DLAbstractOperator implements DLOperator {
+public abstract class DLAbstractOperator implements Operator {
     
     private final Name name;
     private final int arity;

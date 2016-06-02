@@ -14,8 +14,8 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 
 /**
  * The two objects of this class represent the universal and the existential
@@ -42,8 +42,8 @@ public final class Quantifier extends AbstractSortedOperator {
 
     private Quantifier(Name name) {
 	super(name, 
-              new Sort[]{Sort.FORMULA}, 
-              Sort.FORMULA, 
+              new Sort[]{SpecialSorts.FORMULA}, 
+              SpecialSorts.FORMULA, 
               new Boolean[]{true}, 
               true);
     }

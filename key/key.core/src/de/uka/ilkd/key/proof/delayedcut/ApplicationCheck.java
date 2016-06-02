@@ -13,15 +13,11 @@
 
 package de.uka.ilkd.key.proof.delayedcut;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
+import org.key_project.common.core.logic.DefaultVisitor;
 import org.key_project.common.core.logic.Name;
 
-import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 

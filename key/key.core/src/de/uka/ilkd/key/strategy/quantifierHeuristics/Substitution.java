@@ -15,16 +15,15 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -76,7 +75,7 @@ public class Substitution {
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
-            final Sort quantifiedVarSort = var.sort ();
+            final org.key_project.common.core.logic.Sort quantifiedVarSort = var.sort ();
             final Function quantifiedVarSortCast =
                 quantifiedVarSort.getCastSymbol (services);
             Term instance = getSubstitutedTerm( var );
@@ -107,7 +106,7 @@ public class Substitution {
             try {
                 t = applySubst ( var, instance, t, services );
             } catch (TermCreationException e) {
-                final Sort quantifiedVarSort = var.sort ();                
+                final org.key_project.common.core.logic.Sort quantifiedVarSort = var.sort ();                
                 if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
                     final Function quantifiedVarSortCast =
                         quantifiedVarSort.getCastSymbol (services);

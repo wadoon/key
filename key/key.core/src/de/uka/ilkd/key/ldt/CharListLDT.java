@@ -14,6 +14,9 @@
 package de.uka.ilkd.key.ldt;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.ConvertException;
@@ -26,9 +29,6 @@ import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 public final class CharListLDT extends LDT {

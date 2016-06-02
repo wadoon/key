@@ -18,20 +18,16 @@ package de.uka.ilkd.key.rule.match.legacy;
 
 import java.io.File;
 
+import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.TestCase;

@@ -1,44 +1,29 @@
 package de.uka.ilkd.key.symbolic_execution;
 
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
+import org.key_project.common.core.logic.DefaultVisitor;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -96,7 +81,7 @@ public final class TruthValueTracingUtil {
          return true; // These Meta constructs evaluate always to true or false
       }
       else if (operator instanceof SortedOperator) {
-         return ((SortedOperator) operator).sort() == Sort.FORMULA;
+         return ((SortedOperator) operator).sort() == SpecialSorts.FORMULA;
       }
       else {
          return false;
@@ -160,8 +145,8 @@ public final class TruthValueTracingUtil {
     */
    public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<Term> subs) {
       if (operator == IfThenElse.IF_THEN_ELSE) {
-         Sort sort = operator.sort(subs);
-         return sort == Sort.FORMULA;
+         org.key_project.common.core.logic.Sort sort = operator.sort(subs);
+         return sort == SpecialSorts.FORMULA;
       }
       else {
          return false;

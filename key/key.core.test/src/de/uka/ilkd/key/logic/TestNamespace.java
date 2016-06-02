@@ -15,9 +15,8 @@ package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.op.LogicVariable;
 
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import junit.framework.TestCase;
 
@@ -32,7 +31,7 @@ public class TestNamespace extends TestCase {
     Namespace ns2;
     Namespace ns3;
     
-    Sort s1;
+    org.key_project.common.core.logic.Sort s1;
     LogicVariable va;
     LogicVariable vb;
     LogicVariable vc;

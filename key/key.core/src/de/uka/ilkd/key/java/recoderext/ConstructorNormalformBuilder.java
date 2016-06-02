@@ -13,52 +13,21 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
+import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Constructor;
-import recoder.abstraction.DefaultConstructor;
-import recoder.abstraction.Field;
-import recoder.abstraction.Type;
-import recoder.abstraction.Variable;
-import recoder.java.CompilationUnit;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.ClassInitializer;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.FieldSpecification;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.Throws;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.abstraction.*;
+import recoder.java.*;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.expression.operator.New;
-import recoder.java.reference.FieldReference;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.SpecialConstructorReference;
-import recoder.java.reference.SuperConstructorReference;
-import recoder.java.reference.SuperReference;
-import recoder.java.reference.ThisConstructorReference;
-import recoder.java.reference.ThisReference;
-import recoder.java.reference.TypeReference;
-import recoder.java.reference.VariableReference;
+import recoder.java.reference.*;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Transforms the constructors of the given class to their

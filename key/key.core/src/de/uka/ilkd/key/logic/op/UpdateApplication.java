@@ -14,18 +14,16 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractOperator;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.common.core.logic.Operator;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
  * Singleton class defining a binary operator {u}t that applies updates u to
  * terms, formulas, or other updates t. 
  */
-public final class UpdateApplication extends AbstractOperator<Sort, Term> implements Operator {
+public final class UpdateApplication extends AbstractOperator implements Operator {
     
     public static final UpdateApplication UPDATE_APPLICATION 
     	= new UpdateApplication();
@@ -36,17 +34,7 @@ public final class UpdateApplication extends AbstractOperator<Sort, Term> implem
     }
 
     
-    @Override    
-    public Sort sort(ImmutableArray<Term> terms) {
-	return terms.get(1).sort();
-    }    
-    
-    
-    @Override
-    public boolean additionalValidTopLevel (Term term) {
-        return term.sub(0).sort() == Sort.UPDATE;
-    }
-    
+   
     
     /**
      * @return the index of the subterm representing the update being applied

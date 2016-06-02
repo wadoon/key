@@ -38,12 +38,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.mgt.BasicTask;
-import de.uka.ilkd.key.proof.mgt.EnvNode;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.util.Debug;
 
 public class TaskTree extends JPanel {

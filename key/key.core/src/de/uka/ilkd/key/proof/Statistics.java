@@ -7,12 +7,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
-import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;

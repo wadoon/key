@@ -11,11 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 
 
 /**
@@ -24,52 +24,52 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * are six such operators: true, false, conjunction,
  * disjunction, negation, and implication.
  */
-public final class Junctor extends AbstractSortedOperator {
+public final class Junctor extends DLAbstractSortedOperator {
    
     /** 
      * the true constant 
      */
-    public static final Operator TRUE = new Junctor(new Name("true"),0);
+    public static final Junctor TRUE = new Junctor(new Name("true"),0);
 
     /** 
      * the false constant 
      */
-    public static final Operator FALSE = new Junctor(new Name("false"),0);
+    public static final Junctor FALSE = new Junctor(new Name("false"),0);
     
     /** 
      * the usual 'and' operator '/\' (be A, B formulae then 'A /\ B'
      * is true if and only if A is true and B is true 
      */
-    public static final Operator AND = new Junctor(new Name("and"),2);
+    public static final Junctor AND = new Junctor(new Name("and"),2);
     
     /** 
      * the usual 'or' operator '\/' (be A, B formulae then 'A \/ B'
      * is true if and only if A is true or B is true 
      */
-    public static final Operator OR = new Junctor(new Name("or"),2);
+    public static final Junctor OR = new Junctor(new Name("or"),2);
     
     /** 
      * the usual 'negation' operator '-'
      */
-    public static final Operator NOT = new Junctor(new Name("not"), 1);
+    public static final Junctor NOT = new Junctor(new Name("not"), 1);
 
     /**
      * the usual 'implication' operator '->' (be A, B formulae then
      * 'A -> B' is true if and only if A is false or B is true 
      */
-    public static final Operator IMP = new Junctor(new Name("imp"),2);
+    public static final Junctor IMP = new Junctor(new Name("imp"),2);
 
     
     private static Sort[] createFormulaSortArray(int arity) {
 	Sort[] result = new Sort[arity];
 	for(int i = 0; i < arity; i++) {
-	    result[i] = Sort.FORMULA;
+	    result[i] = SpecialSorts.FORMULA;
 	}
 	return result;
     }
     
     
     private Junctor(Name name, int arity) {
-	super(name, createFormulaSortArray(arity), Sort.FORMULA, true);
+        super(name, createFormulaSortArray(arity), SpecialSorts.FORMULA, true);
     }
 }

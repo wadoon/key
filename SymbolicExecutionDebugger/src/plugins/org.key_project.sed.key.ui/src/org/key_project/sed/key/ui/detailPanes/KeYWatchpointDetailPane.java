@@ -15,11 +15,7 @@ package org.key_project.sed.key.ui.detailPanes;
 
 import org.eclipse.jdt.debug.ui.breakpoints.JavaBreakpointConditionEditor;
 import org.eclipse.jdt.internal.debug.ui.JDIDebugUIPlugin;
-import org.eclipse.jdt.internal.debug.ui.breakpoints.AbstractDetailPane;
-import org.eclipse.jdt.internal.debug.ui.breakpoints.AbstractJavaBreakpointEditor;
-import org.eclipse.jdt.internal.debug.ui.breakpoints.BreakpointMessages;
-import org.eclipse.jdt.internal.debug.ui.breakpoints.CompositeBreakpointEditor;
-import org.eclipse.jdt.internal.debug.ui.breakpoints.StandardJavaBreakpointEditor;
+import org.eclipse.jdt.internal.debug.ui.breakpoints.*;
 import org.eclipse.swt.widgets.Composite;
 import org.key_project.sed.key.ui.editors.KeYWatchpointConditionEditor;
 

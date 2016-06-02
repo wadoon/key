@@ -35,16 +35,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicElement;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
+import de.uka.ilkd.key.symbolic_execution.object_model.*;
 
 /**
  * Allows to read XML files which contains an object model
@@ -636,7 +627,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public Sort getType() {
+      public org.key_project.common.core.logic.Sort getType() {
          return null;
       }
 
@@ -769,7 +760,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public Sort getType() {
+      public org.key_project.common.core.logic.Sort getType() {
          return null;
       }
 

@@ -14,13 +14,13 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
+import org.key_project.common.core.logic.Sort;
 import org.key_project.common.core.logic.op.SVSubstitute;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -79,10 +79,10 @@ public final class TypeCondition extends VariableConditionAdapter {
         if(!isProxySort) {
             // for normal sorts this is ...
             if (isReference) {
-                return (s.extendsTrans(objectSort)
+                return (s.extendsTrans(objectSort, services)
                         && !(nonNull && s instanceof NullSort));
             } else {
-                return !(s.extendsTrans(objectSort));
+                return !(s.extendsTrans(objectSort, services));
             }
         } else {
             // for proxy sorts this is ...
@@ -92,10 +92,10 @@ public final class TypeCondition extends VariableConditionAdapter {
             }
             if(isReference) {
                 // one extended sort must have the property and we are fine
-                for (Sort extSort : s.extendsSorts()) {
+                for (Sort extSort : services.getDirectSuperSorts(s)) {
                     // same as:
                     // extends && isReference  ||  !extends && !isReference
-                    if(extSort.extendsTrans(objectSort) == isReference) {
+                    if(extSort.extendsTrans(objectSort, services) == isReference) {
                         return true;
                     }
                 }

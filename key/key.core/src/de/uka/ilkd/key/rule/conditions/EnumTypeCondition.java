@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -58,7 +57,7 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
             return true;
         } else {
             // complete
-            Sort sort = resolver.resolveSort(var, candidate, svInst, services);
+            org.key_project.common.core.logic.Sort sort = resolver.resolveSort(var, candidate, svInst, services);
             KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
             return kjt.getJavaType() instanceof EnumClassDeclaration;
         }

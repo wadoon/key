@@ -13,61 +13,28 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.*;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.ClashFreeSubst;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
-import de.uka.ilkd.key.rule.inst.GenericSortCondition;
-import de.uka.ilkd.key.rule.inst.GenericSortException;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
@@ -772,7 +739,7 @@ public abstract class TacletApp implements RuleApp {
      * @throws GenericSortException
      *             iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(SchemaVariable p_sv, TermServices services) {
+    public org.key_project.common.core.logic.Sort getRealSort(SchemaVariable p_sv, TermServices services) {
 	return instantiations().getGenericSortInstantiations().getRealSort(
 		p_sv, services);
     }
@@ -798,11 +765,11 @@ public abstract class TacletApp implements RuleApp {
 
     public TacletApp createSkolemConstant(String instantiation,
 	    				  SchemaVariable sv, 
-	    				  Sort sort, 
+	    				  org.key_project.common.core.logic.Sort sort, 
 	    				  boolean interesting,
 	    				  Services services) {
 	final Function c 
-		= new Function(new Name(instantiation), sort, true, new Sort[0]);
+		= new Function(new Name(instantiation), sort, true, new org.key_project.common.core.logic.Sort[0]);
 	return addInstantiation(sv, services.getTermBuilder().func(c), interesting, services);
     }
     
@@ -1304,7 +1271,7 @@ public abstract class TacletApp implements RuleApp {
     public ProgramElement getProgramElement(String instantiation,
                                             SchemaVariable sv,
                                             Services services) {
-        Sort svSort = sv.sort();
+        org.key_project.common.core.logic.Sort svSort = sv.sort();
         if (svSort == ProgramSVSort.LABEL) {
             return VariableNamer.parseName(instantiation);
         } else if (svSort == ProgramSVSort.VARIABLE ) {

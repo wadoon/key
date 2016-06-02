@@ -13,12 +13,7 @@
 
 package de.uka.ilkd.key.java.recoderext.adt;
 
-import recoder.java.Identifier;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTList;
 

@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.op.SVSubstitute;
  * All symbols acting as members of a term e.g. logical operators, predicates, 
  * functions, variables etc. have to implement this interface.  
  */
-public interface DLOperator extends Named, SVSubstitute {
+public interface Operator extends Named, SVSubstitute {
     
     /**
      * the arity of this operator  

@@ -11,22 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic;
 
-/**
- * This abstract Vistor class declares the interface for a common term visitor.
- */
-public abstract class DefaultVisitor implements Visitor {	
-    @Override
-    public boolean visitSubtree(Term visited) {
-        return true;
-    }
+public interface Sorted {
 
-    @Override
-    public void subtreeEntered(Term subtreeRoot){
-    }
+    public Sort sort();
 
-    @Override
-    public void subtreeLeft(Term subtreeRoot){
-    }    
 }

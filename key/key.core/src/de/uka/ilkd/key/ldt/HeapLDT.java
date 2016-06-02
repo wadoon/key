@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Named;
-import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -31,14 +31,9 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -207,7 +202,7 @@ public final class HeapLDT extends LDT {
     /**
      * Returns the select function for the given sort.
      */
-    public Function getSelect(Sort instanceSort, TermServices services) {
+    public Function getSelect(org.key_project.common.core.logic.Sort instanceSort, TermServices services) {
 	return select.getInstanceFor(instanceSort, services);
     }
     
@@ -217,7 +212,7 @@ public final class HeapLDT extends LDT {
      * the sort of the function (identical to its return type); otherwise, 
      * returns null.
      */
-    public Sort getSortOfSelect(Operator op) {
+    public org.key_project.common.core.logic.Sort getSortOfSelect(Operator op) {
         if(isSelectOp(op)) {
             return ((SortDependingFunction)op).getSortDependingOn();
         } else {
@@ -266,24 +261,24 @@ public final class HeapLDT extends LDT {
     }
     
         
-    public Function getClassPrepared(Sort instanceSort, TermServices services) {
+    public Function getClassPrepared(org.key_project.common.core.logic.Sort instanceSort, TermServices services) {
 	return classPrepared.getInstanceFor(instanceSort, services);
     }
     
     
-    public Function getClassInitialized(Sort instanceSort, TermServices services) {
+    public Function getClassInitialized(org.key_project.common.core.logic.Sort instanceSort, TermServices services) {
 	return classInitialized.getInstanceFor(instanceSort, services);
     }
     
     
-    public Function getClassInitializationInProgress(Sort instanceSort, 
+    public Function getClassInitializationInProgress(org.key_project.common.core.logic.Sort instanceSort, 
 	    					     TermServices services) {
 	return classInitializationInProgress.getInstanceFor(instanceSort, 
 							    services);
     }
     
     
-    public Function getClassErroneous(Sort instanceSort, TermServices services) {
+    public Function getClassErroneous(org.key_project.common.core.logic.Sort instanceSort, TermServices services) {
 	return classErroneous.getInstanceFor(instanceSort, services);
     }
     
@@ -369,7 +364,7 @@ public final class HeapLDT extends LDT {
 	    SortDependingFunction firstInstance 
 		= SortDependingFunction.getFirstInstance(kind, services);
 	    if(firstInstance != null) {
-		Sort sortDependingOn = fieldPV.getContainerType().getSort();		
+		org.key_project.common.core.logic.Sort sortDependingOn = fieldPV.getContainerType().getSort();		
 		result = firstInstance.getInstanceFor(sortDependingOn, services);
 	    } else {
 		    if(fieldPV.isModel()) {
@@ -393,7 +388,7 @@ public final class HeapLDT extends LDT {
 		} else {
 		    result = new Function(name, 
 				          fieldSort, 
-				          new Sort[0], 
+				          new org.key_project.common.core.logic.Sort[0], 
 				          null,
 				          true);
 		}

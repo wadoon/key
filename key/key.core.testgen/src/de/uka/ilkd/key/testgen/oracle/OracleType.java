@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.testgen.oracle;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-
 public class OracleType implements OracleTerm {
 	
-	private Sort s;
+	private org.key_project.common.core.logic.Sort s;
 
-	public OracleType(Sort s) {
+	public OracleType(org.key_project.common.core.logic.Sort s) {
 		super();
 		this.s = s;
 	}

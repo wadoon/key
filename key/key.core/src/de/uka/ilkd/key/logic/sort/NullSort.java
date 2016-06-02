@@ -15,15 +15,12 @@ package de.uka.ilkd.key.logic.sort;
 
 import java.lang.ref.WeakReference;
 
-import org.key_project.common.core.logic.DLSort;
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 
 /**
@@ -39,7 +36,7 @@ public final class NullSort implements Sort  {
     
     public static final Name NAME = new Name("Null");
     
-    private final Sort objectSort;
+    private final org.key_project.common.core.logic.Sort objectSort;
     
     private WeakReference<Services> lastServices 
     	= new WeakReference<Services>(null);
@@ -47,7 +44,7 @@ public final class NullSort implements Sort  {
         = new WeakReference<ImmutableSet<Sort>>(null);
     
     
-    public NullSort(Sort objectSort) {
+    public NullSort(org.key_project.common.core.logic.Sort objectSort) {
 	assert objectSort != null;
 	this.objectSort = objectSort;
     }
@@ -59,25 +56,20 @@ public final class NullSort implements Sort  {
     }
     
     
-    @Override
-    public ImmutableSet<Sort> extendsSorts() {
-	throw new UnsupportedOperationException(
-		  "NullSort.extendsSorts() cannot be supported");
-    }
-    
+   
     
     @Override
-    public ImmutableSet<Sort> extendsSorts(Services services) {
+    public ImmutableSet<Sort> extendsSorts(TermServices services) {
 	assert services != null;
 	assert objectSort == services.getJavaInfo().objectSort();
 	
 	ImmutableSet<Sort> result = extCache.get();
 	if(result == null || lastServices.get() != services) {
-	    result = DefaultImmutableSet.<Sort>nil();
+	    result = DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil();
 
 	    for(Named n : services.getNamespaces().sorts().allElements()) {
 		Sort s = (Sort)n;
-		if(s != this && s.extendsTrans(objectSort)) {
+		if(s != this && s.extendsTrans(objectSort, services)) {
 		    result = result.add(s);
 		}
 	    }
@@ -91,10 +83,10 @@ public final class NullSort implements Sort  {
     
     
     @Override
-    public boolean extendsTrans(DLSort sort) {
+    public boolean extendsTrans(Sort sort, TermServices services) {
 	return sort == this
-	       || sort == Sort.ANY
-	       || sort.extendsTrans(objectSort);
+	       || sort == SpecialSorts.ANY
+	       || sort.extendsTrans(objectSort, services);
     }
     
     

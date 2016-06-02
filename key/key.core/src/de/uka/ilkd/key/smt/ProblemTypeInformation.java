@@ -18,13 +18,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.TermServices;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
 import de.uka.ilkd.key.smt.lang.Util;
@@ -57,7 +58,7 @@ public class ProblemTypeInformation {
 		originalConstantType.put(c, s);
 	}
 	
-	public Sort getOriginalConstantType(String c){
+	public org.key_project.common.core.logic.Sort getOriginalConstantType(String c){
 		return originalConstantType.get(c);
 	}
 
@@ -113,7 +114,7 @@ public class ProblemTypeInformation {
 	
 	public Set<String> getFieldsForSort(String name){
 		JavaInfo info = services.getJavaInfo();
-		Sort s = info.getKeYJavaType(name).getSort();
+		org.key_project.common.core.logic.Sort s = info.getKeYJavaType(name).getSort();
 		return getFieldsForSort(s);
 	}
 	/**
@@ -121,7 +122,7 @@ public class ProblemTypeInformation {
 	 * @param s
 	 * @return
 	 */
-	public Set<String> getFieldsForSort(Sort s){
+	public Set<String> getFieldsForSort(org.key_project.common.core.logic.Sort s){
 		Set<String> result = new HashSet<String>();
 		result.add(Util.processName("java.lang.Object::<created>"));
 		

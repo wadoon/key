@@ -13,14 +13,10 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -34,23 +30,8 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -59,26 +40,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractAxiom;
-import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.PartialInvAxiom;
-import de.uka.ilkd.key.speclang.QueryAxiom;
-import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.speclang.SpecificationElement;
-import de.uka.ilkd.key.speclang.StatementWellDefinedness;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -177,7 +139,7 @@ public final class SpecificationRepository {
     
     private static Taclet getLimitedToUnlimitedTaclet(IObserverFunction limited,
                                                       IObserverFunction unlimited, 
-                                                      TermServices services) {
+                                                      TermServices<Term, JavaBlock> services) {
        final TermBuilder tb = services.getTermBuilder();
        assert limited.arity() == unlimited.arity();
 
@@ -203,7 +165,7 @@ public final class SpecificationRepository {
     }
 
     private static Taclet getUnlimitedToLimitedTaclet(IObserverFunction limited,
-                                                      IObserverFunction unlimited, TermServices services) {
+                                                      IObserverFunction unlimited, TermServices<Term, JavaBlock> services) {
         assert limited.arity() == unlimited.arity();
 
         final TermBuilder tb = services.getTermBuilder();
@@ -379,7 +341,7 @@ public final class SpecificationRepository {
                 continue;
             }
             for (ClassAxiom ax : e.getValue()) {
-                if (JavaInfo.isVisibleTo(ax, visibleTo)) {
+                if (JavaInfo.isVisibleTo(ax, visibleTo, services)) {
                    result = result.add(ax);
                 }
             }
@@ -1547,7 +1509,7 @@ public final class SpecificationRepository {
         if (limited == null) {
             final String baseName
                 = ((ProgramElementName)obs.name()).getProgramName() + "$lmtd";
-            final Sort heapSort
+            final org.key_project.common.core.logic.Sort heapSort
                 = services.getTypeConverter().getHeapLDT().targetSort();
             limited = new ObserverFunction(baseName,
                                            obs.sort(),

@@ -13,13 +13,10 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.ConvertException;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -28,9 +25,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 public class DLEmbeddedExpression extends Operator {
 
@@ -67,7 +62,7 @@ public class DLEmbeddedExpression extends Operator {
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         
-        Sort sort = functionSymbol.sort();
+        org.key_project.common.core.logic.Sort sort = functionSymbol.sort();
         
         KeYJavaType kjt = getKeYJavaType(javaServ, sort);
         if(kjt != null) {
@@ -98,7 +93,7 @@ public class DLEmbeddedExpression extends Operator {
         p.printDLEmbeddedExpression(this);
     }
 
-    public void check(Services javaServ, 
+    public void check(Services services, 
 		      KeYJavaType containingClass) throws ConvertException {
         
         if(functionSymbol == null)
@@ -111,7 +106,7 @@ public class DLEmbeddedExpression extends Operator {
         int implicitOffset = 0;
         
         if (actual == expected - 1 && 
-                functionSymbol.argSort(0) == getHeapSort(javaServ)) {
+                functionSymbol.argSort(0) == getHeapSort(services)) {
             implicitOffset = 1;
         }
         
@@ -129,15 +124,15 @@ public class DLEmbeddedExpression extends Operator {
         ExecutionContext ec = new ExecutionContext(tr, null, null);
 
         for (int i = 0; i < actual; i++) {
-            Sort argSort = functionSymbol.argSort(i + implicitOffset);
-            KeYJavaType kjtExpected = getKeYJavaType(javaServ, argSort);
+            org.key_project.common.core.logic.Sort argSort = functionSymbol.argSort(i + implicitOffset);
+            KeYJavaType kjtExpected = getKeYJavaType(services, argSort);
                 
             Expression child = children.get(i);
 
 
-            KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child, ec);
+            KeYJavaType kjtActual = services.getTypeConverter().getKeYJavaType(child, ec);
             
-            if(kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort())) {
+            if(kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort(), services)) {
                 throw new ConvertException("Received " + child
                         + " as argument " + i + " for function "
                         + functionSymbol + ". Was expecting type "
@@ -147,11 +142,11 @@ public class DLEmbeddedExpression extends Operator {
     }
 
 
-    private static Sort getHeapSort(Services javaServ) {
+    private static org.key_project.common.core.logic.Sort getHeapSort(Services javaServ) {
         return javaServ.getTypeConverter().getHeapLDT().targetSort();
     }
 
-    private static KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
+    private static KeYJavaType getKeYJavaType(Services javaServ, org.key_project.common.core.logic.Sort argSort) {
         // JavaInfo returns wrong data for sort integer! We need to find it over
         // other paths.
         JavaInfo javaInfo = javaServ.getJavaInfo();

@@ -13,51 +13,24 @@
 
 package de.uka.ilkd.key.java;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.*;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Method;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
@@ -419,7 +392,7 @@ public final class JavaInfo {
             return true;
     }
 
-    public static boolean isVisibleTo(SpecificationElement ax, KeYJavaType visibleTo) {
+    public static boolean isVisibleTo(SpecificationElement ax, KeYJavaType visibleTo, Services services) {
         final KeYJavaType kjt = ax.getKJT();
         // elements of private types are not visible
         if (isPrivate(kjt)) return kjt.equals(visibleTo);
@@ -430,7 +403,7 @@ public final class JavaInfo {
         if (VisibilityModifier.isPublic(visibility))
             return true;
         if (VisibilityModifier.allowsInheritance(visibility))
-            return visibleTo.getSort().extendsTrans(kjt.getSort()) || visibleToPackage;
+            return visibleTo.getSort().extendsTrans(kjt.getSort(), services) || visibleToPackage;
         if (VisibilityModifier.isPackageVisible(visibility))
             return visibleToPackage;
         else
@@ -803,7 +776,7 @@ public final class JavaInfo {
 	}
 
 	if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
-        for (Sort sort : type.getSort().extendsSorts()) {
+        for (Sort sort : services.getDirectSuperSorts(type.getSort())) {
             Sort s = sort;
             if (!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()) {
                 return getKeYJavaType(s);
@@ -1086,7 +1059,7 @@ public final class JavaInfo {
      * in object type <tt>s</tt>
      */
     public ProgramVariable getAttribute(String attributeName, Sort s) {
-	assert s.extendsTrans(objectSort());
+	assert s.extendsTrans(objectSort(), services);
         return getAttribute(attributeName, getKeYJavaType(s));
     }
     
@@ -1136,7 +1109,7 @@ public final class JavaInfo {
         ImmutableList<ProgramVariable> result =
             ImmutableSLList.<ProgramVariable>nil();
 
-	if (!(type.getSort().extendsTrans(objectSort()))) {
+	if (!(type.getSort().extendsTrans(objectSort(), services))) {
 	    return result;
 	}
 
@@ -1379,9 +1352,9 @@ public final class JavaInfo {
 
         result = ImmutableSLList.<KeYJavaType>nil();
 
-        if (k1.getSort().extendsTrans(k2.getSort())) {
+        if (k1.getSort().extendsTrans(k2.getSort(), services)) {
             result = getAllSubtypes(k1).prepend(k1);
-        } else if (k2.getSort().extendsTrans(k1.getSort())) {
+        } else if (k2.getSort().extendsTrans(k1.getSort(), services)) {
             result = getAllSubtypes(k2).prepend(k2);
         } else {
             final ImmutableList<KeYJavaType> l1 = getAllSubtypes(k1);
@@ -1424,7 +1397,7 @@ public final class JavaInfo {
           inv = (IObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
           if (inv == null) {
              inv = new ObserverFunction("<inv>",
-                          Sort.FORMULA,
+                          SpecialSorts.FORMULA,
                           null,
                           services.getTypeConverter().getHeapLDT().targetSort(),
                           getJavaLangObject(),
@@ -1464,7 +1437,7 @@ public final class JavaInfo {
            inv = (IObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv>", target));
            if (inv == null) {
               inv = new ObserverFunction("<$inv>",
-                    Sort.FORMULA,
+                    SpecialSorts.FORMULA,
                     null,
                     services.getTypeConverter().getHeapLDT().targetSort(),
                     target,

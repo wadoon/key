@@ -13,16 +13,9 @@
 
 package de.uka.ilkd.key.smt.model;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Stack;
 
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.ProblemTypeInformation;
 import de.uka.ilkd.key.smt.SMTObjTranslator;
 import de.uka.ilkd.key.smt.lang.SMTSort;
@@ -431,7 +424,7 @@ public class Model {
 		for(Heap h : heaps){
 			for(ObjectVal o : h.getObjects()){	
 
-				Sort s = o.getSort();
+				org.key_project.common.core.logic.Sort s = o.getSort();
 
 				if(s==null){
 					continue;

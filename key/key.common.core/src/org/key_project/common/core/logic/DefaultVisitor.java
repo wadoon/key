@@ -11,29 +11,22 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
-
-import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
-
+package org.key_project.common.core.logic;
 
 /**
- * The objects of this class represent logical variables,
- * used e.g. for quantification.
+ * This abstract Vistor class declares the interface for a common term visitor.
  */
-public final class LogicVariable extends AbstractSortedOperator 
-    implements QuantifiableVariable {
-
-    public LogicVariable(Name name, Sort sort) {
-	super(name, sort, true);
-	assert sort != Sort.FORMULA;
-	assert sort != Sort.UPDATE;
-    }
-    
-    
+public abstract class DefaultVisitor<T extends DLTerm<? extends DLVisitor<T>>> implements DLVisitor<T> {	
     @Override
-    public String toString() {
-	return name() + ":" + sort();
+    public boolean visitSubtree(T visited) {
+        return true;
     }
+
+    @Override
+    public void subtreeEntered(T subtreeRoot){
+    }
+
+    @Override
+    public void subtreeLeft(T subtreeRoot){
+    }    
 }

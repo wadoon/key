@@ -11,14 +11,16 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This interface defines the basic functionalities of services
  * required to construct {@link Term}s.
  * @author Richard Bubel
  */
-public interface TermServices  {
+public interface TermServices<T extends DLTerm<? extends DLVisitor<T>>, P extends Program>  {
 
     /**
      * returns the namespaces for functions, predicates etc.
@@ -30,12 +32,26 @@ public interface TermServices  {
      * Returns the {@link TermBuilder} used to create {@link Term}s.
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
-    public abstract TermBuilder getTermBuilder();
+    public abstract DLTermBuilder<T> getTermBuilder();
 
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s.
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
-    public abstract TermFactory getTermFactory();
+    public abstract DLTermFactory<T,P> getTermFactory();
+    
+    
+    /**
+     * 
+     */
+    public abstract ImmutableSet<Sort> getDirectSuperSorts(Sort s);
+
+    public abstract Sort getAnySort();
+
+    public abstract Sort getFormulaSort();
+
+    public abstract Sort getUpdateSort();
+
+    public abstract Sort getTermLabelSort();
 
 }

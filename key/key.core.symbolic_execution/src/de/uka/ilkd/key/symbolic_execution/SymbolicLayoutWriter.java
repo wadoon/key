@@ -21,12 +21,7 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
+import de.uka.ilkd.key.symbolic_execution.object_model.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**

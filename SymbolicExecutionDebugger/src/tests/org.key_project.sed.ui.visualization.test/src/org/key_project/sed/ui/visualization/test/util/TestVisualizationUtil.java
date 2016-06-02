@@ -18,8 +18,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
@@ -33,13 +31,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IPropertyListener;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.*;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.serialization.SEXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
@@ -47,6 +39,8 @@ import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUti
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 import org.key_project.util.test.util.TestUtilsUtil;
+
+import junit.framework.TestCase;
 
 /**
  * Provides static methods that make testing easier.

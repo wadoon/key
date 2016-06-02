@@ -14,8 +14,8 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 
 
 /**
@@ -31,7 +31,7 @@ public final class Equality extends AbstractSortedOperator {
      * the usual 'equality' operator '='
      */
     public static final Equality EQUALS = new Equality(new Name("equals"), 
-	    					       Sort.ANY);
+	    					       SpecialSorts.ANY);
     
     /** 
      * the usual 'equivalence' operator '<->' (be A, B formulae then
@@ -39,10 +39,10 @@ public final class Equality extends AbstractSortedOperator {
      * value
      */ 
     public static final Equality EQV = new Equality(new Name("equiv"),
-        					    Sort.FORMULA);
+        					    SpecialSorts.FORMULA);
     
     
     private Equality(Name name, Sort targetSort){
-	super(name, new Sort[]{targetSort, targetSort}, Sort.FORMULA, true);
+	super(name, new Sort[]{targetSort, targetSort}, SpecialSorts.FORMULA, true);
     }
 }

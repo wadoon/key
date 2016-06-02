@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.op.Junctor;
+
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;

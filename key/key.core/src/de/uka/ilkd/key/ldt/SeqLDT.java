@@ -14,6 +14,9 @@
 package de.uka.ilkd.key.ldt;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -21,19 +24,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 public final class SeqLDT extends LDT {
@@ -70,7 +63,7 @@ public final class SeqLDT extends LDT {
     }
     
     
-    public Function getSeqGet(Sort instanceSort, TermServices services) {
+    public Function getSeqGet(org.key_project.common.core.logic.Sort instanceSort, TermServices services) {
 	return seqGet.getInstanceFor(instanceSort, services);
     }
     

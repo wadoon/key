@@ -17,6 +17,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,27 +28,10 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ArrayReference;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.Choice;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.tacletbuilder.*;
 import junit.framework.TestCase;
 
 /** class tests the parser for Taclets

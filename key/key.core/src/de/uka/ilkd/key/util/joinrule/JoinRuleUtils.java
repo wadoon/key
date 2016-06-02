@@ -14,50 +14,22 @@
 package de.uka.ilkd.key.util.joinrule;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.*;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.VariableNamer.Globals;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -141,7 +113,7 @@ public class JoinRuleUtils {
                             new StringReader(toTranslate), ""), services,
                             services.getNamespaces());
             final Term result = parser.term();
-            return result.sort() == Sort.FORMULA ? result : null;
+            return result.sort() == SpecialSorts.FORMULA ? result : null;
         }
         catch (Throwable e) {
             return null;
@@ -345,7 +317,7 @@ public class JoinRuleUtils {
      *             if the supplied term is not a formula
      */
     public static int countAtoms(Term term) {
-        if (term.sort().equals(Sort.FORMULA)) {
+        if (term.sort().equals(SpecialSorts.FORMULA)) {
             if (term.op() instanceof Junctor) {
                 int result = 0;
                 for (Term sub : term.subs()) {
@@ -377,7 +349,7 @@ public class JoinRuleUtils {
      *             if the supplied term is not a formula
      */
     public static int countDisjunctions(Term term, boolean negated) {
-        if (term.sort().equals(Sort.FORMULA)) {
+        if (term.sort().equals(SpecialSorts.FORMULA)) {
             if (term.op() instanceof Junctor) {
                 int result = 0;
 
@@ -421,7 +393,7 @@ public class JoinRuleUtils {
      *         its name.
      */
     public static Function getNewSkolemConstantForPrefix(String prefix,
-            Sort sort, Services services) {
+            org.key_project.common.core.logic.Sort sort, Services services) {
         Function result = null;
         String newName = "";
 
@@ -449,7 +421,7 @@ public class JoinRuleUtils {
      *         name.
      */
     public static LogicVariable getFreshVariableForPrefix(String prefix,
-            Sort sort, Services services) {
+            org.key_project.common.core.logic.Sort sort, Services services) {
         LogicVariable result = null;
         String newName = "";
 

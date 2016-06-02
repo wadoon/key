@@ -21,11 +21,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.*;
 import org.junit.Test;
 import org.key_project.util.java.IOUtil;
 

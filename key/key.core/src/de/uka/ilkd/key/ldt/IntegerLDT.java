@@ -14,6 +14,9 @@
 package de.uka.ilkd.key.ldt;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -25,29 +28,9 @@ import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
-import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
-import de.uka.ilkd.key.java.expression.operator.BinaryNot;
-import de.uka.ilkd.key.java.expression.operator.BinaryOr;
-import de.uka.ilkd.key.java.expression.operator.BinaryXOr;
-import de.uka.ilkd.key.java.expression.operator.Divide;
-import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
-import de.uka.ilkd.key.java.expression.operator.GreaterThan;
-import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.Minus;
-import de.uka.ilkd.key.java.expression.operator.Modulo;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.Plus;
-import de.uka.ilkd.key.java.expression.operator.ShiftLeft;
-import de.uka.ilkd.key.java.expression.operator.ShiftRight;
-import de.uka.ilkd.key.java.expression.operator.Times;
-import de.uka.ilkd.key.java.expression.operator.TypeCast;
-import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -509,9 +492,9 @@ public final class IntegerLDT extends LDT {
 	                         Services services, 
 	                         ExecutionContext ec) {
         if(left != null 
-           && left.sort().extendsTrans(targetSort()) 
+           && left.sort().extendsTrans(targetSort(), services) 
            && right != null 
-           && right.sort().extendsTrans(targetSort())) {
+           && right.sort().extendsTrans(targetSort(), services)) {
             if(getFunctionFor(op, services, ec) != null) {
                 return true;
             }
@@ -525,7 +508,7 @@ public final class IntegerLDT extends LDT {
 	                         Term sub, 
 	                         TermServices services, 
 	                         ExecutionContext ec) {
-        if(sub != null && sub.sort().extendsTrans(targetSort())) {
+        if(sub != null && sub.sort().extendsTrans(targetSort(), services)) {
             if(op instanceof Negative) {
                 return true;
             }

@@ -24,13 +24,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.JoinAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.JoinPartnerAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.*;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 

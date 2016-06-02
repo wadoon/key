@@ -24,6 +24,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
+import org.key_project.common.core.logic.Operator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -31,31 +32,10 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermLabelSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
 public class InnerNodeView extends SequentView {

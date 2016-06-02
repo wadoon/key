@@ -13,19 +13,15 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Named;
-import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -40,20 +36,13 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -380,7 +369,7 @@ public final class JMLTranslator {
                     replaceMap.put(eVar, excVar);
                     OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
 
-                    Sort os = excType.getSort();
+                    org.key_project.common.core.logic.Sort os = excType.getSort();
                     Function instance = os.getInstanceofSymbol(services);
 
                     result = tb.imp(
@@ -643,13 +632,13 @@ public final class JMLTranslator {
                 checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
                 final Services services = (Services) params[6];
                 Term guard = tb.convertToFormula((Term) params[0]);
-                assert guard.sort() == Sort.FORMULA;
+                assert guard.sort() == SpecialSorts.FORMULA;
                 final Term body = (Term) params[1];
                 final KeYJavaType declsType = (KeYJavaType) params[2];
                 final boolean nullable = (Boolean) params[4];
                 @SuppressWarnings("unchecked")
                 final ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>) params[3];
-                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                final org.key_project.common.core.logic.Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\min expression must be integer type");
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
@@ -707,7 +696,7 @@ public final class JMLTranslator {
                 final boolean nullable = (Boolean) params[4];
                 @SuppressWarnings("unchecked")
                 final ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>) params[3];
-                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                final org.key_project.common.core.logic.Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\max expression must be integer type");
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
@@ -777,7 +766,7 @@ public final class JMLTranslator {
                 }
                 LogicVariable qv = declVars.head();
                 Term tt = t.getTerm();
-                if (tt.sort() == Sort.FORMULA) {
+                if (tt.sort() == SpecialSorts.FORMULA) {
                     // bugfix (CS): t.getTerm() delivers a formula instead of a
                     // boolean term; obviously the original boolean terms are
                     // converted to formulas somewhere else; however, we need
@@ -982,7 +971,7 @@ public final class JMLTranslator {
                 final TermServices services = (TermServices) params[0];
                 final Term seq = ((SLExpression) params[1]).getTerm();
                 final Term idx = ((SLExpression) params[2]).getTerm();
-                return new SLExpression(tb.seqGet(Sort.ANY, seq, idx));
+                return new SLExpression(tb.seqGet(SpecialSorts.ANY, seq, idx));
             }
         });
 
@@ -1103,7 +1092,7 @@ public final class JMLTranslator {
 	        }
 
 	        Term t = tb.tt();
-	        final Sort objectSort = services.getJavaInfo().objectSort();
+	        final org.key_project.common.core.logic.Sort objectSort = services.getJavaInfo().objectSort();
                 final TypeConverter tc = services.getTypeConverter();
 	        for(SLExpression expr: list) {
     	            if(!expr.isTerm()) {
@@ -1313,9 +1302,9 @@ public final class JMLTranslator {
                         throw excManager.createException("Casting of type variables not (yet) supported.");
                     }
                     assert result.isTerm();
-                    Sort origType = result.getTerm().sort();
+                    org.key_project.common.core.logic.Sort origType = result.getTerm().sort();
 
-                    if (origType == Sort.FORMULA) {
+                    if (origType == SpecialSorts.FORMULA) {
                         // This case might occur since boolean expressions
                         // get converted prematurely (see bug #1121).
                         // Just check whether there is a cast to boolean.
@@ -1581,7 +1570,7 @@ public final class JMLTranslator {
                                 rangeTo.getTerm());
                         return new SLExpression(t);
                     } else {
-                        Term t = tb.seqGet(Sort.ANY,
+                        Term t = tb.seqGet(SpecialSorts.ANY,
                                 receiver.getTerm(),
                                 rangeFrom.getTerm());
                         return new SLExpression(t);
@@ -1862,7 +1851,7 @@ public final class JMLTranslator {
         Name name = null;
         do name = new Name(shortName+"_"+ ++x);
         while (fns.lookup(name)!=null);
-        final Function sk = new Function(name,Sort.FORMULA);
+        final Function sk = new Function(name,SpecialSorts.FORMULA);
         fns.add(sk);
         final Term t = tb.func(sk);
         return new SLExpression(t);
@@ -1940,7 +1929,7 @@ public final class JMLTranslator {
         addUnderspecifiedWarning(jmlKeyWord);
         assert services != null;
         final Namespace fns = services.getNamespaces().functions();
-        final Sort sort = type.getSort();
+        final org.key_project.common.core.logic.Sort sort = type.getSort();
         final String shortName = jmlKeyWord.getText().replace("\\", "");
         int x = -1;
         Name name = null;
@@ -2303,7 +2292,7 @@ public final class JMLTranslator {
                     typeExpr = a;
                 }
 
-                Sort os = typeExpr.getType().getSort();
+                org.key_project.common.core.logic.Sort os = typeExpr.getType().getSort();
                 Function ioFunc = os.getExactInstanceofSymbol(services);
 
                 return new SLExpression(tb.equals(
@@ -2325,10 +2314,10 @@ public final class JMLTranslator {
 
             Term result = null;
             try {
-                if (a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
+                if (a.sort() != SpecialSorts.FORMULA && b.sort() != SpecialSorts.FORMULA) {
                     result = tb.equals(a, b);
                 // Special case so that model methods are handled better
-                } else if(a.sort() == services.getTypeConverter().getBooleanLDT().targetSort() && b.sort() == Sort.FORMULA) {
+                } else if(a.sort() == services.getTypeConverter().getBooleanLDT().targetSort() && b.sort() == SpecialSorts.FORMULA) {
                     result = tb.equals(a, tb.ife(b, tb.TRUE(), tb.FALSE()));
                 } else {
                     result = tb.equals(tb.convertToFormula(a),

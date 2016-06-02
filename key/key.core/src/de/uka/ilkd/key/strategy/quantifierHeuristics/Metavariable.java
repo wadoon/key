@@ -14,10 +14,10 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.SpecialSorts;
 
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 @Deprecated
 public final class Metavariable extends AbstractSortedOperator
@@ -34,9 +34,9 @@ public final class Metavariable extends AbstractSortedOperator
 	serial = maxSerial++;
     }
 
-    private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
+    private Metavariable(Name name, org.key_project.common.core.logic.Sort sort, boolean isTemporaryVariable) {
 	super(name, sort, true);
-	if ( sort == Sort.FORMULA ) {
+	if ( sort == SpecialSorts.FORMULA ) {
 	    throw new RuntimeException(
 		 "Attempt to create metavariable of type formula");
 	}
@@ -45,7 +45,7 @@ public final class Metavariable extends AbstractSortedOperator
 	//assert false : "metavariables are disabled";
     }
 
-    public Metavariable (Name name, Sort sort) {
+    public Metavariable (Name name, org.key_project.common.core.logic.Sort sort) {
         this ( name, sort, false );        
     }
 

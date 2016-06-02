@@ -17,11 +17,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;

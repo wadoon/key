@@ -16,27 +16,17 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.NotFreeIn;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletPrefix;
-import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
+import de.uka.ilkd.key.rule.*;
 
 public class TacletPrefixBuilder {
 

@@ -13,19 +13,27 @@
 
 package org.key_project.common.core.logic.op;
 
-import org.key_project.common.core.logic.DLOperator;
-import org.key_project.common.core.logic.DLSort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 
 
-/** 
- * Operator with well-defined argument and result sorts.
+/**
+ * The objects of this class represent logical variables,
+ * used e.g. for quantification.
  */
-public interface DLSortedOperator<S extends DLSort> extends DLOperator {
-    
-    S sort();
+public final class LogicVariable extends DLAbstractSortedOperator 
+    implements QuantifiableVariable {
 
-    S argSort(int i);
+    public LogicVariable(Name name, Sort sort) {
+	super(name, null, sort, true);
+	assert sort != SpecialSorts.FORMULA;
+	assert sort != SpecialSorts.UPDATE;
+    }
     
-    public ImmutableArray<? extends S> argSorts();
+    
+    @Override
+    public String toString() {
+	return name() + ":" + sort();
+    }
 }

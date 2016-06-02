@@ -15,21 +15,14 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
 
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletAppIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.TacletForTests;
 import junit.framework.TestCase;
 
@@ -47,9 +40,9 @@ public class TestTriggersSet extends TestCase {
 	private Namespace sorts = new Namespace();
 
 	//sort 
-	private Sort r;
-	private Sort s;
-	private Sort t;
+	private org.key_project.common.core.logic.Sort r;
+	private org.key_project.common.core.logic.Sort s;
+	private org.key_project.common.core.logic.Sort t;
 	//private Sort ints ;
 	
 	
@@ -114,35 +107,35 @@ public class TestTriggersSet extends TestCase {
 		//sorts.add(ints);
 		
 		//constant
-		r_a = new Function(new Name("r_a"), r, new Sort [0]);
-		r_b = new Function(new Name("r_b"), r, new Sort [0]);
-		r_c= new Function(new Name("r_c"), r, new Sort [0]);
+		r_a = new Function(new Name("r_a"), r, new org.key_project.common.core.logic.Sort [0]);
+		r_b = new Function(new Name("r_b"), r, new org.key_project.common.core.logic.Sort [0]);
+		r_c= new Function(new Name("r_c"), r, new org.key_project.common.core.logic.Sort [0]);
 		functions.add(r_a);
 		functions.add(r_b);
 		functions.add(r_c);
 		
-		s_a = new Function(new Name("s_a"), s, new Sort [0]);
-		s_b = new Function(new Name("s_b"), s, new Sort [0]);
-		s_c= new Function(new Name("s_c"), s, new Sort [0]);
+		s_a = new Function(new Name("s_a"), s, new org.key_project.common.core.logic.Sort [0]);
+		s_b = new Function(new Name("s_b"), s, new org.key_project.common.core.logic.Sort [0]);
+		s_c= new Function(new Name("s_c"), s, new org.key_project.common.core.logic.Sort [0]);
 		functions.add(s_a);
 		functions.add(s_b);
 		functions.add(s_c);
         
-		t_a = new Function(new Name("t_a"), s, new Sort [0]);
-		t_b = new Function(new Name("t_b"), s, new Sort [0]);
-		t_c = new Function(new Name("t_c"), s, new Sort [0]);
+		t_a = new Function(new Name("t_a"), s, new org.key_project.common.core.logic.Sort [0]);
+		t_b = new Function(new Name("t_b"), s, new org.key_project.common.core.logic.Sort [0]);
+		t_c = new Function(new Name("t_c"), s, new org.key_project.common.core.logic.Sort [0]);
 		functions.add(t_a);
 		functions.add(t_b);
 		functions.add(t_c);
         
         
         	        //function
-		frr = new Function(new Name("frr"), r, new Sort[] { r });
-		f2rr = new Function(new Name("f2rr"), r, new Sort[] { r });
-		fsr = new Function(new Name("fsr"), r, new Sort[] { s });
-		ftr = new Function(new Name("ftr"), r, new Sort[] { t });
-		fstr= new Function(new Name("fst"),r, new Sort[] {s,t});
-		frstr=new Function(new Name("frstr"),r,new Sort[]{r,s,t});
+		frr = new Function(new Name("frr"), r, new org.key_project.common.core.logic.Sort[] { r });
+		f2rr = new Function(new Name("f2rr"), r, new org.key_project.common.core.logic.Sort[] { r });
+		fsr = new Function(new Name("fsr"), r, new org.key_project.common.core.logic.Sort[] { s });
+		ftr = new Function(new Name("ftr"), r, new org.key_project.common.core.logic.Sort[] { t });
+		fstr= new Function(new Name("fst"),r, new org.key_project.common.core.logic.Sort[] {s,t});
+		frstr=new Function(new Name("frstr"),r,new org.key_project.common.core.logic.Sort[]{r,s,t});
 		
 		functions.add(frr);
 		functions.add(f2rr);
@@ -151,11 +144,11 @@ public class TestTriggersSet extends TestCase {
 		functions.add(fstr);
 		functions.add(frstr);
         
-		gss = new Function(new Name("gss"), s, new Sort[] { s });
-		grs = new Function(new Name("grs"), s, new Sort[] { r });
-		gts = new Function(new Name("gts"), s, new Sort[] { t });
-		grts= new Function(new Name("grts"),s, new Sort[] {r,t});
-		grsts=new Function(new Name("grsts"),s,new Sort[]{r,s,t});
+		gss = new Function(new Name("gss"), s, new org.key_project.common.core.logic.Sort[] { s });
+		grs = new Function(new Name("grs"), s, new org.key_project.common.core.logic.Sort[] { r });
+		gts = new Function(new Name("gts"), s, new org.key_project.common.core.logic.Sort[] { t });
+		grts= new Function(new Name("grts"),s, new org.key_project.common.core.logic.Sort[] {r,t});
+		grsts=new Function(new Name("grsts"),s,new org.key_project.common.core.logic.Sort[]{r,s,t});
 
 		functions.add(gss);
 		functions.add(grs);
@@ -163,11 +156,11 @@ public class TestTriggersSet extends TestCase {
 		functions.add(grts);
 		functions.add(grsts);
         
-		htt = new Function(new Name("htt"), t, new Sort[] { t });
-		hrt = new Function(new Name("hrt"), t, new Sort[] { r });
-		hst = new Function(new Name("hst"), t, new Sort[] { s });
-		hrst= new Function(new Name("hrst"),t, new Sort[] {r,s});
-		hrstt=new Function(new Name("hrstt"),t,new Sort[]{r,s,t});
+		htt = new Function(new Name("htt"), t, new org.key_project.common.core.logic.Sort[] { t });
+		hrt = new Function(new Name("hrt"), t, new org.key_project.common.core.logic.Sort[] { r });
+		hst = new Function(new Name("hst"), t, new org.key_project.common.core.logic.Sort[] { s });
+		hrst= new Function(new Name("hrst"),t, new org.key_project.common.core.logic.Sort[] {r,s});
+		hrstt=new Function(new Name("hrstt"),t,new org.key_project.common.core.logic.Sort[]{r,s,t});
 	
 		functions.add(htt);
 		functions.add(hrt);
@@ -176,19 +169,19 @@ public class TestTriggersSet extends TestCase {
 		functions.add(hrstt);
         
 		//Formula function
-		pp=new Function(new Name("pp"),Sort.FORMULA,
-				                    new Sort[]{Sort.FORMULA});
-		pr=new Function(new Name("pr"),Sort.FORMULA,new Sort[]{r});
-		ps=new Function(new Name("ps"),Sort.FORMULA,new Sort[]{s});
-		pt=new Function(new Name("pt"),Sort.FORMULA,new Sort[]{t});
-		prs=new Function(new Name("prs"),Sort.FORMULA,
-				        new Sort[]{r,s});
-		prt=new Function(new Name("prt"),Sort.FORMULA,
-				        new Sort[]{r,t});
-		pst=new Function(new Name("pst"),Sort.FORMULA,
-				        new Sort[]{s,t});
-		prst=new Function(new Name("prst"),Sort.FORMULA,
-				        new Sort[]{r,s,t});
+		pp=new Function(new Name("pp"),SpecialSorts.FORMULA,
+				                    new org.key_project.common.core.logic.Sort[]{SpecialSorts.FORMULA});
+		pr=new Function(new Name("pr"),SpecialSorts.FORMULA,new org.key_project.common.core.logic.Sort[]{r});
+		ps=new Function(new Name("ps"),SpecialSorts.FORMULA,new org.key_project.common.core.logic.Sort[]{s});
+		pt=new Function(new Name("pt"),SpecialSorts.FORMULA,new org.key_project.common.core.logic.Sort[]{t});
+		prs=new Function(new Name("prs"),SpecialSorts.FORMULA,
+				        new org.key_project.common.core.logic.Sort[]{r,s});
+		prt=new Function(new Name("prt"),SpecialSorts.FORMULA,
+				        new org.key_project.common.core.logic.Sort[]{r,t});
+		pst=new Function(new Name("pst"),SpecialSorts.FORMULA,
+				        new org.key_project.common.core.logic.Sort[]{s,t});
+		prst=new Function(new Name("prst"),SpecialSorts.FORMULA,
+				        new org.key_project.common.core.logic.Sort[]{r,s,t});
 		//pi=new Function(new Name("pi"),Sort.FORMULA,new Sort[]{});
 		functions.add(pp);
 		functions.add(pr);

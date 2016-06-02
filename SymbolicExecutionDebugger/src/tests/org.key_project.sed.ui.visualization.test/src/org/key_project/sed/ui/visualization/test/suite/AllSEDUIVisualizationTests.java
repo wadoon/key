@@ -15,12 +15,7 @@ package org.key_project.sed.ui.visualization.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.sed.ui.visualization.test.testcase.AbsoluteFileSystemPathSourceContainerTest;
-import org.key_project.sed.ui.visualization.test.testcase.AbstractDebugViewBasedEditorInViewViewTest;
-import org.key_project.sed.ui.visualization.test.testcase.EditableMultiDeleteInfoTest;
-import org.key_project.sed.ui.visualization.test.testcase.ExecutionTreeUtilTest;
-import org.key_project.sed.ui.visualization.test.testcase.GraphitiUtilTest;
-import org.key_project.sed.ui.visualization.test.testcase.LogUtilTest;
+import org.key_project.sed.ui.visualization.test.testcase.*;
 
 /**
  * Run all contained JUnit 4 test cases.

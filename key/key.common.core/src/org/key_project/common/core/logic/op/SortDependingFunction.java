@@ -11,15 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.*;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+
 
 
 /**
@@ -92,39 +89,40 @@ public final class SortDependingFunction extends Function {
     //public interface
     //------------------------------------------------------------------------- 
     
-    public static SortDependingFunction createFirstInstance(
+    public static <T extends DLTerm<? extends DLVisitor<T>>, P extends Program> SortDependingFunction createFirstInstance(
 	    			GenericSort sortDependingOn,
 	    			Name kind, 
 	    		        Sort sort, 
 	    		        Sort[] argSorts,
-	    		        boolean unique) {
+	    		        boolean unique,
+	    		        TermServices<T,P> services) {
 	SortDependingFunctionTemplate template 
 		= new SortDependingFunctionTemplate(sortDependingOn, 
 						    kind, 
 						    sort, 
 						    new ImmutableArray<Sort>(argSorts),
 						    unique);
-	return new SortDependingFunction(template, Sort.ANY);
+	return new SortDependingFunction(template, services.getAnySort());
     }
     
     
-    public static SortDependingFunction getFirstInstance(Name kind,
-	    					         TermServices services) {
+    public static <T extends DLTerm<? extends DLVisitor<T>>, P extends Program>SortDependingFunction getFirstInstance(Name kind,
+	    					         TermServices<T,P> services) {
 	return (SortDependingFunction) 
 			services.getNamespaces()
 			        .functions()
-	                        .lookup(instantiateName(kind, Sort.ANY));
+	                        .lookup(instantiateName(kind, services.getAnySort()));
     }
         
 
-    public SortDependingFunction getInstanceFor(Sort sort, 
-	    				        TermServices services) {
+    public <T extends DLTerm<? extends DLVisitor<T>>, P extends Program> SortDependingFunction getInstanceFor(Sort sort, 
+	    				        TermServices<T,P> services) {
 	if(sort == this.sortDependingOn) {
 	    return this;
 	}
 	
-	assert !(sort instanceof ProgramSVSort);
-	assert sort != AbstractTermTransformer.METASORT;
+//	assert !(sort instanceof ProgramSVSort);
+//	assert sort != AbstractTermTransformer.METASORT;
 	
 	SortDependingFunction result
 		= (SortDependingFunction) 
@@ -181,7 +179,7 @@ public final class SortDependingFunction extends Function {
     //-------------------------------------------------------------------------     
     
     private static final class SortDependingFunctionTemplate {
-	public final GenericSort sortDependingOn;
+	public final Sort sortDependingOn;
 	public final Name kind;	
 	public final Sort sort;
 	public final ImmutableArray<Sort> argSorts;

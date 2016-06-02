@@ -16,15 +16,16 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
@@ -92,15 +93,15 @@ public abstract class SuperTermGenerator implements TermGenerator {
                     }
 
                     public Sort sort(ImmutableArray<Term> terms) {
-                	return Sort.ANY;
+                	return SpecialSorts.ANY;
                     }
                     
-                    public Sort sort() {
-                	return Sort.ANY;
+                    public org.key_project.common.core.logic.Sort sort() {
+                	return SpecialSorts.ANY;
                     }
                     
-                    public Sort argSort(int i) {
-                	return Sort.ANY;
+                    public org.key_project.common.core.logic.Sort argSort(int i) {
+                	return SpecialSorts.ANY;
                     }
                     
                     public ImmutableArray<Sort> argSorts () {

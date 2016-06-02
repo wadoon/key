@@ -16,12 +16,8 @@ package de.uka.ilkd.key.proof.init;
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;

@@ -23,7 +23,8 @@
 
 package de.uka.ilkd.key.taclettranslation;
 
-import de.uka.ilkd.key.logic.DefaultVisitor;
+import org.key_project.common.core.logic.DefaultVisitor;
+
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;

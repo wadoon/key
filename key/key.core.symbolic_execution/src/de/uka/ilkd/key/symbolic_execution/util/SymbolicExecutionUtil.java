@@ -14,22 +14,13 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.*;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -37,17 +28,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
@@ -57,53 +38,18 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.IntIterator;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -117,16 +63,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -534,7 +471,7 @@ public final class SymbolicExecutionUtil {
       MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
       JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, variable.sort());
+      Function newPredicate = new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), SpecialSorts.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
       Term newTerm = services.getTermBuilder().func(newPredicate, services.getTermBuilder().var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
@@ -568,7 +505,7 @@ public final class SymbolicExecutionUtil {
       assert node != null;
       assert variable instanceof ProgramVariable;
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, variable.sort());
+      Function newPredicate = new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), SpecialSorts.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
       Term newTerm = services.getTermBuilder().func(newPredicate, services.getTermBuilder().var((ProgramVariable)variable));
       // Create Sequent to prove with new succedent.
@@ -599,7 +536,7 @@ public final class SymbolicExecutionUtil {
       assert node != null;
       assert term != null;
       // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(sideProofServices.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, term.sort());
+      Function newPredicate = new Function(new Name(sideProofServices.getTermBuilder().newName("ResultPredicate")), SpecialSorts.FORMULA, term.sort());
       // Create formula which contains the value interested in.
       Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, term);
       // Create Sequent to prove with new succedent.
@@ -3333,7 +3270,7 @@ public final class SymbolicExecutionUtil {
     * @param services The {@link Services} to use.
     * @return {@code true} is Null-Sort, {@code false} is something else.
     */
-   public static boolean isNullSort(Sort sort, Services services) {
+   public static boolean isNullSort(org.key_project.common.core.logic.Sort sort, Services services) {
       return sort instanceof NullSort;
    }
 
@@ -3446,7 +3383,7 @@ public final class SymbolicExecutionUtil {
     * @param sort The {@link Sort} to check.
     * @return {@code true} is reference sort, {@code false} is no reference sort.
     */
-   public static boolean hasReferenceSort(Services services, Sort sort) {
+   public static boolean hasReferenceSort(Services services, org.key_project.common.core.logic.Sort sort) {
       boolean referenceSort = false;
       if (services != null && sort != null) {
          KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
@@ -3652,7 +3589,7 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isHeap(Operator op, HeapLDT heapLDT) {
       if (op instanceof SortedOperator) {
-         final Sort opSort = ((SortedOperator) op).sort();
+         final org.key_project.common.core.logic.Sort opSort = ((SortedOperator) op).sort();
          return CollectionUtil.search(heapLDT.getAllHeaps(), new IFilter<LocationVariable>() {
             @Override
             public boolean select(LocationVariable element) {
@@ -4098,7 +4035,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} exceptional termination, {@code false} normal termination.
     */
    public static boolean lazyComputeIsExceptionalTermination(Node node, IProgramVariable exceptionVariable) {
-      Sort result = lazyComputeExceptionSort(node, exceptionVariable);
+      org.key_project.common.core.logic.Sort result = lazyComputeExceptionSort(node, exceptionVariable);
       return result != null && !(result instanceof NullSort);
 	}
    
@@ -4109,8 +4046,8 @@ public final class SymbolicExecutionUtil {
     * @param exceptionVariable the exception variable which is used to check if the executed program in proof terminates normally.
     * @return The exception {@link Sort}.
     */
-   public static Sort lazyComputeExceptionSort(Node node, IProgramVariable exceptionVariable) {
-      Sort result = null;
+   public static org.key_project.common.core.logic.Sort lazyComputeExceptionSort(Node node, IProgramVariable exceptionVariable) {
+      org.key_project.common.core.logic.Sort result = null;
       if (exceptionVariable != null) {
          // Search final value of the exceptional variable which is used to check if the verified program terminates normally
          ImmutableArray<Term> value = null;

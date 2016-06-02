@@ -25,35 +25,21 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
 
-import recoder.ParserException;
-import recoder.convenience.TreeWalker;
-import recoder.java.Comment;
-import recoder.java.CompilationUnit;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.JavaProgramFactory;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SingleLineComment;
-import recoder.java.SourceElement.Position;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.TypeReference;
-import recoder.list.generic.ASTArrayList;
-import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.parser.schemajava.ParseException;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
+import recoder.ParserException;
+import recoder.convenience.TreeWalker;
+import recoder.java.*;
+import recoder.java.SourceElement.Position;
+import recoder.java.declaration.*;
+import recoder.java.reference.MethodReference;
+import recoder.java.reference.ReferencePrefix;
+import recoder.java.reference.TypeReference;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 
 public class SchemaJavaProgramFactory extends JavaProgramFactory {
 

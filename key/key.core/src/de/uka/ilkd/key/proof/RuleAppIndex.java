@@ -17,14 +17,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.key_project.common.core.logic.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.NotRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;

@@ -15,22 +15,19 @@ package de.uka.ilkd.key.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.key_project.common.core.logic.DLVisitor;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.Sort;
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -53,6 +50,7 @@ class TermImpl implements Term {
 
     //content
     private final Operator op;
+    private final Sort sort;
     private final ImmutableArray<Term> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
     private final JavaBlock javaBlock;
@@ -89,9 +87,14 @@ class TermImpl implements Term {
 	this.javaBlock = javaBlock == null 
 	                 ? JavaBlock.EMPTY_JAVABLOCK 
 	                 : javaBlock;
+	this.sort = null;
     }
     
-
+    @Override
+    public org.key_project.common.core.logic.Sort sort() {
+        return sort;
+    }
+    
         
     //-------------------------------------------------------------------------
     //internal methods
@@ -124,11 +127,12 @@ class TermImpl implements Term {
      * TermCreationException is thrown.  
      */
     public Term checked() {
-    	if (op.validTopLevel(this)) {
+    /* 	if (op.validTopLevel(this)) {
 	    return this;
 	} else {
 	    throw new TermCreationException(op, this);
-	}
+	}*/
+        return null;
     }    
     
     @Override
@@ -186,11 +190,7 @@ class TermImpl implements Term {
     }
     
     
-    @Override
-    public Sort sort() {
-	return op.sort(subs);
-    }
-    
+  
 
     @Override
     public int depth() {
@@ -236,7 +236,7 @@ class TermImpl implements Term {
     }
     
     @Override
-    public void execPostOrder(Visitor visitor) {
+    public void execPostOrder(DLVisitor<Term> visitor) {
        visitor.subtreeEntered(this);
        if (visitor.visitSubtree(this)) {
           for(int i = 0, ar = arity(); i < ar; i++) {
@@ -249,7 +249,7 @@ class TermImpl implements Term {
 
 
     @Override
-    public void execPreOrder(Visitor visitor) {
+    public void execPreOrder(DLVisitor<Term> visitor) {
        visitor.subtreeEntered(this);
        visitor.visit(this);
        if (visitor.visitSubtree(this)) {

@@ -13,13 +13,11 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -30,13 +28,9 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
 
@@ -514,8 +508,8 @@ public class EqualityConstraint implements Constraint {
                                                TermServices services) {
         final Metavariable mv0 = (Metavariable)t0.op ();
         final Metavariable mv1 = (Metavariable)t1.op ();
-        final Sort mv0S = mv0.sort ();
-        final Sort mv1S = mv1.sort ();
+        final org.key_project.common.core.logic.Sort mv0S = mv0.sort ();
+        final org.key_project.common.core.logic.Sort mv1S = mv1.sort ();
         if ( mv1S.extendsTrans ( mv0S ) ) {
             if ( mv0S == mv1S ) {
                 // sorts are equal use Metavariable-order to choose the left MV

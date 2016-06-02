@@ -11,16 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.sort;
+package org.key_project.common.core.logic;
 
-import org.key_project.common.core.logic.DLSort;
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 /**
  * Abstract base class for implementations of the Sort interface.
@@ -28,7 +23,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 public abstract class AbstractSort implements Sort {
     
     private final Name name;
-    private final ImmutableSet<Sort> ext;    
+    protected final ImmutableSet<Sort> ext;    
     private final boolean isAbstract;
 
     
@@ -36,37 +31,29 @@ public abstract class AbstractSort implements Sort {
     	this.name = name;
         this.ext = ext;
         this.isAbstract = isAbstract;
-    }
-   
-
-    @Override    
-    public final ImmutableSet<Sort> extendsSorts() {
-	return this == Sort.FORMULA || this == Sort.UPDATE || this == Sort.ANY
-	       ? DefaultImmutableSet.<Sort>nil()
-	       : ext.isEmpty()
-	         ? ext.add(Sort.ANY)
-	         : ext;
-    }
-    
+    }    
     
     @Override
-    public final ImmutableSet<Sort> extendsSorts(Services services) {
-	return extendsSorts();
+    public final ImmutableSet<Sort> extendsSorts(TermServices<?,?> services) {
+        return this == services.getFormulaSort() || this == services.getUpdateSort() || this == services.getAnySort()
+                ? DefaultImmutableSet.<Sort>nil()
+                : ext.isEmpty()
+                  ? ext.add(services.getAnySort())
+                  : ext;
     }
 
     
     @Override    
-    public final boolean extendsTrans(DLSort sort) {
+    public final boolean extendsTrans(Sort sort, TermServices<?,?> services) {
         if(sort == this) {
             return true;
-        } else if(this == Sort.FORMULA || this == Sort.UPDATE) {
+        } else if(this == services.getFormulaSort() || this == services.getFormulaSort()) {
             return false;
-        } else if(sort == Sort.ANY) {
+        } else if(sort == services.getAnySort()) {
             return true;
         }
-        
-        for(Sort superSort : extendsSorts()) {
-            if(superSort == sort || superSort.extendsTrans(sort)) {
+        for(Sort superSort : services.getDirectSuperSorts(sort)) {
+            if(superSort == sort || superSort.extendsTrans(sort, services)) {
         	return true;
             }
         }
@@ -88,7 +75,7 @@ public abstract class AbstractSort implements Sort {
     
 
     @Override
-    public final SortDependingFunction getCastSymbol(TermServices services) {
+    public final SortDependingFunction getCastSymbol(TermServices<?,?> services) {
         SortDependingFunction result
             = SortDependingFunction.getFirstInstance(CAST_NAME, services)
         			   .getInstanceFor(this, services);
@@ -98,7 +85,7 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override    
-    public final SortDependingFunction getInstanceofSymbol(TermServices services) {
+    public final SortDependingFunction getInstanceofSymbol(TermServices<?,?> services) {
 	SortDependingFunction result
 	    = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
                                    .getInstanceFor(this, services);
@@ -108,7 +95,7 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override
-    public final SortDependingFunction getExactInstanceofSymbol(TermServices services) {
+    public final SortDependingFunction getExactInstanceofSymbol(TermServices<?,?> services) {
 	SortDependingFunction result
             = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
                                    .getInstanceFor(this, services);

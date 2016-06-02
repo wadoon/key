@@ -13,11 +13,9 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 public class TermCreationException extends RuntimeException {
 
@@ -68,7 +66,7 @@ public class TermCreationException extends RuntimeException {
          Term subi = subs.get(i);
          if (subi != null) {
             sb.append(subi);
-            Sort subiSort = subi.sort();
+            org.key_project.common.core.logic.Sort subiSort = subi.sort();
             if (subiSort != null) {
                sb.append("(sort: " + subi.sort() + ", sort hash: "
                      + subi.sort().hashCode() + ")\n");

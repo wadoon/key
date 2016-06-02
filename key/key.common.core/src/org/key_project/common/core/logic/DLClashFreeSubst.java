@@ -12,31 +12,31 @@
 //
 package org.key_project.common.core.logic;
 
-import org.key_project.common.core.logic.op.DLQuantifiableVariable;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-public class DLClashFreeSubst< S extends DLSort, 
-        T extends DLTerm<S, ? extends DLVisitor<T>>, 
-        O extends DLOperator,  
-        P extends Program,
-        Q extends DLQuantifiableVariable<S>> {
+public class DLClashFreeSubst< 
+        T extends DLTerm<? extends DLVisitor<T>>, 
+        O extends Operator,  
+        P extends Program> {
     
-    protected Q v;
+    protected QuantifiableVariable v;
     protected T s;
-    protected ImmutableSet<Q> svars;
+    protected ImmutableSet<QuantifiableVariable> svars;
     protected final DLTermServices services;
 
     @SuppressWarnings("unchecked")
-    public DLClashFreeSubst(Q v, T s, DLTermServices services) {
+    public DLClashFreeSubst(QuantifiableVariable v, T s, DLTermServices services) {
         this.services = services;
         this.v = v;
         this.s = s;
-        svars = (ImmutableSet<Q>) s.freeVars();
+        svars = (ImmutableSet<QuantifiableVariable>) s.freeVars();
     }
 
-    protected Q getVariable () {
+    protected QuantifiableVariable getVariable () {
         return v;
     }
 
@@ -69,12 +69,12 @@ public class DLClashFreeSubst< S extends DLSort,
     }
 
     //XXX
-    protected static ImmutableArray<DLQuantifiableVariable<DLSort>> getSingleArray(ImmutableArray/*<Q>*/[] bv) {
+    protected static ImmutableArray<QuantifiableVariable> getSingleArray(ImmutableArray/*<QuantifiableVariable>*/[] bv) {
         if(bv == null) {
             return null;
         }
-        ImmutableArray<DLQuantifiableVariable<DLSort>> result = null;
-        for(ImmutableArray<DLQuantifiableVariable<DLSort>> arr : bv) {
+        ImmutableArray<QuantifiableVariable> result = null;
+        for(ImmutableArray<QuantifiableVariable> arr : bv) {
             if(arr != null && !arr.isEmpty()) {
                 if(result == null) {
                     result = arr;
@@ -93,9 +93,9 @@ public class DLClashFreeSubst< S extends DLSort,
      * handled. */
     private T applyOnSubterms(T t) {
         final int arity = t.arity();
-        final T[] newSubterms = new DLTerm[arity];
+        final DLTerm[] newSubterms = new DLTerm[arity];
         @SuppressWarnings("unchecked")
-        final ImmutableArray<Q>[] newBoundVars =
+        final ImmutableArray<QuantifiableVariable>[] newBoundVars =
         new ImmutableArray[arity];
         for ( int i=0; i<arity; i++ ) {
             applyOnSubterm ( t, i, newSubterms, newBoundVars );
@@ -112,11 +112,11 @@ public class DLClashFreeSubst< S extends DLSort,
     protected void applyOnSubterm (T completeTerm,
             int subtermIndex,
             T[] newSubterms,
-            ImmutableArray<Q>[] newBoundVars) {
+            ImmutableArray<QuantifiableVariable>[] newBoundVars) {
         if ( subTermChanges ( completeTerm.varsBoundHere ( subtermIndex ),
                 completeTerm.sub ( subtermIndex ) ) ) {
-            final Q[] nbv =
-                    new Q[completeTerm.varsBoundHere ( subtermIndex ).size ()];
+            final QuantifiableVariable [] nbv =
+                    new QuantifiableVariable [completeTerm.varsBoundHere ( subtermIndex ).size ()];
             applyOnSubterm ( 0,
                     completeTerm.varsBoundHere ( subtermIndex ),
                     nbv,
@@ -142,8 +142,8 @@ public class DLClashFreeSubst< S extends DLSort,
      * <code>boundVars</code> from <code>varInd</code> upwards..
      */
     private void applyOnSubterm(int varInd,
-            ImmutableArray<Q> boundVars,
-            Q[] newBoundVars,
+            ImmutableArray<QuantifiableVariable> boundVars,
+            QuantifiableVariable [] newBoundVars,
             int subInd,
             T subTerm,
             T[] newSubterms
@@ -151,13 +151,13 @@ public class DLClashFreeSubst< S extends DLSort,
         if ( varInd >= boundVars.size() ) {
             newSubterms[subInd] = apply1(subTerm);
         } else {
-            Q qv = boundVars.get(varInd);
+            QuantifiableVariable qv = boundVars.get(varInd);
             if ( svars.contains(qv) ) {
                 /* Here is the clash case all this is about! Hurrah! */
 
                 // Determine Variable names to avoid
                 VariableCollectVisitor vcv = new VariableCollectVisitor();
-                ImmutableSet<Q> usedVars;
+                ImmutableSet<QuantifiableVariable> usedVars;
                 subTerm.execPostOrder(vcv);
                 usedVars = svars;
                 usedVars = usedVars.union(vcv.vars());
@@ -166,7 +166,7 @@ public class DLClashFreeSubst< S extends DLSort,
                             usedVars.add(boundVars.get(i));
                 }
                 // Get a new variable with a fitting name.
-                Q qv1 = newVarFor(qv,usedVars);
+                QuantifiableVariable qv1 = newVarFor(qv,usedVars);
 
                 // Substitute that for the old one.
                 newBoundVars[varInd] = qv1;
@@ -175,7 +175,7 @@ public class DLClashFreeSubst< S extends DLSort,
                         subInd,subTerm,newSubterms);
                 // then continue recursively, on the result.
                 applyOnSubterm(varInd+1,
-                        new ImmutableArray<Q>(newBoundVars),
+                        new ImmutableArray<QuantifiableVariable>(newBoundVars),
                         newBoundVars,
                         subInd,newSubterms[subInd],newSubterms);
             } else {
@@ -190,8 +190,8 @@ public class DLClashFreeSubst< S extends DLSort,
      * considered quantified subterm. It is however assumed that no more
      * clash can occurr. */
     private void applyOnSubterm1(int varInd,
-            ImmutableArray<Q> boundVars,
-            Q[] newBoundVars,
+            ImmutableArray<QuantifiableVariable> boundVars,
+            QuantifiableVariable [] newBoundVars,
             int subInd,
             T subTerm,
             T[] newSubterms
@@ -199,7 +199,7 @@ public class DLClashFreeSubst< S extends DLSort,
         if ( varInd >= boundVars.size() ) {
             newSubterms[subInd] = apply(subTerm);
         } else {
-            Q qv = boundVars.get(varInd);
+            QuantifiableVariable qv = boundVars.get(varInd);
             newBoundVars[varInd] = qv;
             if ( qv == v ) {
                 newSubterms[subInd] = subTerm;
@@ -221,7 +221,7 @@ public class DLClashFreeSubst< S extends DLSort,
      * <code>boundVars</code> would change under application of this
      * substitution
      */
-    protected boolean subTermChanges(ImmutableArray<Q> boundVars,
+    protected boolean subTermChanges(ImmutableArray<QuantifiableVariable> boundVars,
             T subTerm) {
         if ( !subTerm.freeVars().contains(v) ) {
             return false;
@@ -239,8 +239,8 @@ public class DLClashFreeSubst< S extends DLSort,
      * <code>var</code>, that is different from any of the names of
      * variables in <code>usedVars</code>.
      * <P> Assumes that <code>var</code> is a @link{LogicVariable}. */
-    protected Q newVarFor(Q var,
-            ImmutableSet<Q> usedVars) {
+    protected QuantifiableVariable newVarFor(QuantifiableVariable var,
+            ImmutableSet<QuantifiableVariable> usedVars) {
         LogicVariable lv = (LogicVariable) var;
         String stem = var.name().toString();
         int i = 1;
@@ -252,8 +252,8 @@ public class DLClashFreeSubst< S extends DLSort,
 
     /** returns true if there is no object named <code>n</code> in the
      * set <code>s</code> */
-    private boolean nameNewInSet(String n, ImmutableSet<Q> qvars) {
-        for (Q qvar : qvars) {
+    private boolean nameNewInSet(String n, ImmutableSet<QuantifiableVariable> qvars) {
+        for (QuantifiableVariable qvar : qvars) {
             if (qvar.name().toString().equals(n)) {
                 return false;
             }
@@ -265,21 +265,21 @@ public class DLClashFreeSubst< S extends DLSort,
     // day.
     /** A Visitor class to collect all (not just the free) variables
      * occurring in a term. */
-    public static class VariableCollectVisitor extends DefaultVisitor {
+    public static class VariableCollectVisitor<T extends DLTerm<? extends DLVisitor<T>>> extends DefaultVisitor<T> {
         /** the collected variables */
-        private ImmutableSet<Q> vars;
+        private ImmutableSet<QuantifiableVariable> vars;
 
         /** creates the Variable collector */
         public VariableCollectVisitor() {
-            vars = DefaultImmutableSet.<Q>nil();
+            vars = DefaultImmutableSet.<QuantifiableVariable>nil();
         }
 
-        public void visit(Tt) {
-            if (t.op() instanceof Q) {
-                vars=vars.add((Q)t.op());
+        public void visit(T t) {
+            if (t.op() instanceof QuantifiableVariable) {
+                vars=vars.add((QuantifiableVariable)t.op());
             } else {
                 for ( int i = 0; i<t.arity(); i++ ) {
-                    ImmutableArray<Q> vbh = t.varsBoundHere(i);
+                    ImmutableArray<QuantifiableVariable> vbh = t.varsBoundHere(i);
                     for ( int j = 0; j<vbh.size(); j++ ) {
                         vars = vars.add(vbh.get(j));
                     }
@@ -288,7 +288,7 @@ public class DLClashFreeSubst< S extends DLSort,
         }
 
         /** the set of all occurring variables.*/
-        public ImmutableSet<Q> vars() {
+        public ImmutableSet<QuantifiableVariable> vars() {
             return vars;
         }
     }

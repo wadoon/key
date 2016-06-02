@@ -13,13 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
-import java.awt.Image;
-import java.awt.Transparency;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 

@@ -14,10 +14,8 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.common.core.logic.label.TermLabel;
-
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A schema variable which matches term labels
@@ -25,7 +23,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class TermLabelSV extends AbstractSV implements SchemaVariable, TermLabel {
 
     protected TermLabelSV(Name name) {
-        super(name, Sort.TERMLABEL, true, false);
+        super(name, SpecialSorts.TERMLABEL, true, false);
     }
 
     @Override
@@ -38,11 +36,7 @@ public final class TermLabelSV extends AbstractSV implements SchemaVariable, Ter
         return toString("termLabel");
     }
 
-    @Override
-    public boolean validTopLevel(Term term) {
-        return true;
-    }
-
+  
     @Override
     public Object getChild(int i) {
         throw new IndexOutOfBoundsException();

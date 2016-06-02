@@ -20,13 +20,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
-import de.uka.ilkd.key.smt.SMTObjTranslator;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Model;
 

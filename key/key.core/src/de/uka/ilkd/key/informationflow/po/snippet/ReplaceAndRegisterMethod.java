@@ -10,6 +10,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -19,11 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -168,7 +168,7 @@ abstract class ReplaceAndRegisterMethod {
                         Services services) {
         Namespace functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
-            assert f.sort() != Sort.UPDATE;
+            assert f.sort() != SpecialSorts.UPDATE;
             functionNames.addSafely(f);
         }
     }

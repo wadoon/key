@@ -16,9 +16,9 @@ package de.uka.ilkd.key.ldt;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Named;
-import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -27,10 +27,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * An "LDT" or "language data type" class corresponds to a standard rule file 

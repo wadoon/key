@@ -17,13 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 
 /**

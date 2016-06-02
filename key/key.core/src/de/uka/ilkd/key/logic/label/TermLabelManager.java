@@ -13,15 +13,12 @@
 
 package de.uka.ilkd.key.logic.label;
 
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.*;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -29,31 +26,14 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
-import de.uka.ilkd.key.rule.label.TermLabelMerger;
-import de.uka.ilkd.key.rule.label.TermLabelPolicy;
-import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.*;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
-import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 
@@ -695,7 +675,7 @@ public class TermLabelManager {
     * @param ruleIndependentPolicies All rules {@link ChildTermLabelPolicy} instances.
     * @returnThe active {@link ChildTermLabelPolicy} which have to be performed.
     */
-   protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices services,
+   protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices<Term, JavaBlock> services,
                                                                         PosInOccurrence applicationPosInOccurrence,
                                                                         Term applicationTerm,
                                                                         Rule rule,
@@ -750,7 +730,7 @@ public class TermLabelManager {
     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
     */
-   protected void performDirectChildPolicies(TermServices services,
+   protected void performDirectChildPolicies(TermServices<Term, JavaBlock> services,
                                              PosInOccurrence applicationPosInOccurrence,
                                              Term applicationTerm,
                                              Rule rule,
@@ -794,7 +774,7 @@ public class TermLabelManager {
     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
     */
-   protected void performChildAndGrandchildPolicies(final TermServices services,
+   protected void performChildAndGrandchildPolicies(final TermServices<Term, JavaBlock> services,
                                                     final PosInOccurrence applicationPosInOccurrence,
                                                     final Term applicationTerm,
                                                     final Rule rule,
@@ -807,7 +787,7 @@ public class TermLabelManager {
                                                     final JavaBlock newTermJavaBlock,
                                                     final Map<Name, ChildTermLabelPolicy> policies,
                                                     final Set<TermLabel> newLabels) {
-      applicationTerm.execPreOrder(new DefaultVisitor() {
+      applicationTerm.execPreOrder(new DefaultVisitor<Term>() {
          @Override
          public void visit(Term visited) {
             if (visited != applicationTerm) {

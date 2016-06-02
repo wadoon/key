@@ -13,9 +13,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-
-
 public class SortMismatchException 
     extends SVInstantiationExceptionWithPosition {
 
@@ -24,10 +21,10 @@ public class SortMismatchException
      */
     private static final long serialVersionUID = -5791743260310763761L;
     private String toInstantiate;
-    private Sort   givenSort;
+    private org.key_project.common.core.logic.Sort   givenSort;
          
     public SortMismatchException( String toInstantiate,
-				  Sort   givenSort,
+				  org.key_project.common.core.logic.Sort   givenSort,
 				  int    row, 
 				  int    column ) {
 	super("Sorts mismatch", row, column, false);

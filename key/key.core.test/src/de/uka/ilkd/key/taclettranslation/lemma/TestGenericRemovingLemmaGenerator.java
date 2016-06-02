@@ -16,14 +16,14 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.key_project.common.core.logic.GenericSort;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
@@ -44,7 +44,7 @@ public class TestGenericRemovingLemmaGenerator extends TestCase {
 
         Name nameG = new Name("G");
         boolean found = false;
-        for (Sort sort : sorts) {
+        for (org.key_project.common.core.logic.Sort sort : sorts) {
             assertFalse("No generic sorts must survive", sort instanceof GenericSort);
 
             if(!found && sort instanceof ProxySort && sort.name().equals(nameG)) {

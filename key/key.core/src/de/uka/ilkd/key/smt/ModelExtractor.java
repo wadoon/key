@@ -13,22 +13,14 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.Sort;
+
 import de.uka.ilkd.key.smt.lang.SMTFunction;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.Util;
-import de.uka.ilkd.key.smt.model.Heap;
-import de.uka.ilkd.key.smt.model.Location;
-import de.uka.ilkd.key.smt.model.LocationSet;
-import de.uka.ilkd.key.smt.model.Model;
-import de.uka.ilkd.key.smt.model.ObjectVal;
-import de.uka.ilkd.key.smt.model.Sequence;
+import de.uka.ilkd.key.smt.model.*;
 /**
  * Represents a query directed to towards the z3 solver.
  * @author mihai
@@ -597,12 +589,12 @@ class FunValueQuery extends AbstractQuery{
  */
 class ExactInstanceQuery extends AbstractQuery{
 	private String objectId;
-	private Sort sort;
+	private org.key_project.common.core.logic.Sort sort;
 	
 	
 	
 	
-	public ExactInstanceQuery(String objectId, Sort sort) {
+	public ExactInstanceQuery(String objectId, org.key_project.common.core.logic.Sort sort) {
 		super();
 		this.objectId = objectId;
 		this.sort = sort;
@@ -616,7 +608,7 @@ class ExactInstanceQuery extends AbstractQuery{
 
 
 
-	public Sort getSort() {
+	public org.key_project.common.core.logic.Sort getSort() {
 		return sort;
 	}
 
@@ -872,7 +864,7 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 					
 					
 					
-					Sort s = objectSorts.get(objectID);
+					org.key_project.common.core.logic.Sort s = objectSorts.get(objectID);
 					Set<String> fields; 
 					if(s == null){
 						fields = types.getFieldsForSort("java.lang.Object");
@@ -904,7 +896,7 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 				continue;
 			
 			
-			Sort s = objectSorts.get(objectID);
+			org.key_project.common.core.logic.Sort s = objectSorts.get(objectID);
 			if(s != null){
 				ExactInstanceQuery eq = new ExactInstanceQuery(objectID, s);
 				queries.add(eq);
@@ -1451,7 +1443,7 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 				String result = oq.getResult();
 				
 				if(result.equals("true")){
-					Sort t = objectSorts.get(objectID);
+					org.key_project.common.core.logic.Sort t = objectSorts.get(objectID);
 					
 					if(t == null || s.extendsTrans(t)){
 						objectSorts.put(objectID, s);

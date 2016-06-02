@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SortCollector;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -14,17 +18,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.SortCollector;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
@@ -35,11 +30,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.*;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
@@ -85,8 +76,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return new SemanticsBlastingStrategy();
     }
     
-    private boolean containsSubTypes(Sort s, Set<Sort> sorts){      
-        for(Sort st : sorts){
+    private boolean containsSubTypes(org.key_project.common.core.logic.Sort s, Set<Sort> sorts){      
+        for(org.key_project.common.core.logic.Sort st : sorts){
             if( st.extendsTrans(s)){
                 return true;
             }
@@ -101,7 +92,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         SpecificationRepository spec = services.getSpecificationRepository();
 
-        Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+        org.key_project.common.core.logic.Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
 
         LogicVariable h = new LogicVariable(new Name("h"), heapSort);
 
@@ -109,7 +100,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         for(KeYJavaType kjt : info.getAllKeYJavaTypes()){
 
-            Sort sort = kjt.getSort();
+            org.key_project.common.core.logic.Sort sort = kjt.getSort();
 
             if(!containsSubTypes(sort, sorts)){
                 continue;

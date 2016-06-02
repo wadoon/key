@@ -15,11 +15,7 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.core.Main;
 

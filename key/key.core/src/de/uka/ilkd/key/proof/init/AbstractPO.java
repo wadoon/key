@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -26,10 +29,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -39,11 +40,7 @@ import de.uka.ilkd.key.rule.Choice;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -89,7 +86,7 @@ public abstract class AbstractPO implements IPersistablePO {
             ImmutableSet<ClassAxiom> axioms) {
         for (ClassAxiom axiom : axioms) {
             if (axiom.getTarget()==null || !(axiom.getTarget().equals(usedObs.second)
-                  && usedObs.first.extendsTrans(axiom.getKJT().getSort()))) {
+                  && usedObs.first.extendsTrans(axiom.getKJT().getSort(), environmentServices))) {
                 axioms = axioms.remove(axiom);
             }
         }
@@ -251,8 +248,8 @@ public abstract class AbstractPO implements IPersistablePO {
     protected final void register(Function f, Services services) {
          Namespace functionNames = services.getNamespaces().functions();
          if (f != null && functionNames.lookup(f.name()) == null) {
-             assert f.sort() != Sort.UPDATE;
-             if (f.sort() == Sort.FORMULA) {
+             assert f.sort() != SpecialSorts.UPDATE;
+             if (f.sort() == SpecialSorts.FORMULA) {
                  functionNames.addSafely(f);
              } else {
                  functionNames.addSafely(f);

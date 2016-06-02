@@ -18,20 +18,15 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.common.core.logic.GenericSort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -46,7 +41,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class GenericSortInstantiations {
 
     public static final GenericSortInstantiations EMPTY_INSTANTIATIONS =
-	new GenericSortInstantiations ( DefaultImmutableMap.<GenericSort,Sort>nilMap() );
+	new GenericSortInstantiations ( DefaultImmutableMap.<GenericSort,org.key_project.common.core.logic.Sort>nilMap() );
 
 
     private final ImmutableMap<GenericSort,Sort> insts;
@@ -151,7 +146,7 @@ public final class GenericSortInstantiations {
      * "GenericSortInstantiations"-object)
      */
     public Boolean checkCondition ( GenericSortCondition p_condition ) {
-	Sort s = insts.get ( p_condition.getGenericSort () );
+	org.key_project.common.core.logic.Sort s = insts.get ( p_condition.getGenericSort () );
 
 	if ( s == null ) { 
 	    return null;
@@ -166,7 +161,7 @@ public final class GenericSortInstantiations {
     }
 
 
-    public Sort    getInstantiation ( GenericSort p_gs ) {
+    public org.key_project.common.core.logic.Sort    getInstantiation ( GenericSort p_gs ) {
 	return insts.get ( p_gs );
     }
 
@@ -200,11 +195,11 @@ public final class GenericSortInstantiations {
      * @throws GenericSortException iff p_s is a generic sort which is
      * not yet instantiated
      */
-    public Sort getRealSort ( SchemaVariable p_sv, TermServices services ) {
+    public org.key_project.common.core.logic.Sort getRealSort ( SchemaVariable p_sv, TermServices services ) {
 	return getRealSort ( p_sv.sort (), services );
     }
 
-    public Sort getRealSort ( Sort p_s, TermServices services ) {
+    public org.key_project.common.core.logic.Sort getRealSort ( org.key_project.common.core.logic.Sort p_s, TermServices services ) {
 	if ( p_s instanceof GenericSort ) {
 	    p_s = getInstantiation ( (GenericSort)p_s );
 	    if ( p_s == null ) {
@@ -242,7 +237,7 @@ public final class GenericSortInstantiations {
 	ImmutableList<GenericSort> topologicalSorts = topology ( p_sorts );
 
 	res = solveHelp ( topologicalSorts,
-			  DefaultImmutableMap.<GenericSort,Sort>nilMap(),
+			  DefaultImmutableMap.<GenericSort,org.key_project.common.core.logic.Sort>nilMap(),
 			  p_conditions,
 			  ImmutableSLList.<GenericSort>nil(),
 			  services);
@@ -291,7 +286,7 @@ public final class GenericSortInstantiations {
 
 	// Find the sorts "gs" has to be a supersort of and the
 	// identity conditions
-	ImmutableList<Sort>                     subsorts     = ImmutableSLList.<Sort>nil();
+	ImmutableList<Sort>                     subsorts     = ImmutableSLList.<org.key_project.common.core.logic.Sort>nil();
 	ImmutableList<GenericSortCondition>     idConditions =
 	                        ImmutableSLList.<GenericSortCondition>nil();
 
@@ -370,7 +365,7 @@ public final class GenericSortInstantiations {
                                          Services services) {
         final Iterator<Sort> itChosen = p_chosenList.iterator ();
         while ( itChosen.hasNext () ) {
-            final Sort chosen = itChosen.next ();
+            final org.key_project.common.core.logic.Sort chosen = itChosen.next ();
             if ( !isSupersortOf ( chosen, p_subsorts ) // this test is unnecessary in some cases
                  || !p_gs.isPossibleInstantiation ( chosen ) ) continue;
 
@@ -401,7 +396,7 @@ public final class GenericSortInstantiations {
                 if ( chosen != condSort ( itC ) ) throw FAIL_EXCEPTION;
             }
 
-            return ImmutableSLList.<Sort>nil().prepend ( chosen );
+            return ImmutableSLList.<org.key_project.common.core.logic.Sort>nil().prepend ( chosen );
         } else {
             // if a list of possible instantiations of the generic
             // sort has been given, use it
@@ -414,7 +409,7 @@ public final class GenericSortInstantiations {
 
     private static ImmutableList<Sort> toList (ImmutableSet<Sort> p_set) {
         ImmutableList<Sort> res;
-        res = ImmutableSLList.<Sort>nil();
+        res = ImmutableSLList.<org.key_project.common.core.logic.Sort>nil();
         final Iterator<Sort> it = p_set.iterator ();
         while ( it.hasNext () )
             res = res.prepend ( it.next () );
@@ -496,7 +491,7 @@ public final class GenericSortInstantiations {
 	    ImmutableMap<GenericSort,Sort> res;
 	    HashSet<Sort>                  todo   = new LinkedHashSet<Sort> ();
 	    HashSet<Sort>                  done   = new LinkedHashSet<Sort> ();
-	    Sort                     cand;
+	    org.key_project.common.core.logic.Sort                     cand;
 
 	    // search for instantiated supersorts of gs (the method
 	    // below is neither fast nor complete, but should find a
@@ -608,7 +603,7 @@ public final class GenericSortInstantiations {
 	// Find a set "inside" of common supersorts of "p_itSorts"
 	// that contains all minimal common supersorts
 	while ( !inside.isEmpty () && p_itSorts.hasNext () ) {
-	    final Sort condition = p_itSorts.next ();
+	    final org.key_project.common.core.logic.Sort condition = p_itSorts.next ();
 
 	    // At this point todo.isEmpty ()
 	    final HashSet<Sort> t = todo;
@@ -640,16 +635,16 @@ public final class GenericSortInstantiations {
      */
     private static ImmutableList<Sort> findMinimalElements (Set<Sort> p_inside) {
         if ( p_inside.size () == 1 )
-            return ImmutableSLList.<Sort>nil()
+            return ImmutableSLList.<org.key_project.common.core.logic.Sort>nil()
                         .prepend ( p_inside.iterator ().next () );
 
-        ImmutableList<Sort> res = ImmutableSLList.<Sort>nil();
+        ImmutableList<Sort> res = ImmutableSLList.<org.key_project.common.core.logic.Sort>nil();
         final Iterator<Sort> it = p_inside.iterator ();
         
         mainloop: while ( it.hasNext () ) {
             final Sort sort = it.next ();
 
-            ImmutableList<Sort> res2 = ImmutableSLList.<Sort>nil();
+            ImmutableList<Sort> res2 = ImmutableSLList.<org.key_project.common.core.logic.Sort>nil();
             final Iterator<Sort> itSort = res.iterator ();
             while ( itSort.hasNext () ) {
                 final Sort oldMinimal = itSort.next ();
@@ -686,7 +681,7 @@ public final class GenericSortInstantiations {
      * @return true iff "p_s" is supersort of every sort of
      * "p_subsorts"
      */
-    private static boolean isSupersortOf ( Sort       p_s,
+    private static boolean isSupersortOf ( org.key_project.common.core.logic.Sort       p_s,
 					   ImmutableList<Sort> p_subsorts ) {
 	final Iterator<Sort> it = p_subsorts.iterator ();
 
@@ -706,7 +701,7 @@ public final class GenericSortInstantiations {
      */
     private static boolean isPossibleInstantiation
 	( GenericSort                p_gs,
-	  Sort                       p_s,
+	  org.key_project.common.core.logic.Sort                       p_s,
 	  ImmutableMap<GenericSort,Sort>   p_curRes) {
         
 	if ( !p_gs.isPossibleInstantiation ( p_s ) )

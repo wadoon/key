@@ -14,8 +14,9 @@
 
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.logic.Sorted;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.Sorted;
+
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 
 /**
@@ -54,8 +55,8 @@ public final class Assert {
      */
     public static void assertSubSort(Sorted t1, Sorted t2) {
         if (!assertionsEnabled()) return;
-        Sort s1 = t1.sort();
-        Sort s2 = t2.sort();
+        org.key_project.common.core.logic.Sort s1 = t1.sort();
+        org.key_project.common.core.logic.Sort s2 = t2.sort();
         if (!s1.extendsTrans(s2)) {
             throw new AssertionFailure("Assertion failed: The sort of "+t1
                             +" was supposed to be a subsort of "+t2+"'s," +

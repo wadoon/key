@@ -13,22 +13,16 @@
 
 package de.uka.ilkd.key.rule.join;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.clearSemisequent;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.closeJoinPartnerGoal;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.createSimplifiedDisjunctivePathCondition;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getConjunctiveElementsFor;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getLocationVariables;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateLeftSideLocations;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateRightSideFor;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isProvableWithSplitting;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isUpdateNormalForm;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSEPair;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -36,21 +30,8 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
@@ -58,11 +39,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
-import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithSignLattice;
+import de.uka.ilkd.key.rule.join.procedures.*;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
@@ -369,7 +346,7 @@ public class JoinRule implements BuiltInRule {
                     && !JoinRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
 
                 Term predicateTerm =
-                        tb.func(new Function(new Name("P"), Sort.FORMULA, v
+                        tb.func(new Function(new Name("P"), SpecialSorts.FORMULA, v
                                 .sort()), tb.var(v));
                 Term appl1 = tb.apply(state1.first, predicateTerm);
                 Term appl2 = tb.apply(state2.first, predicateTerm);

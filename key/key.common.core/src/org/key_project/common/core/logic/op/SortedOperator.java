@@ -11,38 +11,21 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/**
- * 
+package org.key_project.common.core.logic.op;
+
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.util.collection.ImmutableArray;
+
+
+/** 
+ * Operator with well-defined argument and result sorts.
  */
-package de.uka.ilkd.key.logic;
+public interface SortedOperator extends Operator {
+    
+    Sort sort();
 
-import java.util.HashSet;
-import java.util.Set;
-
-import de.uka.ilkd.key.logic.sort.Sort;
-
-/**
- * @author mihai
- *
- */
-public class SortCollector extends DefaultVisitor {	
-	
-	private Set<Sort> sorts;	
-
-	public SortCollector() {
-		sorts = new HashSet<Sort>();
-	}
-	
-	public Set<Sort> getSorts() {
-		return sorts;
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.key_project.common.core.logic.DefaultVisitor#visit(org.key_project.common.core.logic.Term)
-	 */
-	@Override
-	public void visit(Term visited) {
-		sorts.add(visited.sort());
-	}	
-
+    Sort argSort(int i);
+    
+    public ImmutableArray<Sort> argSorts();
 }

@@ -16,14 +16,14 @@ package de.uka.ilkd.key.java.recoderext;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.util.Debug;
 import recoder.ServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.UnitKit;
 import recoder.service.DefaultNameInfo;
-import de.uka.ilkd.key.java.ConvertException;
-import de.uka.ilkd.key.util.Debug;
 
 
 

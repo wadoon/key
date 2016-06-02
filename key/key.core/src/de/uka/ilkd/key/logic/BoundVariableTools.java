@@ -16,20 +16,24 @@ package de.uka.ilkd.key.logic;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.key_project.common.core.logic.DLTerm;
+import org.key_project.common.core.logic.DLVisitor;
+import org.key_project.common.core.logic.Program;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
 
 
 /**
  * Some generally useful tools for dealing with arrays of bound variables
  */
-public class BoundVariableTools {
+public class BoundVariableTools<T extends DLTerm<? extends DLVisitor<T>>, P extends Program> {
     
-    public final static BoundVariableTools DEFAULT = new BoundVariableTools ();
+    public  final static BoundVariableTools DEFAULT = new BoundVariableTools ();
     
     private BoundVariableTools () {}
         
@@ -40,15 +44,15 @@ public class BoundVariableTools {
      * array (in <code>originalTerm</code>)
     * @param services TODO
      */
-    public Term renameVariables (Term originalTerm,
+    public T renameVariables (T originalTerm,
                                  ImmutableArray<QuantifiableVariable> oldBoundVars,
                                  ImmutableArray<QuantifiableVariable> newBoundVars, 
-                                 TermServices services) {
-        Term res = originalTerm;
+                                 TermServices<T,P> services) {
+        T res = originalTerm;
         for (int i = 0; i != oldBoundVars.size(); ++i) {
             if ( oldBoundVars.get ( i )
                  != newBoundVars.get ( i ) ) {
-                final Term newVarTerm =
+                final T newVarTerm =
                     services.getTermFactory().createTerm( newBoundVars.get ( i ) );
                 final ClashFreeSubst subst =
                     new ClashFreeSubst ( oldBoundVars.get ( i ),
@@ -60,16 +64,16 @@ public class BoundVariableTools {
         return res;
     }
 
-    public Term[] renameVariables (Term[] originalTerms,
+    public T[] renameVariables (T[] originalTerms,
                                    ImmutableArray<QuantifiableVariable> oldBoundVars,
                                    ImmutableArray<QuantifiableVariable> newBoundVars, 
-                                   TermServices services) {
-        final Term[] res = new Term [originalTerms.length];
+                                   TermServices<T,P> services) {
+        final DLTerm[] res = new DLTerm [originalTerms.length];
         for ( int i = 0; i != res.length; ++i )
             res[i] = renameVariables ( originalTerms[i],
                                        oldBoundVars,
                                        newBoundVars, services );
-        return res;
+        return (T[])res;
     }
     
     
@@ -135,10 +139,10 @@ public class BoundVariableTools {
      * @return <code>true</code> if it was necessary to rename a variable,
      *         i.e. to changed anything in the term <code>originalTerm</code>
      */
-    public boolean resolveCollisions (Term originalTerm,
+    public boolean resolveCollisions (T originalTerm,
                                       ImmutableSet<QuantifiableVariable> criticalVars,
                                       ImmutableArray<QuantifiableVariable>[] newBoundVars,
-                                      Term[] newSubs, TermServices services) {
+                                      T[] newSubs, TermServices<T,P> services) {
         boolean changed = false;
 
         for ( int i = 0; i != originalTerm.arity (); ++i ) {

@@ -14,9 +14,9 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Schema variable matching modal operators.
@@ -35,7 +35,7 @@ public final class ModalOperatorSV extends AbstractSV  {
      * @param modalities modal operators matched by this SV
      */    
     ModalOperatorSV(Name name, ImmutableSet<Modality> modalities) {
-        super(name, new Sort[]{Sort.FORMULA}, Sort.FORMULA, false, false);
+        super(name, new Sort[]{SpecialSorts.FORMULA}, SpecialSorts.FORMULA, false, false);
         this.modalities = modalities;
     }
 

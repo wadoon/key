@@ -13,14 +13,15 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -30,29 +31,12 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
-import de.uka.ilkd.key.smt.lang.SMTFile;
-import de.uka.ilkd.key.smt.lang.SMTFunction;
-import de.uka.ilkd.key.smt.lang.SMTFunctionDef;
-import de.uka.ilkd.key.smt.lang.SMTSort;
-import de.uka.ilkd.key.smt.lang.SMTTerm;
-import de.uka.ilkd.key.smt.lang.SMTTermCall;
-import de.uka.ilkd.key.smt.lang.SMTTermITE;
-import de.uka.ilkd.key.smt.lang.SMTTermMultOp;
-import de.uka.ilkd.key.smt.lang.SMTTermNumber;
-import de.uka.ilkd.key.smt.lang.SMTTermUnaryOp;
-import de.uka.ilkd.key.smt.lang.SMTTermVariable;
-import de.uka.ilkd.key.smt.lang.Util;
+import de.uka.ilkd.key.smt.lang.*;
 import de.uka.ilkd.key.util.Debug;
 
 public class SMTObjTranslator implements SMTTranslator {
@@ -1102,7 +1086,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	private void addSingleSort(Set<Sort> sorts, Sort s) {
 	    String name = s.name().toString();
 	    JavaInfo javaInfo = services.getJavaInfo();
-	    Sort object = javaInfo.getJavaLangObject().getSort();
+	    org.key_project.common.core.logic.Sort object = javaInfo.getJavaLangObject().getSort();
 		Sort nullSort = services.getTypeConverter().getHeapLDT().getNull()
 		        .sort();
 		//if java reference type
@@ -1412,7 +1396,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	private SMTSort translateSort(Sort s) throws IllegalFormulaException {
 		if (s.equals(boolSort)) {
 			return SMTSort.BOOL;
-		} else if (s.equals(Sort.FORMULA)) {
+		} else if (s.equals(SpecialSorts.FORMULA)) {
 			return SMTSort.BOOL;
 		} else if (s.equals(integerSort)) {
 			return sorts.get(BINT_SORT);
@@ -1422,7 +1406,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			return sorts.get(FIELD_SORT);
 		} else if (s.equals(locsetSort)) {
 			return sorts.get(LOCSET_SORT);
-		} else if (s.equals(Sort.ANY)) {
+		} else if (s.equals(SpecialSorts.ANY)) {
 			return sorts.get(ANY_SORT);
 		} else if (s.equals(seqSort)) {
 			return sorts.get(SEQ_SORT);
@@ -1481,7 +1465,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			return;
 		}
 		// Do not specify constraint for these sorts:
-		if (s == Sort.ANY || s.equals(objectSort)
+		if (s == SpecialSorts.ANY || s.equals(objectSort)
 		        || s.name().toString().equalsIgnoreCase("Null")) {
 			return;
 		}
@@ -1583,7 +1567,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		typeAssertions.put(s.name().toString(), forall);
 	}
 
-	private boolean isFinal(Sort s) {
+	private boolean isFinal(org.key_project.common.core.logic.Sort s) {
 	    KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
 	    boolean finalClass = kjt != null
 	            && kjt.getJavaType() instanceof ClassDeclaration
@@ -1641,8 +1625,8 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param s
 	 * @return true if s or a subtype of s appears in the proof obligation
 	 */
-	private boolean appearsInPO(Sort s) {
-		for (Sort poSort : javaSorts) {
+	private boolean appearsInPO(org.key_project.common.core.logic.Sort s) {
+		for (org.key_project.common.core.logic.Sort poSort : javaSorts) {
 			if (poSort.extendsTrans(s)) {
 				return true;
 			}
@@ -1884,7 +1868,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		typeAssertions.put(f.getId(), assertion);
 	}
 
-	private String getCastFunctionName(Sort castTarget) {
+	private String getCastFunctionName(org.key_project.common.core.logic.Sort castTarget) {
 		return "cast" + castTarget;
 	}
 
@@ -1923,7 +1907,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param s
 	 * @return true if s is an interface
 	 */
-	private boolean isInterface(Sort s) {
+	private boolean isInterface(org.key_project.common.core.logic.Sort s) {
 		KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
 		if (kjt == null) {
 			return false;

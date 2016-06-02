@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -28,19 +29,9 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.rule.Choice;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.NotFreeIn;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletAnnotation;
-import de.uka.ilkd.key.rule.TacletAttributes;
-import de.uka.ilkd.key.rule.Trigger;
-import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.*;
 
 /** 
  * abstract taclet builder class to be inherited from taclet builders

@@ -18,30 +18,16 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.LogicVariable;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.SVInstantiationException;
-import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import junit.framework.TestCase;
@@ -49,7 +35,7 @@ import junit.framework.TestCase;
 
 public class TestCollisionResolving extends TestCase {
 
-    Sort s;
+    org.key_project.common.core.logic.Sort s;
     Goal goal;
     Services services;
 
@@ -61,7 +47,7 @@ public class TestCollisionResolving extends TestCase {
     public void setUp() {
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();
-	s = (Sort)TacletForTests.getSorts().lookup(new Name("s"));
+	s = (org.key_project.common.core.logic.Sort)TacletForTests.getSorts().lookup(new Name("s"));
 
    	services = TacletForTests.services();
 
@@ -89,8 +75,8 @@ public class TestCollisionResolving extends TestCase {
 	// the term has to be built manually because we have to ensure
 	// object equality of the LogicVariable x
 	LogicVariable x = new LogicVariable(new Name("x"), s);
-	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
-	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
+	Function p = new Function(new Name("p"), SpecialSorts.FORMULA, new org.key_project.common.core.logic.Sort[]{s});
+	Function q = new Function(new Name("q"), SpecialSorts.FORMULA, new org.key_project.common.core.logic.Sort[]{s});
 
 	Term t_x = services.getTermFactory().createTerm(x);	
 	Term t_p_x = services.getTermFactory().createTerm(p, new Term[]{t_x}, null, null);
@@ -136,8 +122,8 @@ public class TestCollisionResolving extends TestCase {
 	// the term has to be built manually because we have to ensure
 	// object equality of the LogicVariable x
 	LogicVariable x = new LogicVariable(new Name("x"), s);
-	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
-	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
+	Function p = new Function(new Name("p"), SpecialSorts.FORMULA, new org.key_project.common.core.logic.Sort[]{s});
+	Function q = new Function(new Name("q"), SpecialSorts.FORMULA, new org.key_project.common.core.logic.Sort[]{s});
 
 	TermBuilder tb = services.getTermBuilder();
 

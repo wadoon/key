@@ -14,10 +14,10 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * This class represents proper program variables, which are not program
@@ -72,7 +72,7 @@ public final class LocationVariable extends ProgramVariable
 
 
     @Override
-    public UpdateableOperator rename(Name name) {
+    public LocationVariable rename(Name name) {
         if (getKeYJavaType() != null) {
         return new LocationVariable(new ProgramElementName(name.toString()),
                                     getKeYJavaType(), getContainerType(),

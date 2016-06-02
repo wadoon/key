@@ -13,16 +13,10 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.DLTerm;
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.*;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
  * In contrast to the distinction of formulas and terms as made by most of the 
@@ -32,7 +26,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * software's design/architecture (for example using same visitors, reduction of
  * case distinction, unified interfaces etc.). However, they are strictly
  * separated by their sorts. A formula (and just a formula) must have 
- * the sort {@link Sort#FORMULA}. Terms of a different sort are terms in the
+ * the sort {@link SpecialSorts#FORMULA}. Terms of a different sort are terms in the
  * customary logic sense. A term of sort formula is allowed exact there, where a
  * formuala in logic is allowed to appear, same for terms of different sorts. 
  *   Some words about other design decisions: 
@@ -55,7 +49,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * currently supported: {@link Term#execPostOrder(Visitor)} and
  * {@link Term#execPreOrder(Visitor)}. 
  */
-public interface Term extends DLTerm<Sort, Visitor>, SVSubstitute, Sorted {
+public interface Term extends DLTerm<DLVisitor<Term>>, SVSubstitute, Sorted {
     
     /** 
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
@@ -81,35 +75,11 @@ public interface Term extends DLTerm<Sort, Visitor>, SVSubstitute, Sorted {
     @Override
     public Term sub(int n);
             
-     /**
-     * The logical variables bound by the top level operator.
-     */
-    @Override
-    public ImmutableArray<QuantifiableVariable> boundVars();
-    /**
-     * The logical variables bound by the top level operator for the nth 
-     * subterm.
-     */
-    @Override
-    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
     
     /**
      * The Java block at top level.
      */
     public JavaBlock javaBlock();
-    
-    
-    /**
-     * The sort of the term.
-     */
-    @Override
-    public Sort sort();    
-    
-    /** 
-     * The set of free quantifiable variables occurring in this term.
-     */
-    @Override
-    public ImmutableSet<QuantifiableVariable> freeVars();
     
     
     /**

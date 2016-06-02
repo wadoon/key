@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -20,8 +22,6 @@ import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -227,7 +227,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             Term origTerm = origVarsIt.next();
             Term svTerm = schemaVarsIt.next();
             if (origTerm != null && svTerm != null) {
-                assert svTerm.sort().extendsTrans(origTerm.sort()) :
+                assert svTerm.sort().extendsTrans(origTerm.sort(), services) :
                         "mismatch of sorts: orignal term " + origTerm +
                         ", sort " + origTerm.sort() +
                         "; replacement term" + svTerm + ", sort " +

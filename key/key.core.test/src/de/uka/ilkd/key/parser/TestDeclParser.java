@@ -17,21 +17,17 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.antlr.runtime.RecognitionException;
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import junit.framework.TestCase;
 
@@ -103,7 +99,7 @@ public class TestDeclParser extends TestCase {
 	
 	assertEquals ( "Generic sort has wrong supersorts",
 		       p_ext,
-		       gs.extendsSorts () );
+		       serv.getDirectSuperSorts(gs) );
 	assertEquals ( "Generic sort has wrong oneof-list",
 		       p_oneof,
 		       gs.getOneOf () );
@@ -123,22 +119,22 @@ public class TestDeclParser extends TestCase {
         nss = new NamespaceSet ();
         parseDecls("\\sorts { A; B; \\proxy P; \\proxy Q \\extends A,B; \\proxy R \\extends Q; }");
 
-        Sort P = (Sort) nss.sorts().lookup(new Name("P"));
+        org.key_project.common.core.logic.Sort P = (org.key_project.common.core.logic.Sort) nss.sorts().lookup(new Name("P"));
         assertTrue(P instanceof ProxySort);
         assertEquals("P", P.name().toString());
-        assertEquals(DefaultImmutableSet.nil().add(Sort.ANY), P.extendsSorts());
+        assertEquals(DefaultImmutableSet.nil().add(SpecialSorts.ANY), serv.getDirectSuperSorts(P));
 
         Sort A = (Sort) nss.sorts().lookup(new Name("A"));
         Sort B = (Sort) nss.sorts().lookup(new Name("B"));
         Sort Q = (Sort) nss.sorts().lookup(new Name("Q"));
         assertTrue(Q instanceof ProxySort);
         assertEquals("Q", Q.name().toString());
-        assertEquals(DefaultImmutableSet.nil().add(A).add(B), Q.extendsSorts());
+        assertEquals(DefaultImmutableSet.nil().add(A).add(B), serv.getDirectSuperSorts(Q));
 
-        Sort R = (Sort) nss.sorts().lookup(new Name("R"));
+        org.key_project.common.core.logic.Sort R = (org.key_project.common.core.logic.Sort) nss.sorts().lookup(new Name("R"));
         assertTrue(P instanceof ProxySort);
         assertEquals("R", R.name().toString());
-        assertEquals(DefaultImmutableSet.nil().add(Q), R.extendsSorts());
+        assertEquals(DefaultImmutableSet.nil().add(Q), serv.getDirectSuperSorts(R));
     }
 
 
@@ -150,11 +146,11 @@ public class TestDeclParser extends TestCase {
 	parseDecls("\\sorts { \\generic G; \\generic H \\extends G; }");
 
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-			       DefaultImmutableSet.<Sort>nil() );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add(SpecialSorts.ANY),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       DefaultImmutableSet.<Sort>nil().add ( G ),
-			       DefaultImmutableSet.<Sort>nil() );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add ( G ),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil() );
 
 
 	nss = new NamespaceSet ();
@@ -162,11 +158,11 @@ public class TestDeclParser extends TestCase {
 	
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-			       DefaultImmutableSet.<Sort>nil() );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add(SpecialSorts.ANY),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( G ),
-			       DefaultImmutableSet.<Sort>nil() );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add ( S ).add ( G ),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil() );
 
 
 	nss = new NamespaceSet ();
@@ -175,8 +171,8 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( T ) );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add(SpecialSorts.ANY),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add ( S ).add ( T ) );
 	
 
 	nss = new NamespaceSet ();
@@ -185,11 +181,11 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-			       DefaultImmutableSet.<Sort>nil() );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add(SpecialSorts.ANY),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
-			       DefaultImmutableSet.<Sort>nil().add ( S ) );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add ( T ).add ( G ),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add ( S ) );
 	
 
 	nss = new NamespaceSet ();
@@ -198,17 +194,17 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-			       DefaultImmutableSet.<Sort>nil() );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add(SpecialSorts.ANY),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil() );
 	checkGenericSort     ( nss.sorts().lookup(new Name("G2")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-			       DefaultImmutableSet.<Sort>nil() );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add(SpecialSorts.ANY),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
-			       DefaultImmutableSet.<Sort>nil().add ( S ) );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add ( T ).add ( G ),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add ( S ) );
 	checkGenericSort     ( nss.sorts().lookup(new Name("H2")),
-			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
-			       DefaultImmutableSet.<Sort>nil().add ( S ) );
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add ( T ).add ( G ),
+			       DefaultImmutableSet.<org.key_project.common.core.logic.Sort>nil().add ( S ) );
 	
 
 	nss = new NamespaceSet ();
@@ -246,7 +242,7 @@ public class TestDeclParser extends TestCase {
 		   ", but the type SchemaVariable was expected",
 		   o instanceof SchemaVariable);
 	assertTrue("Schemavariable is not allowed to match a term of sort FORMULA.",
-		   ((SchemaVariable)o).sort() != Sort.FORMULA);
+		   ((SchemaVariable)o).sort() != SpecialSorts.FORMULA);
     }
 
     /** asserts that the SchemaVariable matches to a formula 
@@ -259,7 +255,7 @@ public class TestDeclParser extends TestCase {
 		   o instanceof SchemaVariable);
 	assertSame("Only matches to terms of sort FORMULA allowed. "+
 		   "But term has sort "+((SchemaVariable)o).sort(), 
-		   ((SchemaVariable)o).sort(), Sort.FORMULA);
+		   ((SchemaVariable)o).sort(), SpecialSorts.FORMULA);
 
 	
     }
@@ -274,8 +270,8 @@ public class TestDeclParser extends TestCase {
 	Sort cloneableSort = serv.getJavaInfo().cloneableSort();
         Sort serializableSort = serv.getJavaInfo().serializableSort();
 	Sort aSortArr = ArraySort.getArraySort(aSort, objectSort, cloneableSort, serializableSort);
-	Sort aSortArr2 = ArraySort.getArraySort(aSortArr, objectSort, cloneableSort, serializableSort);
-	assertTrue("aSort[] should extend Cloneable: " + aSortArr.extendsSorts(), 
+	org.key_project.common.core.logic.Sort aSortArr2 = ArraySort.getArraySort(aSortArr, objectSort, cloneableSort, serializableSort);
+	assertTrue("aSort[] should extend Cloneable: " + serv.getDirectSuperSorts(aSortArr), 
 		   aSortArr.extendsSorts().contains(cloneableSort)); 
  	assertTrue("aSort[] should transitively extend Object ", 
 		   aSortArr.extendsTrans(objectSort)); 
@@ -369,7 +365,7 @@ public class TestDeclParser extends TestCase {
 		     ((Function)nss.functions().lookup(new Name("isEmpty"))).arity());
 	assertEquals("isEmpty arg sort 0", list,
 		   ((Function)nss.functions().lookup(new Name("isEmpty"))).argSort(0));
-	assertEquals("isEmpty return sort", Sort.FORMULA,
+	assertEquals("isEmpty return sort", SpecialSorts.FORMULA,
 		     ((Function)nss.functions().lookup(new Name("isEmpty"))).sort());
 
 	assertEquals("find contains predicate", new Name("contains"),
@@ -380,14 +376,14 @@ public class TestDeclParser extends TestCase {
 		   ((Function)nss.functions().lookup(new Name("contains"))).argSort(0));
 	assertEquals("contains arg sort 1", elem,
 		   ((Function)nss.functions().lookup(new Name("contains"))).argSort(1));
-	assertEquals("contains return sort", Sort.FORMULA,
+	assertEquals("contains return sort", SpecialSorts.FORMULA,
 		     ((Function)nss.functions().lookup(new Name("contains"))).sort());
 
 	assertEquals("find maybe predicate", new Name("maybe"),
 		     nss.functions().lookup(new Name("maybe")).name());
 	assertEquals("maybe arity", 0,
 		     ((Function)nss.functions().lookup(new Name("maybe"))).arity());
-	assertEquals("maybe return sort", Sort.FORMULA,
+	assertEquals("maybe return sort", SpecialSorts.FORMULA,
 		     ((Function)nss.functions().lookup(new Name("maybe"))).sort());
     }
 
@@ -429,7 +425,7 @@ public class TestDeclParser extends TestCase {
 		     nss.variables().lookup(new Name("b")).name()); 
 	assertFormulaSV("SV b type", 
 		     nss.variables().lookup(new Name("b"))); 
-	assertEquals("SV b sort", Sort.FORMULA,
+	assertEquals("SV b sort", SpecialSorts.FORMULA,
 		     ((SchemaVariable)nss.variables().lookup(new Name("b"))).sort()); 
     }
     

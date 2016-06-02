@@ -22,11 +22,7 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;

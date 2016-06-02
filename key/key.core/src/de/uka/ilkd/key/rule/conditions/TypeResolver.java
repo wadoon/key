@@ -13,21 +13,17 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SVSubstitute;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -65,7 +61,7 @@ public abstract class TypeResolver {
             			       SVInstantiations instMap, 
             			       TermServices services);
     
-    public abstract Sort resolveSort(SchemaVariable sv, 
+    public abstract org.key_project.common.core.logic.Sort resolveSort(SchemaVariable sv, 
             			     SVSubstitute instCandidate, 
             			     SVInstantiations instMap, 
             			     Services services);
@@ -94,7 +90,7 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
+        public org.key_project.common.core.logic.Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs);
         }
@@ -120,12 +116,12 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
+        public org.key_project.common.core.logic.Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {
             return s;
         }
         
-        public Sort getSort(){
+        public org.key_project.common.core.logic.Sort getSort(){
             return s;
         }
         
@@ -150,10 +146,10 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
+        public org.key_project.common.core.logic.Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {
             
-            final Sort s;        
+            final org.key_project.common.core.logic.Sort s;        
             
             final SVSubstitute inst = (SVSubstitute) (resolveSV == sv ? instCandidate : 
                 instMap.getInstantiation(resolveSV));
@@ -200,11 +196,11 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, 
+        public org.key_project.common.core.logic.Sort resolveSort(SchemaVariable sv, 
         			SVSubstitute instCandidate,
         			SVInstantiations instMap, 
         			Services services) {     
-            final Sort result;
+            final org.key_project.common.core.logic.Sort result;
             
             final SVSubstitute inst = (SVSubstitute) (memberSV == sv ? instCandidate : 
                 instMap.getInstantiation(memberSV)); 
@@ -226,8 +222,8 @@ public abstract class TypeResolver {
             return result;
         }
     
-        private Sort getContainerSort(Operator op, TermServices services) {
-            Sort result = null;
+        private org.key_project.common.core.logic.Sort getContainerSort(Operator op, TermServices services) {
+            org.key_project.common.core.logic.Sort result = null;
             if (op instanceof ProgramVariable) {
                 result  = ((ProgramVariable)op).getContainerType().getSort();
             } else if(op instanceof IObserverFunction) {
@@ -239,7 +235,7 @@ public abstract class TypeResolver {
         	Function func = (Function) op;
         	String funcName = func.name().toString();
         	String sortName = funcName.substring(0, funcName.indexOf("::"));
-        	return (Sort) 
+        	return (org.key_project.common.core.logic.Sort) 
         	   services.getNamespaces().sorts().lookup(new Name(sortName));
             } else {
                 Debug.fail("Unknown member type", op);

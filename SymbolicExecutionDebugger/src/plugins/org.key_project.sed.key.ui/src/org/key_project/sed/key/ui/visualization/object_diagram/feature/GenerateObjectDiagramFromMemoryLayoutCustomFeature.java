@@ -23,24 +23,14 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
-import org.key_project.sed.ui.visualization.model.od.ODAssociation;
-import org.key_project.sed.ui.visualization.model.od.ODFactory;
-import org.key_project.sed.ui.visualization.model.od.ODModel;
-import org.key_project.sed.ui.visualization.model.od.ODObject;
-import org.key_project.sed.ui.visualization.model.od.ODState;
-import org.key_project.sed.ui.visualization.model.od.ODValue;
+import org.key_project.sed.ui.visualization.model.od.*;
 import org.key_project.sed.ui.visualization.object_diagram.feature.AbstractGenerateObjectDiagramCustomFeature;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
+import de.uka.ilkd.key.symbolic_execution.object_model.*;
 
 /**
  * An {@link ICustomFeature} that generates an object diagram based

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.symbolic_execution.object_model;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
 
 /**
@@ -82,7 +81,7 @@ public interface ISymbolicValue extends ISymbolicElement {
     * Returns the type of the value.
     * @return The type of the value.
     */
-   public Sort getType();
+   public org.key_project.common.core.logic.Sort getType();
    
    /**
     * Returns the type of the value as human readable string.

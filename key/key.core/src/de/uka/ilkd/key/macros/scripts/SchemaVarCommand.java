@@ -6,13 +6,8 @@ import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -46,7 +41,7 @@ public class SchemaVarCommand extends AbstractCommand {
             if("Formula".equals(type)) {
                 sv = SchemaVariableFactory.createFormulaSV(new Name("_SCHEMA_" + var));
             } else {
-                Sort sort = toSort(proof, stateMap, type);
+                org.key_project.common.core.logic.Sort sort = toSort(proof, stateMap, type);
                 sv = SchemaVariableFactory.createTermSV(new Name("_SCHEMA_" + var), sort);
             }
 

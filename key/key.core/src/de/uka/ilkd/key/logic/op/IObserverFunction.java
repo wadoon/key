@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;

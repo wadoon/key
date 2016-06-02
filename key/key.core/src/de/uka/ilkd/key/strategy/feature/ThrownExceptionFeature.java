@@ -16,6 +16,8 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.key_project.common.core.logic.Sort;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -27,7 +29,6 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -38,7 +39,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
         return new ThrownExceptionFeature(blockedExceptions, services);
     }
 
-    private final Sort[] filteredExceptions;
+    private final org.key_project.common.core.logic.Sort[] filteredExceptions;
 
     /**
      * creates a feature filtering first active throw statements where the
@@ -65,8 +66,8 @@ public class ThrownExceptionFeature extends BinaryFeature {
         filteredExceptions = filtered.toArray(new Sort[filtered.size()]);
     }
 
-    private boolean blockedExceptions(Sort excType) {
-        for (Sort filteredException : filteredExceptions) {
+    private boolean blockedExceptions(org.key_project.common.core.logic.Sort excType) {
+        for (org.key_project.common.core.logic.Sort filteredException : filteredExceptions) {
             if (excType.extendsTrans(filteredException)) {
                 return true;
             }

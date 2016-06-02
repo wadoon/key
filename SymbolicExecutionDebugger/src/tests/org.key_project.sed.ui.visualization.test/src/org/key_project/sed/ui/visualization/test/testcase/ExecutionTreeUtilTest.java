@@ -13,11 +13,7 @@
 
 package org.key_project.sed.ui.visualization.test.testcase;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;

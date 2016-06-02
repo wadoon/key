@@ -14,8 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 
 /**
  * Schema variable that is instantiated with fresh Skolem constants. At the
@@ -32,9 +31,9 @@ public final class SkolemTermSV extends AbstractSV {
      * @param sort the Sort of the SchemaVariable and the matched type     
      * allowed to match a list of program constructs
      */    
-    SkolemTermSV(Name name, Sort sort) {
+    SkolemTermSV(Name name, org.key_project.common.core.logic.Sort sort) {
 	super(name, sort, true, false);	
-	assert sort != Sort.UPDATE;
+	assert sort != SpecialSorts.UPDATE;
     }
 	
     @Override
@@ -46,7 +45,7 @@ public final class SkolemTermSV extends AbstractSV {
     @Override
     public String proofToString() {
 	return "\\schemaVar " 
-	        + (sort() == Sort.FORMULA 
+	        + (sort() == SpecialSorts.FORMULA 
 	           ? "\\skolemFormula" 
 	           : "\\skolemTerm " + sort().name()) 
 	        + " " 

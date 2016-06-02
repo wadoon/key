@@ -13,22 +13,17 @@
 
 package de.uka.ilkd.key.smt.hierarchy;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.key_project.common.core.logic.Named;
-
-import java.util.Set;
+import org.key_project.common.core.logic.Sort;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Represents the hierarchy of the Java reference types known to KeY.
@@ -81,7 +76,7 @@ public class TypeHierarchy {
 		
 		//For all found sorts find their parents and children.
 		for(Entry<Sort, SortNode> e : sortmap.entrySet() ){
-			Sort s = e.getKey();
+			org.key_project.common.core.logic.Sort s = e.getKey();
 			SortNode n = e.getValue();
 
 			for(Sort p : s.extendsSorts(services)){
@@ -223,7 +218,7 @@ public class TypeHierarchy {
 
 	public void print(){
 		for(Entry<Sort, SortNode> e : sortmap.entrySet() ){
-			Sort s = e.getKey();
+			org.key_project.common.core.logic.Sort s = e.getKey();
 			SortNode n = e.getValue();
 
 			String sorttype = s.isAbstract()? "abstract" : "concrete";

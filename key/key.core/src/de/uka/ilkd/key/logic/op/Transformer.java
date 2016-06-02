@@ -13,15 +13,13 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level
@@ -37,12 +35,12 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class Transformer extends Function {
 
-    public Transformer(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
+    public Transformer(Name name, org.key_project.common.core.logic.Sort sort, ImmutableArray<Sort> argSorts) {
         super(name, sort, argSorts, false);
     }
 
     public Transformer(Name name, Sort argSort) {
-        this(name, Sort.FORMULA, new ImmutableArray<Sort>(argSort));
+        this(name, SpecialSorts.FORMULA, new ImmutableArray<Sort>(argSort));
     }
 
     /**
@@ -56,9 +54,9 @@ public class Transformer extends Function {
      * @return the term transformer of interest
      */
     public static Transformer getTransformer(Name name,
-                                                      Sort sort,
+                                                      org.key_project.common.core.logic.Sort sort,
                                                       ImmutableArray<Sort> argSorts,
-                                                      TermServices services) {
+                                                      TermServices<?,?> services) {
         final Named f = services.getNamespaces().functions().lookup(name);
         if (f != null && f instanceof Transformer) {
             Transformer t = (Transformer)f;
@@ -78,7 +76,7 @@ public class Transformer extends Function {
      * @return the term transformer to be used
      */
     public static Transformer getTransformer(Transformer t,
-                                                      TermServices services) {
+                                             TermServices<?,?> services) {
         return getTransformer(t.name(), t.sort(), t.argSorts(), services);
     }
 

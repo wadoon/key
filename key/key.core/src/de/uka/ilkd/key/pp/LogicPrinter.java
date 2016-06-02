@@ -20,7 +20,10 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
+import org.key_project.common.core.logic.AbstractSort;
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -35,41 +38,11 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
 import de.uka.ilkd.key.pp.Notation.ObserverNotation;
-import de.uka.ilkd.key.rule.AntecTaclet;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.NotFreeIn;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.SuccTaclet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -1182,7 +1155,7 @@ public class LogicPrinter {
     public void printSeqGet(Term t) throws IOException {
         if (notationInfo.isPrettySyntax()) {
             startTerm(2);
-            if (!t.sort().equals(Sort.ANY)) {
+            if (!t.sort().equals(SpecialSorts.ANY)) {
                 layouter.print("(" + t.sort().toString() + ")");
             }
             markStartSub();
@@ -1224,7 +1197,7 @@ public class LogicPrinter {
 
         if(notationInfo.isPrettySyntax() && heapLDT != null) {
 
-            Sort heapSort = heapLDT.targetSort();
+            org.key_project.common.core.logic.Sort heapSort = heapLDT.targetSort();
             int numHeaps = obs.getHeapCount(services);
             int stateCount = obs.getStateCount();
             int totalHeaps = stateCount * numHeaps;
@@ -2251,7 +2224,7 @@ public class LogicPrinter {
      */
     public boolean printInShortForm(String attributeProgramName,
                                     Term t) {
-        final Sort prefixSort;
+        final org.key_project.common.core.logic.Sort prefixSort;
         prefixSort = t.sort();
         return printInShortForm(attributeProgramName, prefixSort);
     }
@@ -2266,7 +2239,7 @@ public class LogicPrinter {
      * we test for uniqueness
      * @return true if the attribute is uniquely determined
      */
-    public boolean printInShortForm(String programName, Sort sort) {
+    public boolean printInShortForm(String programName, org.key_project.common.core.logic.Sort sort) {
         return printInShortForm(programName, sort, services);
     }
 
@@ -2343,7 +2316,7 @@ public class LogicPrinter {
      * @return true if the attribute is uniquely determined
      */
     public static boolean printInShortForm(String programName,
-	    				   Sort sort,
+	    				   org.key_project.common.core.logic.Sort sort,
 	    				   Services services) {
         if ( ! ( services != null
         	  && sort.extendsTrans(services.getJavaInfo().objectSort()))) {

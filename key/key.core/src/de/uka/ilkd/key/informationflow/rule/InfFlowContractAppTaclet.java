@@ -13,14 +13,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.Choice;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.TacletAnnotation;
-import de.uka.ilkd.key.rule.TacletApplPart;
-import de.uka.ilkd.key.rule.TacletAttributes;
-import de.uka.ilkd.key.rule.TacletPrefix;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 

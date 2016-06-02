@@ -19,27 +19,8 @@ import java.util.Map;
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
-import de.uka.ilkd.key.java.expression.literal.RealLiteral;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.FreeLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.MapLDT;
-import de.uka.ilkd.key.ldt.RealLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.java.expression.literal.*;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 /**

@@ -18,13 +18,7 @@ package de.uka.ilkd.key.util;
  * removes an old one, but should be useable in other projects.
  *
  */
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Vector;
 
 public class AddAHead {

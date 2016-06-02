@@ -7,17 +7,16 @@ import java.io.StringWriter;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -46,15 +45,15 @@ public class AbstractTestTermParser extends TestCase {
         nss = services.getNamespaces();
     }
 
-    Sort lookup_sort(String name) {
-        return (Sort) nss.sorts().lookup(new Name(name));
+    org.key_project.common.core.logic.Sort lookup_sort(String name) {
+        return (org.key_project.common.core.logic.Sort) nss.sorts().lookup(new Name(name));
     }
 
     Function lookup_func(String name) {
         return (Function) nss.functions().lookup(new Name(name));
     }
 
-    LogicVariable declareVar(String name, Sort sort) {
+    LogicVariable declareVar(String name, org.key_project.common.core.logic.Sort sort) {
         LogicVariable v = new LogicVariable(new Name(name), sort);
         nss.variables().add(v);
         return v;

@@ -19,11 +19,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.Throws;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 public interface IProgramMethod extends IObserverFunction, SourceElement, ProgramElement, MemberDeclaration {

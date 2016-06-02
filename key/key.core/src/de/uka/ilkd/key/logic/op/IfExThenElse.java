@@ -14,11 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractOperator;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.Operator;
 
 
 /**
@@ -27,7 +23,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * variable, phi is a formula, and where t1 and t2 are terms with the same sort.
  * The variable iv is bound in phi and in t1, but not in t2.
  */
-public final class IfExThenElse extends AbstractOperator<Sort, Term> implements Operator {
+public final class IfExThenElse extends AbstractOperator implements Operator {
     
     public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse();
     
@@ -40,24 +36,5 @@ public final class IfExThenElse extends AbstractOperator<Sort, Term> implements 
     }
     
     
-    @Override
-    public Sort sort(ImmutableArray<Term> terms) {
-	return terms.get(1).sort();
-    }
-    
-
-    @Override
-    protected boolean additionalValidTopLevel(Term term) {
-        for(QuantifiableVariable var : term.varsBoundHere(0)) {
-            if(!var.sort().name().toString().equals("int")) {
-        	return false;
-            }
-        }
-
-        final Sort s0 = term.sub(0).sort();
-        final Sort s1 = term.sub(1).sort();
-        final Sort s2 = term.sub(2).sort();
-        
-        return s0 == Sort.FORMULA && s1.equals(s2);
-    }
+  
 }

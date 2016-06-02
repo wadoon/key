@@ -16,6 +16,8 @@ package de.uka.ilkd.key.speclang.dl.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.key_project.common.core.logic.SpecialSorts;
+import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -29,15 +31,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -82,7 +76,7 @@ public final class DLSpecFactory {
     		throws ProofInputException {
 	if(fma.sub(1).op() instanceof UpdateApplication) {
 	    final Term update = fma.sub(1).sub(0);
-	    assert update.sort() == Sort.UPDATE;
+	    assert update.sort() == SpecialSorts.UPDATE;
 	    if(!(update.op() instanceof ElementaryUpdate)) {
 		throw new ProofInputException("Elementary update expected, "
 					      + "but found: " + update);

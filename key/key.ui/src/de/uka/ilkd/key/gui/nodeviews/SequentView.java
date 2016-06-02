@@ -34,11 +34,7 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.util.Debug;
 
 /*

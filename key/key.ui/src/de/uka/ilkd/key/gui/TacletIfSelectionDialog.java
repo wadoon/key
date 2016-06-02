@@ -19,13 +19,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;

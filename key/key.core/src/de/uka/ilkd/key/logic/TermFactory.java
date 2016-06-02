@@ -16,12 +16,10 @@ package de.uka.ilkd.key.logic;
 import java.util.Map;
 
 import org.key_project.common.core.logic.DLTermFactory;
+import org.key_project.common.core.logic.Operator;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
  * The TermFactory is the <em>only</em> way to create terms using constructors 
@@ -35,7 +33,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * See {@link org.key_project.common.core.logic.TermBuilder} for more convenient methods to 
  * create terms. 
  */
-public final class TermFactory implements DLTermFactory<Sort, Term, Operator, JavaBlock, QuantifiableVariable> {
+public final class TermFactory implements DLTermFactory<Term, JavaBlock> {
     
 
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();

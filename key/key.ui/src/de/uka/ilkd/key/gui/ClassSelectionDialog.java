@@ -22,14 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import org.key_project.util.collection.DefaultImmutableSet;

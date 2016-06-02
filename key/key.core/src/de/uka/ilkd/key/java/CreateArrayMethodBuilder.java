@@ -26,16 +26,7 @@ import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Static;
@@ -47,12 +38,7 @@ import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
 import de.uka.ilkd.key.java.recoderext.PrepareObjectBuilder;
-import de.uka.ilkd.key.java.reference.ArrayReference;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -60,7 +46,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array
@@ -90,7 +75,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     private final KeYJavaType objectType;
     
-    private final Sort heapSort;
+    private final org.key_project.common.core.logic.Sort heapSort;
     
     private final int heapCount;
     
@@ -99,7 +84,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     /** create the method builder for array implict creation methods */
     public CreateArrayMethodBuilder(KeYJavaType integerType,
             			    KeYJavaType objectType,
-            			    Sort heapSort,
+            			    org.key_project.common.core.logic.Sort heapSort,
             			    int heapCount) {
         this.integerType = integerType;
         this.objectType = objectType;

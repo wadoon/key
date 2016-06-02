@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicObject;
 
 /**
@@ -44,7 +43,7 @@ public interface ISymbolicObject extends ISymbolicAssociationValueContainer {
     * Returns the type of this object.
     * @return The type of this object.
     */
-   public Sort getType();
+   public org.key_project.common.core.logic.Sort getType();
    
    /**
     * Returns the type of this object as human readable string.

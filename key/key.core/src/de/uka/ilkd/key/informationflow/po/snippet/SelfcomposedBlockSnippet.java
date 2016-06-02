@@ -2,8 +2,9 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.HashSet;
 
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 

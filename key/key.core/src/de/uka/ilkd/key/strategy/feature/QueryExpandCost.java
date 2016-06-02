@@ -23,7 +23,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -130,7 +129,7 @@ public class QueryExpandCost implements Feature {
 	 */
 	private static int maxIntliteralInArgumentsTimesTwo(Term t, IntegerLDT iLDT, Services serv){
 		final Namespace sorts = serv.getNamespaces().sorts();
-		final Sort intSort = (Sort) sorts.lookup(IntegerLDT.NAME);
+		final org.key_project.common.core.logic.Sort intSort = (org.key_project.common.core.logic.Sort) sorts.lookup(IntegerLDT.NAME);
 		int cost=0;
 		//The computation is limited to arguments that have an arithmetic type. E.g., don't calculate int literals in the heap parameter. 
 		for(int i=0;i<t.arity();i++){  

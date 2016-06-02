@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import org.key_project.common.core.logic.Sort;
+
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
@@ -58,7 +59,7 @@ public interface IExecutionTermination extends IExecutionNode<SourceElement> {
     * Returns the {@link Sort} of the caught exception.
     * @return The {@link Sort} of the caught exception.
     */
-   public Sort getExceptionSort();
+   public org.key_project.common.core.logic.Sort getExceptionSort();
    
    /**
     * Returns the {@link TerminationKind}.

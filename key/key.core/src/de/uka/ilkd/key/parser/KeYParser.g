@@ -63,10 +63,13 @@ options {
   import org.key_project.util.collection.ImmutableSLList;
   import org.key_project.util.collection.ImmutableSet;
   import org.key_project.common.core.logic.*;
+  import org.key_project.common.core.logic.label.TermLabel;
+  import org.key_project.common.core.logic.op.*;
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
   import de.uka.ilkd.key.logic.label.*;
+ 
 
   import de.uka.ilkd.key.proof.init.*;
   import de.uka.ilkd.key.proof.io.*;
@@ -716,10 +719,10 @@ options {
             			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
             SchemaVariable v;
-            if(s == Sort.FORMULA && !makeSkolemTermSV) {
+            if(s == SpecialSorts.FORMULA && !makeSkolemTermSV) {
                 v = SchemaVariableFactory.createFormulaSV(new Name(name), 
                 					  mods.rigid());
-            } else if(s == Sort.UPDATE) {
+            } else if(s == SpecialSorts.UPDATE) {
                 v = SchemaVariableFactory.createUpdateSV(new Name(name));
             } else if(s instanceof ProgramSVSort) {
                 v = SchemaVariableFactory.createProgramSV(
@@ -878,7 +881,7 @@ options {
         } else {
 	            if(attribute instanceof LogicVariable) {
 	                Term attrTerm = getTermFactory().createTerm(attribute);
-	                result = getServices().getTermBuilder().dot(Sort.ANY, result, attrTerm);
+	                result = getServices().getTermBuilder().dot(SpecialSorts.ANY, result, attrTerm);
 	            } else if(attribute instanceof ProgramConstant) {
                 result = getTermFactory().createTerm(attribute);
             } else if(attribute == getServices().getJavaInfo().getArrayLength()) {
@@ -1728,7 +1731,7 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                         e.getIllegalSort(), getSourceName(), getLine(), getColumn());
                                 }
                             } else if (new Name("any").equals(sort_name)) {
-                                s = Sort.ANY;
+                                s = SpecialSorts.ANY;
                             } else  {
                                 ImmutableSet<Sort>  ext = DefaultImmutableSet.<Sort>nil();
 
@@ -1926,7 +1929,7 @@ one_schema_var_decl
   | FORMULA
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?
-    {s = Sort.FORMULA;}
+    {s = SpecialSorts.FORMULA;}
     ids = simple_ident_comma_list 
   | TERMLABEL
     { makeTermLabelSV = true; }
@@ -1936,13 +1939,13 @@ one_schema_var_decl
   | UPDATE
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?
-    {s = Sort.UPDATE;}
+    {s = SpecialSorts.UPDATE;}
     ids = simple_ident_comma_list 
   | SKOLEMFORMULA
     { makeSkolemTermSV = true; } 
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?    
-    {s = Sort.FORMULA;}
+    {s = SpecialSorts.FORMULA;}
     ids = simple_ident_comma_list  
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
@@ -1992,11 +1995,11 @@ schema_modifiers[SchemaVariableModifierSet mods]
 one_schema_modal_op_decl
 @init{
     ImmutableSet<Modality> modalities = DefaultImmutableSet.<Modality>nil();
-    sort = Sort.FORMULA;
+    sort = SpecialSorts.FORMULA;
 } 
     :
         (LPAREN sort = any_sortId_check[true] {
-           if (sort != Sort.FORMULA) { 
+           if (sort != SpecialSorts.FORMULA) { 
                semanticError("Modal operator SV must be a FORMULA, not " + sort);
            }            
          } RPAREN)? 
@@ -2053,7 +2056,7 @@ pred_decl
 		    	p = SortDependingFunction.createFirstInstance(
 		    	    		(GenericSort)genSort,
 		    	    		new Name(baseName),
-		    	    		Sort.FORMULA,
+		    	    		SpecialSorts.FORMULA,
 		    	    		argSorts,
 		    	    		false);
 		    }
@@ -2061,7 +2064,7 @@ pred_decl
             
                 if(p == null) {	                        
                     p = new Function(new Name(pred_name), 
-                    		     Sort.FORMULA, 
+                    		     SpecialSorts.FORMULA, 
                     		     argSorts,
                     		     whereToBind,
                     		     false);
@@ -2197,11 +2200,11 @@ arg_sorts_or_formula[boolean checkSort] returns [Sort[\] argSorts = null]
             LPAREN
 
             ( s = sortId_check[checkSort] { args.add(s); }
-            | FORMULA {args.add(Sort.FORMULA);} )
+            | FORMULA {args.add(SpecialSorts.FORMULA);} )
 
             (
                 COMMA ( s = sortId_check[checkSort] {args.add(s);}
-                      | FORMULA {args.add(Sort.FORMULA);} )
+                      | FORMULA {args.add(SpecialSorts.FORMULA);} )
             ) *
             RPAREN
         ) ?
@@ -2215,7 +2218,7 @@ transform_decl
     :
         (
           retSort = any_sortId_check[!skip_transformers]
-        | FORMULA { retSort = Sort.FORMULA; }
+        | FORMULA { retSort = SpecialSorts.FORMULA; }
         )
 
         trans_name = funcpred_name
@@ -2420,7 +2423,7 @@ array_decls[Pair<Sort,Type> p, boolean checksort] returns [Sort s = null]
         {   if (!checksort) return s;
             if(n != 0) {
                 final JavaInfo ji = getJavaInfo();
-                s = ArraySort.getArraySortForDim(p.first,
+                s = ArraySpecialSorts.getArraySortForDim(p.first,
                 				 p.second, 
                 			         n, 
                 			         ji.objectSort(),
@@ -2485,7 +2488,7 @@ formula returns [Term _formula = null]
     :
         a = term 
         {
-            if (a != null && a.sort() != Sort.FORMULA ) {
+            if (a != null && a.sort() != SpecialSorts.FORMULA ) {
                 semanticError("Just Parsed a Term where a Formula was expected.");
             }
         }
@@ -2606,8 +2609,8 @@ equality_term returns [Term _equality_term = null]
         (  (EQUALS | NOT_EQUALS) =>
 	      (EQUALS | NOT_EQUALS {negated = true;}) a1 = logicTermReEntry
             { 
-                if (a.sort() == Sort.FORMULA ||
-                    a1.sort() == Sort.FORMULA) {
+                if (a.sort() == SpecialSorts.FORMULA ||
+                    a1.sort() == SpecialSorts.FORMULA) {
                     String errorMessage = 
                     "The term equality \'=\'/\'!=\' is not "+
                     "allowed between formulas.\n Please use \'" + Equality.EQV +
@@ -2726,7 +2729,7 @@ strong_arith_op_term returns [Term _strong_arith_op_term = null]
 /**
  * helps to better distinguish if formulas are allowed or only term are
  * accepted
- * WATCHOUT: Woj: the check for Sort.FORMULA had to be removed to allow
+ * WATCHOUT: Woj: the check for SpecialSorts.FORMULA had to be removed to allow
  * infix operators and the whole bunch of grammar rules above.
  */
 term110 returns [Term _term110 = null]
@@ -2738,7 +2741,7 @@ term110 returns [Term _term110 = null]
         )
         {
 	/*
-            if (result.sort() == Sort.FORMULA) {
+            if (result.sort() == SpecialSorts.FORMULA) {
                 semanticError("Only terms may stand here.");
             }
 	*/
@@ -2917,7 +2920,7 @@ accessterm returns [Term _accessterm = null]
     :
       (MINUS ~NUM_LITERAL) => MINUS result = term110
         {
-            if (result.sort() != Sort.FORMULA) {
+            if (result.sort() != SpecialSorts.FORMULA) {
                 result = getTermFactory().createTerm
                 ((Function) functions().lookup(new Name("neg")), result);
             } else {
@@ -2987,7 +2990,7 @@ seq_get_suffix[Term reference] returns [Term result]
 	indexTerm = logicTermReEntry
     {
         if(!isIntTerm(indexTerm)) semanticError("Expecting term of sort " + IntegerLDT.NAME + " as index of sequence " + reference + ", but found: " + indexTerm);
-	    result = getServices().getTermBuilder().seqGet(Sort.ANY, reference, indexTerm);
+	    result = getServices().getTermBuilder().seqGet(SpecialSorts.ANY, reference, indexTerm);
     }
     RBRACKET
     ;
@@ -3186,7 +3189,7 @@ ifThenElseTerm returns [Term _if_then_else_term = null]
     :
         IF LPAREN condF = term RPAREN
         {
-            if (condF.sort() != Sort.FORMULA) {
+            if (condF.sort() != SpecialSorts.FORMULA) {
                 semanticError
 		  ("Condition of an \\if-then-else term has to be a formula.");
             }
@@ -3215,7 +3218,7 @@ ifExThenElseTerm returns [Term _if_ex_then_else_term = null]
         IFEX exVars = bound_variables
         LPAREN condF = term RPAREN
         {
-            if (condF.sort() != Sort.FORMULA) {
+            if (condF.sort() != SpecialSorts.FORMULA) {
                 semanticError
 		  ("Condition of an \\ifEx-then-else term has to be a formula.");
             }

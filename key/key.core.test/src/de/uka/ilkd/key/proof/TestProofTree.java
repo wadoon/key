@@ -16,18 +16,13 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -54,7 +49,7 @@ public class TestProofTree extends TestCase {
     }
 
     public void setUp() {
-	Sort s = new SortImpl(new Name("s"));
+	org.key_project.common.core.logic.Sort s = new SortImpl(new Name("s"));
 	LogicVariable b1=new LogicVariable(new Name("b1"),s);
 	LogicVariable b2=new LogicVariable(new Name("b2"),s);
 	LogicVariable b3=new LogicVariable(new Name("b3"),s);

@@ -14,17 +14,10 @@
 package de.uka.ilkd.key.smt;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Vector;
+import java.util.*;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -34,21 +27,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
@@ -290,7 +269,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 // add one variable for each sort
                 for (Sort s : this.usedRealSort.keySet()) {                 
-                   if(!s.equals(Sort.FORMULA)){
+                   if(!s.equals(SpecialSorts.FORMULA)){
                         LogicVariable l = new LogicVariable(new Name("dummy_"
                                         + s.name().toString()), s);
                         this.addFunction(l, new ArrayList<Sort>(), s);
@@ -770,7 +749,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
                         element.add(usedFunctionNames.get(op));
                         for (Sort s : functionDecls.get(op)) {
-                                if (s == Sort.FORMULA) {
+                                if (s == SpecialSorts.FORMULA) {
                                     //This function was used with a formula as argument. Treat like a boolean sort
                                     element.add(this.getBoolSort());
                                 } else {
@@ -992,7 +971,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      
 
         private Term createLogicalVar(TermServices services, String baseName,
-                        Sort sort) {
+                        org.key_project.common.core.logic.Sort sort) {
                 return tb.var(new LogicVariable(new Name(
                                 tb.newName(baseName)),
                                 sort));
@@ -1001,7 +980,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private ArrayList<StringBuffer> buildAssumptionsForUninterpretedMultiplication(
                         Services services) throws IllegalFormulaException {
                 ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
-                Sort sort = services.getTypeConverter().getIntegerLDT()
+                org.key_project.common.core.logic.Sort sort = services.getTypeConverter().getIntegerLDT()
                                 .getMul().sort();
                 Function mult = getMultiplicationFunction(services);
                 Term zero = tb.zero();
@@ -1068,7 +1047,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          		for(Sort sort : usedRealSort.keySet()){
          	
          		//Do not add Assumptions for Boolean or integer sorts
-             		if(!isSomeIntegerSort(sort) && sort != Sort.FORMULA ){
+             		if(!isSomeIntegerSort(sort) && sort != SpecialSorts.FORMULA ){
              			Term var = createLogicalVar(services, "x", sort);
              			StringBuffer sVar = translateVariable(var.op());
             			//StringBuffer var = this.makeUnique(new StringBuffer("x"));
@@ -1903,7 +1882,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         return this.getModalityPredicate(term, quantifiedVars,
                                         services);
                 } else if (op == IfThenElse.IF_THEN_ELSE) {
-                        if (term.sub(1).sort() == Sort.FORMULA) {
+                        if (term.sub(1).sort() == SpecialSorts.FORMULA) {
                                 // a logical if then else was used
                                 StringBuffer cond = translateTerm(term.sub(0),
                                                 quantifiedVars, services);
@@ -2017,7 +1996,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         }
                 } else if (op instanceof Function) {
                         Function fun = (Function) op;
-                        if (fun.sort() == Sort.FORMULA) {
+                        if (fun.sort() == SpecialSorts.FORMULA) {
                                 // This Function is a predicate, so translate it
                                 // as such
                                 if (fun == services.getTypeConverter()
@@ -2631,7 +2610,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 .toArray(new QuantifiableVariable[freeVars
                                                 .size()]);
                 Term[] subs = new Term[args.length];
-                Sort[] argsorts = new Sort[args.length];
+                org.key_project.common.core.logic.Sort[] argsorts = new org.key_project.common.core.logic.Sort[args.length];
                 for (int i = 0; i < args.length; i++) {
                         QuantifiableVariable qv = args[i];
                         if (qv instanceof LogicVariable) {
@@ -2709,7 +2688,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 // translate the term as uninterpreted function/predicate
                 Operator op = term.op();
-                if (term.sort() == Sort.FORMULA) {
+                if (term.sort() == SpecialSorts.FORMULA) {
                         // predicate
                         Debug.log4jDebug(
                                         "Translated as uninterpreted predicate:\n"
@@ -2740,10 +2719,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         }
                         ArrayList<Sort> sorts = new ArrayList<Sort>();
                         for (int i = 0; i < op.arity(); i++) {
-                            if (term.sub(i).sort() != Sort.FORMULA) {
+                            if (term.sub(i).sort() != SpecialSorts.FORMULA) {
                                 sorts.add(term.sub(i).sort());
                             } else {
-                                sorts.add(Sort.FORMULA);
+                                sorts.add(SpecialSorts.FORMULA);
                             }
                         }
                         this.addFunction(op, sorts, term.sort());
@@ -2956,7 +2935,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
         }
 
-        protected boolean isSomeIntegerSort(Sort s) {
+        protected boolean isSomeIntegerSort(org.key_project.common.core.logic.Sort s) {
                 return s == integerSort;
         }
         
@@ -3075,7 +3054,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         if (ldt.getHeap().sort() != sort
                                         && ldt.getFieldSort() != sort
                                         && services.getJavaInfo().nullSort() != sort                                      
-                                        && Sort.FORMULA != sort) {
+                                        && SpecialSorts.FORMULA != sort) {
                                 sorts = sorts.add(sort);
                         }
                 }

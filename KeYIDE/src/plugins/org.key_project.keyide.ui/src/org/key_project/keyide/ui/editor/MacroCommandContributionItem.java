@@ -4,9 +4,9 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.macros.ProofMacro;;;
+import de.uka.ilkd.key.proof.Node;;;
 
 /**
  * A customized {@link CommandContributionItem} which contains a {@link ProofMacro}, a {@link UserInterfaceControl}, a {@link Node} and a {@link PosInSequent}.

@@ -4,6 +4,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
 
 import java.util.HashMap;
 
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -11,7 +12,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
@@ -152,7 +152,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 	    // null is OK: In this case, we generate the distinguishing
 	    // formula automatically. Otherwise, the term must indeed be
 	    // a formula.
-	    assert distForm == null || distForm.sort() == Sort.FORMULA;
+	    assert distForm == null || distForm.sort() == SpecialSorts.FORMULA;
 	    
 	    this.distForm  = distForm;
 	}

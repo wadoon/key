@@ -12,11 +12,7 @@
 //
 package de.uka.ilkd.key.informationflow.macros;
 
-import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
-import de.uka.ilkd.key.macros.ProofMacro;
-import de.uka.ilkd.key.macros.SequentialOnLastGoalProofMacro;
-import de.uka.ilkd.key.macros.SequentialProofMacro;
-import de.uka.ilkd.key.macros.TryCloseMacro;
+import de.uka.ilkd.key.macros.*;
 
 
 /**

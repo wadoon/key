@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.testgen.oracle;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.LogicVariable;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -11,8 +12,6 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
@@ -25,12 +24,12 @@ public class OracleInvariantTranslator {
 		this.services = services;
 	}
 
-	public Term getInvariantTerm(Sort s){
+	public Term getInvariantTerm(org.key_project.common.core.logic.Sort s){
 		JavaInfo info = services.getJavaInfo();
 		TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
 		SpecificationRepository spec = services.getSpecificationRepository();
 
-		Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+		org.key_project.common.core.logic.Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
 
 		LogicVariable h = new LogicVariable(new Name("h"), heapSort);
 

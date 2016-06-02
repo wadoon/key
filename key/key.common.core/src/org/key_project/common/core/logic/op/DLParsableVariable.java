@@ -13,11 +13,9 @@
 
 package org.key_project.common.core.logic.op;
 
-import org.key_project.common.core.logic.DLSort;
-
 /** 
  * This interface represents the variables that can be recognized 
  * by one of the parsers. 
  */
-public interface DLParsableVariable<S extends DLSort> extends DLSortedOperator<S> {
+public interface DLParsableVariable extends SortedOperator {
 }

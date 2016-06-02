@@ -2,9 +2,9 @@ package de.uka.ilkd.key.testgen;
 
 import java.util.HashSet;
 
+import org.key_project.common.core.logic.Sort;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.KeYConstants;
 
 /** Creates the RFL.java file, that provides setter and getter methods using the reflection API

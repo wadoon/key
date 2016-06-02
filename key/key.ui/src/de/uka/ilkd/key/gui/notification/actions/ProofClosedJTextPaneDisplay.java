@@ -20,11 +20,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 
-import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;

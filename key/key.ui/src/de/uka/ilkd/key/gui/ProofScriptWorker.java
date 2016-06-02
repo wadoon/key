@@ -15,12 +15,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.CancellationException;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 

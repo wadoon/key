@@ -18,8 +18,6 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -41,6 +39,8 @@ import org.key_project.sed.ui.visualization.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+
+import junit.framework.TestCase;
 
 /**
  * Provides the basic functionality to test SET files.

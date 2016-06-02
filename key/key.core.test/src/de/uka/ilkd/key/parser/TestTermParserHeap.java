@@ -5,9 +5,9 @@ import static de.uka.ilkd.key.parser.KeYParser.NO_HEAP_EXPRESSION_BEFORE_AT_EXCE
 import java.io.IOException;
 
 import org.antlr.runtime.RecognitionException;
+import org.key_project.common.core.logic.Operator;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 
 /**
  * Parser tests for heap terms.

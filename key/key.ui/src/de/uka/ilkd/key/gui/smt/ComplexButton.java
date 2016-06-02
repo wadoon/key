@@ -19,11 +19,7 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 

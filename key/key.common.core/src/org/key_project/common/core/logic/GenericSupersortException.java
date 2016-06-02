@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.sort;
+package org.key_project.common.core.logic;
 
 /** this exception is thrown if a generic sort has been declared with
  * an illegal supersort */

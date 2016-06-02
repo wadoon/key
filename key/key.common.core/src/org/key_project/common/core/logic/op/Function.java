@@ -11,13 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -25,7 +24,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * that program variables are a separate syntactic category, and not a type
  * of function.
  */
-public class Function extends AbstractSortedOperator {
+public class Function extends DLAbstractSortedOperator {
 
     private final boolean unique;
     private final boolean skolemConstant;
@@ -45,10 +44,10 @@ public class Function extends AbstractSortedOperator {
 	super(name, argSorts, sort, whereToBind, isRigid);
 	this.unique = unique;
 	skolemConstant = isSkolemConstant;
-	assert sort != Sort.UPDATE;
-	assert !(unique && sort == Sort.FORMULA);
-	assert !(sort instanceof NullSort) || name.toString().equals("null")
-	       : "Functions with sort \"null\" are not allowed: " + this;
+	assert sort != SpecialSorts.UPDATE;
+	assert !(unique && sort == SpecialSorts.FORMULA);
+	/* assert !(sort instanceof NullSort) || name.toString().equals("null")
+	       : "Functions with sort \"null\" are not allowed: " + this;*/
     }
 
     public Function(Name name,
@@ -94,7 +93,7 @@ public class Function extends AbstractSortedOperator {
              isSkolemConstant);
     }
 
-    Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
+    protected Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
         this(name, sort, argSorts, null, false, isRigid, false);
     }
 
@@ -151,7 +150,7 @@ public class Function extends AbstractSortedOperator {
      */
     public final String proofToString() {
        String s =
-	   (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
+	   (sort() == SpecialSorts.FORMULA ? "" : sort().toString()) + " ";
        s += name();
        if (arity()>0) {
           int i = 0;

@@ -13,13 +13,13 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
+import org.key_project.common.core.logic.SpecialSorts;
 import org.key_project.common.core.logic.op.SVSubstitute;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -53,7 +53,7 @@ public class SubFormulaCondition extends VariableConditionAdapter {
             return negated;
         } else {
             for (Term sub: tInst.subs()) {
-                if (sub.sort() == Sort.FORMULA) {
+                if (sub.sort() == SpecialSorts.FORMULA) {
                     return !negated;
                 }
             }

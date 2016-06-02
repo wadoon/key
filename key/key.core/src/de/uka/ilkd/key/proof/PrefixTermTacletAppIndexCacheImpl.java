@@ -15,10 +15,10 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * The abstract superclass of caches for taclet app indexes that are implemented

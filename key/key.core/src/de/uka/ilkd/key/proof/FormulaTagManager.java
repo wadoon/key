@@ -19,13 +19,7 @@ import java.util.LinkedHashMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**

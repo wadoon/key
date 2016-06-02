@@ -15,11 +15,7 @@ package org.key_project.keyide.ui.views;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.part.IPage;
-import org.eclipse.ui.part.IPageBookViewPage;
-import org.eclipse.ui.part.MessagePage;
-import org.eclipse.ui.part.PageBook;
-import org.eclipse.ui.part.PageBookView;
+import org.eclipse.ui.part.*;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.proof.Proof;

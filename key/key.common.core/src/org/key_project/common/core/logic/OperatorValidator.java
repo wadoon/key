@@ -2,7 +2,7 @@ package org.key_project.common.core.logic;
 
 import org.key_project.util.collection.ImmutableArray;
 
-public interface OperatorValidator<S extends DLSort, T extends DLTerm<S, ? extends DLVisitor<T>>> {
+public interface OperatorValidator<T extends DLTerm<? extends DLVisitor<T>>> {
 
     
 
@@ -12,10 +12,11 @@ public interface OperatorValidator<S extends DLSort, T extends DLTerm<S, ? exten
      * assumption that the constructed term would be allowed is not checked.
      * @param terms an array of Term containing the subterms of a (potential)
      * term with this operator as top level operator
+     * @param services TODO
      * @return sort of the term with this operator as top level operator of the
      * given substerms
      */
-    S sort(ImmutableArray<T> terms);
+    Sort sort(ImmutableArray<T> terms, TermServices services);
     
 
     /**

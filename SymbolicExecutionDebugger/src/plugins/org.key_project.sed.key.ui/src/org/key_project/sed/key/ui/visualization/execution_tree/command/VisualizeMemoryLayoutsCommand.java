@@ -21,13 +21,13 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.sed.key.ui.visualization.object_diagram.editor.MemoryLayoutDiagramEditor;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 /**

@@ -16,6 +16,8 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.TermServices;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -23,9 +25,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -94,7 +94,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
         
         if(selfVar != null && originalSelfVar != null) {
-            assert selfVar.sort().extendsTrans(originalSelfVar.sort());
+            assert selfVar.sort().extendsTrans(originalSelfVar.sort(), services);
             result.put(originalSelfVar, selfVar);
         }
 

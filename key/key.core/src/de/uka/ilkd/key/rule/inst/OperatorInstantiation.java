@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.inst;
 
-import de.uka.ilkd.key.logic.op.Operator;
+import org.key_project.common.core.logic.Operator;
 
 /** This class is used to store the instantiation of a schemavarible
  * if it is an operator.

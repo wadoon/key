@@ -1,16 +1,6 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import static de.uka.ilkd.key.util.UnicodeHelper.AND;
-import static de.uka.ilkd.key.util.UnicodeHelper.BOT;
-import static de.uka.ilkd.key.util.UnicodeHelper.EMPTY;
-import static de.uka.ilkd.key.util.UnicodeHelper.EQV;
-import static de.uka.ilkd.key.util.UnicodeHelper.EXISTS;
-import static de.uka.ilkd.key.util.UnicodeHelper.FORALL;
-import static de.uka.ilkd.key.util.UnicodeHelper.IMP;
-import static de.uka.ilkd.key.util.UnicodeHelper.IN;
-import static de.uka.ilkd.key.util.UnicodeHelper.NEG;
-import static de.uka.ilkd.key.util.UnicodeHelper.OR;
-import static de.uka.ilkd.key.util.UnicodeHelper.TOP;
+import static de.uka.ilkd.key.util.UnicodeHelper.*;
 
 import java.util.Arrays;
 import java.util.HashSet;

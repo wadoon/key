@@ -17,10 +17,10 @@ import java.math.BigDecimal;
 
 import org.key_project.util.ExtList;
 
+import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
-import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
 
 /**
  * Literal for JML \real type;

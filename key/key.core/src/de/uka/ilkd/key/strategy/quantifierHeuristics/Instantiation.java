@@ -16,23 +16,17 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.TermServices;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
@@ -190,7 +184,7 @@ class Instantiation {
    private RuleAppCost computeCostHelp(Term inst) {
       Long cost = instancesWithCosts.get(inst);
       if ( cost == null && ( inst.op () instanceof SortDependingFunction
-            && ((SortDependingFunction)inst.op()).getKind().equals(Sort.CAST_NAME)) )
+            && ((SortDependingFunction)inst.op()).getKind().equals(org.key_project.common.core.logic.Sort.CAST_NAME)) )
          cost = instancesWithCosts.get(inst.sub(0));
 
       if (cost == null) {

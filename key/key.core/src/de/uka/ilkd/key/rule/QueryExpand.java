@@ -13,25 +13,18 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-import java.util.WeakHashMap;
+import java.util.*;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -39,28 +32,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
@@ -402,7 +375,7 @@ public class QueryExpand implements BuiltInRule {
         		pathInTerm.set(nextLevel, 0);
     			findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars, curPosIsPositive, nextLevel, curPosIsPositive, qeps);
     		}
-    	}else if(t.sort() == Sort.FORMULA){
+    	}else if(t.sort() == SpecialSorts.FORMULA){
     		Vector<Term> queries = collectQueries(t);
     		for(Term query:queries){
         		QueryEvalPos qep = new QueryEvalPos(query, (Vector<Integer>)pathInTerm.clone(), qepLevel+1, instVars, qepIsPositive);
@@ -629,7 +602,7 @@ public class QueryExpand implements BuiltInRule {
             if (Transformer.inTransformer(pio)) {
                 return false;
             }
-            final Sort nullSort = goal.proof().getJavaInfo().nullSort();
+            final org.key_project.common.core.logic.Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic()
                     || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort())
                             && !pmTerm.sub(1).sort().extendsTrans(nullSort))) {

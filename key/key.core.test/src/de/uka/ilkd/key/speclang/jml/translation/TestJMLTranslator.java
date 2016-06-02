@@ -18,6 +18,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.Operator;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,21 +32,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -266,7 +261,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(termContains(result, Junctor.AND));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  (Sort) services.getNamespaces().sorts().lookup(new Name(
+                                  (org.key_project.common.core.logic.Sort) services.getNamespaces().sorts().lookup(new Name(
                 "int")));
         Term expected =
                 TB.all(i,
@@ -299,7 +294,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(termContains(result, Junctor.AND));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  (Sort) services.getNamespaces().sorts().lookup(new Name(
+                                  (org.key_project.common.core.logic.Sort) services.getNamespaces().sorts().lookup(new Name(
                 "int")));
         Term expected =
                 TB.ex(i,
@@ -330,7 +325,7 @@ public class TestJMLTranslator extends TestCase {
         Function q = (Function) nss.functions().lookup(new Name("bsum"));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  (Sort) nss.sorts().lookup(new Name("int")));
+                                  (org.key_project.common.core.logic.Sort) nss.sorts().lookup(new Name("int")));
         Term expected =
                 TB.func(services.getTypeConverter().getIntegerLDT().getJavaCastInt(),
                 TB.bsum(i,
@@ -361,7 +356,7 @@ public class TestJMLTranslator extends TestCase {
         Function q = (Function) nss.functions().lookup(new Name("bsum"));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  (Sort) nss.sorts().lookup(new Name("int")));
+                                  (org.key_project.common.core.logic.Sort) nss.sorts().lookup(new Name("int")));
         Term expected =
                 TB.bsum(i,
                         TB.zTerm("0"),
@@ -699,7 +694,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
 
-        Sort sds = javaInfo.objectSort();
+        org.key_project.common.core.logic.Sort sds = javaInfo.objectSort();
         Function ioFunc = sds.getInstanceofSymbol(services);
         assertTrue(termContains(result, ioFunc));
     }

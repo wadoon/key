@@ -13,11 +13,12 @@
 
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
+import org.key_project.common.core.logic.GenericSort;
+import org.key_project.common.core.logic.Sort;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 
 /** 
@@ -59,6 +60,6 @@ public interface TranslationListener {
      * @return return <code>true</code> if you want to terminate the translation
      * of the taclet, otherwise <code>false<code>.
      */
-    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, Term term);
+    public boolean eventInstantiationFailure(GenericSort dest, org.key_project.common.core.logic.Sort sort, Taclet t, Term term);
 
 }
