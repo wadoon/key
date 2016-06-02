@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
@@ -95,6 +94,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         queue = ImmutableLeftistHeap.<RuleAppContainer>nilHeap();
         secQueue = ImmutableLeftistHeap.<RuleAppContainer>nilHeap();
         workingList = ImmutableSLList.<RuleAppContainer>nil();
+        generalMan.clear();
 
         // to support encapsulating rule managers (delegation, like in
         // <code>FocussedRuleApplicationManager</code>) the rule index
@@ -176,14 +176,14 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             queue = queue.insert ( c );
             break;
         case SECONDARY_QUEUE:
+            secQueue = secQueue.insert ( c );
+            break;
+        case WORKING_LIST:
             if(generalMan.isResponsible(c)) {
                 generalMan.add(c);
             } else {
-            secQueue = secQueue.insert ( c );
-            }
-            break;
-        case WORKING_LIST:
             workingList = workingList.prepend(c);
+            }
             break;
         }
     }
@@ -227,7 +227,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         ensureQueueExists ();
 
         Iterable<RuleAppContainer> list = generalMan.getMatchingRuleApps(goal);
-        secQueue = secQueue.insert(list.iterator());
+        queue = queue.insert(list.iterator());
 
         final long currentTime = getGoal ().getTime ();
         if ( currentTime != nextRuleTime ) {
@@ -339,7 +339,6 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
 
     private void createFurtherRuleApps (RuleAppContainer app, boolean secondary) {
-        assert secondary = true;
         push ( app.createFurtherApps ( getGoal (), getStrategy () ).iterator (),
                secondary ? SECONDARY_QUEUE : PRIMARY_QUEUE );
     }
