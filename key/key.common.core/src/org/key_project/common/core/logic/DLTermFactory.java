@@ -6,9 +6,9 @@ import org.key_project.util.collection.ImmutableArray;
 
 public interface DLTermFactory< S extends DLSort, 
                                 T extends DLTerm<S, ? extends DLVisitor<T>>, 
-                                O extends DLOperator<S,T>,  
+                                O extends DLOperator,  
                                 P extends Program,
-                                Q extends DLQuantifiableVariable<S,T>> {
+                                Q extends DLQuantifiableVariable<S>> {
 
     /**
      * Master method for T creation. Should be the only place where terms 

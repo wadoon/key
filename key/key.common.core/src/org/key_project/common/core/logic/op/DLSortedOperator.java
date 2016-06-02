@@ -15,15 +15,13 @@ package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.DLOperator;
 import org.key_project.common.core.logic.DLSort;
-import org.key_project.common.core.logic.DLTerm;
-import org.key_project.common.core.logic.DLVisitor;
 import org.key_project.util.collection.ImmutableArray;
 
 
 /** 
  * Operator with well-defined argument and result sorts.
  */
-public interface DLSortedOperator<S extends DLSort, T extends DLTerm<S, ? extends DLVisitor<T>>> extends DLOperator<S, T> {
+public interface DLSortedOperator<S extends DLSort> extends DLOperator {
     
     S sort();
 

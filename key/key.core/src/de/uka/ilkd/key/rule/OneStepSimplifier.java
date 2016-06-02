@@ -720,7 +720,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     /**
      * Instances of this class are used in the {@link Map} of
-     * {@link OneStepSimplifier#replaceKnown(TermServices, SequentFormula, Map, List, Protocol)}
+     * {@link OneStepSimplifier#replaceKnown(DLTermServices, SequentFormula, Map, List, Protocol)}
      * to forece the same behavior as in Taclet rules where
      * names of logical variables and {@link TermLabel}s are ignored.
      * @author Martin Hentschel

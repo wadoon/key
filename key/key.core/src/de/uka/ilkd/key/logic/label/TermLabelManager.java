@@ -1259,7 +1259,7 @@ public class TermLabelManager {
    }
    
    /**
-    * Utility class used by {@link TermLabelManager#computeRefactorings(TermServices, PosInOccurrence, Term, Rule, Goal, Term)}.
+    * Utility class used by {@link TermLabelManager#computeRefactorings(DLTermServices, PosInOccurrence, Term, Rule, Goal, Term)}.
     * @author Martin Hentschel
     */
    protected static class RefactoringsContainer {

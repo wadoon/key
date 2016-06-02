@@ -373,7 +373,7 @@ public final class WhileInvariantTransformer {
     //---------------------------------------------------------------
 
 
-    private Term createLongJunctorTerm(Junctor junctor, ArrayList<Term> terms) {
+    private Term createLongJunctorTerm(Operator junctor, ArrayList<Term> terms) {
         if (terms.size() == 1)
             return terms.get(0);
         else if (terms.size() == 2)

@@ -18,7 +18,7 @@ package de.uka.ilkd.key.logic;
  * required to construct {@link Term}s.
  * @author Richard Bubel
  */
-public interface TermServices {
+public interface TermServices  {
 
     /**
      * returns the namespaces for functions, predicates etc.

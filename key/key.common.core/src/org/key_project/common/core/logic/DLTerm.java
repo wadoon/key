@@ -4,12 +4,13 @@ import org.key_project.common.core.logic.op.DLQuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-public interface DLTerm<S extends DLSort, V extends DLVisitor<? extends DLTerm<S,V>>> {
+public interface DLTerm<S extends DLSort,
+                        V extends DLVisitor<? extends DLTerm<S,V>>> {
 
     /** 
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
      */
-    public DLOperator<S, ? extends DLTerm<S, V>> op();
+    public DLOperator op();
 
     /** 
      * The <code>n</code>-th direct subterm.
@@ -51,21 +52,26 @@ public interface DLTerm<S extends DLSort, V extends DLVisitor<? extends DLTerm<S
      */
     public void execPreOrder(V visitor);
 
+    /**
+     * The sort of the term.
+     */
+    public S sort();    
+
     /** 
      * The set of free quantifiable variables occurring in this term.
      */
-    public ImmutableSet<? extends DLQuantifiableVariable<S, ? extends DLTerm<S, V>>> freeVars();
+    public <Q extends DLQuantifiableVariable<S>> ImmutableSet<Q> freeVars();
     
     /**
     * The logical variables bound by the top level operator.
     */
-   public ImmutableArray<? extends DLQuantifiableVariable<S, ? extends DLTerm<S, V>>> boundVars();
+   public ImmutableArray<? extends DLQuantifiableVariable<S>> boundVars();
 
    /**
     * The logical variables bound by the top level operator for the nth 
     * subterm.
     */
-   public ImmutableArray<? extends DLQuantifiableVariable<S, ? extends DLTerm<S, V>>> varsBoundHere(int n);
+   public ImmutableArray<? extends DLQuantifiableVariable<S>> varsBoundHere(int n);
 
 
 }

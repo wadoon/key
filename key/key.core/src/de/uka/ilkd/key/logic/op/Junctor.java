@@ -29,35 +29,35 @@ public final class Junctor extends AbstractSortedOperator {
     /** 
      * the true constant 
      */
-    public static final Junctor TRUE = new Junctor(new Name("true"),0);
+    public static final Operator TRUE = new Junctor(new Name("true"),0);
 
     /** 
      * the false constant 
      */
-    public static final Junctor FALSE = new Junctor(new Name("false"),0);
+    public static final Operator FALSE = new Junctor(new Name("false"),0);
     
     /** 
      * the usual 'and' operator '/\' (be A, B formulae then 'A /\ B'
      * is true if and only if A is true and B is true 
      */
-    public static final Junctor AND = new Junctor(new Name("and"),2);
+    public static final Operator AND = new Junctor(new Name("and"),2);
     
     /** 
      * the usual 'or' operator '\/' (be A, B formulae then 'A \/ B'
      * is true if and only if A is true or B is true 
      */
-    public static final Junctor OR = new Junctor(new Name("or"),2);
+    public static final Operator OR = new Junctor(new Name("or"),2);
     
     /** 
      * the usual 'negation' operator '-'
      */
-    public static final Junctor NOT = new Junctor(new Name("not"), 1);
+    public static final Operator NOT = new Junctor(new Name("not"), 1);
 
     /**
      * the usual 'implication' operator '->' (be A, B formulae then
      * 'A -> B' is true if and only if A is false or B is true 
      */
-    public static final Junctor IMP = new Junctor(new Name("imp"),2);
+    public static final Operator IMP = new Junctor(new Name("imp"),2);
 
     
     private static Sort[] createFormulaSortArray(int arity) {

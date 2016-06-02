@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.DLOperator;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.OperatorValidator;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -26,7 +27,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * All symbols acting as members of a term e.g. logical operators, predicates, 
  * functions, variables etc. have to implement this interface.  
  */
-public interface Operator extends DLOperator<Sort, Term>, Named, SVSubstitute {
+public interface Operator extends DLOperator, Named, SVSubstitute, OperatorValidator<Sort, Term> {
     
 
     /**

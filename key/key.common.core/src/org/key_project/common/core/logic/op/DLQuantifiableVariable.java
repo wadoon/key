@@ -21,5 +21,7 @@ import org.key_project.common.core.logic.DLVisitor;
  * This interface represents the variables that can be bound
  * (by quantifiers or other binding operators).
  */
-public interface DLQuantifiableVariable<S extends DLSort, T extends DLTerm<S, ? extends DLVisitor<T>>> extends DLParsableVariable<S, T> {
+public interface DLQuantifiableVariable<S extends DLSort> extends DLParsableVariable<S> {
+
+
 }

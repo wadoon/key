@@ -14,12 +14,10 @@
 package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.DLSort;
-import org.key_project.common.core.logic.DLTerm;
-import org.key_project.common.core.logic.DLVisitor;
 
 /** 
  * This interface represents the variables that can be recognized 
  * by one of the parsers. 
  */
-public interface DLParsableVariable<S extends DLSort, T extends DLTerm<S, ? extends DLVisitor<T>>> extends DLSortedOperator<S, T> {
+public interface DLParsableVariable<S extends DLSort> extends DLSortedOperator<S> {
 }

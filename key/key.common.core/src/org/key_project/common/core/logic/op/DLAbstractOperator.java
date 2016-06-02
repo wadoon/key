@@ -14,9 +14,6 @@
 package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.DLOperator;
-import org.key_project.common.core.logic.DLSort;
-import org.key_project.common.core.logic.DLTerm;
-import org.key_project.common.core.logic.DLVisitor;
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -24,7 +21,7 @@ import org.key_project.util.collection.ImmutableArray;
 /** 
  * Abstract operator class offering some common functionality.
  */
-public abstract class AbstractOperator<S extends DLSort, T extends DLTerm<S, ? extends DLVisitor<T>>> implements DLOperator<S, T> {
+public abstract class DLAbstractOperator implements DLOperator {
     
     private final Name name;
     private final int arity;
@@ -32,7 +29,7 @@ public abstract class AbstractOperator<S extends DLSort, T extends DLTerm<S, ? e
     private final boolean isRigid;
     
     
-    protected AbstractOperator(Name name, 
+    protected DLAbstractOperator(Name name, 
 	    		               int arity, 
 	    		               ImmutableArray<Boolean> whereToBind,
 	    		               boolean isRigid) {
@@ -46,7 +43,7 @@ public abstract class AbstractOperator<S extends DLSort, T extends DLTerm<S, ? e
     }
     
     
-    protected AbstractOperator(Name name, 
+    protected DLAbstractOperator(Name name, 
 	    		       int arity, 
 	    		       Boolean[] whereToBind,
 	    		       boolean isRigid) {
@@ -54,7 +51,7 @@ public abstract class AbstractOperator<S extends DLSort, T extends DLTerm<S, ? e
     }        
     
     
-    protected AbstractOperator(Name name, int arity, boolean isRigid) {
+    protected DLAbstractOperator(Name name, int arity, boolean isRigid) {
 	this(name, arity, (ImmutableArray<Boolean>) null, isRigid);
     }
     
@@ -88,29 +85,7 @@ public abstract class AbstractOperator<S extends DLSort, T extends DLTerm<S, ? e
     }
     
     
-    /**
-     * Allows subclasses to impose custom demands on what constitutes a 
-     * valid term using the operator represented by the subclass. 
-     */
-    protected abstract boolean additionalValidTopLevel(T term);
-    
-    
-    @Override
-    public boolean validTopLevel(T term) {
-	if(arity != term.arity()
-	   || arity != term.subs().size()
-	   || (whereToBind == null) != term.boundVars().isEmpty()) {
-	    return false;
-	}
-	
-	for(int i = 0, n = arity; i < n; i++) {
-	    if(term.sub(i) == null) {
-		return false;
-	    }
-	}
-	
-	return additionalValidTopLevel(term);
-    }
+   
     
     
     @Override

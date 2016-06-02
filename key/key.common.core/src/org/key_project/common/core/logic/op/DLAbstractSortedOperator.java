@@ -1,14 +1,11 @@
 package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.DLSort;
-import org.key_project.common.core.logic.DLTerm;
-import org.key_project.common.core.logic.DLVisitor;
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 
-public abstract class DLAbstractSortedOperator<S extends DLSort, 
-    T extends DLTerm<S, ? extends DLVisitor<T>>>
-        extends AbstractOperator<S, T> implements DLSortedOperator<S,T> {
+public abstract class DLAbstractSortedOperator<S extends DLSort>
+        extends DLAbstractOperator implements DLSortedOperator<S> {
 
     @SuppressWarnings("rawtypes")
     protected static final ImmutableArray<?> EMPTY_SORT_LIST = new ImmutableArray();
@@ -31,10 +28,6 @@ public abstract class DLAbstractSortedOperator<S extends DLSort,
         this.sort = sort;
     }
 
-    @Override
-    public final S sort(ImmutableArray<T> terms) {
-        return sort;
-    }
 
     @Override
     public final S argSort(int i) {
