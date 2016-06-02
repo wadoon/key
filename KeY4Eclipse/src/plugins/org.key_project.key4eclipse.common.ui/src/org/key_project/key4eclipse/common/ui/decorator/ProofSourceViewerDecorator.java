@@ -28,6 +28,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.services.IDisposable;
+import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.ObjectUtil;
@@ -38,7 +39,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -57,7 +57,7 @@ import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 /**
  * The Decorator for the KeYEditor.
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
  */
 public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**

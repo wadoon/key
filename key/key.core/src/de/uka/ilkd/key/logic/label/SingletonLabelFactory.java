@@ -15,6 +15,8 @@ package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
 
+import org.key_project.common.core.logic.label.TermLabel;
+
 /**
  * A factory for creating singleton {@link TermLabel}.
  *

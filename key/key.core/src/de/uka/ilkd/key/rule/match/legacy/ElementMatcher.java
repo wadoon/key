@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.rule.match.legacy;
 
+import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractSV;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;

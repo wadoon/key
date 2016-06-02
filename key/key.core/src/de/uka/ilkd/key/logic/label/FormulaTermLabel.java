@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.label.TermLabel;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;

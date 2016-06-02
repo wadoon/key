@@ -15,11 +15,13 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Map;
 
+import org.key_project.common.core.logic.DLTermFactory;
+import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
  * The TermFactory is the <em>only</em> way to create terms using constructors 
@@ -33,7 +35,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  * See {@link org.key_project.common.core.logic.TermBuilder} for more convenient methods to 
  * create terms. 
  */
-public final class TermFactory {
+public final class TermFactory implements DLTermFactory<Sort, Term, Operator, JavaBlock, QuantifiableVariable> {
     
 
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
@@ -52,15 +54,15 @@ public final class TermFactory {
     //public interface
     //-------------------------------------------------------------------------
     
-    /**
-     * Master method for term creation. Should be the only place where terms 
-     * are created in the entire system.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, org.key_project.util.collection.ImmutableArray, org.key_project.util.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock, org.key_project.util.collection.ImmutableArray)
      */
+    @Override
     public Term createTerm(Operator op, 
 	    		   ImmutableArray<Term> subs, 
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
 	    		   JavaBlock javaBlock,
-			   ImmutableArray<TermLabel> labels) {
+			       ImmutableArray<TermLabel> labels) {
         if(op == null) {
             throw new TermCreationException("null-Operator at TermFactory");
         }
@@ -72,6 +74,10 @@ public final class TermFactory {
         return doCreateTerm(op, subs, boundVars, javaBlock, labels);
     }
     
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, org.key_project.util.collection.ImmutableArray, org.key_project.util.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock)
+     */
+    @Override
     public Term createTerm(Operator op, 
 	    		   ImmutableArray<Term> subs, 
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
@@ -81,6 +87,10 @@ public final class TermFactory {
     }
 
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.logic.Term[], org.key_project.util.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock)
+     */
+    @Override
     public Term createTerm(Operator op,
                            Term[] subs,
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
@@ -89,10 +99,18 @@ public final class TermFactory {
     }
     
  
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.logic.Term)
+     */
+    @Override
     public Term createTerm(Operator op, Term... subs) {
         return createTerm(op, subs, null, null);
     }
     
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.logic.Term[], org.key_project.util.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock, org.key_project.util.collection.ImmutableArray)
+     */
+    @Override
     public Term createTerm(Operator op,
                            Term[] subs,
                            ImmutableArray<QuantifiableVariable> boundVars,
@@ -101,6 +119,10 @@ public final class TermFactory {
     	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels);
     }
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.logic.Term[], org.key_project.util.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock, de.uka.ilkd.key.logic.label.TermLabel)
+     */
+    @Override
     public Term createTerm(Operator op,
             Term[] subs,
             ImmutableArray<QuantifiableVariable> boundVars,
@@ -110,23 +132,43 @@ public final class TermFactory {
                 javaBlock, new ImmutableArray<TermLabel>(label));
     }
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.logic.Term[], de.uka.ilkd.key.logic.label.TermLabel)
+     */
+    @Override
     public Term createTerm(Operator op, Term[] subs, TermLabel label) {
         return createTerm(op, subs, null, null, label);
     }
        
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.logic.Term[], org.key_project.util.collection.ImmutableArray)
+     */
+    @Override
     public Term createTerm(Operator op, Term[] subs, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, createSubtermArray(subs), null, null, labels);
     }
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.logic.Term, org.key_project.util.collection.ImmutableArray)
+     */
+    @Override
     public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels);
     }    
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, org.key_project.util.collection.ImmutableArray)
+     */
+    @Override
     public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, new Term[]{sub1, sub2}, null, null, labels);
     }    
 
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.DLTermFactory#createTerm(de.uka.ilkd.key.logic.op.Operator, org.key_project.util.collection.ImmutableArray)
+     */
+    @Override
     public Term createTerm(Operator op, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, NO_SUBTERMS, null, null, labels);
     }

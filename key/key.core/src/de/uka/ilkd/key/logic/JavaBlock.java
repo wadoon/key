@@ -16,12 +16,14 @@ package de.uka.ilkd.key.logic;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import org.key_project.common.core.logic.Program;
+
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.StatementBlock;
 
-public class JavaBlock {
+public class JavaBlock implements Program {
     
     /**
      * Attention using the JavaBlock below means no program not the empty program.

@@ -14,8 +14,7 @@
 package de.uka.ilkd.key.pp;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.label.TermLabel;
+import org.key_project.common.core.logic.label.TermLabel;
 
 /**
  * This abstract class is used by SequentViewLogicPrinter to determine the set

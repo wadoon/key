@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.speclang;
 
+import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.logic.label.TermLabel;
 
 /**
  * A positionedString with labels, which can then be passed over to the translated term.
