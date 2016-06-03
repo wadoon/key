@@ -168,8 +168,7 @@ public interface Term extends SVSubstitute, Sorted {
     /**
      * Returns a serial number for a term. The serial number is not persistent.
      */
-    public int serialNumber();
-    
+    public int serialNumber();    
     
     /**
      * Checks if the {@link Term} or one of its direct or indirect children

@@ -74,7 +74,7 @@ public class TacletApplPart {
     } 
 
     /** returns the list of additional generic conditions on
-     * instantiations of schema variables. The list ist readonly. */
+     * instantiations of schema variables. The list is read only. */
     public ImmutableList<VariableCondition> getVariableConditions() {
 	return variableConditions;
     }

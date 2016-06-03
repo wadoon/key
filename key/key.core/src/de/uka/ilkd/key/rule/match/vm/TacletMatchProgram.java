@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -102,8 +101,6 @@ public class TacletMatchProgram {
     private static void createProgram(Term pattern, ArrayList<MatchInstruction> program) {
         final Operator op = pattern.op();
 
-        final JavaProgramElement patternPrg = pattern.javaBlock().program();
-
         final ImmutableArray<QuantifiableVariable> boundVars = pattern
                 .boundVars();
         
@@ -112,7 +109,7 @@ public class TacletMatchProgram {
         }
 
         if (pattern.op() instanceof Modality || pattern.op() instanceof ModalOperatorSV) {
-            program.add(Instruction.matchProgram(patternPrg));
+            program.add(Instruction.matchProgram(pattern.javaBlock().program()));
         }
 
         if (pattern.hasLabels()) {
