@@ -45,25 +45,25 @@ abstract class AbstractOperator extends GenericAbstractOperator implements
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.logic.op.ExtendedTypeCheckingAndInferenceService#additionalValidTopLevel(de.uka.ilkd.key.logic.Term)
      */
-    @Override
-    public abstract boolean additionalValidTopLevel(Term term);
+//    @Override
+//    public abstract boolean additionalValidTopLevel(Term term);
 
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.logic.op.ExtendedTypeCheckingAndInferenceService#validTopLevel(de.uka.ilkd.key.logic.Term)
      */
-    @Override
-    public boolean validTopLevel(Term term) {
-        if (arity != term.arity() || arity != term.subs().size()
-                || (whereToBind == null) != term.boundVars().isEmpty()) {
-            return false;
-        }
-
-        for (int i = 0, n = arity; i < n; i++) {
-            if (term.sub(i) == null) {
-                return false;
-            }
-        }
-
-        return additionalValidTopLevel(term);
-    }
+//    @Override
+//    public boolean validTopLevel(Term term) {
+//        if (arity != term.arity() || arity != term.subs().size()
+//                || (whereToBind == null) != term.boundVars().isEmpty()) {
+//            return false;
+//        }
+//
+//        for (int i = 0, n = arity; i < n; i++) {
+//            if (term.sub(i) == null) {
+//                return false;
+//            }
+//        }
+//
+//        return additionalValidTopLevel(term);
+//    }
 }

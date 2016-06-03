@@ -22,6 +22,7 @@ Protokoll
   - (Generic)UpdateableOperator
   - (Generic)ParseableVariable
   - (Generic)AbstractSortedOperator
+  - (Generic)SchemaVariable
 
 Muster für Kommentare in Klassen, aus denen generalisierte Versionen extrahiert wurden:
 

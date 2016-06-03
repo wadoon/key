@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -19,22 +19,39 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
- * Abstract base class for schema variables.
+ * TODO: Document.
+ *
+ * @author Dominic Scheurer
+ *
  */
-public abstract class AbstractSV extends GenericAbstractSV implements
-        SchemaVariable {
+public abstract class GenericAbstractSV extends AbstractSortedOperator
+        implements GenericSchemaVariable {
 
-    protected AbstractSV(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            boolean isRigid, boolean isStrict) {
-        super(name, argSorts, sort, isRigid, isStrict);
+    protected final boolean isStrict;
+
+    protected GenericAbstractSV(Name name, ImmutableArray<Sort> argSorts,
+            Sort sort, boolean isRigid, boolean isStrict) {
+        super(name, argSorts, sort, isRigid);
+        this.isStrict = isStrict;
     }
 
-    protected AbstractSV(Name name, Sort[] argSorts, Sort sort,
+    protected GenericAbstractSV(Name name, Sort[] argSorts, Sort sort,
             boolean isRigid, boolean isStrict) {
         this(name, new ImmutableArray<Sort>(argSorts), sort, isRigid, isStrict);
     }
 
-    protected AbstractSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {
+    protected GenericAbstractSV(Name name, Sort sort, boolean isRigid,
+            boolean isStrict) {
         this(name, (ImmutableArray<Sort>) null, sort, isRigid, isStrict);
     }
+
+    protected final String toString(String sortSpec) {
+        return name() + " (" + sortSpec + ")";
+    }
+
+    @Override
+    public final boolean isStrict() {
+        return isStrict;
+    }
+
 }
