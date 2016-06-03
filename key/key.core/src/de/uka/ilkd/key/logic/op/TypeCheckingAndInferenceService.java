@@ -86,12 +86,32 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
                 return result;
             }
         }
+        
+        if (!op.getClass().isAnonymousClass() || !(op instanceof SortedOperator)) {
+            throw new UnsupportedOperationException(
+                    "There is no type checker and sort inference service registred for class "
+                            + op.getClass().getName());
 
-        throw new UnsupportedOperationException(
-                "There is no type checker and sort inference service registred for class "
-                        + op.getClass().getName());
+        } else {// ignore anonymous classes as these are hacks
+            return new TypeCheckingAndInferenceService<C>() {
+                @Override
+                public Sort sort(ImmutableArray<Term> terms, C op) {
+                    return ((SortedOperator)op).sort();
+                }
+
+                @Override
+                public boolean additionalValidTopLevel(Term term,
+                        C op) {
+                    return true;
+                }
+
+                @Override
+                public boolean validTopLevel(Term term, C op) {
+                    return true;
+                }
+            };
+        }
     }
-
     // /////////////////////////////////// //
     // /////// POLYMORPHIC GETTERS /////// //
     // /////////////////////////////////// //
@@ -351,4 +371,5 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             return term.sub(0).sort() == Sort.UPDATE;
         }
     }
+    
 }
