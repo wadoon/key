@@ -16,7 +16,10 @@ package de.uka.ilkd.key.logic.op;
 
 /** 
  * This interface represents the variables that can be recognized 
- * by one of the parsers. 
+ * by one of the parsers.<br/>
+ * 
+ * <strong>TODO:</strong> This should be renamed since it includes type checking
+ * methods of the {@link Operator} interface.
  */
 public interface ParsableVariable extends SortedOperator {
 }

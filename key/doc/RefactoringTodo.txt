@@ -16,8 +16,30 @@ Protokoll
 
 - Habe Interface “GenericOperator” extrahiert  
   TODO: Dieses zu Operator umbenennen, GenericOperator wird zu TypeCheckingAndInferenceService o.ä.
-- Das selbige für “GenericAbstractOperator” / “AbstractOperator”
+- Das selbige für:
+  - “GenericAbstractOperator” / “AbstractOperator”
+  - (Generic)SortedOperator
+  - (Generic)UpdateableOperator
+  - (Generic)ParseableVariable
+  - (Generic)AbstractSortedOperator
 
+Muster für Kommentare in Klassen, aus denen generalisierte Versionen extrahiert wurden:
+
+``
+<br/>
+ * 
+ * <strong>TODO:</strong> This should be renamed since it includes type checking
+ * methods of the {@link Operator} interface.
+``
+
+Muster für Kommentare in verallgemeinerten Klassen:
+
+``
+<br/>
+ * 
+ * <strong>TODO:</strong> This should be named "SortedOperator"; the previous
+ * {@link SortedOperator} interface should get a different name.
+``
 
 Term (Dominic)
 ====

@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,13 +13,21 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.Term;
 
 /**
- * Operator with well-defined argument and result sorts.
- * 
- * <strong>TODO:</strong> This should be renamed since it includes type checking
- * methods of the {@link Operator} interface.
+ * TODO: Document.
+ *
+ * @author Dominic Scheurer
  */
-public interface SortedOperator extends Operator, GenericSortedOperator {
-    
+interface ExtendedTypeCheckingAndInferenceService extends Operator {
+
+    /**
+     * Allows subclasses to impose custom demands on what constitutes a valid
+     * term using the operator represented by the subclass.
+     */
+    boolean additionalValidTopLevel(Term term);
+
+    boolean validTopLevel(Term term);
+
 }

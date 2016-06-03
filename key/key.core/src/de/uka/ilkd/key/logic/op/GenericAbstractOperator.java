@@ -18,6 +18,8 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
 
 /**
+ * Abstract operator class offering some common functionality.<br/>
+ * 
  * <strong>TODO:</strong> This should be named "AbstractOperator"; the previous
  * {@link AbstractOperator} interface should get the name
  * "AbstractTypeCheckingAndInferenceService" or the like.

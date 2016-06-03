@@ -87,7 +87,7 @@ public final class IfThenElse extends AbstractOperator {
     
 
     @Override
-    protected boolean additionalValidTopLevel(Term term) {
+    public boolean additionalValidTopLevel(Term term) {
         final Sort s0 = term.sub(0).sort();
         final Sort s1 = term.sub(1).sort();
         final Sort s2 = term.sub(2).sort();

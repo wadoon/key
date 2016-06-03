@@ -17,8 +17,11 @@ package de.uka.ilkd.key.logic.op;
 /** 
  * Operators implementing this interface may stand for
  * locations as well. This means e.g. occur as top level operators on the 
- * left side of an assignment pair of an update. 
+ * left side of an assignment pair of an update.<br/>
+ * 
+ * <strong>TODO:</strong> This should be renamed since it includes type checking
+ * methods of the {@link Operator} interface.
  */
-public interface UpdateableOperator extends SortedOperator, ParsableVariable {
+public interface UpdateableOperator extends GenericUpdateableOperator, Operator, ParsableVariable {
 
 }

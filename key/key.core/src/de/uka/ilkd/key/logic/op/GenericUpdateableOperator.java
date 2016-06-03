@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,13 +13,16 @@
 
 package de.uka.ilkd.key.logic.op;
 
-
-/**
- * Operator with well-defined argument and result sorts.
+/** 
+ * Operators implementing this interface may stand for
+ * locations as well. This means e.g. occur as top level operators on the 
+ * left side of an assignment pair of an update.<br/>
  * 
- * <strong>TODO:</strong> This should be renamed since it includes type checking
- * methods of the {@link Operator} interface.
+ * <strong>TODO:</strong> This should be named "UpdateableOperator"; the previous
+ * {@link UpdateableOperator} interface should get a different name.
+ *
+ * @author Dominic Scheurer
  */
-public interface SortedOperator extends Operator, GenericSortedOperator {
-    
+public interface GenericUpdateableOperator extends GenericSortedOperator, GenericParsableVariable {
+
 }

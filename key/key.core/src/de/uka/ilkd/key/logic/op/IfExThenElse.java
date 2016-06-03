@@ -46,7 +46,7 @@ public final class IfExThenElse extends AbstractOperator {
     
 
     @Override
-    protected boolean additionalValidTopLevel(Term term) {
+    public boolean additionalValidTopLevel(Term term) {
         for(QuantifiableVariable var : term.varsBoundHere(0)) {
             if(!var.sort().name().toString().equals("int")) {
         	return false;

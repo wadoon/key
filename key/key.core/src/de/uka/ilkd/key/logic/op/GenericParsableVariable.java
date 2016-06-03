@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,13 +13,15 @@
 
 package de.uka.ilkd.key.logic.op;
 
-
-/**
- * Operator with well-defined argument and result sorts.
+/** 
+ * This interface represents the variables that can be recognized 
+ * by one of the parsers.<br/>
  * 
- * <strong>TODO:</strong> This should be renamed since it includes type checking
- * methods of the {@link Operator} interface.
+ * <strong>TODO:</strong> This should be named "ParsableVariable"; the previous
+ * {@link ParsableVariable} interface should get a different name.
+ *
+ * @author Dominic Scheurer
  */
-public interface SortedOperator extends Operator, GenericSortedOperator {
-    
+public interface GenericParsableVariable extends GenericSortedOperator {
+
 }

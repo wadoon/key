@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.Term;
  * actual terms.
  */
 abstract class AbstractOperator extends GenericAbstractOperator implements
-        Operator {
+        Operator, ExtendedTypeCheckingAndInferenceService {
 
     protected AbstractOperator(Name name, int arity,
             ImmutableArray<Boolean> whereToBind, boolean isRigid) {
@@ -42,12 +42,15 @@ abstract class AbstractOperator extends GenericAbstractOperator implements
         this(name, arity, (ImmutableArray<Boolean>) null, isRigid);
     }
 
-    /**
-     * Allows subclasses to impose custom demands on what constitutes a valid
-     * term using the operator represented by the subclass.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.op.ExtendedTypeCheckingAndInferenceService#additionalValidTopLevel(de.uka.ilkd.key.logic.Term)
      */
-    protected abstract boolean additionalValidTopLevel(Term term);
+    @Override
+    public abstract boolean additionalValidTopLevel(Term term);
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.op.ExtendedTypeCheckingAndInferenceService#validTopLevel(de.uka.ilkd.key.logic.Term)
+     */
     @Override
     public boolean validTopLevel(Term term) {
         if (arity != term.arity() || arity != term.subs().size()

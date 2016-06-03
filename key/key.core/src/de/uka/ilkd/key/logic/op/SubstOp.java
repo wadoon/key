@@ -54,8 +54,8 @@ public abstract class SubstOp extends AbstractOperator {
      * term's arity is 2 and the numer of variables bound there is 0
      * for the 0th subterm and 1 for the 1st subterm.
      */
-    @Override    
-    protected boolean additionalValidTopLevel(Term term){
+    @Override
+    public boolean additionalValidTopLevel(Term term){
 	if(term.varsBoundHere(1).size() != 1) { 
 	    return false;
 	}
