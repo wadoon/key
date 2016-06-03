@@ -421,7 +421,7 @@ public final class SymbolicExecutionSideProofUtil {
          return true;
       }
       else if (term.op() instanceof Function) {
-         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+         HeapLDT heapLDT = services.getTheories().getHeapLDT();
          if (SymbolicExecutionUtil.isHeap(term.op(), heapLDT)) {
             return true;
          }

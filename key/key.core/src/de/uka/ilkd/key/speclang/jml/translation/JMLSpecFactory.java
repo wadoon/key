@@ -123,7 +123,7 @@ public class JMLSpecFactory {
                                                IProgramMethod pm,
                                                ProgramVariableCollection progVars) {
         LocationVariable heap =
-                services.getTypeConverter().getHeapLDT().getHeap();
+                services.getTheories().getHeapLDT().getHeap();
 
         // create contracts
         ImmutableSet<Contract> symbDatas =
@@ -325,7 +325,7 @@ public class JMLSpecFactory {
 
         progVar.atPreVars = new LinkedHashMap<LocationVariable,LocationVariable>();
         progVar.atPres = new LinkedHashMap<LocationVariable,Term>();
-        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
            LocationVariable lv = TB.heapAtPreVar(h+"AtPre", h.sort(), false);
            progVar.atPreVars.put(h, lv);
            progVar.atPres.put(h, TB.var(lv));
@@ -340,7 +340,7 @@ public class JMLSpecFactory {
                                                 Behavior originalBehavior)
                                                         throws SLTranslationException {
         ContractClauses clauses = new ContractClauses();
-        final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
+        final LocationVariable savedHeap = services.getTheories().getHeapLDT().getSavedHeap();
 
         clauses.abbreviations =
                 registerAbbreviationVariables(textualSpecCase, pm.getContainerType(),
@@ -350,7 +350,7 @@ public class JMLSpecFactory {
                 translateMeasuredBy(pm, progVars.selfVar,
                                     progVars.paramVars,
                                     textualSpecCase.getMeasuredBy());
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
            clauses.hasMod.put(heap,
                     !translateStrictlyPure(pm, progVars.selfVar,
                             progVars.paramVars,
@@ -848,14 +848,14 @@ public class JMLSpecFactory {
             Behavior originalBehavior) {
         Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
         if(progVars.excVar == null) { // Model methods do not have exceptions
-            for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
                 if(clauses.ensures.get(heap) != null) {
                     Term post = TB.convertToFormula(clauses.ensures.get(heap));
                     result.put(heap, post);
                 }
             }
         }else{
-            for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
                 if(clauses.ensures.get(heap) != null) {
                     Term excNull = TB.label(TB.equals(TB.var(progVars.excVar), TB.NULL()),
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
@@ -868,7 +868,7 @@ public class JMLSpecFactory {
                                     : TB.imp(TB.not(excNull),
                                             TB.and(TB.convertToFormula(clauses.signals),
                                                     TB.convertToFormula(clauses.signalsOnly))));
-                    result.put(heap, heap == services.getTypeConverter().getHeapLDT().getHeap() ?
+                    result.put(heap, heap == services.getTheories().getHeapLDT().getHeap() ?
                             TB.and(post1, post2) : post1);
                 }else{
                     if(clauses.assignables.get(heap) != null) {
@@ -884,7 +884,7 @@ public class JMLSpecFactory {
     		ContractClauses clauses,
     		Behavior originalBehavior) {
         Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
         	if(clauses.axioms.get(heap) != null) {
         	    result.put(heap, TB.convertToFormula(clauses.axioms.get(heap)));
         	}
@@ -921,7 +921,7 @@ public class JMLSpecFactory {
 
         // requires
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
            if(clauses.requires.get(heap) != null) {
              final Term pre = TB.convertToFormula(clauses.requires.get(heap));
              pres.put(heap, pre);
@@ -951,7 +951,7 @@ public class JMLSpecFactory {
             result = result.add(contract);
         } else {
             // create two contracts for each diamond and box modality
-            for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
               if(clauses.requires.get(heap) != null) {
                 pres.put(heap, TB.andSC(pres.get(heap),
                          TB.not(TB.convertToFormula(clauses.diverges))));
@@ -1015,7 +1015,7 @@ public class JMLSpecFactory {
         if (createContract) {
             assert (progVars.selfVar == null) == pm.isStatic();
             Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
-            for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
                 if(clauses.requires.get(heap) != null) {
                     final Term pre = TB.convertToFormula(clauses.requires.get(heap));
                     pres.put(heap, pre);
@@ -1465,7 +1465,7 @@ public class JMLSpecFactory {
         ProgramVariable excVar = TB.excVar(pm, false); // only for information flow
 
         final ImmutableList<LocationVariable> allHeaps =
-                services.getTypeConverter().getHeapLDT().getAllHeaps();
+                services.getTheories().getHeapLDT().getAllHeaps();
 
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : allHeaps) {
@@ -1506,7 +1506,7 @@ public class JMLSpecFactory {
         Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         for(String h : originalAssignables.keySet()) {
            LocationVariable heap =
-                   services.getTypeConverter().getHeapLDT().getHeapForName(new Name(h));
+                   services.getTheories().getHeapLDT().getHeapForName(new Name(h));
            if(heap == null) continue;
            Term a = null;
            ImmutableList<PositionedString> as = originalAssignables.get(h);
@@ -1533,7 +1533,7 @@ public class JMLSpecFactory {
             infFlowSpecs = new LinkedHashMap<LocationVariable,
                                          ImmutableList<InfFlowSpec>>();
         ImmutableList<InfFlowSpec> infFlowSpecTermList;
-        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        final LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
         for(LocationVariable heap : allHeaps) {
             if (!originalInfFlowSpecs.isEmpty() && heap.equals(baseHeap)) {
                 infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, allVars,

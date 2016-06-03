@@ -196,7 +196,7 @@ public final class WhileInvariantTransformer {
         if (w.continueOccurred()) {
             stmnt.add(contFlagDecl(contFlag));
             contFlagTerm =  services.getTermBuilder().equals(typeConv.convertToLogicElement(contFlag), 
-        	    	             typeConv.getBooleanLDT().getTrueTerm());
+                    services.getTheories().getBooleanLDT().getTrueTerm());
         }
         
         // exception case
@@ -412,7 +412,7 @@ public final class WhileInvariantTransformer {
                                                  post,
                                                  TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "ReturnCaseModality", null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock, post.getLabels()));
         
-        return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(returnFlag), typeConv.getBooleanLDT().getTrueTerm()),
+        return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(returnFlag), services.getTermBuilder().TRUE()),
                                   executeReturn);
     }
 
@@ -444,7 +444,7 @@ public final class WhileInvariantTransformer {
                                                 post,
                                                 TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "BreakCaseModality", null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock, post.getLabels()));
         return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(breakFlag), 
-                                typeConv.getBooleanLDT().getTrueTerm()), 
+                                services.getTheories().getBooleanLDT().getTrueTerm()), 
                                 executeBreak); 
     }
 
@@ -463,7 +463,7 @@ public final class WhileInvariantTransformer {
                                         Term inv) {
 
         final TermBuilder TB = services.getTermBuilder();
-        final Term TRUE_TERM = typeConv.getBooleanLDT().getTrueTerm();
+        final Term TRUE_TERM = services.getTheories().getBooleanLDT().getTrueTerm();
 
         ArrayList<Term> al = new ArrayList<Term>();
 
@@ -536,7 +536,7 @@ public final class WhileInvariantTransformer {
                                                   TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "ThrowCaseModality", null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock, post.getLabels()));
         return TB.imp( 
               TB.equals(typeConv.convertToLogicElement(excFlag), 
-        	       typeConv.getBooleanLDT().getTrueTerm()), 
+                      services.getTheories().getBooleanLDT().getTrueTerm()), 
              throwException);
     }
 

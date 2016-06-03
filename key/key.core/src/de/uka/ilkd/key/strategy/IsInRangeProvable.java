@@ -44,7 +44,7 @@ public class IsInRangeProvable implements Feature {
      * @return the set of axioms
      */
     private ImmutableSet<Term> collectAxioms(Sequent seq, PosInOccurrence ignore, Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
 
         // collect the operators used to identify the formulas of interest in the sequent
         final HashSet<Operator> ops = new HashSet<>();
@@ -78,7 +78,7 @@ public class IsInRangeProvable implements Feature {
             final HashSet<Operator> ops, final SequentFormula formulaToIgnore, Services services) {
         
         final TermBuilder tb = services.getTermBuilder();
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
         
         for (final SequentFormula sf : semisequent) {
             if (formulaToIgnore != sf) {
@@ -182,7 +182,7 @@ public class IsInRangeProvable implements Feature {
         
         final Term termToCheck = pos.subTerm().sub(0);
         final TermBuilder tb = services.getTermBuilder();
-        final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+        final IntegerLDT intLDT = services.getTheories().getIntegerLDT();
         
         long upperBound;
         long lowerBound;

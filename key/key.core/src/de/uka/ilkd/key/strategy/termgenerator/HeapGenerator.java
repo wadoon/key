@@ -43,7 +43,7 @@ public class HeapGenerator implements TermGenerator {
     }
 
     private void collectHeaps(Term term, LinkedHashSet<Term> heaps, Services services) {
-        if (term.sort().equals(services.getTypeConverter().getHeapLDT().targetSort())) {
+        if (term.sort().equals(services.getTheories().getHeapLDT().targetSort())) {
             heaps.add(term);
         } else {
             if (!includeUpdates && term.op() instanceof UpdateApplication) {

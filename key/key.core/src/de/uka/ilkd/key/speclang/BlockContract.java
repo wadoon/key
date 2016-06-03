@@ -452,7 +452,7 @@ public interface BlockContract extends SpecificationElement {
         {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for (LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
                 result.put(heap, heapAtPreVar(heap + "_" + REMEMBRANCE_SUFFIX, heap.sort(), false));
             }
             return result;

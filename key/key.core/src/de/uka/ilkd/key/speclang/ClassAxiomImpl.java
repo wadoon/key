@@ -131,7 +131,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
         ImmutableList<ProgramVariable> replaceVars =
                 ImmutableSLList.<ProgramVariable>nil();
         replaceVars = replaceVars.append(
-                services.getTypeConverter().getHeapLDT().getHeap());
+                services.getTheories().getHeapLDT().getHeap());
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);
         }

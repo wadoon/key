@@ -363,7 +363,7 @@ public class BlockContractRule implements BuiltInRule {
 
         // prepare information flow analysis
         final LocationVariable baseHeap =
-                services.getTypeConverter().getHeapLDT().getHeap();
+                services.getTheories().getHeapLDT().getHeap();
         final TermBuilder tb = services.getTermBuilder();
         
         assert infFlowGoal.proof() instanceof InfFlowProof;
@@ -1073,7 +1073,7 @@ public class BlockContractRule implements BuiltInRule {
 
         private LocationVariable getBaseHeapFunction()
         {
-            return services.getTypeConverter().getHeapLDT().getHeap();
+            return services.getTheories().getHeapLDT().getHeap();
         }
 
         public Term buildWellFormedAnonymisationHeapsCondition(

@@ -32,8 +32,8 @@ public class HeapContext {
 
   public static List<LocationVariable> getModHeaps(Services services, boolean transaction) {
       List<LocationVariable> result = new ArrayList<LocationVariable>();
-      final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
-      for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+      final LocationVariable savedHeap = services.getTheories().getHeapLDT().getSavedHeap();
+      for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
           if(savedHeap == heap && !transaction) {
               continue;
           }
@@ -53,7 +53,7 @@ public class HeapContext {
   
   public static Map<LocationVariable,Term> getAtPres(Map<LocationVariable,LocationVariable> atPreVars, Services services) {
     final Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
-    for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+    for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
        final LocationVariable lv = atPreVars.get(heap);
        final Term t = lv == null ? null : services.getTermBuilder().var(lv);
        result.put(heap, t);

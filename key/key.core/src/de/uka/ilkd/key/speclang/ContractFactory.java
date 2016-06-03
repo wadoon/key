@@ -85,7 +85,7 @@ public class ContractFactory {
 
     Map<LocationVariable,Term> newPosts = new LinkedHashMap<LocationVariable,Term>(10);
     for(LocationVariable h : foci.originalPosts.keySet()) {
-       if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
+       if(h == services.getTheories().getHeapLDT().getHeap()) {
           newPosts.put(h, tb.andSC(foci.originalPosts.get(h), addedPost));
        }else{
           newPosts.put(h, foci.originalPosts.get(h));
@@ -143,7 +143,7 @@ public class ContractFactory {
 
       Map<LocationVariable,Term> newPres = new LinkedHashMap<LocationVariable,Term>(10);
       for(LocationVariable h : foci.originalPres.keySet()) {
-         if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
+         if(h == services.getTheories().getHeapLDT().getHeap()) {
             newPres.put(h, tb.and(foci.originalPres.get(h), addedPre));
          }else{
             newPres.put(h, foci.originalPres.get(h));
@@ -175,8 +175,7 @@ public class ContractFactory {
                                                    foci.id,
                                                    foci.toBeSaved,
                                                    foci.originalMods
-                                                   .get(services.getTypeConverter()
-                                                           .getHeapLDT().getSavedHeap()) != null,
+                                                   .get(services.getTheories().getHeapLDT().getSavedHeap()) != null,
                                                    services);
     }
 
@@ -224,7 +223,7 @@ public class ContractFactory {
                 tb.paramVars(dep.first, false);
         assert (selfVar == null) == dep.first.isStatic();
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
-        pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
+        pres.put(services.getTheories().getHeapLDT().getHeap(),
                  selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
         Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
         for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
@@ -270,7 +269,7 @@ public class ContractFactory {
             Term accessible,
             ImmutableList<InfFlowSpec> infFlowSpecs,
             boolean toBeSaved) {
-        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        final LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
         final Term atPre = tb.var(progVars.atPreVars.get(baseHeap));
         final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
         final ImmutableList<Term> params = tb.var(progVars.paramVars);
@@ -320,7 +319,7 @@ public class ContractFactory {
                                                    axioms, mods, accs, hasMod, selfVar, paramVars,
                                                    resultVar, excVar, atPreVars, null,
                                                    Contract.INVALID_ID, toBeSaved,
-                                                   mods.get(services.getTypeConverter().getHeapLDT()
+                                                   mods.get(services.getTheories().getHeapLDT()
                                                            .getSavedHeap()) != null, services);
     }
 
@@ -340,7 +339,7 @@ public class ContractFactory {
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres,
                     freePres, mby, posts, freePosts, axioms,
                     mods, accessibles, hasMod, pv, false, mods.get(
-                            services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
+                            services.getTheories().getHeapLDT().getSavedHeap()) != null);
     }
 
 
@@ -406,7 +405,7 @@ public class ContractFactory {
                 new LinkedHashMap<LocationVariable, Term>(t.originalPosts.size());
         Map<LocationVariable,Term> freePosts =
                 new LinkedHashMap<LocationVariable, Term>(t.originalFreePosts.size());
-        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
            hasMod.put(h, false);
            Term oriPost = t.originalPosts.get(h);
            Term oriFreePost = t.originalFreePosts.get(h);
@@ -423,7 +422,7 @@ public class ContractFactory {
 
         Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
         if(t.originalAxioms != null) { // TODO: what about the others?
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
                 Term oriAxiom = t.originalAxioms.get(h);
                 if(oriAxiom != null) {
                     axioms.put(h,tb.imp(atPreify(t.originalPres.get(h), t.originalAtPreVars),
@@ -452,7 +451,7 @@ public class ContractFactory {
                     t.originalParamVars,
                     services)
                     : null;
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
                 Term otherPre = other.getPre(h, t.originalSelfVar,
                         t.originalParamVars,
                         t.originalAtPreVars,
@@ -475,7 +474,7 @@ public class ContractFactory {
                         t.originalAtPreVars,
                         services);
 
-                if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
+                if(h == services.getTheories().getHeapLDT().getHeap()) {
                     // bugfix (MU)
                     // if the first or the other contract do not have a
                     // measured-by-clause, assume no clause at all
@@ -493,7 +492,7 @@ public class ContractFactory {
                     Term m2 = other.getMod(h, t.originalSelfVar,
                             t.originalParamVars,
                             services);
-                    Function emptyMod = services.getTypeConverter().getLocSetLDT().getEmpty();
+                    Function emptyMod = services.getTheories().getLocSetLDT().getEmpty();
                     if (m1 != null || m2 != null) {
                         Term nm;
                         if (m1 == null) {
@@ -532,7 +531,7 @@ public class ContractFactory {
                 
             }
 
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
                 Term a1 = deps.get(h);
                 Term a2 = other.getDep(h, false,
                                        t.originalSelfVar,

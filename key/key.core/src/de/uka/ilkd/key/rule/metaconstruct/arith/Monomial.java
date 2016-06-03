@@ -210,7 +210,7 @@ public class Monomial {
     
     public Term toTerm (Services services) {
         final Operator mul = 
-	    services.getTypeConverter().getIntegerLDT().getMul();
+	    services.getTheories().getIntegerLDT().getMul();
         Term res = null;
         
         final Iterator<Term> it = parts.iterator ();
@@ -249,7 +249,7 @@ public class Monomial {
         	
         public Analyser(final Services services) {
             this.services = services;
-	    final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+	    final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
             numbers = integerLDT.getNumberSymbol();
             mul     = integerLDT.getMul();
         }

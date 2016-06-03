@@ -1143,7 +1143,7 @@ public class Recoder2KeYConverter {
         .getCrossReferenceSourceInfo().getContainingClassType(
                 (recoder.abstraction.Member) cd);
 
-        final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         Sort heapSort = heapLDT == null
                             ? Sort.ANY
                             : heapLDT.targetSort();
@@ -1169,7 +1169,7 @@ public class Recoder2KeYConverter {
         ConstructorDeclaration consDecl = new ConstructorDeclaration(children,
                 dc.getContainingClassType().isInterface());
         recoder.abstraction.ClassType cont = dc.getContainingClassType();
-        final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         Sort heapSort = heapLDT == null
                             ? Sort.ANY
                             : heapLDT.targetSort();
@@ -1313,7 +1313,7 @@ public class Recoder2KeYConverter {
             	= getServiceConfiguration().getCrossReferenceSourceInfo()
             	                           .getContainingClassType((recoder.abstraction.Member) md);
 
-            final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
+            final HeapLDT heapLDT = services.getTheories().getHeapLDT();
             Sort heapSort = heapLDT == null
                             ? Sort.ANY
                             : heapLDT.targetSort();

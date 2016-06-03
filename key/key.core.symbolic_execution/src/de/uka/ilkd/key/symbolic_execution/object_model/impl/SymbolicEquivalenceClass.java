@@ -104,7 +104,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
    @Override
    public Term getRepresentative() {
       // Prefer null if contained in equivalence class
-      final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+      final HeapLDT heapLDT = services.getTheories().getHeapLDT();
       Term nullTerm = CollectionUtil.search(terms, new IFilter<Term>() {
          @Override
          public boolean select(Term element) {

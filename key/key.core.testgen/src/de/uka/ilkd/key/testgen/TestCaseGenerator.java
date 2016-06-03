@@ -724,7 +724,7 @@ public class TestCaseGenerator {
             Function func = (Function)t.op();
             String name = func.name().toString();
             Sort sort = func.sort();
-            HeapLDT hLDT = services.getTypeConverter().getHeapLDT();
+            HeapLDT hLDT = services.getTheories().getHeapLDT();
             if(sort==hLDT.getFieldSort()){
                 String fieldSort = HeapLDT.getClassName(func);
                 ProgramVariable pv = getProgramVariable(t);
@@ -753,7 +753,7 @@ public class TestCaseGenerator {
     }
     
     private ProgramVariable getProgramVariable(Term locationTerm) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         ProgramVariable result = null;
         if (locationTerm.op() instanceof Function) {
             Function function = (Function)locationTerm.op();
@@ -778,10 +778,10 @@ public class TestCaseGenerator {
 			if(!existingConstants.contains(c.toString())){
 
 				String init = "null";
-				if(c.sort().equals(services.getTypeConverter().getIntegerLDT().targetSort())){
+				if(c.sort().equals(services.getTheories().getIntegerLDT().targetSort())){
 					init = "0";
 				}
-				else if(c.sort().equals(services.getTypeConverter().getBooleanLDT().targetSort())){
+				else if(c.sort().equals(services.getTheories().getBooleanLDT().targetSort())){
 					init = "false";
 				}
 

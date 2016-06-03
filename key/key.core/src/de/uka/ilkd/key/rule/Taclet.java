@@ -548,7 +548,7 @@ public abstract class Taclet implements Rule, Named {
 	// should be synchronized
 	if ( svNameCorrespondences == null ) {
 	    final SVNameCorrespondenceCollector c =
-		new SVNameCorrespondenceCollector (services.getTypeConverter().getHeapLDT());
+		new SVNameCorrespondenceCollector (services.getTheories().getHeapLDT());
 	    c.visit ( this, true );
 	    svNameCorrespondences = c.getCorrespondences ();
 	}

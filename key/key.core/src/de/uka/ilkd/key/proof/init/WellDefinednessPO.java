@@ -87,7 +87,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     private static Function createAnonHeap(LocationVariable heap,
                                            Services services) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         final Name anonHeapName = new Name(services.getTermBuilder().newName("anon_"+heap.toString()));
         final Function anonHeap = new Function(anonHeapName, heapLDT.targetSort());
         return anonHeap;

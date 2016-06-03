@@ -36,7 +36,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
     public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
 	    		  Services services ) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
+        HeapLDT heapLDT = services.getTheories().getHeapLDT();	
  	
  	    
  	Operator op = term.sub(0).op();

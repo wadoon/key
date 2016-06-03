@@ -138,7 +138,7 @@ public class LogicPrinter {
     private final StorePrinter storePrinter = new StorePrinter(this);
     
     protected HeapLDT getHeapLDT() {
-        return services == null ? null : services.getTypeConverter().getHeapLDT();
+        return services == null ? null : services.getTheories().getHeapLDT();
     }
 
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
@@ -992,8 +992,8 @@ public class LogicPrinter {
        boolean isKeyword = false;
        if (services != null) {
            Function measuredByEmpty =  services.getTermBuilder().getMeasuredByEmpty();
-           BooleanLDT bool = services.getTypeConverter().getBooleanLDT();
-           IntegerLDT integer = services.getTypeConverter().getIntegerLDT();
+           BooleanLDT bool = services.getTheories().getBooleanLDT();
+           IntegerLDT integer = services.getTheories().getIntegerLDT();
            
            isKeyword = (t.op() == getHeapLDT().getWellFormed() || t.op() == measuredByEmpty 
                  || t.op() == bool.getFalseConst() || t.op() == bool.getTrueConst()
@@ -1505,7 +1505,7 @@ public class LogicPrinter {
     {
         boolean isKeyword = false;
         if (services != null) {
-           LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
+           LocSetLDT loc = services.getTheories().getLocSetLDT();
            isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP 
                  || t.op() == Equality.EQV || t.op() == loc.getUnion());
         }

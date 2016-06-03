@@ -60,7 +60,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
     
     protected void addInvariantFormula(Goal goal) {
-       Sort nullSort = goal.proof().getServices().getTypeConverter().getHeapLDT().getNull().sort();
+       Sort nullSort = goal.proof().getServices().getTheories().getHeapLDT().getNull().sort();
 
        SortCollector sortCollector = new SortCollector();
 
@@ -101,7 +101,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         SpecificationRepository spec = services.getSpecificationRepository();
 
-        Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+        Sort heapSort = services.getTheories().getHeapLDT().targetSort();
 
         LogicVariable h = new LogicVariable(new Name("h"), heapSort);
 

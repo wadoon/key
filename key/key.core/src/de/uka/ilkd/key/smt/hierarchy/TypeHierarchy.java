@@ -66,7 +66,7 @@ public class TypeHierarchy {
 			if(n instanceof Sort){
 				Sort sort = (Sort) n;
 				//don't add the null sort
-				if(!sort.equals(services.getTypeConverter().getHeapLDT().getNull().sort())){
+				if(!sort.equals(services.getTheories().getHeapLDT().getNull().sort())){
 					addSort(sort);
 					sortList.add(sort);
 					

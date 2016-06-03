@@ -525,7 +525,7 @@ public class Recoder2KeYTypeConverter {
         final KeYJavaType integerType = getKeYJavaType(getServiceConfiguration()
                 .getNameInfo().getIntType());
         final KeYJavaType objectType = javaInfo.getJavaLangObject();
-        final HeapLDT heapLDT = typeConverter.getHeapLDT(); 
+        final HeapLDT heapLDT = javaInfo.getServices().getTheories().getHeapLDT(); 
         Sort heapSort =  heapLDT == null
                         ? Sort.ANY
                         : heapLDT.targetSort();

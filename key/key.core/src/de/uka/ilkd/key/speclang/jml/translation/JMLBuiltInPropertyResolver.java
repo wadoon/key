@@ -36,7 +36,7 @@ public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
 	    			      SLResolverManager manager,
 	    			      KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
-        this.seqLDT = services.getTypeConverter().getSeqLDT();
+        this.seqLDT = services.getTheories().getSeqLDT();
     }
     
 

@@ -216,7 +216,7 @@ public abstract class AbstractSlicer {
       Term modalityTerm = pair.second;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
       Services services = node.proof().getServices();
-      HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+      HeapLDT heapLDT = services.getTheories().getHeapLDT();
       if (label != null) {
          // Solve this reference
          ExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
@@ -961,7 +961,7 @@ public abstract class AbstractSlicer {
          return null;
       }
       else {
-         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+         HeapLDT heapLDT = services.getTheories().getHeapLDT();
          if (term.op() == heapLDT.getSelect(term.sort(), services)) {
             Location prefix = toLocation(services, term.sub(1));
             Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(services, heapLDT, term.sub(2));
@@ -980,7 +980,7 @@ public abstract class AbstractSlicer {
                String fullTypeName = name.substring(0, index);
                String fieldName = name.substring(index + 3);
                ProgramVariable pv = services.getJavaInfo().getAttribute(fullTypeName + "::" + fieldName);
-               assert term.op() == services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable) pv, services);
+               assert term.op() == services.getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable) pv, services);
                return new Location(new Access(pv));
             }
             else {

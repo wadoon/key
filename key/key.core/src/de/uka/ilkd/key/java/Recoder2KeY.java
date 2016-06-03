@@ -299,6 +299,7 @@ public class Recoder2KeY implements JavaReader {
         return typeConverter;
     }
 
+    
     /**
      * set this to true before parsing special classes and to false afterwards.
      * 

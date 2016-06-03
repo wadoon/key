@@ -407,7 +407,7 @@ public class StateVars {
     private static Term buildHeapFunc(String postfix,
                                       ImmutableArray<TermLabel> labels,
                                       Services services) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        HeapLDT heapLDT = services.getTheories().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
         if ("".equals(postfix)) {
             return tb.getBaseHeap();
@@ -436,7 +436,7 @@ public class StateVars {
                                     Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Sort intSort =
-                services.getTypeConverter().getIntegerLDT().targetSort();
+                services.getTheories().getIntegerLDT().targetSort();
         String newName = tb.newName("mbyAtPre" + postfix);
         final Function mbyAtPreFunc =
                 new Function(new Name(newName), intSort);

@@ -191,7 +191,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services){
         assert (selfTerm == null) == (originalSelfTerm == null);
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
@@ -200,7 +200,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     @Override
     public Term getInvariant(Services services) {
-        return originalInvariants.get(services.getTypeConverter().getHeapLDT().getHeap());
+        return originalInvariants.get(services.getTheories().getHeapLDT().getHeap());
     }
     
     @Override
@@ -217,7 +217,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public Term getModifies(Term selfTerm, Map<LocationVariable,Term> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
@@ -243,7 +243,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public ImmutableList<InfFlowSpec> getInfFlowSpecs(Services services) {
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
         return getInfFlowSpecs(baseHeap);
     }
 
@@ -427,13 +427,13 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     public String getPlainText(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
-       final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+       final HeapLDT heapLDT = services.getTheories().getHeapLDT();
        return getPlainText(services, heapLDT.getAllHeaps(), usePrettyPrinting, useUnicodeSymbols);
     }
 
     @Override
     public String getPlainText(Services services, Iterable<LocationVariable> heapContext, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
-       final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+       final HeapLDT heapLDT = services.getTheories().getHeapLDT();
        final LocationVariable baseHeap = heapLDT.getHeap();
        
        String mods = "";

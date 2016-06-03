@@ -225,7 +225,7 @@ public final class NotationInfo {
      
 	//arithmetic operators
 	final IntegerLDT integerLDT 
-		= services.getTypeConverter().getIntegerLDT();	
+		= services.getTheories().getIntegerLDT();	
 	tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
 	tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
 	tbl.put(integerLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
@@ -241,7 +241,7 @@ public final class NotationInfo {
 	tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
         	
 	//heap operators
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final HeapLDT heapLDT = services.getTheories().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
 	tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
         tbl.put(heapLDT.getAnon(), new Notation.HeapConstructorNotation());
@@ -252,14 +252,14 @@ public final class NotationInfo {
 	tbl.put(heapLDT.getLength(), new Notation.Postfix(".length"));
 
     // sequence operators
-    final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+    final SeqLDT seqLDT = services.getTheories().getSeqLDT();
 	tbl.put(seqLDT.getSeqLen(), new Notation.Postfix(".length"));
     tbl.put(SeqLDT.SEQGET_NAME, new Notation.SeqGetNotation());
     tbl.put(seqLDT.getSeqConcat(), new Notation.SeqConcatNotation(seqLDT.getSeqConcat(), 
             seqLDT.getSeqSingleton(), integerLDT.getCharSymbol()));
 	
 	//set operators
-	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+	final LocSetLDT setLDT = services.getTheories().getLocSetLDT();
 	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
@@ -280,8 +280,8 @@ public final class NotationInfo {
     
         HashMap<Object,Notation> tbl = createPrettyNotation(services);
         
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();  
-        final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+        final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();  
+        final LocSetLDT setLDT = services.getTheories().getLocSetLDT();
     	
     	tbl.put(integerLDT.getJavaCastByte(), new Notation.Prefix("(byte)", PRIORITY_CAST, PRIORITY_BOTTOM));
     	tbl.put(integerLDT.getJavaCastShort(), new Notation.Prefix("(short)", PRIORITY_CAST, PRIORITY_BOTTOM));
@@ -306,10 +306,10 @@ public final class NotationInfo {
         tbl.put(setLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
         tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(services.getTypeConverter().getHeapLDT().getPrec(), new Notation.Infix(""+UnicodeHelper.PRECEDES, PRIORITY_ATOM,PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(services.getTheories().getHeapLDT().getPrec(), new Notation.Infix(""+UnicodeHelper.PRECEDES, PRIORITY_ATOM,PRIORITY_TOP, PRIORITY_TOP));
 
         //seq operators
-        final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+        final SeqLDT seqLDT = services.getTheories().getSeqLDT();
         tbl.put(seqLDT.getSeqConcat(), new Notation.Infix(""+UnicodeHelper.SEQ_CONCAT, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
         tbl.put(seqLDT.getSeqEmpty(), new Notation.Constant(""+UnicodeHelper.SEQ_SINGLETON_L+UnicodeHelper.SEQ_SINGLETON_R, PRIORITY_BOTTOM));
         tbl.put(seqLDT.getSeqSingleton(), new Notation.SeqSingletonNotation(""+UnicodeHelper.SEQ_SINGLETON_L,""+UnicodeHelper.SEQ_SINGLETON_R));

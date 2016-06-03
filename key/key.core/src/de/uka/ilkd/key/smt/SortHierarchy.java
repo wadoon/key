@@ -83,7 +83,7 @@ class SortWrapper {
     }
 
    private boolean addParent(SortWrapper parent, boolean explicitNullHierarchy, boolean explicitHierarchy, Services services) {
-	Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
+	Function nullOp = services.getTheories().getHeapLDT().getNull();
 	if((explicitNullHierarchy && this.getSort() == nullOp.sort())|| explicitHierarchy){
 	    parentSorts.add(parent);
 	    return true;

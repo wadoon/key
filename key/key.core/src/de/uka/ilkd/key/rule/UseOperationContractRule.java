@@ -322,7 +322,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	assert mod != null;
 	final TermBuilder TB = services.getTermBuilder();
 
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final HeapLDT heapLDT = services.getTheories().getHeapLDT();
 	final Name methodHeapName = new Name(TB.newName(heap+"After_" + pm.getName()));
 	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(methodHeapFunc);
@@ -365,7 +365,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             assert selfTerm != null;
             Term createdForm = null;
             for(LocationVariable heap : heapContext) {
-            	if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+            	if(heap == services.getTheories().getHeapLDT().getSavedHeap()) {
             		continue;
             	}
             	final Term cr = TB.and(OpReplacer.replace(TB.var(heap),
@@ -702,7 +702,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         assert excVar != null;
         goal.addProgramVariable(excVar);
 
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
         //translate the contract
         final Term baseHeapTerm = tb.getBaseHeap();
         final ImmutableList<Term> contractParams = computeParams(baseHeapTerm, atPres, baseHeap, inst, tb.tf());

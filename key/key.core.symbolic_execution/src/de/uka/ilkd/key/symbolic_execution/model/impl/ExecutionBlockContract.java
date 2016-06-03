@@ -169,7 +169,7 @@ public class ExecutionBlockContract extends AbstractExecutionNode<SourceElement>
       }
       else if (term.op() instanceof ElementaryUpdate) {
          ElementaryUpdate eu = (ElementaryUpdate) term.op();
-         if (SymbolicExecutionUtil.isHeap(eu.lhs(), getServices().getTypeConverter().getHeapLDT())) {
+         if (SymbolicExecutionUtil.isHeap(eu.lhs(), getServices().getTheories().getHeapLDT())) {
             remembranceHeaps.put((LocationVariable) term.sub(0).op(), getServices().getTermBuilder().var(eu.lhs()));
          }
          else {

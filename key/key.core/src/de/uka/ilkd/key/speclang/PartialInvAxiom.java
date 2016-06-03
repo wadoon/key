@@ -121,7 +121,7 @@ public final class PartialInvAxiom extends ClassAxiom {
                                                     + (i == 0 ? "" : " EQ"));
             
             //create schema variables
-            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            final HeapLDT heapLDT = services.getTheories().getHeapLDT();
             final List<SchemaVariable> heapSVs = new LinkedList<SchemaVariable>();
             for(int j=0; j<HeapContext.getModHeaps(services, false).size(); j++) {
                 heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h"+j),

@@ -134,7 +134,7 @@ public class TestTermLabelManager extends TestCase {
       TermBuilder TB = services.getTermBuilder();
       // Create sequent
       PosInOccurrence pos = createTestPosInOccurrence(services);
-      IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+      IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
       Term one = integerLDT.translateLiteral(new IntLiteral(1), services);
       Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
       one = TB.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
@@ -440,7 +440,7 @@ public class TestTermLabelManager extends TestCase {
     }
       TermBuilder TB = services.getTermBuilder();
       Term modality = TB.label(TB.box(JavaBlock.EMPTY_JAVABLOCK, TB.label(TB.tt(), new ParameterlessTermLabel(new Name("POST")))), new ParameterlessTermLabel(new Name("ONE")));
-      LocationVariable heap = services.getTypeConverter().getHeapLDT().getSavedHeap();
+      LocationVariable heap = services.getTheories().getHeapLDT().getSavedHeap();
       Term update = TB.label(TB.elementary(TB.var(heap), TB.var(heap)), new ParameterlessTermLabel(new Name("UPDATE")));
       Term updateApp = TB.apply(update, modality, new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
       PosInOccurrence pos = new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.getTopLevel(), true);
@@ -515,7 +515,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    protected Term createTestTerm(Services services) {
-      IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+      IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
       Term one = integerLDT.translateLiteral(new IntLiteral(1), services);
       Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
       Term three = integerLDT.translateLiteral(new IntLiteral(3), services);

@@ -280,7 +280,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final Map<LocationVariable, Term> newModifiesClauses =
                 new LinkedHashMap<LocationVariable, Term>();
         boolean changed = blockChanged;
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for (LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
             final Term oldPrecondition = oldContract.getPrecondition(heap, services);
             final Term oldPostcondition = oldContract.getPostcondition(heap, services);
             final Term oldModifies = oldContract.getModifiesClause(heap, services);
@@ -399,7 +399,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             = new LinkedHashMap<LocationVariable,
                                 ImmutableList<InfFlowSpec>>();
 
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for (LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
             final Term m =
                     replaceVariablesInTerm(inv.getModifies(heap, selfTerm,
                                                            atPres,

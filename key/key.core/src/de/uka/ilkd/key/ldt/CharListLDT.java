@@ -202,7 +202,7 @@ public final class CharListLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-	final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+	final SeqLDT seqLDT = services.getTheories().getSeqLDT();
     final TermBuilder tb = services.getTermBuilder();
     final Term term_empty = tb.func(seqLDT.getSeqEmpty());
 
@@ -215,7 +215,7 @@ public final class CharListLDT extends LDT {
 	    return null;
 	}
 
-	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+	IntegerLDT intLDT = services.getTheories().getIntegerLDT();
 	if (intLDT == null) {
 	    throw new IllegalArgumentException(
 		    "IntegerLDT is needed for StringLiteral translation");

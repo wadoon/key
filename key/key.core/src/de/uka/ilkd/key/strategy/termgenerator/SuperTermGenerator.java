@@ -79,7 +79,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
             if ( services == null ) {
                 services = goal.proof ().getServices ();
-                final IntegerLDT numbers = services.getTypeConverter ().getIntegerLDT ();
+                final IntegerLDT numbers = services.getTheories().getIntegerLDT();
                 
                 binFunc = new SortedOperator() {
                     private final Name NAME = new Name("SuperTermGenerated");

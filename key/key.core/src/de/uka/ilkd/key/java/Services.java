@@ -104,11 +104,8 @@ public class Services implements TermServices {
     
     private final TermBuilder termBuilder;
 
-    private final TheoryServices theories;
+    private TheoryServices theories;
 
-    public TheoryServices getTheories() {
-        return theories;
-    }
 
     /**
      * creates a new Services object with a new TypeConverter and a new
@@ -119,15 +116,16 @@ public class Services implements TermServices {
     	this.profile = profile;
     	this.counters = new LinkedHashMap<String, Counter>();
     	this.caches = new ServiceCaches();
-    	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+        this.theories = new TheoryServices();
+        this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
     	this.specRepos = new SpecificationRepository(this);
         this.nameRecorder = new NameRecorder();
-        this.theories = new TheoryServices();
-
+        
         this.cee = new ConstantExpressionEvaluator(this);
-    	typeconverter = new TypeConverter(this);
-    	javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
+    	this.typeconverter = new TypeConverter(this);
+    	this.javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
     	                                             new KeYRecoderExcHandler()), this);
+
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
@@ -139,17 +137,17 @@ public class Services implements TermServices {
     	this.profile = profile;
     	this.counters = counters;
     	this.caches = caches;
-    	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-    	this.specRepos = new SpecificationRepository(this);
+        this.theories     = new TheoryServices();
+        this.termBuilder  = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+    	this.specRepos    = new SpecificationRepository(this);
         this.nameRecorder = new NameRecorder();
-        this.theories = new TheoryServices();
-        this.theories.init(this);
         
         cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
     	javainfo = new JavaInfo
     			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
-    }
+
+}
 
 
     /**
@@ -190,7 +188,12 @@ public class Services implements TermServices {
     public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
     }
-    
+
+    /** returns the theories of the logic */
+    public TheoryServices getTheories() {
+        return theories;
+    }
+
     
     public SpecificationRepository getSpecificationRepository() {
 	return specRepos;
@@ -232,11 +235,13 @@ public class Services implements TermServices {
     			(profile, getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
     					copyCounters(), newCaches);
     	s.specRepos = specRepos;
-    	s.typeconverter = getTypeConverter().copy(s);
-    	s.setNamespaces(namespaces.copy());
-    	nameRecorder = nameRecorder.copy();
+        s.setNamespaces(namespaces.copy());
+        s.nameRecorder = nameRecorder.copy();
+
+        s.typeconverter = getTypeConverter().copy(s);
+        s.theories.init(theories);
     	s.setJavaModel(getJavaModel());
-    	return s;
+        return s;
     }
     
     /**
@@ -262,11 +267,12 @@ public class Services implements TermServices {
     			instanceof SchemaCrossReferenceServiceConfiguration),
     			"services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
-    	s.typeconverter = getTypeConverter().copy(s);
-    	s.setNamespaces(namespaces.copy());
-    	nameRecorder = nameRecorder.copy();
+        s.setNamespaces(namespaces.copy());
+        s.nameRecorder = nameRecorder.copy();
+        
+        s.typeconverter = getTypeConverter().copy(s);
+        s.theories.init(theories);
     	s.setJavaModel(getJavaModel());
-
     	return s;
     }
     
@@ -292,9 +298,11 @@ public class Services implements TermServices {
                 copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
-        s.typeconverter = getTypeConverter().copy(s);
         s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
+        s.nameRecorder = nameRecorder.copy();
+
+        s.typeconverter = getTypeConverter().copy(s);
+        s.theories.init(theories);
         s.setJavaModel(getJavaModel());
 
         return s;
@@ -400,4 +408,5 @@ public class Services implements TermServices {
       assert this.javaModel == null;
       this.javaModel = javaModel;
    }
+
 }

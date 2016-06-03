@@ -117,7 +117,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 
     private boolean hasRawSteps(Term heapTerm, Sequent seq, Services services) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final HeapLDT heapLDT = services.getTheories().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
 	if(op == heapLDT.getStore()
@@ -143,7 +143,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    		     Sequent seq,
 	    		     Services services,
 	    		     List<Term> result) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final HeapLDT heapLDT = services.getTheories().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
 	if(op == heapLDT.getStore()
@@ -165,8 +165,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
     private static PosInOccurrence getFreshLocsStep(PosInOccurrence heapPos,
 	    				     Sequent seq,
 	    				     Services services) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+	final HeapLDT heapLDT = services.getTheories().getHeapLDT();
+	final LocSetLDT locSetLDT = services.getTheories().getLocSetLDT();
 	final Term heapTerm = heapPos.subTerm();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
@@ -197,7 +197,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	                       	       Term stepHeap,
 	                       	       Sequent seq,
 	                       	       Services services) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final HeapLDT heapLDT = services.getTheories().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
 	final TermBuilder TB = services.getTermBuilder();
@@ -445,7 +445,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    			     Services services,
 	    			     RuleApp ruleApp) {
 	//collect information
-	final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+	final LocSetLDT locSetLDT = services.getTheories().getLocSetLDT();
 	final PosInOccurrence pio = ruleApp.posInOccurrence();
         final Term focus = pio.subTerm();
         final IObserverFunction target = (IObserverFunction) focus.op();

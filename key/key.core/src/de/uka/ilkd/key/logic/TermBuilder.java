@@ -28,10 +28,9 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.TheoryServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -90,10 +89,15 @@ public class TermBuilder {
     private final Term ff;
 
     protected final Services services; // TODO; Make private
+    protected final TheoryServices theories;
     
     public TermBuilder(TermFactory tf, Services services) {
-       assert services != null;
        this.services = services;
+       assert services != null;
+       
+       this.theories = services.getTheories();
+       assert theories != null;
+       
        this.tf = tf;
        this.tt = tf.createTerm(Junctor.TRUE);
        this.ff = tf.createTerm(Junctor.FALSE);
@@ -366,7 +370,7 @@ public class TermBuilder {
      */
     public LocationVariable heapAtPreVar(String baseName,
                                          boolean makeNameUnique) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        HeapLDT heapLDT = theories.getHeapLDT();
         return heapAtPreVar(baseName, heapLDT.getHeap().sort(), makeNameUnique);
     }
 
@@ -577,7 +581,7 @@ public class TermBuilder {
                      Term a,
                      Term b,
                      Term t) {
-        Function bsum = services.getTypeConverter().getIntegerLDT().getBsum();
+        Function bsum = theories.getIntegerLDT().getBsum();
         return func(bsum,
                     new Term[]{a, b, t},
                     new ImmutableArray<QuantifiableVariable>(qv));
@@ -601,7 +605,7 @@ public class TermBuilder {
                      Term b,
                      Term t,
                      Services services) {
-        Function bprod = services.getTypeConverter().getIntegerLDT().getBprod();
+        Function bprod = theories.getIntegerLDT().getBprod();
         return func(bprod,
                     new Term[]{a, b, t},
                     new ImmutableArray<QuantifiableVariable>(qv));
@@ -914,7 +918,7 @@ public class TermBuilder {
      * If a is a boolean literal, the method returns the literal as a Formula.
      */
     public Term convertToFormula(Term a) {
-        BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
+        BooleanLDT booleanLDT = theories.getBooleanLDT();
         if (a.sort() == Sort.FORMULA) {
             return a;
         } else if (a.sort() == booleanLDT.targetSort()) {
@@ -936,7 +940,7 @@ public class TermBuilder {
 
     /** For a formula a, convert it to a boolean expression. */
     public Term convertToBoolean(Term a){
-        BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
+        BooleanLDT booleanLDT = theories.getBooleanLDT();
         if (a.sort() == booleanLDT.targetSort()) {
             return a;
         } else if (a.sort() == Sort.FORMULA) {
@@ -963,7 +967,7 @@ public class TermBuilder {
 
 
     public Term elementary(Term lhs, Term rhs) {
-    HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        HeapLDT heapLDT = theories.getHeapLDT();
     if(lhs.op() instanceof UpdateableOperator) {
         assert lhs.arity() == 0 : "uh oh: " + lhs;
         return elementary((UpdateableOperator)lhs.op(), rhs);
@@ -1182,12 +1186,12 @@ public class TermBuilder {
     //-------------------------------------------------------------------------
 
     public Term TRUE() {
-        return services.getTypeConverter().getBooleanLDT().getTrueTerm();
+        return theories.getBooleanLDT().getTrueTerm();
     }
 
 
     public Term FALSE() {
-        return services.getTypeConverter().getBooleanLDT().getFalseTerm();
+        return theories.getBooleanLDT().getFalseTerm();
     }
 
 
@@ -1197,36 +1201,36 @@ public class TermBuilder {
     //-------------------------------------------------------------------------
 
     public Term geq(Term t1, Term t2) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final IntegerLDT integerLDT = theories.getIntegerLDT();
         return func(integerLDT.getGreaterOrEquals(), t1, t2);
     }
 
 
     public Term gt(Term t1, Term t2) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final IntegerLDT integerLDT = theories.getIntegerLDT();
         return func(integerLDT.getGreaterThan(), t1, t2);
     }
 
 
     public Term lt(Term t1, Term t2) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final IntegerLDT integerLDT = theories.getIntegerLDT();
         return func(integerLDT.getLessThan(), t1, t2);
     }
 
 
     public Term leq(Term t1, Term t2) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final IntegerLDT integerLDT = theories.getIntegerLDT();
         return func(integerLDT.getLessOrEquals(), t1, t2);
     }
 
 
     public Term zero() {
-    return services.getTypeConverter().getIntegerLDT().zero();
+    return theories.getIntegerLDT().zero();
     }
 
 
     public Term one() {
-        return services.getTypeConverter().getIntegerLDT().one();
+        return theories.getIntegerLDT().one();
     }
 
     /**
@@ -1244,7 +1248,7 @@ public class TermBuilder {
         boolean negate = false;
         int j = 0;
 
-        final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+        final IntegerLDT intLDT = theories.getIntegerLDT();
 
         if (numberString.charAt(0) == '-') {
             negate = true;
@@ -1288,7 +1292,7 @@ public class TermBuilder {
 
 
     public Term add(Term t1, Term t2) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final IntegerLDT integerLDT = theories.getIntegerLDT();
         final Term zero = integerLDT.zero();
         if(t1.equals(zero)) {
             return t2;
@@ -1337,7 +1341,7 @@ public class TermBuilder {
     }
 
     public Term index(){
-        return func(services.getTypeConverter().getIntegerLDT().getIndex());
+        return func(theories.getIntegerLDT().getIndex());
     }
 
 
@@ -1358,24 +1362,24 @@ public class TermBuilder {
     }
 
     public Term empty() {
-    return func(services.getTypeConverter().getLocSetLDT().getEmpty());
+    return func(theories.getLocSetLDT().getEmpty());
     }
 
 
     public Term allLocs() {
-    return func(services.getTypeConverter().getLocSetLDT().getAllLocs());
+    return func(theories.getLocSetLDT().getAllLocs());
     }
 
 
     public Term singleton(Term o, Term f) {
-    return func(services.getTypeConverter().getLocSetLDT().getSingleton(),
+    return func(theories.getLocSetLDT().getSingleton(),
             o,
             f);
     }
 
 
     public Term union(Term s1, Term s2) {
-        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        final LocSetLDT ldt = theories.getLocSetLDT();
         if(s1.op() == ldt.getEmpty()) {
             return s2;
         } else if(s2.op() == ldt.getEmpty()) {
@@ -1405,7 +1409,7 @@ public class TermBuilder {
 
 
     public Term intersect(Term s1, Term s2) {
-        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        final LocSetLDT ldt = theories.getLocSetLDT();
         if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
             return empty();
         } else {
@@ -1433,7 +1437,7 @@ public class TermBuilder {
 
 
     public Term setMinus(Term s1, Term s2) {
-        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        final LocSetLDT ldt = theories.getLocSetLDT();
         if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
             return s1;
         } else {
@@ -1444,7 +1448,7 @@ public class TermBuilder {
 
     public Term infiniteUnion(QuantifiableVariable[] qvs,
                               Term s) {
-        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        final LocSetLDT ldt = theories.getLocSetLDT();
         return tf.createTerm(ldt.getInfiniteUnion(),
                 new Term[]{s},
                 new ImmutableArray<QuantifiableVariable>(qvs),
@@ -1478,28 +1482,28 @@ public class TermBuilder {
 
 
     public Term allFields(Term o) {
-        return func(services.getTypeConverter().getLocSetLDT().getAllFields(), o);
+        return func(theories.getLocSetLDT().getAllFields(), o);
     }
 
 
     public Term allObjects(Term f) {
-        return func(services.getTypeConverter().getLocSetLDT().getAllObjects(), f);
+        return func(theories.getLocSetLDT().getAllObjects(), f);
     }
 
 
     public Term arrayRange(Term o, Term lower, Term upper) {
-        return func(services.getTypeConverter().getLocSetLDT().getArrayRange(),
+        return func(theories.getLocSetLDT().getArrayRange(),
                 o, lower, upper);
     }
 
 
     public Term freshLocs(Term h) {
-        return func(services.getTypeConverter().getLocSetLDT().getFreshLocs(), h);
+        return func(theories.getLocSetLDT().getFreshLocs(), h);
     }
 
 
     public Term elementOf(Term o, Term f, Term s) {
-        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        final LocSetLDT ldt = theories.getLocSetLDT();
         if(s.op() == ldt.getEmpty()) {
             return ff();
         } else {
@@ -1509,7 +1513,7 @@ public class TermBuilder {
 
 
     public Term subset(Term s1, Term s2) {
-        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        final LocSetLDT ldt = theories.getLocSetLDT();
         if(s1.op() == ldt.getEmpty()) {
             return tt();
         } else {
@@ -1519,7 +1523,7 @@ public class TermBuilder {
 
 
     public Term disjoint(Term s1, Term s2) {
-        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        final LocSetLDT ldt = theories.getLocSetLDT();
         if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
             return tt();
         } else {
@@ -1529,7 +1533,7 @@ public class TermBuilder {
 
 
     public Term createdInHeap(Term s, Term h) {
-        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        final LocSetLDT ldt = theories.getLocSetLDT();
         if(s.op() == ldt.getEmpty()) {
             return tt();
         } else {
@@ -1583,7 +1587,7 @@ public class TermBuilder {
     //-------------------------------------------------------------------------
 
     public Term NULL() {
-        return func(services.getTypeConverter().getHeapLDT().getNull());
+        return func(theories.getHeapLDT().getNull());
     }
     
     /** The "deep non null" predicate arising from JML non_null types.
@@ -1597,7 +1601,7 @@ public class TermBuilder {
     }
 
     public Term wellFormed(Term heap) {
-        return func(services.getTypeConverter().getHeapLDT().getWellFormed(), heap);
+        return func(theories.getHeapLDT().getWellFormed(), heap);
     }
 
     public Term wellFormed(LocationVariable heap) {
@@ -1605,7 +1609,7 @@ public class TermBuilder {
     }
 
     public Term permissionsFor(Term permHeap, Term regularHeap) {
-        return func(services.getTypeConverter().getPermissionLDT().getPermissionsFor(),
+        return func(theories.getPermissionLDT().getPermissionsFor(),
                 permHeap, regularHeap);
     }
 
@@ -1647,7 +1651,7 @@ public class TermBuilder {
 
 
     public Term select(Sort asSort, Term h, Term o, Term f) {
-    return func(services.getTypeConverter().getHeapLDT().getSelect(
+    return func(theories.getHeapLDT().getSelect(
             asSort,
             services),
             h, o, f);
@@ -1658,7 +1662,7 @@ public class TermBuilder {
      * representing the field.
      */
     public Term select(Sort asSort, Term h, Term o, LocationVariable field) {
-        final Function f = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
+        final Function f = theories.getHeapLDT().getFieldSymbolForPV(field, services);
         return select(asSort, h, o, func(f));
     }
 
@@ -1668,19 +1672,19 @@ public class TermBuilder {
     }
 
     public Term getBaseHeap() {
-        return var(services.getTypeConverter().getHeapLDT().getHeap());
+        return var(theories.getHeapLDT().getHeap());
     }
 
     public Term dot(Sort asSort, Term o, Function f) {
     final Sort fieldSort
-        = services.getTypeConverter().getHeapLDT().getFieldSort();
+        = theories.getHeapLDT().getFieldSort();
         return f.sort() == fieldSort
                ? dot(asSort, o, func(f))
                : func(f, getBaseHeap(), o);
     }
     
     public Term dot (Sort asSort, Term o, LocationVariable field) {
-        final Function f = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
+        final Function f = theories.getHeapLDT().getFieldSymbolForPV(field, services);
         return dot(asSort, o, f);
     }
 
@@ -1692,7 +1696,7 @@ public class TermBuilder {
 
     public Term staticDot(Sort asSort, Function f) {
     final Sort fieldSort
-        = services.getTypeConverter().getHeapLDT().getFieldSort();
+        = theories.getHeapLDT().getFieldSort();
     return f.sort() == fieldSort
            ? staticDot(asSort, func(f))
            : func(f, getBaseHeap());
@@ -1700,7 +1704,7 @@ public class TermBuilder {
 
 
     public Term arr(Term idx) {
-    return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
+    return func(theories.getHeapLDT().getArr(), idx);
     }
 
     public Term addLabel(Term term, ImmutableArray<TermLabel> labels) {
@@ -1804,17 +1808,15 @@ public class TermBuilder {
 
 
     public Term dotLength(Term a) {
-        final TypeConverter tc = services.getTypeConverter();
-        return func(tc.getHeapLDT().getLength(), a);
+        return func(theories.getHeapLDT().getLength(), a);
     }
 
 
     public Term created(Term h, Term o) {
-        final TypeConverter tc = services.getTypeConverter();
-        return equals(select(tc.getBooleanLDT().targetSort(),
+        return equals(select(theories.getBooleanLDT().targetSort(),
                              h,
                              o,
-                             func(tc.getHeapLDT().getCreated())),
+                             func(theories.getHeapLDT().getCreated())),
                       TRUE());
     }
 
@@ -1824,34 +1826,30 @@ public class TermBuilder {
     }
 
     public Term initialized(Term o) {
-        final TypeConverter tc = services.getTypeConverter();
-        return equals(dot(tc.getBooleanLDT().targetSort(),
+        return equals(dot(theories.getBooleanLDT().targetSort(),
                 o,
-                tc.getHeapLDT().getInitialized()),
+                theories.getHeapLDT().getInitialized()),
                 TRUE());
     }
 
 
     public Term classPrepared(Sort classSort) {
-        final TypeConverter tc = services.getTypeConverter();
-        return equals(staticDot(tc.getBooleanLDT().targetSort(),
-                tc.getHeapLDT().getClassPrepared(classSort,
+        return equals(staticDot(theories.getBooleanLDT().targetSort(),
+                theories.getHeapLDT().getClassPrepared(classSort,
                         services)),
                         TRUE());
     }
 
     public Term classInitialized(Sort classSort) {
-        final TypeConverter tc = services.getTypeConverter();
-        return equals(staticDot(tc.getBooleanLDT().targetSort(),
-                tc.getHeapLDT().getClassInitialized(classSort,
+        return equals(staticDot(theories.getBooleanLDT().targetSort(),
+                theories.getHeapLDT().getClassInitialized(classSort,
                         services)),
                         TRUE());
     }
 
     public Term classInitializationInProgress(Sort classSort) {
-        final TypeConverter tc = services.getTypeConverter();
-        return equals(staticDot(tc.getBooleanLDT().targetSort(),
-                tc.getHeapLDT()
+        return equals(staticDot(theories.getBooleanLDT().targetSort(),
+                theories.getHeapLDT()
                 .getClassInitializationInProgress(classSort,
                         services)),
                         TRUE());
@@ -1859,28 +1857,27 @@ public class TermBuilder {
 
 
     public Term classErroneous(Sort classSort) {
-        final TypeConverter tc = services.getTypeConverter();
-        return equals(staticDot(tc.getBooleanLDT().targetSort(),
-                tc.getHeapLDT().getClassErroneous(classSort,
+        return equals(staticDot(theories.getBooleanLDT().targetSort(),
+                theories.getHeapLDT().getClassErroneous(classSort,
                         services)),
                         TRUE());
     }
 
 
     public Term store(Term h, Term o, Term f, Term v) {
-        return func(services.getTypeConverter().getHeapLDT().getStore(),
+        return func(theories.getHeapLDT().getStore(),
                 h, o, f, v);
     }
 
 
     public Term create(Term h, Term o) {
-        return func(services.getTypeConverter().getHeapLDT().getCreate(),
+        return func(theories.getHeapLDT().getCreate(),
                  new Term[]{h, o});
     }
 
 
     public Term anon(Term h1, Term s, Term h2) {
-    return func(services.getTypeConverter().getHeapLDT().getAnon(),
+    return func(theories.getHeapLDT().getAnon(),
             h1, s, h2);
     }
 
@@ -1898,7 +1895,7 @@ public class TermBuilder {
     public Term arrayStore(Term o, Term i, Term v) {
         return store(getBaseHeap(),
                 o,
-                 func(services.getTypeConverter().getHeapLDT().getArr(), i),
+                 func(theories.getHeapLDT().getArr(), i),
                  v);
     }
 
@@ -1908,8 +1905,8 @@ public class TermBuilder {
                                KeYJavaType kjt) {
         assert t.sort().extendsTrans(kjt.getSort()) || t.sort() instanceof ProgramSVSort;
         final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
-        final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-        final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+        final IntegerLDT intLDT = theories.getIntegerLDT();
+        final LocSetLDT setLDT = theories.getLocSetLDT();
         if (s.extendsTrans(services.getJavaInfo().objectSort())) {
             return orSC(equals(t, NULL()), created(h, t));
         } else if(s.equals(setLDT.targetSort())) {
@@ -1935,8 +1932,7 @@ public class TermBuilder {
     public Term frame(Term heapTerm, Map<Term,Term> normalToAtPre,
                   Term mod) {
         final Sort objectSort = services.getJavaInfo().objectSort();
-        final Sort fieldSort = services.getTypeConverter()
-                .getHeapLDT()
+        final Sort fieldSort = theories.getHeapLDT()
                 .getFieldSort();
 
         final Name objVarName   = new Name(newName("o"));
@@ -1959,18 +1955,18 @@ public class TermBuilder {
         // selects on permission heaps have to be explicitly typed as field type narrowing
         // does not follow Java typing for the permission heap
         boolean permissionHeap =
-            heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
+            heapTerm.op() == theories.getHeapLDT().getPermissionHeap();
         return all(quantVars,
                 or(elementOf(objVarTerm,
                         fieldVarTerm,
                         modAtPre),
                         and(not(equals(objVarTerm, NULL())),
                                 not(createdAtPre)),
-                                equals(select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
+                                equals(select(permissionHeap ? theories.getPermissionLDT().targetSort() : Sort.ANY,
                                         heapTerm,
                                         objVarTerm,
                                         fieldVarTerm),
-                                        select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
+                                        select(permissionHeap ? theories.getPermissionLDT().targetSort() : Sort.ANY,
                                                 or.replace(heapTerm),
                                                 objVarTerm,
                                                 fieldVarTerm))));
@@ -1984,8 +1980,7 @@ public class TermBuilder {
      */
     public Term frameStrictlyEmpty(Term heapTerm, Map<Term,Term> normalToAtPre) {
         final Sort objectSort = services.getJavaInfo().objectSort();
-        final Sort fieldSort = services.getTypeConverter()
-                .getHeapLDT()
+        final Sort fieldSort = theories.getHeapLDT()
                 .getFieldSort();
 
         final Name objVarName   = new Name(newName("o"));
@@ -2003,14 +1998,14 @@ public class TermBuilder {
         quantVars = quantVars.append(fieldVar);
 
         // see above
-        boolean permissionHeap = heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
+        boolean permissionHeap = heapTerm.op() == theories.getHeapLDT().getPermissionHeap();
 
         return all(quantVars,
-                equals(select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
+                equals(select(permissionHeap ? theories.getPermissionLDT().targetSort() : Sort.ANY,
                         heapTerm,
                         objVarTerm,
                         fieldVarTerm),
-                        select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
+                        select(permissionHeap ? theories.getPermissionLDT().targetSort() : Sort.ANY,
                                 or.replace(heapTerm),
                                 objVarTerm,
                                 fieldVarTerm)));
@@ -2022,7 +2017,7 @@ public class TermBuilder {
 
 
     public Term forallHeaps(Services services, Term t) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = theories.getHeapLDT();
         final LogicVariable heapLV
         = new LogicVariable(new Name("h"), heapLDT.targetSort());
         final Map<LocationVariable, LogicVariable> map
@@ -2039,7 +2034,7 @@ public class TermBuilder {
     //-------------------------------------------------------------------------
 
     public Term acc(Term h, Term s, Term o1, Term o2) {
-    return func(services.getTypeConverter().getHeapLDT().getAcc(),
+    return func(theories.getHeapLDT().getAcc(),
             h, s, o1, o2);
     }
 
@@ -2049,7 +2044,7 @@ public class TermBuilder {
                   Term o1,
                   Term o2,
                   Term n) {
-    return func(services.getTypeConverter().getHeapLDT().getReach(),
+    return func(theories.getHeapLDT().getReach(),
             h, s, o1, o2, n);
     }
 
@@ -2059,28 +2054,28 @@ public class TermBuilder {
     //-------------------------------------------------------------------------
 
     public Term seqGet(Sort asSort, Term s, Term idx) {
-        return func(services.getTypeConverter().getSeqLDT().getSeqGet(asSort, services),
+        return func(theories.getSeqLDT().getSeqGet(asSort, services),
                     s,
                     idx);
     }
 
 
     public Term seqLen(Term s) {
-        return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
+        return func(theories.getSeqLDT().getSeqLen(), s);
     }
 
     /** Function representing the least index of an element x in a sequence s (or underspecified) */
     public Term indexOf(Term s, Term x){
-        return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
+        return func(theories.getSeqLDT().getSeqIndexOf(),s,x);
     }
 
 
     public Term seqEmpty() {
-        return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
+        return func(theories.getSeqLDT().getSeqEmpty());
     }
 
     public Term seqSingleton(Term x) {
-        return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), x);
+        return func(theories.getSeqLDT().getSeqSingleton(), x);
     }
 
     public Term seqConcat(Term s, Term s2) {
@@ -2089,7 +2084,7 @@ public class TermBuilder {
         } else if (s2 == seqEmpty()) {
             return s;
         } else {
-            return func(services.getTypeConverter().getSeqLDT().getSeqConcat(),
+            return func(theories.getSeqLDT().getSeqConcat(),
                         s,
                         s2);
         }
@@ -2113,11 +2108,11 @@ public class TermBuilder {
     }
 
     public Term seqSub(Term s, Term from, Term to) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqSub(), s, from, to);
+    return func(theories.getSeqLDT().getSeqSub(), s, from, to);
     }
 
     public Term seqReverse(Term s) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
+    return func(theories.getSeqLDT().getSeqReverse(), s);
     }
 
     //-------------------------------------------------------------------------
@@ -2127,7 +2122,7 @@ public class TermBuilder {
 
 
     public ImmutableSet<Term> unionToSet(Term s) {
-    final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+    final LocSetLDT setLDT = theories.getLocSetLDT();
     assert s.sort().equals(setLDT.targetSort());
     final Function union = setLDT.getUnion();
     ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
@@ -2176,13 +2171,13 @@ public class TermBuilder {
                        Term a,
                        Term b,
                        Term t) {
-        return func(services.getTypeConverter().getSeqLDT().getSeqDef(),
+        return func(theories.getSeqLDT().getSeqDef(),
                     new Term[]{a, b, t},
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
 
     public Term values(){
-        return func(services.getTypeConverter().getSeqLDT().getValues());
+        return func(theories.getSeqLDT().getValues());
     }
 
     /**

@@ -148,7 +148,7 @@ public class DLEmbeddedExpression extends Operator {
 
 
     private static Sort getHeapSort(Services javaServ) {
-        return javaServ.getTypeConverter().getHeapLDT().targetSort();
+        return javaServ.getTheories().getHeapLDT().targetSort();
     }
 
     private static KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {

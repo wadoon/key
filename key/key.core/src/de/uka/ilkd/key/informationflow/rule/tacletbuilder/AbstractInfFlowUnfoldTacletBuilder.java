@@ -123,7 +123,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     private ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
                                                            ProofObligationVars poVars,
                                                            Services services) {
-        Function n = services.getTypeConverter().getHeapLDT().getNull();
+        Function n = services.getTheories().getHeapLDT().getNull();
 
         // generate a new schema variable for any pre variable
         Term selfAtPreSV =

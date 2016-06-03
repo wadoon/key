@@ -159,7 +159,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      */
     private List<CofactorPolynomial> extractPolys(Goal goal, Services services) {
         final IntegerLDT numbers =
-            services.getTypeConverter ().getIntegerLDT ();
+            services.getTheories().getIntegerLDT();
 
         final List<CofactorPolynomial> res = new ArrayList<CofactorPolynomial> ();
      

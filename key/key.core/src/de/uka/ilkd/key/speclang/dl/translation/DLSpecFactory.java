@@ -280,7 +280,7 @@ public final class DLSpecFactory {
 	    }
 	}
 	
-	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	HeapLDT heapLDT = services.getTheories().getHeapLDT();
 	//heapAtPre variable may be omitted
 	TermBuilder tb = services.getTermBuilder();
 	if(heapAtPreVar == null) {

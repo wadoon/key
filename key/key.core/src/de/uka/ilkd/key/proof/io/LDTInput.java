@@ -19,6 +19,7 @@ import java.util.List;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -141,7 +142,8 @@ public class LDTInput implements EnvInput {
 	}
 
         //create LDT objects
-        initConfig.getServices().getTheories().init(initConfig.getServices());
+        final Services services = initConfig.getServices();
+        services.getTheories().init(services);
         return DefaultImmutableSet.nil();
     }
 

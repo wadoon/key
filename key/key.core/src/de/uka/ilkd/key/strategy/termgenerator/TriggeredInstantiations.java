@@ -162,7 +162,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
     private void computeAxiomAndCandidateSets(final Sequent seq,
             final Set<Term> terms, final Set<Term> axioms, Services services) {        
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.antecedent(), true, services);
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.succedent(), false, services);
     }

@@ -41,7 +41,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
    public void testImproveReadability() throws ProblemLoaderException {
       KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/readability/InnerAndAnonymousTypeTest.java"), null, null, null);
       Services services = environment.getServices();
-      IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+      IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
       Sort intSort = integerLDT.targetSort();
       final TermBuilder TB = services.getTermBuilder();
       // Create test terms
@@ -61,7 +61,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
       Term altBPlusOne = TB.lt(a, bPlusOne);
       Term ageqOnePlusB = TB.geq(a, onePlusB);
       Term ageqBPlusOne = TB.geq(a, bPlusOne);
-      Term minusOne = services.getTypeConverter().getIntegerLDT().translateLiteral(new IntLiteral(-1), services);
+      Term minusOne = services.getTheories().getIntegerLDT().translateLiteral(new IntLiteral(-1), services);
       Term minusOnePlusB = TB.add(minusOne, b);
       Term bPlusMinusOne = TB.add(b, minusOne);
       Term bMinusOne = TB.func(integerLDT.getSub(), b, TB.one());

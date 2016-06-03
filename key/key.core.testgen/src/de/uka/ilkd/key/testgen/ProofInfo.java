@@ -74,7 +74,7 @@ public class ProofInfo {
 		if(c instanceof FunctionalOperationContract){
 			FunctionalOperationContract t = (FunctionalOperationContract) c;
 			OriginalVariables orig = t.getOrigVars();
-			Term post = t.getPost(services.getTypeConverter().getHeapLDT().getHeap(), orig.self, orig.params, orig.result, orig.exception, orig.atPres, services);
+			Term post = t.getPost(services.getTheories().getHeapLDT().getHeap(), orig.self, orig.params, orig.result, orig.exception, orig.atPres, services);
 			//System.out.println("Alt post: "+getPostCondition2());
 			return post;
 
@@ -105,7 +105,7 @@ public class ProofInfo {
 		if(c instanceof FunctionalOperationContract){
 			FunctionalOperationContract t = (FunctionalOperationContract) c;
 			OriginalVariables orig = t.getOrigVars();
-			Term post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self, orig.params, orig.atPres, services);
+			Term post = t.getPre(services.getTheories().getHeapLDT().getHeap(), orig.self, orig.params, orig.atPres, services);
 			return post;
 		}
 		//no pre <==> false
@@ -114,7 +114,7 @@ public class ProofInfo {
 
 	public Term getAssignable(){
 		Contract c = getContract();
-		return c.getAssignable(services.getTypeConverter().getHeapLDT().getHeap());
+		return c.getAssignable(services.getTheories().getHeapLDT().getHeap());
 	}
 
 	public String getCode() {
@@ -166,8 +166,8 @@ public class ProofInfo {
 		
 		Sort nullSort = services.getJavaInfo().getNullType().getSort();
 		Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
-		Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-		Sort boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
+		Sort intSort = services.getTheories().getIntegerLDT().targetSort();
+		Sort boolSort = services.getTheories().getBooleanLDT().targetSort();
 		
 		if(s.equals(nullSort)){
 			return false;
@@ -182,11 +182,11 @@ public class ProofInfo {
 	}
 	
 	private boolean isTrueConstant(Operator o) {
-		return o.equals(services.getTypeConverter().getBooleanLDT().getTrueConst());
+		return o.equals(services.getTheories().getBooleanLDT().getTrueConst());
 	}
 	
 	private boolean isFalseConstant(Operator o) {
-		return o.equals(services.getTypeConverter().getBooleanLDT().getFalseConst());
+		return o.equals(services.getTheories().getBooleanLDT().getFalseConst());
 	}
 
 	public Term getPO() {
@@ -219,7 +219,7 @@ public class ProofInfo {
 	private String processUpdate(Term update) {
 		if(update.op() instanceof ElementaryUpdate){			
 			ElementaryUpdate up = (ElementaryUpdate) update.op();			
-			if(up.lhs().sort().extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())){
+			if(up.lhs().sort().extendsTrans(services.getTheories().getHeapLDT().targetSort())){
 				return "";
 			}			
 			return "   \n"+up.lhs().sort()+" "+up.lhs().toString()+" = "+update.sub(0)+";";

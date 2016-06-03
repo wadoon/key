@@ -210,7 +210,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
           }
 
           Term permsFor = tb.tt();
-          if(pm.getHeapCount(proofServices) == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
+          if(pm.getHeapCount(proofServices) == 2 && proofServices.getTheories().getHeapLDT().getPermissionHeap() != null) {
               int stateCount = pm.getStateCount();
               for(int i=0;i<stateCount;i++) {
                   LocationVariable h = heaps.get(i);
@@ -359,7 +359,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                  buildOperationBlocks(formalParamVars, selfVar, resultVar, proofServices);
 
          Term permsFor = tb.tt();
-         if(pm.getHeapCount(proofServices) == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
+         if(pm.getHeapCount(proofServices) == 2 && proofServices.getTheories().getHeapLDT().getPermissionHeap() != null) {
              int stateCount = pm.getStateCount();
              for(int i=0;i<stateCount;i++) {
                  LocationVariable h = modHeaps.get(i);
@@ -400,7 +400,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          Term post = tb.and(postTerm, frameTerm);
          post = modifyPostTerm(proofServices, post);
          
-         final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
+         final LocationVariable baseHeap = proofServices.getTheories().getHeapLDT().getHeap();
          final Term selfVarTerm = selfVar==null? null: tb.var(selfVar);
          final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
                                                  tb.var(paramVars), proofServices);
@@ -560,7 +560,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 	  }
 	  Term created = null;
 	  for(LocationVariable heap : heaps) {
-		  if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap())
+		  if(heap == services.getTheories().getHeapLDT().getSavedHeap())
 			  continue;
 		  final Term cr = tb.created(tb.var(heap), tb.var(selfVar));
 		  if(created == null) {
@@ -839,7 +839,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The {@link LocationVariable} of the base heap.
     */
    protected LocationVariable getBaseHeap(Services services) {
-      return services.getTypeConverter().getHeapLDT().getHeap();
+      return services.getTheories().getHeapLDT().getHeap();
    }
 
    /**
@@ -847,7 +847,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The {@link LocationVariable} of the saved heap.
     */
    protected LocationVariable getSavedHeap(Services services) {
-      return services.getTypeConverter().getHeapLDT().getSavedHeap();
+      return services.getTheories().getHeapLDT().getSavedHeap();
    }
 
    /**

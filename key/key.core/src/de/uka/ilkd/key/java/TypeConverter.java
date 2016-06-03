@@ -63,15 +63,7 @@ import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.VariableReference;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.MapLDT;
-import de.uka.ilkd.key.ldt.PermissionLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -100,38 +92,6 @@ public final class TypeConverter {
         return services.getTheories();
     }
 
-    public BooleanLDT getBooleanLDT() {
-        return getTheories().getBooleanLDT();
-    }
-
-    public CharListLDT getCharListLDT() {
-        return getTheories().getCharListLDT();
-    }
-
-    public HeapLDT getHeapLDT() {
-        return getTheories().getHeapLDT();
-    }
-
-    public IntegerLDT getIntegerLDT() {
-        return getTheories().getIntegerLDT();
-    }
-
-    public LocSetLDT getLocSetLDT() {
-        return getTheories().getLocSetLDT();
-    }
-
-    public MapLDT getMapLDT() {
-        return getTheories().getMapLDT();
-    }
-    
-    public PermissionLDT getPermissionLDT() {
-        return getTheories().getPermissionLDT();
-    }
-
-    public SeqLDT getSeqLDT() {
-        return getTheories().getSeqLDT();
-    }
-    
     public KeYJavaType getBooleanType() {
         return services.getJavaInfo()
                 .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
@@ -146,7 +106,7 @@ public final class TypeConverter {
 
         //hack: convert object singleton to location singleton
         if (op instanceof Singleton) {
-            assert getHeapLDT().getSortOfSelect(subs[0].op()) != null : "unexpected argument of \\singleton: " + subs[0];
+            assert getTheories().getHeapLDT().getSortOfSelect(subs[0].op()) != null : "unexpected argument of \\singleton: " + subs[0];
             return tb.singleton(subs[0].sub(1), subs[0].sub(2));
         }
 
@@ -164,7 +124,7 @@ public final class TypeConverter {
             return tb.ife(subs[0], subs[1], subs[2]);
         } else if (op instanceof DLEmbeddedExpression) {
             DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
-            return emb.makeTerm(getHeapLDT().getHeap(), subs, services);
+            return emb.makeTerm(getTheories().getHeapLDT().getHeap(), subs, services);
         } else if (op instanceof TypeCast) {
             TypeCast tc = (TypeCast) op;
             return tb.cast(tc.getKeYJavaType(services).getSort(), subs[0]);
@@ -241,7 +201,7 @@ public final class TypeConverter {
                     services.getJavaInfo().getAttribute(
                        ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
             final Function fieldSymbol
-            	= getHeapLDT().getFieldSymbolForPV(inst, services);
+            	= getTheories().getHeapLDT().getFieldSymbolForPV(inst, services);
             result = tb.dot(inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
@@ -258,8 +218,8 @@ public final class TypeConverter {
     	  ImmutableArray<? extends Expression> args = mr.getArguments();
     	  Term[] argTerms = new Term[args.size()+2]; // heap, self, 
     	  int index = 0;
-    	  for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-    		  if(h == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+    	  for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
+    		  if(h == services.getTheories().getHeapLDT().getSavedHeap()) {
     			  continue;
     		  }
         	  argTerms[index++] = tb.var(h);
@@ -284,12 +244,12 @@ public final class TypeConverter {
 	    return tb.dotLength(convertReferencePrefix(prefix, ec));
 	} else if(var.isStatic()) {
 	    final Function fieldSymbol
-	    	= getHeapLDT().getFieldSymbolForPV((LocationVariable)var, services);
+	    	= getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable)var, services);
 	    return tb.staticDot(var.sort(), fieldSymbol);
 	} else if(prefix == null) {
 	    if(var.isMember()) {
 		final Function fieldSymbol
-			= getHeapLDT().getFieldSymbolForPV((LocationVariable)var,
+			= getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable)var,
 						      services);
 		return tb.dot(var.sort(),
 			      findThisForSort(var.getContainerType().getSort(),
@@ -300,7 +260,7 @@ public final class TypeConverter {
 	    }
 	} else if (!(prefix instanceof PackageReference) ) {
 	    final Function fieldSymbol
-	    	= getHeapLDT().getFieldSymbolForPV((LocationVariable)var, services);
+	    	= getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable)var, services);
 	    return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
 	}
 	Debug.out("typeconverter: Not supported reference type (fr, class):",
@@ -362,10 +322,10 @@ public final class TypeConverter {
 	        && ((Negative)pe).getChildAt(0) instanceof IntLiteral) {
 	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return getIntegerLDT().translateLiteral
+		return getTheories().getIntegerLDT().translateLiteral
 		    (new IntLiteral(val.substring(1)), services);
 	    } else {
-		return getIntegerLDT().translateLiteral
+		return getTheories().getIntegerLDT().translateLiteral
 		    (new IntLiteral("-"+val), services);
 	    }
 	} else if (pe instanceof Negative
@@ -373,10 +333,10 @@ public final class TypeConverter {
 	    String val = ((LongLiteral)
 			  ((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return getIntegerLDT().translateLiteral
+		return getTheories().getIntegerLDT().translateLiteral
 		    (new LongLiteral(val.substring(1)), services);
 	    } else {
-		return getIntegerLDT().translateLiteral
+		return getTheories().getIntegerLDT().translateLiteral
 		    (new LongLiteral("-"+val), services);
 	    }
 	} else if (pe instanceof ThisReference) {
@@ -568,7 +528,7 @@ public final class TypeConverter {
      */
     public Expression convertToProgramElement(Term term) {
         assert term != null;
-        if (term.op() == getHeapLDT().getNull()) {
+        if (term.op() == getTheories().getHeapLDT().getNull()) {
             return NullLiteral.NULL;
         } else if (term.op() instanceof Function) {
             Function function = (Function)term.op();

@@ -93,7 +93,7 @@ public abstract class WellDefinednessCheck implements Contract {
         this.name = name +" WD." + id;
         this.type = type;
         this.target = target;
-        this.heap = services.getTypeConverter().getHeapLDT().getHeap();
+        this.heap = services.getTheories().getHeapLDT().getHeap();
         this.origVars = origVars;
         this.TB = services.getTermBuilder();
     }

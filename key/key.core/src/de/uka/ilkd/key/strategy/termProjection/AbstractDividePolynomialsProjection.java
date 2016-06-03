@@ -51,7 +51,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
 
     private Term quotient(BigInteger monoCoeff, Term rightPoly, Services services) {
         final Function add = 
-            services.getTypeConverter ().getIntegerLDT ().getAdd ();
+            services.getTheories().getIntegerLDT().getAdd ();
         if ( rightPoly.op () == add ) {
             final Term left = quotient ( monoCoeff, rightPoly.sub ( 0 ),
                                          services );

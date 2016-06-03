@@ -148,7 +148,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 	boolean neg = false;
 	
 	Operator top = term.op();
-	IntegerLDT intModel = services.getTypeConverter().getIntegerLDT();	    
+	IntegerLDT intModel = services.getTheories().getIntegerLDT();	    
 	final Operator numbers = intModel.getNumberSymbol();
 	final Operator base    = intModel.getNumberTerminator();
 	final Operator minus   = intModel.getNegativeNumberSign();

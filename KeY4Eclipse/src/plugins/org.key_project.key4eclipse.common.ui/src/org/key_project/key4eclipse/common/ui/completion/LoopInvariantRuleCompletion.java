@@ -287,13 +287,13 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          LoopInvariant loopInv = loopApp.getInvariant();
 
          Map<LocationVariable, Term> atPres = loopInv.getInternalAtPres();
-         int heapCnt = services.getTypeConverter().getHeapLDT().getAllHeaps().size();
+         int heapCnt = services.getTheories().getHeapLDT().getAllHeaps().size();
          heaps = new LocationVariable[heapCnt];
          String[] invariantStrings = new String[heapCnt];
          String[] modifiesStrings = new String[heapCnt];
          String variantString = "unable to load";
          int iter = 0; //iterator so we know where we're at.
-         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+         for (LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
             heaps[iter] = heap;
             Term invTerm = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
             Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
@@ -461,7 +461,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             Text wdgt = getTextField(-1, i, 0);
             Term invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, null);
             wdgt = getTextField(-1, i, 1);
-            Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
+            Sort modSort = services.getTheories().getLocSetLDT().targetSort();
             Term modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
             if (invariantTerm == null) {
                setErrorMessage("Error in current specification: " + heap.toString() + " / invariant");
@@ -506,7 +506,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       private Term resetModifiesState() {
          Text wdgt = getTextField(-1, -1, 1);
-         Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
+         Sort modSort = services.getTheories().getLocSetLDT().targetSort();
          return parseInputText(wdgt.getText(), modSort, modifiesStatus);
       }
       
@@ -517,7 +517,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       private Term resetVariantsState() {
          Text wdgt = getTextField(-1, -1, 2);
-         Sort varSort = services.getTypeConverter().getIntegerLDT().targetSort();
+         Sort varSort = services.getTheories().getIntegerLDT().targetSort();
          return parseInputText(wdgt.getText(), varSort, variantStatus);
       }
       
@@ -601,7 +601,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
                return null;
             }
             wdgt = getTextField(-1, i, 1);
-            Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
+            Sort modSort = services.getTheories().getLocSetLDT().targetSort();
             Term modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
             if (modifiesTerm == null) {
                return null;

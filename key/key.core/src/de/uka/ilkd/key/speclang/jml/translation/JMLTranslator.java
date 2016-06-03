@@ -21,15 +21,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.TheoryServices;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -255,7 +255,7 @@ public final class JMLTranslator {
                 Services services = (Services) params[1];
 
                 BooleanLDT booleanLDT =
-                        services.getTypeConverter().getBooleanLDT();
+                        services.getTheories().getBooleanLDT();
                 if (ensuresTerm.sort() == booleanLDT.targetSort()) {
                     return tb.convertToFormula(ensuresTerm);
                 } else {
@@ -275,7 +275,7 @@ public final class JMLTranslator {
                 Services services = (Services) params[1];
 
                 BooleanLDT booleanLDT =
-                        services.getTypeConverter().getBooleanLDT();
+                        services.getTheories().getBooleanLDT();
                 if (ensuresTerm.sort() == booleanLDT.targetSort()) {
                     return tb.convertToFormula(ensuresTerm);
                 } else {
@@ -299,7 +299,7 @@ public final class JMLTranslator {
                 Services services = (Services) params[3];
 
                 LocationVariable heap =
-                        services.getTypeConverter().getHeapLDT().getHeap();
+                        services.getTheories().getHeapLDT().getHeap();
                 if (!lhs.isTerm()
                     || !(lhs.getTerm().op() instanceof IObserverFunction)
                     || lhs.getTerm().sub(0).op() != heap) {
@@ -649,7 +649,7 @@ public final class JMLTranslator {
                 final boolean nullable = (Boolean) params[4];
                 @SuppressWarnings("unchecked")
                 final ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>) params[3];
-                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                final Sort intSort = services.getTheories().getIntegerLDT().targetSort();
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\min expression must be integer type");
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
@@ -707,7 +707,7 @@ public final class JMLTranslator {
                 final boolean nullable = (Boolean) params[4];
                 @SuppressWarnings("unchecked")
                 final ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>) params[3];
-                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                final Sort intSort = services.getTheories().getIntegerLDT().targetSort();
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\max expression must be integer type");
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
@@ -1022,7 +1022,7 @@ public final class JMLTranslator {
                 final Services services = (Services) params[4];
                 final LogicVariable stepsLV = e3 == null
                                               ? new LogicVariable(new Name("n"),
-                                                                  services.getTypeConverter().getIntegerLDT().targetSort())
+                                                                  services.getTheories().getIntegerLDT().targetSort())
                         : null;
                 final Term h = tb.getBaseHeap();
                 final Term s = getFields(excManager, t, services);
@@ -1050,12 +1050,14 @@ public final class JMLTranslator {
                 final SLExpression e1 = (SLExpression) params[1];
                 final SLExpression e3 = (SLExpression) params[2];
                 final Services services = (Services) params[3];
+                final TheoryServices theories = services.getTheories();
+
                 final LogicVariable objLV =
                         new LogicVariable(new Name("o"),
                                           services.getJavaInfo().objectSort());
                 final LogicVariable stepsLV = e3 == null
                                               ? new LogicVariable(new Name("n"),
-                                                                  services.getTypeConverter().getIntegerLDT().targetSort())
+                                                      theories.getIntegerLDT().targetSort())
                         : null;
                 final Term h = tb.getBaseHeap();
                 final Term s = getFields(excManager, t, services);
@@ -1068,7 +1070,7 @@ public final class JMLTranslator {
                 }
 
                 final LogicVariable fieldLV
-                = new LogicVariable(new Name("f"), services.getTypeConverter().getHeapLDT().getFieldSort());
+                = new LogicVariable(new Name("f"), theories.getHeapLDT().getFieldSort());
                 final Term locSet
                 = tb.setComprehension(new LogicVariable[]{objLV, fieldLV},
                         reach,
@@ -1096,7 +1098,9 @@ public final class JMLTranslator {
                 @SuppressWarnings("unchecked")
                 final Map<LocationVariable,Term> atPres = (Map<LocationVariable, Term>) params[1];
                 final Services services = (Services) params[2];
-                final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+                final TheoryServices theories = services.getTheories();
+
+                final LocationVariable baseHeap = theories.getHeapLDT().getHeap();
 
 	        if(atPres == null || atPres.get(baseHeap) == null) {
 	            throw excManager.createException("\\fresh not allowed in this context");
@@ -1104,20 +1108,19 @@ public final class JMLTranslator {
 
 	        Term t = tb.tt();
 	        final Sort objectSort = services.getJavaInfo().objectSort();
-                final TypeConverter tc = services.getTypeConverter();
 	        for(SLExpression expr: list) {
     	            if(!expr.isTerm()) {
 	                throw excManager.createException("Expected a term, but found: " + expr);
 	            } else if(expr.getTerm().sort().extendsTrans(objectSort)) {
 	                t = tb.and(t,
-	                           tb.equals(tb.select(tc.getBooleanLDT().targetSort(),
+	                           tb.equals(tb.select(theories.getBooleanLDT().targetSort(),
 	                                           atPres.get(baseHeap),
 	                                           expr.getTerm(),
-	                                           tb.func(tc.getHeapLDT().getCreated())),
+	                                           tb.func(theories.getHeapLDT().getCreated())),
 	                                 tb.FALSE()));
                         // add non-nullness (bug #1364)
                         t = tb.and(t, tb.not(tb.equals(expr.getTerm(),tb.NULL())));
-    	            } else if(expr.getTerm().sort().extendsTrans(tc.getLocSetLDT().targetSort())) {
+    	            } else if(expr.getTerm().sort().extendsTrans(theories.getLocSetLDT().targetSort())) {
 	            t = tb.and(t, tb.subset(expr.getTerm(),
 	                                    tb.freshLocs(atPres.get(baseHeap))));
 	            } else {
@@ -1601,7 +1604,7 @@ public final class JMLTranslator {
                 if (expr.isTerm()) {
                     Term t = expr.getTerm();
                     LocSetLDT locSetLDT =
-                            services.getTypeConverter().getLocSetLDT();
+                            services.getTheories().getLocSetLDT();
                     if (t.sort().equals(locSetLDT.targetSort())
                         || t.op().equals(locSetLDT.getSingleton())) {
                         return t;
@@ -1639,10 +1642,10 @@ public final class JMLTranslator {
                     if (expr.isTerm()) {
                         Term t = expr.getTerm();
                         LocSetLDT locSetLDT =
-                                services.getTypeConverter().getLocSetLDT();
+                                services.getTheories().getLocSetLDT();
                         if (!t.op().equals(locSetLDT.getSingleton())) {
                             HeapLDT heapLDT =
-                                    services.getTypeConverter().getHeapLDT();
+                                    services.getTheories().getHeapLDT();
                             if (heapLDT.getSortOfSelect(t.op()) != null) {
                                 final Term objTerm = t.sub(1);
                                 final Term fieldTerm = t.sub(2);
@@ -2113,7 +2116,7 @@ public final class JMLTranslator {
          * @throws SLTranslationException in case <code>t</code> is not a store-ref term cosisting of unions of singletons
          */
         protected Term getFields(SLTranslationExceptionManager excManager, Term t, Services services) throws SLTranslationException {
-            final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+            final LocSetLDT locSetLDT = services.getTheories().getLocSetLDT();
             if(t.op().equals(locSetLDT.getUnion())) {
                 final Term sub0 = getFields(excManager, t.sub(0),services);
                 final Term sub1 = getFields(excManager, t.sub(1),services);
@@ -2143,7 +2146,7 @@ public final class JMLTranslator {
                 a=a.sub(0);
             }
             if(a.arity()==2 && a.op()== Junctor.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
-                    && a.sub(0).op().equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())){
+                    && a.sub(0).op().equals(services.getTheories().getIntegerLDT().getLessOrEquals())){
                 return a.sub(0).sub(0);
             }
             return null;
@@ -2160,7 +2163,7 @@ public final class JMLTranslator {
                 a=a.sub(0);
             }
             if(a.arity()==2 && a.op()==Junctor.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
-                    && a.sub(1).op().equals(services.getTypeConverter().getIntegerLDT().getLessThan())){
+                    && a.sub(1).op().equals(services.getTheories().getIntegerLDT().getLessThan())){
                 return a.sub(1).sub(1);
             }
             return null;
@@ -2328,7 +2331,7 @@ public final class JMLTranslator {
                 if (a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
                     result = tb.equals(a, b);
                 // Special case so that model methods are handled better
-                } else if(a.sort() == services.getTypeConverter().getBooleanLDT().targetSort() && b.sort() == Sort.FORMULA) {
+                } else if(a.sort() == services.getTheories().getBooleanLDT().targetSort() && b.sort() == Sort.FORMULA) {
                     result = tb.equals(a, tb.ife(b, tb.TRUE(), tb.FALSE()));
                 } else {
                     result = tb.equals(tb.convertToFormula(a),
@@ -2444,7 +2447,7 @@ public final class JMLTranslator {
             try {
                 Term resultTerm = tb.func(function, args, null);
                 final KeYJavaType type
-                        = services.getTypeConverter().getIntegerLDT().targetSort() == resultTerm.sort()
+                        = services.getTheories().getIntegerLDT().targetSort() == resultTerm.sort()
                         ? services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
                         : services.getJavaInfo().getKeYJavaType(resultTerm.sort());
                 SLExpression result = type == null ? new SLExpression(resultTerm) : new SLExpression(resultTerm, type);

@@ -82,7 +82,7 @@ public final class KeyHacks {
          // This realization is implemented, because it is easier and more performant. 
          Assert.isNotNull(contract);
          if (contract instanceof FunctionalOperationContractImpl) {
-            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            final HeapLDT heapLDT = services.getTheories().getHeapLDT();
             final LocationVariable baseHeap = heapLDT.getHeap();
             Map<LocationVariable,Term> originalPres = ObjectUtil.get(contract, "originalPres");
             String pres = "";
@@ -125,7 +125,7 @@ public final class KeyHacks {
          // An alternative possible solution will be to convert the HTML text back to plain text.
          // This realization is implemented, because it is easier and more performant.
          Assert.isNotNull(operationContract);
-         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+         final HeapLDT heapLDT = services.getTheories().getHeapLDT();
          final LocationVariable baseHeap = heapLDT.getHeap();
          Map<LocationVariable,Term> originalPosts = ObjectUtil.get(operationContract, "originalPosts");
          String posts = "";
@@ -188,7 +188,7 @@ public final class KeyHacks {
          // This realization is implemented, because it is easier and more performant. 
          Assert.isNotNull(contract);
          Map<LocationVariable,Term> originalMods = ObjectUtil.get(contract, "originalMods");
-         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+         final HeapLDT heapLDT = services.getTheories().getHeapLDT();
          final LocationVariable baseHeap = heapLDT.getHeap();
          String mods = "";
          for(LocationVariable h : heapLDT.getAllHeaps()) {

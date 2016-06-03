@@ -43,7 +43,7 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
     private static boolean clearlyDisjoint(Term t1, 
 	    				   Term t2, 
 	    				   Services services) {
-	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+	final LocSetLDT setLDT = services.getTheories().getLocSetLDT();
 	if(t1.op() instanceof Function && ((Function)t1.op()).isUnique()
            && t2.op() instanceof Function && ((Function)t2.op()).isUnique()
            && !t1.equals(t2)) {

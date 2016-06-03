@@ -179,7 +179,7 @@ public final class DependencyContractImpl implements DependencyContract {
             paramVars = paramVars.tail();
         }
         if(atPreVars != null && originalAtPreVars != null) {
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPreVars.get(h) != null && originalAtPreVar != null) {
                     map.put(services.getTermBuilder().var(originalAtPreVar), services.getTermBuilder().var(atPreVars.get(h)));
@@ -231,7 +231,7 @@ public final class DependencyContractImpl implements DependencyContract {
             paramTerms = paramTerms.tail();
         }
         if(atPres != null && originalAtPreVars != null) {
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPres.get(h) != null && originalAtPreVar != null) {
                     map.put(services.getTermBuilder().var(originalAtPreVar), atPres.get(h));
@@ -327,7 +327,7 @@ public final class DependencyContractImpl implements DependencyContract {
             paramTerms = paramTerms.tail();
         }
         if(atPres != null && originalAtPreVars != null) {
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPres.get(h) != null && originalAtPreVar != null) {
                     map.put(services.getTermBuilder().var(originalAtPreVar), atPres.get(h));
@@ -424,7 +424,7 @@ public final class DependencyContractImpl implements DependencyContract {
             paramVars = paramVars.tail();
         }
         if(atPreVars != null && originalAtPreVars != null) {
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPreVars.get(h) != null && originalAtPreVar != null) {
                     map.put(services.getTermBuilder().var(atPre ? h : originalAtPreVar), services.getTermBuilder().var(atPreVars.get(h)));
@@ -458,7 +458,7 @@ public final class DependencyContractImpl implements DependencyContract {
             paramTerms = paramTerms.tail();
         }
         if(atPres != null && originalAtPreVars != null) {
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(originalAtPreVar != null && atPres.get(h) != null) {
                     map.put(services.getTermBuilder().var(originalAtPreVar), atPres.get(h));

@@ -58,7 +58,7 @@ public class HandleArith {
        }
        
        TermBuilder tb = services.getTermBuilder();
-       IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+       IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
        
        final Term trueT = tb.tt(); 
        final Term falseT = tb.ff(); 
@@ -148,7 +148,7 @@ public class HandleArith {
         }
        
         final TermBuilder tb = services.getTermBuilder();
-        final IntegerLDT integerLDT = services.getTypeConverter ().getIntegerLDT ();
+        final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
         final ServiceCaches caches = services.getCaches();
         
         final Term cd = formatArithTerm ( problem, tb, integerLDT, caches );

@@ -229,7 +229,7 @@ public class QueryExpand implements BuiltInRule {
            final Term methodCall = tb.dia(jb, tb.not(tb.equals(tb.var(result),placeHolderResultTrm)));  //Not sure if box or diamond should be used.
            //final Term methodCall = tb.box(jb, tb.equals(tb.var(result), query));
 
-           Term update = tb.elementary(services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
+           Term update = tb.elementary(services.getTheories().getHeapLDT().getHeap(), query.sub(0));
            if (callee != null) {
                update = tb.parallel(tb.elementary(tb.var(callee), query.sub(1)), update);
            }

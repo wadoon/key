@@ -384,21 +384,21 @@ public class SMTObjTranslator implements SMTTranslator {
 		opTable.put(Junctor.IMP, SMTTermMultOp.Op.IMPLIES);
 		opTable.put(Equality.EQUALS, SMTTermMultOp.Op.EQUALS);
 		opTable.put(Equality.EQV, SMTTermMultOp.Op.EQUALS);
-		opTable.put(services.getTypeConverter().getIntegerLDT().getLessThan(),
+		opTable.put(services.getTheories().getIntegerLDT().getLessThan(),
 		        SMTTermMultOp.Op.BVSLT);
-		opTable.put(services.getTypeConverter().getIntegerLDT()
+		opTable.put(services.getTheories().getIntegerLDT()
 		        .getLessOrEquals(), SMTTermMultOp.Op.BVSLE);
-		opTable.put(services.getTypeConverter().getIntegerLDT()
+		opTable.put(services.getTheories().getIntegerLDT()
 		        .getGreaterThan(), SMTTermMultOp.Op.BVSGT);
-		opTable.put(services.getTypeConverter().getIntegerLDT()
+		opTable.put(services.getTheories().getIntegerLDT()
 		        .getGreaterOrEquals(), SMTTermMultOp.Op.BVSGE);
-		opTable.put(services.getTypeConverter().getIntegerLDT().getAdd(),
+		opTable.put(services.getTheories().getIntegerLDT().getAdd(),
 		        SMTTermMultOp.Op.PLUS);
-		opTable.put(services.getTypeConverter().getIntegerLDT().getSub(),
+		opTable.put(services.getTheories().getIntegerLDT().getSub(),
 		        SMTTermMultOp.Op.MINUS);
-		opTable.put(services.getTypeConverter().getIntegerLDT().getMul(),
+		opTable.put(services.getTheories().getIntegerLDT().getMul(),
 		        SMTTermMultOp.Op.MUL);
-		opTable.put(services.getTypeConverter().getIntegerLDT().getDiv(),
+		opTable.put(services.getTheories().getIntegerLDT().getDiv(),
 		        SMTTermMultOp.Op.BVSDIV);
 	}
 
@@ -407,12 +407,12 @@ public class SMTObjTranslator implements SMTTranslator {
 	 */
 	private void initSorts() {
 		// KeY Sorts
-		seqSort = services.getTypeConverter().getSeqLDT().targetSort();
-		integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
-		heapSort = services.getTypeConverter().getHeapLDT().targetSort();
-		fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
-		locsetSort = services.getTypeConverter().getLocSetLDT().targetSort();
-		boolSort = services.getTypeConverter().getBooleanLDT().targetSort();		
+		seqSort = services.getTheories().getSeqLDT().targetSort();
+		integerSort = services.getTheories().getIntegerLDT().targetSort();
+		heapSort = services.getTheories().getHeapLDT().targetSort();
+		fieldSort = services.getTheories().getHeapLDT().getFieldSort();
+		locsetSort = services.getTheories().getLocSetLDT().targetSort();
+		boolSort = services.getTheories().getBooleanLDT().targetSort();		
 		objectSort = services.getJavaInfo().getJavaLangObject().getSort();		
 		cc = new ConstantCounter();
 	}
@@ -1103,7 +1103,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	    String name = s.name().toString();
 	    JavaInfo javaInfo = services.getJavaInfo();
 	    Sort object = javaInfo.getJavaLangObject().getSort();
-		Sort nullSort = services.getTypeConverter().getHeapLDT().getNull()
+		Sort nullSort = services.getTheories().getHeapLDT().getNull()
 		        .sort();
 		//if java reference type
 		if (s.extendsTrans(object) && !s.equals(nullSort)) {
@@ -1311,7 +1311,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			return SMTTerm.TRUE;
 		} else if (op == Junctor.FALSE) {
 			return SMTTerm.FALSE;
-		} else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
+		} else if (op == services.getTheories().getHeapLDT().getNull()) {
 			return nullConstant;
 		} else if (op instanceof QuantifiableVariable) {
 			// translate as variable or constant
@@ -1330,7 +1330,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			SMTFunction constant = translateConstant(pv.name().toString(),
 			        pv.sort());
 			return SMTTerm.call(constant);
-		} else if (op == services.getTypeConverter().getIntegerLDT()
+		} else if (op == services.getTheories().getIntegerLDT()
 		        .getNumberSymbol()) {
 			Debug.assertTrue(term.arity() == 1);
 			
@@ -1354,7 +1354,7 @@ public class SMTObjTranslator implements SMTTranslator {
 				return SMTTerm.TRUE;
 			} else if (isFalseConstant(fun, services)) {
 				return SMTTerm.FALSE;
-			} else if (fun == services.getTypeConverter().getIntegerLDT()
+			} else if (fun == services.getTheories().getIntegerLDT()
 			        .getNeg()) {
 				SMTTerm left = new SMTTermNumber(0, settings.getIntBound(),
 				        sorts.get(BINT_SORT));
@@ -2073,11 +2073,11 @@ public class SMTObjTranslator implements SMTTranslator {
 	}
 
 	private boolean isTrueConstant(Operator o, Services s) {
-		return o.equals(s.getTypeConverter().getBooleanLDT().getTrueConst());
+		return o.equals(s.getTheories().getBooleanLDT().getTrueConst());
 	}
 
 	private boolean isFalseConstant(Operator o, Services s) {
-		return o.equals(s.getTypeConverter().getBooleanLDT().getFalseConst());
+		return o.equals(s.getTheories().getBooleanLDT().getFalseConst());
 	}
 
 	@Override

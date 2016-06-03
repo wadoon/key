@@ -133,7 +133,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 	assert (selfVar == null) == target.isStatic();
 	final Map<ProgramVariable, ParsableVariable> map =
 	        new LinkedHashMap<ProgramVariable, ParsableVariable>();
-	map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);	
+	map.put(services.getTheories().getHeapLDT().getHeap(), heapVar);	
 	if(selfVar != null) {
 	    map.put(originalSelfVar, selfVar);
 	}

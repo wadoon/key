@@ -264,7 +264,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         public AbstractSMTTranslator(Sequent sequent, Services services,
                         Configuration config) {
                 this.config = config;
-                integerSort = services.getTypeConverter().getIntegerLDT()
+                integerSort = services.getTheories().getIntegerLDT()
                                 .targetSort();
                 this.tb = services.getTermBuilder();
 
@@ -319,8 +319,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         private Function getMultiplicationFunction(Services services) {
                 if (multiplicationFunction == null) {
-                        Function reference = services.getTypeConverter()
-                                        .getIntegerLDT().getMul();
+                        Function reference = services.getTheories().getIntegerLDT().getMul();
 
                         multiplicationFunction = new Function(new Name(
                                         tb.newName("unin_mult")),
@@ -463,20 +462,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         StringBuffer rightForm = new StringBuffer();
 
                         // use the interpreted function here!!
-                        if (o == services.getTypeConverter().getIntegerLDT()
+                        if (o == services.getTheories().getIntegerLDT()
                                         .getAdd()) {
                                 rightForm = this.translateIntegerPlus(
                                                 varList.get(0), varList.get(1));
-                        } else if (o == services.getTypeConverter()
-                                        .getIntegerLDT().getSub()) {
+                        } else if (o == services.getTheories().getIntegerLDT().getSub()) {
                                 rightForm = this.translateIntegerMinus(
                                                 varList.get(0), varList.get(1));
-                        } else if (o == services.getTypeConverter()
-                                        .getIntegerLDT().getMul()) {
+                        } else if (o == services.getTheories().getIntegerLDT().getMul()) {
                                 rightForm = this.translateIntegerMult(
                                                 varList.get(0), varList.get(1));
-                        } else if (o == services.getTypeConverter()
-                                        .getIntegerLDT().getDiv()) {
+                        } else if (o == services.getTheories().getIntegerLDT().getDiv()) {
                                 rightForm = this.translateIntegerDiv(
                                                 varList.get(0), varList.get(1));
                         }
@@ -539,7 +535,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          */
         private ArrayList<StringBuffer> getSortHierarchyPredicates(
                         Services services, SMTSettings settings) {
-                Function nullOp = services.getTypeConverter().getHeapLDT()
+                Function nullOp = services.getTheories().getHeapLDT()
                                 .getNull();
                 SortHierarchy sh = this.buildSortHierarchy(services, settings);
                 ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
@@ -1001,7 +997,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private ArrayList<StringBuffer> buildAssumptionsForUninterpretedMultiplication(
                         Services services) throws IllegalFormulaException {
                 ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
-                Sort sort = services.getTypeConverter().getIntegerLDT()
+                Sort sort = services.getTheories().getIntegerLDT()
                                 .getMul().sort();
                 Function mult = getMultiplicationFunction(services);
                 Term zero = tb.zero();
@@ -1983,10 +1979,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         return this.translateLogicalTrue();
                 } else if (op == Junctor.FALSE) {
                         return this.translateLogicalFalse();
-                } else if (op == services.getTypeConverter().getHeapLDT()
+                } else if (op == services.getTheories().getHeapLDT()
                                 .getNull()) {
-                        Function nullOp = services.getTypeConverter()
-                                        .getHeapLDT().getNull();
+                        Function nullOp = services.getTheories().getHeapLDT().getNull();
 
                         addFunction(nullOp, new ArrayList<Sort>(),
                                         nullOp.sort());
@@ -2020,8 +2015,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         if (fun.sort() == Sort.FORMULA) {
                                 // This Function is a predicate, so translate it
                                 // as such
-                                if (fun == services.getTypeConverter()
-                                                .getIntegerLDT().getLessThan()) {
+                                if (fun == services.getTheories().getIntegerLDT().getLessThan()) {
                                         StringBuffer arg1 = translateTerm(
                                                         term.sub(0),
                                                         quantifiedVars,
@@ -2032,8 +2026,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                         services);
                                         return this.translateIntegerLt(arg1,
                                                         arg2);
-                                } else if (fun == services.getTypeConverter()
-                                                .getIntegerLDT()
+                                } else if (fun == services.getTheories().getIntegerLDT()
                                                 .getGreaterThan()) {
                                         StringBuffer arg1 = translateTerm(
                                                         term.sub(0),
@@ -2045,8 +2038,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                         services);
                                         return this.translateIntegerGt(arg1,
                                                         arg2);
-                                } else if (fun == services.getTypeConverter()
-                                                .getIntegerLDT()
+                                } else if (fun == services.getTheories().getIntegerLDT()
                                                 .getLessOrEquals()) {
                                         StringBuffer arg1 = translateTerm(
                                                         term.sub(0),
@@ -2058,8 +2050,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                         services);
                                         return this.translateIntegerLeq(arg1,
                                                         arg2);
-                                } else if (fun == services.getTypeConverter()
-                                                .getIntegerLDT()
+                                } else if (fun == services.getTheories().getIntegerLDT()
                                                 .getGreaterOrEquals()) {
                                         StringBuffer arg1 = translateTerm(
                                                         term.sub(0),
@@ -2110,8 +2101,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         } else {                          
                                 // this Function is a function, so translate it
                                 // as such
-                                if (fun == services.getTypeConverter()
-                                                .getIntegerLDT().getAdd()) {
+                                if (fun == services.getTheories().getIntegerLDT().getAdd()) {
                                         StringBuffer arg1 = translateTerm(
                                                         term.sub(0),
                                                         quantifiedVars,
@@ -2125,8 +2115,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         // return the final translation
                                         return this.translateIntegerPlus(arg1,
                                                         arg2);
-                                } else if (fun == services.getTypeConverter()
-                                                .getIntegerLDT().getSub()) {
+                                } else if (fun == services.getTheories().getIntegerLDT().getSub()) {
                                         StringBuffer arg1 = translateTerm(
                                                         term.sub(0),
                                                         quantifiedVars,
@@ -2140,15 +2129,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         // return the final translation
                                         return this.translateIntegerMinus(arg1,
                                                         arg2);
-                                } else if (fun == services.getTypeConverter()
-                                                .getIntegerLDT().getNeg()) {
+                                } else if (fun == services.getTheories().getIntegerLDT().getNeg()) {
                                         StringBuffer arg1 = translateTerm(
                                                         term.sub(0),
                                                         quantifiedVars,
                                                         services);
                                         return this.translateIntegerUnaryMinus(arg1);
-                                } else if (fun == services.getTypeConverter()
-                                                .getIntegerLDT().getMul()) {
+                                } else if (fun == services.getTheories().getIntegerLDT().getMul()) {
 
                                         StringBuffer arg1 = translateTerm(
                                                         term.sub(0),
@@ -2189,8 +2176,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                                         return this.translateIntegerMult(arg1,
                                                         arg2);
-                                } else if (fun == services.getTypeConverter()
-                                                .getIntegerLDT().getDiv()) {
+                                } else if (fun == services.getTheories().getIntegerLDT().getDiv()) {
                                         StringBuffer arg1 = translateTerm(
                                                         term.sub(0),
                                                         quantifiedVars,
@@ -2234,7 +2220,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         addConstantTypePredicate(term, numVal);
 
                                         return numVal;
-                                } else if (fun == services.getTypeConverter().getIntegerLDT().getBsum()) {                                   
+                                } else if (fun == services.getTheories().getIntegerLDT().getBsum()) {                                   
                                     //the bsum has to be translated in a special fashion in order to ensure soundness.
                                     StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
                                     StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
@@ -2243,7 +2229,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                     subterms.add(arg2);
                                     
                                     return translateBsumFunction(term, subterms);
-                                } else if (fun == services.getTypeConverter().getIntegerLDT().getBprod()) {
+                                } else if (fun == services.getTheories().getIntegerLDT().getBprod()) {
                                     //the bprod has to be translated in a special fashion in order to ensure soundness.
                                     StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
                                     StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
@@ -2516,7 +2502,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         private boolean isNumberSymbol(Services services, Operator op) {
-                return op == services.getTypeConverter().getIntegerLDT()
+                return op == services.getTheories().getIntegerLDT()
                                 .getNumberSymbol();
         }
 
@@ -3070,7 +3056,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
 
                 for (Sort sort : tempSorts) {
-                        HeapLDT ldt = services.getTypeConverter().getHeapLDT();
+                        HeapLDT ldt = services.getTheories().getHeapLDT();
                         //Several special sorts should not be added to the collection
                         if (ldt.getHeap().sort() != sort
                                         && ldt.getFieldSort() != sort

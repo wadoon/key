@@ -157,8 +157,8 @@ public final class SimpleBlockContract implements BlockContract {
     @Override
     public boolean isReadOnly(final Services services)
     {
-        return modifiesClauses.get(services.getTypeConverter().getHeapLDT().getHeap()).op()
-                == services.getTypeConverter().getLocSetLDT().getEmpty();
+        return modifiesClauses.get(services.getTheories().getHeapLDT().getHeap()).op()
+                == services.getTheories().getLocSetLDT().getEmpty();
     }
 
     
@@ -295,7 +295,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     @Override
     public Term getPre(Services services) {
-        return preconditions.get(services.getTypeConverter().getHeapLDT().getHeap());
+        return preconditions.get(services.getTheories().getHeapLDT().getHeap());
     }
 
     public Term getRequires(LocationVariable heap) {
@@ -305,7 +305,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     @Override
     public Term getPost(Services services) {
-        return postconditions.get(services.getTypeConverter().getHeapLDT().getHeap());
+        return postconditions.get(services.getTheories().getHeapLDT().getHeap());
     }
 
     public Term getEnsures(LocationVariable heap) {
@@ -315,7 +315,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     @Override
     public Term getMod(Services services) {
-        return modifiesClauses.get(services.getTypeConverter().getHeapLDT().getHeap());
+        return modifiesClauses.get(services.getTheories().getHeapLDT().getHeap());
     }
 
 
@@ -364,7 +364,7 @@ public final class SimpleBlockContract implements BlockContract {
     public String getHtmlText(final Services services) {
         assert services != null;
         // TODO Clean up.
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
         final StringBuilder stringBuilder = new StringBuilder();
         if (variables.result != null) {
@@ -430,7 +430,7 @@ public final class SimpleBlockContract implements BlockContract {
     public String getPlainText(final Services services, Terms terms) {
         assert services != null;
         // TODO Clean up.
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
         final StringBuilder stringBuilder = new StringBuilder();
         if (terms.result != null) {
@@ -790,7 +790,7 @@ public final class SimpleBlockContract implements BlockContract {
                                                       ? extends S> newRemembranceHeaps,
                                             final Services services) {
             if (newRemembranceHeaps != null) {
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for (LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
                     if (newRemembranceHeaps.get(heap) != null) {
                         final LocationVariable oldRemembranceHeap = oldRemembranceHeaps.get(heap);
                         final S newRemembranceHeap = newRemembranceHeaps.get(heap);
@@ -844,7 +844,7 @@ public final class SimpleBlockContract implements BlockContract {
         public void replaceHeap(final Term newHeap, final Services services)
         {
             assert newHeap != null;
-            assert newHeap.sort().equals(services.getTypeConverter().getHeapLDT().targetSort());
+            assert newHeap.sort().equals(services.getTheories().getHeapLDT().targetSort());
             put(services.getTermBuilder().getBaseHeap(), newHeap);
         }
 
@@ -912,7 +912,7 @@ public final class SimpleBlockContract implements BlockContract {
             this.signalsOnly = signalsOnly;
             this.diverges = diverges;
             this.assignables = assignables;
-            this.heaps = services.getTypeConverter().getHeapLDT().getAllHeaps();
+            this.heaps = services.getTheories().getHeapLDT().getAllHeaps();
             this.hasMod = hasMod;
         }
 
@@ -951,7 +951,7 @@ public final class SimpleBlockContract implements BlockContract {
                     conditionPostcondition(variables.returnFlag, returns);
             final Term throwPostcondition = buildThrowPostcondition();
             // TODO Why do we handle the two cases differently? Surely has something to do with transactions.
-            if (heap == services.getTypeConverter().getHeapLDT().getHeap()) {
+            if (heap == services.getTheories().getHeapLDT().getHeap()) {
                 if (behavior == Behavior.NORMAL_BEHAVIOR) {
                     return and(buildNormalTerminationCondition(),
                                convertToFormula(ensures.get(heap)));
@@ -1116,7 +1116,7 @@ public final class SimpleBlockContract implements BlockContract {
             ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
             final boolean transactionApplicable =
                     modifiesClauses.get(
-                            services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
+                            services.getTheories().getHeapLDT().getSavedHeap()) != null;
             result = result.add(
                 new SimpleBlockContract(
                     block, labels, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
@@ -1200,7 +1200,7 @@ public final class SimpleBlockContract implements BlockContract {
                 addConditionsFrom(contract);
             }
             Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
-            for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
             	boolean hm = false;
                 for (int i = 1; i < contracts.length && !hm; i++) {
                     hm = contracts[i].hasModifiesClause(heap);
@@ -1217,7 +1217,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         private void addConditionsFrom(final BlockContract contract)
         {
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for (LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
                 final Term precondition = addPreconditionFrom(contract, heap);
                 addPostconditionFrom(precondition, contract, heap);
                 addModifiesClauseFrom(contract, heap);

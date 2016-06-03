@@ -157,14 +157,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             StrategyProperties strategyProperties) {
 
         super(p_proof);
-        heapLDT = getServices().getTypeConverter().getHeapLDT();
+        heapLDT = getServices().getTheories().getHeapLDT();
 
         this.strategyProperties =
                 (StrategyProperties) strategyProperties.clone();
 
         this.tf =
-                new ArithTermFeatures(getServices().getTypeConverter()
-                        .getIntegerLDT());
+                new ArithTermFeatures(getServices().getTheories().getIntegerLDT());
         this.ff = new FormulaTermFeatures();
         this.vf = new ValueTermFeature();
 
@@ -335,9 +334,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private RuleSetDispatchFeature setupCostComputationF() {
         final IntegerLDT numbers =
-                getServices().getTypeConverter().getIntegerLDT();
+                getServices().getTheories().getIntegerLDT();
         final LocSetLDT locSetLDT =
-                getServices().getTypeConverter().getLocSetLDT();
+                getServices().getTheories().getLocSetLDT();
 
         final RuleSetDispatchFeature d = RuleSetDispatchFeature.create();
 
@@ -768,11 +767,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // do not convert char to int when inside a string function
         // feature used to recognize if one is inside a string literal
         final SeqLDT seqLDT =
-                getServices().getTypeConverter().getSeqLDT();
+                getServices().getTheories().getSeqLDT();
         final CharListLDT charListLDT =
-                getServices().getTypeConverter().getCharListLDT();
+                getServices().getTheories().getCharListLDT();
         final BooleanLDT booleanLDT =
-                getServices().getTypeConverter().getBooleanLDT();
+                getServices().getTheories().getBooleanLDT();
 
         
         final TermFeature keepChar =
@@ -1727,7 +1726,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // the queue and do not have to be considered again).
     private void setupPolySimpInstantiationWithoutRetry(RuleSetDispatchFeature d) {
         final IntegerLDT numbers =
-                getServices().getTypeConverter().getIntegerLDT();
+                getServices().getTheories().getIntegerLDT();
 
         // category "direct equations"
 
@@ -2330,7 +2329,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer intRel = new TermBuffer();
         final TermBuffer atom = new TermBuffer();
         final TermBuffer zero = new TermBuffer();
-        zero.setContent(getServices().getTypeConverter().getIntegerLDT().zero());
+        zero.setContent(getServices().getTheories().getIntegerLDT().zero());
         final TermBuffer rootInf = new TermBuffer();
 
         final Feature posNegSplitting =
@@ -2689,7 +2688,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final RuleSetDispatchFeature d = RuleSetDispatchFeature.create();
 
         final IntegerLDT numbers =
-                getServices().getTypeConverter().getIntegerLDT();
+                getServices().getTheories().getIntegerLDT();
 
         if (arithNonLinInferences())
             setupMultiplyInequations(d, inftyConst());

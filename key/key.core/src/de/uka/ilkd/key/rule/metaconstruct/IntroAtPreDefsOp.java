@@ -122,7 +122,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         Term atPreUpdate = null;
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
           final LocationVariable l = TB.heapAtPreVar(heap.name()+"Before_" + methodName, heap.sort(), true);
           // buf fix. see #1197
           services.getNamespaces().programVariables().addSafely(l);
@@ -184,10 +184,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                                      ImmutableList<InfFlowSpec>>();
                 //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                  if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap()
+                for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
+                  if(heap == services.getTheories().getHeapLDT().getSavedHeap()
                      &&
-                     inv.getInternalModifies().get(services.getTypeConverter().getHeapLDT().getHeap()).equals(TB.strictlyNothing())) {
+                     inv.getInternalModifies().get(services.getTheories().getHeapLDT().getHeap()).equals(TB.strictlyNothing())) {
                     continue;
                   }
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);

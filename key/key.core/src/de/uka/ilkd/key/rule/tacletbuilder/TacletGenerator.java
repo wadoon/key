@@ -672,9 +672,9 @@ public class TacletGenerator {
 
         final Term[] updateSubs = new Term[target.arity()];
         int i = 0;
-        updateSubs[i++] = TB.var(services.getTypeConverter().getHeapLDT().getHeap());
+        updateSubs[i++] = TB.var(services.getTheories().getHeapLDT().getHeap());
         if(target.getStateCount() == 2) {
-            updateSubs[i++] = TB.var(services.getTypeConverter().getHeapLDT().getHeap());
+            updateSubs[i++] = TB.var(services.getTheories().getHeapLDT().getHeap());
         }
         if(!target.isStatic()) {
             updateSubs[i++] = TB.var(selfProgSV);

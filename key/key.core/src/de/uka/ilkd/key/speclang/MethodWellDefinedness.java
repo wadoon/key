@@ -121,7 +121,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                                        rep.getTarget().getContainerType()),
               0, rep.getTarget(), rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
-        pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
+        pres.put(services.getTheories().getHeapLDT().getHeap(),
                  rep.getOrigVars().self == null ?
                          TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
         Map<ProgramVariable,Term> deps = new LinkedHashMap<ProgramVariable, Term>();
@@ -221,7 +221,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     Function generateMbyAtPreFunc(Services services) {
         return hasMby() ?
                 new Function(new Name(TB.newName("mbyAtPre")),
-                             services.getTypeConverter().getIntegerLDT().targetSort()) :
+                             services.getTheories().getIntegerLDT().targetSort()) :
                 null;
     }
 

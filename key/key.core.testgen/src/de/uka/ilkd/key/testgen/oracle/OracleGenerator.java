@@ -105,20 +105,20 @@ public class OracleGenerator {
 		ops.put(Equality.EQUALS, EQUALS);
 		ops.put(Junctor.AND, AND);
 		ops.put(Junctor.OR, OR);
-		ops.put(services.getTypeConverter().getIntegerLDT().getLessOrEquals(), "<=");
-		ops.put(services.getTypeConverter().getIntegerLDT().getLessThan(), "<");
-		ops.put(services.getTypeConverter().getIntegerLDT().getGreaterOrEquals(), ">=");
-		ops.put(services.getTypeConverter().getIntegerLDT().getGreaterThan(), ">");
-		ops.put(services.getTypeConverter().getIntegerLDT().getAdd(), "+");
-		ops.put(services.getTypeConverter().getIntegerLDT().getArithJavaIntAddition(), "+");
-		ops.put(services.getTypeConverter().getIntegerLDT().getSub(), "-");
-		ops.put(services.getTypeConverter().getIntegerLDT().getJavaSubInt(), "-");
-		ops.put(services.getTypeConverter().getIntegerLDT().getMul(), "*");
-		ops.put(services.getTypeConverter().getIntegerLDT().getJavaMulInt(), "*");
-		ops.put(services.getTypeConverter().getIntegerLDT().getDiv(), "/");
-		ops.put(services.getTypeConverter().getIntegerLDT().getJavaDivInt(), "/");
-		ops.put(services.getTypeConverter().getIntegerLDT().getMod(), "%");
-		ops.put(services.getTypeConverter().getIntegerLDT().getJavaMod(), "%");		
+		ops.put(services.getTheories().getIntegerLDT().getLessOrEquals(), "<=");
+		ops.put(services.getTheories().getIntegerLDT().getLessThan(), "<");
+		ops.put(services.getTheories().getIntegerLDT().getGreaterOrEquals(), ">=");
+		ops.put(services.getTheories().getIntegerLDT().getGreaterThan(), ">");
+		ops.put(services.getTheories().getIntegerLDT().getAdd(), "+");
+		ops.put(services.getTheories().getIntegerLDT().getArithJavaIntAddition(), "+");
+		ops.put(services.getTheories().getIntegerLDT().getSub(), "-");
+		ops.put(services.getTheories().getIntegerLDT().getJavaSubInt(), "-");
+		ops.put(services.getTheories().getIntegerLDT().getMul(), "*");
+		ops.put(services.getTheories().getIntegerLDT().getJavaMulInt(), "*");
+		ops.put(services.getTheories().getIntegerLDT().getDiv(), "/");
+		ops.put(services.getTheories().getIntegerLDT().getJavaDivInt(), "/");
+		ops.put(services.getTheories().getIntegerLDT().getMod(), "%");
+		ops.put(services.getTheories().getIntegerLDT().getJavaMod(), "%");		
 	}
 	
 	public OracleMethod generateOracleMethod(Term term){
@@ -158,8 +158,8 @@ public class OracleGenerator {
 		
 		Sort nullSort = services.getJavaInfo().getNullType().getSort();
 		Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
-		Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-		Sort boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
+		Sort intSort = services.getTheories().getIntegerLDT().targetSort();
+		Sort boolSort = services.getTheories().getBooleanLDT().targetSort();
 		
 		if(s.equals(nullSort)){
 			return false;
@@ -297,15 +297,15 @@ public class OracleGenerator {
 			return new OracleVariable(qop.name().toString(), qop.sort());
 		}
 		//integers
-		else if (op == services.getTypeConverter().getIntegerLDT()
+		else if (op == services.getTheories().getIntegerLDT()
 		        .getNumberSymbol()) {			
 			long num = NumberTranslation.translate(term.sub(0)).longValue();			
 			return new OracleConstant(Long.toString(num),term.sort());
 		}
 		//forall
 		else if (op == Quantifier.ALL || op == Quantifier.EX) {
-			Sort field = services.getTypeConverter().getHeapLDT().getFieldSort();
-			Sort heap = services.getTypeConverter().getHeapLDT().targetSort();
+			Sort field = services.getTheories().getHeapLDT().getFieldSort();
+			Sort heap = services.getTheories().getHeapLDT().targetSort();
 			Sort varSort = term.boundVars().get(0).sort();
 			if(varSort.equals(field) || varSort.equals(heap)){
 				return OracleConstant.TRUE;
@@ -600,11 +600,11 @@ public class OracleGenerator {
 	}
 	
 	private boolean isTrueConstant(Operator o) {
-		return o.equals(services.getTypeConverter().getBooleanLDT().getTrueConst());
+		return o.equals(services.getTheories().getBooleanLDT().getTrueConst());
 	}
 
 	private boolean isFalseConstant(Operator o) {
-		return o.equals(services.getTypeConverter().getBooleanLDT().getFalseConst());
+		return o.equals(services.getTheories().getBooleanLDT().getFalseConst());
 	}
 	
 	public static String generateMethodName(){
@@ -688,22 +688,22 @@ public class OracleGenerator {
 		if(s.equals(Sort.FORMULA)){
 			return TestCaseGenerator.ALL_BOOLS;
 		}
-		else if(s.equals(services.getTypeConverter().getIntegerLDT().targetSort())){
+		else if(s.equals(services.getTheories().getIntegerLDT().targetSort())){
 			return TestCaseGenerator.ALL_INTS;
 		}
-		else if(s.equals(services.getTypeConverter().getLocSetLDT().targetSort())){
+		else if(s.equals(services.getTheories().getLocSetLDT().targetSort())){
 			throw new RuntimeException("Not implemented yet.");
 			//return TestCaseGenerator.ALL_LOCSETS;
 		}
-		else if(s.equals(services.getTypeConverter().getHeapLDT().getFieldSort())){
+		else if(s.equals(services.getTheories().getHeapLDT().getFieldSort())){
 			throw new RuntimeException("Not implemented yet.");
 			//return TestCaseGenerator.ALL_FIELDS;
 		}
-		else if(s.equals(services.getTypeConverter().getHeapLDT().targetSort())){
+		else if(s.equals(services.getTheories().getHeapLDT().targetSort())){
 			throw new RuntimeException("Not implemented yet.");
 			//return TestCaseGenerator.ALL_HEAPS;
 		}
-		else if(s.equals(services.getTypeConverter().getSeqLDT().targetSort())){
+		else if(s.equals(services.getTheories().getSeqLDT().targetSort())){
 			throw new RuntimeException("Not implemented yet.");
 			//return TestCaseGenerator.ALL_SEQ:
 		}

@@ -190,7 +190,7 @@ public final class DependencyContractPO extends AbstractPO
        }
 
        Term permsFor = tb.tt();
-       if(heapCount == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
+       if(heapCount == 2 && proofServices.getTheories().getHeapLDT().getPermissionHeap() != null) {
            int stateCount = contract.getTarget().getStateCount();
            for(int i=0;i<stateCount;i++) {
                LocationVariable h = heaps.get(i);

@@ -70,7 +70,7 @@ public class TestJMLTranslator extends TestCase {
             services = javaInfo.getServices();
             TB = services.getTermBuilder();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-            atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar("heapAtPre", services.getTypeConverter().getHeapLDT().getHeap().sort(),
+            atPres.put(services.getTheories().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar("heapAtPre", services.getTheories().getHeapLDT().getHeap().sort(),
                     false)));
 
         }
@@ -333,7 +333,7 @@ public class TestJMLTranslator extends TestCase {
                 new LogicVariable(new Name("i"),
                                   (Sort) nss.sorts().lookup(new Name("int")));
         Term expected =
-                TB.func(services.getTypeConverter().getIntegerLDT().getJavaCastInt(),
+                TB.func(services.getTheories().getIntegerLDT().getJavaCastInt(),
                 TB.bsum(i,
                         TB.zTerm("0"),
                         TB.zTerm("2147483647"),
@@ -383,7 +383,7 @@ public class TestJMLTranslator extends TestCase {
             fail(""+e);
         }
         assertNotNull(result);
-        Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
+        Operator unionOp = services.getTheories().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
                         new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
         assertSame(unionOp, result.op());
@@ -402,7 +402,7 @@ public class TestJMLTranslator extends TestCase {
             fail(""+e);
         }
         assertNotNull(result);
-        Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
+        Operator unionOp = services.getTheories().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
                         new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
         assertSame(unionOp, result.op());
@@ -456,8 +456,8 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result.op().equals(Equality.EQUALS));
         assertTrue(
                 termContains(result,
-                             services.getTypeConverter().getHeapLDT().getHeap()));
-        assertTrue(termContains(result, atPres.get(services.getTypeConverter().getHeapLDT().getHeap()).op()));
+                             services.getTheories().getHeapLDT().getHeap()));
+        assertTrue(termContains(result, atPres.get(services.getTheories().getHeapLDT().getHeap()).op()));
     }
 
 
@@ -731,7 +731,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result != null);
         final LogicVariable qv =
                 new LogicVariable(new Name("a"), selfVar.sort());
-        final Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+        final Function fieldSymbol = services.getTheories().getHeapLDT().getFieldSymbolForPV(
                 array, services);
         Term expected = TB.all(qv,
                                TB.imp(

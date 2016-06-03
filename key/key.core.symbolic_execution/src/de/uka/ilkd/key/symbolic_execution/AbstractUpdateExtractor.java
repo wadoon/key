@@ -273,7 +273,7 @@ public abstract class AbstractUpdateExtractor {
             collectLocationsFromHeapUpdate(updateTerm.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
          }
          else if (eu.lhs() instanceof ProgramVariable) {
-            final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
+            final HeapLDT heapLDT = getServices().getTheories().getHeapLDT();
             ProgramVariable var = (ProgramVariable)eu.lhs();
             if (!SymbolicExecutionUtil.isHeap(var, heapLDT)) {
                if (!isImplicitProgramVariable(var) && 
@@ -320,7 +320,7 @@ public abstract class AbstractUpdateExtractor {
                                                  Set<ExtractLocationParameter> locationsToFill, 
                                                  Set<Term> updateCreatedObjectsToFill, 
                                                  Set<Term> updateValueObjectsToFill) throws ProofInputException {
-      final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
+      final HeapLDT heapLDT = getServices().getTheories().getHeapLDT();
       if (term.op() == heapLDT.getStore()) {
          // Add select object term to result
          Term selectArgument = term.sub(1);
@@ -466,7 +466,7 @@ public abstract class AbstractUpdateExtractor {
    protected void collectLocationsFromTerm(Set<ExtractLocationParameter> toFill, 
                                            Term term, 
                                            Set<Term> objectsToIgnore) throws ProofInputException {
-      final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
+      final HeapLDT heapLDT = getServices().getTheories().getHeapLDT();
       if (term.op() instanceof ProgramVariable) {
          ProgramVariable var = (ProgramVariable)term.op();
          if (!SymbolicExecutionUtil.isHeap(var, heapLDT) && 
@@ -799,18 +799,18 @@ public abstract class AbstractUpdateExtractor {
             else {
                if (getServices().getJavaInfo().getArrayLength() == programVariable) {
                   // Special handling for length attribute of arrays
-                  Function function = getServices().getTypeConverter().getHeapLDT().getLength();
+                  Function function = getServices().getTheories().getHeapLDT().getLength();
                   return getServices().getTermBuilder().func(function, createPreParentTerm());
                }
                else {
-                  Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
+                  Function function = getServices().getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
                   return getServices().getTermBuilder().dot(programVariable.sort(), createPreParentTerm(), function);
                }
             }
          }
          else {
             if (programVariable.isStatic()) {
-               Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
+               Function function = getServices().getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
                return getServices().getTermBuilder().staticDot(programVariable.sort(), function);
             }
             else {

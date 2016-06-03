@@ -469,7 +469,7 @@ public final class SpecificationRepository {
                         services.getJavaInfo().getJavaLangObject())) {
             // Create or extend a well-definedness check for a class invariant
             final Term deps = contract.getAccessible(services
-                    .getTypeConverter().getHeapLDT().getHeap());
+            .getTheories().getHeapLDT().getHeap());
             final Term mby = contract.getMby();
             final String invName = "JML model class invariant in "
                     + targetKJT.getName();
@@ -1548,7 +1548,7 @@ public final class SpecificationRepository {
             final String baseName
                 = ((ProgramElementName)obs.name()).getProgramName() + "$lmtd";
             final Sort heapSort
-                = services.getTypeConverter().getHeapLDT().targetSort();
+                = services.getTheories().getHeapLDT().targetSort();
             limited = new ObserverFunction(baseName,
                                            obs.sort(),
                                            obs.getType(),
@@ -1599,7 +1599,7 @@ public final class SpecificationRepository {
                 reps = reps.add((RepresentsAxiom) ax);
             }
         }
-        final ProgramVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
+        final ProgramVariable heap = services.getTheories().getHeapLDT().getHeap();
         for (RepresentsAxiom rep : reps) {
             boolean dep = false;
             for (MethodWellDefinedness ch : getWdMethodChecks(kjt)) {

@@ -82,8 +82,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
                 containingType = et.getKeYJavaType();
                 if(recTerm!=null){
                     final Function fieldSymbol 
-                    	= services.getTypeConverter()
-                    	          .getHeapLDT()
+                    	= services.getTheories().getHeapLDT()
                     	          .getFieldSymbolForPV(et, services);
                     recTerm = services.getTermBuilder().dot(et.sort(), recTerm, fieldSymbol);
                 }

@@ -75,7 +75,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
                listModifiedLocations(UpdateApplication.getUpdate(updateTerm), 
                                      services, 
-                                     services.getTypeConverter().getHeapLDT(), 
+                                     services.getTheories().getHeapLDT(), 
                                      modifiedLocations, 
                                      info.getExecutionContext(), 
                                      info.getThisReference(), 

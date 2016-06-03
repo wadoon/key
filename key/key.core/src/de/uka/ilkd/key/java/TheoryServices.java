@@ -24,6 +24,10 @@ public class TheoryServices {
         theories = Collections.emptyMap();
     }
             
+    public void init(TheoryServices theoryServices) {
+        this.theories = Collections.unmodifiableMap(theoryServices.theories);
+    }
+
     public void init(Services services) {
         theories = Collections.unmodifiableMap(LDT.getNewLDTInstances(services));
     }
@@ -60,13 +64,8 @@ public class TheoryServices {
         return (SeqLDT) getLDT(SeqLDT.NAME);
     }
 
-
     LDT getLDT(Name ldtName) {
-        if (theories == null) {
-            return null;
-        } else {
-            return theories.get(ldtName);
-        }
+        return theories.get(ldtName);
     }
 
     public LDT getModelFor(Sort s) {

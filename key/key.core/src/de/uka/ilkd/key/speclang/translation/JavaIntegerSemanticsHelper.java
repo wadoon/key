@@ -46,7 +46,7 @@ public class JavaIntegerSemanticsHelper {
 	this.excManager = excManager;
 	this.tc = services.getTypeConverter();
 	this.tb = services.getTermBuilder();
-	this.integerLDT = services.getTypeConverter().getIntegerLDT();
+	this.integerLDT = services.getTheories().getIntegerLDT();
     }
     
     

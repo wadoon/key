@@ -196,7 +196,7 @@ public class Polynomial {
     
     public Term toTerm (Services services) {
         final Operator add = 
-            services.getTypeConverter().getIntegerLDT().getAdd();
+            services.getTheories().getIntegerLDT().getAdd();
         Term res = null;
         
         final Iterator<Monomial> it = parts.iterator ();
@@ -230,13 +230,11 @@ public class Polynomial {
         public BigInteger constantPart = BigInteger.ZERO;
         public ImmutableList<Monomial> parts = ImmutableSLList.<Monomial>nil();
         private final Services services;
-        private final TypeConverter tc;
         private final Operator numbers, add;
             
         public Analyser(final Services services) {
             this.services = services;
-            this.tc = services.getTypeConverter ();
-            final IntegerLDT intLDT = tc.getIntegerLDT ();
+            final IntegerLDT intLDT = services.getTheories().getIntegerLDT();
             numbers = intLDT.getNumberSymbol ();
             add = intLDT.getAdd();
         }

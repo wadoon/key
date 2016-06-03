@@ -95,7 +95,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
             return null;
         }
         
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT(); 
+        final HeapLDT heapLDT = services.getTheories().getHeapLDT(); 
         
         Term recTerm = receiver.getTerm(); 
         

@@ -121,7 +121,7 @@ public final class QueryAxiom extends ClassAxiom {
     public ImmutableSet<Taclet> getTaclets(
 	    		ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, 
 	    		Services services) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final HeapLDT heapLDT = services.getTheories().getHeapLDT();
 	final TermBuilder TB = services.getTermBuilder();
 	
 	//create schema variables

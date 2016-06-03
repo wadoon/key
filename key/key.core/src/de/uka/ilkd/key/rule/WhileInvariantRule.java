@@ -119,7 +119,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         instantiate(ruleApp, services);
 
         // create heap_Before_LOOP
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        HeapLDT heapLDT = services.getTheories().getHeapLDT();
         Name heapAtPreName = new Name(tb.newName(baseHeap + "_Before_LOOP"));
         final Function heapAtPreFunc = new Function(heapAtPreName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(heapAtPreFunc);
@@ -285,7 +285,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
                                                    LoopInvariant inv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final HeapLDT heapLDT = services.getTheories().getHeapLDT();
 	final Name loopHeapName = new Name(tb.newName(heap+"_After_LOOP"));
 	final Function loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(loopHeapFunc);
@@ -854,9 +854,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // This is needed because of the shallow access of \permission,
         // heap references that are deeper than top-level have to be replaced to, but with heapBefore_....
-        final LocationVariable permissionHeap = services.getTypeConverter().getHeapLDT().getPermissionHeap();
+        final LocationVariable permissionHeap = services.getTheories().getHeapLDT().getPermissionHeap();
         if(permissionHeap != null && heapContext.contains(permissionHeap)) {
-            final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+            final LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
             final Term baseHeapVar = services.getTermBuilder().var(baseHeap);
             heapToBeforeLoop.get(permissionHeap).put(baseHeapVar, heapToBeforeLoop.get(baseHeap).get(baseHeapVar));
         }
@@ -870,7 +870,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
                                            tb.elementary(pvBeforeLoop, 
                                                          tb.var(pv)));
-            heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap())
+            heapToBeforeLoop.get(services.getTheories().getHeapLDT().getHeap())
                     .put(tb.var(pv), tb.var(pvBeforeLoop));
         }
 

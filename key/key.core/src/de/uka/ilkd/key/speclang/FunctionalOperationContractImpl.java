@@ -253,7 +253,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
 
         if(atPreVars != null) {
-            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            final HeapLDT heapLDT = services.getTheories().getHeapLDT();
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                 if(atPreVars.get(h) != null) {
                     assertEqualSort(originalAtPreVars.get(h), atPreVars.get(h));
@@ -296,8 +296,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         for(LocationVariable heap : heapTerms.keySet()) {
             final Term heapTerm = heapTerms.get(heap);
-            assert heapTerm == null || heapTerm.sort().equals(services.getTypeConverter()
-                    .getHeapLDT()
+            assert heapTerm == null || heapTerm.sort().equals(services.getTheories().getHeapLDT()
                     .targetSort());
             result.put(TB.var(heap), heapTerm);
         }
@@ -335,7 +334,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
 
         if(atPres != null) {
-            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            final HeapLDT heapLDT = services.getTheories().getHeapLDT();
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                 if(atPres.get(h) != null) {
                     assertEqualSort(originalAtPreVars.get(h), atPres.get(h));
@@ -791,7 +790,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                   Services services,
                                   boolean usePrettyPrinting, 
                                   boolean useUnicodeSymbols) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
         final LocationVariable baseHeap = heapLDT.getHeap();
         final StringBuffer sig = new StringBuffer();
@@ -978,7 +977,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     public String proofToString(Services services) {
         assert toBeSaved;
         final StringBuffer sb = new StringBuffer();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
         sb.append(baseName).append(" {\n");
 
@@ -1304,8 +1303,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     public boolean isReadOnlyContract(Services services) {
-        return originalMods.get(services.getTypeConverter().getHeapLDT().getHeap()).op() ==
-                services.getTypeConverter().getLocSetLDT().getEmpty();
+        return originalMods.get(services.getTheories().getHeapLDT().getHeap()).op() ==
+                services.getTheories().getLocSetLDT().getEmpty();
     }
 
     public Term getAnyMod(Term mod, ProgramVariable selfVar,
@@ -1394,7 +1393,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             paramVars = paramVars.tail();
         }
         if(atPreVars != null && originalAtPreVars != null) {
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPreVars.get(h) != null && originalAtPreVar != null) {
                     map.put(TB.var(atPre ? h : originalAtPreVar), TB.var(atPreVars.get(h)));
@@ -1427,7 +1426,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             paramTerms = paramTerms.tail();
         }
         if(atPres != null && originalAtPreVars != null) {
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(originalAtPreVar != null && atPres.get(h) != null) {
                     map.put(TB.var(originalAtPreVar), atPres.get(h));
@@ -1463,7 +1462,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public String toString() {
-        final LocationVariable heap = ((Services)services).getTypeConverter().getHeapLDT().getHeap();
+        final LocationVariable heap = ((Services)services).getTheories().getHeapLDT().getHeap();
         return
                 (globalDefs == null? "": "defs: "+ globalDefs +"; ")
                 + "pre: "

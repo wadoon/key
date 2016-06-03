@@ -340,7 +340,7 @@ public final class SymbolicExecutionUtil {
     */
    public static Term improveReadability(Term term, Services services) {
       if (term != null && services != null) {
-         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+         IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
          term = improveReadabilityRecursive(term, services, integerLDT);
       }
       return term;
@@ -668,8 +668,8 @@ public final class SymbolicExecutionUtil {
          ImmutableArray<Term> subs = term.subs();
          if (subs.size() == 1) {
             Term sub = subs.get(0);
-            if (sub.op() == services.getTypeConverter().getHeapLDT().getStore() ||
-                sub.op() == services.getTypeConverter().getHeapLDT().getCreate()) {
+            if (sub.op() == services.getTheories().getHeapLDT().getStore() ||
+                sub.op() == services.getTheories().getHeapLDT().getCreate()) {
                heapUpdate = true;
             }
          }
@@ -910,7 +910,7 @@ public final class SymbolicExecutionUtil {
    private static void internalCollectStaticProgramVariablesOnHeap(Services services,
                                                                    Set<IProgramVariable> result,
                                                                    Term term) {
-      final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+      final HeapLDT heapLDT = services.getTheories().getHeapLDT();
       try {
          if (term.op() == heapLDT.getStore()) {
             ImmutableArray<Term> subs = term.subs();
@@ -3692,7 +3692,7 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isSelect(Services services, Term term) {
       if (!isNullSort(term.sort(), services)) {
-         Function select = services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services);
+         Function select = services.getTheories().getHeapLDT().getSelect(term.sort(), services);
          return select == term.op();
       }
       else {
@@ -3723,7 +3723,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is boolean, {@code false} is something else.
     */
    public static boolean isBoolean(Services services, Operator op) {
-      BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
+      BooleanLDT booleanLDT = services.getTheories().getBooleanLDT();
       return booleanLDT.getFalseConst() == op ||
              booleanLDT.getTrueConst() == op;
    }
@@ -3947,7 +3947,7 @@ public final class SymbolicExecutionUtil {
       final Services services = variable.getServices();
       if (SymbolicExecutionUtil.isStaticVariable(variable.getProgramVariable())) {
          // Static field access
-         Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)variable.getProgramVariable(), services);
+         Function function = services.getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable)variable.getProgramVariable(), services);
          return services.getTermBuilder().staticDot(variable.getProgramVariable().sort(), function);
       }
       else {
@@ -3960,12 +3960,12 @@ public final class SymbolicExecutionUtil {
             if (variable.getProgramVariable() != null) {
                if (services.getJavaInfo().getArrayLength() == variable.getProgramVariable()) {
                   // Special handling for length attribute of arrays
-                  Function function = services.getTypeConverter().getHeapLDT().getLength();
+                  Function function = services.getTheories().getHeapLDT().getLength();
                   return services.getTermBuilder().func(function, parentTerm);
                }
                else {
                   // Field access on the parent variable
-                  Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)variable.getProgramVariable(), services);
+                  Function function = services.getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable)variable.getProgramVariable(), services);
                   return services.getTermBuilder().dot(variable.getProgramVariable().sort(), parentTerm, function);
                }
             }

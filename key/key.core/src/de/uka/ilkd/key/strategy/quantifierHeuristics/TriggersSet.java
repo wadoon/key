@@ -325,13 +325,13 @@ public class TriggersSet {
 
             // we do not want to match on expressions a.<created>
             
-            if(term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services)) {
+            if(term.op() == services.getTheories().getHeapLDT().getSelect(term.sort(), services)) {
         	if(term.sub(2).op().name().toString().endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
                     return false;
                 }
             }
 
-            final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+            final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
             // matching on equations and inequalities does not seem to have any
             // positive effect for the time being
             if (op == Equality.EQUALS || 

@@ -29,7 +29,7 @@ public class OracleInvariantTranslator {
 		TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
 		SpecificationRepository spec = services.getSpecificationRepository();
 
-		Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+		Sort heapSort = services.getTheories().getHeapLDT().targetSort();
 
 		LogicVariable h = new LogicVariable(new Name("h"), heapSort);
 

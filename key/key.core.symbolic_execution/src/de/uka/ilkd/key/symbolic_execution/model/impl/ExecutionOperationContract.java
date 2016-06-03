@@ -108,7 +108,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
          List<LocationVariable> heapContext = HeapContext.getModHeaps(services, inst.transaction);
          Map<LocationVariable,LocationVariable> atPreVars = UseOperationContractRule.computeAtPreVars(heapContext, services, inst);
          Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, services);
-         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+         LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
          Term baseHeapTerm = services.getTermBuilder().getBaseHeap();
          if (contract.hasSelfVar()) {
             if (inst.pm.isConstructor()) {

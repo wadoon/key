@@ -62,7 +62,7 @@ public class RootsGenerator implements TermGenerator {
 
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
-        final IntegerLDT numbers = services.getTypeConverter ().getIntegerLDT ();
+        final IntegerLDT numbers = services.getTheories().getIntegerLDT();
         
         final Term powerRel = powerRelation.toTerm ( app, pos, goal );
         

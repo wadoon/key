@@ -133,7 +133,7 @@ public class Location {
          else if (SymbolicExecutionUtil.isStaticVariable(access.getProgramVariable())) {
             // Static field access
             assert parent == null;
-            Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)access.getProgramVariable(), services);
+            Function function = services.getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable)access.getProgramVariable(), services);
             parent =  services.getTermBuilder().staticDot(access.getProgramVariable().sort(), function);
          }
          else if (parent == null) {
@@ -144,13 +144,13 @@ public class Location {
          else if (services.getJavaInfo().getArrayLength() == access.getProgramVariable()) {
             // Special handling for length attribute of arrays
             assert parent != null;
-            Function function = services.getTypeConverter().getHeapLDT().getLength();
+            Function function = services.getTheories().getHeapLDT().getLength();
             parent = services.getTermBuilder().func(function, parent);
          }
          else {
             // Field access on the parent variable
             assert parent != null;
-            Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)access.getProgramVariable(), services);
+            Function function = services.getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable)access.getProgramVariable(), services);
             parent = services.getTermBuilder().dot(access.getProgramVariable().sort(), parent, function);
          }
       }

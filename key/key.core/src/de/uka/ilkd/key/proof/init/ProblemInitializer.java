@@ -511,7 +511,7 @@ public final class ProblemInitializer {
         final Namespace functions 
         = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 
-        = initConfig.getServices().getTypeConverter().getHeapLDT();
+        = initConfig.getServices().getTheories().getHeapLDT();
         assert heapLDT != null;
         if (javaInfo != null) {
             for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {

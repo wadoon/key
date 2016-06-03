@@ -69,8 +69,7 @@ public final class MetaDiv extends AbstractTermTransformer {
 	    Function undef = (Function)services.getNamespaces().functions().lookup(undefName);
 	    if (undef==null) {
 		undef = new Function(undefName,
-				     services.getTypeConverter().
-				     getIntegerLDT().targetSort(), 
+				     services.getTheories().getIntegerLDT().targetSort(), 
 				     new Sort[0]);
 		services.getNamespaces().functions().add(undef);
 	    }
