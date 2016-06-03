@@ -79,8 +79,8 @@ public class TestTermFactory extends TestCase {
     }
 
     public void setUp() {
-	Term et_x=new TermImpl(x, new ImmutableArray<Term>(), null, null);
-	Term et_px=new TermImpl(p, new ImmutableArray<Term>(new Term[]{et_x}), null, null);
+	Term et_x=new TermImpl(x, x.sort(), new ImmutableArray<Term>(), null, null);
+	Term et_px=new TermImpl(p, p.sort(), new ImmutableArray<Term>(new Term[]{et_x}), null, null);
 	et1=et_px;       
 	TB = TacletForTests.services().getTermBuilder();
 	tf = TB.tf();
@@ -139,7 +139,7 @@ public class TestTermFactory extends TestCase {
      * constructed anyway, as subformulae are not checked
      */
     public void testWithInvalidSubformulae() { 
-	Term invalidBuilt=new TermImpl(p, new ImmutableArray<Term>(new TermImpl(y, new ImmutableArray<Term>(), null, null)), null, null);
+	Term invalidBuilt=new TermImpl(p, p.sort(), new ImmutableArray<Term>(new TermImpl(y, y.sort(), new ImmutableArray<Term>(), null, null)), null, null);
 	try {
 	    Term t_px_or_py=tf.createTerm(Junctor.OR,
 						 new Term[]{invalidBuilt, 
@@ -151,41 +151,41 @@ public class TestTermFactory extends TestCase {
 
     public void testConstantTrue() {
         Term t_true=tf.createTerm(Junctor.TRUE);
-	Assert.assertEquals(t_true,new TermImpl(Junctor.TRUE, new ImmutableArray<Term>(), null, null));
+	Assert.assertEquals(t_true, new TermImpl(Junctor.TRUE, Sort.FORMULA, new ImmutableArray<Term>(), null, null));
     }
 
     public void testQuantifierTerm() {
 	Term t_forallx_px=TB.all(ImmutableSLList.<QuantifiableVariable>nil().append(x),t1());
 	Assert.assertEquals(t_forallx_px,
-			    new TermImpl(Quantifier.ALL,new ImmutableArray<Term>(t1()), new ImmutableArray<QuantifiableVariable>(x), null));
+			    new TermImpl(Quantifier.ALL, Sort.FORMULA,new ImmutableArray<Term>(t1()), new ImmutableArray<QuantifiableVariable>(x), null));
     }
 
     public void testJunctorTerm() {
 	Term  t_px_imp_ryw= tf.createTerm(Junctor.IMP, t1(), t2());
-	Assert.assertEquals(t_px_imp_ryw, new TermImpl(Junctor.IMP, new ImmutableArray<Term>(new Term[]{ t1(), t2()}), null, null));
+	Assert.assertEquals(t_px_imp_ryw, new TermImpl(Junctor.IMP, Sort.FORMULA, new ImmutableArray<Term>(new Term[]{ t1(), t2()}), null, null));
     }
 
     public void testNegationTerm() {
 	Term t_not_ryw=tf.createTerm(Junctor.NOT, t2());
-	Assert.assertEquals(t_not_ryw, new TermImpl(Junctor.NOT, new ImmutableArray<Term>( t2()), null, null));
+	Assert.assertEquals(t_not_ryw, new TermImpl(Junctor.NOT, Sort.FORMULA, new ImmutableArray<Term>( t2()), null, null));
     }
 
     public void testDiamondTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
 	Term t_dia_ryw=tf.createTerm(Modality.DIA, new Term[]{t2()}, null, jb);
-	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.DIA, new ImmutableArray<Term>(t2()), null, jb));
+	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.DIA, Sort.FORMULA, new ImmutableArray<Term>(t2()), null, jb));
     }
 
     public void testBoxTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
 	Term t_dia_ryw=tf.createTerm(Modality.BOX, new ImmutableArray<Term>(t2()), null, jb);
-	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.BOX, new ImmutableArray<Term>(t2()), null, jb));
+	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.BOX, Sort.FORMULA, new ImmutableArray<Term>(t2()), null, jb));
     }
 
     public void testSubstitutionTerm() {
 	Term t_x_subst_fy_in_px=TB.subst(WarySubstOp.SUBST, x, t3(),
 							  t1());
-	Assert.assertEquals(new TermImpl(WarySubstOp.SUBST, new ImmutableArray<Term>(new Term[]{ t3(),t1() }),
+	Assert.assertEquals(new TermImpl(WarySubstOp.SUBST,t1().sort(), new ImmutableArray<Term>(new Term[]{ t3(),t1() }),
 				    	 new ImmutableArray<QuantifiableVariable>(x), null), 
 			    t_x_subst_fy_in_px);
     }

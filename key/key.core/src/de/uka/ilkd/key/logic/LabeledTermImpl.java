@@ -21,6 +21,7 @@ import org.key_project.util.java.ObjectUtil;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * The labeled term class is used for terms that have a label 
@@ -45,11 +46,11 @@ class LabeledTermImpl extends TermImpl {
 	 * @param javaBlock contains the program part of the term (if any) 
 	 * @param labels the terms labels (must not be null or empty)
 	 */
-	public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
+	public LabeledTermImpl(Operator op, Sort sort,ImmutableArray<Term> subs,
 			ImmutableArray<QuantifiableVariable> boundVars, 
 			JavaBlock javaBlock,
 			ImmutableArray<TermLabel> labels) {
-		super(op, subs, boundVars, javaBlock);
+		super(op, sort, subs, boundVars, javaBlock);
 		assert labels != null : "Term labels must not be null";
 		assert !labels.isEmpty() : "There must be at least one term label";
 		this.labels = labels;

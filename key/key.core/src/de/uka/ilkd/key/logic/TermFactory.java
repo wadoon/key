@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
  * The TermFactory is the <em>only</em> way to create terms using constructors 
@@ -145,11 +146,12 @@ public final class TermFactory {
             ImmutableArray<QuantifiableVariable> boundVars,
             JavaBlock javaBlock, ImmutableArray<TermLabel> labels) {
         
+        final Sort sort = TypeCheckingAndInferenceService.getTypeCheckerFor(op).sort(subs, op);
+        
         final Term newTerm 
             = (labels == null || labels.isEmpty() ? 
-                    new TermImpl(op, subs, boundVars, javaBlock) : 
-                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels));
-                
+                    new TermImpl(op, sort, subs, boundVars, javaBlock) : 
+                new LabeledTermImpl(op, sort, subs, boundVars, javaBlock, labels));
         
         return cacheTerm(newTerm);
     }

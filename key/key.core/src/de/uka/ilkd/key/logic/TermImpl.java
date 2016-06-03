@@ -43,6 +43,7 @@ class TermImpl implements Term {
 
     // content
     private final Operator op;
+    private final Sort sort;
     private final ImmutableArray<Term> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
     private final JavaBlock javaBlock;
@@ -71,11 +72,12 @@ class TermImpl implements Term {
     // constructors
     // -------------------------------------------------------------------------
 
-    public TermImpl(Operator op, ImmutableArray<Term> subs,
+    public TermImpl(Operator op, Sort sort, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
         assert op != null;
         assert subs != null;
         this.op = op;
+        this.sort = sort;
         this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
         this.javaBlock =
@@ -153,8 +155,7 @@ class TermImpl implements Term {
 
     @Override
     public Sort sort() {
-        return TypeCheckingAndInferenceService.getTypeCheckerFor(op).sort(subs,
-                op);
+        return sort;
     }
 
     @Override
