@@ -80,10 +80,10 @@ options {
 	this.tb             = services.getTermBuilder();
 	this.javaInfo       = services.getJavaInfo();
 	containerType  =   specInClass;
-	this.intLDT         = services.getTypeConverter().getIntegerLDT();
-	this.heapLDT        = services.getTypeConverter().getHeapLDT();
-	this.locSetLDT      = services.getTypeConverter().getLocSetLDT();
-	this.booleanLDT     = services.getTypeConverter().getBooleanLDT();
+	this.intLDT         = services.getTheories().getIntegerLDT();
+	this.heapLDT        = services.getTheories().getHeapLDT();
+	this.locSetLDT      = services.getTheories().getLocSetLDT();
+	this.booleanLDT     = services.getTheories().getBooleanLDT();
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName,
 				    				new Position(0,0));
@@ -236,15 +236,15 @@ options {
     }
 
 	private LocationVariable getBaseHeap() {
-		return services.getTypeConverter().getHeapLDT().getHeap();
+		return heapLDT.getHeap();
 	}
 
 	private LocationVariable getSavedHeap() {
-		return services.getTypeConverter().getHeapLDT().getSavedHeap();
+		return heapLDT.getSavedHeap();
 	}
 
 	private LocationVariable getPermissionHeap() {
-		return services.getTypeConverter().getHeapLDT().getPermissionHeap();
+		return heapLDT.getPermissionHeap();
 	}
 
     /**
@@ -284,7 +284,7 @@ options {
         if(!term.op().name().toString().endsWith("::select")) {
            raiseError("\\permission expression used with non store-ref expression.");
         }
-        return tb.select(services.getTypeConverter().getPermissionLDT().targetSort(), tb.var(getPermissionHeap()), term.sub(1), term.sub(2));
+        return tb.select(services.getTheories().getPermissionLDT().targetSort(), tb.var(getPermissionHeap()), term.sub(1), term.sub(2));
     }
 
     private String createSignatureString(ImmutableList<SLExpression> signature) {
@@ -1456,7 +1456,7 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
 	c=CHAR_LITERAL
 	{
        Term charLit = 
-         services.getTypeConverter().getIntegerLDT().translateLiteral(new CharLiteral(c.getText()), services);
+         intLDT.translateLiteral(new CharLiteral(c.getText()), services);
         	   
 	    return new SLExpression(charLit, javaInfo.getKeYJavaType("char"));
 	}

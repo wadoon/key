@@ -885,7 +885,7 @@ options {
             } else {
 	            ProgramVariable pv = (ProgramVariable) attribute;
             	Function fieldSymbol 
-            		= getServices().getTypeConverter()
+            		= getServices().getTheories()
             		               .getHeapLDT()
             		               .getFieldSymbolForPV((LocationVariable)pv, 
             		                                    getServices());        
@@ -942,7 +942,7 @@ options {
     
     protected boolean isHeapTerm(Term term) {
         return term != null && term.sort() == 
-            getServices().getTypeConverter().getHeapLDT().targetSort();
+            getServices().getTheories().getHeapLDT().targetSort();
     }
 
     private boolean isSequenceTerm(Term reference) {
@@ -2850,7 +2850,7 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
     (result = query_suffix[prefix, memberName] {assert result != null;})?
     {
         if(result == null)  {
-            if(prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
+            if(prefix.sort() == getServices().getTheories().getSeqLDT().targetSort()) {
                 if("length".equals(memberName)) {
                     result = getServices().getTermBuilder().seqLen(prefix);
                 } else {
@@ -3513,7 +3513,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
                 
         {  
             if(varfuncid.equals("inReachableState") && args == null) {
-	        a = getServices().getTermBuilder().wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap());
+	        a = getServices().getTermBuilder().wellFormed(getServices().getTheories().getHeapLDT().getHeap());
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = getTermFactory().createTerm(UpdateJunctor.SKIP);
 	    } else {
