@@ -141,7 +141,7 @@ public class LDTInput implements EnvInput {
 	}
 
         //create LDT objects
-        initConfig.getServices().getTypeConverter().init();
+        initConfig.getServices().getTheories().init(initConfig.getServices());
         return DefaultImmutableSet.nil();
     }
 

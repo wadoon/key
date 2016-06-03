@@ -104,6 +104,12 @@ public class Services implements TermServices {
     
     private final TermBuilder termBuilder;
 
+    private final TheoryServices theories;
+
+    public TheoryServices getTheories() {
+        return theories;
+    }
+
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
@@ -115,11 +121,13 @@ public class Services implements TermServices {
     	this.caches = new ServiceCaches();
     	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
     	this.specRepos = new SpecificationRepository(this);
-    	cee = new ConstantExpressionEvaluator(this);
+        this.nameRecorder = new NameRecorder();
+        this.theories = new TheoryServices();
+
+        this.cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
     	javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
     	                                             new KeYRecoderExcHandler()), this);
-    	nameRecorder = new NameRecorder();
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
@@ -133,11 +141,14 @@ public class Services implements TermServices {
     	this.caches = caches;
     	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
     	this.specRepos = new SpecificationRepository(this);
-    	cee = new ConstantExpressionEvaluator(this);
+        this.nameRecorder = new NameRecorder();
+        this.theories = new TheoryServices();
+        this.theories.init(this);
+        
+        cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
     	javainfo = new JavaInfo
     			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
-    	nameRecorder = new NameRecorder();
     }
 
 
@@ -149,11 +160,6 @@ public class Services implements TermServices {
     }
 
 
-    private void setTypeConverter(TypeConverter tc) {
-    	typeconverter = tc;
-    }
-
-    
     /**
      * Returns the ConstantExpressionEvaluator associated with this Services object.
      */
@@ -226,7 +232,7 @@ public class Services implements TermServices {
     			(profile, getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
     					copyCounters(), newCaches);
     	s.specRepos = specRepos;
-    	s.setTypeConverter(getTypeConverter().copy(s));
+    	s.typeconverter = getTypeConverter().copy(s);
     	s.setNamespaces(namespaces.copy());
     	nameRecorder = nameRecorder.copy();
     	s.setJavaModel(getJavaModel());
@@ -256,7 +262,7 @@ public class Services implements TermServices {
     			instanceof SchemaCrossReferenceServiceConfiguration),
     			"services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
-    	s.setTypeConverter(getTypeConverter().copy(s));
+    	s.typeconverter = getTypeConverter().copy(s);
     	s.setNamespaces(namespaces.copy());
     	nameRecorder = nameRecorder.copy();
     	s.setJavaModel(getJavaModel());
@@ -286,7 +292,7 @@ public class Services implements TermServices {
                 copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
-        s.setTypeConverter(getTypeConverter().copy(s));
+        s.typeconverter = getTypeConverter().copy(s);
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());

@@ -14,14 +14,9 @@
 package de.uka.ilkd.key.java;
 
 
-import java.util.Map;
-
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -77,7 +72,6 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.PermissionLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -89,95 +83,60 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+import recoder.service.ConstantEvaluator;
 
 public final class TypeConverter {
 
+
     private final TermBuilder tb;
     private final Services services;
-
-    // Maps LDT names to LDT instances.
-    private Map<Name,LDT> LDTs = null;
-    
-    private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
-    
-    private HeapLDT heapLDT = null;
-    private IntegerLDT integerLDT = null;
     
     TypeConverter(Services s) {
         this.services = s;
         this.tb = services.getTermBuilder();
     }
     
-    public void init(){
-        init(LDT.getNewLDTInstances(services));
-    }
-    
-    private void init(Map<Name, LDT> map) {
-        LDTs = map;
-        models = ImmutableSLList.<LDT>nil();
-        if (LDTs != null) {
-            for (LDT ldt : LDTs.values()) {
-                models = models.prepend(ldt);
-            }
-        }
-        heapLDT = getHeapLDT();
-        integerLDT = getIntegerLDT();
-    }
-
-    public ImmutableList<LDT> getModels() {
-        return models;
-    }
-
-    public LDT getModelFor(Sort s) {
-	for(LDT ldt : models) {
-	    if(s.equals(ldt.targetSort())) {
-		return ldt;
-	    }
-	}
-        Debug.out("No LDT found for ", s);
-        return null;
-    }
-    
-    private LDT getLDT(Name ldtName) {
-        if (LDTs == null) {
-            return null;
-        } else {
-            return LDTs.get(ldtName);
-        }
-    }
-    
-    public IntegerLDT getIntegerLDT() {
-        return (IntegerLDT) getLDT(IntegerLDT.NAME);
+    private TheoryServices getTheories() {
+        return services.getTheories();
     }
 
     public BooleanLDT getBooleanLDT() {
-        return (BooleanLDT) getLDT(BooleanLDT.NAME);
-    }
-
-    public LocSetLDT getLocSetLDT() {
-	return (LocSetLDT) getLDT(LocSetLDT.NAME);
-    }
-
-    public HeapLDT getHeapLDT() {
-        return (HeapLDT) getLDT(HeapLDT.NAME);
-    }
-
-    public PermissionLDT getPermissionLDT() {
-        return (PermissionLDT) getLDT(PermissionLDT.NAME);
-    }
-
-    public SeqLDT getSeqLDT() {
-	return (SeqLDT) getLDT(SeqLDT.NAME);
-    }
-    
-    public MapLDT getMapLDT() {
-	return (MapLDT) getLDT(MapLDT.NAME);
+        return getTheories().getBooleanLDT();
     }
 
     public CharListLDT getCharListLDT() {
-	return (CharListLDT) getLDT(CharListLDT.NAME);
+        return getTheories().getCharListLDT();
     }
 
+    public HeapLDT getHeapLDT() {
+        return getTheories().getHeapLDT();
+    }
+
+    public IntegerLDT getIntegerLDT() {
+        return getTheories().getIntegerLDT();
+    }
+
+    public LocSetLDT getLocSetLDT() {
+        return getTheories().getLocSetLDT();
+    }
+
+    public MapLDT getMapLDT() {
+        return getTheories().getMapLDT();
+    }
+    
+    public PermissionLDT getPermissionLDT() {
+        return getTheories().getPermissionLDT();
+    }
+
+    public SeqLDT getSeqLDT() {
+        return getTheories().getSeqLDT();
+    }
+    
+    public KeYJavaType getBooleanType() {
+        return services.getJavaInfo()
+                .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+    }
+    
     private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
 
         final Term[] subs = new Term[op.getArity()];
@@ -187,7 +146,7 @@ public final class TypeConverter {
 
         //hack: convert object singleton to location singleton
         if (op instanceof Singleton) {
-            assert heapLDT.getSortOfSelect(subs[0].op()) != null : "unexpected argument of \\singleton: " + subs[0];
+            assert getHeapLDT().getSortOfSelect(subs[0].op()) != null : "unexpected argument of \\singleton: " + subs[0];
             return tb.singleton(subs[0].sub(1), subs[0].sub(2));
         }
 
@@ -205,7 +164,7 @@ public final class TypeConverter {
             return tb.ife(subs[0], subs[1], subs[2]);
         } else if (op instanceof DLEmbeddedExpression) {
             DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
-            return emb.makeTerm(heapLDT.getHeap(), subs, services);
+            return emb.makeTerm(getHeapLDT().getHeap(), subs, services);
         } else if (op instanceof TypeCast) {
             TypeCast tc = (TypeCast) op;
             return tb.cast(tc.getKeYJavaType(services).getSort(), subs[0]);
@@ -282,7 +241,7 @@ public final class TypeConverter {
                     services.getJavaInfo().getAttribute(
                        ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
             final Function fieldSymbol
-            	= heapLDT.getFieldSymbolForPV(inst, services);
+            	= getHeapLDT().getFieldSymbolForPV(inst, services);
             result = tb.dot(inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
@@ -325,12 +284,12 @@ public final class TypeConverter {
 	    return tb.dotLength(convertReferencePrefix(prefix, ec));
 	} else if(var.isStatic()) {
 	    final Function fieldSymbol
-	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
+	    	= getHeapLDT().getFieldSymbolForPV((LocationVariable)var, services);
 	    return tb.staticDot(var.sort(), fieldSymbol);
 	} else if(prefix == null) {
 	    if(var.isMember()) {
 		final Function fieldSymbol
-			= heapLDT.getFieldSymbolForPV((LocationVariable)var,
+			= getHeapLDT().getFieldSymbolForPV((LocationVariable)var,
 						      services);
 		return tb.dot(var.sort(),
 			      findThisForSort(var.getContainerType().getSort(),
@@ -341,7 +300,7 @@ public final class TypeConverter {
 	    }
 	} else if (!(prefix instanceof PackageReference) ) {
 	    final Function fieldSymbol
-	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
+	    	= getHeapLDT().getFieldSymbolForPV((LocationVariable)var, services);
 	    return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
 	}
 	Debug.out("typeconverter: Not supported reference type (fr, class):",
@@ -403,10 +362,10 @@ public final class TypeConverter {
 	        && ((Negative)pe).getChildAt(0) instanceof IntLiteral) {
 	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return integerLDT.translateLiteral
+		return getIntegerLDT().translateLiteral
 		    (new IntLiteral(val.substring(1)), services);
 	    } else {
-		return integerLDT.translateLiteral
+		return getIntegerLDT().translateLiteral
 		    (new IntLiteral("-"+val), services);
 	    }
 	} else if (pe instanceof Negative
@@ -414,10 +373,10 @@ public final class TypeConverter {
 	    String val = ((LongLiteral)
 			  ((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return integerLDT.translateLiteral
+		return getIntegerLDT().translateLiteral
 		    (new LongLiteral(val.substring(1)), services);
 	    } else {
-		return integerLDT.translateLiteral
+		return getIntegerLDT().translateLiteral
 		    (new LongLiteral("-"+val), services);
 	    }
 	} else if (pe instanceof ThisReference) {
@@ -451,7 +410,7 @@ public final class TypeConverter {
         if (lit instanceof NullLiteral) {
             return tb.NULL();
         } else {
-            LDT ldt = LDTs.get(lit.getLDTName());
+            LDT ldt = getTheories().getLDT(lit.getLDTName());
             if (ldt != null) {
                 return ldt.translateLiteral(lit, services);
             } else {
@@ -564,12 +523,6 @@ public final class TypeConverter {
     }
 
 
-    public KeYJavaType getBooleanType() {
-	return services.getJavaInfo()
-	               .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
-    }
-
-
     public Sort getPrimitiveSort(Type t) {
 	return services.getJavaInfo().getKeYJavaType(t).getSort();
     }
@@ -615,11 +568,11 @@ public final class TypeConverter {
      */
     public Expression convertToProgramElement(Term term) {
         assert term != null;
-        if (term.op() == heapLDT.getNull()) {
+        if (term.op() == getHeapLDT().getNull()) {
             return NullLiteral.NULL;
         } else if (term.op() instanceof Function) {
             Function function = (Function)term.op();
-            for(LDT model : models) {
+            for(LDT model : getTheories().getModels()) {
                 if (model.hasLiteralFunction(function)) {
                     return model.translateTerm(term, null, services);
                 }
@@ -635,7 +588,7 @@ public final class TypeConverter {
             return ((ProgramInLogic)term.op()).convertToProgram(term, children);
         } else if (term.op() instanceof Function) {
             Function function = (Function)term.op();
-            for(LDT model : models) {
+            for(LDT model : getTheories().getModels()) {
                 if (model.containsFunction(function)) {
                     return model.translateTerm(term, children, services);
                 }
@@ -676,7 +629,7 @@ public final class TypeConverter {
 	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
 	    result = services.getJavaInfo().getKeYJavaType(t.sort());
 	} else if(t.op() instanceof Function) {
-	    for(LDT ldt : models) {
+	    for(LDT ldt : getTheories().getModels()) {
 		if(ldt.containsFunction((Function)t.op())) {
 		    Type type = ldt.getType(t);
 		    result = services.getJavaInfo().getKeYJavaType(type);
@@ -1050,13 +1003,11 @@ public final class TypeConverter {
     }
 
     public TypeConverter copy(Services services) {
-        TypeConverter TC = new TypeConverter(services);
-        TC.init(LDTs);
-        return TC;
+        return new TypeConverter(services);
     }
 
     private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, Services services, ExecutionContext ec) {
-        for (LDT ldt : LDTs.values()) {
+        for (LDT ldt : getTheories().getModels()) {
             if (ldt.isResponsible(op, subs, services, ec)) {
                 return ldt;
             }
