@@ -63,7 +63,7 @@ public class TestJavaWatchpointStopConditionWithHitCount extends AbstractSymboli
          FieldWatchpoint thirdBreakpoint = new FieldWatchpoint(true, 2, "accessAndModification", true,true, containerType, env.getBuilder().getProof());
          SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(firstBreakpoint,secondBreakpoint,thirdBreakpoint);
          allBreakpoints.addChildren(bc);
-         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
+         env.getProof().getServices().getJavaServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);

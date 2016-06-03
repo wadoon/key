@@ -271,7 +271,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 						ExecutionContext ec) {
 	ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
 	if (arguments != null) {
-            final TypeConverter typeConverter = services.getTypeConverter();
+            final TypeConverter typeConverter = services.getJavaServices().getTypeconverter();
 	    for (int i = arguments.size()-1; i>=0; i--) {		
                 signature = signature.prepend
                     (typeConverter.getKeYJavaType(getArgumentAt(i), ec));
@@ -301,7 +301,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public IProgramMethod method(Services services, 
             			KeYJavaType refPrefixType, 
             			ExecutionContext ec) {	
-        ProgramVariable inst = services.getJavaInfo().getAttribute(
+        ProgramVariable inst = services.getJavaServices().getJavainfo().getAttribute(
                 ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
         IProgramMethod pm = method(services, refPrefixType, 
                 getMethodSignature(services, ec),
@@ -314,7 +314,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
             if(pm!=null){
                 return pm;
             }
-            inst = services.getJavaInfo().getAttribute(
+            inst = services.getJavaServices().getJavainfo().getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType);
         }
         return pm;
@@ -335,7 +335,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     	        ImmutableList<KeYJavaType> signature, 
     	        KeYJavaType context) {
         final String methodName = name.toString();        
-        IProgramMethod pm = services.getJavaInfo().getProgramMethod(classType, 
+        IProgramMethod pm = services.getJavaServices().getJavainfo().getProgramMethod(classType, 
                 methodName, signature, context);
 	return pm;
     }

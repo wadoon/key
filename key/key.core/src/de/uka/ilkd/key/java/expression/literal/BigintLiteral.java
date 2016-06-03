@@ -127,7 +127,7 @@ public final class BigintLiteral extends Literal {
 
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+        return javaServ.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
     }
 
     @Override

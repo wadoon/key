@@ -44,7 +44,7 @@ public class JavaIntegerSemanticsHelper {
 	assert excManager != null;
 
 	this.excManager = excManager;
-	this.tc = services.getTypeConverter();
+	this.tc = services.getJavaServices().getTypeconverter();
 	this.tb = services.getTermBuilder();
 	this.integerLDT = services.getTheories().getIntegerLDT();
     }

@@ -88,7 +88,7 @@ public final class MetaDiv extends AbstractTermTransformer {
 	Debug.assertTrue(checkResult(bigIntArg1, bigIntArg2, bigIntResult), 
 			 bigIntArg1+"/"+bigIntArg2+"="+bigIntResult+
 			 " is inconsistent with the taclet div_axiom");
-	return services.getTypeConverter().convertToLogicElement(lit);
+	return services.getJavaServices().getTypeconverter().convertToLogicElement(lit);
 
     }
 }

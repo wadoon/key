@@ -88,7 +88,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnLoopInvariant(LoopInvariant x) {
         TermProgramVariableCollector tpvc =
-            services.getFactory().create(services);
+            services.getJavaServices().getFactory().create(services);
         Term selfTerm = x.getInternalSelfTerm();
 
         Map<LocationVariable,Term> atPres = x.getInternalAtPres();
@@ -140,7 +140,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
     @Override
     public void performActionOnBlockContract(BlockContract x) {
-        TermProgramVariableCollector collector = services.getFactory().create(services);
+        TermProgramVariableCollector collector = services.getJavaServices().getFactory().create(services);
         for (LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
             Term precondition = x.getPrecondition(heap, services);
             if (precondition != null) {

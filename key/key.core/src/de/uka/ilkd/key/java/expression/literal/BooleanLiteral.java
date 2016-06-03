@@ -146,7 +146,7 @@ public class BooleanLiteral extends Literal {
 
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+	return javaServ.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 
     @Override

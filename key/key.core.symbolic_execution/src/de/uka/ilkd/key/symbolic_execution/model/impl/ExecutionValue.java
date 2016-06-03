@@ -141,8 +141,8 @@ public class ExecutionValue extends AbstractExecutionValue {
          Term value = getValue();
          if (value != null && !isValueUnknown()) { // Don't show children of unknown values
             Sort valueSort = value.sort();
-            if (valueSort != services.getJavaInfo().getNullType().getSort()) {
-               KeYJavaType keyType = services.getJavaInfo().getKeYJavaType(valueSort);
+            if (valueSort != services.getJavaServices().getJavainfo().getNullType().getSort()) {
+               KeYJavaType keyType = services.getJavaServices().getJavainfo().getKeYJavaType(valueSort);
                if (keyType != null) { // Can be null, e.g. if Sort is the Sort of Heap
                   Type javaType = keyType.getJavaType();
                   if (javaType instanceof ArrayDeclaration) {
@@ -174,7 +174,7 @@ public class ExecutionValue extends AbstractExecutionValue {
                      // Normal value
                      ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(services);
                      for (Field field : fields) {
-                        ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), keyType);
+                        ImmutableList<ProgramVariable> vars = services.getJavaServices().getJavainfo().getAllAttributes(field.getFullName(), keyType);
                         for (ProgramVariable var : vars) {
                            if (!var.isImplicit() && !var.isStatic()) {
                               children.add(new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, field.getProgramVariable(), getVariable().getAdditionalCondition()));

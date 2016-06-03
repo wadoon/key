@@ -137,7 +137,7 @@ public class ProofObligationVars {
      * @return  the generated variable.
      */
     private Term buildExceptionParameter(Services services) {
-        JavaInfo javaInfo = services.getJavaInfo();
+        JavaInfo javaInfo = services.getJavaServices().getJavainfo();
         final KeYJavaType eType =
             javaInfo.getTypeByClassName("java.lang.Exception");
         final ProgramElementName ePEN = new ProgramElementName("e");

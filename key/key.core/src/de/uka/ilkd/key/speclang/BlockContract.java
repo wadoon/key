@@ -445,7 +445,7 @@ public interface BlockContract extends SpecificationElement {
 
         private ProgramVariable createFlag(final String name)
         {
-            return createVariable(name, services.getJavaInfo().getKeYJavaType("boolean"));
+            return createVariable(name, services.getJavaServices().getJavainfo().getKeYJavaType("boolean"));
         }
 
         private Map<LocationVariable, LocationVariable> createRemembranceHeaps()

@@ -135,7 +135,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
          if (!args.isEmpty()) {
             throw new IllegalArgumentException("Empty argument list expected.");
          }
-         IProgramMethod pm = services.getJavaInfo().getProgramMethod(type.getKeYJavaType(), method.toString(), ImmutableSLList.<Type>nil(), type.getKeYJavaType());
+         IProgramMethod pm = services.getJavaServices().getJavainfo().getProgramMethod(type.getKeYJavaType(), method.toString(), ImmutableSLList.<Type>nil(), type.getKeYJavaType());
          return new DefaultProofReference<IProgramMethod>(IProofReference.CALL_METHOD, node, pm);
       }
    }

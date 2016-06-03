@@ -55,7 +55,7 @@ public final class KeYTypeUtil {
    public static boolean isInnerType(Services services, KeYJavaType type) {
       String parentName = getParentName(services, type);
       if (parentName != null) {
-         return !services.getJavaInfo().isPackage(parentName);
+         return !services.getJavaServices().getJavainfo().isPackage(parentName);
       }
       else {
          return false; // Normal class in default package
@@ -83,7 +83,7 @@ public final class KeYTypeUtil {
       if (lastSeparator >= 0) {
          String parentName = fullName.substring(0, lastSeparator);
          // Check if parentName is existing package or type (required for anonymous classes that have multiple numbers like ClassContainer.DefaultChildClass.23543334.10115480)
-         if (services.getJavaInfo().isPackage(parentName)) {
+         if (services.getJavaServices().getJavainfo().isPackage(parentName)) {
             return parentName;
          }
          else if (isType(services, parentName)) {
@@ -116,7 +116,7 @@ public final class KeYTypeUtil {
     */
    public static KeYJavaType getType(Services services, String fullName) {
       try {
-         return services.getJavaInfo().getKeYJavaType(fullName); 
+         return services.getJavaServices().getJavainfo().getKeYJavaType(fullName); 
       }
       catch (Exception e) {
          return null; // RuntimeException is thrown if type not exist.
@@ -152,7 +152,7 @@ public final class KeYTypeUtil {
     */
    public static IProgramMethod findExplicitConstructor(Services services, final IProgramMethod implicitConstructor) {
       if (services != null && implicitConstructor != null) {
-         ImmutableList<IProgramMethod> pms = services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
+         ImmutableList<IProgramMethod> pms = services.getJavaServices().getJavainfo().getConstructors(implicitConstructor.getContainerType());
          return CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
             @Override
             public boolean select(IProgramMethod element) {

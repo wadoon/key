@@ -89,7 +89,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
         this.brk = brk;
         this.returnExpr = returnExpr;
         this.breakList = breakList;
-        this.javaInfo = this.services.getJavaInfo();
+        this.javaInfo = this.services.getJavaServices().getJavainfo();
     }
 
     /**

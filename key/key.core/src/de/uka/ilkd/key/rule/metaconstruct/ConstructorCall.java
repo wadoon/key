@@ -134,7 +134,7 @@ public class ConstructorCall extends ProgramTransformer {
 	final ArrayList<Statement> evaluatedArgs = new ArrayList<Statement>();
 
 	int j=0;
-	if(services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType)!=null){
+	if(services.getJavaServices().getJavainfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType)!=null){
 	    j=1;
 	}
 	final ProgramVariable[] argumentVariables =
@@ -147,11 +147,11 @@ public class ConstructorCall extends ProgramTransformer {
 	}
 
 	if ( j == 1 ) {
-            Sort s = services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType).sort();
+            Sort s = services.getJavaServices().getJavainfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType).sort();
 	    Expression enclosingThis = (Expression) (constructorReference.getReferencePrefix() instanceof Expression?
 	            constructorReference.getReferencePrefix() :
-                        services.getTypeConverter().convertToProgramElement(
-                                services.getTypeConverter().findThisForSort(s, ec)));
+                        services.getJavaServices().getTypeconverter().convertToProgramElement(
+                                services.getJavaServices().getTypeconverter().findThisForSort(s, ec)));
 	    argumentVariables[argumentVariables.length-1] =
 	        EvaluateArgs.evaluate(enclosingThis, evaluatedArgs,
 	                        services, ec);
@@ -161,7 +161,7 @@ public class ConstructorCall extends ProgramTransformer {
 	//(deliberately using classType itself as the "context type", in order
 	//to allow public calls to private init methods)
 	final MethodBodyStatement mbs = KeYJavaASTFactory.methodBody(
-		services.getJavaInfo(), null, newObject, classType,
+		services.getJavaServices().getJavainfo(), null, newObject, classType,
 		NORMALFORM_IDENTIFIER, argumentVariables);
 
 	Debug.assertTrue(mbs != null, "Call to non-existent constructor.");

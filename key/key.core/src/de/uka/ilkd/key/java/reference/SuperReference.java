@@ -179,7 +179,7 @@ public class SuperReference extends JavaNonTerminalProgramElement
      * returns the KeYJavaType 
      */
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getSuperclass
+	return javaServ.getJavaServices().getJavainfo().getSuperclass
 	    (ec.getTypeReference().getKeYJavaType());
     }
 

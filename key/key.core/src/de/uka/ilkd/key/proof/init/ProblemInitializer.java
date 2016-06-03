@@ -268,11 +268,10 @@ public final class ProblemInitializer {
     private void readJava(EnvInput envInput, InitConfig initConfig) 
                 throws ProofInputException {
         //this method must only be called once per init config
-        assert !initConfig.getServices()
-                          .getJavaInfo()
+        assert !initConfig.getServices().getJavaServices().getJavainfo()
                           .rec2key()
                           .parsedSpecial();
-        assert initConfig.getServices().getJavaModel() == null;
+        assert initConfig.getServices().getJavaServices().getJavaModel() == null;
 
         //read Java source and classpath settings
         envInput.setInitConfig(initConfig);
@@ -297,8 +296,7 @@ public final class ProblemInitializer {
         if(javaPath != null) {
             reportStatus("Reading Java source");
             final ProjectSettings settings 
-                =  initConfig.getServices()
-                             .getJavaInfo()
+                =  initConfig.getServices().getJavaServices().getJavainfo()
                              .getKeYProgModelInfo()
                              .getServConf()
                              .getProjectSettings();
@@ -314,11 +312,11 @@ public final class ProblemInitializer {
             r2k.parseSpecialClasses();
         }
         File initialFile = envInput.getInitialFile();
-        initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,
-                                                                        classPath,
-                                                                        bootClassPath,
-                                                                        includes,
-                                                                        initialFile));
+        initConfig.getServices().getJavaServices().setJavaModel(JavaModel.createJavaModel(javaPath,
+        classPath,
+        bootClassPath,
+        includes,
+        initialFile));
     }
     
     /**
@@ -507,7 +505,7 @@ public final class ProblemInitializer {
         readJava(envInput, initConfig);
 
         //register function and predicate symbols defined by Java program
-        final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+        final JavaInfo javaInfo = initConfig.getServices().getJavaServices().getJavainfo();
         final Namespace functions 
         = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 

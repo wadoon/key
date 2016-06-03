@@ -77,7 +77,7 @@ public final class EnumConstantValue extends AbstractTermTransformer {
             }
 
 	    final IntLiteral valueLiteral = KeYJavaASTFactory.intLiteral(value);
-	    term = services.getTypeConverter().convertToLogicElement(
+	    term = services.getJavaServices().getTypeconverter().convertToLogicElement(
 		    valueLiteral);
         }   
 

@@ -356,7 +356,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
       }
       String className = value.substring(0, classMethodSeparator);
       String signature = value.substring(classMethodSeparator + 1);
-      JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+      JavaInfo javaInfo = initConfig.getServices().getJavaServices().getJavainfo();
       // Split signature in name and parameter type names
       int breaketsStart = signature.indexOf("(");
       if (breaketsStart < 0) {

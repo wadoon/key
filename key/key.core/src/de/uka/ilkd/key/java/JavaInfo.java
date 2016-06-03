@@ -183,7 +183,7 @@ public final class JavaInfo {
      * logic equivalent
      */
     private TypeConverter getTypeConverter() {
-        return services.getTypeConverter();
+        return services.getJavaServices().getTypeconverter();
     }
 
     /**

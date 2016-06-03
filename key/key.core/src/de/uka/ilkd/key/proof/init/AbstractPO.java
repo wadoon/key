@@ -73,7 +73,7 @@ public abstract class AbstractPO implements IPersistablePO {
                       String name) {
         this.environmentConfig = initConfig;
         this.environmentServices = initConfig.getServices();
-        this.javaInfo = initConfig.getServices().getJavaInfo();
+        this.javaInfo = initConfig.getServices().getJavaServices().getJavainfo();
         this.heapLDT = initConfig.getServices().getTheories().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();
         this.name = name;
@@ -331,7 +331,7 @@ public abstract class AbstractPO implements IPersistablePO {
         if (proofConfig == null) {
             proofConfig = environmentConfig.deepCopy();
         }
-        final JavaModel javaModel = proofConfig.getServices().getJavaModel();
+        final JavaModel javaModel = proofConfig.getServices().getJavaServices().getJavaModel();
         createProofHeader(javaModel.getModelDir(),
                           javaModel.getClassPath(),
                           javaModel.getBootClassPath(),

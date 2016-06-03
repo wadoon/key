@@ -78,7 +78,7 @@ public class SwitchToIf extends ProgramTransformer {
 	Label l = new ProgramElementName("_l"+(labelCount++));
 	Break newBreak = KeYJavaASTFactory.breakStatement(l);
 
-	VariableNamer varNamer = services.getVariableNamer();
+	VariableNamer varNamer = services.getJavaServices().getInnerVarNamer();
 	ProgramElementName name = varNamer.getTemporaryNameProposal("_var");
 
 	Statement[] ifs = new Statement[sw.getBranchCount()];
@@ -139,7 +139,7 @@ public class SwitchToIf extends ProgramTransformer {
     
     private Statement[] mkIfNullCheck(Services services, ProgramVariable var) {
 	final New exception = KeYJavaASTFactory
-		.newOperator(services.getJavaInfo().getKeYJavaType(
+		.newOperator(services.getJavaServices().getJavainfo().getKeYJavaType(
 			"java.lang.NullPointerException"));
 	Throw t = KeYJavaASTFactory.throwClause(exception);
         

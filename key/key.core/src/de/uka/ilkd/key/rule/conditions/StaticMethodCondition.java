@@ -91,7 +91,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 		= svInst.getContextInstantiation().activeStatementContext();
 	    MethodReference mr =new MethodReference(ar, mn, rp);
 	    IProgramMethod method = null;
-	    KeYJavaType prefixType = services.getTypeConverter().
+	    KeYJavaType prefixType = services.getJavaServices().getTypeconverter().
 		getKeYJavaType((Expression) rp, ec);
 	    if((rp instanceof LocationVariable) &&
 	       (((LocationVariable) rp).sort() instanceof NullSort)){

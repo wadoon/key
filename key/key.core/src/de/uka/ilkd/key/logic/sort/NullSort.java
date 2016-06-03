@@ -68,7 +68,7 @@ public final class NullSort implements Sort  {
     @Override
     public ImmutableSet<Sort> extendsSorts(Services services) {
 	assert services != null;
-	assert objectSort == services.getJavaInfo().objectSort();
+	assert objectSort == services.getJavaServices().getJavainfo().objectSort();
 	
 	ImmutableSet<Sort> result = extCache.get();
 	if(result == null || lastServices.get() != services) {

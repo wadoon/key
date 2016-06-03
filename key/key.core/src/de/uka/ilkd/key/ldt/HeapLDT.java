@@ -355,7 +355,7 @@ public final class HeapLDT extends LDT {
     public Function getFieldSymbolForPV(LocationVariable fieldPV, 
 	    				Services services) {
 	assert fieldPV.isMember();	
-	assert fieldPV != services.getJavaInfo().getArrayLength();
+	assert fieldPV != services.getJavaServices().getJavainfo().getArrayLength();
 	
 	final Name name = new Name(getFieldSymbolName(fieldPV));
 	Function result = (Function) services.getNamespaces()
@@ -490,7 +490,7 @@ public final class HeapLDT extends LDT {
     		}
     		return new FieldReference(field, prefix);
     	} else if (t.sort() == getFieldSort() && t.op() instanceof Function && ((Function) t.op()).isUnique()) {
-    		return services.getJavaInfo().getAttribute(getPrettyFieldName(t.op()), getClassName((Function) t.op()));
+    		return services.getJavaServices().getJavainfo().getAttribute(getPrettyFieldName(t.op()), getClassName((Function) t.op()));
     	}
     	throw new IllegalArgumentException("Could not translate " + ProofSaver.printTerm(t, null) + " to program.");
     }

@@ -221,7 +221,7 @@ public final class DLSpecFactory {
 	assert inv != null;
 
 	final KeYJavaType kjt 
-		= services.getJavaInfo().getKeYJavaType(selfVar.sort());
+		= services.getJavaServices().getJavainfo().getKeYJavaType(selfVar.sort());
 	assert kjt != null;
 
 	return new ClassInvariantImpl(name, 

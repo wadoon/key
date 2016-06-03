@@ -62,9 +62,9 @@ public class PostWork extends ProgramTransformer {
 	                (ProgramVariable) svInst.getInstantiation((SchemaVariable)body())
 	                : (ProgramVariable)body();
 
-	final ProgramVariable initialized = services.getJavaInfo().getAttribute
+	final ProgramVariable initialized = services.getJavaServices().getJavainfo().getAttribute
 	    (ImplicitFieldAdder.IMPLICIT_INITIALIZED,
-             services.getJavaInfo().getJavaLangObject());
+             services.getJavaServices().getJavainfo().getJavaLangObject());
 	return KeYJavaASTFactory.assign(
 		KeYJavaASTFactory.fieldReference(newObject, initialized),
 		BooleanLiteral.TRUE);

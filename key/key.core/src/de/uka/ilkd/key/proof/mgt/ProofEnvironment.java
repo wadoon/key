@@ -49,7 +49,7 @@ public class ProofEnvironment {
    /** retrieves the java model underlying this environment.
     */
    public JavaModel getJavaModel() {
-      return initConfig.getServices().getJavaModel();
+      return initConfig.getServices().getJavaServices().getJavaModel();
    }
 
 

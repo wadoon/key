@@ -271,9 +271,9 @@ public class TestDeclParser extends TestCase {
 		   "  aSort[][] f(aSort);\n" +
 		   "}\n");
 	Sort aSort = (Sort)nss.sorts().lookup(new Name("aSort"));
-	Sort objectSort = serv.getJavaInfo().objectSort();
-	Sort cloneableSort = serv.getJavaInfo().cloneableSort();
-        Sort serializableSort = serv.getJavaInfo().serializableSort();
+	Sort objectSort = serv.getJavaServices().getJavainfo().objectSort();
+	Sort cloneableSort = serv.getJavaServices().getJavainfo().cloneableSort();
+        Sort serializableSort = serv.getJavaServices().getJavainfo().serializableSort();
 	Sort aSortArr = ArraySort.getArraySort(aSort, objectSort, cloneableSort, serializableSort);
 	Sort aSortArr2 = ArraySort.getArraySort(aSortArr, objectSort, cloneableSort, serializableSort);
 	assertTrue("aSort[] should extend Cloneable: " + aSortArr.extendsSorts(), 
@@ -304,9 +304,9 @@ public class TestDeclParser extends TestCase {
 	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
 	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
 
-        Sort objectSort = serv.getJavaInfo().objectSort();
-        Sort cloneableSort = serv.getJavaInfo().cloneableSort();
-        Sort serializableSort = serv.getJavaInfo().serializableSort();
+        Sort objectSort = serv.getJavaServices().getJavainfo().objectSort();
+        Sort cloneableSort = serv.getJavaServices().getJavainfo().cloneableSort();
+        Sort serializableSort = serv.getJavaServices().getJavainfo().serializableSort();
         
 	assertEquals("find head function", new Name("head"),
 		     nss.functions().lookup(new Name("head")).name());

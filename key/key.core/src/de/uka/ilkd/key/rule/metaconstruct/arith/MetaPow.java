@@ -55,7 +55,7 @@ public final class MetaPow extends AbstractTermTransformer {
     	
     	IntLiteral lit = new IntLiteral(result.toString());
 
-    	return services.getTypeConverter().convertToLogicElement(lit);
+    	return services.getJavaServices().getTypeconverter().convertToLogicElement(lit);
 
     }
 }

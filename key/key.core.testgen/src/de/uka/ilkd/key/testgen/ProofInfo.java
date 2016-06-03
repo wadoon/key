@@ -164,8 +164,8 @@ public class ProofInfo {
 		
 		Sort s = c.sort();
 		
-		Sort nullSort = services.getJavaInfo().getNullType().getSort();
-		Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
+		Sort nullSort = services.getJavaServices().getJavainfo().getNullType().getSort();
+		Sort objSort = services.getJavaServices().getJavainfo().getJavaLangObject().getSort();
 		Sort intSort = services.getTheories().getIntegerLDT().targetSort();
 		Sort boolSort = services.getTheories().getBooleanLDT().targetSort();
 		

@@ -222,7 +222,7 @@ public class Monomial {
         }
         
         final IntLiteral lit = new IntLiteral ( coefficient.toString () );
-        final Term cTerm = services.getTypeConverter ().convertToLogicElement ( lit );
+        final Term cTerm = services.getJavaServices().getTypeconverter().convertToLogicElement ( lit );
 
         if ( res == null )
             res = cTerm;

@@ -654,7 +654,7 @@ public final class JMLTranslator {
                     throw excManager.createException("body of \\min expression must be integer type");
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
                 final Term min = tb.min(qvs, tb.andSC(tr, guard), body, services);
-                final KeYJavaType type = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                final KeYJavaType type = services.getJavaServices().getTypeconverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
                 final SLExpression result = new SLExpression(min,type);
 
@@ -712,7 +712,7 @@ public final class JMLTranslator {
                     throw excManager.createException("body of \\max expression must be integer type");
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
                 final Term max = tb.max(qvs, tb.andSC(tr, guard), body, services);
-                final KeYJavaType type = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                final KeYJavaType type = services.getJavaServices().getTypeconverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
                 final SLExpression result = new SLExpression(max,type);
 
@@ -734,7 +734,7 @@ public final class JMLTranslator {
                 final Term t = (Term) params[2];
                 final Term t2 = (Term) params[3];
                 final Services services = (Services) params[4];
-                final JavaInfo javaInfo = services.getJavaInfo();
+                final JavaInfo javaInfo = services.getJavaServices().getJavainfo();
 
                 final Term restr = JMLTranslator.this.typerestrict(declVars.first, nullable, declVars.second, services);
                 final Term guard = t2==null? restr: tb.and(restr, t2);
@@ -786,7 +786,7 @@ public final class JMLTranslator {
                 }
                 Term resultTerm = tb.seqDef(qv, a.getTerm(), b.getTerm(), tt);
                 final KeYJavaType seqtype =
-                        services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
+                        services.getJavaServices().getJavainfo().getPrimitiveKeYJavaType("\\seq");
                 return new SLExpression(resultTerm, seqtype);
             }
         });
@@ -849,7 +849,7 @@ public final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class);
                 final Services services = (Services)params[0];
-                IObserverFunction inv = services.getJavaInfo().getInv();
+                IObserverFunction inv = services.getJavaServices().getJavainfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
                 return new SLExpression(tb.func(inv, tb.getBaseHeap(), obj));
             }
@@ -938,7 +938,7 @@ public final class JMLTranslator {
                 final Services services = (Services)params[0];
                 final Term seq = ((SLExpression)params[1]).getTerm();
                 final Term elem = ((SLExpression)params[2]).getTerm();
-                final KeYJavaType inttype = services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                final KeYJavaType inttype = services.getJavaServices().getJavainfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
                 return new SLExpression(tb.indexOf(seq,elem),inttype);
             }
         });
@@ -965,7 +965,7 @@ public final class JMLTranslator {
                     }
                 }
                 final KeYJavaType seqtype =
-                        services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
+                        services.getJavaServices().getJavainfo().getPrimitiveKeYJavaType("\\seq");
                 return new SLExpression(tb.seq(terms), seqtype);
             }
         });
@@ -999,7 +999,7 @@ public final class JMLTranslator {
                 final Term seq1 = ((SLExpression) params[1]).getTerm();
                 final Term seq2 = ((SLExpression) params[2]).getTerm();
                 final KeYJavaType seqtype =
-                        services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
+                        services.getJavaServices().getJavainfo().getPrimitiveKeYJavaType("\\seq");
                 return new SLExpression(tb.seqConcat(seq1, seq2),
                                         seqtype);
             }
@@ -1054,7 +1054,7 @@ public final class JMLTranslator {
 
                 final LogicVariable objLV =
                         new LogicVariable(new Name("o"),
-                                          services.getJavaInfo().objectSort());
+                                          services.getJavaServices().getJavainfo().objectSort());
                 final LogicVariable stepsLV = e3 == null
                                               ? new LogicVariable(new Name("n"),
                                                       theories.getIntegerLDT().targetSort())
@@ -1077,7 +1077,7 @@ public final class JMLTranslator {
                         o2,
                         tb.var(fieldLV));
 
-                return new SLExpression(locSet, services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+                return new SLExpression(locSet, services.getJavaServices().getJavainfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
             }
         });
 
@@ -1107,7 +1107,7 @@ public final class JMLTranslator {
 	        }
 
 	        Term t = tb.tt();
-	        final Sort objectSort = services.getJavaInfo().objectSort();
+	        final Sort objectSort = services.getJavaServices().getJavainfo().objectSort();
 	        for(SLExpression expr: list) {
     	            if(!expr.isTerm()) {
 	                throw excManager.createException("Expected a term, but found: " + expr);
@@ -1322,7 +1322,7 @@ public final class JMLTranslator {
                         // This case might occur since boolean expressions
                         // get converted prematurely (see bug #1121).
                         // Just check whether there is a cast to boolean.
-                        if (type != services.getTypeConverter().getBooleanType()){
+                        if (type != services.getJavaServices().getTypeconverter().getBooleanType()){
                             throw excManager.createException("Cannot cast from boolean to "+type+".");
                         }
                     } else if(intHelper.isIntegerTerm(result)) {
@@ -1349,7 +1349,7 @@ public final class JMLTranslator {
                 SLExpression b = (SLExpression)params[3];
 
                 // handle cases where a and b are of sort FORMULA and boolean respectively (which are incompatible, unfortunately)
-                final KeYJavaType bool = services.getTypeConverter().getBooleanType();
+                final KeYJavaType bool = services.getJavaServices().getTypeconverter().getBooleanType();
                 Term aTerm = a.getType() == bool ? tb.convertToFormula(a.getTerm()) : a.getTerm();
                 Term bTerm = b.getType() == bool ? tb.convertToFormula(b.getTerm()) : b.getTerm();
 
@@ -1707,7 +1707,7 @@ public final class JMLTranslator {
 			public SLExpression translate(SLTranslationExceptionManager excManager,
 					Object... params) throws SLTranslationException {
 				checkParameters(params, Services.class);
-				final KeYJavaType t = ((Services)params[0]).getJavaInfo()
+				final KeYJavaType t = ((Services)params[0]).getJavaServices().getJavainfo()
 			               .getKeYJavaType(PrimitiveType.JAVA_INT);
 				return new SLExpression(tb.index(),t);
 			}});
@@ -1718,7 +1718,7 @@ public final class JMLTranslator {
 			public SLExpression translate(SLTranslationExceptionManager excManager,
 					Object... params) throws SLTranslationException {
 				checkParameters(params, Services.class);
-				final KeYJavaType t = ((Services)params[0]).getJavaInfo()
+				final KeYJavaType t = ((Services)params[0]).getJavaServices().getJavainfo()
 			               .getKeYJavaType(PrimitiveType.JAVA_SEQ);
 				return new SLExpression(tb.values(),t);
 			}});
@@ -1849,7 +1849,7 @@ public final class JMLTranslator {
      */
     SLExpression createSkolemExprObject(Token jmlKeyWord, Services services) {
         assert services != null;
-        final KeYJavaType objType = services.getJavaInfo().getJavaLangObject();
+        final KeYJavaType objType = services.getJavaServices().getJavainfo().getJavaLangObject();
         assert objType != null;
         return skolemExprHelper(jmlKeyWord, objType, services);
     }
@@ -1935,7 +1935,7 @@ public final class JMLTranslator {
     }
 
     private SLExpression skolemExprHelper(Token jmlKeyWord, PrimitiveType type, Services services) {
-        final KeYJavaType kjt = services.getJavaInfo().getPrimitiveKeYJavaType(type);
+        final KeYJavaType kjt = services.getJavaServices().getJavainfo().getPrimitiveKeYJavaType(type);
         return skolemExprHelper(jmlKeyWord,kjt,services);
     }
 
@@ -2043,13 +2043,13 @@ public final class JMLTranslator {
             KeYJavaType resultType = (KeYJavaType) params[5];
             if (resultType == null) {
                 // quick fix. may happen with \num_of
-                resultType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                resultType = services.getJavaServices().getTypeconverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
             }
 
             for (LogicVariable lv : declVars) {
                 preTerm = tb.and(preTerm,
                                  tb.reachableValue(tb.var(lv), declsType));
-                if (lv.sort().extendsTrans(services.getJavaInfo().objectSort())
+                if (lv.sort().extendsTrans(services.getJavaServices().getJavainfo().objectSort())
                     && !nullable) {
                     final Term nonNull = arrayDepth > 0 ?
                             tb.deepNonNull(tb.var(lv), tb.zTerm(arrayDepth))
@@ -2186,7 +2186,7 @@ public final class JMLTranslator {
             assert services != null;
             KeYJavaType resultType = (KeYJavaType) params[5];
             if (resultType == null) // happens with num_of
-                resultType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                resultType = services.getJavaServices().getTypeconverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
             if (declsType instanceof PrimitiveType && ((PrimitiveType)declsType).isIntegerType())
                 return super.translate(excManager, params);
@@ -2386,7 +2386,7 @@ public final class JMLTranslator {
         public SLExpression translate (SLTranslationExceptionManager man, Object ... params ) throws SLTranslationException{
             checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
             JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((Services)params[0],man);
-            bigint = ((Services)params[0]).getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            bigint = ((Services)params[0]).getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
             SLExpression e1 = (SLExpression) params[1];
             SLExpression e2 = (SLExpression) params[2];
             checkNotType(e1,man);
@@ -2448,8 +2448,8 @@ public final class JMLTranslator {
                 Term resultTerm = tb.func(function, args, null);
                 final KeYJavaType type
                         = services.getTheories().getIntegerLDT().targetSort() == resultTerm.sort()
-                        ? services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
-                        : services.getJavaInfo().getKeYJavaType(resultTerm.sort());
+                        ? services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
+                        : services.getJavaServices().getJavainfo().getKeYJavaType(resultTerm.sort());
                 SLExpression result = type == null ? new SLExpression(resultTerm) : new SLExpression(resultTerm, type);
                 return result;
             } catch (TermCreationException ex) {

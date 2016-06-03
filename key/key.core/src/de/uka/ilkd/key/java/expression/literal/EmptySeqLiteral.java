@@ -50,7 +50,7 @@ public class EmptySeqLiteral extends Literal {
 
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+	return javaServ.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }
 
     @Override

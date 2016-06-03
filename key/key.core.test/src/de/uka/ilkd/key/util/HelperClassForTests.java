@@ -288,7 +288,7 @@ public class HelperClassForTests {
     public static IProgramMethod searchProgramMethod(Services services, 
                                                      String containerTypeName, 
                                                      final String methodFullName) {
-       JavaInfo javaInfo = services.getJavaInfo();
+       JavaInfo javaInfo = services.getJavaServices().getJavainfo();
        KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
        Assert.assertNotNull(containerKJT);
        ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);

@@ -116,7 +116,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
                      exceptionNodes.add(node);
                      exceptionParentNodes.add(SETParent);
                   }else if(suspendOnSubclasses){
-                     JavaInfo info = proof.getServices().getJavaInfo();
+                     JavaInfo info = proof.getServices().getJavaServices().getJavainfo();
                      KeYJavaType kjt = locVar.getKeYJavaType();
                      ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
                      for(KeYJavaType kjtloc: kjts){

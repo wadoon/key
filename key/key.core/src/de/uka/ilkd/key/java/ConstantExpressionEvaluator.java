@@ -57,7 +57,7 @@ public class ConstantExpressionEvaluator {
     public KeYJavaType getCompileTimeConstantType(Expression expr) {	
 	recoder.abstraction.Type javaType = getRecoderConstantEvaluator().
 	    getCompileTimeConstantType(parseExpression(expr));
-	return services.getJavaInfo().getKeYJavaType
+	return services.getJavaServices().getJavainfo().getKeYJavaType
 	    (javaType.getFullName());
     }
 
@@ -65,7 +65,7 @@ public class ConstantExpressionEvaluator {
     private ConstantEvaluator getRecoderConstantEvaluator() {
 	if (recCe == null) {
 	    KeYCrossReferenceServiceConfiguration servConf = 
-		services.getJavaInfo().getKeYProgModelInfo().getServConf();
+		services.getJavaServices().getJavainfo().getKeYProgModelInfo().getServConf();
 	    recCe = new DefaultConstantEvaluator(servConf);
 	}
 	return recCe;

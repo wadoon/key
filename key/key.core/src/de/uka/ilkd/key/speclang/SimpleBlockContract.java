@@ -1005,7 +1005,7 @@ public final class SimpleBlockContract implements BlockContract {
             Term result = tt();
             if (flag != null) {
                 result = imp(
-                    equals(services.getTypeConverter().convertToLogicElement(flag), TRUE()),
+                    equals(services.getJavaServices().getTypeconverter().convertToLogicElement(flag), TRUE()),
                     postcondition == null ? tt() : postcondition
                 );
             }

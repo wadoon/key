@@ -308,7 +308,7 @@ public class TestMatchTaclet extends TestCase {
     public void testUpdateMatch() {           
 	LocationVariable i 
 	   = new LocationVariable(new ProgramElementName("i"), 
-	        	          services.getJavaInfo().getKeYJavaType("int"));
+	        	          services.getJavaServices().getJavainfo().getKeYJavaType("int"));
 	services.getNamespaces().programVariables().add(i);
 	Term match = TacletForTests.parseTerm("\\<{}\\>{i:=2}(\\forall nat z; (q1(z)))");
 	match = match.sub(0);

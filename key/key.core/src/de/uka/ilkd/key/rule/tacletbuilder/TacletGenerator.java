@@ -653,7 +653,7 @@ public class TacletGenerator {
         final ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil()
                  .append(target.getParamTypes().toArray(new KeYJavaType[target.getNumParams()]));
         final IProgramMethod targetImpl
-            = services.getJavaInfo().getProgramMethod(kjt, ((ProgramMethod)target).getName(), sig, kjt);
+            = services.getJavaServices().getJavainfo().getProgramMethod(kjt, ((ProgramMethod)target).getName(), sig, kjt);
 
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl,
             selfProgSV, resultProgSV,

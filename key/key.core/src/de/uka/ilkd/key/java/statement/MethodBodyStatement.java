@@ -282,10 +282,10 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     private void resolveMethod(Services services) {
-        method = services.getJavaInfo().
+        method = services.getJavaServices().getJavainfo().
         getProgramMethod(getBodySource(), 
                          methodReference.getName(), 
-                         services.getJavaInfo().
+                         services.getJavaServices().getJavainfo().
                          createSignature(methodReference.getArguments()),
                          getBodySource());        
     }

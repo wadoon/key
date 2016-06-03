@@ -325,7 +325,7 @@ public final class ProofManagementDialog extends JDialog {
         IObserverFunction selectedTarget = null;
 
         Services servicesLocal = initConfig.getServices();
-        Set<KeYJavaType> kjts = servicesLocal.getJavaInfo().getAllKeYJavaTypes();
+        Set<KeYJavaType> kjts = servicesLocal.getJavaServices().getJavainfo().getAllKeYJavaTypes();
         final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
         Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
                     @Override
@@ -578,7 +578,7 @@ public final class ProofManagementDialog extends JDialog {
         SpecificationRepository specRepos = services.getSpecificationRepository();
         
        
-        Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+        Set<KeYJavaType> kjts = services.getJavaServices().getJavainfo().getAllKeYJavaTypes();
         for (KeYJavaType kjt : kjts) {
             ImmutableSet<IObserverFunction> targets = specRepos.getContractTargets(kjt);
             for (IObserverFunction target : targets) {

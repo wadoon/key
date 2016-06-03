@@ -413,7 +413,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		fieldSort = services.getTheories().getHeapLDT().getFieldSort();
 		locsetSort = services.getTheories().getLocSetLDT().targetSort();
 		boolSort = services.getTheories().getBooleanLDT().targetSort();		
-		objectSort = services.getJavaInfo().getJavaLangObject().getSort();		
+		objectSort = services.getJavaServices().getJavainfo().getJavaLangObject().getSort();		
 		cc = new ConstantCounter();
 	}
 
@@ -812,7 +812,7 @@ public class SMTObjTranslator implements SMTTranslator {
 				// System.err.println(single);
 				typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)),
 				        selectArr);
-				Sort singleSort = services.getJavaInfo().getKeYJavaType(single)
+				Sort singleSort = services.getJavaServices().getJavainfo().getKeYJavaType(single)
 				        .getSort();
 				addTypePredicate(singleSort);
 				SMTFunction tps = getTypePredicate(singleSort.name().toString());
@@ -1101,7 +1101,7 @@ public class SMTObjTranslator implements SMTTranslator {
 
 	private void addSingleSort(Set<Sort> sorts, Sort s) {
 	    String name = s.name().toString();
-	    JavaInfo javaInfo = services.getJavaInfo();
+	    JavaInfo javaInfo = services.getJavaServices().getJavainfo();
 	    Sort object = javaInfo.getJavaLangObject().getSort();
 		Sort nullSort = services.getTheories().getHeapLDT().getNull()
 		        .sort();
@@ -1112,7 +1112,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	    //if array type- add element type
 	    if(name.endsWith("[]")){
 	    	String single = name.substring(0, name.length() - 2);
-	    	Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
+	    	Sort singleSort = services.getJavaServices().getJavainfo().getKeYJavaType(single).getSort();
 	    	addSingleSort(sorts, singleSort);
 	    }
     }
@@ -1584,7 +1584,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	}
 
 	private boolean isFinal(Sort s) {
-	    KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
+	    KeYJavaType kjt = services.getJavaServices().getJavainfo().getKeYJavaType(s);
 	    boolean finalClass = kjt != null
 	            && kjt.getJavaType() instanceof ClassDeclaration
 	            && ((ClassDeclaration) kjt.getJavaType()).isFinal();
@@ -1719,7 +1719,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		// handle sort constants
 		if (fun.sort().equals(fieldSort) && subs.isEmpty()) {
 			name = name.replace("$", "");
-			JavaInfo info = services.getJavaInfo();
+			JavaInfo info = services.getJavaServices().getJavainfo();
 			Sort sort = info.getAttribute(name).getKeYJavaType().getSort();
 			fieldSorts.put(name, sort);
 			types.putFieldType(Util.processName(name), translateSort(sort));
@@ -1924,7 +1924,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @return true if s is an interface
 	 */
 	private boolean isInterface(Sort s) {
-		KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
+		KeYJavaType kjt = services.getJavaServices().getJavainfo().getKeYJavaType(s);
 		if (kjt == null) {
 			return false;
 		}

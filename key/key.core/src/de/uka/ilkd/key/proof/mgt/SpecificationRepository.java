@@ -262,8 +262,7 @@ public final class SpecificationRepository {
         // search through all locally available methods
         final String name = pm.getMethodDeclaration().getName();
         final int numParams = pm.getParameterDeclarationCount();
-        final ImmutableList<IProgramMethod> candidatePMs = services
-                .getJavaInfo().getAllProgramMethods(kjt);
+        final ImmutableList<IProgramMethod> candidatePMs = services.getJavaServices().getJavainfo().getAllProgramMethods(kjt);
         outer: for (IProgramMethod candidatePM : candidatePMs) {
             if (candidatePM.getMethodDeclaration().getName().equals(name)
                     && candidatePM.getParameterDeclarationCount() == numParams) {
@@ -279,7 +278,7 @@ public final class SpecificationRepository {
 
         // not found (happens for private methods of superclasses)
         // -> search through superclasses
-        for (KeYJavaType sup : services.getJavaInfo().getAllSupertypes(kjt)
+        for (KeYJavaType sup : services.getJavaServices().getJavainfo().getAllSupertypes(kjt)
                 .removeAll(kjt)) {
             final IProgramMethod result = (IProgramMethod) getCanonicalFormForKJT(
                     obs, sup);
@@ -305,7 +304,7 @@ public final class SpecificationRepository {
         }
 
         assert kjt != null;
-        final JavaInfo javaInfo = services.getJavaInfo();
+        final JavaInfo javaInfo = services.getJavaServices().getJavainfo();
         for (KeYJavaType sub : javaInfo.getAllSubtypes(kjt)) {
             assert sub != null;
             final IProgramMethod subPM = (IProgramMethod) getCanonicalFormForKJT(
@@ -324,7 +323,7 @@ public final class SpecificationRepository {
         } else {
             ImmutableSet<Pair<KeYJavaType, IObserverFunction>> result = DefaultImmutableSet
                     .<Pair<KeYJavaType, IObserverFunction>> nil();
-            for (KeYJavaType sub : services.getJavaInfo().getAllSubtypes(kjt)) {
+            for (KeYJavaType sub : services.getJavaServices().getJavainfo().getAllSubtypes(kjt)) {
                 result = result.add(new Pair<KeYJavaType, IObserverFunction>(
                         sub, target));
             }
@@ -359,7 +358,7 @@ public final class SpecificationRepository {
             if (name.contains(".")) {
                 final String enclosingName = name.substring(0,
                         name.lastIndexOf("."));
-                final KeYJavaType result = services.getJavaInfo()
+                final KeYJavaType result = services.getJavaServices().getJavainfo()
                         .getTypeByName(enclosingName);
                 return result;
             } else {
@@ -466,7 +465,7 @@ public final class SpecificationRepository {
         } else if (contract instanceof DependencyContract
                 && contract.getOrigVars().atPres.isEmpty()
                 && targetMethod.getContainerType().equals(
-                        services.getJavaInfo().getJavaLangObject())) {
+                        services.getJavaServices().getJavainfo().getJavaLangObject())) {
             // Create or extend a well-definedness check for a class invariant
             final Term deps = contract.getAccessible(services
             .getTheories().getHeapLDT().getHeap());
@@ -552,7 +551,7 @@ public final class SpecificationRepository {
                 throws SLTranslationException {
         if (!kjt.equals(inv.getKJT()))
             inv = inv.setKJT(kjt);
-        for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
+        for (IProgramMethod pm : services.getJavaServices().getJavainfo().getConstructors(kjt)) {
             if (!JMLInfoExtractor.isHelper(pm)) {
                 final ImmutableSet<Contract> oldContracts = getContracts(kjt,
                         pm);
@@ -946,8 +945,7 @@ public final class SpecificationRepository {
      */
     public void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
-        final IObserverFunction target = inv.isStatic() ? services
-                .getJavaInfo().getStaticInv(kjt) : services.getJavaInfo()
+        final IObserverFunction target = inv.isStatic() ? services.getJavaServices().getJavainfo().getStaticInv(kjt) : services.getJavaServices().getJavainfo()
                 .getInv();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
         final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(kjt);
@@ -971,13 +969,11 @@ public final class SpecificationRepository {
         // inherit non-private, non-static invariants
         if (!inv.isStatic()
                 && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
-            final ImmutableList<KeYJavaType> subs = services.getJavaInfo()
+            final ImmutableList<KeYJavaType> subs = services.getJavaServices().getJavainfo()
                     .getAllSubtypes(kjt);
             for (KeYJavaType sub : subs) {
                 ClassInvariant subInv = inv.setKJT(sub);
-                final IObserverFunction subTarget = subInv.isStatic() ? services
-                        .getJavaInfo().getStaticInv(sub) : services
-                        .getJavaInfo().getInv();
+                final IObserverFunction subTarget = subInv.isStatic() ? services.getJavaServices().getJavainfo().getStaticInv(sub) : services.getJavaServices().getJavainfo().getInv();
                 invs.put(sub, getClassInvariants(sub).add(subInv));
                 final ImmutableSet<ClassWellDefinedness> subCwds = getWdClassChecks(sub);
                 if (subCwds.isEmpty()) {
@@ -1014,8 +1010,7 @@ public final class SpecificationRepository {
             for (InitiallyClause inv : initiallyClauses.get(kjt)) {
                 createContractsFromInitiallyClause(inv, kjt);
                 if (VisibilityModifier.allowsInheritance(inv.getVisibility())) {
-                    final ImmutableList<KeYJavaType> subs = services
-                            .getJavaInfo().getAllSubtypes(kjt);
+                    final ImmutableList<KeYJavaType> subs = services.getJavaServices().getJavainfo().getAllSubtypes(kjt);
                     for (KeYJavaType sub : subs) {
                         createContractsFromInitiallyClause(inv, sub);
                     }
@@ -1068,10 +1063,10 @@ public final class SpecificationRepository {
                 }
             }
 
-            final JavaInfo ji = services.getJavaInfo();
+            final JavaInfo ji = services.getJavaServices().getJavainfo();
 
             // add invariant axiom for own class and other final classes
-            for (KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
+            for (KeYJavaType kjt : services.getJavaServices().getJavainfo().getAllKeYJavaTypes()) {
                 if (kjt != selfKjt && !ji.isFinal(kjt)) continue; // only final classes
                 if (kjt != selfKjt && JavaInfo.isPrivate(kjt)) continue; // only non-private classes
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
@@ -1082,7 +1077,7 @@ public final class SpecificationRepository {
                 }
                 invDef = tb.tf().createTerm(Equality.EQV,
                         tb.inv(tb.var(selfVar)), invDef);
-                final IObserverFunction invSymbol = services.getJavaInfo().getInv();
+                final IObserverFunction invSymbol = services.getJavaServices().getJavainfo().getInv();
                 
                 final ClassAxiom invRepresentsAxiom
                 = new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(),
@@ -1097,10 +1092,10 @@ public final class SpecificationRepository {
                 result = result.add(invRepresentsAxiom);
             }
             // add query axioms for own class
-            for (IProgramMethod pm : services.getJavaInfo()
+            for (IProgramMethod pm : services.getJavaServices().getJavainfo()
                     .getAllProgramMethods(selfKjt)) {
                 if (!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit() && !pm.isModel()) {
-                    pm = services.getJavaInfo().getToplevelPM(selfKjt, pm);
+                    pm = services.getJavaServices().getJavainfo().getToplevelPM(selfKjt, pm);
 
                     StringBuffer sb = new StringBuffer();
                     for (KeYJavaType pd : pm.getParamTypes()) {
@@ -1132,11 +1127,11 @@ public final class SpecificationRepository {
 
     private ImmutableSet<ClassAxiom> getModelMethodAxioms() {
         ImmutableSet<ClassAxiom> result  = DefaultImmutableSet.<ClassAxiom>nil();
-        for(KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
-            for(IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
+        for(KeYJavaType kjt : services.getJavaServices().getJavainfo().getAllKeYJavaTypes()) {
+            for(IProgramMethod pm : services.getJavaServices().getJavainfo().getAllProgramMethods(kjt)) {
                 final ProgramVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
                 if(!pm.isVoid() && pm.isModel()) {
-                    pm = services.getJavaInfo().getToplevelPM(kjt, pm);
+                    pm = services.getJavaServices().getJavainfo().getToplevelPM(kjt, pm);
                     ImmutableList<ProgramVariable> paramVars = tb.paramVars(pm, false);
                     Map<LocationVariable,ProgramVariable> atPreVars =
                             new LinkedHashMap<LocationVariable,ProgramVariable>();
@@ -1154,7 +1149,7 @@ public final class SpecificationRepository {
                             ImmutableSLList.<FunctionalOperationContract>nil();
                     ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
                     ImmutableList<KeYJavaType> superTypes =
-                            services.getJavaInfo().getAllSupertypes(kjt);
+                            services.getJavaServices().getJavainfo().getAllSupertypes(kjt);
                     for(KeYJavaType superType : superTypes) {
                         for(FunctionalOperationContract fop : cs) {
                             if(fop.getSpecifiedIn().equals(superType)) {
@@ -1230,7 +1225,7 @@ public final class SpecificationRepository {
             }
             // inherit represents clauses to subclasses and conjoin together
             if (VisibilityModifier.allowsInheritance(ax.getVisibility())) {
-                final ImmutableList<KeYJavaType> subs = services.getJavaInfo()
+                final ImmutableList<KeYJavaType> subs = services.getJavaServices().getJavainfo()
                         .getAllSubtypes(kjt);
                 for (KeYJavaType sub : subs) {
                     RepresentsAxiom subAx = ((RepresentsAxiom) ax).setKJT(sub);

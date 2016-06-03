@@ -19,16 +19,13 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.logic.InnerVariableNamer;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.proof.Counter;
-import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -37,7 +34,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 /**
  * this is a collection of common services to the KeY prover. Services
@@ -55,26 +51,6 @@ public class Services implements TermServices {
      */
     private NamespaceSet namespaces = new NamespaceSet();
 
-    /** used to determine whether an expression is a compile-time 
-     * constant and if so the type and result of the expression
-     */
-    private ConstantExpressionEvaluator cee;
-
-    /** used to convert types, expressions and so on to logic elements
-     * (in special into to terms or formulas)
-     */
-    private TypeConverter typeconverter;
-
-    /**
-     * the information object on the Java model
-     */
-    private final JavaInfo javainfo;
-
-    /**
-     * variable namer for inner renaming
-     */
-    private final VariableNamer innerVarNamer = new InnerVariableNamer(this);
-
     /**
      * map of names to counters
      */
@@ -85,18 +61,9 @@ public class Services implements TermServices {
      */
     private SpecificationRepository specRepos;
     
-    /*
-     * the Java model (with all paths)
-     */
-    private JavaModel javaModel;
-
     private NameRecorder nameRecorder;
     
-    private ITermProgramVariableCollectorFactory factory = new ITermProgramVariableCollectorFactory(){
-      @Override
-      public TermProgramVariableCollector create(Services services) {
-         return new TermProgramVariableCollector(services);
-      }};
+    private JavaServices javaServices;
 
     private final Profile profile;
     
@@ -121,11 +88,7 @@ public class Services implements TermServices {
     	this.specRepos = new SpecificationRepository(this);
         this.nameRecorder = new NameRecorder();
         
-        this.cee = new ConstantExpressionEvaluator(this);
-    	this.typeconverter = new TypeConverter(this);
-    	this.javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
-    	                                             new KeYRecoderExcHandler()), this);
-
+        this.javaServices = new JavaServices(this);
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
@@ -142,38 +105,10 @@ public class Services implements TermServices {
     	this.specRepos    = new SpecificationRepository(this);
         this.nameRecorder = new NameRecorder();
         
-        cee = new ConstantExpressionEvaluator(this);
-    	typeconverter = new TypeConverter(this);
-    	javainfo = new JavaInfo
-    			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
-
-}
-
-
-    /**
-     * Returns the TypeConverter associated with this Services object.
-     */
-    public TypeConverter getTypeConverter(){
-    	return typeconverter;
+        this.javaServices = new JavaServices(this, crsc, rec2key);
     }
 
 
-    /**
-     * Returns the ConstantExpressionEvaluator associated with this Services object.
-     */
-    public ConstantExpressionEvaluator getConstantExpressionEvaluator() {
-        return cee;
-    }
-
-    
-    /**
-     * Returns the JavaInfo associated with this Services object.
-     */
-    public JavaInfo getJavaInfo() {
-        return javainfo;
-    }
-    
-    
     public NameRecorder getNameRecorder() {
         return nameRecorder;
     }
@@ -196,15 +131,7 @@ public class Services implements TermServices {
 
     
     public SpecificationRepository getSpecificationRepository() {
-	return specRepos;
-    }
-    
-    
-    /**
-     * Returns the VariableNamer associated with this Services object.
-     */
-    public VariableNamer getVariableNamer() {
-        return innerVarNamer;
+        return specRepos;
     }
     
     /**
@@ -226,21 +153,22 @@ public class Services implements TermServices {
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
-    	Debug.assertTrue
-    	(!(getJavaInfo().getKeYProgModelInfo().getServConf() 
+    	final KeYProgModelInfo keYProgModelInfo = javaServices.getJavainfo().getKeYProgModelInfo();
+        Debug.assertTrue
+    	(!(keYProgModelInfo.getServConf() 
     			instanceof SchemaCrossReferenceServiceConfiguration),
     			"services: tried to copy schema cross reference service config.");
     	ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
     	Services s = new Services
-    			(profile, getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+    			(profile, keYProgModelInfo.getServConf(), keYProgModelInfo.rec2key().copy(),
     					copyCounters(), newCaches);
     	s.specRepos = specRepos;
         s.setNamespaces(namespaces.copy());
         s.nameRecorder = nameRecorder.copy();
 
-        s.typeconverter = getTypeConverter().copy(s);
         s.theories.init(theories);
-    	s.setJavaModel(getJavaModel());
+        s.javaServices.setTypeconverter(getJavaServices().getTypeconverter().copy(s));
+    	s.javaServices.setJavaModel(getJavaServices().getJavaModel());
         return s;
     }
     
@@ -263,16 +191,16 @@ public class Services implements TermServices {
      */
     public Services copyPreservesLDTInformation() {
     	Debug.assertTrue
-    	(!(javainfo.getKeYProgModelInfo().getServConf() 
+    	(!(getJavaServices().getJavainfo().getKeYProgModelInfo().getServConf() 
     			instanceof SchemaCrossReferenceServiceConfiguration),
     			"services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
         s.setNamespaces(namespaces.copy());
         s.nameRecorder = nameRecorder.copy();
         
-        s.typeconverter = getTypeConverter().copy(s);
         s.theories.init(theories);
-    	s.setJavaModel(getJavaModel());
+        s.javaServices.setTypeconverter(getJavaServices().getTypeconverter().copy(s));
+    	s.javaServices.setJavaModel(getJavaServices().getJavaModel());
     	return s;
     }
     
@@ -294,16 +222,16 @@ public class Services implements TermServices {
    
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key(),
+        final Services s = new Services(getProfile(), getJavaServices().getJavainfo().getKeYProgModelInfo().getServConf(), getJavaServices().getJavainfo().getKeYProgModelInfo().rec2key(),
                 copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
         s.setNamespaces(namespaces.copy());
         s.nameRecorder = nameRecorder.copy();
 
-        s.typeconverter = getTypeConverter().copy(s);
         s.theories.init(theories);
-        s.setJavaModel(getJavaModel());
+        s.javaServices.setTypeconverter(getJavaServices().getTypeconverter().copy(s));
+        s.javaServices.setJavaModel(getJavaServices().getJavaModel());
 
         return s;
     }
@@ -385,28 +313,8 @@ public class Services implements TermServices {
         return termBuilder.tf();
     }
 
-    public ITermProgramVariableCollectorFactory getFactory() {
-        return factory;
-    }
-
-
-    public void setFactory(ITermProgramVariableCollectorFactory factory) {
-        this.factory = factory;
-    }
-
-
-    /**
-     * returns the {@link JavaModel} with all path information
-     * @return the {@link JavaModel} on which this services is based on
-     */
-   public JavaModel getJavaModel() {
-      return javaModel;
-   }
-
-
-   public void setJavaModel(JavaModel javaModel) {
-      assert this.javaModel == null;
-      this.javaModel = javaModel;
+    public JavaServices getJavaServices() {
+       return javaServices;
    }
 
 }

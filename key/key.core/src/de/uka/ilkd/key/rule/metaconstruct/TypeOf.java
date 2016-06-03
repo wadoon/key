@@ -49,7 +49,7 @@ public class TypeOf extends ProgramTransformer {
 		}
 		KeYJavaType kjt=null;
 		if(pe instanceof Expression){
-			kjt = services.getTypeConverter().getKeYJavaType((Expression)pe, ec);
+			kjt = services.getJavaServices().getTypeconverter().getKeYJavaType((Expression)pe, ec);
 		} else {
 			kjt = ((TypeRef) pe).getKeYJavaType();
 		}

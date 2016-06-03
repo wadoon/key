@@ -140,7 +140,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
                 heapContext = HeapContext.getModHeaps(services, false);
             }
             selfTerm = focus.sub(target.getStateCount() * target.getHeapCount(services));
-            kjt = services.getJavaInfo().getKeYJavaType(
+            kjt = services.getJavaServices().getJavainfo().getKeYJavaType(
                     selfTerm.sort());
         }
         ImmutableSet<Contract> contracts = UseDependencyContractRule.getApplicableContracts(

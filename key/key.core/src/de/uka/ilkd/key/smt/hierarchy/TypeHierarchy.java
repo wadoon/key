@@ -141,7 +141,7 @@ public class TypeHierarchy {
 	 */
 	public void removeInterfaceNodes(){
 		
-		JavaInfo info = services.getJavaInfo();
+		JavaInfo info = services.getJavaServices().getJavainfo();
 		
 		//find all interface sorts and contract them
 		Set<Sort> interfaceSorts = new HashSet<Sort>();

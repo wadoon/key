@@ -50,7 +50,7 @@ public class NullLiteral extends Literal {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getNullType();
+	return javaServ.getJavaServices().getJavainfo().getNullType();
     }
 
     @Override

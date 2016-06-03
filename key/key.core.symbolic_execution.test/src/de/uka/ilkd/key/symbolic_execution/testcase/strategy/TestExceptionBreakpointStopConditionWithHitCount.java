@@ -62,7 +62,7 @@ public class TestExceptionBreakpointStopConditionWithHitCount extends AbstractSy
          SymbolicExecutionExceptionBreakpoint firstBreakpoint = new SymbolicExecutionExceptionBreakpoint(proof,"java.lang.NullPointerException", true, true, false, true, 2);
          SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(firstBreakpoint);
          allBreakpoints.addChildren(bc);
-         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
+         env.getProof().getServices().getJavaServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);

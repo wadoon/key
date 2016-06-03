@@ -33,7 +33,7 @@ public class FreeLiteral extends Literal {
 
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FREE_ADT);
+        return javaServ.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_FREE_ADT);
     }
 
     @Override

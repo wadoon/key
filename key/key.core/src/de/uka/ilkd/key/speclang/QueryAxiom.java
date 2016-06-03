@@ -212,7 +212,7 @@ public final class QueryAxiom extends ClassAxiom {
 		                	       .toArray(
 		                      new KeYJavaType[target.getNumParams()]));	
 	final IProgramMethod targetImpl 
-		= services.getJavaInfo().getProgramMethod(kjt,
+		= services.getJavaServices().getJavainfo().getProgramMethod(kjt,
 							  target.getName(), 
 							  sig,
 							  kjt);

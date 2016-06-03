@@ -175,11 +175,11 @@ public class TestGenericSortInstantiations extends TestCase {
     @Override
     public void setUp() {
        // this ensures that necessary Java types are loaded
-       TacletForTests.services ().getJavaInfo().readJavaBlock("{}");  
+       TacletForTests.services ().getJavaServices().getJavainfo().readJavaBlock("{}");  
        
-       object       = TacletForTests.services ().getJavaInfo ().objectSort ();
-       cloneable    = TacletForTests.services ().getJavaInfo ().cloneableSort ();
-       serializable = TacletForTests.services ().getJavaInfo ().serializableSort();
+       object       = TacletForTests.services ().getJavaServices().getJavainfo().objectSort ();
+       cloneable    = TacletForTests.services ().getJavaServices().getJavainfo().cloneableSort ();
+       serializable = TacletForTests.services ().getJavaServices().getJavainfo().serializableSort();
 
        objectArray = ArraySort.getArraySort ( object,
              object, cloneable, serializable );    
@@ -751,7 +751,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	GenericSortInstantiations gsi;
 	
 	Services services = TacletForTests.services();
-	Sort nullSort = new NullSort(services.getJavaInfo().objectSort());
+	Sort nullSort = new NullSort(services.getJavaServices().getJavainfo().objectSort());
 	services.getNamespaces().sorts().add(ImmutableSLList.<Named>nil().prepend(A1OBJ)
 		                                                     .prepend(A2OBJ)
 		                                                     .prepend(A3OBJ)

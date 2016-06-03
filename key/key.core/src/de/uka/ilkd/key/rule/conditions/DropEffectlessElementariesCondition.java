@@ -92,7 +92,7 @@ public final class DropEffectlessElementariesCondition
 	    					   Term target,
 	    					   Services services) {
 	TermProgramVariableCollector collector 
-		= services.getFactory().create(services);
+		= services.getJavaServices().getFactory().create(services);
 	target.execPostOrder(collector);
 	Set<LocationVariable> varsInTarget = collector.result();
 	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, 

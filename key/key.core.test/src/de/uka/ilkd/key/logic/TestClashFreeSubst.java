@@ -158,9 +158,9 @@ public class TestClashFreeSubst extends TestCase {
 			"No file. Call of parser from logic/TestClashFreeSubst.java"),
 		new Recoder2KeY(services,
 			new KeYCrossReferenceServiceConfiguration(new KeYRecoderExcHandler()),
-			services.getJavaInfo().rec2key(),
+			services.getJavaServices().getJavainfo().rec2key(),
 			new NamespaceSet(),
-			services.getTypeConverter()),
+			services.getJavaServices().getTypeconverter()),
 		services,
 		nss,
 		new AbbrevMap());

@@ -236,7 +236,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
     public String reuseSignature(Services services, ExecutionContext ec) {
        return super.reuseSignature(services, ec)+"("+
-          services.getTypeConverter().getKeYJavaType(this, ec).getName()+")";
+          services.getJavaServices().getTypeconverter().getKeYJavaType(this, ec).getName()+")";
     }
 
     public abstract KeYJavaType getKeYJavaType(Services javaServ, 

@@ -66,6 +66,7 @@ Services  (Richard)
 0. Services sollte noch Namespaces und ConstructionServices kapseln
 1. Füge TheoryServices hinzu <- verlagere Methoden aus TypeConverter (DONE)
 2. Danach TypeConverter, JavaInfo, JavaModel konsolidieren  und in JavaServices kapseln 
+    - gekapselt in JavaServices (DONE)
 3. Danach Services verallg. getProgramServices
 
 

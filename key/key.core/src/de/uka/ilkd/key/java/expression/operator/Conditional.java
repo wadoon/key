@@ -91,7 +91,7 @@ public class Conditional extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	final TypeConverter tc = javaServ.getTypeConverter();
+	final TypeConverter tc = javaServ.getJavaServices().getTypeconverter();
 	final KeYJavaType type1 = tc.getKeYJavaType(getExpressionAt(1), ec);
 	final KeYJavaType type2 = tc.getKeYJavaType(getExpressionAt(2), ec);
 	if (tc.isIdentical(type1, type2))
@@ -104,7 +104,7 @@ public class Conditional extends Operator {
 		type2.getJavaType() == PrimitiveType.JAVA_SHORT || 
 		type1.getJavaType() == PrimitiveType.JAVA_SHORT &&
 		type2.getJavaType() == PrimitiveType.JAVA_BYTE)
-		return javaServ.getJavaInfo().
+		return javaServ.getJavaServices().getJavainfo().
 		    getKeYJavaType(PrimitiveType.JAVA_SHORT);
 	    if (tc.isImplicitNarrowing(getExpressionAt(1),
 						  (PrimitiveType)type2.getJavaType()))

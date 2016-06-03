@@ -57,7 +57,7 @@ public class EvaluateArgs extends ProgramTransformer{
                                            Services services, 
                                            ExecutionContext ec) {
 
-	final VariableNamer varNamer = services.getVariableNamer();
+	final VariableNamer varNamer = services.getJavaServices().getInnerVarNamer();
 	final KeYJavaType t = e.getKeYJavaType(services, ec);
 	final ProgramElementName name = VariableNamer.parseName(varNamer
 		.getSuggestiveNameProposalForSchemaVariable(e));

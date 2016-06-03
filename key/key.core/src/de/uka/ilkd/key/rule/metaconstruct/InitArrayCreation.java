@@ -73,8 +73,7 @@ public class InitArrayCreation extends InitArray {
      */
     private If checkNegativeDimension(Expression cond,
 				      Services services) {
-	final New exception = KeYJavaASTFactory.newOperator(services
-		.getJavaInfo().getKeYJavaType(
+	final New exception = KeYJavaASTFactory.newOperator(services.getJavaServices().getJavainfo().getKeYJavaType(
 			"java.lang.NegativeArraySizeException"));
 
 	return KeYJavaASTFactory.ifThen(cond,
@@ -103,8 +102,8 @@ public class InitArrayCreation extends InitArray {
 
 	Expression checkDimensions = BooleanLiteral.FALSE;
 	ProgramVariable[] pvars = new ProgramVariable[dimExpr.size()];
-	final VariableNamer varNamer = services.getVariableNamer();
-	final KeYJavaType intType = services.getJavaInfo()
+	final VariableNamer varNamer = services.getJavaServices().getInnerVarNamer();
+	final KeYJavaType intType = services.getJavaServices().getJavainfo()
 		.getKeYJavaType(PrimitiveType.JAVA_INT);
 
 	for (int i = 0; i<pvars.length; i++) {
@@ -152,8 +151,8 @@ public class InitArrayCreation extends InitArray {
 	if (dimensions.length > 1) {
 	    Expression[] baseDim = new Expression[dimensions.length-1];
 	    System.arraycopy(dimensions, 1, baseDim, 0, dimensions.length-1);
-	    final VariableNamer varNamer = services.getVariableNamer();
-	    final KeYJavaType intType = services.getJavaInfo()
+	    final VariableNamer varNamer = services.getJavaServices().getInnerVarNamer();
+	    final KeYJavaType intType = services.getJavaServices().getJavainfo()
 		.getKeYJavaType(PrimitiveType.JAVA_INT);
 	    final ProgramElementName name 
 	    	= varNamer.getTemporaryNameProposal("i");

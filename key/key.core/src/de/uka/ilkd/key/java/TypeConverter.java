@@ -93,7 +93,7 @@ public final class TypeConverter {
     }
 
     public KeYJavaType getBooleanType() {
-        return services.getJavaInfo()
+        return services.getJavaServices().getJavainfo()
                 .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
     
@@ -198,7 +198,7 @@ public final class TypeConverter {
         while(!exact && !context.getSort().extendsTrans(s)
               || exact && !context.getSort().equals(s)){
             inst = (LocationVariable)
-                    services.getJavaInfo().getAttribute(
+                    services.getJavaServices().getJavainfo().getAttribute(
                        ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
             final Function fieldSymbol
             	= getTheories().getHeapLDT().getFieldSymbolForPV(inst, services);
@@ -213,7 +213,7 @@ public final class TypeConverter {
     	// FIXME this needs to handle two state?
     	final ReferencePrefix prefix = mr.getReferencePrefix();
     	Term p = convertReferencePrefix(prefix, ec);
-    	IProgramMethod pm = mr.method(services, services.getTypeConverter().getKeYJavaType(p), ec);
+    	IProgramMethod pm = mr.method(services, services.getJavaServices().getTypeconverter().getKeYJavaType(p), ec);
     	if(pm.isModel()) {
     	  ImmutableArray<? extends Expression> args = mr.getArguments();
     	  Term[] argTerms = new Term[args.size()+2]; // heap, self, 
@@ -240,7 +240,7 @@ public final class TypeConverter {
 	final ProgramVariable var = fr.getProgramVariable();
 	if(var instanceof ProgramConstant) {
 	    return tb.var(var);
-	} else if(var == services.getJavaInfo().getArrayLength()) {
+	} else if(var == services.getJavaServices().getJavainfo().getArrayLength()) {
 	    return tb.dotLength(convertReferencePrefix(prefix, ec));
 	} else if(var.isStatic()) {
 	    final Function fieldSymbol
@@ -406,10 +406,10 @@ public final class TypeConverter {
 
         if ((t1 == PrimitiveType.JAVA_REAL && isNumericalType(t2)
                 || (isNumericalType(t1) && t2 == PrimitiveType.JAVA_REAL)))
-                return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+                return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
         else if ((t1 == PrimitiveType.JAVA_BOOLEAN &&
                 t2 == PrimitiveType.JAVA_BOOLEAN)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+            return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
         } else if ((t1 == PrimitiveType.JAVA_BYTE ||
                 t1 == PrimitiveType.JAVA_SHORT ||
                 t1 == PrimitiveType.JAVA_CHAR||
@@ -418,32 +418,32 @@ public final class TypeConverter {
                         t2 == PrimitiveType.JAVA_SHORT||
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_INT)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+            return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_INT);
     	} else if ((t2 == PrimitiveType.JAVA_LONG) &&
                 (t1 == PrimitiveType.JAVA_BYTE||
                         t1 == PrimitiveType.JAVA_SHORT||
                         t1 == PrimitiveType.JAVA_INT||
                         t1 == PrimitiveType.JAVA_CHAR||
                         t1 == PrimitiveType.JAVA_LONG)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+            return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
     	} else if ((t1 == PrimitiveType.JAVA_LONG) &&
                 (t2 == PrimitiveType.JAVA_BYTE||
                         t2 == PrimitiveType.JAVA_SHORT||
                         t2 == PrimitiveType.JAVA_INT||
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+            return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
     	} else if ((t1 == PrimitiveType.JAVA_BIGINT) && isIntegerType(t2)) {
-    	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+    	    return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
         } else if ((t2 == PrimitiveType.JAVA_BIGINT) && isIntegerType(t2)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
     	} else if (t1 == PrimitiveType.JAVA_LOCSET && t2 == PrimitiveType.JAVA_LOCSET) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+            return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
     	} else if (t1 == PrimitiveType.JAVA_SEQ && t2 == PrimitiveType.JAVA_SEQ) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-    	} else if (type1.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
+            return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+    	} else if (type1.equals(services.getJavaServices().getJavainfo().getKeYJavaType("java.lang.String"))) {
             return type1;
-    	} else if (type2.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
+    	} else if (type2.equals(services.getJavaServices().getJavainfo().getKeYJavaType("java.lang.String"))) {
             return type2;
         } else {
             throw new RuntimeException("Could not determine promoted type "
@@ -462,29 +462,29 @@ public final class TypeConverter {
         final Type t1 = type1.getJavaType();
 	if (t1 == PrimitiveType.JAVA_BOOLEAN)
 	    // not really numeric ...
-	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+	    return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
 	else if (t1 == PrimitiveType.JAVA_BYTE ||
 	    t1 == PrimitiveType.JAVA_SHORT||
 	    t1 == PrimitiveType.JAVA_CHAR||
 	    t1 == PrimitiveType.JAVA_INT)
-	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+	    return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_INT);
 	else if (t1 == PrimitiveType.JAVA_LONG)
-	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+	    return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
 	else if (t1 == PrimitiveType.JAVA_LOCSET)
-	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+	    return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
 	else if (t1 == PrimitiveType.JAVA_SEQ)
-	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+	    return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
 	else if (t1 == PrimitiveType.JAVA_BIGINT)
-	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+	    return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 	else if (t1 == PrimitiveType.JAVA_REAL)
-        return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+        return services.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
 	else throw new RuntimeException("Could not determine promoted type "+
 				   "of "+type1);
     }
 
 
     public Sort getPrimitiveSort(Type t) {
-	return services.getJavaInfo().getKeYJavaType(t).getSort();
+	return services.getJavaServices().getJavainfo().getKeYJavaType(t).getSort();
     }
 
 
@@ -572,7 +572,7 @@ public final class TypeConverter {
                         SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
                 if(sdf.isSimilar(castFunction)) {
                     Sort s = sdf.getSortDependingOn();
-                    KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
+                    KeYJavaType kjt = services.getJavaServices().getJavainfo().getKeYJavaType(s);
                     if(kjt != null) {
                         children.add(new TypeRef(kjt));
                         return new ParenthesizedExpression(new TypeCast(children));
@@ -586,13 +586,13 @@ public final class TypeConverter {
 
     public KeYJavaType getKeYJavaType(Term t) {
 	KeYJavaType result = null;
-	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
-	    result = services.getJavaInfo().getKeYJavaType(t.sort());
+	if(t.sort().extendsTrans(services.getJavaServices().getJavainfo().objectSort())) {
+	    result = services.getJavaServices().getJavainfo().getKeYJavaType(t.sort());
 	} else if(t.op() instanceof Function) {
 	    for(LDT ldt : getTheories().getModels()) {
 		if(ldt.containsFunction((Function)t.op())) {
 		    Type type = ldt.getType(t);
-		    result = services.getJavaInfo().getKeYJavaType(type);
+		    result = services.getJavaServices().getJavainfo().getKeYJavaType(type);
 		    break;
 		}
 	    }
@@ -600,7 +600,7 @@ public final class TypeConverter {
 
         if(result == null) {
             //HACK
-            result = services.getJavaInfo().getKeYJavaType(t.sort().toString());
+            result = services.getJavaServices().getJavainfo().getKeYJavaType(t.sort().toString());
         }
         if (result == null) {
            result = getKeYJavaType(convertToProgramElement(t));
@@ -611,7 +611,7 @@ public final class TypeConverter {
 
 
     public KeYJavaType getKeYJavaType(Type t) {
-	return services.getJavaInfo().getKeYJavaType(t);
+	return services.getJavaServices().getJavainfo().getKeYJavaType(t);
     }
 
 
@@ -660,7 +660,7 @@ public final class TypeConverter {
     public boolean isWidening(ArrayType from, ArrayType to) {
 	KeYJavaType toBase   =  to.getBaseType().getKeYJavaType();
 	if (toBase ==
-	    services.getJavaInfo().getJavaLangObject() ) { // seems incorrect
+	    services.getJavaServices().getJavainfo().getJavaLangObject() ) { // seems incorrect
 	    return true;
 	}
 	KeYJavaType fromBase = from.getBaseType().getKeYJavaType();
@@ -689,7 +689,7 @@ public final class TypeConverter {
 	} else if (from instanceof ArrayType) {
 	    if (to instanceof ClassType) {
                 final Sort toSort = getKeYJavaType ( to ).getSort();
-		return services.getJavaInfo().isAJavaCommonSort(toSort);
+		return services.getJavaServices().getJavainfo().isAJavaCommonSort(toSort);
 	    } else if (to instanceof ArrayType) {
 		return isWidening((ArrayType)from, (ArrayType)to);
 	    }
@@ -711,7 +711,7 @@ public final class TypeConverter {
 	} else {
 	    if ( b == null )
 		return
-		    to == services.getJavaInfo().
+		    to == services.getJavaServices().getJavainfo().
 		    getJavaLangObject () &&
 		    a instanceof ArrayType;
 	    else
@@ -738,7 +738,7 @@ public final class TypeConverter {
 	}
 
 	ConstantExpressionEvaluator cee =
-	    services.getConstantExpressionEvaluator();
+	    services.getJavaServices().getConstantExpressionEvaluator();
 
 	ConstantEvaluator.EvaluationResult res =
 	    new ConstantEvaluator.EvaluationResult();
@@ -782,8 +782,7 @@ public final class TypeConverter {
 	if ( a instanceof ClassType || a == null ) {
 	    return
 		to.getSort ().extendsTrans ( from.getSort () ) ||
-		( from == services.
-		  getJavaInfo().getJavaLangObject () &&
+		( from == services.getJavaServices().getJavainfo().getJavaLangObject () &&
 		  a instanceof ArrayType );
 	} else {
 	    if ( b == null )

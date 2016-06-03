@@ -150,7 +150,7 @@ public final class SLEnvInput extends AbstractEnvInput {
      */
     private ImmutableSet<PositionedString> createDLLibrarySpecs() throws ProofInputException {
         final Set<KeYJavaType> allKJTs 
-		= initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();			
+		= initConfig.getServices().getJavaServices().getJavainfo().getAllKeYJavaTypes();			
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 	//either boot class path or JavaRedux
 	if(bootClassPath != null) {
@@ -177,7 +177,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor) 
             throws ProofInputException {
         final JavaInfo javaInfo 
-            = initConfig.getServices().getJavaInfo();
+            = initConfig.getServices().getJavaServices().getJavainfo();
         final SpecificationRepository specRepos 
             = initConfig.getServices().getSpecificationRepository();
 

@@ -96,7 +96,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 	    addChildren(instArray);
 	} else if (inst instanceof Term
 		   && ((Term)inst).op() instanceof ProgramInLogic) {
-	    addChild(services.getTypeConverter().convertToProgramElement((Term)inst));
+	    addChild(services.getJavaServices().getTypeconverter().convertToProgramElement((Term)inst));
 	} else {
 	    throw new IllegalStateException("programreplacevisitor: Instantiation missing " + 
 		       "for schema variable " + sv);

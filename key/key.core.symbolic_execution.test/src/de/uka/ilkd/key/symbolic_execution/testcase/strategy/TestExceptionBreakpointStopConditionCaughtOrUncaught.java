@@ -68,7 +68,7 @@ public class TestExceptionBreakpointStopConditionCaughtOrUncaught extends Abstra
          SymbolicExecutionExceptionBreakpoint secondBreakpoint = new SymbolicExecutionExceptionBreakpoint(proof, "java.lang.ClassCastException", false, true, false, true, -1);
          SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(firstBreakpoint, secondBreakpoint);
          allBreakpoints.addChildren(bc);
-         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
+         env.getProof().getServices().getJavaServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);

@@ -74,7 +74,7 @@ public class DLEmbeddedExpression extends Operator {
             return kjt;
         } else {
             // FIXME FIXME FIXME Unknown types are mapped to int.
-            return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+            return javaServ.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_INT);
         }
     }
 
@@ -135,7 +135,7 @@ public class DLEmbeddedExpression extends Operator {
             Expression child = children.get(i);
 
 
-            KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child, ec);
+            KeYJavaType kjtActual = javaServ.getJavaServices().getTypeconverter().getKeYJavaType(child, ec);
             
             if(kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort())) {
                 throw new ConvertException("Received " + child
@@ -154,7 +154,7 @@ public class DLEmbeddedExpression extends Operator {
     private static KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
         // JavaInfo returns wrong data for sort integer! We need to find it over
         // other paths.
-        JavaInfo javaInfo = javaServ.getJavaInfo();
+        JavaInfo javaInfo = javaServ.getJavaServices().getJavainfo();
         KeYJavaType intType = javaInfo.getPrimitiveKeYJavaType("int");
         if(argSort == intType.getSort()) {
             return intType;

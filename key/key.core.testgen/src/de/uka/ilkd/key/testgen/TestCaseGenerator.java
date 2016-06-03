@@ -186,7 +186,7 @@ public class TestCaseGenerator {
 		services = proof.getServices();
 		junitFormat = settings.useJunit();
 		useRFL = settings.useRFL();
-		modDir = computeProjectSubPath(services.getJavaModel().getModelDir());
+		modDir = computeProjectSubPath(services.getJavaServices().getJavaModel().getModelDir());
 		dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
 		directory = settings.getOutputFolderPath();
 		sortDummyClass = new HashMap<Sort, StringBuffer>();		
@@ -270,7 +270,7 @@ public class TestCaseGenerator {
 	}
 
 	protected String buildDummyClassForAbstractSort(Sort sort) {
-		final JavaInfo jinfo = services.getJavaInfo();
+		final JavaInfo jinfo = services.getJavaServices().getJavainfo();
 		final KeYJavaType kjt = jinfo.getKeYJavaType(sort);
 		final String className = getDummyClassNameFor(sort);
 		if (sortDummyClass.containsKey(sort)) {
@@ -760,10 +760,10 @@ public class TestCaseGenerator {
             // Make sure that the function is not an array
             if (heapLDT.getArr() != function) {
                 String typeName = HeapLDT.getClassName(function);
-                KeYJavaType type = services.getJavaInfo().getKeYJavaType(typeName);
+                KeYJavaType type = services.getJavaServices().getJavainfo().getKeYJavaType(typeName);
                 if (type != null) {
                     String fieldName = HeapLDT.getPrettyFieldName(function);
-                    result = services.getJavaInfo().getAttribute(fieldName, type);
+                    result = services.getJavaServices().getJavainfo().getAttribute(fieldName, type);
                 }
             }
         }
@@ -1051,7 +1051,7 @@ public class TestCaseGenerator {
 	}
 
 	private String getDummyClassNameFor(Sort sort) {
-		final JavaInfo jinfo = services.getJavaInfo();
+		final JavaInfo jinfo = services.getJavaServices().getJavainfo();
 		final KeYJavaType kjt = jinfo.getKeYJavaType(sort);
 		return kjt.getName() + DummyPostfix;
 	}

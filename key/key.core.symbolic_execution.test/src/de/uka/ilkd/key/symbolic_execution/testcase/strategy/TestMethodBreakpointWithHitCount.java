@@ -62,7 +62,7 @@ public class TestMethodBreakpointWithHitCount extends AbstractSymbolicExecutionT
          MethodBreakpoint thirdBreakpoint = new MethodBreakpoint(calleeMain.getPositionInfo().getFileName(), 6, 2, calleeMain, env.getBuilder().getProof(),null, true, false, 6, 9, false, true);
          SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(inAndOutBreakpoint,hitCountBreakpoint,thirdBreakpoint);
          allBreakpoints.addChildren(bc);
-         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
+         env.getProof().getServices().getJavaServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);

@@ -107,7 +107,7 @@ public class TacletFindModel extends AbstractTableModel {
 	this.services = services;
 	this.scm = scm;
 	this.goal = goal;
-	this.varNamer = services.getVariableNamer();
+	this.varNamer = services.getJavaServices().getInnerVarNamer();
 	
 	instantiationProposers = new InstantiationProposerCollection();
 	instantiationProposers.add(varNamer);

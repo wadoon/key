@@ -193,7 +193,7 @@ public class TestVariableNamer extends TestCase {
 
 
     public void testInnerRename() {    	
-    	VariableNamer vn = services.getVariableNamer();
+    	VariableNamer vn = services.getJavaServices().getInnerVarNamer();
 	ProgramVariable v, w;
 
 	PosInOccurrence pio = constructPIO(formulaWithX);
@@ -235,7 +235,7 @@ public class TestVariableNamer extends TestCase {
 //    }
     
     public void testNameProposals() {
-    	VariableNamer vn = services.getVariableNamer();
+    	VariableNamer vn = services.getJavaServices().getInnerVarNamer();
 	ProgramElementName proposal;
 
 	PosInOccurrence pio = constructPIO(formulaWithVar_1);
@@ -261,7 +261,7 @@ public class TestVariableNamer extends TestCase {
     
     
     public void testInnerRenameUniqueness() {     	
-    	VariableNamer vn = services.getVariableNamer();
+    	VariableNamer vn = services.getJavaServices().getInnerVarNamer();
 	ProgramVariable v;
 	
 	PosInOccurrence pio = constructPIO(formulaWithX_1);
