@@ -15,7 +15,6 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -26,7 +25,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * "TypeCheckingAndInferenceService" and not be used for assembling actual
  * terms.
  */
-public interface Operator extends Named, SVSubstitute, GenericOperator {
+public interface Operator extends GenericOperator {
 
     /**
      * Determines the sort of the {@link Term} if it would be created using this
