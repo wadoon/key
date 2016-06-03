@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -35,11 +34,6 @@ public final class TermLabelSV extends AbstractSV implements SchemaVariable, Ter
     @Override
     public String toString() {
         return toString("termLabel");
-    }
-
-    @Override
-    public boolean validTopLevel(Term term) {
-        return true;
     }
 
     @Override

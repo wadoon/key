@@ -13,50 +13,20 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
-
 
 /**
- * This singleton class implements a conditional operator 
- * "\ifEx iv; (phi) \then (t1) \else (t2)", where iv is an integer logic 
- * variable, phi is a formula, and where t1 and t2 are terms with the same sort.
- * The variable iv is bound in phi and in t1, but not in t2.
+ * This singleton class implements a conditional operator "\ifEx iv; (phi) \then
+ * (t1) \else (t2)", where iv is an integer logic variable, phi is a formula,
+ * and where t1 and t2 are terms with the same sort. The variable iv is bound in
+ * phi and in t1, but not in t2.
  */
 public final class IfExThenElse extends AbstractOperator {
-    
+
     public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse();
-    
-    
+
     private IfExThenElse() {
-	super(new Name("ifExThenElse"), 
-	      3,
-	      new Boolean[]{true, true, false},
-	      true);
-    }
-    
-    
-    @Override
-    public Sort sort(ImmutableArray<Term> terms) {
-	return terms.get(1).sort();
-    }
-    
-
-    @Override
-    public boolean additionalValidTopLevel(Term term) {
-        for(QuantifiableVariable var : term.varsBoundHere(0)) {
-            if(!var.sort().name().toString().equals("int")) {
-        	return false;
-            }
-        }
-
-        final Sort s0 = term.sub(0).sort();
-        final Sort s1 = term.sub(1).sort();
-        final Sort s2 = term.sub(2).sort();
-        
-        return s0 == Sort.FORMULA && s1.equals(s2);
+        super(new Name("ifExThenElse"), 3, new Boolean[] { true, true, false },
+                true);
     }
 }

@@ -42,6 +42,15 @@ Muster für Kommentare in verallgemeinerten Klassen:
  * {@link SortedOperator} interface should get a different name.
 ``
 
+New Type Checker
+----------------
+
+Example Call:
+
+``
+return TypeCheckingAndInferenceService.getTypeCheckerFor(op).sort(subs, op);
+``
+
 Term (Dominic)
 ====
 

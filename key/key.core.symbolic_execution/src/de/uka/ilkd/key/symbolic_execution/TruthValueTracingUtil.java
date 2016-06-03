@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -160,7 +161,7 @@ public final class TruthValueTracingUtil {
     */
    public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<Term> subs) {
       if (operator == IfThenElse.IF_THEN_ELSE) {
-         Sort sort = operator.sort(subs);
+         Sort sort = TypeCheckingAndInferenceService.getTypeCheckerFor(operator).sort(subs, operator);
          return sort == Sort.FORMULA;
       }
       else {

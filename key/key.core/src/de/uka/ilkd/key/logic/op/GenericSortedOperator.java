@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  *
  * @author Dominic Scheurer
  */
-public interface GenericSortedOperator extends GenericOperator {
+public interface GenericSortedOperator extends Operator {
 
     Sort sort();
 

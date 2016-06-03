@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,48 +13,39 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.Named;
 
 /**
- * Provides methods used in type checking.<br/>
+ * Generic interface for an operator. All symbols acting as members of a term
+ * e.g. logical operators, predicates, functions, variables etc. have to
+ * implement this interface.<br/>
  * 
- * <strong>TODO:</strong> This should be named something like
- * "TypeCheckingAndInferenceService" and not be used for assembling actual
- * terms.
+ * <strong>TODO:</strong> This should be named "Operator"; the previous
+ * {@link Operator} interface should get the name
+ * "TypeCheckingAndInferenceService" or the like.
+ *
+ * @author Dominic Scheurer
  */
-public interface Operator extends GenericOperator {
+public interface Operator extends Named, SVSubstitute {
 
     /**
-     * Determines the sort of the {@link Term} if it would be created using this
-     * Operator as top level operator and the given terms as sub terms. The
-     * assumption that the constructed term would be allowed is not checked.
-     * 
-     * @param terms
-     *            an array of Term containing the subterms of a (potential) term
-     *            with this operator as top level operator
-     * @return sort of the term with this operator as top level operator of the
-     *         given substerms
+     * the arity of this operator
      */
-    Sort sort(ImmutableArray<Term> terms);
+    int arity();
 
     /**
-     * Checks whether the top level structure of the given @link Term is
-     * syntactically valid, given the assumption that the top level operator of
-     * the term is the same as this Operator. The assumption that the top level
-     * operator and the term are equal is NOT checked.
-     * 
-     * @return true iff the top level structure of the {@link Term} is valid.
+     * Tells whether the operator binds variables at the n-th subterm.
      */
-    boolean validTopLevel(Term term);
-
+    boolean bindVarsAt(int n);
+    
     /**
-     * Introduced to decouple Operators from Java specifics; needed in
-     * {@link ExtendedTypeCheckingAndInferenceService}.
-     *
-     * @return True iff the operator binds any variables.
+     * @return true iff this operator binds any variables
      */
     boolean bindsVars();
+
+    /**
+     * Tells whether the operator is rigid.
+     */
+    boolean isRigid();
+
 }
