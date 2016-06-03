@@ -25,7 +25,7 @@ package de.uka.ilkd.key.logic.op;
  *
  * @author Dominic Scheurer
  */
-public interface GenericSchemaVariable extends GenericParsableVariable {
+public interface GenericSchemaVariable extends ParsableVariable {
 
     /**
      * @return true if the schemavariable has the strict modifier which forces
