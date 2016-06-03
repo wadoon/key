@@ -78,7 +78,7 @@ options {
 	// save parameters
 	this.services       = services;
 	this.tb             = services.getTermBuilder();
-	this.javaInfo       = services.getJavaInfo();
+	this.javaInfo       = services.getJavaServices().getJavaInfo();
 	containerType  =   specInClass;
 	this.intLDT         = services.getTheories().getIntegerLDT();
 	this.heapLDT        = services.getTheories().getHeapLDT();
@@ -970,7 +970,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 	    llt=LOCKSET_LT right=postfixexpr
 	    {
 	        addIgnoreWarning("Lockset ordering is not supported",llt);
-	        final Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
+	        final Sort objSort = javaInfo.getJavaLangObject().getSort();
 	        f = new Function(new Name("lockset_lt"), Sort.FORMULA, objSort, objSort);
 	        opToken = llt;
 	    }
@@ -978,7 +978,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 	    lleq=LOCKSET_LEQ right=postfixexpr
 	    {
 	        addIgnoreWarning("Lockset ordering is not supported",lleq);
-	        final Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
+	        final Sort objSort = javaInfo.getJavaLangObject().getSort();
 	        f = new Function(new Name("lockset_leq"), Sort.FORMULA, objSort, objSort);
 	        opToken = lleq;
 	    }
@@ -1722,7 +1722,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 
     |   ALLFIELDS LPAREN e1=expression RPAREN
         {
-            if(!e1.isTerm() || !e1.getTerm().sort().extendsTrans(services.getJavaInfo().objectSort())) {
+            if(!e1.isTerm() || !e1.getTerm().sort().extendsTrans(javaInfo.objectSort())) {
                 raiseError("Invalid argument to \\allFields: " + e1);
             }
             result = new SLExpression(tb.allFields(e1.getTerm()),

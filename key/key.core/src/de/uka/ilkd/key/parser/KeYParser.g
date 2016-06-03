@@ -405,7 +405,7 @@ options {
         if(isProblemParser()) 
           return parserConfig.javaInfo();
     	if(getServices() != null)
-          return getServices().getJavaInfo();
+          return getServices().getJavaServices().getJavaInfo();
 	else
 	  return null;
     }
@@ -880,7 +880,7 @@ options {
 	                result = getServices().getTermBuilder().dot(Sort.ANY, result, attrTerm);
 	            } else if(attribute instanceof ProgramConstant) {
                 result = getTermFactory().createTerm(attribute);
-            } else if(attribute == getServices().getJavaInfo().getArrayLength()) {
+            } else if(attribute == getJavaInfo().getArrayLength()) {
                 result = getServices().getTermBuilder().dotLength(result);
             } else {
 	            ProgramVariable pv = (ProgramVariable) attribute;
@@ -2902,7 +2902,7 @@ query_suffix [Term prefix, String memberName] returns [Term result = null]
           throw new NotDeclException(input, "Class", classRef);
        classRef = kjt.getFullName();
 
-       result = getServices().getJavaInfo().getProgramMethodTerm(prefix, name, args, classRef, implicitClassName);
+       result = getJavaInfo().getProgramMethodTerm(prefix, name, args, classRef, implicitClassName);
     }
  ;
 catch [TermCreationException ex] {
@@ -2927,7 +2927,7 @@ accessterm returns [Term _accessterm = null]
       (LPAREN any_sortId_check[false] RPAREN term110)=> 
         LPAREN s = any_sortId_check[true] RPAREN result=term110 
         {
-         final Sort objectSort = getServices().getJavaInfo().objectSort();
+         final Sort objectSort = getJavaInfo().objectSort();
          if(s==null) {
            semanticError("Tried to cast to unknown type.");
          } else if (objectSort != null
@@ -3001,13 +3001,13 @@ static_query returns [Term result = null]
        int index = queryRef.indexOf(':');
        String className = queryRef.substring(0, index); 
        String qname = queryRef.substring(index+2); 
-       result = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, args, className);
+       result = getJavaInfo().getStaticProgramMethodTerm(qname, args, className);
        if(result == null && isTermParser()) {
 	  final Sort sort = lookupSort(className);
           if (sort == null) {
 		semanticError("Could not find matching sort for " + className);
           }
-          KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
+          KeYJavaType kjt = getJavaInfo().getKeYJavaType(sort);
           if (kjt == null) {
 		semanticError("Found logic sort for " + className + 
 		 " but no corresponding java type!");
