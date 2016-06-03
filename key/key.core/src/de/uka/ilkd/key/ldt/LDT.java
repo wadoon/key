@@ -61,7 +61,7 @@ public abstract class LDT implements Named {
     }
 
     
-    protected LDT(Name name, Sort targetSort, TermServices services) {
+    protected LDT(Name name, Sort targetSort) {
         sort = targetSort;
         if (sort == null)
             throw new RuntimeException("LDT "+name+" not found.\n"+

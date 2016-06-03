@@ -16,6 +16,11 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
+/**
+ * This class provides access to the theories.
+ * 
+ * @author Richard Bubel
+ */
 public class TheoryServices {
     // Maps LDT names to LDT instances.
     private Map<Name, LDT> theories;
@@ -23,11 +28,19 @@ public class TheoryServices {
     public TheoryServices() {
         theories = Collections.emptyMap();
     }
-            
-    public void init(TheoryServices theoryServices) {
+
+    /**
+     * initializes this service by copying the content of {@code theoryServices}
+     * @param theoryServices the {@link TheoryServices} to copy
+     */
+    void init(TheoryServices theoryServices) {
         this.theories = Collections.unmodifiableMap(theoryServices.theories);
     }
 
+    /**
+     * populates this service by fresh LDTS obtained from {@link LDT#getNewLDTInstances(Services)}
+     * @param theoryServices the {@link Services} 
+     */
     public void init(Services services) {
         theories = Collections.unmodifiableMap(LDT.getNewLDTInstances(services));
     }

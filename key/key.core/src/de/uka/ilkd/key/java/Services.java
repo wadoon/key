@@ -63,14 +63,19 @@ public class Services implements TermServices {
     
     private NameRecorder nameRecorder;
     
+    /** programming language dependent services like converting expressions, program type information etc. */
     private JavaServices javaServices;
 
+    /** The profile specifies the logic that is used and provides specialised components */
     private final Profile profile;
     
+    /** common used caches */
     private final ServiceCaches caches;
     
+    /** term construction */
     private final TermBuilder termBuilder;
 
+    /** contains all the specified theories (LDTs) */
     private TheoryServices theories;
 
 
