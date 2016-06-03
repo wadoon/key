@@ -116,7 +116,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
                if (selfTerm == null) {
                   throw new ProofInputException("Can't find self term, implementation of UseOperationContractRule might has changed!"); 
                }
-               KeYJavaType selfType = services.getJavaServices().getJavainfo().getKeYJavaType(selfTerm.sort());
+               KeYJavaType selfType = services.getJavaServices().getJavaInfo().getKeYJavaType(selfTerm.sort());
                if (inst.staticType != selfType) {
                   throw new ProofInputException("Type \"" + inst.staticType + "\" expected but found \"" + selfType + "\", implementation of UseOperationContractRule might has changed!"); 
                }
@@ -158,7 +158,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
           term.sub(0).op() == Equality.EQUALS && 
           term.sub(0).sub(0).op() instanceof LocationVariable && 
           SymbolicExecutionUtil.isNullSort(term.sub(0).sub(1).sort(), services) &&
-          services.getJavaServices().getJavainfo().getKeYJavaType(term.sub(0).sub(0).sort()) == staticType) {
+          services.getJavaServices().getJavaInfo().getKeYJavaType(term.sub(0).sub(0).sort()) == staticType) {
          return term.sub(0).sub(0);
       }
       else {

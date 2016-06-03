@@ -118,7 +118,7 @@ public class CharLiteral extends Literal {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_CHAR);
+	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_CHAR);
     }
 
     @Override

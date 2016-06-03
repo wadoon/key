@@ -1377,7 +1377,7 @@ public class BlockContractRule implements BuiltInRule {
 
         private void declareFlagFalse(final ProgramVariable flag) {
             statements.add(KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE,
-                             services.getJavaServices().getJavainfo().getKeYJavaType("boolean")));
+                             services.getJavaServices().getJavaInfo().getKeYJavaType("boolean")));
         }
 
         private void declareResultDefault() {
@@ -1428,7 +1428,7 @@ public class BlockContractRule implements BuiltInRule {
                                          final ProgramVariable exceptionParameter) {
             Catch katch =
                     KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(
-                                                                    services.getJavaServices().getJavainfo(),
+                                                                    services.getJavaServices().getJavaInfo(),
                                                                     exceptionParameter.getKeYJavaType(),
                                                                     exceptionParameter),
                                                   new StatementBlock(KeYJavaASTFactory.assign(

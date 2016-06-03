@@ -243,7 +243,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
           Term post = tb.and(postTerm, frameTerm);
           ImmutableList<FunctionalOperationContract> lookupContracts = ImmutableSLList.<FunctionalOperationContract>nil();
           ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository().getOperationContracts(getCalleeKeYJavaType(), pm);
-          for(KeYJavaType superType : proofServices.getJavaServices().getJavainfo().getAllSupertypes(getCalleeKeYJavaType())) {
+          for(KeYJavaType superType : proofServices.getJavaServices().getJavaInfo().getAllSupertypes(getCalleeKeYJavaType())) {
               for(FunctionalOperationContract fop : cs) {
                   if(fop.getSpecifiedIn().equals(superType)) { lookupContracts = lookupContracts.append(fop); }
               }
@@ -376,7 +376,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
              // Need to add assumptions about the transaction depth
              try {
                  final Term depthTerm =
-                         proofServices.getJavaServices().getJavainfo().getStaticProgramMethodTerm("getTransactionDepth", new Term[0], "javacard.framework.JCSystem");
+                         proofServices.getJavaServices().getJavaInfo().getStaticProgramMethodTerm("getTransactionDepth", new Term[0], "javacard.framework.JCSystem");
                  final Term depthValue = transactionFlag ? tb.one() : tb.zero();
                  pre = tb.and(pre, tb.equals(depthTerm, depthValue));
              }catch(IllegalArgumentException iae) {

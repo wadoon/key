@@ -66,7 +66,7 @@ public abstract class ComparativeOperator extends Operator {
 	return getKeYJavaType(services);
     }
     public KeYJavaType getKeYJavaType(Services services) {
-	return services.getJavaServices().getTypeconverter().getBooleanType();
+	return services.getJavaServices().getTypeConverter().getBooleanType();
     }
 
 }

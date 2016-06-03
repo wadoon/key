@@ -52,7 +52,7 @@ public class TestKeYWatchpointGlobalVariablesOnTrueWithHitCount extends Abstract
          int oracleIndex = 0;
          assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory);
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
-         JavaInfo javaInfo = env.getServices().getJavaServices().getJavainfo();
+         JavaInfo javaInfo = env.getServices().getJavaServices().getJavaInfo();
          KeYJavaType containerType = javaInfo.getTypeByClassName(containerTypeName);
          
          KeYWatchpoint globalVariableCondition = new KeYWatchpoint(2, env.getBuilder().getProof(),"x_global==17", true, true, containerType, true);

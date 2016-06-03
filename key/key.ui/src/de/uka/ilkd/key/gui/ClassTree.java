@@ -310,7 +310,7 @@ public class ClassTree extends JTree {
 	    					     Services services) {
 	//get all classes
 	final Set<KeYJavaType> kjts 
-		= services.getJavaServices().getJavainfo().getAllKeYJavaTypes();
+		= services.getJavaServices().getJavaInfo().getAllKeYJavaTypes();
 	final Iterator<KeYJavaType> it = kjts.iterator();
 	while(it.hasNext()) {
 	    KeYJavaType kjt = it.next();

@@ -56,8 +56,8 @@ public final class PartialInvAxiom extends ClassAxiom {
 	assert inv != null;
 	this.inv = inv;
 	assert !isStatic || inv.isStatic();
-	this.target = isStatic? services.getJavaServices().getJavainfo().getStaticInv(inv.getKJT())
-	            : services.getJavaServices().getJavainfo().getInv();
+	this.target = isStatic? services.getJavaServices().getJavaInfo().getStaticInv(inv.getKJT())
+	            : services.getJavaServices().getJavaInfo().getInv();
 	
 	
 	assert target != null;
@@ -138,7 +138,7 @@ public final class PartialInvAxiom extends ClassAxiom {
                                         ? null
                                         : SchemaVariableFactory.createTermSV(
                     new Name("EQ"),
-                    services.getJavaServices().getJavainfo().objectSort());
+                    services.getJavaServices().getJavaInfo().objectSort());
             
             ImmutableSet<Taclet> taclets =
                     TG.generatePartialInvTaclet(name,

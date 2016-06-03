@@ -360,7 +360,7 @@ public class TermBuilder {
         name = newName(name);
     }
         return new LocationVariable(new ProgramElementName(name),
-                                    services.getJavaServices().getJavainfo().getTypeByClassName(JAVA_LANG_THROWABLE));
+                                    services.getJavaServices().getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE));
     }
 
 
@@ -1621,7 +1621,7 @@ public class TermBuilder {
         Term[] p = new Term[h.length + 1];
         System.arraycopy(h, 0, p, 0, h.length);
         p[h.length] = o;
-        return func(services.getJavaServices().getJavainfo().getInv(), p);
+        return func(services.getJavaServices().getJavaInfo().getInv(), p);
     }
 
 
@@ -1636,7 +1636,7 @@ public class TermBuilder {
     }
 
     public Term staticInv(Term[] h, KeYJavaType t){
-        return func(services.getJavaServices().getJavainfo().getStaticInv(t), h);
+        return func(services.getJavaServices().getJavaInfo().getStaticInv(t), h);
     }
 
     public Term staticInv(KeYJavaType t){
@@ -1646,7 +1646,7 @@ public class TermBuilder {
         for(LocationVariable heap : heaps) {
             hs[i++] = var(heap);
         }
-        return func(services.getJavaServices().getJavainfo().getStaticInv(t), hs);
+        return func(services.getJavaServices().getJavaInfo().getStaticInv(t), hs);
     }
 
 
@@ -1907,7 +1907,7 @@ public class TermBuilder {
         final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
         final IntegerLDT intLDT = theories.getIntegerLDT();
         final LocSetLDT setLDT = theories.getLocSetLDT();
-        if (s.extendsTrans(services.getJavaServices().getJavainfo().objectSort())) {
+        if (s.extendsTrans(services.getJavaServices().getJavaInfo().objectSort())) {
             return orSC(equals(t, NULL()), created(h, t));
         } else if(s.equals(setLDT.targetSort())) {
             return createdInHeap(t, h);
@@ -1931,7 +1931,7 @@ public class TermBuilder {
 
     public Term frame(Term heapTerm, Map<Term,Term> normalToAtPre,
                   Term mod) {
-        final Sort objectSort = services.getJavaServices().getJavainfo().objectSort();
+        final Sort objectSort = services.getJavaServices().getJavaInfo().objectSort();
         final Sort fieldSort = theories.getHeapLDT()
                 .getFieldSort();
 
@@ -1979,7 +1979,7 @@ public class TermBuilder {
      * @see #frame(Term, Map, Term)
      */
     public Term frameStrictlyEmpty(Term heapTerm, Map<Term,Term> normalToAtPre) {
-        final Sort objectSort = services.getJavaServices().getJavainfo().objectSort();
+        final Sort objectSort = services.getJavaServices().getJavaInfo().objectSort();
         final Sort fieldSort = theories.getHeapLDT()
                 .getFieldSort();
 

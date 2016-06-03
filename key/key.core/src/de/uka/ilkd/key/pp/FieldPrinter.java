@@ -38,7 +38,7 @@ class FieldPrinter {
     protected String getPrettySyntaxForFieldConstant(Term objectTerm,
             Term fieldTerm) {
 
-        JavaInfo javaInfo = lp.services.getJavaServices().getJavainfo();
+        JavaInfo javaInfo = lp.services.getJavaServices().getJavaInfo();
 
         if (isCanonicField(objectTerm, fieldTerm, javaInfo)) {
             /*
@@ -124,7 +124,7 @@ class FieldPrinter {
         if(name.contains("::$") && isFieldConstant(fieldTerm, heapLDT)) {
             String pvName = name.replace("::$", "::");
             try {
-                return services.getJavaServices().getJavainfo().getAttribute(pvName) != null;
+                return services.getJavaServices().getJavaInfo().getAttribute(pvName) != null;
             } catch (UnknownJavaTypeException e) {
                 // If there exists a constant of the form x::$y and there is no type
                 // x, this exception is thrown.

@@ -529,7 +529,7 @@ public class SVInstantiations {
         } else if (inst instanceof Term) {
             return (Term) inst;
         } else if (inst instanceof ProgramElement) {
-            return services.getJavaServices().getTypeconverter().convertToLogicElement(
+            return services.getJavaServices().getTypeConverter().convertToLogicElement(
                     (ProgramElement) inst, ec);
         } else {
             throw CONVERT_INSTANTIATION_EXCEPTION;

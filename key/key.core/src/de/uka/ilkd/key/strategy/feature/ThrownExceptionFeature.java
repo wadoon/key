@@ -53,7 +53,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
             Services services) {
         final List<Sort> filtered = new ArrayList<Sort>();
 
-        final JavaInfo javaInfo = services.getJavaServices().getJavainfo();
+        final JavaInfo javaInfo = services.getJavaServices().getJavaInfo();
 
         for (String p_filteredException : p_filteredExceptions) {
             final KeYJavaType nullPointer = javaInfo

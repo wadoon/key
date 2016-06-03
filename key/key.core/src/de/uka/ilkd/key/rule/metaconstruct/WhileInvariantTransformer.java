@@ -118,9 +118,9 @@ public final class WhileInvariantTransformer {
         inv = invariantFramingTermination;
         post = initialPost.sub(0);
 
-        javaInfo = services.getJavaServices().getJavainfo();
+        javaInfo = services.getJavaServices().getJavaInfo();
         tf = services.getTermFactory() ;
-        typeConv = services.getJavaServices().getTypeconverter();
+        typeConv = services.getJavaServices().getTypeConverter();
         
         returnType = removeWhile.returnType();
     }

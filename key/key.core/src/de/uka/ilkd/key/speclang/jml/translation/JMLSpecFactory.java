@@ -489,7 +489,7 @@ public class JMLSpecFactory {
         for (Triple<PositionedString,
                     PositionedString,
                     PositionedString> abbrv: textualSpecCase.getAbbreviations()) {
-            final KeYJavaType abbrKJT = services.getJavaServices().getJavainfo().getKeYJavaType(abbrv.first.text);
+            final KeYJavaType abbrKJT = services.getJavaServices().getJavaInfo().getKeYJavaType(abbrv.first.text);
             final ProgramElementName abbrVarName = new ProgramElementName(abbrv.second.text);
             final LocationVariable abbrVar = new LocationVariable(abbrVarName, abbrKJT, true, true);
             assert abbrVar.isGhost() : "specification parameter not ghost";
@@ -1069,7 +1069,7 @@ public class JMLSpecFactory {
         final ImmutableList<String> mods = textualInv.getMods();
         final boolean isStatic = (mods.contains("static") || // modifier "static"
                 // in an interface "static" is the default (see Sect. 2.5 of the reference manual)
-                (services.getJavaServices().getJavainfo().isInterface(kjt) && !mods.contains("instance")));
+                (services.getJavaServices().getJavaInfo().isInterface(kjt) && !mods.contains("instance")));
 
         //create variable for self
         ProgramVariable selfVar = isStatic? null: TB.selfVar(kjt, false);

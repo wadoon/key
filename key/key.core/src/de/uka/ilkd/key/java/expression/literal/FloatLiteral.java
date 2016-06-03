@@ -112,7 +112,7 @@ public class FloatLiteral extends Literal {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
     }
 
     @Override

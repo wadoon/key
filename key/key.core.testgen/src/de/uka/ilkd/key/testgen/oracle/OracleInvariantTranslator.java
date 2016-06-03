@@ -25,7 +25,7 @@ public class OracleInvariantTranslator {
 	}
 
 	public Term getInvariantTerm(Sort s){
-		JavaInfo info = services.getJavaServices().getJavainfo();
+		JavaInfo info = services.getJavaServices().getJavaInfo();
 		TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
 		SpecificationRepository spec = services.getSpecificationRepository();
 

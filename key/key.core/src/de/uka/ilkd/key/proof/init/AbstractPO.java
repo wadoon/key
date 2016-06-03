@@ -73,7 +73,7 @@ public abstract class AbstractPO implements IPersistablePO {
                       String name) {
         this.environmentConfig = initConfig;
         this.environmentServices = initConfig.getServices();
-        this.javaInfo = initConfig.getServices().getJavaServices().getJavainfo();
+        this.javaInfo = initConfig.getServices().getJavaServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTheories().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();
         this.name = name;

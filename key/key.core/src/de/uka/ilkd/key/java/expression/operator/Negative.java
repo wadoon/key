@@ -97,7 +97,7 @@ public class Negative extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	return services.getJavaServices().getTypeconverter().
+	return services.getJavaServices().getTypeConverter().
 	    getPromotedType(getExpressionAt(0).getKeYJavaType(services, ec));
     }
 

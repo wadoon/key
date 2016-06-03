@@ -2144,7 +2144,7 @@ public abstract class KeYJavaASTFactory {
 	    final ExecutionContext context) {
 	final KeYJavaType classType = expression.getKeYJavaType(services,
 		context);
-	final ProgramVariable field = services.getJavaServices().getJavainfo().getAttribute(name,
+	final ProgramVariable field = services.getJavaServices().getJavaInfo().getAttribute(name,
 		classType);
 	final FieldReference reference = KeYJavaASTFactory.fieldReference(
 		new ParenthesizedExpression(expression), field);

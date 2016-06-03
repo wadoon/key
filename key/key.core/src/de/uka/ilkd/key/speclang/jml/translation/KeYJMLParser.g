@@ -1341,7 +1341,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
      THIS
     {
     	result = new SLExpression(
-    		services.getTypeConverter().findThisForSort(receiver.getType().getSort(),
+    		services.getJavaServices().getTypeConverter().findThisForSort(receiver.getType().getSort(),
     							    tb.var(selfVar),
     							    javaInfo.getKeYJavaType(selfVar.sort()),
     							    true),
@@ -1437,7 +1437,7 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
 	l=STRING_LITERAL
 	{
 	    Term charListTerm
-	       = services.getTypeConverter()
+	       = services.getJavaServices().getTypeConverter()
 	                 .convertToLogicElement(
 	                 	new StringLiteral(l.getText()));
 	    Function strPool

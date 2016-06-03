@@ -38,7 +38,7 @@ public class TestContextStatementBlock extends TestCase {
 	    = new Recoder2KeY(services,ji.getKeYProgModelInfo().getServConf(),
 			      ji.rec2key(),
 			      new NamespaceSet(),
-			      services.getJavaServices().getTypeconverter());
+			      services.getJavaServices().getTypeConverter());
 	blockOne
 	    = c2k.readBlock("{int a=1; {int b=3; b++;} a++;}",
 			   c2k.createEmptyContext());	

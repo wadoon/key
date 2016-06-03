@@ -312,7 +312,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             varsForCondition = saveAddVariable(x, varsForCondition);
          }
       }
-      JavaInfo info = getProof().getServices().getJavaServices().getJavainfo();
+      JavaInfo info = getProof().getServices().getJavaServices().getJavaInfo();
       ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(containerType);
       ImmutableList<ProgramVariable> globalVars = ImmutableSLList.nil();
       for(KeYJavaType kjtloc: kjts){

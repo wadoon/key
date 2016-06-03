@@ -667,7 +667,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
          stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
          SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition = getBreakpointManager().getBreakpointStopCondition();
          stopCondition.addChildren(breakpointParentStopCondition);
-         proof.getServices().setFactory(createNewFactory(breakpointParentStopCondition));
+         proof.getServices().getJavaServices().setFactory(createNewFactory(breakpointParentStopCondition));
          if (stepOver) {
             stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
          }

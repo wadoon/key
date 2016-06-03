@@ -112,7 +112,7 @@ public class LongLiteral extends Literal {
 
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
     }
 
     @Override

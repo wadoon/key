@@ -48,7 +48,7 @@ public final class ArrayLengthCondition extends VariableConditionAdapter {
 		attribute = (ProgramVariable)subst;
 	    }
 	    return negation 
-	           ^ attribute == services.getJavaServices().getJavainfo().getArrayLength();
+	           ^ attribute == services.getJavaServices().getJavaInfo().getArrayLength();
 	}
 	return true;
     }

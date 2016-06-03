@@ -60,7 +60,7 @@ public class SeqLength extends Operator {
 
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        return javaServ.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+        return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
     }
 
 

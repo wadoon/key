@@ -119,7 +119,7 @@ public class DoubleLiteral extends Literal {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaServices().getJavainfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
+	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
     }
 
     @Override

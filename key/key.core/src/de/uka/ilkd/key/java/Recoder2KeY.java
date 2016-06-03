@@ -213,7 +213,7 @@ public class Recoder2KeY implements JavaReader {
      *            the namespaces to work upon, not null
      */
     public Recoder2KeY(Services services, NamespaceSet nss) {
-        this(services,services.getJavaServices().getJavainfo().getKeYProgModelInfo().getServConf(), null, services.getJavaServices().getJavainfo().rec2key(), nss, services.getJavaServices().getTypeconverter());
+        this(services,services.getJavaServices().getJavaInfo().getKeYProgModelInfo().getServConf(), null, services.getJavaServices().getJavaInfo().rec2key(), nss, services.getJavaServices().getTypeConverter());
     }
 
     /**

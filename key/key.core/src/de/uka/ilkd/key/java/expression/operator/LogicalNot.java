@@ -92,7 +92,7 @@ public class LogicalNot extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	return services.getJavaServices().getTypeconverter().getBooleanType();
+	return services.getJavaServices().getTypeConverter().getBooleanType();
     }
 
 }

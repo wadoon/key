@@ -75,7 +75,7 @@ public final class ArrayComponentTypeCondition
 	if (s==null || !(s instanceof ArraySort)) {
 	    return false;
 	}
-	return !(((ArraySort)s).elementSort().extendsTrans(services.getJavaServices().getJavainfo().objectSort())) ^ checkReferenceType;
+	return !(((ArraySort)s).elementSort().extendsTrans(services.getJavaServices().getJavaInfo().objectSort())) ^ checkReferenceType;
     }
 
     

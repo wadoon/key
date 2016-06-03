@@ -52,7 +52,7 @@ public class TestKeYWatchpointMethodsOnSatisfiable extends AbstractSymbolicExecu
          int oracleIndex = 0;
          assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory);
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
-         JavaInfo javaInfo = env.getServices().getJavaServices().getJavainfo();
+         JavaInfo javaInfo = env.getServices().getJavaServices().getJavaInfo();
          KeYJavaType containerType = javaInfo.getTypeByClassName(containerTypeName);
          
          KeYWatchpoint globalVariableCondition = new KeYWatchpoint(-1, env.getBuilder().getProof(),"main(x_global)==42", true, true, containerType, false);

@@ -784,7 +784,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
         LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
         final Sequent applicationSequent = goal.sequent();
-        final KeYJavaType booleanKJT = services.getJavaServices().getTypeconverter().getBooleanType();
+        final KeYJavaType booleanKJT = services.getJavaServices().getTypeConverter().getBooleanType();
         final TermBuilder tb = services.getTermBuilder();
 
         //get instantiation

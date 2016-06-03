@@ -288,7 +288,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                              InitConfig initConfig, 
                                              KeYLaunchSettings settings) throws Exception {
        // Get method to proof in KeY
-       IProgramMethod pm = KeYUtil.getProgramMethod(settings.getMethod(), initConfig.getServices().getJavaInfo());
+       IProgramMethod pm = KeYUtil.getProgramMethod(settings.getMethod(), initConfig.getServices().getJavaServices().getJavaInfo());
        Assert.isNotNull(pm, "Can't find method \"" + settings.getMethod() + "\" in KeY.");
        // Instantiate proof
        AbstractOperationPO input;

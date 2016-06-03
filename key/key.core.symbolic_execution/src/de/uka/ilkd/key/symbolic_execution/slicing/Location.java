@@ -141,7 +141,7 @@ public class Location {
             assert parent == null;
             parent = services.getTermBuilder().var(access.getProgramVariable());
          }
-         else if (services.getJavaServices().getJavainfo().getArrayLength() == access.getProgramVariable()) {
+         else if (services.getJavaServices().getJavaInfo().getArrayLength() == access.getProgramVariable()) {
             // Special handling for length attribute of arrays
             assert parent != null;
             Function function = services.getTheories().getHeapLDT().getLength();

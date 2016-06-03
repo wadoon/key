@@ -58,7 +58,7 @@ public class JavaServices {
     }
 
 
-    public TypeConverter getTypeconverter() {
+    public TypeConverter getTypeConverter() {
         return typeconverter;
     }
 
@@ -66,7 +66,7 @@ public class JavaServices {
         this.typeconverter = typeconverter;
     }
 
-    public JavaInfo getJavainfo() {
+    public JavaInfo getJavaInfo() {
         return javainfo;
     }
 

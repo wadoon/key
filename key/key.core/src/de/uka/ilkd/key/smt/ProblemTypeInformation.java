@@ -112,7 +112,7 @@ public class ProblemTypeInformation {
 	}
 	
 	public Set<String> getFieldsForSort(String name){
-		JavaInfo info = services.getJavaServices().getJavainfo();
+		JavaInfo info = services.getJavaServices().getJavaInfo();
 		Sort s = info.getKeYJavaType(name).getSort();
 		return getFieldsForSort(s);
 	}
@@ -125,7 +125,7 @@ public class ProblemTypeInformation {
 		Set<String> result = new HashSet<String>();
 		result.add(Util.processName("java.lang.Object::<created>"));
 		
-		JavaInfo info = services.getJavaServices().getJavainfo();
+		JavaInfo info = services.getJavaServices().getJavaInfo();
 		
 		KeYJavaType kjt = info.getKeYJavaType(s);
 

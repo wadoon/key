@@ -82,7 +82,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
      */
     public static ImmutableSet<RewriteTaclet> createInvTaclet(Services services) {
         final TermBuilder TB = services.getTermBuilder();
-        final KeYJavaType kjt = services.getJavaServices().getJavainfo().getJavaLangObject();
+        final KeYJavaType kjt = services.getJavaServices().getJavaInfo().getJavaLangObject();
         final String prefix = WellDefinednessCheck.INV_TACLET;
         final LocationVariable heap = services.getTheories().getHeapLDT().getHeap();
         final SchemaVariable heapSV =

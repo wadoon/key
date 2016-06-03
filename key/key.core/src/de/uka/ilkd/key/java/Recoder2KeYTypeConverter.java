@@ -103,7 +103,7 @@ public class Recoder2KeYTypeConverter {
         this.typeConverter = typeConverter;
         this.namespaces = namespaces;
         this.recoder2key = recoder2key;
-        javaInfo = services.getJavaServices().getJavainfo();
+        javaInfo = services.getJavaServices().getJavaInfo();
     }
 
     private KeYJavaType lookupInCache(recoder.abstraction.Type t) {

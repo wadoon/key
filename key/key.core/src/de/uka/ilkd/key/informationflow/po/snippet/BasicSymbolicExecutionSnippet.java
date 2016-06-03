@@ -126,7 +126,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
             throw new UnsupportedOperationException("Tried to produce a "
                     + "java-block for an observer which is no program method.");
         }
-        JavaInfo javaInfo = d.services.getJavaServices().getJavainfo();
+        JavaInfo javaInfo = d.services.getJavaServices().getJavaInfo();
         IProgramMethod pm = (IProgramMethod) targetMethod;
 
         //create method call

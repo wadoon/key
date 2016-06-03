@@ -44,7 +44,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
             Object peForCompare = pe;
             if (inMap instanceof Term) {
                 try {
-                    peForCompare = services.getJavaServices().getTypeconverter()
+                    peForCompare = services.getJavaServices().getTypeConverter()
                             .convertToLogicElement(
                                     pe,
                                     matchCond.getInstantiations()

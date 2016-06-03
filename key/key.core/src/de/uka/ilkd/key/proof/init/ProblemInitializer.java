@@ -268,7 +268,7 @@ public final class ProblemInitializer {
     private void readJava(EnvInput envInput, InitConfig initConfig) 
                 throws ProofInputException {
         //this method must only be called once per init config
-        assert !initConfig.getServices().getJavaServices().getJavainfo()
+        assert !initConfig.getServices().getJavaServices().getJavaInfo()
                           .rec2key()
                           .parsedSpecial();
         assert initConfig.getServices().getJavaServices().getJavaModel() == null;
@@ -296,7 +296,7 @@ public final class ProblemInitializer {
         if(javaPath != null) {
             reportStatus("Reading Java source");
             final ProjectSettings settings 
-                =  initConfig.getServices().getJavaServices().getJavainfo()
+                =  initConfig.getServices().getJavaServices().getJavaInfo()
                              .getKeYProgModelInfo()
                              .getServConf()
                              .getProjectSettings();
@@ -505,7 +505,7 @@ public final class ProblemInitializer {
         readJava(envInput, initConfig);
 
         //register function and predicate symbols defined by Java program
-        final JavaInfo javaInfo = initConfig.getServices().getJavaServices().getJavainfo();
+        final JavaInfo javaInfo = initConfig.getServices().getJavaServices().getJavaInfo();
         final Namespace functions 
         = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 

@@ -325,7 +325,7 @@ public class Proof implements Named {
 
     /** returns the JavaInfo with the java type information */
     public JavaInfo getJavaInfo() {
-        return getServices().getJavaServices().getJavainfo();
+        return getServices().getJavaServices().getJavaInfo();
     }
 
     /** returns the Services with the java service classes */

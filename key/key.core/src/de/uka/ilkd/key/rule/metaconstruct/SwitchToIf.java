@@ -139,7 +139,7 @@ public class SwitchToIf extends ProgramTransformer {
     
     private Statement[] mkIfNullCheck(Services services, ProgramVariable var) {
 	final New exception = KeYJavaASTFactory
-		.newOperator(services.getJavaServices().getJavainfo().getKeYJavaType(
+		.newOperator(services.getJavaServices().getJavaInfo().getKeYJavaType(
 			"java.lang.NullPointerException"));
 	Throw t = KeYJavaASTFactory.throwClause(exception);
         

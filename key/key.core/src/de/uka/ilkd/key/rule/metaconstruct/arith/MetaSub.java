@@ -44,6 +44,6 @@ public class MetaSub extends AbstractTermTransformer {
 	BigInteger bigIntResult = bigIntArg1.subtract(bigIntArg2);
 	
 	IntLiteral lit = new IntLiteral(bigIntResult.toString());
-	return services.getJavaServices().getTypeconverter().convertToLogicElement(lit);
+	return services.getJavaServices().getTypeConverter().convertToLogicElement(lit);
     }
 }

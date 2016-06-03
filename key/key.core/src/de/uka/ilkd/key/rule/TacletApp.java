@@ -1312,9 +1312,9 @@ public abstract class TacletApp implements RuleApp {
             if (nvc != null) {
         	KeYJavaType kjt;
         	Object o = nvc.getTypeDefiningObject();
-        	JavaInfo javaInfo = services.getJavaServices().getJavainfo();
+        	JavaInfo javaInfo = services.getJavaServices().getJavaInfo();
         	if (o instanceof SchemaVariable) {
-                    final TypeConverter tc = services.getJavaServices().getTypeconverter();
+                    final TypeConverter tc = services.getJavaServices().getTypeConverter();
         	    final SchemaVariable peerSV = (SchemaVariable)o;
         	    final Object peerInst = instantiations().getInstantiation(peerSV);
                     if(peerInst instanceof TypeReference){

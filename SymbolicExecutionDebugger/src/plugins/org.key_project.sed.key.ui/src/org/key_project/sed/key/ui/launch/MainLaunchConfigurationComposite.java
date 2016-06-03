@@ -633,7 +633,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
                }
                if (initConfig != null) {
                    // Get method to proof in KeY
-                   IProgramMethod pm = KeYUtil.getProgramMethod(method, initConfig.getServices().getJavaInfo());
+                   IProgramMethod pm = KeYUtil.getProgramMethod(method, initConfig.getServices().getJavaServices().getJavaInfo());
                    if (pm != null) {
                        KeYJavaType type = pm.getContainerType();
                        ImmutableSet<FunctionalOperationContract> operationContracts = initConfig.getServices().getSpecificationRepository().getOperationContracts(type, pm);

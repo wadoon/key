@@ -959,10 +959,10 @@ public final class SymbolicExecutionUtil {
          // Make sure that the function is not an array
          if (heapLDT.getArr() != function) {
             String typeName = HeapLDT.getClassName(function);
-            KeYJavaType type = services.getJavaServices().getJavainfo().getKeYJavaType(typeName);
+            KeYJavaType type = services.getJavaServices().getJavaInfo().getKeYJavaType(typeName);
             if (type != null) {
                String fieldName = HeapLDT.getPrettyFieldName(function);
-               result = services.getJavaServices().getJavainfo().getAttribute(fieldName, type);
+               result = services.getJavaServices().getJavaInfo().getAttribute(fieldName, type);
             }
          }
       }
@@ -2091,7 +2091,7 @@ public final class SymbolicExecutionUtil {
           term.sub(0).op() instanceof LocationVariable && 
           term.sub(0).toString().startsWith("exc_") &&
           isNullSort(term.sub(1).sort(), services) &&
-          services.getJavaServices().getJavainfo().isSubtype(services.getJavaServices().getJavainfo().getKeYJavaType(term.sub(0).sort()), services.getJavaServices().getJavainfo().getKeYJavaType("java.lang.Throwable"))) {
+          services.getJavaServices().getJavaInfo().isSubtype(services.getJavaServices().getJavaInfo().getKeYJavaType(term.sub(0).sort()), services.getJavaServices().getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
          return term;
       }
       else {
@@ -3449,9 +3449,9 @@ public final class SymbolicExecutionUtil {
    public static boolean hasReferenceSort(Services services, Sort sort) {
       boolean referenceSort = false;
       if (services != null && sort != null) {
-         KeYJavaType kjt = services.getJavaServices().getJavainfo().getKeYJavaType(sort);
+         KeYJavaType kjt = services.getJavaServices().getJavaInfo().getKeYJavaType(sort);
          if (kjt != null) {
-            TypeConverter typeConverter = services.getJavaServices().getTypeconverter();
+            TypeConverter typeConverter = services.getJavaServices().getTypeConverter();
             referenceSort = typeConverter.isReferenceType(kjt) && // Check if the value is a reference type
                             (!(kjt.getJavaType() instanceof TypeDeclaration) || // check if the value is a library class which should be ignored
                             !((TypeDeclaration)kjt.getJavaType()).isLibraryClass());
@@ -3958,7 +3958,7 @@ public final class SymbolicExecutionUtil {
          else {
             Term parentTerm = variable.getParentValue().getVariable().createSelectTerm();
             if (variable.getProgramVariable() != null) {
-               if (services.getJavaServices().getJavainfo().getArrayLength() == variable.getProgramVariable()) {
+               if (services.getJavaServices().getJavaInfo().getArrayLength() == variable.getProgramVariable()) {
                   // Special handling for length attribute of arrays
                   Function function = services.getTheories().getHeapLDT().getLength();
                   return services.getTermBuilder().func(function, parentTerm);

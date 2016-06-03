@@ -72,7 +72,7 @@ public final class TypeCondition extends VariableConditionAdapter {
         }
         final Sort s = resolver.resolveSort(p_var, candidate, svInst, services);
 
-        Sort objectSort = services.getJavaServices().getJavainfo().objectSort();
+        Sort objectSort = services.getJavaServices().getJavaInfo().objectSort();
 
         boolean isProxySort = s instanceof ProxySort;
         if(!isProxySort) {

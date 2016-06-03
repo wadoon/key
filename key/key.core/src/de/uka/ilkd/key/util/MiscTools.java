@@ -89,7 +89,7 @@ public final class MiscTools {
 	ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
 	ReferencePrefix rp = ec.getRuntimeInstance();
 	if(!(rp instanceof TypeReference) && rp != null) {
-	    return services.getJavaServices().getTypeconverter().convertToLogicElement(rp);
+	    return services.getJavaServices().getTypeConverter().convertToLogicElement(rp);
 	} else {
 	    return null;
 	}

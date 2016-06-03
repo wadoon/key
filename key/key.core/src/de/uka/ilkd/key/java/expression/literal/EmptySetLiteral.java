@@ -49,7 +49,7 @@ public class EmptySetLiteral extends Literal {
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
 	PrimitiveType type = PrimitiveType.JAVA_LOCSET;
-	return javaServ.getJavaServices().getJavainfo().getKeYJavaType(type);
+	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(type);
     }
 
     @Override

@@ -153,7 +153,7 @@ public class Services implements TermServices {
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
-    	final KeYProgModelInfo keYProgModelInfo = javaServices.getJavainfo().getKeYProgModelInfo();
+    	final KeYProgModelInfo keYProgModelInfo = javaServices.getJavaInfo().getKeYProgModelInfo();
         Debug.assertTrue
     	(!(keYProgModelInfo.getServConf() 
     			instanceof SchemaCrossReferenceServiceConfiguration),
@@ -167,7 +167,7 @@ public class Services implements TermServices {
         s.nameRecorder = nameRecorder.copy();
 
         s.theories.init(theories);
-        s.javaServices.setTypeconverter(getJavaServices().getTypeconverter().copy(s));
+        s.javaServices.setTypeconverter(getJavaServices().getTypeConverter().copy(s));
     	s.javaServices.setJavaModel(getJavaServices().getJavaModel());
         return s;
     }
@@ -191,7 +191,7 @@ public class Services implements TermServices {
      */
     public Services copyPreservesLDTInformation() {
     	Debug.assertTrue
-    	(!(getJavaServices().getJavainfo().getKeYProgModelInfo().getServConf() 
+    	(!(getJavaServices().getJavaInfo().getKeYProgModelInfo().getServConf() 
     			instanceof SchemaCrossReferenceServiceConfiguration),
     			"services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
@@ -199,7 +199,7 @@ public class Services implements TermServices {
         s.nameRecorder = nameRecorder.copy();
         
         s.theories.init(theories);
-        s.javaServices.setTypeconverter(getJavaServices().getTypeconverter().copy(s));
+        s.javaServices.setTypeconverter(getJavaServices().getTypeConverter().copy(s));
     	s.javaServices.setJavaModel(getJavaServices().getJavaModel());
     	return s;
     }
@@ -222,7 +222,7 @@ public class Services implements TermServices {
    
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s = new Services(getProfile(), getJavaServices().getJavainfo().getKeYProgModelInfo().getServConf(), getJavaServices().getJavainfo().getKeYProgModelInfo().rec2key(),
+        final Services s = new Services(getProfile(), getJavaServices().getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaServices().getJavaInfo().getKeYProgModelInfo().rec2key(),
                 copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
@@ -230,7 +230,7 @@ public class Services implements TermServices {
         s.nameRecorder = nameRecorder.copy();
 
         s.theories.init(theories);
-        s.javaServices.setTypeconverter(getJavaServices().getTypeconverter().copy(s));
+        s.javaServices.setTypeconverter(getJavaServices().getTypeConverter().copy(s));
         s.javaServices.setJavaModel(getJavaServices().getJavaModel());
 
         return s;
