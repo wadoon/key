@@ -23,6 +23,6 @@ package de.uka.ilkd.key.logic.op;
  *
  * @author Dominic Scheurer
  */
-public interface GenericUpdateableOperator extends GenericSortedOperator {
+public interface GenericUpdateableOperator extends SortedOperator {
 
 }

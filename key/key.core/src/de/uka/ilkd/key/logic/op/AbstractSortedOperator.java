@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author Dominic Scheurer
  */
 public abstract class AbstractSortedOperator extends AbstractOperator
-        implements GenericSortedOperator, Sorted {
+        implements SortedOperator, Sorted {
 
     protected static final ImmutableArray<Sort> EMPTY_SORT_LIST =
             new ImmutableArray<Sort>();

@@ -22,6 +22,6 @@ package de.uka.ilkd.key.logic.op;
  *
  * @author Dominic Scheurer
  */
-public interface GenericParsableVariable extends GenericSortedOperator {
+public interface GenericParsableVariable extends SortedOperator {
 
 }
