@@ -75,6 +75,10 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
                 (TypeCheckingAndInferenceService<C>) CHECKERS
                         .get(op.getClass());
 
+        if (result != null) {
+            return result;
+        }
+        
         for (Class<?> c : CHECKERS.keySet()) {
             if (c.isInstance(op)) {
                 result = (TypeCheckingAndInferenceService<C>) CHECKERS.get(c);
@@ -143,7 +147,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
         @Override
         public boolean validTopLevel(Term term, O op) {
             if (op.arity() != term.arity() || op.arity() != term.subs().size()
-                    || op.bindsVars() != term.boundVars().isEmpty()) {
+                    || ( op.bindsVars() == term.boundVars().isEmpty() ) ) {
                 return false;
             }
 
@@ -188,7 +192,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
          * of the given subterm is NOT checked.
          * 
          * @param at
-         *            theposition of the term where this method should check the
+         *            the position of the term where this method should check the
          *            validity.
          * @param possibleSub
          *            the subterm to be ckecked.
@@ -206,7 +210,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
                     || s.extendsTrans(op.argSort(at));
         }
     }
-
+    
     static class IfExThenElseTypeCheckingAndInferenceService extends
             DefaultTypeCheckingAndInferenceService<IfExThenElse> {
 
