@@ -58,7 +58,6 @@ public class InnerVariableNamer extends VariableNamer {
 	//prepare renaming of inner var
 	final NameCreationInfo nci = MethodStackInfo.create(getProgramFromPIO(posOfFind));
 	ProgramElementName newname = null;
-   ProgramElementName branchUniqueName = null;
 
 	// Name proposal = services.getProof().getNameRecorder().getProposal();
         Name proposal = services.getNameRecorder().getProposal();

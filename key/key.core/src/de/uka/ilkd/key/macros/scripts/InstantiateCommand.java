@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
@@ -136,7 +134,6 @@ public class InstantiateCommand extends AbstractCommand {
      * Filter those apps from a list that are according to the parameters.
      */
     private TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
-        List<TacletApp> matchingApps = new ArrayList<TacletApp>();
         for (TacletApp tacletApp : list) {
             if(tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
