@@ -19,9 +19,14 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 
 /**
- * Abstract operator class offering some common functionality.
+ * Abstract operator class offering some common functionality.<br/>
+ * 
+ * <strong>TODO:</strong> This should be named something like
+ * "AbstractTypeCheckingAndInferenceService" and not be used for assembling
+ * actual terms.
  */
-abstract class AbstractOperator extends GenericAbstractOperator implements Operator {
+abstract class AbstractOperator extends GenericAbstractOperator implements
+        Operator {
 
     protected AbstractOperator(Name name, int arity,
             ImmutableArray<Boolean> whereToBind, boolean isRigid) {

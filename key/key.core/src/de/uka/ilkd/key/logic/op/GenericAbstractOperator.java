@@ -18,7 +18,9 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
 
 /**
- * TODO: Document.
+ * <strong>TODO:</strong> This should be named "AbstractOperator"; the previous
+ * {@link AbstractOperator} interface should get the name
+ * "AbstractTypeCheckingAndInferenceService" or the like.
  *
  * @author Dominic Scheurer
  */
@@ -28,7 +30,7 @@ public class GenericAbstractOperator implements GenericOperator {
     protected final int arity;
     protected final ImmutableArray<Boolean> whereToBind;
     protected final boolean isRigid;
-    
+
     protected GenericAbstractOperator(Name name, int arity,
             ImmutableArray<Boolean> whereToBind, boolean isRigid) {
         assert name != null;
