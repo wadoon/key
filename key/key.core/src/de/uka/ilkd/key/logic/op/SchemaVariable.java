@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.logic.op;
 
-
 /**
  * This interface represents the root of a schema variable hierarchy to be
  * express termstructures that match on logical terms. Schema variables
@@ -21,8 +20,25 @@ package de.uka.ilkd.key.logic.op;
  * TermSymbols. The TermSymbols a SchemaVariable is allowed to match
  * is specified by their type and sort.<br/>
  * 
- * <strong>TODO:</strong> This should be renamed since it includes type checking
- * methods of the {@link Operator} interface.
+ * <strong>TODO:</strong> This should be named "SchemaVariable"; the previous
+ * {@link SchemaVariable} interface should get a different name.
+ *
+ * @author Dominic Scheurer
  */
-public interface SchemaVariable extends ParsableVariable, GenericSchemaVariable {
+public interface SchemaVariable extends ParsableVariable {
+
+    /**
+     * @return true if the schemavariable has the strict modifier which forces
+     *         the instantiation to have exactly the same sort as the
+     *         schemavariable (or if the sv is of generic sort - the
+     *         instantiation of the generic sort)
+     */
+    boolean isStrict();
+
+    /**
+     * Creates a parseable string representation of the declaration of the 
+     * schema variable.
+     */
+    String proofToString();
+
 }

@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  *
  */
 public abstract class GenericAbstractSV extends AbstractSortedOperator
-        implements GenericSchemaVariable {
+        implements SchemaVariable {
 
     protected final boolean isStrict;
 
