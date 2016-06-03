@@ -26,8 +26,23 @@ interface ExtendedTypeCheckingAndInferenceService extends Operator {
      * Allows subclasses to impose custom demands on what constitutes a valid
      * term using the operator represented by the subclass.
      */
-    boolean additionalValidTopLevel(Term term);
+    default boolean additionalValidTopLevel(Term term) {
+        return true;
+    }
 
-    boolean validTopLevel(Term term);
+    default boolean validTopLevel(Term term) {
+        if (arity() != term.arity() || arity() != term.subs().size()
+                || bindsVars() != term.boundVars().isEmpty()) {
+            return false;
+        }
+
+        for (int i = 0, n = arity(); i < n; i++) {
+            if (term.sub(i) == null) {
+                return false;
+            }
+        }
+
+        return additionalValidTopLevel(term);
+    }
 
 }

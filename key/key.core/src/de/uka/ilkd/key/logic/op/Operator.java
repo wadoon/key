@@ -49,4 +49,12 @@ public interface Operator extends GenericOperator {
      * @return true iff the top level structure of the {@link Term} is valid.
      */
     boolean validTopLevel(Term term);
+
+    /**
+     * Introduced to decouple Operators from Java specifics; needed in
+     * {@link ExtendedTypeCheckingAndInferenceService}.
+     *
+     * @return True iff the operator binds any variables.
+     */
+    boolean bindsVars();
 }

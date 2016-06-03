@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Abstract sorted operator class offering some common functionality.
  */
 public abstract class AbstractSortedOperator extends
-        GenericAbstractSortedOperator implements GenericSortedOperator, Sorted, ExtendedTypeCheckingAndInferenceService {
+        GenericAbstractSortedOperator implements Sorted, ExtendedTypeCheckingAndInferenceService {
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts,
             Sort sort, ImmutableArray<Boolean> whereToBind, boolean isRigid) {
@@ -115,5 +115,13 @@ public abstract class AbstractSortedOperator extends
         }
 
         return additionalValidTopLevel(term);
+    }
+    
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.op.Operator#bindsVars()
+     */
+    @Override
+    public boolean bindsVars() {
+        return whereToBind != null && whereToBind.size() > 0;
     }
 }

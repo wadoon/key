@@ -120,6 +120,11 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 	       && term.sub(1).sort().extendsTrans(numbers.getNumberSymbol ().sort ());
                     }
 
+                    @Override
+                    public boolean bindsVars() {
+                        return false;
+                    }
+
                 };
                 
 //                binFunc = new Function

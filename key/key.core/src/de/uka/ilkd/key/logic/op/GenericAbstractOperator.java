@@ -72,5 +72,9 @@ public class GenericAbstractOperator implements GenericOperator {
     public String toString() {
         return name().toString();
     }
+    
+    public boolean bindsVars() {
+        return whereToBind != null && whereToBind.size() > 0;
+    }
 
 }

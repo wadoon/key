@@ -37,6 +37,11 @@ public interface GenericOperator extends Named, SVSubstitute {
      * Tells whether the operator binds variables at the n-th subterm.
      */
     boolean bindVarsAt(int n);
+    
+    /**
+     * @return true iff this operator binds any variables
+     */
+    boolean bindsVars();
 
     /**
      * Tells whether the operator is rigid.
