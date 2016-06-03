@@ -26,7 +26,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /**
  * This method performs type checking and sort inference by supplying methods
  * previously defined by the {@link Operator} class which, however, were not
- * Operator-relatex.
+ * Operator-related.<br/>
+ * 
+ * <strong>TODO</strong>: This does not belong into the operators package. Move
+ * somewhere else.
  *
  * @author Dominic Scheurer
  */

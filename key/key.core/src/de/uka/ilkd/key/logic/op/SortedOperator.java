@@ -18,10 +18,7 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
- * Operator with well-defined argument and result sorts.<br/>
- * 
- * <strong>TODO:</strong> This should be named "SortedOperator"; the previous
- * {@link SortedOperator} interface should get a different name.
+ * Operator with well-defined argument and result sorts.
  *
  * @author Dominic Scheurer
  */

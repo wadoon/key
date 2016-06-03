@@ -18,10 +18,7 @@ package de.uka.ilkd.key.logic.op;
  * express termstructures that match on logical terms. Schema variables
  * are used in Taclets where they act as placeholders for other
  * TermSymbols. The TermSymbols a SchemaVariable is allowed to match
- * is specified by their type and sort.<br/>
- * 
- * <strong>TODO:</strong> This should be named "SchemaVariable"; the previous
- * {@link SchemaVariable} interface should get a different name.
+ * is specified by their type and sort.
  *
  * @author Dominic Scheurer
  */

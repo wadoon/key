@@ -15,10 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 /** 
  * This interface represents the variables that can be recognized 
- * by one of the parsers.<br/>
- * 
- * <strong>TODO:</strong> This should be named "ParsableVariable"; the previous
- * {@link ParsableVariable} interface should get a different name.
+ * by one of the parsers.
  *
  * @author Dominic Scheurer
  */
