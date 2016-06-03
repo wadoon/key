@@ -11,7 +11,11 @@ folgende Methoden herausfaktorisieren in
 
 Ziel: Operator unabhängig vom Term und u.U. spezielle TermFactories ohne Validation (schneller)
 
+Protokoll
+---------
 
+- Habe Interface “GenericOperator” extrahiert  
+  TODO: Dieses zu Operator umbenennen, GenericOperator wird zu TypeCheckingAndInferenceService o.ä.
 
 
 Term (Dominic)
