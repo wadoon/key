@@ -16,6 +16,7 @@ Protokoll
 
 - Habe Interface “GenericOperator” extrahiert  
   TODO: Dieses zu Operator umbenennen, GenericOperator wird zu TypeCheckingAndInferenceService o.ä.
+- Das selbige für “GenericAbstractOperator” / “AbstractOperator”
 
 
 Term (Dominic)
