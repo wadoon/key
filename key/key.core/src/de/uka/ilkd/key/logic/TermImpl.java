@@ -105,21 +105,6 @@ class TermImpl implements Term {
     // public interface
     // -------------------------------------------------------------------------
 
-    /**
-     * Checks whether the Term is valid on the top level. If this is the case
-     * this method returns the Term unmodified. Otherwise a
-     * TermCreationException is thrown.
-     */
-    public Term checked() {
-        if (TypeCheckingAndInferenceService.getTypeCheckerFor(op)
-                .validTopLevel(this, op)) {
-            return this;
-        }
-        else {
-            throw new TermCreationException(op, this);
-        }
-    }
-
     @Override
     public Operator op() {
         return op;

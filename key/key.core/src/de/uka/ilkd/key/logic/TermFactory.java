@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
 
 /** 
  * The TermFactory is the <em>only</em> way to create terms using constructors 
@@ -143,10 +144,37 @@ public final class TermFactory {
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             JavaBlock javaBlock, ImmutableArray<TermLabel> labels) {
+        
         final Term newTerm 
             = (labels == null || labels.isEmpty() ? 
                     new TermImpl(op, subs, boundVars, javaBlock) : 
-                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
+                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels));
+                
+        
+        return cacheTerm(newTerm);
+    }
+
+    
+    /**
+     * Checks whether the Term is valid on the top level. If this is the case
+     * this method returns the Term unmodified. Otherwise a
+     * TermCreationException is thrown.
+     * @param term the {@link Term} to be checked
+     * @return the same term 
+     * @throws TermCreationException if the term is not wellformed
+     */
+    public final Term checked(Term term) {
+        final Operator op = term.op();
+        if (TypeCheckingAndInferenceService.getTypeCheckerFor(op)
+                .validTopLevel(term, op)) {
+            return term;
+        }
+        else {
+            throw new TermCreationException(op, term);
+        }
+    }
+    
+    private Term cacheTerm(final Term newTerm) {
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
@@ -157,7 +185,7 @@ public final class TermFactory {
                term = cache.get(newTerm);
            }
            if(term == null) {
-               term = newTerm;
+               term = checked(newTerm);
                synchronized(cache) { 
                    cache.put(term, term);
                }
@@ -165,7 +193,7 @@ public final class TermFactory {
            return term;
         }
         else {
-           return newTerm;
+           return checked(newTerm);
         }
     }
 }
