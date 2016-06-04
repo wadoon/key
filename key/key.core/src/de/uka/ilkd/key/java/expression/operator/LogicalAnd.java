@@ -85,7 +85,7 @@ public class LogicalAnd extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	return services.getJavaServices().getTypeConverter().getBooleanType();
+	return services.getProgramServices().getTypeConverter().getBooleanType();
     }
 
 }

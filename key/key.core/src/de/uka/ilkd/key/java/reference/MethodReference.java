@@ -271,7 +271,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 						ExecutionContext ec) {
 	ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
 	if (arguments != null) {
-            final TypeConverter typeConverter = services.getJavaServices().getTypeConverter();
+            final TypeConverter typeConverter = services.getProgramServices().getTypeConverter();
 	    for (int i = arguments.size()-1; i>=0; i--) {		
                 signature = signature.prepend
                     (typeConverter.getKeYJavaType(getArgumentAt(i), ec));
@@ -301,7 +301,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public IProgramMethod method(Services services, 
             			KeYJavaType refPrefixType, 
             			ExecutionContext ec) {	
-        ProgramVariable inst = services.getJavaServices().getJavaInfo().getAttribute(
+        ProgramVariable inst = services.getProgramServices().getJavaInfo().getAttribute(
                 ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
         IProgramMethod pm = method(services, refPrefixType, 
                 getMethodSignature(services, ec),
@@ -314,7 +314,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
             if(pm!=null){
                 return pm;
             }
-            inst = services.getJavaServices().getJavaInfo().getAttribute(
+            inst = services.getProgramServices().getJavaInfo().getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType);
         }
         return pm;
@@ -335,7 +335,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     	        ImmutableList<KeYJavaType> signature, 
     	        KeYJavaType context) {
         final String methodName = name.toString();        
-        IProgramMethod pm = services.getJavaServices().getJavaInfo().getProgramMethod(classType, 
+        IProgramMethod pm = services.getProgramServices().getJavaInfo().getProgramMethod(classType, 
                 methodName, signature, context);
 	return pm;
     }

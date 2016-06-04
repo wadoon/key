@@ -50,7 +50,7 @@ public class TestJavaInfo extends TestCase {
         HelperClassForTests helper =  new HelperClassForTests();
         final ProofAggregate agg = helper.parse(new File(testfile));
         services = agg.getFirstProof().getServices();
-        javaInfo = services.getJavaServices().getJavaInfo();
+        javaInfo = services.getProgramServices().getJavaInfo();
     }
     
     public void tearDown() {
@@ -75,10 +75,10 @@ public class TestJavaInfo extends TestCase {
     }
     
     public void testGetAllSubtypes() {
-        assertTrue("No subtypes of java.lang.Object?", javaInfo.getAllSubtypes(services.getJavaServices().getJavaInfo().getJavaLangObject()) != null);
+        assertTrue("No subtypes of java.lang.Object?", javaInfo.getAllSubtypes(services.getProgramServices().getJavaInfo().getJavaLangObject()) != null);
         // attention this test is not for fun, there are some methods deoending on
         // this property
-        assertTrue("The method getAllSubtypes must not contain the type itself", !javaInfo.getAllSubtypes(services.getJavaServices().getJavaInfo().getJavaLangObject()).
+        assertTrue("The method getAllSubtypes must not contain the type itself", !javaInfo.getAllSubtypes(services.getProgramServices().getJavaInfo().getJavaLangObject()).
                  contains(javaInfo.getJavaLangObject()));        
     }
     

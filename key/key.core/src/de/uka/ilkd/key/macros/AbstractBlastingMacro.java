@@ -97,7 +97,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     private List<SequentFormula> createFormulae(Services services, Set<Sort> sorts){
         List<SequentFormula> result = new LinkedList<SequentFormula>();
 
-        JavaInfo info = services.getJavaServices().getJavaInfo();
+        JavaInfo info = services.getProgramServices().getJavaInfo();
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         SpecificationRepository spec = services.getSpecificationRepository();
 

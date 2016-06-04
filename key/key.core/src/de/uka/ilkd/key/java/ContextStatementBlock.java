@@ -311,7 +311,7 @@ public class ContextStatementBlock extends StatementBlock {
             if (prefix != null && prefix.getInnerMostMethodFrame() != null) {
                 innerContext = (ExecutionContext) prefix.getInnerMostMethodFrame().getExecutionContext();
             } else {
-                innerContext = services.getJavaServices().getJavaInfo().getDefaultExecutionContext();
+                innerContext = services.getProgramServices().getJavaInfo().getDefaultExecutionContext();
             }
         }
         

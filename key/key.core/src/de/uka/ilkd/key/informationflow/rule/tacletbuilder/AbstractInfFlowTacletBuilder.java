@@ -68,7 +68,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
                                                       t.toString()).toString();
         Sort sort = t.sort();
         Name name =
-                services.getJavaServices().getInnerVarNamer().getTemporaryNameProposal(svName);
+                services.getProgramServices().getInnerVarNamer().getTemporaryNameProposal(svName);
         return var(SchemaVariableFactory.createTermSV(name, sort));
     }
 
@@ -83,7 +83,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
                 MiscTools.toValidVariableName(schemaPrefix + v.name()).toString();
         Sort sort = v.sort();
         Name name =
-                services.getJavaServices().getInnerVarNamer().getTemporaryNameProposal(svName);
+                services.getProgramServices().getInnerVarNamer().getTemporaryNameProposal(svName);
         return SchemaVariableFactory.createVariableSV(name, sort);
 
     }

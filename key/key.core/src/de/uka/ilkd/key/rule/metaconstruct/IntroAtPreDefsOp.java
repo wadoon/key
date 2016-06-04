@@ -113,7 +113,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         if(rp == null || rp instanceof TypeReference) {
             selfTerm = null;
         } else {
-            selfTerm = services.getJavaServices().getTypeConverter().convertToLogicElement(rp);
+            selfTerm = services.getProgramServices().getTypeConverter().convertToLogicElement(rp);
         }
 
         //create atPre heap

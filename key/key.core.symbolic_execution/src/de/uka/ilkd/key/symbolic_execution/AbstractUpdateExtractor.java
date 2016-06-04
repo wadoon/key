@@ -487,7 +487,7 @@ public abstract class AbstractUpdateExtractor {
          else if (heapLDT.getLength() == term.op()) {
             if (!objectsToIgnore.contains(term.sub(0)) &&
                 !hasFreeVariables(term)) {
-               ProgramVariable var = getServices().getJavaServices().getJavaInfo().getArrayLength();
+               ProgramVariable var = getServices().getProgramServices().getJavaInfo().getArrayLength();
                toFill.add(new ExtractLocationParameter(var, term.sub(0)));
             }
          }
@@ -797,7 +797,7 @@ public abstract class AbstractUpdateExtractor {
                return getServices().getTermBuilder().dotArr(parentTerm, arrayIndex);
             }
             else {
-               if (getServices().getJavaServices().getJavaInfo().getArrayLength() == programVariable) {
+               if (getServices().getProgramServices().getJavaInfo().getArrayLength() == programVariable) {
                   // Special handling for length attribute of arrays
                   Function function = getServices().getTheories().getHeapLDT().getLength();
                   return getServices().getTermBuilder().func(function, createPreParentTerm());

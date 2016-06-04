@@ -167,7 +167,7 @@ public class Proof implements Named {
 
         final Services services = this.initConfig.getServices();
         services.setProof(this);
-        this.proofFile = services.getJavaServices().getJavaModel() != null ? services.getJavaServices().getJavaModel().getInitialFile() : null;
+        this.proofFile = services.getProgramServices().getJavaModel() != null ? services.getProgramServices().getJavaModel().getInitialFile() : null;
 
         settingsListener = new SettingsListener () {
             @Override
@@ -325,7 +325,7 @@ public class Proof implements Named {
 
     /** returns the JavaInfo with the java type information */
     public JavaInfo getJavaInfo() {
-        return getServices().getJavaServices().getJavaInfo();
+        return getServices().getProgramServices().getJavaInfo();
     }
 
     /** returns the Services with the java service classes */

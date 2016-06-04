@@ -345,7 +345,7 @@ public class KeyConnection extends MemoryConnection {
                                DSPackageManagement packageManagement,
                                IProgressMonitor monitor) throws DSException {
       // get all classes
-      final Set<KeYJavaType> kjts = services.getJavaServices().getJavaInfo().getAllKeYJavaTypes();
+      final Set<KeYJavaType> kjts = services.getProgramServices().getJavaInfo().getAllKeYJavaTypes();
       monitor.beginTask("Filtering types", kjts.size());
       final Iterator<KeYJavaType> it = kjts.iterator();
       while (it.hasNext()) {
@@ -748,7 +748,7 @@ public class KeyConnection extends MemoryConnection {
       MemoryInterface result = new KeyInterface(this, type);
       result.setName(interfaceName);
       // Add methods
-      ImmutableList<IProgramMethod> methods = services.getJavaServices().getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      ImmutableList<IProgramMethod> methods = services.getProgramServices().getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
       fillInterfaceWithMethods(services, result, methods, type);
       // Add attributes
       result.setStatic(ct.isStatic());
@@ -766,7 +766,7 @@ public class KeyConnection extends MemoryConnection {
       }      
       ImmutableList<Field> fields = ct.getAllFields(services);
       for (Field field : fields) {
-         ImmutableList<ProgramVariable> vars = services.getJavaServices().getJavaInfo().getAllAttributes(field.getFullName(), type);
+         ImmutableList<ProgramVariable> vars = services.getProgramServices().getJavaInfo().getAllAttributes(field.getFullName(), type);
          for (ProgramVariable var : vars) {
             if (!var.isImplicit()) {
                MemoryAttribute attribute = createAttribute(services, field);
@@ -776,7 +776,7 @@ public class KeyConnection extends MemoryConnection {
          }
       }
       // Analyze parents
-      ImmutableList<KeYJavaType> superTypes = services.getJavaServices().getJavaInfo().getDirectSuperTypes(type);
+      ImmutableList<KeYJavaType> superTypes = services.getProgramServices().getJavaInfo().getDirectSuperTypes(type);
       for (KeYJavaType superType : superTypes) {
          if (superType.getJavaType() instanceof InterfaceDeclaration) {
             result.getExtendsFullnames().add(superType.getFullName());
@@ -839,11 +839,11 @@ public class KeyConnection extends MemoryConnection {
       MemoryEnum result = new KeyEnum(this, type);
       result.setName(className);
       // Add methods (must be done before constructor adding to collect implicit defined constructors)
-      ImmutableList<IProgramMethod> methods = services.getJavaServices().getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      ImmutableList<IProgramMethod> methods = services.getProgramServices().getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
       List<IProgramMethod> implicitConstructors = new LinkedList<IProgramMethod>(); 
       fillEnumWithMethodsAndConstructors(services, result, methods, implicitConstructors, type);
       // Add constructors with use of implicit constructor definitions to get the specifications
-      ImmutableList<IProgramMethod> constructors = services.getJavaServices().getJavaInfo().getConstructors(type);
+      ImmutableList<IProgramMethod> constructors = services.getProgramServices().getJavaInfo().getConstructors(type);
       fillEnumWithMethodsAndConstructors(services, result, constructors, implicitConstructors, type);
       // Add attributes
       result.setStatic(ct.isStatic());
@@ -861,7 +861,7 @@ public class KeyConnection extends MemoryConnection {
       }      
       ImmutableList<Field> fields = ct.getAllFields(services);
       for (Field field : fields) {
-         ImmutableList<ProgramVariable> vars = services.getJavaServices().getJavaInfo().getAllAttributes(field.getFullName(), type);
+         ImmutableList<ProgramVariable> vars = services.getProgramServices().getJavaInfo().getAllAttributes(field.getFullName(), type);
          for (ProgramVariable var : vars) {
             if (!var.isImplicit()) {
                if (EnumClassDeclaration.isEnumConstant(field.getProgramVariable())) {
@@ -880,7 +880,7 @@ public class KeyConnection extends MemoryConnection {
          }
       }
       // Analyze parents
-      ImmutableList<KeYJavaType> superTypes = services.getJavaServices().getJavaInfo().getDirectSuperTypes(type);
+      ImmutableList<KeYJavaType> superTypes = services.getProgramServices().getJavaInfo().getDirectSuperTypes(type);
       for (KeYJavaType superType : superTypes) {
          if (superType.getJavaType() instanceof ClassType) {
             ClassType superCt = (ClassType)superType.getJavaType();
@@ -979,11 +979,11 @@ public class KeyConnection extends MemoryConnection {
       MemoryClass result = new KeyClass(this, type);
       result.setName(className);
       // Add methods (must be done before constructor adding to collect implicit defined constructors)
-      ImmutableList<IProgramMethod> methods = services.getJavaServices().getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      ImmutableList<IProgramMethod> methods = services.getProgramServices().getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
       List<IProgramMethod> implicitConstructors = new LinkedList<IProgramMethod>(); 
       fillClassWithMethodsAndConstructors(services, result, methods, implicitConstructors, type);
       // Add constructors with use of implicit constructor definitions to get the specifications
-      ImmutableList<IProgramMethod> constructors = services.getJavaServices().getJavaInfo().getConstructors(type);
+      ImmutableList<IProgramMethod> constructors = services.getProgramServices().getJavaInfo().getConstructors(type);
       fillClassWithMethodsAndConstructors(services, result, constructors, implicitConstructors, type);
       // Add attributes
       result.setAnonymous(isAnonymous(ct));
@@ -1004,7 +1004,7 @@ public class KeyConnection extends MemoryConnection {
       }      
       ImmutableList<Field> fields = ct.getAllFields(services);
       for (Field field : fields) {
-         ImmutableList<ProgramVariable> vars = services.getJavaServices().getJavaInfo().getAllAttributes(field.getFullName(), type);
+         ImmutableList<ProgramVariable> vars = services.getProgramServices().getJavaInfo().getAllAttributes(field.getFullName(), type);
          for (ProgramVariable var : vars) {
             if (!var.isImplicit()) {
                MemoryAttribute attribute = createAttribute(services, field);
@@ -1014,7 +1014,7 @@ public class KeyConnection extends MemoryConnection {
          }
       }
       // Analyze parents
-      ImmutableList<KeYJavaType> superTypes = services.getJavaServices().getJavaInfo().getDirectSuperTypes(type);
+      ImmutableList<KeYJavaType> superTypes = services.getProgramServices().getJavaInfo().getDirectSuperTypes(type);
       for (KeYJavaType superType : superTypes) {
          if (superType.getJavaType() instanceof ClassType) {
             ClassType superCt = (ClassType)superType.getJavaType();

@@ -384,7 +384,7 @@ public final class KeYUtil {
                         AbstractProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, includes, null, false);
                         InitConfig initConfig = loader.getInitConfig();
                         // Get method to proof in KeY
-                        IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaServices().getJavaInfo());
+                        IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getProgramServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
                         // Start proof by showing the proof management dialog
                         ProofManagementDialog.showInstance(initConfig, pm.getContainerType(), pm);

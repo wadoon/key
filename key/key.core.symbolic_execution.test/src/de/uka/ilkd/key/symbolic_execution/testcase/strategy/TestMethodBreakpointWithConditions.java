@@ -59,7 +59,7 @@ public class TestMethodBreakpointWithConditions extends AbstractSymbolicExecutio
          
          SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(mainBreakpoint);
          allBreakpoints.addChildren(bc);
-         envMain.getProof().getServices().getJavaServices().setFactory(createNewProgramVariableCollectorFactory(bc));
+         envMain.getProof().getServices().getProgramServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          
          stepReturnWithBreakpoints(envMain.getUi(), envMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
          stepReturnWithBreakpoints(envMain.getUi(), envMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints); 
@@ -74,7 +74,7 @@ public class TestMethodBreakpointWithConditions extends AbstractSymbolicExecutio
          MethodBreakpoint somethingBreakpoint = new MethodBreakpoint(something.getPositionInfo().getFileName(), 19, -1, something, envSomethingMain.getBuilder().getProof(),"b==3", true, true,19,21,true,true);
          bc = new SymbolicExecutionBreakpointStopCondition(somethingBreakpoint, somethingMainBreakpoint);
          allBreakpoints.addChildren(bc);
-         envSomethingMain.getProof().getServices().getJavaServices().setFactory(createNewProgramVariableCollectorFactory(bc));
+         envSomethingMain.getProof().getServices().getProgramServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          assertSetTreeAfterStep(envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory);
          stepReturnWithBreakpoints(envSomethingMain.getUi(), envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
          stepReturnWithBreakpoints(envSomethingMain.getUi(), envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints); 
@@ -90,7 +90,7 @@ public class TestMethodBreakpointWithConditions extends AbstractSymbolicExecutio
          MethodBreakpoint somethingLocalMainBreakpoint = new MethodBreakpoint(somethingLocalMain.getPositionInfo().getFileName(), 23, -1, somethingLocalMain, envSomethingLocalMain.getBuilder().getProof(),"x==42*42", true, true,23,28,true,true);
          bc = new SymbolicExecutionBreakpointStopCondition(somethingLocalBreakpoint, somethingLocalMainBreakpoint);
          allBreakpoints.addChildren(bc);
-         envSomethingLocalMain.getProof().getServices().getJavaServices().setFactory(createNewProgramVariableCollectorFactory(bc));
+         envSomethingLocalMain.getProof().getServices().getProgramServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          assertSetTreeAfterStep(envSomethingLocalMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory);
          stepReturnWithBreakpoints(envSomethingLocalMain.getUi(), envSomethingLocalMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
          stepReturnWithBreakpoints(envSomethingLocalMain.getUi(), envSomethingLocalMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints); 

@@ -121,7 +121,7 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
                   exceptionParentNodes.add(SETParent);
                   return true;
                }else if(suspendOnSubclasses){
-                  JavaInfo info = proof.getServices().getJavaServices().getJavaInfo();
+                  JavaInfo info = proof.getServices().getProgramServices().getJavaInfo();
                   KeYJavaType kjt = locVar.getKeYJavaType();
                   ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
                   for(KeYJavaType kjtloc: kjts){

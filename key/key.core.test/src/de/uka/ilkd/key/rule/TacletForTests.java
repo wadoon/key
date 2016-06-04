@@ -115,7 +115,7 @@ public class TacletForTests {
 
     
     public static JavaInfo javaInfo() {
-	return services ().getJavaServices().getJavaInfo();
+	return services ().getProgramServices().getJavaInfo();
     }
 
     public static JavaInfo getJavaInfo() {

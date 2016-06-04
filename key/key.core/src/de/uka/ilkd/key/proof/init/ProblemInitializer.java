@@ -268,10 +268,10 @@ public final class ProblemInitializer {
     private void readJava(EnvInput envInput, InitConfig initConfig) 
                 throws ProofInputException {
         //this method must only be called once per init config
-        assert !initConfig.getServices().getJavaServices().getJavaInfo()
+        assert !initConfig.getServices().getProgramServices().getJavaInfo()
                           .rec2key()
                           .parsedSpecial();
-        assert initConfig.getServices().getJavaServices().getJavaModel() == null;
+        assert initConfig.getServices().getProgramServices().getJavaModel() == null;
 
         //read Java source and classpath settings
         envInput.setInitConfig(initConfig);
@@ -296,7 +296,7 @@ public final class ProblemInitializer {
         if(javaPath != null) {
             reportStatus("Reading Java source");
             final ProjectSettings settings 
-                =  initConfig.getServices().getJavaServices().getJavaInfo()
+                =  initConfig.getServices().getProgramServices().getJavaInfo()
                              .getKeYProgModelInfo()
                              .getServConf()
                              .getProjectSettings();
@@ -312,7 +312,7 @@ public final class ProblemInitializer {
             r2k.parseSpecialClasses();
         }
         File initialFile = envInput.getInitialFile();
-        initConfig.getServices().getJavaServices().setJavaModel(JavaModel.createJavaModel(javaPath,
+        initConfig.getServices().getProgramServices().setJavaModel(JavaModel.createJavaModel(javaPath,
         classPath,
         bootClassPath,
         includes,
@@ -505,7 +505,7 @@ public final class ProblemInitializer {
         readJava(envInput, initConfig);
 
         //register function and predicate symbols defined by Java program
-        final JavaInfo javaInfo = initConfig.getServices().getJavaServices().getJavaInfo();
+        final JavaInfo javaInfo = initConfig.getServices().getProgramServices().getJavaInfo();
         final Namespace functions 
         = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 

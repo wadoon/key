@@ -2098,7 +2098,7 @@ public class Recoder2KeYConverter {
 
        IProgramMethod methodContext = null;
        if (arg.getMethodContext() != null) {
-          JavaInfo jInfo = services.getJavaServices().getJavaInfo();
+          JavaInfo jInfo = services.getProgramServices().getJavaInfo();
 
           ImmutableList<KeYJavaType> paramTypes = ImmutableSLList.<KeYJavaType>nil();
           for (recoder.java.reference.TypeReference tr : arg.getMethodContext().getParamTypes()) {

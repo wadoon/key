@@ -64,6 +64,6 @@ public class SeqSub extends Operator {
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         // bugfix, this used to return the join for the the first two arguments'
         // types.
-        return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        return javaServ.getProgramServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }
 }

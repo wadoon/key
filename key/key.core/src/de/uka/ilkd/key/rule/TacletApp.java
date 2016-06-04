@@ -581,7 +581,7 @@ public abstract class TacletApp implements RuleApp {
      * @return A TacletApp with this.sufficientlyComplete() or null
      */
     public final TacletApp tryToInstantiate(Services services) {
-	final VariableNamer varNamer = services.getJavaServices().getInnerVarNamer();
+	final VariableNamer varNamer = services.getProgramServices().getInnerVarNamer();
 	final TermBuilder tb = services.getTermBuilder();
 
 	TacletApp app = this;
@@ -1312,9 +1312,9 @@ public abstract class TacletApp implements RuleApp {
             if (nvc != null) {
         	KeYJavaType kjt;
         	Object o = nvc.getTypeDefiningObject();
-        	JavaInfo javaInfo = services.getJavaServices().getJavaInfo();
+        	JavaInfo javaInfo = services.getProgramServices().getJavaInfo();
         	if (o instanceof SchemaVariable) {
-                    final TypeConverter tc = services.getJavaServices().getTypeConverter();
+                    final TypeConverter tc = services.getProgramServices().getTypeConverter();
         	    final SchemaVariable peerSV = (SchemaVariable)o;
         	    final Object peerInst = instantiations().getInstantiation(peerSV);
                     if(peerInst instanceof TypeReference){

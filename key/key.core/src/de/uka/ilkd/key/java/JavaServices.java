@@ -8,7 +8,7 @@ import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
-public class JavaServices {
+public class JavaServices implements ProgramServices {
     /** used to convert types, expressions and so on to logic elements
      * (in special into to terms or formulas)
      */

@@ -108,7 +108,7 @@ public abstract class ElementMatcher<T extends Operator> {
                 Object peForCompare = pe;
                 if (inMap instanceof Term) {
                     try {
-                        peForCompare = services.getJavaServices().getTypeConverter()
+                        peForCompare = services.getProgramServices().getTypeConverter()
                                 .convertToLogicElement(
                                         pe,
                                         matchCond.getInstantiations()

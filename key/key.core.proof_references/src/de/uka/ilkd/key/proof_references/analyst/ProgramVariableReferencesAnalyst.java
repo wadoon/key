@@ -44,12 +44,12 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
          SourceElement statement = node.getNodeInfo().getActiveStatement();
          if (statement instanceof CopyAssignment) {
             LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
-            listReferences(node, (CopyAssignment)statement, services.getJavaServices().getJavaInfo().getArrayLength(), result, true);
+            listReferences(node, (CopyAssignment)statement, services.getProgramServices().getJavaInfo().getArrayLength(), result, true);
             return result;
          }
          else if (statement instanceof If) {
             LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
-            listReferences(node, ((If)statement).getExpression(), services.getJavaServices().getJavaInfo().getArrayLength(), result, false);
+            listReferences(node, ((If)statement).getExpression(), services.getProgramServices().getJavaInfo().getArrayLength(), result, false);
             return result;
          }
          else {

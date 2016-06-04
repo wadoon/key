@@ -385,7 +385,7 @@ public class TestJMLTranslator extends TestCase {
         assertNotNull(result);
         Operator unionOp = services.getTheories().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
-                        new LogicVariable(new Name("o"), services.getJavaServices().getJavaInfo().getJavaLangObject().getSort());
+                        new LogicVariable(new Name("o"), services.getProgramServices().getJavaInfo().getJavaLangObject().getSort());
         assertSame(unionOp, result.op());
         Term guard = TB.and( TB.convertToFormula(TB.created(TB.var(o))), TB.not(TB.equals(TB.var(o), TB.NULL())));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[]{o}, TB.ife(guard, TB.empty(), TB.empty()));
@@ -404,7 +404,7 @@ public class TestJMLTranslator extends TestCase {
         assertNotNull(result);
         Operator unionOp = services.getTheories().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
-                        new LogicVariable(new Name("o"), services.getJavaServices().getJavaInfo().getJavaLangObject().getSort());
+                        new LogicVariable(new Name("o"), services.getProgramServices().getJavaInfo().getJavaLangObject().getSort());
         assertSame(unionOp, result.op());
         Term guard = TB.or( TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[]{o}, TB.ife(guard, TB.empty(), TB.empty()));

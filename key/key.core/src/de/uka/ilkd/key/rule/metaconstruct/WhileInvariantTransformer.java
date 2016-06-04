@@ -118,9 +118,9 @@ public final class WhileInvariantTransformer {
         inv = invariantFramingTermination;
         post = initialPost.sub(0);
 
-        javaInfo = services.getJavaServices().getJavaInfo();
+        javaInfo = services.getProgramServices().getJavaInfo();
         tf = services.getTermFactory() ;
-        typeConv = services.getJavaServices().getTypeConverter();
+        typeConv = services.getProgramServices().getTypeConverter();
         
         returnType = removeWhile.returnType();
     }
@@ -336,7 +336,7 @@ public final class WhileInvariantTransformer {
     private ProgramVariable getNewLocalvariable
     (String varNameBase, KeYJavaType varType, Services services) {        
         return KeYJavaASTFactory.
-          localVariable(services.getJavaServices().getInnerVarNamer().
+          localVariable(services.getProgramServices().getInnerVarNamer().
                         getTemporaryNameProposal(varNameBase), varType);
         
     }

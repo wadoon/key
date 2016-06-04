@@ -131,7 +131,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @return true, if expression's type is a subtype of Iterable
      */
     private boolean isIterable(Expression expression, Services services) {
-        JavaInfo ji = services.getJavaServices().getJavaInfo();
+        JavaInfo ji = services.getProgramServices().getJavaInfo();
         // TODO: how to get a more appropriate execution context?
         final ExecutionContext ec = ji.getDefaultExecutionContext();
         boolean iterable = ji.isSubtype(expression.getKeYJavaType(services, ec),
@@ -154,7 +154,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         assert expression instanceof ReferencePrefix :
             expression + " is not an arrray reference.";
 
-        final JavaInfo ji = services.getJavaServices().getJavaInfo();
+        final JavaInfo ji = services.getProgramServices().getJavaInfo();
 
         // T[] arr = exp;
         // TODO: how to get a more appropriate execution context?
@@ -200,12 +200,12 @@ public class EnhancedForElimination extends ProgramTransformer {
     private ProgramElement makeIterableForLoop(EnhancedFor enhancedFor, Services services) {
 
         // local variable "it"
-        final KeYJavaType iteratorType = services.getJavaServices().getJavaInfo().getTypeByName(ITERATOR);
+        final KeYJavaType iteratorType = services.getProgramServices().getJavaInfo().getTypeByName(ITERATOR);
 	final ProgramVariable itVar = KeYJavaASTFactory.localVariable(services,
 		IT, iteratorType);
 
         // local variable "values"
-        final KeYJavaType seqType = services.getJavaServices().getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        final KeYJavaType seqType = services.getProgramServices().getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
 	final ProgramVariable valuesVar = KeYJavaASTFactory.localVariable(
 		services, VALUES, seqType);
 

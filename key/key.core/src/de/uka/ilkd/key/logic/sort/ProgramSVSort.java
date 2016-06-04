@@ -1098,7 +1098,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 		final Sort checkSort = ((ProgramVariable)check).sort();
 		Namespace ns = services.getNamespaces().sorts();
 		Sort stringSort = (Sort)ns.lookup(new Name("java.lang.String"));
-		return checkSort.extendsTrans(services.getJavaServices().getJavaInfo().objectSort()) 
+		return checkSort.extendsTrans(services.getProgramServices().getJavaInfo().objectSort()) 
 		       && !checkSort.equals(stringSort);
 	    }
 	    return false;
@@ -1299,7 +1299,7 @@ public abstract class ProgramSVSort extends AbstractSort {
         protected boolean canStandFor(ProgramElement check, 
                 Services services) {            
             if (check instanceof ProgramVariable) {
-                return check == services.getJavaServices().getJavaInfo().getArrayLength();
+                return check == services.getProgramServices().getJavaInfo().getArrayLength();
             }
             return false;
         }
@@ -1339,7 +1339,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     }
 
     static KeYJavaType getKeYJavaType(ProgramElement pe, ExecutionContext ec, Services services) {
-	return services.getJavaServices().getTypeConverter().getKeYJavaType((Expression)pe, ec);
+	return services.getProgramServices().getTypeConverter().getKeYJavaType((Expression)pe, ec);
     }
 
     static boolean implicit(ProgramElement pe) {

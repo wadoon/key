@@ -190,7 +190,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                 toStore = "//" + Calendar.getInstance().getTime().toString()
                                 + "\n";
 
-                String modelDir = services.getJavaServices().getJavaModel()
+                String modelDir = services.getProgramServices().getJavaModel()
                                 .getModelDir();
 
                 if (modelDir != "" && modelDir != null) {

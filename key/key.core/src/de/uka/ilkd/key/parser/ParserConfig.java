@@ -42,19 +42,19 @@ public class ParserConfig {
     }
 
     public JavaInfo javaInfo() {
-	return services.getJavaServices().getJavaInfo();
+	return services.getProgramServices().getJavaInfo();
     }
 
     public KeYRecoderMapping keyRecoderMapping() {
-	return services.getJavaServices().getJavaInfo().rec2key();
+	return services.getProgramServices().getJavaInfo().rec2key();
     }
 
     public TypeConverter typeConverter() {
-	return services.getJavaServices().getTypeConverter();
+	return services.getProgramServices().getTypeConverter();
     }
 
     public KeYCrossReferenceServiceConfiguration serviceConfiguration() {
-	return services.getJavaServices().getJavaInfo().
+	return services.getProgramServices().getJavaInfo().
 	    getKeYProgModelInfo().getServConf();
     }
 

@@ -59,8 +59,8 @@ public final class ProofManagementAction extends MainWindowAction {
 
     private boolean enabled() {
 	return getMediator().getSelectedProof() != null
-	        && getMediator().getSelectedProof().getServices().getJavaServices().getJavaModel() != null
-	        && !getMediator().getSelectedProof().getServices().getJavaServices().getJavaModel().isEmpty();
+	        && getMediator().getSelectedProof().getServices().getProgramServices().getJavaModel() != null
+	        && !getMediator().getSelectedProof().getServices().getProgramServices().getJavaModel().isEmpty();
     }
 
     public void actionPerformed(ActionEvent e) {

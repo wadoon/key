@@ -137,7 +137,7 @@ public class KeYSourceLookupParticipant extends AbstractSourceLookupParticipant 
          KeYDebugTarget keyTarget = (KeYDebugTarget) target;
          Proof proof = keyTarget.getProof();
          if (proof != null && !proof.isDisposed()) {
-            JavaModel javaModel = proof.getServices().getJavaServices().getJavaModel();
+            JavaModel javaModel = proof.getServices().getProgramServices().getJavaModel();
             if (javaModel.getModelDir() != null) {
                result.add(new File(javaModel.getModelDir()));
             }

@@ -78,7 +78,7 @@ public class KeYBreakpointManager {
    public void keyWatchpointAdded(KeYWatchpoint watchpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException, ProofInputException {
       IResource resource = watchpoint.getMarker().getResource();
       if (JDTUtil.isJavaFile(resource)) {
-         JavaInfo javaInfo = environment.getServices().getJavaServices().getJavaInfo();
+         JavaInfo javaInfo = environment.getServices().getProgramServices().getJavaInfo();
          String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
@@ -141,7 +141,7 @@ public class KeYBreakpointManager {
    public void javaWatchpointAdded(JavaWatchpoint javaWatchpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException, ProofInputException {
       IResource resource = javaWatchpoint.getMarker().getResource();
       if (JDTUtil.isJavaFile(resource)) {
-         JavaInfo javaInfo = environment.getServices().getJavaServices().getJavaInfo();
+         JavaInfo javaInfo = environment.getServices().getProgramServices().getJavaInfo();
          String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);

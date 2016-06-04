@@ -128,7 +128,7 @@ public class IntLiteral extends Literal {
 
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+	return javaServ.getProgramServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
     }
 
     @Override

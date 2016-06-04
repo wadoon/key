@@ -45,7 +45,7 @@ public final class MetaAdd extends AbstractTermTransformer {
 	BigInteger bigIntResult = bigIntArg1.add(bigIntArg2);
 	
 	IntLiteral lit = new IntLiteral(bigIntResult.toString());
-	return services.getJavaServices().getTypeConverter().convertToLogicElement(lit);
+	return services.getProgramServices().getTypeConverter().convertToLogicElement(lit);
 
     }
 

@@ -627,7 +627,7 @@ public class BlockContractRule implements BuiltInRule {
                                                 final KeYJavaType type,
                                                 final Services services)
     {
-        return KeYJavaASTFactory.localVariable(services.getJavaServices().getInnerVarNamer()
+        return KeYJavaASTFactory.localVariable(services.getProgramServices().getInnerVarNamer()
                                 .getTemporaryNameProposal(nameBase), type);
     }
 
@@ -1377,7 +1377,7 @@ public class BlockContractRule implements BuiltInRule {
 
         private void declareFlagFalse(final ProgramVariable flag) {
             statements.add(KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE,
-                             services.getJavaServices().getJavaInfo().getKeYJavaType("boolean")));
+                             services.getProgramServices().getJavaInfo().getKeYJavaType("boolean")));
         }
 
         private void declareResultDefault() {
@@ -1428,7 +1428,7 @@ public class BlockContractRule implements BuiltInRule {
                                          final ProgramVariable exceptionParameter) {
             Catch katch =
                     KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(
-                                                                    services.getJavaServices().getJavaInfo(),
+                                                                    services.getProgramServices().getJavaInfo(),
                                                                     exceptionParameter.getKeYJavaType(),
                                                                     exceptionParameter),
                                                   new StatementBlock(KeYJavaASTFactory.assign(

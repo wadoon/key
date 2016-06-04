@@ -170,9 +170,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
         String exceptionsString = ERROR +", " + RUNTIME_EXCEPTION + ", ";
 
         for(int i = 0; i < exceptions.size(); i++) {
-            if(services.getJavaServices().getJavaInfo().isSubtype(
+            if(services.getProgramServices().getJavaInfo().isSubtype(
                     exceptions.get(i).getKeYJavaType(),
-                    services.getJavaServices().getJavaInfo()
+                    services.getProgramServices().getJavaInfo()
                             .getKeYJavaType(THROWABLE))) {
                 exceptionsString
                     += exceptions.get(i).getKeYJavaType().getFullName() + ", ";
@@ -208,7 +208,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil();
         final Type varType  = kjt.getJavaType();
 
-        final TypeConverter typeConverter = services.getJavaServices().getTypeConverter();
+        final TypeConverter typeConverter = services.getProgramServices().getTypeConverter();
         if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
             final int arrayDepth = arrayDepth(varType, services);
 
@@ -231,7 +231,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
      */
     public static int arrayDepth (Type type, Services services) {
         assert services != null;
-        final TypeConverter tc = services.getJavaServices().getTypeConverter();
+        final TypeConverter tc = services.getProgramServices().getTypeConverter();
         if (type instanceof ArrayType) {
             final int d = ((ArrayType)type).getDimension();
             while (type instanceof ArrayType) {

@@ -426,7 +426,7 @@ public final class SymbolicExecutionSideProofUtil {
             return true;
          }
          else {
-            KeYJavaType kjt = services.getJavaServices().getJavaInfo().getKeYJavaType(term.sort());
+            KeYJavaType kjt = services.getProgramServices().getJavaInfo().getKeYJavaType(term.sort());
             return kjt != null;
          }
       }

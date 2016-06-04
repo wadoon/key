@@ -222,7 +222,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             for(Expression e : n.getArguments()) {
                 sig = sig.append(e.getKeYJavaType(services, ec));
             }
-            result = services.getJavaServices().getJavaInfo().getConstructor(staticType, sig);
+            result = services.getProgramServices().getJavaInfo().getConstructor(staticType, sig);
             assert result != null;
         }
         return result;
@@ -233,7 +233,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    		              IProgramMethod pm,
 	    		              ExecutionContext ec,
 	    		              Services services) {
-	final TypeConverter tc = services.getJavaServices().getTypeConverter();
+	final TypeConverter tc = services.getProgramServices().getTypeConverter();
 	final ReferencePrefix rp = mr.getReferencePrefix();
 	if(pm.isStatic() || pm.isConstructor()) {
 	    return null;
@@ -260,7 +260,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
 	for(Expression expr : mr.getArguments()) {
 	    Term actualParam
-	    	= services.getJavaServices().getTypeConverter().convertToLogicElement(expr, ec);
+	    	= services.getProgramServices().getTypeConverter().convertToLogicElement(expr, ec);
 	    result = result.append(actualParam);
 	}
 	return result;

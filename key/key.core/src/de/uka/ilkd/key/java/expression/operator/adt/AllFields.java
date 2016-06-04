@@ -54,6 +54,6 @@ public class AllFields extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+	return javaServ.getProgramServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
     }    
 }

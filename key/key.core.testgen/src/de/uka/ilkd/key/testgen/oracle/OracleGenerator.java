@@ -156,8 +156,8 @@ public class OracleGenerator {
 		
 		Sort s = c.sort();
 		
-		Sort nullSort = services.getJavaServices().getJavaInfo().getNullType().getSort();
-		Sort objSort = services.getJavaServices().getJavaInfo().getJavaLangObject().getSort();
+		Sort nullSort = services.getProgramServices().getJavaInfo().getNullType().getSort();
+		Sort objSort = services.getProgramServices().getJavaInfo().getJavaLangObject().getSort();
 		Sort intSort = services.getTheories().getIntegerLDT().targetSort();
 		Sort boolSort = services.getTheories().getBooleanLDT().targetSort();
 		
@@ -539,7 +539,7 @@ public class OracleGenerator {
 		value = createLocationString(heapTerm, objTerm, fieldName, object.sort(), term.sort(), initialSelect);		
 		
 		if(!initialSelect && isPreHeap(heapTerm)){
-			if(term.sort().extendsTrans(services.getJavaServices().getJavaInfo().getJavaLangObject().getSort())){
+			if(term.sort().extendsTrans(services.getProgramServices().getJavaInfo().getJavaLangObject().getSort())){
 				return new OracleConstant(TestCaseGenerator.OLDMap+".get("+value+")", term.sort());
 			}
 		}		

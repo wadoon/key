@@ -64,7 +64,7 @@ public class TestLineBreakpointStopConditionSimpleWithHitCount extends AbstractS
          LineBreakpoint thirdBreakpoint = new LineBreakpoint(calleeMain.getPositionInfo().getFileName(), 7, -1, calleeMain, env.getBuilder().getProof(),null, true, false, 6, 9);
          SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(firstBreakpoint, secondBreakpoint, thirdBreakpoint);
          allBreakpoints.addChildren(bc);
-         env.getProof().getServices().getJavaServices().setFactory(createNewProgramVariableCollectorFactory(bc));
+         env.getProof().getServices().getProgramServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);

@@ -101,7 +101,7 @@ public class StringLiteral extends Literal implements ReferencePrefix {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType("java.lang.String");
+	return javaServ.getProgramServices().getJavaInfo().getKeYJavaType("java.lang.String");
     }
 
     @Override

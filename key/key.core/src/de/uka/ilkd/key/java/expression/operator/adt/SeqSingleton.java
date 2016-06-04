@@ -59,6 +59,6 @@ public class SeqSingleton extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+	return javaServ.getProgramServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }    
 }

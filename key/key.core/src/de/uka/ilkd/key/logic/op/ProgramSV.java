@@ -294,7 +294,7 @@ public final class ProgramSV extends AbstractSV
 	if (foundInst != null) {
 	    final Object newInst;
 	    if (foundInst instanceof Term) {
-		newInst = services.getJavaServices().getTypeConverter().
+		newInst = services.getProgramServices().getTypeConverter().
 		    convertToLogicElement(pe, insts.getExecutionContext());
 	    } else {
 		newInst = pe;

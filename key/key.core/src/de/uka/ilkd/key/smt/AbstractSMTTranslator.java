@@ -3060,7 +3060,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         //Several special sorts should not be added to the collection
                         if (ldt.getHeap().sort() != sort
                                         && ldt.getFieldSort() != sort
-                                        && services.getJavaServices().getJavaInfo().nullSort() != sort                                      
+                                        && services.getProgramServices().getJavaInfo().nullSort() != sort                                      
                                         && Sort.FORMULA != sort) {
                                 sorts = sorts.add(sort);
                         }

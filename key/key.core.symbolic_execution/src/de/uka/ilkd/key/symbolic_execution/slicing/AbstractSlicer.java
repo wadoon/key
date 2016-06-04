@@ -944,7 +944,7 @@ public abstract class AbstractSlicer {
    public static Term toTerm(Services services, 
                              Expression expression, 
                              ExecutionContext ec) {
-      return services.getJavaServices().getTypeConverter().convertToLogicElement(expression, ec);
+      return services.getProgramServices().getTypeConverter().convertToLogicElement(expression, ec);
    }
 
    /**
@@ -979,7 +979,7 @@ public abstract class AbstractSlicer {
             if (index >= 0) {
                String fullTypeName = name.substring(0, index);
                String fieldName = name.substring(index + 3);
-               ProgramVariable pv = services.getJavaServices().getJavaInfo().getAttribute(fullTypeName + "::" + fieldName);
+               ProgramVariable pv = services.getProgramServices().getJavaInfo().getAttribute(fullTypeName + "::" + fieldName);
                assert term.op() == services.getTheories().getHeapLDT().getFieldSymbolForPV((LocationVariable) pv, services);
                return new Location(new Access(pv));
             }

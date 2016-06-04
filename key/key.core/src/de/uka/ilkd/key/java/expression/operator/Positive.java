@@ -97,7 +97,7 @@ public class Positive extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	return services.getJavaServices().getTypeConverter().
+	return services.getProgramServices().getTypeConverter().
 	    getPromotedType(getExpressionAt(0).getKeYJavaType(services, ec));
     }
 

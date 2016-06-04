@@ -164,7 +164,7 @@ public abstract class TypeResolver {
                 if (inst instanceof Term) {
                     gsTerm = (Term) inst;
                 } else if (inst instanceof ProgramElement) {
-                    gsTerm = services.getJavaServices().getTypeConverter().
+                    gsTerm = services.getProgramServices().getTypeConverter().
                     convertToLogicElement((ProgramElement)inst, instMap.getExecutionContext());
                 } else {
                     Debug.fail("Unexpected substitution for sv " + resolveSV +":" + inst);
@@ -213,7 +213,7 @@ public abstract class TypeResolver {
             } else {
                 if (inst instanceof Expression) {
                     result = getContainerSort
-                    (services.getJavaServices().getTypeConverter().convertToLogicElement((Expression)inst, 
+                    (services.getProgramServices().getTypeConverter().convertToLogicElement((Expression)inst, 
                             instMap.getExecutionContext()).op(), services);
                 } else if (inst instanceof Term) {
                     result = getContainerSort(((Term)inst).op(), services);

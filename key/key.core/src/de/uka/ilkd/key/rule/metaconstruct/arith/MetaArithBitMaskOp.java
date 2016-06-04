@@ -31,7 +31,7 @@ public abstract class MetaArithBitMaskOp extends AbstractTermTransformer {
 		BigInteger result = bitmaskOp(left, right);
 	
 		IntLiteral lit = new IntLiteral(result.toString());
-		return services.getJavaServices().getTypeConverter().convertToLogicElement(lit);
+		return services.getProgramServices().getTypeConverter().convertToLogicElement(lit);
 	
 	}
 

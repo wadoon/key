@@ -119,7 +119,7 @@ public class RealLiteral extends Literal {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+	return javaServ.getProgramServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
     }
     
     @Override

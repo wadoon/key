@@ -118,7 +118,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @return The used {@link JavaInfo}.
     */
    public JavaInfo getJavaInfo() {
-      return getServices().getJavaServices().getJavaInfo();
+      return getServices().getProgramServices().getJavaInfo();
    }
 
    /**

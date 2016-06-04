@@ -30,7 +30,6 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
@@ -40,7 +39,7 @@ import de.uka.ilkd.key.util.Debug;
  * include information on the underlying Java model and a converter to
  * transform Java program elements to logic (where possible) and back.
  */
-public class Services implements TermServices {
+public class Services implements TermServices, ProofServices {
    /**
      * the proof
      */
@@ -114,27 +113,46 @@ public class Services implements TermServices {
     }
 
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#getNameRecorder()
+     */
+    @Override
     public NameRecorder getNameRecorder() {
         return nameRecorder;
     }
 
     
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#saveNameRecorder(de.uka.ilkd.key.proof.Node)
+     */
+    @Override
     public void saveNameRecorder(Node n) {
         n.setNameRecorder(nameRecorder);
         nameRecorder = new NameRecorder();
     }
 
     
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#addNameProposal(de.uka.ilkd.key.logic.Name)
+     */
+    @Override
     public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
     }
 
-    /** returns the theories of the logic */
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#getTheories()
+     */
+    @Override
     public TheoryServices getTheories() {
         return theories;
     }
 
     
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#getSpecificationRepository()
+     */
+    @Override
     public SpecificationRepository getSpecificationRepository() {
         return specRepos;
     }
@@ -172,8 +190,8 @@ public class Services implements TermServices {
         s.nameRecorder = nameRecorder.copy();
 
         s.theories.init(theories);
-        s.javaServices.setTypeconverter(getJavaServices().getTypeConverter().copy(s));
-    	s.javaServices.setJavaModel(getJavaServices().getJavaModel());
+        s.javaServices.setTypeconverter(getProgramServices().getTypeConverter().copy(s));
+    	s.javaServices.setJavaModel(getProgramServices().getJavaModel());
         return s;
     }
     
@@ -196,7 +214,7 @@ public class Services implements TermServices {
      */
     public Services copyPreservesLDTInformation() {
     	Debug.assertTrue
-    	(!(getJavaServices().getJavaInfo().getKeYProgModelInfo().getServConf() 
+    	(!(getProgramServices().getJavaInfo().getKeYProgModelInfo().getServConf() 
     			instanceof SchemaCrossReferenceServiceConfiguration),
     			"services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
@@ -204,19 +222,16 @@ public class Services implements TermServices {
         s.nameRecorder = nameRecorder.copy();
         
         s.theories.init(theories);
-        s.javaServices.setTypeconverter(getJavaServices().getTypeConverter().copy(s));
-    	s.javaServices.setJavaModel(getJavaServices().getJavaModel());
+        s.javaServices.setTypeconverter(getProgramServices().getTypeConverter().copy(s));
+    	s.javaServices.setJavaModel(getProgramServices().getJavaModel());
     	return s;
     }
     
     
-    /** 
-     * Marks this services as proof specific 
-     * Please make sure that the {@link Services} does not not yet belong to an existing proof 
-     * or that it is owned by a proof environment. In both cases copy the {@link InitConfig} via
-     * {@link InitConfig#deepCopy()} or one of the other copy methods first. 
-     * @param p_proof the Proof to which this {@link Services} instance belongs
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#setProof(de.uka.ilkd.key.proof.Proof)
      */
+    @Override
     public void setProof(Proof p_proof) {
        if (this.proof != null) {
           throw new IllegalStateException("Services are already owned by another proof:" + proof.name());
@@ -227,7 +242,7 @@ public class Services implements TermServices {
    
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s = new Services(getProfile(), getJavaServices().getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaServices().getJavaInfo().getKeYProgModelInfo().rec2key(),
+        final Services s = new Services(getProfile(), getProgramServices().getJavaInfo().getKeYProgModelInfo().getServConf(), getProgramServices().getJavaInfo().getKeYProgModelInfo().rec2key(),
                 copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
@@ -235,8 +250,8 @@ public class Services implements TermServices {
         s.nameRecorder = nameRecorder.copy();
 
         s.theories.init(theories);
-        s.javaServices.setTypeconverter(getJavaServices().getTypeConverter().copy(s));
-        s.javaServices.setJavaModel(getJavaServices().getJavaModel());
+        s.javaServices.setTypeconverter(getProgramServices().getTypeConverter().copy(s));
+        s.javaServices.setJavaModel(getProgramServices().getJavaModel());
 
         return s;
     }
@@ -245,6 +260,10 @@ public class Services implements TermServices {
     /*
      * returns an existing named counter, creates a new one otherwise
      */
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#getCounter(java.lang.String)
+     */
+    @Override
     public Counter getCounter(String name) {
         Counter c = counters.get(name);
         if (c != null) return c;
@@ -253,9 +272,8 @@ public class Services implements TermServices {
         return c;
     }
 
-    /**
-     * returns the namespaces for functions, predicates etc.
-     * @return the proof specific namespaces
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#getNamespaces()
      */
     @Override
     public NamespaceSet getNamespaces() {
@@ -263,19 +281,19 @@ public class Services implements TermServices {
     }
     
     
-    /**
-     * sets the namespaces of known predicates, functions, variables
-     * @param namespaces the NamespaceSet with the proof specific namespaces
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#setNamespaces(de.uka.ilkd.key.logic.NamespaceSet)
      */
+    @Override
     public void setNamespaces(NamespaceSet namespaces) {
         this.namespaces = namespaces;
     }
     
     
-    /**
-     * Returns the proof to which this object belongs, or null if it does not 
-     * belong to any proof.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#getProof()
      */
+    @Override
     public Proof getProof() {
 	return proof;
     }
@@ -284,10 +302,10 @@ public class Services implements TermServices {
        public TermProgramVariableCollector create(Services services);
     }
 
-    /**
-     * Returns the sued {@link Profile}.
-     * @return The used {@link Profile}.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#getProfile()
      */
+    @Override
     public Profile getProfile() {
         return profile;
     }
@@ -318,7 +336,11 @@ public class Services implements TermServices {
         return termBuilder.tf();
     }
 
-    public JavaServices getJavaServices() {
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.ProofServices#getJavaServices()
+     */
+    @Override
+    public JavaServices getProgramServices() {
        return javaServices;
    }
 

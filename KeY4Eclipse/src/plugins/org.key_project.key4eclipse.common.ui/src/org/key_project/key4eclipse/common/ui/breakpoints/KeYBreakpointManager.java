@@ -131,7 +131,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
    public void javaWatchpointAdded(JavaWatchpoint javaWatchpoint) throws CoreException, ProofInputException {
       IResource resource = javaWatchpoint.getMarker().getResource();
       if (JDTUtil.isJavaFile(resource)) {
-         JavaInfo javaInfo = proof.getServices().getJavaServices().getJavaInfo();
+         JavaInfo javaInfo = proof.getServices().getProgramServices().getJavaInfo();
          String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
@@ -416,7 +416,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
    public void setEnabled(boolean enabled) {
       if (enabled) {
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(getBreakpointStopCondition());
-         proof.getServices().getJavaServices().setFactory(KeYBreakpointManager.createNewFactory(getBreakpointStopCondition()));
+         proof.getServices().getProgramServices().setFactory(KeYBreakpointManager.createNewFactory(getBreakpointStopCondition()));
          StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          proof.setActiveStrategy(proof.getActiveStrategyFactory().create(proof, strategyProperties));
       }

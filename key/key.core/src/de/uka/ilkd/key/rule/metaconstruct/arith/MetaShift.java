@@ -66,7 +66,7 @@ public abstract class MetaShift extends AbstractTermTransformer {
 				&& !result.equals(BigInteger.ZERO) // if the result is zero nothing changes anymore, so we can exit the loop 
 				);
 
-		return services.getJavaServices().getTypeConverter().convertToLogicElement(new IntLiteral(result.toString()));
+		return services.getProgramServices().getTypeConverter().convertToLogicElement(new IntLiteral(result.toString()));
 
 	}
 

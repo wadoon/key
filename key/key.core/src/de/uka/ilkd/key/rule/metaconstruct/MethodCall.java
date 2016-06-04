@@ -115,7 +115,7 @@ public class MethodCall extends ProgramTransformer {
 	for (int i = args.size()-1; i >= 0 ; i--) {
 	    Expression argument = args.get(i);
 	    result = result.prepend
-		(services.getJavaServices().getTypeConverter().getKeYJavaType(argument, execContext));
+		(services.getProgramServices().getTypeConverter().getKeYJavaType(argument, execContext));
 	}
 	return result;
     }
@@ -141,7 +141,7 @@ public class MethodCall extends ProgramTransformer {
 	    return ((FieldReference)refPrefix).getProgramVariable()
 		.getKeYJavaType();
 	} else if (refPrefix instanceof SuperReference) {
-	    KeYJavaType st = services.getJavaServices().getJavaInfo().getSuperclass
+	    KeYJavaType st = services.getProgramServices().getJavaInfo().getSuperclass
                 (execContext.getTypeReference().getKeYJavaType());
 	    return st; 	
 	} else {
@@ -177,7 +177,7 @@ public class MethodCall extends ProgramTransformer {
     }
 
     private KeYJavaType getSuperType(ExecutionContext ex, Services services) {
-	return services.getJavaServices().getJavaInfo().getSuperclass
+	return services.getProgramServices().getJavaInfo().getSuperclass
 	    (ex.getTypeReference().getKeYJavaType());
     }
     
@@ -236,13 +236,13 @@ public class MethodCall extends ProgramTransformer {
 	
         newContext = methRef.getReferencePrefix();
 	if (newContext == null){
-	    Term self = services.getJavaServices().getTypeConverter().findThisForSort(pm.getContainerType().getSort(), execContext);
+	    Term self = services.getProgramServices().getTypeConverter().findThisForSort(pm.getContainerType().getSort(), execContext);
 	    if(self!=null){
-	        newContext = (ReferencePrefix) services.getJavaServices().getTypeConverter().convertToProgramElement(self);
+	        newContext = (ReferencePrefix) services.getProgramServices().getTypeConverter().convertToProgramElement(self);
 	    }
 	} else if(newContext instanceof ThisReference){
-	    newContext = (ReferencePrefix) services.getJavaServices().getTypeConverter().convertToProgramElement(
-                services.getJavaServices().getTypeConverter().convertToLogicElement(newContext, execContext));
+	    newContext = (ReferencePrefix) services.getProgramServices().getTypeConverter().convertToProgramElement(
+                services.getProgramServices().getTypeConverter().convertToLogicElement(newContext, execContext));
 	} else if (newContext instanceof FieldReference) {
 	    final FieldReference fieldContext = (FieldReference) newContext;
             if (fieldContext.referencesOwnInstanceField())
@@ -284,10 +284,10 @@ public class MethodCall extends ProgramTransformer {
 			  +" instance method detected." 
 			  +"Requires dynamic resolving.");
 		ImmutableList<KeYJavaType> imps = 
-		    services.getJavaServices().getJavaInfo().getKeYProgModelInfo().findImplementations
+		    services.getProgramServices().getJavaInfo().getKeYProgModelInfo().findImplementations
 		    (staticPrefixType, methRef.getName(), getTypes(arguments, services));
 		if (imps.isEmpty()) {
-		    imps = services.getJavaServices().getJavaInfo().getKeYProgModelInfo().findImplementations
+		    imps = services.getProgramServices().getJavaInfo().getKeYProgModelInfo().findImplementations
 	                    (pm.getContainerType(), methRef.getName(), getTypes(arguments, services));
 		}
 		if (imps.isEmpty()) {

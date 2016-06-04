@@ -25,8 +25,8 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
          containerType and self variable are not relevant for the tests
          currently and can be changed if needed.
          */
-        KeYJavaType containerType = services.getJavaServices().getJavaInfo().getKeYJavaType("testTermParserHeap.A");
-        ProgramVariable self = services.getJavaServices().getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
+        KeYJavaType containerType = services.getProgramServices().getJavaInfo().getKeYJavaType("testTermParserHeap.A");
+        ProgramVariable self = services.getProgramServices().getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
         KeYJMLParser parser = new KeYJMLParser(p, getServices(), containerType, self,
                 null, null, null, null);
         return parser.termexpression();

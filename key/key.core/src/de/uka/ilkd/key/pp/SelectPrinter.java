@@ -79,7 +79,7 @@ class SelectPrinter extends FieldPrinter {
      */
     private boolean isFieldName(String variableName, Term objectTerm) {
         Sort sort = objectTerm.sort();
-        JavaInfo javaInfo = lp.services.getJavaServices().getJavaInfo();
+        JavaInfo javaInfo = lp.services.getProgramServices().getJavaInfo();
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(variableName, kjt);
         return pv != null;
@@ -109,7 +109,7 @@ class SelectPrinter extends FieldPrinter {
      */
     private Sort getFieldSort(Term fieldTerm) {
         String lookup = fieldTerm.op().toString().replace("$", "");
-        ProgramVariable progVar = lp.services.getJavaServices().getJavaInfo().getAttribute(lookup);
+        ProgramVariable progVar = lp.services.getProgramServices().getJavaInfo().getAttribute(lookup);
         return progVar.sort();
     }
 
@@ -214,7 +214,7 @@ class SelectPrinter extends FieldPrinter {
      */
     private void printBuiltinObjectProperty(Term t, Term heapTerm, Term objectTerm, Term fieldTerm, Term tacitHeap) throws IOException {
 
-        JavaInfo javaInfo = lp.services.getJavaServices().getJavaInfo();
+        JavaInfo javaInfo = lp.services.getProgramServices().getJavaInfo();
         KeYJavaType selectKJT = javaInfo.getKeYJavaType(t.sort());
         KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());
 

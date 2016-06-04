@@ -1262,11 +1262,11 @@ public class LogicPrinter {
             fieldName += HeapLDT.getPrettyFieldName(t.op());
             boolean isKeyword = false;
             if (services != null) {
-               isKeyword = (obs == services.getJavaServices().getJavaInfo().getInv());
+               isKeyword = (obs == services.getProgramServices().getJavaInfo().getInv());
             }
 
             if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
-                JavaInfo javaInfo = services.getJavaServices().getJavaInfo();
+                JavaInfo javaInfo = services.getProgramServices().getJavaInfo();
                 if (t.arity() > 1) {
                     // in case arity > 1 we assume fieldName refers to a query (method call)
                     Term object = t.sub(1);
@@ -2346,13 +2346,13 @@ public class LogicPrinter {
 	    				   Sort sort,
 	    				   Services services) {
         if ( ! ( services != null
-        	  && sort.extendsTrans(services.getJavaServices().getJavaInfo().objectSort()))) {
+        	  && sort.extendsTrans(services.getProgramServices().getJavaInfo().objectSort()))) {
             return false;
         }
-        final KeYJavaType kjt = services.getJavaServices().getJavaInfo().getKeYJavaType(sort);
+        final KeYJavaType kjt = services.getProgramServices().getJavaInfo().getKeYJavaType(sort);
         assert kjt != null : "Did not find KeYJavaType for " + sort;
         return
-            services.getJavaServices().getJavaInfo().getAllAttributes(programName, kjt).size() == 1;
+            services.getProgramServices().getJavaInfo().getAllAttributes(programName, kjt).size() == 1;
     }
 
     /** Utility class for stack entries containing the position table

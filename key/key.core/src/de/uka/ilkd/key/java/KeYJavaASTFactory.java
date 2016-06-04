@@ -225,7 +225,7 @@ public abstract class KeYJavaASTFactory {
     public static LocalVariableDeclaration declare(final Services services,
 	    final String name, final Expression initializer,
 	    final KeYJavaType type) {
-	final ProgramElementName uniqueName = services.getJavaServices().getInnerVarNamer()
+	final ProgramElementName uniqueName = services.getProgramServices().getInnerVarNamer()
 		.getTemporaryNameProposal(name);
 	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
 		uniqueName, initializer, type);
@@ -373,7 +373,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static ProgramVariable localVariable(final Services services,
 	    final String name, final KeYJavaType type) {
-	final ProgramElementName uniqueName = services.getJavaServices().getInnerVarNamer()
+	final ProgramElementName uniqueName = services.getProgramServices().getInnerVarNamer()
 		.getTemporaryNameProposal(name);
 	final ProgramVariable variable = KeYJavaASTFactory.localVariable(
 		uniqueName, type);
@@ -2144,7 +2144,7 @@ public abstract class KeYJavaASTFactory {
 	    final ExecutionContext context) {
 	final KeYJavaType classType = expression.getKeYJavaType(services,
 		context);
-	final ProgramVariable field = services.getJavaServices().getJavaInfo().getAttribute(name,
+	final ProgramVariable field = services.getProgramServices().getJavaInfo().getAttribute(name,
 		classType);
 	final FieldReference reference = KeYJavaASTFactory.fieldReference(
 		new ParenthesizedExpression(expression), field);

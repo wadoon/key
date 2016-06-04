@@ -232,7 +232,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 
         //if not, compute it 
         if(result == null) {
-            final JavaInfo javaInfo = services.getJavaServices().getJavaInfo();
+            final JavaInfo javaInfo = services.getProgramServices().getJavaInfo();
 
             //array sorts are disjoint if their element sorts are disjoint
             Sort fstElemSort = fstSort;
@@ -244,7 +244,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
             }
 
             //object sorts?
-            final Sort objectSort = services.getJavaServices().getJavaInfo().objectSort();	    
+            final Sort objectSort = services.getProgramServices().getJavaInfo().objectSort();	    
             boolean fstElemIsObject = fstElemSort.extendsTrans(objectSort);
             boolean sndElemIsObject = sndElemSort.extendsTrans(objectSort);
 

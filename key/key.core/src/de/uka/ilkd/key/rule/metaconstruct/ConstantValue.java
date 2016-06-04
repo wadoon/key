@@ -41,7 +41,7 @@ public final class ConstantValue extends AbstractTermTransformer {
 	if(op instanceof ProgramConstant) {
 	    Literal lit = ((ProgramConstant)op).getCompileTimeConstant();
 	    if(lit != null) {
-		term = services.getJavaServices().getTypeConverter().convertToLogicElement(lit);
+		term = services.getProgramServices().getTypeConverter().convertToLogicElement(lit);
 	    }
 	}
 

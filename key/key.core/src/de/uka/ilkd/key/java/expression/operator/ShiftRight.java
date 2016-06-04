@@ -98,7 +98,7 @@ public class ShiftRight extends Operator {
 
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	final TypeConverter tc = javaServ.getJavaServices().getTypeConverter();
+	final TypeConverter tc = javaServ.getProgramServices().getTypeConverter();
 	return tc.getPromotedType
 	    (tc.getKeYJavaType((Expression)getChildAt(0), ec));
     }

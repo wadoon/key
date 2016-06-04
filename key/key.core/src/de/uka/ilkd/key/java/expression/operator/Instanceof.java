@@ -132,7 +132,7 @@ public class Instanceof extends TypeOperator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+	return javaServ.getProgramServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {

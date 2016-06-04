@@ -160,7 +160,7 @@ class GenericTranslator {
                               // have the condition.
 
                                 if (func.getSortDependingOn().equals(generic)) {
-                                        if (instantiation.extendsTrans(services.getJavaServices().getJavaInfo()
+                                        if (instantiation.extendsTrans(services.getProgramServices().getJavaInfo()
                                                         .nullSort())) {
                                                 return null;
                                         }
