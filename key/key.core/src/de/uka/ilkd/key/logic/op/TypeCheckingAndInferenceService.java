@@ -56,19 +56,6 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
     // /////////////////////////////////// //
 
     @SuppressWarnings("unchecked")
-    private static <C extends Operator> TypeCheckingAndInferenceService<C> getTypeCheckerFor(
-            Class<C> clazz) {
-        if (CHECKERS.containsKey(clazz)) {
-            return (TypeCheckingAndInferenceService<C>) CHECKERS.get(clazz);
-        }
-        else {
-            throw new UnsupportedOperationException(
-                    "There is no type checker and sort inference service registred for class "
-                            + clazz.getName());
-        }
-    }
-
-    @SuppressWarnings("unchecked")
     public static <C extends Operator> TypeCheckingAndInferenceService<C> getTypeCheckerFor(
             C op) {
         TypeCheckingAndInferenceService<C> result =
@@ -111,33 +98,6 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
                 }
             };
         }
-    }
-    // /////////////////////////////////// //
-    // /////// POLYMORPHIC GETTERS /////// //
-    // /////////////////////////////////// //
-
-    public static TypeCheckingAndInferenceService<AbstractSortedOperator> getChecker(
-            AbstractSortedOperator op) {
-        return getTypeCheckerFor(AbstractSortedOperator.class);
-    }
-
-    public static TypeCheckingAndInferenceService<IfExThenElse> getChecker(
-            IfExThenElse op) {
-        return getTypeCheckerFor(IfExThenElse.class);
-    }
-
-    public static TypeCheckingAndInferenceService<IfThenElse> getChecker(
-            IfThenElse op) {
-        return getTypeCheckerFor(IfThenElse.class);
-    }
-
-    public static TypeCheckingAndInferenceService<SubstOp> getChecker(SubstOp op) {
-        return getTypeCheckerFor(SubstOp.class);
-    }
-
-    public static TypeCheckingAndInferenceService<UpdateApplication> getChecker(
-            UpdateApplication op) {
-        return getTypeCheckerFor(UpdateApplication.class);
     }
 
     // /////////////////////////////////// //
