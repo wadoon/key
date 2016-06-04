@@ -78,7 +78,7 @@ options {
 	// save parameters
 	this.services       = services;
 	this.tb             = services.getTermBuilder();
-	this.javaInfo       = services.getJavaServices().getJavaInfo();
+	this.javaInfo       = services.getProgramServices().getJavaInfo();
 	containerType  =   specInClass;
 	this.intLDT         = services.getTheories().getIntegerLDT();
 	this.heapLDT        = services.getTheories().getHeapLDT();
@@ -1341,7 +1341,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
      THIS
     {
     	result = new SLExpression(
-    		services.getJavaServices().getTypeConverter().findThisForSort(receiver.getType().getSort(),
+    		services.getProgramServices().getTypeConverter().findThisForSort(receiver.getType().getSort(),
     							    tb.var(selfVar),
     							    javaInfo.getKeYJavaType(selfVar.sort()),
     							    true),
@@ -1437,7 +1437,7 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
 	l=STRING_LITERAL
 	{
 	    Term charListTerm
-	       = services.getJavaServices().getTypeConverter()
+	       = services.getProgramServices().getTypeConverter()
 	                 .convertToLogicElement(
 	                 	new StringLiteral(l.getText()));
 	    Function strPool

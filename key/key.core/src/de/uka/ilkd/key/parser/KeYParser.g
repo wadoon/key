@@ -405,7 +405,7 @@ options {
         if(isProblemParser()) 
           return parserConfig.javaInfo();
     	if(getServices() != null)
-          return getServices().getJavaServices().getJavaInfo();
+          return getServices().getProgramServices().getJavaInfo();
 	else
 	  return null;
     }
@@ -3115,7 +3115,7 @@ atom returns [Term _atom = null]
     |   literal=STRING_LITERAL
         {
             String s = unescapeString(literal.getText());
-            a = getServices().getJavaServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(s));
+            a = getServices().getProgramServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(s));
         }   
     ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = getServices().getTermBuilder().addLabel(a, labels);} } RGUILLEMETS)?
     ;
