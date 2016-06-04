@@ -11,6 +11,24 @@ folgende Methoden herausfaktorisieren in
 
 Ziel: Operator unabhängig vom Term und u.U. spezielle TermFactories ohne Validation (schneller)
 
+Classes still depending on either Term or KeYJavaType
+-----------------------------------------------------
+
+- AbstractTermTransformer
+- IObserverFunction
+- IProgramMethod
+- ProgramVariable
+- LocationVariable
+- ObserverFunction
+- ProgramConstant
+- ProgramMethod
+- ProgramSV
+- ProgramVariable
+- SubstOp
+- TermTransformer
+- UpdateApplication
+- WarySubstOp
+
 New Type Checker
 ----------------
 
