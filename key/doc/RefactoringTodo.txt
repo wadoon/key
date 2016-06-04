@@ -4,12 +4,14 @@ Operator  (Dominic)
 
 folgende Methoden herausfaktorisieren in 
 
-   TypeCheckingAndInferenceService: Diese Klasse in TermFactory beim Term zusammenbauen verwenden um Sorten zu bestimmen und welldefinedness zu checken
+   TypeCheckingAndInferenceService: Diese Klasse in TermFactory beim Term
+   zusammenbauen verwenden um Sorten zu bestimmen und welldefinedness zu checken
 
     Sort sort(ImmutableArray<Term> terms);
     boolean validTopLevel(Term term);
 
-Ziel: Operator unabhängig vom Term und u.U. spezielle TermFactories ohne Validation (schneller)
+Ziel: Operator unabhängig vom Term und u.U. spezielle TermFactories
+ohne Validation (schneller)
 
 Classes still depending on either Term or KeYJavaType
 -----------------------------------------------------
@@ -28,6 +30,9 @@ Classes still depending on either Term or KeYJavaType
 - TermTransformer
 - UpdateApplication
 - WarySubstOp
+
+*Note*: I a lready separated the Java specific stuff from the Term interface;
+a problem is the KeYJavaType.
 
 New Type Checker
 ----------------
