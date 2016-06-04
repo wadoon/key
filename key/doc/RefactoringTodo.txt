@@ -28,10 +28,10 @@ Classes still depending on either Term or KeYJavaType
 - ProgramVariable (KeYJavaType)
 - SubstOp (Term)
 - TermTransformer (Term)
-- UpdateApplication (Term)
+- UpdateApplication (Term) [Abhängigkeit nur in statischen Methoden]
 - WarySubstOp (Term)
 
-*Note*: I a lready separated the Java specific stuff from the Term interface;
+*Note*: I already separated the Java specific stuff from the Term interface;
 a problem is the KeYJavaType.
 
 New Type Checker
