@@ -16,20 +16,20 @@ ohne Validation (schneller)
 Classes still depending on either Term or KeYJavaType
 -----------------------------------------------------
 
-- AbstractTermTransformer
-- IObserverFunction
-- IProgramMethod
-- ProgramVariable
-- LocationVariable
-- ObserverFunction
-- ProgramConstant
-- ProgramMethod
-- ProgramSV
-- ProgramVariable
-- SubstOp
-- TermTransformer
-- UpdateApplication
-- WarySubstOp
+- AbstractTermTransformer (Term)
+- IObserverFunction (KeYJavaType)
+- IProgramMethod (KeYJavaType)
+- IProgramVariable (KeYJavaType)
+- LocationVariable (KeYJavaType)
+- ObserverFunction (KeYJavaType)
+- ProgramConstant (KeYJavaType)
+- ProgramMethod (KeYJavaType, Term)
+- ProgramSV (KeYJavaType, Term)
+- ProgramVariable (KeYJavaType)
+- SubstOp (Term)
+- TermTransformer (Term)
+- UpdateApplication (Term)
+- WarySubstOp (Term)
 
 *Note*: I a lready separated the Java specific stuff from the Term interface;
 a problem is the KeYJavaType.
