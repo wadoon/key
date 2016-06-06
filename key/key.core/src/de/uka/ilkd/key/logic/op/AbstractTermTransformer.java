@@ -20,6 +20,7 @@ import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.AbstractSortedOperator;
 import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;

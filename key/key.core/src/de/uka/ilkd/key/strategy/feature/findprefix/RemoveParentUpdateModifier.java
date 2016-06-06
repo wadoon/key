@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
+import org.key_project.common.core.logic.op.UpdateApplication;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 
 
 /**

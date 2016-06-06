@@ -11,13 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractOperator;
-
-import de.uka.ilkd.key.logic.Term;
 
 /**
  * Singleton class defining a binary operator {u}t that applies updates u to
@@ -44,9 +41,10 @@ public final class UpdateApplication extends AbstractOperator {
      * @param t
      *            term with this operator as top level operator
      */
-    public static Term getUpdate(GenericTerm t) {
+    @SuppressWarnings("unchecked")
+    public static <T extends GenericTerm<?>> T getUpdate(T t) {
         assert t.op() == UPDATE_APPLICATION;
-        return t.sub(updatePos());
+        return (T) t.sub(updatePos());
     }
 
     /**
@@ -63,8 +61,9 @@ public final class UpdateApplication extends AbstractOperator {
      * @param t
      *            term with this operator as top level operator
      */
-    public static Term getTarget(GenericTerm t) {
+    @SuppressWarnings("unchecked")
+    public static <T extends GenericTerm<?>> T getTarget(T t) {
         assert t.op() == UPDATE_APPLICATION;
-        return t.sub(targetPos());
+        return (T) t.sub(targetPos());
     }
 }

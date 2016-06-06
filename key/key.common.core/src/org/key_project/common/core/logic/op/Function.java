@@ -45,8 +45,12 @@ public class Function extends AbstractSortedOperator {
         skolemConstant = isSkolemConstant;
         assert sort != Sort.UPDATE;
         assert !(unique && sort == Sort.FORMULA);
-        assert !(sort instanceof NullSort) || name.toString().equals("null") : "Functions with sort \"null\" are not allowed: "
-                + this;
+        // TODO: Commented out the following assertion in which the Java
+        // NullSort was contained hard-coded; should this be re-inserted
+        // somewhere in a niceer way?
+        // assert !(sort instanceof NullSort) || name.toString().equals("null")
+        // : "Functions with sort \"null\" are not allowed: "
+        // + this;
     }
 
     public Function(Name name,

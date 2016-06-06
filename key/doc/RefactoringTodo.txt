@@ -34,6 +34,10 @@ Classes still depending on either Term or KeYJavaType
 *Note*: I already separated the Java specific stuff from the Term interface;
 a problem is the KeYJavaType.
 
+*TODO*: In Function.java, there was a hardcoded assertion checking that the sort name
+is not null (and that the Sort is not the NullSort). I commented this out; should it be
+inserted somewhere?
+
 New Type Checker
 ----------------
 

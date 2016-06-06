@@ -104,12 +104,12 @@ public final class SortDependingFunction extends Function {
         if (result != null && sort instanceof Sort
                 && result.getSortDependingOn() != sort) {
             result = new SortDependingFunction(template, sort);
-            services.getNamespaces().functions().add(result);
+            services.getNamespaces().getNamespace("functions").add(result);
         }
 
         if (result == null) {
             result = new SortDependingFunction(template, sort);
-            services.getNamespaces().functions().addSafely(result);
+            services.getNamespaces().getNamespace("functions").addSafely(result);
         }
 
         assert result.getSortDependingOn() == sort : result + " depends on "
