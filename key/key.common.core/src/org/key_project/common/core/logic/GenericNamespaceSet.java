@@ -35,4 +35,14 @@ public interface GenericNamespaceSet {
      * @return The named object looked for or null if there is no such object.
      */
     Named lookup(Name name);
+
+    /**
+     * TODO: Document.
+     *
+     * @return The functions set.
+     * @deprecated Is here for backwards compatibility; you should use
+     *             {@link #getNamespace(String)} instead to be compatible with
+     *             other logics than JavaDL.
+     */
+    GenericNamespaceSet functions();
 }

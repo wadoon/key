@@ -96,7 +96,10 @@ public class Function extends AbstractSortedOperator {
              isSkolemConstant);
     }
 
-    Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
+    //TODO Made this protected during refactoring (was package-private before) because
+    // Transformer has overridden it before. Should maybe be made package-private again
+    // after finishing refactoring. (DS, 2016-06-06)
+    protected Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
         this(name, sort, argSorts, null, false, isRigid, false);
     }
 

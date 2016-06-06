@@ -38,6 +38,8 @@ a problem is the KeYJavaType.
 is not null (and that the Sort is not the NullSort). I commented this out; should it be
 inserted somewhere?
 
+*TODO*: Term interface: Add Generics
+
 New Type Checker
 ----------------
 

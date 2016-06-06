@@ -24,7 +24,7 @@ import org.key_project.common.core.services.TermServices;
  * operators. Currently, only the subclass <code>WarySubstOp</code> is used and
  * accessible through the key parser.
  */
-public abstract class SubstOp extends AbstractOperator {
+public abstract class SubstOp <T extends GenericTerm<?>> extends AbstractOperator {
 
     protected SubstOp(Name name) {
         super(name, 2, new Boolean[] { false, true }, true);
@@ -37,7 +37,7 @@ public abstract class SubstOp extends AbstractOperator {
      * @param services
      *            TODO
      */
-    public abstract GenericTerm apply(GenericTerm term, TermServices services);// {
+    public abstract T apply(T term, TermServices services);// {
     // QuantifiableVariable v =
     // term.varsBoundHere(1).getQuantifiableVariable(0);
     // ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));
