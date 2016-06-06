@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class MultipleVarDecl extends ProgramTransformer {

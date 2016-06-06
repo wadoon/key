@@ -20,6 +20,7 @@ package de.uka.ilkd.key.rule;
 import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -37,7 +38,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;

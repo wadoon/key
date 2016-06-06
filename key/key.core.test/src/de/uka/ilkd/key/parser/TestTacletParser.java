@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -37,7 +38,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;

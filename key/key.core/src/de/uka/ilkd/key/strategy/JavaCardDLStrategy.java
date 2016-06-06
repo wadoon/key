@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.ParsableVariable;
@@ -27,7 +28,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;

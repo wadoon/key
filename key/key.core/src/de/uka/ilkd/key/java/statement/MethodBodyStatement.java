@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -33,7 +34,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 
 /**

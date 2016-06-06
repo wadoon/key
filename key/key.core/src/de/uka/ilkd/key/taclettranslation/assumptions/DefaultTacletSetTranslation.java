@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -28,7 +29,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;

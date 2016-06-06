@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
@@ -52,7 +53,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;

@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;

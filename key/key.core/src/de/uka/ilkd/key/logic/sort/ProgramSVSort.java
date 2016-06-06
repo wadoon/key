@@ -19,6 +19,7 @@ import java.util.Map;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.*;
 import org.key_project.util.ExtList;
@@ -71,7 +72,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**
  * Special "sorts" used for schema variables matching program constructs 

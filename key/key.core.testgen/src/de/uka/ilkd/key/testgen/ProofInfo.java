@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Set;
 
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.sort.Sort;
 
@@ -12,7 +13,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -49,7 +50,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;

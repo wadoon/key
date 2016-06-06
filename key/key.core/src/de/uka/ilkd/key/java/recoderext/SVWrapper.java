@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
 
 public interface SVWrapper {
 

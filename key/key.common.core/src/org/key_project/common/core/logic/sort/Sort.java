@@ -16,6 +16,7 @@ package org.key_project.common.core.logic.sort;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.common.core.services.GenericProofServices;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -42,7 +43,7 @@ public interface Sort extends Named {
         }
 
         @Override
-        public ImmutableSet<Sort> extendsSorts(ProofServices services) {
+        public ImmutableSet<Sort> extendsSorts(GenericProofServices services) {
             return extendsSorts();
         }
 
@@ -108,7 +109,7 @@ public interface Sort extends Named {
     /**
      * Returns the direct supersorts of this sort.
      */
-    ImmutableSet<Sort> extendsSorts(ProofServices services); 
+    <T extends GenericProofServices> ImmutableSet<Sort> extendsSorts(T services); 
 
     /**
      * Tells whether the given sort is a reflexive, transitive subsort of this 

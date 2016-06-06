@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -26,7 +27,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;

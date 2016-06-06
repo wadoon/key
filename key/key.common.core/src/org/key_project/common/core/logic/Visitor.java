@@ -13,9 +13,8 @@
 
 package org.key_project.common.core.logic;
 
-import de.uka.ilkd.key.logic.Term;
 
-public interface Visitor<T extends GenericTerm> {
+public interface Visitor<T extends GenericTerm<Visitor<T>>> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      * @param visited The currently visited {@link Term}.

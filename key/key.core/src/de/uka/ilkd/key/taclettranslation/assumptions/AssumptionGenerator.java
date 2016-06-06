@@ -23,6 +23,7 @@ import java.util.LinkedList;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
@@ -35,7 +36,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.rule.Taclet;

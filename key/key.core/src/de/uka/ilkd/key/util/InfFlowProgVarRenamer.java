@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.UpdateableOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -17,9 +19,7 @@ import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 

@@ -11,9 +11,8 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
-import org.key_project.common.core.logic.op.ParsableVariable;
 
 /**
  * This interface represents the root of a schema variable hierarchy to be

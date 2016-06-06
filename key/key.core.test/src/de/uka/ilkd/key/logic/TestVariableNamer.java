@@ -18,6 +18,7 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSet;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.SortImpl;

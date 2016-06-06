@@ -16,10 +16,10 @@ package de.uka.ilkd.key.rule.conditions;
 import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.pp.LogicPrinter;

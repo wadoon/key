@@ -17,12 +17,12 @@ import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;

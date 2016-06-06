@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
+
 import recoder.java.Identifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class ProgramVariableSVWrapper extends Identifier
     implements KeYRecoderExtension, SVWrapper{

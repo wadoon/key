@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -30,7 +31,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
 

@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.swing.JPopupMenu;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -38,7 +39,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;

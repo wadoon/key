@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
+
 import recoder.java.SourceElement;
 import recoder.java.SourceVisitor;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class ExecCtxtSVWrapper extends ExecutionContext 
     implements KeYRecoderExtension, SVWrapper{

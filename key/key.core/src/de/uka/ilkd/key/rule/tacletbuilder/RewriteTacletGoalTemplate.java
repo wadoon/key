@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -22,7 +23,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
 /** this class inherits from TacletGoalTemplate. It is used if there is a

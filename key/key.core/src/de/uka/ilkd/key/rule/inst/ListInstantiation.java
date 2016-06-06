@@ -13,9 +13,8 @@
 
 package de.uka.ilkd.key.rule.inst;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class ListInstantiation extends InstantiationEntry<ImmutableList<Object>> {
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -21,7 +22,6 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;

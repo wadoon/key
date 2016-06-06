@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -27,7 +28,6 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;

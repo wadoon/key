@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
@@ -46,7 +47,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;

@@ -16,25 +16,6 @@ package org.key_project.common.core.logic.label;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
-import de.uka.ilkd.key.rule.label.TermLabelMerger;
-import de.uka.ilkd.key.rule.label.TermLabelPolicy;
-import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
-import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
-import de.uka.ilkd.key.rule.label.TermLabelUpdate;
-
 /**
  * <p>
  * The interface for term labels. Term labels are annotations that can be attached

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.services.GenericProofServices;
 
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Counter;
@@ -11,7 +12,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
-public interface ProofServices {
+public interface ProofServices extends GenericProofServices {
 
     NameRecorder getNameRecorder();
 

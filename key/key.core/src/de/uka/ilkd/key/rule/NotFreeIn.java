@@ -18,7 +18,8 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
+
 import de.uka.ilkd.key.logic.op.VariableSV;
 
 public class NotFreeIn {

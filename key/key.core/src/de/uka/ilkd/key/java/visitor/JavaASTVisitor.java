@@ -12,6 +12,7 @@
 //
 
 package de.uka.ilkd.key.java.visitor;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Comment;
@@ -164,7 +165,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;

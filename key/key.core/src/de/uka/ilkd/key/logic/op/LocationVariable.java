@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.UpdateableOperator;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
+
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.TermSV;
 

@@ -11,13 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractSortedOperator;
 import org.key_project.common.core.logic.sort.Sort;
 
 

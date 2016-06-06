@@ -11,10 +11,8 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
-import org.key_project.common.core.logic.op.ParsableVariable;
-import org.key_project.common.core.logic.op.SortedOperator;
 
 /** 
  * Operators implementing this interface may stand for

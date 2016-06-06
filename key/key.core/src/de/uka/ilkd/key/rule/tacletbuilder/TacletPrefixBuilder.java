@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -28,7 +29,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.FindTaclet;

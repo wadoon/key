@@ -13,7 +13,7 @@
 
 package org.key_project.common.core.logic;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.Sort;
 
 public interface Sorted {
 

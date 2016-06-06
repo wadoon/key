@@ -12,6 +12,7 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -23,7 +24,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;

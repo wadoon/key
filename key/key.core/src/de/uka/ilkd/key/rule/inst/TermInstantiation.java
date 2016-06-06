@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.rule.inst;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
+
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /** This class is used to store the instantiation of a schemavarible
  * if it is a term.

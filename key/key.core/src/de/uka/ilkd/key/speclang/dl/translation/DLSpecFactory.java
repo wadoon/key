@@ -16,6 +16,7 @@ package de.uka.ilkd.key.speclang.dl.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.ParsableVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
@@ -31,7 +32,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;

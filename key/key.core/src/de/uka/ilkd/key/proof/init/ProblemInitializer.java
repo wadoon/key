@@ -23,6 +23,7 @@ import java.util.Vector;
 
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -45,7 +46,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;

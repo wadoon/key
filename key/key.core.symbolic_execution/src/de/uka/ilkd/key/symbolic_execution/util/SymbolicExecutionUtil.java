@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SortedOperator;
@@ -93,7 +94,6 @@ import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;

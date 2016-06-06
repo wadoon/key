@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -187,7 +188,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
 

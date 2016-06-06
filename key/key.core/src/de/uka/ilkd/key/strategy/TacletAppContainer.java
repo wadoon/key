@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.FormulaTagManager;
 import de.uka.ilkd.key.proof.Goal;

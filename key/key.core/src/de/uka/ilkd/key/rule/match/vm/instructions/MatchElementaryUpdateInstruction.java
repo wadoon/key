@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.MatchConditions;

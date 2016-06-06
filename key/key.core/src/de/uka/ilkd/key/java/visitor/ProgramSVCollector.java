@@ -12,11 +12,11 @@
 //
 
 package de.uka.ilkd.key.java.visitor;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 

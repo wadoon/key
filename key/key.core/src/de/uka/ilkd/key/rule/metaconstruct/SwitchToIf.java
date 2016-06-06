@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -42,7 +43,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 

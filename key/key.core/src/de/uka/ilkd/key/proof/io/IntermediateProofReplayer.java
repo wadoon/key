@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -41,7 +42,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.parser.DefaultTermParser;

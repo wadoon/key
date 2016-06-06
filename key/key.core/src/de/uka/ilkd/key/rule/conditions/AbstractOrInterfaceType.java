@@ -14,10 +14,10 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import org.key_project.common.core.logic.op.SVSubstitute;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 

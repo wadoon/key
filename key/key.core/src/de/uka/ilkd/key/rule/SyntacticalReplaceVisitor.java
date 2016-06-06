@@ -24,9 +24,12 @@ import java.util.Deque;
 import java.util.Stack;
 
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.common.core.logic.op.UpdateableOperator;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -44,13 +47,10 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.logic.op.TermTransformer;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;

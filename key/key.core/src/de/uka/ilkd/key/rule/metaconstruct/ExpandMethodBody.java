@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
@@ -39,7 +40,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ExpandMethodBody extends ProgramTransformer {

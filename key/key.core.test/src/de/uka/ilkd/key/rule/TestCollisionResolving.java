@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
@@ -35,7 +36,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;

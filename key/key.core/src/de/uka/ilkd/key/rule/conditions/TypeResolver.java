@@ -17,6 +17,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SVSubstitute;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 
@@ -26,7 +27,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;

@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.common.core.logic.op.SVSubstitute;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 import de.uka.ilkd.key.java.Label;
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;

@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.rule;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /** This class is used to collect all appearing SchemaVariables that are bound in a
  * Taclet. Duplicates are not removed becaues the use of persistent

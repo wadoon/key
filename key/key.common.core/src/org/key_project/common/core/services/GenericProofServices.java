@@ -11,15 +11,14 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.logic.op;
+package org.key_project.common.core.services;
 
-
-/** 
- * This interface represents the variables that can be recognized 
- * by one of the parsers.
+/**
+ * TODO: Document.
  *
  * @author Dominic Scheurer
+ *
  */
-public interface ParsableVariable extends SortedOperator {
+public interface GenericProofServices {
 
 }

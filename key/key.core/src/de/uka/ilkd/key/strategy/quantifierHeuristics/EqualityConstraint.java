@@ -22,6 +22,7 @@ import java.util.WeakHashMap;
 
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.LRUCache;
@@ -36,7 +37,6 @@ import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
 

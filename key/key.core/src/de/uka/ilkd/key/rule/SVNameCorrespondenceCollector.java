@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;

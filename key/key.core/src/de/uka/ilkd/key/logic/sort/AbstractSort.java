@@ -16,11 +16,10 @@ package de.uka.ilkd.key.logic.sort;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.services.GenericProofServices;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.Services;
 
 /**
  * Abstract base class for implementations of the Sort interface.
@@ -50,7 +49,7 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override
-    public final ImmutableSet<Sort> extendsSorts(Services services) {
+    public final ImmutableSet<Sort> extendsSorts(GenericProofServices services) {
 	return extendsSorts();
     }
 

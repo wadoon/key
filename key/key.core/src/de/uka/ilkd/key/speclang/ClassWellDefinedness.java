@@ -15,6 +15,7 @@ package de.uka.ilkd.key.speclang;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -27,7 +28,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 

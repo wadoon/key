@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 

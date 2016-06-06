@@ -34,6 +34,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -54,7 +55,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;

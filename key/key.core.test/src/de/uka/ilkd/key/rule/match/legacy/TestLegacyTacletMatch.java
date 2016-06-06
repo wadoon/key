@@ -20,6 +20,7 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
@@ -28,7 +29,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet;
