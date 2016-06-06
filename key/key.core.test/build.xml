@@ -20,6 +20,7 @@
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
 			<classpath>
+            <pathelement location="${dist.dir}/key.common.core.jar"/>
 				<pathelement location="${dist.dir}/key.core.jar"/>
 				<pathelement location="${dist.dir}/key.util.jar"/>
 				<pathelement location="${basedir}/../key.util.test/lib/junit-4.12.jar"/>
@@ -61,6 +62,7 @@
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
 			<classpath>
+            <pathelement path="${basedir}/../key.common.core/bin"/>
 				<pathelement path="${basedir}/../key.core/bin"/>
 				<pathelement path="${basedir}/../key.util/bin"/>
 				<pathelement location="${lib.dir}/recoderKey.jar"/>
@@ -85,6 +87,7 @@
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
 			<classpath>
+            <pathelement path="${basedir}/../key.common.core/bin"/>
 				<pathelement path="${basedir}/../key.core/bin"/>
 				<pathelement path="${basedir}/../key.util/bin"/>
 				<pathelement location="${lib.dir}/recoderKey.jar"/>
@@ -109,6 +112,7 @@
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
 			<classpath>
+            <pathelement path="${basedir}/../key.common.core/bin"/>
 				<pathelement path="${basedir}/../key.core/bin"/>
 				<pathelement path="${basedir}/../key.util/bin"/>
 				<pathelement location="${lib.dir}/recoderKey.jar"/>
@@ -143,6 +147,7 @@
 		       depend="${build.depend}" 
 		       optimize="off">
 			<classpath>
+            <pathelement path="${basedir}/../key.common.core/bin"/>
 				<pathelement path="${basedir}/../key.core/bin"/>
 				<pathelement path="${basedir}/../key.util.test/bin"/>
 				<pathelement path="${basedir}/../key.util/bin"/>

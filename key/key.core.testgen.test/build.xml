@@ -16,6 +16,7 @@
 			<jvmarg value="-ea"/>
 			<classpath>
 				<pathelement path="${build.dir}"/>
+            <pathelement location="${dist.dir}/key.common.core.jar"/>
 				<pathelement location="${dist.dir}/key.core.testgen.jar"/>
 				<pathelement path="${basedir}/../key.core.test/bin"/>
 				<pathelement location="${dist.dir}/key.core.jar"/>
@@ -40,6 +41,7 @@
 				<pathelement path="${build.dir}"/>
 				<pathelement path="${basedir}/../key.core.testgen/bin/"/>
 				<pathelement path="${basedir}/../key.core.test/bin"/>
+            <pathelement path="${basedir}/../key.common.core/bin/"/>
 				<pathelement path="${basedir}/../key.core/bin/"/>
 				<pathelement path="${basedir}/../key.util.test/bin"/>
 				<pathelement path="${basedir}/../key.util/bin/"/>
@@ -68,6 +70,7 @@
 			<classpath>
 				<pathelement path="${basedir}/../key.core.testgen/bin/"/>
 				<pathelement path="${basedir}/../key.core.test/bin"/>
+            <pathelement path="${basedir}/../key.common.core/bin"/>
 				<pathelement path="${basedir}/../key.core/bin/"/>
 				<pathelement path="${basedir}/../key.util.test/bin"/>
 				<pathelement path="${basedir}/../key.util/bin/"/>

@@ -9,6 +9,8 @@ options {
     package de.uka.ilkd.key.speclang.jml.translation;
 
     import java.io.StringReader;
+  
+    import org.key_project.common.core.logic.*;
 
     import org.key_project.util.collection.*;
     import de.uka.ilkd.key.java.JavaInfo;

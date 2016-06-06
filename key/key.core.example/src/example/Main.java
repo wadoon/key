@@ -86,7 +86,7 @@ public class Main {
                   ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(maxSteps);
                   ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
                   proof.getSettings().getStrategySettings().setMaxSteps(maxSteps);
-                  proof.setActiveStrategy(proof.getServices().getProfile().getDefaultStrategyFactory().create(proof, sp));
+                  proof.setActiveStrategy(proof.getServices().getProfile().getDefaultStrategyFactory().create(proof, sp)); 
                   // Start auto mode
                   env.getUi().getProofControl().startAndWaitForAutoMode(proof);
                   // Show proof result

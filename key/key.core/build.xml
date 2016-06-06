@@ -38,6 +38,7 @@
 			<classpath>
 				<pathelement location="${ext.dir}/antlr.jar"/>
 				<pathelement location="${ext.dir}/recoderKey.jar"/>
+				<pathelement location="${basedir}/../key.common.core/bin/"/>
 				<pathelement location="${basedir}/../key.util/bin/"/>
 			</classpath>
 		</javac>

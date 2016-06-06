@@ -6,6 +6,7 @@
 
 	<path id="key.ui.class.path">
 	  <pathelement path="${basedir}/../key.util/bin"/>
+	  <pathelement path="${basedir}/../key.common.core/bin"/>
 	  <pathelement path="${basedir}/../key.core/bin"/>
 	  <pathelement location="${basedir}/../key.core/lib/antlr.jar"/>
 	  <pathelement location="${basedir}/../key.core/lib/recoderKey.jar"/>
