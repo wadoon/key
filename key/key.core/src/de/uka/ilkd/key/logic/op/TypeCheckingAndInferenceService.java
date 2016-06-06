@@ -18,7 +18,7 @@ import java.util.HashMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.GenericTerm;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -82,18 +82,18 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
         } else {// ignore anonymous classes as these are hacks
             return new TypeCheckingAndInferenceService<C>() {
                 @Override
-                public Sort sort(ImmutableArray<Term> terms, C op) {
+                public Sort sort(ImmutableArray<? extends GenericTerm> terms, C op) {
                     return ((SortedOperator)op).sort();
                 }
 
                 @Override
-                public boolean additionalValidTopLevel(Term term,
+                public boolean additionalValidTopLevel(GenericTerm term,
                         C op) {
                     return true;
                 }
 
                 @Override
-                public boolean validTopLevel(Term term, C op) {
+                public boolean validTopLevel(GenericTerm term, C op) {
                     return true;
                 }
             };
@@ -104,19 +104,19 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
     // //////// PUBLIC__INTERFACE //////// //
     // /////////////////////////////////// //
 
-    public abstract Sort sort(ImmutableArray<Term> terms, O op);
+    public abstract Sort sort(ImmutableArray<? extends GenericTerm> terms, O op);
 
-    public abstract boolean additionalValidTopLevel(Term term, O op);
+    public abstract boolean additionalValidTopLevel(GenericTerm term, O op);
 
     /**
-     * Checks whether the top level structure of the given @link Term is
+     * Checks whether the top level structure of the given @link GenericTerm is
      * syntactically valid, given the assumption that the top level operator of
      * the term is the same as this Operator. The assumption that the top level
      * operator and the term are equal is NOT checked.
      * 
-     * @return true iff the top level structure of the {@link Term} is valid.
+     * @return true iff the top level structure of the {@link GenericTerm} is valid.
      */
-    public abstract boolean validTopLevel(Term term, O op);
+    public abstract boolean validTopLevel(GenericTerm term, O op);
 
     // /////////////////////////////////// //
     // ///////// TEMPLATE__CLASS ///////// //
@@ -125,7 +125,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
     static abstract class DefaultTypeCheckingAndInferenceService<O extends Operator>
             extends TypeCheckingAndInferenceService<O> {
         @Override
-        public boolean validTopLevel(Term term, O op) {
+        public boolean validTopLevel(GenericTerm term, O op) {
             if (op.arity() != term.arity() || op.arity() != term.subs().size()
                     || ( op.bindsVars() == term.boundVars().isEmpty() ) ) {
                 return false;
@@ -152,11 +152,11 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             // This class should be a Singleton.
         }
 
-        public Sort sort(ImmutableArray<Term> terms, AbstractSortedOperator op) {
+        public Sort sort(ImmutableArray<? extends GenericTerm> terms, AbstractSortedOperator op) {
             return op.sort();
         }
 
-        public boolean additionalValidTopLevel(Term term,
+        public boolean additionalValidTopLevel(GenericTerm term,
                 AbstractSortedOperator op) {
             for (int i = 0, n = op.arity(); i < n; i++) {
                 if (!possibleSub(i, term.sub(i), op)) {
@@ -167,7 +167,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
         }
 
         /**
-         * checks if a given Term could be subterm (at the at'th subterm
+         * checks if a given GenericTerm could be subterm (at the at'th subterm
          * position) of a term with this function at its top level. The validity
          * of the given subterm is NOT checked.
          * 
@@ -179,7 +179,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
          * @return true iff the given term can be subterm at the indicated
          *         position
          */
-        private boolean possibleSub(int at, Term possibleSub,
+        private boolean possibleSub(int at, GenericTerm possibleSub,
                 AbstractSortedOperator op) {
             final Sort s = possibleSub.sort();
 
@@ -198,11 +198,11 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             // This class should be a Singleton.
         }
 
-        public Sort sort(ImmutableArray<Term> terms, IfExThenElse op) {
+        public Sort sort(ImmutableArray<? extends GenericTerm> terms, IfExThenElse op) {
             return terms.get(1).sort();
         }
 
-        public boolean additionalValidTopLevel(Term term, IfExThenElse op) {
+        public boolean additionalValidTopLevel(GenericTerm term, IfExThenElse op) {
             for (QuantifiableVariable var : term.varsBoundHere(0)) {
                 if (!var.sort().name().toString().equals("int")) {
                     return false;
@@ -224,7 +224,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             // This class should be a Singleton.
         }
 
-        public Sort sort(ImmutableArray<Term> terms, IfThenElse op) {
+        public Sort sort(ImmutableArray<? extends GenericTerm> terms, IfThenElse op) {
             final Sort s2 = terms.get(1).sort();
             final Sort s3 = terms.get(2).sort();
             if (s2 instanceof ProgramSVSort
@@ -240,7 +240,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             }
         }
 
-        public boolean additionalValidTopLevel(Term term, IfThenElse op) {
+        public boolean additionalValidTopLevel(GenericTerm term, IfThenElse op) {
             final Sort s0 = term.sub(0).sort();
             final Sort s1 = term.sub(1).sort();
             final Sort s2 = term.sub(2).sort();
@@ -296,7 +296,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             // This class should be a Singleton.
         }
 
-        public Sort sort(ImmutableArray<Term> terms, SubstOp op) {
+        public Sort sort(ImmutableArray<? extends GenericTerm> terms, SubstOp op) {
             if (terms.size() == 2) {
                 return terms.get(1).sort();
             }
@@ -306,7 +306,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             }
         }
 
-        public boolean additionalValidTopLevel(Term term, SubstOp op) {
+        public boolean additionalValidTopLevel(GenericTerm term, SubstOp op) {
             if (term.varsBoundHere(1).size() != 1) {
                 return false;
             }
@@ -323,11 +323,11 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             // This class should be a Singleton.
         }
 
-        public Sort sort(ImmutableArray<Term> terms, UpdateApplication op) {
+        public Sort sort(ImmutableArray<? extends GenericTerm> terms, UpdateApplication op) {
             return terms.get(1).sort();
         }
 
-        public boolean additionalValidTopLevel(Term term, UpdateApplication op) {
+        public boolean additionalValidTopLevel(GenericTerm term, UpdateApplication op) {
             return term.sub(0).sort() == Sort.UPDATE;
         }
     }
