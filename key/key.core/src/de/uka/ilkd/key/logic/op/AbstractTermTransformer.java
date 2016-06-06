@@ -18,8 +18,8 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.GenericTerm;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.metaconstruct.AddCast;
@@ -143,7 +143,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     /** @return String representing a logical integer literal 
      *  in decimal representation
      */
-    public static String convertToDecimalString(Term term, Services services) {
+    public static String convertToDecimalString(GenericTerm term, Services services) {
       	StringBuilder result = new StringBuilder();
 	boolean neg = false;
 	

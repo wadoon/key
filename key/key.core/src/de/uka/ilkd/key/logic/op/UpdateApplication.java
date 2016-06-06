@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.GenericTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 
@@ -41,7 +42,7 @@ public final class UpdateApplication extends AbstractOperator {
      * @param t
      *            term with this operator as top level operator
      */
-    public static Term getUpdate(Term t) {
+    public static Term getUpdate(GenericTerm t) {
         assert t.op() == UPDATE_APPLICATION;
         return t.sub(updatePos());
     }
@@ -60,7 +61,7 @@ public final class UpdateApplication extends AbstractOperator {
      * @param t
      *            term with this operator as top level operator
      */
-    public static Term getTarget(Term t) {
+    public static Term getTarget(GenericTerm t) {
         assert t.op() == UPDATE_APPLICATION;
         return t.sub(targetPos());
     }

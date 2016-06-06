@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.GenericTerm;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 
 /**
@@ -36,7 +36,7 @@ public abstract class SubstOp extends AbstractOperator {
      * @param services
      *            TODO
      */
-    public abstract Term apply(Term term, TermServices services);// {
+    public abstract GenericTerm apply(GenericTerm term, TermServices services);// {
     // QuantifiableVariable v =
     // term.varsBoundHere(1).getQuantifiableVariable(0);
     // ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));

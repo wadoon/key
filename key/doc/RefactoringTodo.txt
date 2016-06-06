@@ -27,7 +27,7 @@ Classes still depending on either Term or KeYJavaType
 - ProgramSV (KeYJavaType, Term)
 - ProgramVariable (KeYJavaType)
 - SubstOp (Term)
-- TermTransformer (Term)
+- TermTransformer (Term) (TODO! is TermTransformer maybe a class solely connected to Java?)
 - UpdateApplication (Term) [Abhängigkeit nur in statischen Methoden]
 - WarySubstOp (Term)
 

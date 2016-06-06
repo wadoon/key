@@ -368,7 +368,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 
     private Term resolveSubst(Term t) {
         if (t.op() instanceof SubstOp) {
-           Term resolved = ((SubstOp)t.op ()).apply ( t, services );
+           Term resolved = (Term) ((SubstOp)t.op ()).apply ( t, services );
            resolved = services.getTermBuilder().label(resolved, t.sub(1).getLabels());
            if (t.hasLabels()) {
               resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved, rule, goal, SUBSTITUTION_WITH_LABELS_HINT, t);

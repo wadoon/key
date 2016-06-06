@@ -41,6 +41,7 @@ import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.GenericTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramConstruct;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -293,7 +294,7 @@ public final class ProgramSV extends AbstractSV
 
 	if (foundInst != null) {
 	    final Object newInst;
-	    if (foundInst instanceof Term) {
+	    if (foundInst instanceof GenericTerm) {
 		newInst = services.getProgramServices().getTypeConverter().
 		    convertToLogicElement(pe, insts.getExecutionContext());
 	    } else {
