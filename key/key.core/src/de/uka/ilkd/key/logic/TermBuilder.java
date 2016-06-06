@@ -1911,8 +1911,8 @@ public class TermBuilder {
             return orSC(equals(t, NULL()), created(h, t));
         } else if(s.equals(setLDT.targetSort())) {
             return createdInHeap(t, h);
-        } else if(s.equals(intLDT.targetSort()) && kjt.getJavaType() != PrimitiveType.JAVA_BIGINT) {
-            return func(intLDT.getInBounds(kjt.getJavaType()), t);
+        } else if(s.equals(intLDT.targetSort()) && kjt.getProgramType() != PrimitiveType.JAVA_BIGINT) {
+            return func(intLDT.getInBounds(kjt.getProgramType()), t);
         } else {
             return tt();
         }

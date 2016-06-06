@@ -242,7 +242,7 @@ public class Recoder2KeYTypeConverter {
             }
 
             // I may not use JavaInfo here because the classes may not yet be cached!
-            de.uka.ilkd.key.java.abstraction.Type elemType = kjt.getJavaType();
+            de.uka.ilkd.key.java.abstraction.Type elemType = kjt.getProgramType();
             s = ArraySort.getArraySort(kjt.getSort(),
         	    		       elemType,
         	    		       objectType.getSort(),
@@ -392,10 +392,10 @@ public class Recoder2KeYTypeConverter {
             // length attribute
         }
         final FieldDeclaration length = ((SuperArrayDeclaration) recoder2key.rec2key()
-                .getSuperArrayType().getJavaType()).length();
+                .getSuperArrayType().getProgramType()).length();
         final TypeReference baseTypeRef;
 
-        if (baseType.getJavaType() != null) {
+        if (baseType.getProgramType() != null) {
             baseTypeRef = new TypeRef(baseType);
         } else {
             baseTypeRef = new TypeRef(new ProgramElementName(baseType.getSort()
@@ -450,7 +450,7 @@ public class Recoder2KeYTypeConverter {
     private void addImplicitArrayMembers(ExtList members, KeYJavaType parent,
             KeYJavaType baseType, ProgramVariable len) {
 
-        de.uka.ilkd.key.java.abstraction.Type base = baseType.getJavaType();
+        de.uka.ilkd.key.java.abstraction.Type base = baseType.getProgramType();
         int dimension = base instanceof ArrayType ? ((ArrayType) base)
                 .getDimension() + 1 : 1;
                 TypeRef parentReference = new TypeRef(new ProgramElementName(""

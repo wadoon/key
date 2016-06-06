@@ -153,11 +153,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         //constructor may not refer to anonymous class
         if(mr instanceof New
-           && ((New)mr).getTypeReference().getKeYJavaType().getJavaType()
+           && ((New)mr).getTypeReference().getKeYJavaType().getProgramType()
                        instanceof ClassDeclaration
            && ((ClassDeclaration)((New)mr).getTypeReference()
         	                          .getKeYJavaType()
-        	                          .getJavaType()).isAnonymousClass()) {
+        	                          .getProgramType()).isAnonymousClass()) {
             return null;
         }
 

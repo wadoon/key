@@ -539,8 +539,8 @@ public final class JMLTranslator {
                 KeYJavaType promo = t.getType();
                     // services.getTypeConverter().getPromotedType(declsType, t.getType());
 
-                if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
-                        || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
+                if (!(declsType.getProgramType().equals(PrimitiveType.JAVA_INT)
+                        || declsType.getProgramType().equals(PrimitiveType.JAVA_BIGINT))) {
                     throw new SLTranslationException("bounded sum variable must be of type int or \\bigint");
                 } else if (declVars.size() != 1) {
                     throw new SLTranslationException(
@@ -608,7 +608,7 @@ public final class JMLTranslator {
 
             // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
             private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
-                final Type type = kjt.getJavaType();
+                final Type type = kjt.getProgramType();
                 final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
                 Term res = tb.tt();
                 for (QuantifiableVariable qv: qvs) {
@@ -668,7 +668,7 @@ public final class JMLTranslator {
 
             // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
             private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
-                final Type type = kjt.getJavaType();
+                final Type type = kjt.getProgramType();
                 final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
                 Term res = tb.tt();
                 for (QuantifiableVariable qv: qvs) {
@@ -768,8 +768,8 @@ public final class JMLTranslator {
                         (ImmutableList<LogicVariable>) params[4];
                 Services services = (Services) params[5];
 
-                if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
-                        || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
+                if (!(declsType.getProgramType().equals(PrimitiveType.JAVA_INT)
+                        || declsType.getProgramType().equals(PrimitiveType.JAVA_BIGINT))) {
                     throw new SLTranslationException("sequence definition variable must be of type int or \\bigint");
                 } else if (declVars.size() != 1) {
                     throw new SLTranslationException(
@@ -1502,7 +1502,7 @@ public final class JMLTranslator {
                                   lbrack);
 
                     //arrays
-                    if (receiver.getType().getJavaType() instanceof ArrayType) {
+                    if (receiver.getType().getProgramType() instanceof ArrayType) {
                         result = translateArrayReference(services, receiver,
                                 rangeFrom, rangeTo);
 
@@ -1531,8 +1531,8 @@ public final class JMLTranslator {
                     throw excManager.createException("Error in array expression: \""
                                                      + fullyQualifiedName
                                                      + "\" is a type.", lbrack);
-                } else if (!(receiver.getType().getJavaType() instanceof ArrayType
-                             || receiver.getType().getJavaType().equals(
+                } else if (!(receiver.getType().getProgramType() instanceof ArrayType
+                             || receiver.getType().getProgramType().equals(
                         PrimitiveType.JAVA_SEQ))) {
                     throw excManager.createException("Cannot access "
                                                      + receiver.getTerm()
@@ -1561,7 +1561,7 @@ public final class JMLTranslator {
                     Term t = tb.dotArr(receiver.getTerm(),
                             rangeFrom.getTerm());
                     ArrayType arrayType =
-                            (ArrayType) receiver.getType().getJavaType();
+                            (ArrayType) receiver.getType().getProgramType();
                     KeYJavaType elementType =
                             arrayType.getBaseType().getKeYJavaType();
                     result = new SLExpression(t, elementType);
@@ -2033,7 +2033,7 @@ public final class JMLTranslator {
             Term preTerm = (Term) params[0];
             Term bodyTerm = (Term) params[1];
             KeYJavaType declsType = (KeYJavaType) params[2];
-            final Type type = declsType.getJavaType();
+            final Type type = declsType.getProgramType();
             services = (Services) params[6];
             assert services != null;
             final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
@@ -2179,7 +2179,7 @@ public final class JMLTranslator {
                     ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
             final KeYJavaType _declsType = (KeYJavaType) params[2];
             de.uka.ilkd.key.java.abstraction.Type declsType =
-                    _declsType.getJavaType();
+                    _declsType.getProgramType();
             ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>)params[3];
             boolean nullable = (Boolean) params[4];
             services = (Services) params[6];
@@ -2500,7 +2500,7 @@ public final class JMLTranslator {
      *  See also {@link TermBuilder#reachableValue(Term, KeYJavaType)}. 
      */
     protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
-        final Type type = kjt.getJavaType();
+        final Type type = kjt.getProgramType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();
         for (QuantifiableVariable qv: qvs) {

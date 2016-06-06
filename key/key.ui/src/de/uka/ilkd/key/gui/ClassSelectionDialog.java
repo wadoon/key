@@ -79,7 +79,7 @@ public class ClassSelectionDialog extends JDialog {
         }
         Vector<WrappedKJT> v = new Vector<WrappedKJT>();
         for (final KeYJavaType kjt : kjts) {
-            if(kjt.getJavaType() instanceof ClassType) {
+            if(kjt.getProgramType() instanceof ClassType) {
         	v.add(new WrappedKJT(kjt));
             }
         }

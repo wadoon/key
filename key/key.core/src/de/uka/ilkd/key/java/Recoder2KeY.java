@@ -1022,7 +1022,7 @@ public class Recoder2KeY implements JavaReader {
             }
 
             String typeName = "";
-            Type javaType = var.getKeYJavaType().getJavaType();
+            Type javaType = var.getKeYJavaType().getProgramType();
             if(javaType == null) continue;
             typeName = javaType.getFullName();
 

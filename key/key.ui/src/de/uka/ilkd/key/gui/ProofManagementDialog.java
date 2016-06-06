@@ -335,8 +335,8 @@ public final class ProofManagementDialog extends JDialog {
         });
         outer:
         for (KeYJavaType kjtTmp : kjtsarr) {
-            if (kjtTmp.getJavaType() instanceof TypeDeclaration
-                    && ((TypeDeclaration) kjtTmp.getJavaType())
+            if (kjtTmp.getProgramType() instanceof TypeDeclaration
+                    && ((TypeDeclaration) kjtTmp.getProgramType())
                     .isLibraryClass()) {
                 continue;
             }
@@ -540,7 +540,7 @@ public final class ProofManagementDialog extends JDialog {
 
 
     private boolean isInstanceMethodOfAbstractClass(KeYJavaType p_class, IObserverFunction obs) {
-        return p_class.getJavaType() instanceof InterfaceDeclaration
+        return p_class.getProgramType() instanceof InterfaceDeclaration
             || (p_class.getSort().isAbstract() && !obs.isStatic());
     }
 

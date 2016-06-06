@@ -115,8 +115,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 continue;
             }
 
-            if(!(kjt.getJavaType() instanceof ClassDeclaration 
-                    || kjt.getJavaType() instanceof InterfaceDeclaration || kjt.getJavaType() instanceof ArrayDeclaration) 
+            if(!(kjt.getProgramType() instanceof ClassDeclaration 
+                    || kjt.getProgramType() instanceof InterfaceDeclaration || kjt.getProgramType() instanceof ArrayDeclaration) 
                     )  {
                 continue;
             }

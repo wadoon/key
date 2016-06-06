@@ -254,7 +254,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
 	final KeYJavaType arrayType = services.getProgramServices().getTypeConverter().
 	    getKeYJavaType((Expression)getChildAt(0), ec);
-	return ((ArrayDeclaration)arrayType.getJavaType()).
+	return ((ArrayDeclaration)arrayType.getProgramType()).
 	    getBaseType().getKeYJavaType();
     }
 }

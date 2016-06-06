@@ -100,17 +100,17 @@ public class Conditional extends Operator {
 	// numeric types
 	if (tc.isNumericalType(type1) &&
 	    tc.isNumericalType(type2) ) {
-	    if (type1.getJavaType() == PrimitiveType.JAVA_BYTE &&
-		type2.getJavaType() == PrimitiveType.JAVA_SHORT || 
-		type1.getJavaType() == PrimitiveType.JAVA_SHORT &&
-		type2.getJavaType() == PrimitiveType.JAVA_BYTE)
+	    if (type1.getProgramType() == PrimitiveType.JAVA_BYTE &&
+		type2.getProgramType() == PrimitiveType.JAVA_SHORT || 
+		type1.getProgramType() == PrimitiveType.JAVA_SHORT &&
+		type2.getProgramType() == PrimitiveType.JAVA_BYTE)
 		return javaServ.getProgramServices().getJavaInfo().
 		    getKeYJavaType(PrimitiveType.JAVA_SHORT);
 	    if (tc.isImplicitNarrowing(getExpressionAt(1),
-						  (PrimitiveType)type2.getJavaType()))
+						  (PrimitiveType)type2.getProgramType()))
 		return type2;
 	    if (tc.isImplicitNarrowing(getExpressionAt(2),
-						  (PrimitiveType)type1.getJavaType()))
+						  (PrimitiveType)type1.getProgramType()))
 		return type1;
 	    return tc.getPromotedType(type1, type2);
 	}

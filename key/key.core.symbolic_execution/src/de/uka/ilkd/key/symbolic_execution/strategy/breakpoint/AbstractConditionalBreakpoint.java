@@ -316,8 +316,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
       ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(containerType);
       ImmutableList<ProgramVariable> globalVars = ImmutableSLList.nil();
       for(KeYJavaType kjtloc: kjts){
-         if (kjtloc.getJavaType() instanceof TypeDeclaration) {
-            ImmutableList<Field> fields = info.getAllFields((TypeDeclaration)kjtloc.getJavaType());
+         if (kjtloc.getProgramType() instanceof TypeDeclaration) {
+            ImmutableList<Field> fields = info.getAllFields((TypeDeclaration)kjtloc.getProgramType());
             for(Field field : fields){
                if((kjtloc.equals(containerType)||!field.isPrivate())&&!((LocationVariable) field.getProgramVariable()).isImplicit())
                   globalVars = globalVars.append((ProgramVariable) field.getProgramVariable());

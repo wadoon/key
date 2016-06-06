@@ -128,11 +128,11 @@ public final class JMLInfoExtractor {
      */
 	private static ImmutableList<Comment> extractFieldModifiers(String fieldName, KeYJavaType containingClass) {
         ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
-		if(!(containingClass.getJavaType() instanceof TypeDeclaration)) {
+		if(!(containingClass.getProgramType() instanceof TypeDeclaration)) {
             return comments;
         }
 
-        TypeDeclaration td = (TypeDeclaration) containingClass.getJavaType();
+        TypeDeclaration td = (TypeDeclaration) containingClass.getProgramType();
         FieldDeclaration fd = null;
         int position = 0;
 
@@ -196,10 +196,10 @@ public final class JMLInfoExtractor {
      * If t is not a reference type, false is returned.
      */
     public static boolean isPureByDefault(KeYJavaType t) {
-        if(!(t.getJavaType() instanceof TypeDeclaration)) {
+        if(!(t.getProgramType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return hasJMLModifier((TypeDeclaration)t.getJavaType(), "pure");
+            return hasJMLModifier((TypeDeclaration)t.getProgramType(), "pure");
         }
     }
     
@@ -210,10 +210,10 @@ public final class JMLInfoExtractor {
      * If t is not a reference type, false is returned.
      */
     public static boolean isStrictlyPureByDefault(KeYJavaType t) {
-        if(!(t.getJavaType() instanceof TypeDeclaration)) {
+        if(!(t.getProgramType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return hasJMLModifier((TypeDeclaration)t.getJavaType(), "strictly_pure");
+            return hasJMLModifier((TypeDeclaration)t.getProgramType(), "strictly_pure");
         }
     }
 
@@ -225,10 +225,10 @@ public final class JMLInfoExtractor {
      * If t is not a reference type, false is returned.
      */
     public static boolean isNullableByDefault(KeYJavaType t) {
-        if(!(t.getJavaType() instanceof TypeDeclaration)) {
+        if(!(t.getProgramType() instanceof TypeDeclaration)) {
             return false;
         } else{
-            return hasJMLModifier((TypeDeclaration)t.getJavaType(), 
+            return hasJMLModifier((TypeDeclaration)t.getProgramType(), 
         	    	          "nullable_by_default");
         }
     }    

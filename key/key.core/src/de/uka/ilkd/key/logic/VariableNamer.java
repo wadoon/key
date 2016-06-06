@@ -353,7 +353,7 @@ public abstract class VariableNamer implements InstantiationProposer {
         if(type instanceof ArrayType) {
 	    result = getBaseNameProposal(((ArrayType)type).getBaseType()
 		    					  .getKeYJavaType()
-		    					  .getJavaType());
+		    					  .getProgramType());
             result += "_arr";
         } else {
             String name = type.getName();
@@ -485,7 +485,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 			KeYJavaType kjt 
 			    = ((Expression)inst).getKeYJavaType(this.services, 
 				    				ec);		    
-			basename = getBaseNameProposal(kjt.getJavaType());
+			basename = getBaseNameProposal(kjt.getProgramType());
 		    } else {
 			// usually this should never be entered, but because of 
 			// naming issues we do not want nullpointer exceptions

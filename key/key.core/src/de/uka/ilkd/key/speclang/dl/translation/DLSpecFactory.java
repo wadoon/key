@@ -327,7 +327,7 @@ public final class DLSpecFactory {
         
 	final boolean isLibraryClass 
 		= ((TypeDeclaration)pm.getContainerType() 
-			              .getJavaType()).isLibraryClass();
+			              .getProgramType()).isLibraryClass();
 	return cf.func(name,
 	               pm.getContainerType(),
 	               pm,

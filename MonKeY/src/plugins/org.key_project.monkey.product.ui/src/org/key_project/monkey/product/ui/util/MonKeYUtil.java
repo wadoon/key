@@ -105,9 +105,9 @@ public final class MonKeYUtil {
          while (it.hasNext()) {
             SWTUtil.checkCanceled(monitor);
             KeYJavaType kjt = it.next();
-            if (!(kjt.getJavaType() instanceof ClassDeclaration || 
-                  kjt.getJavaType() instanceof InterfaceDeclaration) || 
-                (((TypeDeclaration)kjt.getJavaType()).isLibraryClass() && skipLibraryClasses)) {
+            if (!(kjt.getProgramType() instanceof ClassDeclaration || 
+                  kjt.getProgramType() instanceof InterfaceDeclaration) || 
+                (((TypeDeclaration)kjt.getProgramType()).isLibraryClass() && skipLibraryClasses)) {
                it.remove();
             }
             monitor.worked(1);

@@ -288,7 +288,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final IObserverFunction target = getTarget();
         final String methodName = target.name().toString();
         final String tName =
-                getKJT().getJavaType().getFullName() + " " +
+                getKJT().getProgramType().getFullName() + " " +
                 methodName.substring(methodName.indexOf("::") + 2).replace("$", "");
         final boolean isStatic = target.isStatic();
         final boolean twoState = target.getStateCount() == 2;

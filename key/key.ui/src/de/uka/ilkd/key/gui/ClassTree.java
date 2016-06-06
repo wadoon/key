@@ -314,9 +314,9 @@ public class ClassTree extends JTree {
 	final Iterator<KeYJavaType> it = kjts.iterator();
 	while(it.hasNext()) {
 	    KeYJavaType kjt = it.next();
-	    if(!(kjt.getJavaType() instanceof ClassDeclaration 
-		 || kjt.getJavaType() instanceof InterfaceDeclaration) 
-		 || (((TypeDeclaration) kjt.getJavaType()).isLibraryClass() 
+	    if(!(kjt.getProgramType() instanceof ClassDeclaration 
+		 || kjt.getProgramType() instanceof InterfaceDeclaration) 
+		 || (((TypeDeclaration) kjt.getProgramType()).isLibraryClass() 
 		       && skipLibraryClasses)) {
 		it.remove();
 	    }

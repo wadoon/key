@@ -351,9 +351,9 @@ public final class SpecificationRepository {
      */
     private KeYJavaType getEnclosingKJT(KeYJavaType kjt) {
         // HACK, this should be easier
-        if (kjt.getJavaType() instanceof ClassDeclaration) {
+        if (kjt.getProgramType() instanceof ClassDeclaration) {
 
-            final String name = kjt.getJavaType().getFullName();
+            final String name = kjt.getProgramType().getFullName();
 
             if (name.contains(".")) {
                 final String enclosingName = name.substring(0,
@@ -1099,7 +1099,7 @@ public final class SpecificationRepository {
 
                     StringBuffer sb = new StringBuffer();
                     for (KeYJavaType pd : pm.getParamTypes()) {
-                       sb.append(pd.getJavaType().getFullName());
+                       sb.append(pd.getProgramType().getFullName());
                        sb.append("_");
                     }
                 

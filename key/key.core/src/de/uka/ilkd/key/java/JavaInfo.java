@@ -244,8 +244,8 @@ public final class JavaInfo {
         for (final Object o : kpmi.allElements()) {
             if (o != null && o instanceof KeYJavaType){
                 final KeYJavaType oKJT = (KeYJavaType)o;
-                if (oKJT.getJavaType() instanceof ArrayType) {
-                    final ArrayType at = (ArrayType) oKJT.getJavaType();
+                if (oKJT.getProgramType() instanceof ArrayType) {
+                    final ArrayType at = (ArrayType) oKJT.getProgramType();
                     name2KJTCache.put(at.getFullName(), oKJT);
                     name2KJTCache.put(at.getAlternativeNameRepresentation(), oKJT);
                 } else {
@@ -312,7 +312,7 @@ public final class JavaInfo {
      * returns a type declaration with the full name of the given String fullName
      */
     public TypeDeclaration getTypeDeclaration(String fullName) {
-        return (TypeDeclaration)getTypeByName(fullName).getJavaType();
+        return (TypeDeclaration)getTypeByName(fullName).getProgramType();
     }
 
 
@@ -394,7 +394,7 @@ public final class JavaInfo {
     }
 
     public boolean isInterface(KeYJavaType t){
-        return (t.getJavaType() instanceof InterfaceDeclaration);
+        return (t.getProgramType() instanceof InterfaceDeclaration);
     }
 
 
@@ -409,7 +409,7 @@ public final class JavaInfo {
     }
 
     public static boolean isPrivate(KeYJavaType kjt) {
-        final Type t = kjt.getJavaType();
+        final Type t = kjt.getProgramType();
         if (t instanceof ClassType) {
             return ((ClassType)t).isPrivate();
         } else if (t instanceof ArrayType) {
@@ -493,7 +493,7 @@ public final class JavaInfo {
 	    for (final Object o : kpmi.allElements()) {
 		if (o instanceof KeYJavaType) {
 		    final KeYJavaType oKJT = (KeYJavaType)o;
-		    type2KJTCache.put(oKJT.getJavaType(), oKJT);
+		    type2KJTCache.put(oKJT.getProgramType(), oKJT);
 		}
 	    }
 	}
@@ -756,7 +756,7 @@ public final class JavaInfo {
      * (it is not added for interfaces)
      */
     public ImmutableList<KeYJavaType> getDirectSuperTypes(KeYJavaType type) {
-        final ClassType javaType = (ClassType) type.getJavaType();
+        final ClassType javaType = (ClassType) type.getProgramType();
 
         ImmutableList<KeYJavaType> localSupertypes = javaType.getSupertypes();
 
@@ -765,7 +765,7 @@ public final class JavaInfo {
             boolean found = false;
             while (it.hasNext()) {
                 KeYJavaType keYType = it.next();
-                if (!((ClassType)keYType.getJavaType()).isInterface()) {
+                if (!((ClassType)keYType.getProgramType()).isInterface()) {
                     found = true;
                     break;
                 }
@@ -787,7 +787,7 @@ public final class JavaInfo {
      */
     public KeYJavaType getSuperclass(KeYJavaType type) {
 	KeYJavaType result = null;
-	final ClassType javaType = (ClassType) type.getJavaType();
+	final ClassType javaType = (ClassType) type.getProgramType();
 
 	if (javaType.isInterface()) {
 	    return null;
@@ -797,7 +797,7 @@ public final class JavaInfo {
 	final Iterator<KeYJavaType> it = localSupertypes.iterator();
 	while (result == null && it.hasNext()) {
 	    final KeYJavaType keYType = it.next();
-	    if (!((ClassType)keYType.getJavaType()).isInterface()) {
+	    if (!((ClassType)keYType.getProgramType()).isInterface()) {
 		result = keYType;
 	    }
 	}
@@ -805,7 +805,7 @@ public final class JavaInfo {
 	if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
         for (Sort sort : type.getSort().extendsSorts()) {
             Sort s = sort;
-            if (!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()) {
+            if (!((ClassType) getKeYJavaType(s).getProgramType()).isInterface()) {
                 return getKeYJavaType(s);
             }
         }
@@ -1057,9 +1057,9 @@ public final class JavaInfo {
      */
     public ProgramVariable getAttribute(final String name,
 					KeYJavaType classType) {
-	if (classType.getJavaType() instanceof ArrayDeclaration) {
+	if (classType.getProgramType() instanceof ArrayDeclaration) {
 	    ProgramVariable res = find(name,
-		    getFields(((ArrayDeclaration) classType.getJavaType())
+		    getFields(((ArrayDeclaration) classType.getProgramType())
 		            .getMembers()));
 	    if (res == null) {
 		return getAttribute(name, getJavaLangObject());
@@ -1101,7 +1101,7 @@ public final class JavaInfo {
      */
     public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType kjt) {
         ImmutableList<ProgramVariable> allAttributes = getAllAttributes(fieldName, kjt, false);
-        if (kjt.getJavaType() instanceof ArrayType) {
+        if (kjt.getProgramType() instanceof ArrayType) {
             return allAttributes.head();
         } else {
             return allAttributes.reverse().head();
@@ -1140,9 +1140,9 @@ public final class JavaInfo {
 	    return result;
 	}
 
-        if (type.getJavaType() instanceof ArrayType) {
+        if (type.getProgramType() instanceof ArrayType) {
             ProgramVariable var = find(programName, getFields
-                        (((ArrayDeclaration)type.getJavaType())
+                        (((ArrayDeclaration)type.getProgramType())
                          .getMembers()));
             if (var != null) { result = result.prepend(var); }
             var = getAttribute(programName, getJavaLangObject());
@@ -1322,7 +1322,7 @@ public final class JavaInfo {
      * @return list of all supertypes
      */
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
-        if (type.getJavaType() instanceof ArrayType) {
+        if (type.getProgramType() instanceof ArrayType) {
             ImmutableList<KeYJavaType> res = ImmutableSLList.<KeYJavaType>nil();
             for (Sort s: getSuperSorts(type.getSort()))
                 res = res.append(getKeYJavaType(s));
@@ -1404,7 +1404,7 @@ public final class JavaInfo {
         if (length == null) {
             final SuperArrayDeclaration sad =
                 (SuperArrayDeclaration)
-                rec2key().getSuperArrayType().getJavaType();
+                rec2key().getSuperArrayType().getProgramType();
             length =
                 (ProgramVariable) sad.length().getVariables().
                 get(0).getProgramVariable();

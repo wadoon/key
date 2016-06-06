@@ -130,8 +130,8 @@ public final class KeYTypeUtil {
     */
    public static boolean isLibraryClass(KeYJavaType kjt) {
       return kjt != null && 
-             kjt.getJavaType() instanceof TypeDeclaration && 
-             ((TypeDeclaration)kjt.getJavaType()).isLibraryClass();
+             kjt.getProgramType() instanceof TypeDeclaration && 
+             ((TypeDeclaration)kjt.getProgramType()).isLibraryClass();
    }
    
    /**
@@ -203,7 +203,7 @@ public final class KeYTypeUtil {
     */
    public static String resolveType(Type type) {
       if (type instanceof KeYJavaType) {
-         return resolveType(((KeYJavaType) type).getJavaType());
+         return resolveType(((KeYJavaType) type).getProgramType());
       }
       else if (type instanceof ArrayType) {
          ArrayType arrayType = (ArrayType) type;

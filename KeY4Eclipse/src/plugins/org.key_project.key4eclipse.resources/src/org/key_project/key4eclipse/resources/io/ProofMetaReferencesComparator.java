@@ -27,7 +27,7 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * Compares {@link ProofMetaReferences} with the current code state
- * @author Stefan Käsdorf
+ * @author Stefan Kï¿½sdorf
  */
 public class ProofMetaReferencesComparator {
 
@@ -70,8 +70,8 @@ public class ProofMetaReferencesComparator {
       for(ProofMetaReferenceCallMethod callMethod : references.getCallMethods()) {
          if(hasKjtChanged(callMethod.getKjt())){
             KeYJavaType kjt = env.getJavaInfo().getKeYJavaType(callMethod.getKjt());
-            if(kjt.getJavaType() instanceof TypeDeclaration){
-               TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
+            if(kjt.getProgramType() instanceof TypeDeclaration){
+               TypeDeclaration typeDecl = (TypeDeclaration) kjt.getProgramType();
                for(MemberDeclaration memberDecl : typeDecl.getMembers()) {
                   if (memberDecl instanceof IProgramMethod) {
                      IProgramMethod pm = (IProgramMethod) memberDecl;
@@ -113,8 +113,8 @@ public class ProofMetaReferencesComparator {
    
    private IFile getKjtJavaFile(KeYJavaType kjt){
       IFile file = null;
-      if(kjt != null && kjt.getJavaType() instanceof TypeDeclaration){
-         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
+      if(kjt != null && kjt.getProgramType() instanceof TypeDeclaration){
+         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getProgramType();
          String pos = typeDecl.getPositionInfo().getFileName();
          IPath path = new Path(pos);
          file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);

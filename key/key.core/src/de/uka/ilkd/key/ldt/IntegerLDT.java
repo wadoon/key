@@ -440,7 +440,7 @@ public final class IntegerLDT extends LDT {
 	    	de.uka.ilkd.key.java.expression.Operator op, 
                 Services serv, 
                 ExecutionContext ec) {
-        final Type opReturnType = op.getKeYJavaType(serv, ec).getJavaType();
+        final Type opReturnType = op.getKeYJavaType(serv, ec).getProgramType();
         final boolean isLong = opReturnType == PrimitiveType.JAVA_LONG; 
         final boolean isBigint = opReturnType == PrimitiveType.JAVA_BIGINT;
 

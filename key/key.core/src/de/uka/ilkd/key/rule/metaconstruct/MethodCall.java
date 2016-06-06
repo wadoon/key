@@ -291,7 +291,7 @@ public class MethodCall extends ProgramTransformer {
 	                    (pm.getContainerType(), methRef.getName(), getTypes(arguments, services));
 		}
 		if (imps.isEmpty()) {
-		    Type staticPrefix = staticPrefixType.getJavaType();
+		    Type staticPrefix = staticPrefixType.getProgramType();
 		    if (staticPrefix instanceof ClassType &&
 		       (((ClassType)staticPrefix).isInterface() || 
 		        ((ClassType)staticPrefix).isAbstract()) ) {
@@ -421,7 +421,7 @@ public class MethodCall extends ProgramTransformer {
         // for some reason this does not work, but type itself is a KJT ???
         // KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(type);
         KeYJavaType kjt = (KeYJavaType)type;
-        ArrayType arrayTy = (ArrayType) kjt.getJavaType();
+        ArrayType arrayTy = (ArrayType) kjt.getProgramType();
         
         TypeReference baseTyRef = arrayTy.getBaseType();
         

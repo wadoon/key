@@ -105,7 +105,7 @@ public class ConstructorCall extends ProgramTransformer {
 	final New constructorReference = (New) pe;
 	final KeYJavaType classType = constructorReference.getTypeReference().getKeYJavaType();
 
-	if (!(classType.getJavaType() instanceof ClassDeclaration)) {
+	if (!(classType.getProgramType() instanceof ClassDeclaration)) {
 	    // no implementation available
 	    return pe;
 	}

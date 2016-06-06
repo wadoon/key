@@ -685,7 +685,7 @@ public class ContractFactory {
                 (specifiedIn.equals(forClass)
                   ? ""
                   : " for "
-                    + specifiedIn.getJavaType().getFullName());
+                    + specifiedIn.getProgramType().getFullName());
     }
 
 
@@ -706,8 +706,8 @@ public class ContractFactory {
         final String methodName = target.name().toString();
         final int startIndexShortName = methodName.indexOf("::") + 2;
         final String methodShortName = methodName.substring(startIndexShortName);
-        return forClass.getJavaType().getFullName() + "[" +
-               specifiedIn.getJavaType().getFullName() + "::" +
+        return forClass.getProgramType().getFullName() + "[" +
+               specifiedIn.getProgramType().getFullName() + "::" +
                methodShortName + "(" +
                concadinate(",", target.getParamTypes()) + ")" + "]"
                + "." + baseName;

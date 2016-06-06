@@ -91,7 +91,7 @@ public class SwitchToIf extends ProgramTransformer {
 		KeYJavaASTFactory.assign(exV, sw.getExpression()));
 
         // mulbrich: Added additional null check for enum constants
-        if(!(sw.getExpression().getKeYJavaType(services, ec).getJavaType() instanceof PrimitiveType))
+        if(!(sw.getExpression().getKeYJavaType(services, ec).getProgramType() instanceof PrimitiveType))
 	    result = KeYJavaASTFactory.insertStatementInBlock(result,
 		    mkIfNullCheck(services, exV));
 

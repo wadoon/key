@@ -1248,7 +1248,7 @@ postfixexpr returns [SLExpression ret=null] throws SLTranslationException
 	    {
 	        if (expr != null && expr.getType() == null) {
 	            raiseError("SLExpression without a type: " + expr);
-	        }/* else if (expr != null && expr.getType().getJavaType() instanceof PrimitiveType) {
+	        }/* else if (expr != null && expr.getType().getProgramType() instanceof PrimitiveType) {
 		    raiseError("Cannot build postfix expression from primitive type.");
 		}*/
 	    }
@@ -2112,8 +2112,8 @@ quantifiedvariabledeclarator[KeYJavaType t] returns [LogicVariable v = null] thr
    {
 	  if (dim > 0) {
 	    String fullName;
-	    if (t.getJavaType() instanceof ArrayType) {
-		fullName = ((ArrayType) t.getJavaType()).getAlternativeNameRepresentation();
+	    if (t.getProgramType() instanceof ArrayType) {
+		fullName = ((ArrayType) t.getProgramType()).getAlternativeNameRepresentation();
 	    } else {
 		fullName = t.getFullName();
 	    }

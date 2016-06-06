@@ -61,9 +61,9 @@ public final class EnumConstantValue extends AbstractTermTransformer {
 
             if (false){//varname.endsWith(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE)) {//TODO
                 // <nextToCreate>
-                if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
+                if (pv.getContainerType().getProgramType() instanceof EnumClassDeclaration) {
                     EnumClassDeclaration ecd = (EnumClassDeclaration) pv
-                            .getContainerType().getJavaType();
+                            .getContainerType().getProgramType();
                     value = ecd.getNumberOfConstants();
                 } else {
                     throw new IllegalArgumentException(term

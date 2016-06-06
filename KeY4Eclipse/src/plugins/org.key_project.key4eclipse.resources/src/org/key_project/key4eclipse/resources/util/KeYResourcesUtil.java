@@ -99,7 +99,7 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * @author Stefan Käsdorf
+ * @author Stefan Kï¿½sdorf
  */
 public class KeYResourcesUtil {
    
@@ -139,8 +139,8 @@ public class KeYResourcesUtil {
     * @return false if the {@link KeYJavaType} is an internal resource
     */
    public static boolean filterKeYJavaType(KeYJavaType kjt){
-      if (!(kjt.getJavaType() instanceof ClassDeclaration || 
-            kjt.getJavaType() instanceof InterfaceDeclaration) || 
+      if (!(kjt.getProgramType() instanceof ClassDeclaration || 
+            kjt.getProgramType() instanceof InterfaceDeclaration) || 
             KeYTypeUtil.isLibraryClass(kjt)) {
          return true;
       }
@@ -1024,8 +1024,8 @@ public class KeYResourcesUtil {
     * @return the {@link IProgramMethod} of null
     */
    public static IProgramMethod getMethodForKjt(KeYJavaType kjt, String method, String parameters) {
-      if(kjt != null && kjt.getJavaType() instanceof TypeDeclaration) {
-         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
+      if(kjt != null && kjt.getProgramType() instanceof TypeDeclaration) {
+         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getProgramType();
          for(MemberDeclaration memberDecl : typeDecl.getMembers()) {
             if (memberDecl instanceof IProgramMethod) {
                IProgramMethod pm = (IProgramMethod) memberDecl;
@@ -1089,8 +1089,8 @@ public class KeYResourcesUtil {
     * @return the {@link FieldDeclaration} or null
     */
    public static FieldDeclaration getFieldDeclFromKjt(KeYJavaType kjt, String name) {
-      if(kjt.getJavaType() instanceof TypeDeclaration) {
-         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
+      if(kjt.getProgramType() instanceof TypeDeclaration) {
+         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getProgramType();
          for(MemberDeclaration memberDecl : typeDecl.getMembers()){
             if(memberDecl instanceof FieldDeclaration){
                FieldDeclaration fieldDecl = (FieldDeclaration) memberDecl;

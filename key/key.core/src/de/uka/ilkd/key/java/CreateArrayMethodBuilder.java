@@ -212,9 +212,9 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
     protected ProgramVariable findInObjectFields(String name) {
         ProgramVariable var = cache.get(name);
-        if (var == null && objectType.getJavaType() != null) {
+        if (var == null && objectType.getProgramType() != null) {
             final ImmutableList<Field> objectFields = filterImplicitFields(filterField(((ClassDeclaration) objectType
-                    .getJavaType()).getMembers()));
+                    .getProgramType()).getMembers()));
 //            final ListOfField objectFields = filterField(((ClassDeclaration) objectType
 //                    .getJavaType()).getMembers());
             var = find(name, objectFields);

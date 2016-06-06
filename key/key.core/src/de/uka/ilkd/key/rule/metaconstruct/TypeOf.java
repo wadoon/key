@@ -56,10 +56,10 @@ public class TypeOf extends ProgramTransformer {
 
 		assert kjt != null;
 
-		if (!(kjt.getJavaType() instanceof PrimitiveType)) {
-			if (kjt.getJavaType() instanceof ArrayType) {
+		if (!(kjt.getProgramType() instanceof PrimitiveType)) {
+			if (kjt.getProgramType() instanceof ArrayType) {
 		return KeYJavaASTFactory.typeRef(kjt,
-			((ArrayType) kjt.getJavaType()).getDimension());
+			((ArrayType) kjt.getProgramType()).getDimension());
 			}
 		}
 

@@ -74,7 +74,7 @@ public class ArrayDeclaration
     }
 
     private static ExtList addLength(ExtList children, KeYJavaType superType) {
-	children.add(((SuperArrayDeclaration)superType.getJavaType()).length());
+	children.add(((SuperArrayDeclaration)superType.getProgramType()).length());
 	return children;
     }
 
@@ -103,7 +103,7 @@ public class ArrayDeclaration
     }
 
     public FieldDeclaration length() {
-	return ((SuperArrayDeclaration)superType.getJavaType()).length();
+	return ((SuperArrayDeclaration)superType.getProgramType()).length();
     }
 
     /**
@@ -195,7 +195,7 @@ public class ArrayDeclaration
      * computes the dimension of this array
      */
     private int dimension() {
-	Type javaType = basetype.getKeYJavaType().getJavaType(); 
+	Type javaType = basetype.getKeYJavaType().getProgramType(); 
 	if (javaType instanceof ArrayType) {
 	    return 1+((ArrayType)javaType).getDimension();
 	} else {
@@ -205,7 +205,7 @@ public class ArrayDeclaration
 
     public static ProgramElementName createName(TypeReference basetype) {
 
-	Type javaBasetype = basetype.getKeYJavaType().getJavaType();
+	Type javaBasetype = basetype.getKeYJavaType().getProgramType();
 	
 	if (javaBasetype == null) {
 	    // entered only if base type is class type
@@ -229,7 +229,7 @@ public class ArrayDeclaration
     public String getAlternativeNameRepresentation() {
         if (altNameRepresentation == null) {
             final StringBuffer alt = new StringBuffer();            
-            Type baseType = basetype.getKeYJavaType().getJavaType();
+            Type baseType = basetype.getKeYJavaType().getProgramType();
             
             if (baseType instanceof ArrayType) {
                 alt.append(((ArrayType) baseType).

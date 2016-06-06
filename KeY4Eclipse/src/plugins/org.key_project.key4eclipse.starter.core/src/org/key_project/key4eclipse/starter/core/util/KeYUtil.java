@@ -1514,8 +1514,8 @@ public final class KeYUtil {
       Iterator<KeYJavaType> it = kjts.iterator();
       while (it.hasNext()) {
          KeYJavaType kjt = it.next();
-         if (!(kjt.getJavaType() instanceof ClassDeclaration || 
-               kjt.getJavaType() instanceof InterfaceDeclaration) || 
+         if (!(kjt.getProgramType() instanceof ClassDeclaration || 
+               kjt.getProgramType() instanceof InterfaceDeclaration) || 
                KeYTypeUtil.isLibraryClass(kjt)) {
             it.remove();
          }

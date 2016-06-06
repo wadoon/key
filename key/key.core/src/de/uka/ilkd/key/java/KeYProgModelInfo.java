@@ -98,7 +98,7 @@ public class KeYProgModelInfo{
     }
 
     private List<recoder.abstraction.Method> getAllRecoderMethods(KeYJavaType kjt){
-	if (kjt.getJavaType() instanceof TypeDeclaration) {
+	if (kjt.getProgramType() instanceof TypeDeclaration) {
 	    Object o = rec2key().toRecoder(kjt);
 	    if (o instanceof recoder.abstraction.ClassType) {
 		recoder.abstraction.ClassType rtd
@@ -351,7 +351,7 @@ public class KeYProgModelInfo{
     }
 
     private List<recoder.abstraction.Method> getRecoderMethods(KeYJavaType kjt){
-        if (kjt.getJavaType() instanceof TypeDeclaration) {
+        if (kjt.getProgramType() instanceof TypeDeclaration) {
             Object o = rec2key().toRecoder(kjt);
             if (o instanceof recoder.abstraction.ClassType) {
                 recoder.abstraction.ClassType rct
@@ -510,7 +510,7 @@ public class KeYProgModelInfo{
 		return pm;
 	    }
 	}
- 	TypeDeclaration cd = (TypeDeclaration)ct.getJavaType();
+ 	TypeDeclaration cd = (TypeDeclaration)ct.getProgramType();
  	ImmutableArray<MemberDeclaration> members = cd.getMembers();
  	for (int i = 0; i<members.size(); i++) {
  	    final MemberDeclaration member = members.get(i);
@@ -539,8 +539,8 @@ public class KeYProgModelInfo{
     public IProgramMethod getProgramMethod(KeYJavaType ct, String m,
 					  ImmutableList<? extends Type> signature,
 					  KeYJavaType context) {
-	if (ct.getJavaType() instanceof ArrayType ||
-	    context.getJavaType() instanceof ArrayType) {
+	if (ct.getProgramType() instanceof ArrayType ||
+	    context.getProgramType() instanceof ArrayType) {
             return getImplicitMethod(ct, m);
 	}
 
@@ -594,7 +594,7 @@ public class KeYProgModelInfo{
      * @return the list of field members of the given type.
      */
     public ImmutableList<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct){
-        if (ct.getJavaType() instanceof ArrayType) {
+        if (ct.getProgramType() instanceof ArrayType) {
             return getVisibleArrayFields(ct);
         }
         recoder.abstraction.ClassType rct = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
@@ -614,7 +614,7 @@ public class KeYProgModelInfo{
      * @return the list of field members of the given type.
      */
     public ImmutableList<Field> getAllVisibleFields(KeYJavaType ct){
-        if (ct.getJavaType() instanceof ArrayDeclaration) {
+        if (ct.getProgramType() instanceof ArrayDeclaration) {
             return getVisibleArrayFields(ct);
         }
 
@@ -635,7 +635,7 @@ public class KeYProgModelInfo{
         ImmutableList<Field> result = ImmutableSLList.<Field>nil();
 
         final ImmutableArray<MemberDeclaration> members =
-            ((ArrayDeclaration)arrayType.getJavaType()).getMembers();
+            ((ArrayDeclaration)arrayType.getProgramType()).getMembers();
 
         for (int i = members.size()-1; i>=0; i--){
             final MemberDeclaration member = members.get(i);

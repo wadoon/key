@@ -112,8 +112,8 @@ public final class SLEnvInput extends AbstractEnvInput {
     		throws ProofInputException {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         for(KeYJavaType kjt : allKJTs) {
-            if(kjt.getJavaType() instanceof TypeDeclaration
-               && ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
+            if(kjt.getProgramType() instanceof TypeDeclaration
+               && ((TypeDeclaration)kjt.getProgramType()).isLibraryClass()) {
                 final String filePath
                 	= path + "/" + kjt.getFullName().replace(".", "/") 
                 	       + ".key";
@@ -192,8 +192,8 @@ public final class SLEnvInput extends AbstractEnvInput {
         
         //create specifications for all types
         for(KeYJavaType kjt : kjts) {
-            if(!(kjt.getJavaType() instanceof ClassDeclaration 
-        	  || kjt.getJavaType() instanceof InterfaceDeclaration)) {
+            if(!(kjt.getProgramType() instanceof ClassDeclaration 
+        	  || kjt.getProgramType() instanceof InterfaceDeclaration)) {
         	continue;
             }
 

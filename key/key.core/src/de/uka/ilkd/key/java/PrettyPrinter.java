@@ -1358,7 +1358,7 @@ public class PrettyPrinter {
     }
  
     public void printArrayDeclaration(ArrayDeclaration type) throws java.io.IOException {
-	Type baseType = type.getBaseType().getKeYJavaType().getJavaType();       
+	Type baseType = type.getBaseType().getKeYJavaType().getProgramType();       
         assert baseType != null;
 	if (baseType instanceof ArrayDeclaration) {
 	    printArrayDeclaration((ArrayDeclaration)baseType);
@@ -1373,9 +1373,9 @@ public class PrettyPrinter {
     }
 
     public void printTypeReference(TypeReference x, boolean fullTypeNames) throws java.io.IOException {
-	if (x.getKeYJavaType().getJavaType() instanceof ArrayDeclaration) {
+	if (x.getKeYJavaType().getProgramType() instanceof ArrayDeclaration) {
 	    printArrayDeclaration
-		((ArrayDeclaration)x.getKeYJavaType().getJavaType());
+		((ArrayDeclaration)x.getKeYJavaType().getProgramType());
 	} else if (x.getProgramElementName() != null) {
 	    printHeader(x);
 	    if (x.getReferencePrefix() != null) {

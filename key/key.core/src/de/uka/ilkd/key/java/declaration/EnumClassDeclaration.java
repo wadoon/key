@@ -130,7 +130,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      */
     public static boolean isEnumConstant(IProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
-        Type type = kjt.getJavaType();
+        Type type = kjt.getProgramType();
         if (type instanceof EnumClassDeclaration)
             return ((EnumClassDeclaration) type).isLocalEnumConstant(attribute);
         else
@@ -140,7 +140,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
     // TODO DOC
     public static int indexOf(ProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
-        Type type = kjt.getJavaType();
+        Type type = kjt.getProgramType();
         if (type instanceof EnumClassDeclaration)
             return ((EnumClassDeclaration) type).localIndexOf(attribute);
         else

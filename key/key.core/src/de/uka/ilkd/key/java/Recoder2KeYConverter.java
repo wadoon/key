@@ -1535,7 +1535,7 @@ public class Recoder2KeYConverter {
         .getCrossReferenceSourceInfo()
         .getType(alr.getReferencePrefix());
         ArrayDeclaration ad = (ArrayDeclaration) getKeYJavaType(recoderType)
-        .getJavaType();
+        .getProgramType();
 
         final ProgramVariable length = find("length", filterField(ad.length()));
         // the invocation of callConvert should work well as each array

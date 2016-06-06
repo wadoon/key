@@ -306,8 +306,8 @@ public class TacletGenerator {
 
         //create if sequent
         final boolean finalClass =
-                kjt.getJavaType() instanceof ClassDeclaration
-                && ((ClassDeclaration) kjt.getJavaType()).isFinal();
+                kjt.getProgramType() instanceof ClassDeclaration
+                && ((ClassDeclaration) kjt.getProgramType()).isFinal();
         final Sequent ifSeq;
         if (target.isStatic() || finalClass) {
             ifSeq = null;
@@ -1096,8 +1096,8 @@ public class TacletGenerator {
                                            TermServices services,
                                            final SchemaVariable selfSV) {
         final boolean finalClass =
-                kjt.getJavaType() instanceof ClassDeclaration
-                && ((ClassDeclaration) kjt.getJavaType()).isFinal();
+                kjt.getProgramType() instanceof ClassDeclaration
+                && ((ClassDeclaration) kjt.getProgramType()).isFinal();
         // TODO: exact instance necessary?
         // or better: instance(finalClass, selfSV, services)?
         final TermBuilder TB = services.getTermBuilder();

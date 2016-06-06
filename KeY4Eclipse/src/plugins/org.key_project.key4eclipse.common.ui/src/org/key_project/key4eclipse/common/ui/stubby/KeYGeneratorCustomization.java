@@ -120,7 +120,7 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
             try {
                // Add KeYJavaType from the original boot class path to the DependencyAnalyzer
                for (KeYJavaType kjt : environment.getJavaInfo().getAllKeYJavaTypes()) {
-                  de.uka.ilkd.key.java.abstraction.Type javaType = kjt.getJavaType();
+                  de.uka.ilkd.key.java.abstraction.Type javaType = kjt.getProgramType();
                   if (javaType instanceof ClassDeclaration || javaType instanceof InterfaceDeclaration) {
                      IType jdtType = javaProject.findType(javaType.getFullName());
                      if (jdtType != null) { // Types like '<Default>' are ignored.

@@ -144,7 +144,7 @@ public class ExecutionValue extends AbstractExecutionValue {
             if (valueSort != services.getProgramServices().getJavaInfo().getNullType().getSort()) {
                KeYJavaType keyType = services.getProgramServices().getJavaInfo().getKeYJavaType(valueSort);
                if (keyType != null) { // Can be null, e.g. if Sort is the Sort of Heap
-                  Type javaType = keyType.getJavaType();
+                  Type javaType = keyType.getProgramType();
                   if (javaType instanceof ArrayDeclaration) {
                      // Array value
                      ArrayDeclaration ad = (ArrayDeclaration)javaType;

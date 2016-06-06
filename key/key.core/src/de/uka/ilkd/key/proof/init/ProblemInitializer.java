@@ -513,7 +513,7 @@ public final class ProblemInitializer {
         assert heapLDT != null;
         if (javaInfo != null) {
             for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
-                final Type type = kjt.getJavaType();
+                final Type type = kjt.getProgramType();
                 if(type instanceof ClassDeclaration 
                         || type instanceof InterfaceDeclaration) {
                     for(Field f : javaInfo.getAllFields((TypeDeclaration)type)) {

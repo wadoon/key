@@ -206,7 +206,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                                                       boolean isImplicitVar, String fileName,
                                                       Position pos, Services services) {
         ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil();
-        final Type varType  = kjt.getJavaType();
+        final Type varType  = kjt.getProgramType();
 
         final TypeConverter typeConverter = services.getProgramServices().getTypeConverter();
         if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
@@ -235,7 +235,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         if (type instanceof ArrayType) {
             final int d = ((ArrayType)type).getDimension();
             while (type instanceof ArrayType) {
-                type = ((ArrayType)type).getBaseType().getKeYJavaType().getJavaType();
+                type = ((ArrayType)type).getBaseType().getKeYJavaType().getProgramType();
             }
             return tc.isReferenceType(type)? d: d-1;
         } else return 0;
@@ -253,12 +253,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	= DefaultImmutableSet.<SpecificationElement>nil();
 
         //primitive types have no class invariants
-        if(!(kjt.getJavaType() instanceof TypeDeclaration)) {
+        if(!(kjt.getProgramType() instanceof TypeDeclaration)) {
             return result;
         }
 
         //get type declaration, file name
-        TypeDeclaration td = (TypeDeclaration) kjt.getJavaType();
+        TypeDeclaration td = (TypeDeclaration) kjt.getProgramType();
         String fileName = td.getPositionInfo().getFileName();
 
         //add invariants for non_null fields
@@ -396,7 +396,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         //get type declaration, file name
         TypeDeclaration td
-        = (TypeDeclaration) pm.getContainerType().getJavaType();
+        = (TypeDeclaration) pm.getContainerType().getProgramType();
         String fileName = td.getPositionInfo().getFileName();
 
         //determine purity
@@ -597,7 +597,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     private String getFileName(final IProgramMethod method) {
-        final TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
+        final TypeDeclaration type = (TypeDeclaration) method.getContainerType().getProgramType();
         return type.getPositionInfo().getFileName();
     }
 
@@ -629,7 +629,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         //get type declaration, file name
         TypeDeclaration td
-            = (TypeDeclaration) pm.getContainerType().getJavaType();
+            = (TypeDeclaration) pm.getContainerType().getProgramType();
         String fileName = td.getPositionInfo().getFileName();
 
         //get comments

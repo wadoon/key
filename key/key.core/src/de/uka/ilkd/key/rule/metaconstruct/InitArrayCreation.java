@@ -163,12 +163,12 @@ public class InitArrayCreation extends InitArray {
 	    get(0).getProgramVariable();
 
 	    TypeReference baseTypeRef =
-		((ArrayType)arrayType.getJavaType()).getBaseType();
+		((ArrayType)arrayType.getProgramType()).getBaseType();
 	    final KeYJavaType baseType = baseTypeRef.getKeYJavaType();
             
             for(int i = 0; i < dimensions.length - 1; i++){
         	ArrayType at = (ArrayType) baseTypeRef.getKeYJavaType()
-        	                                      .getJavaType();
+        	                                      .getProgramType();
                 baseTypeRef = at.getBaseType();                  
             }
 
@@ -227,7 +227,7 @@ public class InitArrayCreation extends InitArray {
 	    final ArrayInitializer init = (ArrayInitializer)pe;
 	    ArrayType arrayType = null;
 	    try {
-            arrayType = (ArrayType)kjt.getJavaType();
+            arrayType = (ArrayType)kjt.getProgramType();
 	    } catch (ClassCastException e) {
 	        throw new RuntimeException("Array dimension does not match its definition. This is a Java syntax error.",e);
 	    }

@@ -965,10 +965,10 @@ public abstract class ProgramSVSort extends AbstractSort {
 
 	protected boolean canStandFor(ProgramElement check, Services services) {	    
 	    if (!(check instanceof TypeReference)) return false;
-            if(((TypeReference)(check)).getKeYJavaType().getJavaType() 
+            if(((TypeReference)(check)).getKeYJavaType().getProgramType() 
 		     instanceof PrimitiveType) return false;
             if(matchName != null) {
-                return matchName.equals(((TypeReference)(check)).getKeYJavaType().getJavaType().getFullName());
+                return matchName.equals(((TypeReference)(check)).getKeYJavaType().getProgramType().getFullName());
             }
             return true;
 	}
@@ -1132,7 +1132,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    }
 	    final KeYJavaType kjt = getKeYJavaType(check, ec, services);
             if (kjt != null) {
-                final Type type = kjt.getJavaType();
+                final Type type = kjt.getProgramType();
                 for (PrimitiveType allowed_type : allowed_types) {
                     if (type == allowed_type)
                         return true;
@@ -1167,7 +1167,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    
             final KeYJavaType kjt = getKeYJavaType(check, ec, services);
 	    if (kjt != null) {
-	        final Type type = kjt.getJavaType();
+	        final Type type = kjt.getProgramType();
 
             for (PrimitiveType allowed_type : allowed_types) {
                 if (type == allowed_type)

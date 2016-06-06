@@ -78,13 +78,13 @@ public class JavaIntegerSemanticsHelper {
     }
 
     private boolean isBigint(KeYJavaType resultType) {
-        return resultType.getJavaType() == PrimitiveType.JAVA_BIGINT;
+        return resultType.getProgramType() == PrimitiveType.JAVA_BIGINT;
     }
 
 
 
     private boolean isLong(KeYJavaType resultType) {
-        return resultType.getJavaType() == PrimitiveType.JAVA_LONG;
+        return resultType.getProgramType() == PrimitiveType.JAVA_LONG;
     }
 
     
@@ -392,7 +392,7 @@ public class JavaIntegerSemanticsHelper {
             throws SLTranslationException {
         assert a != null;
         try {
-	    Function cast = integerLDT.getJavaCast(resultType.getJavaType());
+	    Function cast = integerLDT.getJavaCast(resultType.getProgramType());
 	    if (cast != null)
             return new SLExpression(tb.func(cast, a.getTerm()), resultType);
 	    else { // there is no cast to \bigint

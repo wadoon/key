@@ -1586,8 +1586,8 @@ public class SMTObjTranslator implements SMTTranslator {
 	private boolean isFinal(Sort s) {
 	    KeYJavaType kjt = services.getProgramServices().getJavaInfo().getKeYJavaType(s);
 	    boolean finalClass = kjt != null
-	            && kjt.getJavaType() instanceof ClassDeclaration
-	            && ((ClassDeclaration) kjt.getJavaType()).isFinal();
+	            && kjt.getProgramType() instanceof ClassDeclaration
+	            && ((ClassDeclaration) kjt.getProgramType()).isFinal();
 //	    if (kjt != null && kjt.getJavaType() instanceof ArrayDeclaration) {
 //	    	finalClass = true;
 //	    }
@@ -1928,7 +1928,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		if (kjt == null) {
 			return false;
 		}
-		return kjt.getJavaType() instanceof InterfaceDeclaration;
+		return kjt.getProgramType() instanceof InterfaceDeclaration;
 	}
 
 	/**

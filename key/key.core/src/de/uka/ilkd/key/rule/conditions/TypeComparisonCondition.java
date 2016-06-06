@@ -256,9 +256,9 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                     && sndElemIsObject
                     && !(fstElemSort instanceof ArraySort)
                     && !(sndElemSort instanceof ArraySort)
-                    && (fstKJT != null && fstKJT.getJavaType() 
+                    && (fstKJT != null && fstKJT.getProgramType() 
                     instanceof InterfaceDeclaration
-                    || sndKJT != null && sndKJT.getJavaType() 
+                    || sndKJT != null && sndKJT.getProgramType() 
                     instanceof InterfaceDeclaration)) {
                 //be conservative wrt. modularity: program extensions may add 
                 //new subtypes between object sorts, if none of them is

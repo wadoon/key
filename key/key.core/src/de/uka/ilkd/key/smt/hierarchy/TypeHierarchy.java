@@ -149,7 +149,7 @@ public class TypeHierarchy {
 			
 			KeYJavaType kjt = info.getKeYJavaType(s);
 			if(kjt!=null){
-				Type jt = kjt.getJavaType();
+				Type jt = kjt.getProgramType();
 				if(jt instanceof InterfaceDeclaration){
 					//contract interface sort
 					contractNode(s);

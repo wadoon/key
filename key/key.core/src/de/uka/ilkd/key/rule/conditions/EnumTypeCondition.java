@@ -59,7 +59,7 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
             // complete
             Sort sort = resolver.resolveSort(var, candidate, svInst, services);
             KeYJavaType kjt = services.getProgramServices().getJavaInfo().getKeYJavaType(sort);
-            return kjt.getJavaType() instanceof EnumClassDeclaration;
+            return kjt.getProgramType() instanceof EnumClassDeclaration;
         }
     }
 

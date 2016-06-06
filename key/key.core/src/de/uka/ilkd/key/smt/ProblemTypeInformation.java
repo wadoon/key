@@ -129,8 +129,8 @@ public class ProblemTypeInformation {
 		
 		KeYJavaType kjt = info.getKeYJavaType(s);
 
-		if( kjt !=null && kjt.getJavaType() instanceof ClassDeclaration){
-			ClassDeclaration c = (ClassDeclaration) kjt.getJavaType();
+		if( kjt !=null && kjt.getProgramType() instanceof ClassDeclaration){
+			ClassDeclaration c = (ClassDeclaration) kjt.getProgramType();
 
 			for(KeYJavaType sp : info.getAllSupertypes(kjt)){
 				if(!sp.equals(kjt))

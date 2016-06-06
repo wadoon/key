@@ -401,8 +401,8 @@ public final class TypeConverter {
      */
     public KeYJavaType getPromotedType(KeYJavaType type1,
             			       KeYJavaType type2) {
-        final Type t1 = type1.getJavaType();
-        final Type t2 = type2.getJavaType();
+        final Type t1 = type1.getProgramType();
+        final Type t2 = type2.getProgramType();
 
         if ((t1 == PrimitiveType.JAVA_REAL && isNumericalType(t2)
                 || (isNumericalType(t1) && t2 == PrimitiveType.JAVA_REAL)))
@@ -459,7 +459,7 @@ public final class TypeConverter {
 
     // this method performs unary numeric promotion on the arguments
     public KeYJavaType getPromotedType(KeYJavaType type1) {
-        final Type t1 = type1.getJavaType();
+        final Type t1 = type1.getProgramType();
 	if (t1 == PrimitiveType.JAVA_BOOLEAN)
 	    // not really numeric ...
 	    return services.getProgramServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
@@ -664,7 +664,7 @@ public final class TypeConverter {
 	    return true;
 	}
 	KeYJavaType fromBase = from.getBaseType().getKeYJavaType();
-	if (toBase.getJavaType () instanceof PrimitiveType) {
+	if (toBase.getProgramType () instanceof PrimitiveType) {
 	    return toBase == fromBase;
 	}
 	return isWidening(fromBase, toBase);
@@ -700,8 +700,8 @@ public final class TypeConverter {
 
     // this also handles class types
     public boolean isWidening(KeYJavaType from, KeYJavaType to) {
-	Type a = from.getJavaType ();
-	Type b = to  .getJavaType ();
+	Type a = from.getProgramType ();
+	Type b = to  .getProgramType ();
 
 	if ( a instanceof ClassType || a == null ) {
 	    return
@@ -776,8 +776,8 @@ public final class TypeConverter {
 
     // this also handles class types
     public boolean isNarrowing(KeYJavaType from, KeYJavaType to) {
-	Type a = from.getJavaType ();
-	Type b = to  .getJavaType ();
+	Type a = from.getProgramType ();
+	Type b = to  .getProgramType ();
 
 	if ( a instanceof ClassType || a == null ) {
 	    return
@@ -907,7 +907,7 @@ public final class TypeConverter {
 
     public boolean isNumericalType ( Type t ) {
 	if ( t instanceof KeYJavaType )
-	    t = ((KeYJavaType)t).getJavaType ();
+	    t = ((KeYJavaType)t).getProgramType ();
 	return
 	    t == PrimitiveType.JAVA_BYTE   ||
 	    t == PrimitiveType.JAVA_SHORT  ||
@@ -924,7 +924,7 @@ public final class TypeConverter {
 
     public boolean isIntegralType ( Type t ) {
 	if ( t instanceof KeYJavaType )
-	    t = ((KeYJavaType)t).getJavaType ();
+	    t = ((KeYJavaType)t).getProgramType ();
 	return
 	    t == PrimitiveType.JAVA_BYTE   ||
 	    t == PrimitiveType.JAVA_SHORT  ||
@@ -937,7 +937,7 @@ public final class TypeConverter {
 
     public boolean isReferenceType ( Type t ) {
 	if ( t instanceof KeYJavaType )
-	    t = ((KeYJavaType)t).getJavaType ();
+	    t = ((KeYJavaType)t).getProgramType ();
 	return
 	    // there is currently no interface handling
 	    t == null ||
@@ -948,7 +948,7 @@ public final class TypeConverter {
 
     public boolean isNullType ( Type t ) {
 	if ( t instanceof KeYJavaType )
-	    t = ((KeYJavaType)t).getJavaType ();
+	    t = ((KeYJavaType)t).getProgramType ();
 	return
 	    t == NullType.JAVA_NULL;
     }
@@ -956,7 +956,7 @@ public final class TypeConverter {
 
     public boolean isBooleanType ( Type t ) {
 	if ( t instanceof KeYJavaType )
-	    t = ((KeYJavaType)t).getJavaType ();
+	    t = ((KeYJavaType)t).getProgramType ();
 	return
 	    t == PrimitiveType.JAVA_BOOLEAN;
     }

@@ -276,7 +276,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     
     
     public String proofToString() {
-	final Type javaType = type.getJavaType();
+	final Type javaType = type.getProgramType();
 	final String typeName;
 	if(javaType instanceof ArrayType) {
 	    typeName = ((ArrayType)javaType).getAlternativeNameRepresentation();

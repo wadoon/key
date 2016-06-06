@@ -65,11 +65,11 @@ public abstract class InitArray extends ProgramTransformer {
 
 	KeYJavaType aType = p_creationExpression.getKeYJavaType();
 
-	Debug.assertTrue ( aType.getJavaType () instanceof ArrayType,
+	Debug.assertTrue ( aType.getProgramType () instanceof ArrayType,
 			   "Very strange are arrays of type " +
-			   aType.getJavaType () );
+			   aType.getProgramType () );
 
-	return ((ArrayType)aType.getJavaType ()).getBaseType ().getKeYJavaType ();
+	return ((ArrayType)aType.getProgramType ()).getBaseType ().getKeYJavaType ();
     }
 
     /**
@@ -171,12 +171,12 @@ public abstract class InitArray extends ProgramTransformer {
 					   KeYJavaType    p_elementType,
 					   TypeReference p_baseType) {
 	if ( p_initializer instanceof ArrayInitializer ) {
-	    Debug.assertTrue ( p_elementType.getJavaType () instanceof ArrayType,
+	    Debug.assertTrue ( p_elementType.getProgramType () instanceof ArrayType,
 			       "Very strange are arrays of type " +
-			       p_elementType.getJavaType () );
+			       p_elementType.getProgramType () );
 
 	    p_initializer = KeYJavaASTFactory.newArray(p_baseType,
-		    ((ArrayType) p_elementType.getJavaType()).getDimension(),
+		    ((ArrayType) p_elementType.getProgramType()).getDimension(),
 		    (ArrayInitializer) p_initializer, p_elementType);
 	}
 

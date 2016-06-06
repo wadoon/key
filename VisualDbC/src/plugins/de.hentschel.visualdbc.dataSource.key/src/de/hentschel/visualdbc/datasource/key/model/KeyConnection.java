@@ -350,9 +350,9 @@ public class KeyConnection extends MemoryConnection {
       final Iterator<KeYJavaType> it = kjts.iterator();
       while (it.hasNext()) {
          KeYJavaType kjt = it.next();
-         if (!(kjt.getJavaType() instanceof ClassDeclaration || 
-               kjt.getJavaType() instanceof InterfaceDeclaration) || 
-             (((TypeDeclaration)kjt.getJavaType()).isLibraryClass() && skipLibraryClasses)) {
+         if (!(kjt.getProgramType() instanceof ClassDeclaration || 
+               kjt.getProgramType() instanceof InterfaceDeclaration) || 
+             (((TypeDeclaration)kjt.getProgramType()).isLibraryClass() && skipLibraryClasses)) {
             it.remove();
          }
          monitor.worked(1);
@@ -376,8 +376,8 @@ public class KeyConnection extends MemoryConnection {
       for (KeYJavaType type : kjtsarr) {
          // Create class
          String typeName = getTypeName(type, packageManagement);
-         Assert.isTrue(type.getJavaType() instanceof ClassType);
-         ClassType ct = (ClassType)type.getJavaType();
+         Assert.isTrue(type.getProgramType() instanceof ClassType);
+         ClassType ct = (ClassType)type.getProgramType();
          if (KeYTypeUtil.isInnerType(services, type)) {
             String parentName = KeYTypeUtil.getParentName(services, type);
             if (ct.isInterface()) {
@@ -703,8 +703,8 @@ public class KeyConnection extends MemoryConnection {
     */
    public static String getTypeName(KeYJavaType type, 
                                     DSPackageManagement packageManagement) {
-      if (type.getJavaType() instanceof ArrayDeclaration) {
-         ArrayDeclaration ad = (ArrayDeclaration)type.getJavaType();
+      if (type.getProgramType() instanceof ArrayDeclaration) {
+         ArrayDeclaration ad = (ArrayDeclaration)type.getProgramType();
          StringBuffer sb = new StringBuffer();
          sb.append(getTypeName(ad.getBaseType(), packageManagement));
          sb.append(ARRAY_DECLARATION);
@@ -778,7 +778,7 @@ public class KeyConnection extends MemoryConnection {
       // Analyze parents
       ImmutableList<KeYJavaType> superTypes = services.getProgramServices().getJavaInfo().getDirectSuperTypes(type);
       for (KeYJavaType superType : superTypes) {
-         if (superType.getJavaType() instanceof InterfaceDeclaration) {
+         if (superType.getProgramType() instanceof InterfaceDeclaration) {
             result.getExtendsFullnames().add(superType.getFullName());
          }
          else {
@@ -882,13 +882,13 @@ public class KeyConnection extends MemoryConnection {
       // Analyze parents
       ImmutableList<KeYJavaType> superTypes = services.getProgramServices().getJavaInfo().getDirectSuperTypes(type);
       for (KeYJavaType superType : superTypes) {
-         if (superType.getJavaType() instanceof ClassType) {
-            ClassType superCt = (ClassType)superType.getJavaType();
+         if (superType.getProgramType() instanceof ClassType) {
+            ClassType superCt = (ClassType)superType.getProgramType();
             if (superCt.isInterface()) {
                result.getImplementsFullnames().add(superType.getFullName());
             }
          }
-         else if (superType.getJavaType() instanceof InterfaceDeclaration) {
+         else if (superType.getProgramType() instanceof InterfaceDeclaration) {
             result.getImplementsFullnames().add(superType.getFullName());
          }
          else {
@@ -1016,8 +1016,8 @@ public class KeyConnection extends MemoryConnection {
       // Analyze parents
       ImmutableList<KeYJavaType> superTypes = services.getProgramServices().getJavaInfo().getDirectSuperTypes(type);
       for (KeYJavaType superType : superTypes) {
-         if (superType.getJavaType() instanceof ClassType) {
-            ClassType superCt = (ClassType)superType.getJavaType();
+         if (superType.getProgramType() instanceof ClassType) {
+            ClassType superCt = (ClassType)superType.getProgramType();
             if (superCt.isInterface()) {
                result.getImplementsFullnames().add(superType.getFullName());
             }
@@ -1025,7 +1025,7 @@ public class KeyConnection extends MemoryConnection {
                result.getExtendsFullnames().add(superType.getFullName());
             }
          }
-         else if (superType.getJavaType() instanceof InterfaceDeclaration) {
+         else if (superType.getProgramType() instanceof InterfaceDeclaration) {
             result.getImplementsFullnames().add(superType.getFullName());
          }
          else {

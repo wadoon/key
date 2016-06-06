@@ -3453,8 +3453,8 @@ public final class SymbolicExecutionUtil {
          if (kjt != null) {
             TypeConverter typeConverter = services.getProgramServices().getTypeConverter();
             referenceSort = typeConverter.isReferenceType(kjt) && // Check if the value is a reference type
-                            (!(kjt.getJavaType() instanceof TypeDeclaration) || // check if the value is a library class which should be ignored
-                            !((TypeDeclaration)kjt.getJavaType()).isLibraryClass());
+                            (!(kjt.getProgramType() instanceof TypeDeclaration) || // check if the value is a library class which should be ignored
+                            !((TypeDeclaration)kjt.getProgramType()).isLibraryClass());
          }
       }
       return referenceSort;

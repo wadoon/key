@@ -50,7 +50,7 @@ public class CreateObject extends ProgramTransformer {
 	
  	TypeReference classReference = ((New)pe).getTypeReference();
 
-  	if (!(classReference.getKeYJavaType().getJavaType() 
+  	if (!(classReference.getKeYJavaType().getProgramType() 
 	      instanceof ClassDeclaration)) {
   	    // no implementation available
   	    return pe;

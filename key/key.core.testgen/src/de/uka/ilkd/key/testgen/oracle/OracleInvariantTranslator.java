@@ -36,8 +36,8 @@ public class OracleInvariantTranslator {
 
 		KeYJavaType kjt = info.getKeYJavaType(s);
 
-		if(!(kjt.getJavaType() instanceof ClassDeclaration 
-				|| kjt.getJavaType() instanceof InterfaceDeclaration || kjt.getJavaType() instanceof ArrayDeclaration) 
+		if(!(kjt.getProgramType() instanceof ClassDeclaration 
+				|| kjt.getProgramType() instanceof InterfaceDeclaration || kjt.getProgramType() instanceof ArrayDeclaration) 
 				)  {
 			return tb.tt();
 		}

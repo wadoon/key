@@ -27,7 +27,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * In contrast to other classes the KeYJavaType is <emph>not</emph>
  * immutable, so use it with care. 
  */
-public class KeYJavaType implements Type {
+public class KeYJavaType implements Type, PorgramType2SortEntry<Type> {
 
     /** Special return "type" for void methods. */
     public static final KeYJavaType VOID_TYPE = new KeYJavaType(null,Sort.ANY);
@@ -65,10 +65,18 @@ public class KeYJavaType implements Type {
  	sort = s;
     }
 
-    public Type getJavaType() {
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.abstraction.PorgramType2SortEntry#getJavaType()
+     */
+    @Override
+    public Type getProgramType() {
 	return javaType;
     }
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.abstraction.PorgramType2SortEntry#getSort()
+     */
+    @Override
     public Sort getSort() {
 	return sort;
     }
@@ -93,11 +101,11 @@ public class KeYJavaType implements Type {
     }
 
     public String getFullName() {
-	return getJavaType().getFullName();
+	return getProgramType().getFullName();
     }
 
     public String getName() {
-	return getJavaType().getName();
+	return getProgramType().getName();
     }
     
     @Override

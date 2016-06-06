@@ -508,7 +508,7 @@ public class ProofReferenceModelCreator {
       if (!KeYTypeUtil.isLibraryClass(kjt)) {
          AbstractDbcType result = typeMapping.get(kjt);
          if (result == null) {
-            ClassType ct = (ClassType)kjt.getJavaType();
+            ClassType ct = (ClassType)kjt.getProgramType();
             if (ct.isInterface()) {
                DbcInterface dbcInterface = DbcmodelFactory.eINSTANCE.createDbcInterface();
                addToParentTypeOrModelOtherwise(dbcInterface, kjt, services);
@@ -675,7 +675,7 @@ public class ProofReferenceModelCreator {
     * @return The found {@link Field} or {@code null} if not available.
     */
    protected Field toField(final ProgramVariable pv, Services services) {
-      ClassType ct = (ClassType)pv.getContainerType().getJavaType();
+      ClassType ct = (ClassType)pv.getContainerType().getProgramType();
       ImmutableList<Field> fields = ct.getAllFields(services);
       return CollectionUtil.search(fields, new IFilter<Field>() {
          @Override
