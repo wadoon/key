@@ -58,6 +58,7 @@ options {
   import java.math.BigInteger;
   
   import org.key_project.common.core.logic.*;
+  import org.key_project.common.core.logic.op.*;
 
   import org.key_project.util.collection.DefaultImmutableSet;
   import org.key_project.util.collection.ImmutableArray;

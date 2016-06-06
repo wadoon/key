@@ -28,7 +28,7 @@ public final class WarySubstOp extends SubstOp<Term> {
      * all free occurrences of variable x in A with d, however without replacing
      * x with a non-rigid A below modalities
      */
-    public static final SubstOp SUBST = new WarySubstOp(new Name("subst"));
+    public static final SubstOp<Term> SUBST = new WarySubstOp(new Name("subst"));
 
     private WarySubstOp(Name name) {
         super(name);
