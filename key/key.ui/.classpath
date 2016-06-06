@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/key.util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.core.testgen"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.core.symbolic_execution"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/key.common.core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

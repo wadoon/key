@@ -16,10 +16,10 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.IOException;
 
+import org.key_project.common.core.logic.Namespace;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Comment;
@@ -36,7 +37,6 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.GenericTerm;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.sort.Sort;

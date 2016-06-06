@@ -17,7 +17,8 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.AppliedRuleStopCondition;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;

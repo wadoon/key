@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;

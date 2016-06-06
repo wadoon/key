@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.ldt;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -43,7 +44,6 @@ import de.uka.ilkd.key.java.expression.operator.Times;
 import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;

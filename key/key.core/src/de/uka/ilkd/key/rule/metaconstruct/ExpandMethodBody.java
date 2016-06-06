@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
@@ -34,7 +35,6 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;

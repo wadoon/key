@@ -22,6 +22,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;

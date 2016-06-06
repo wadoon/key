@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.common.core.logic.Name;
 
 /**
  * This singleton class implements a conditional operator "\ifEx iv; (phi) \then

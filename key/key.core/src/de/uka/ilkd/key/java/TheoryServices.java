@@ -3,6 +3,8 @@ package de.uka.ilkd.key.java;
 import java.util.Collections;
 import java.util.Map;
 
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -12,7 +14,6 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.PermissionLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 

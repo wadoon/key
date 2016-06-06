@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.logic.label;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
+import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Named;
+
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;

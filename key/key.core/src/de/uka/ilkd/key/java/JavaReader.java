@@ -14,8 +14,9 @@
 package de.uka.ilkd.key.java;
 
 
+import org.key_project.common.core.logic.Namespace;
+
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Namespace;
 
 public interface JavaReader {
 

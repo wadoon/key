@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Named;
+import org.key_project.common.core.logic.Named;
 
 /**
  * Generic interface for an operator. All symbols acting as members of a term

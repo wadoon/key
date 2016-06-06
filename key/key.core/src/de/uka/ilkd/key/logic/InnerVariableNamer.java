@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;

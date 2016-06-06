@@ -15,13 +15,13 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;

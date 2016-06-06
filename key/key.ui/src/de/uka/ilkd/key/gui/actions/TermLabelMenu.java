@@ -24,10 +24,11 @@ import java.util.TreeMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 
 /**

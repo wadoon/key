@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.axiom_abstraction;
 
+import org.key_project.common.core.logic.Named;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 
 /**

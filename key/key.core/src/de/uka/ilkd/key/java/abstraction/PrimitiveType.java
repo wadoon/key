@@ -16,6 +16,8 @@ package de.uka.ilkd.key.java.abstraction;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -38,7 +40,6 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 /**

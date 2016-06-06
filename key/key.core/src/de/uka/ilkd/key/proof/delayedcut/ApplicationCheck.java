@@ -19,8 +19,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 

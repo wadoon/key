@@ -33,7 +33,7 @@ options {
     import de.uka.ilkd.key.speclang.*;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.ldt.HeapLDT;
-    import de.uka.ilkd.key.logic.Name;
+    import org.key_project.common.core.logic.Name;
     import de.uka.ilkd.key.logic.TermBuilder;
 
     import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;

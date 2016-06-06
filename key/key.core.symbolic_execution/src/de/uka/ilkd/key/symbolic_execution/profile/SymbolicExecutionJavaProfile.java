@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.symbolic_execution.profile;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabelFactory;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;

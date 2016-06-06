@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.logic.label;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.common.core.logic.Name;
 
 /**
  * Label attached to the modality of the validity branch of a block contract.

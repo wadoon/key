@@ -13,9 +13,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.Name;
 
 /**
  * Abstract operator class offering some common functionality.<br/>

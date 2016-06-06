@@ -13,13 +13,14 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
 import de.uka.ilkd.key.java.reference.ThisConstructorReference;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 

@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.common.core.logic.Name;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
