@@ -17,12 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 

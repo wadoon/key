@@ -11,12 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.logic.op;
+package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.GenericSortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
+
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 
 /**
  * The objects of this class represent families of function symbols, where each
@@ -25,7 +30,7 @@ import org.key_project.util.collection.ImmutableArray;
  * and f2 then from f1.isSimilar(f2) and f1.getSortDependingOn() ==
  * f2.getSortDependingOn() follows f1 == f2
  */
-public final class SortDependingFunction extends Function {
+public final class SortDependingFunction extends Function implements GenericSortDependingFunction {
 
     private final SortDependingFunctionTemplate template;
     private final Sort sortDependingOn;
@@ -84,7 +89,7 @@ public final class SortDependingFunction extends Function {
 
     public static SortDependingFunction getFirstInstance(Name kind,
             TermServices services) {
-        return (SortDependingFunction) services.getNamespaces().functions()
+        return (SortDependingFunction) services.getNamespaces().getNamespace("functions")
                 .lookup(instantiateName(kind, SortImpl.ANY));
     }
 

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.java;
 
 
 import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -74,6 +73,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.util.Debug;
 import recoder.service.ConstantEvaluator;
 

@@ -15,7 +15,7 @@ package org.key_project.common.core.logic.sort;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
-import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.common.core.logic.op.GenericSortDependingFunction;
 import org.key_project.common.core.services.GenericProofServices;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -58,18 +58,18 @@ public interface Sort extends Named {
         }
 
         @Override
-        public SortDependingFunction getCastSymbol(TermServices services) {
+        public GenericSortDependingFunction getCastSymbol(TermServices services) {
             throw new UnsupportedOperationException("Cannot cast to " + name);
         }
 
         @Override
-        public SortDependingFunction getInstanceofSymbol(
+        public GenericSortDependingFunction getInstanceofSymbol(
                 TermServices services) {
             throw new UnsupportedOperationException("Cannot check instanceof for " + name);
         }
 
         @Override
-        public SortDependingFunction getExactInstanceofSymbol(
+        public GenericSortDependingFunction getExactInstanceofSymbol(
                 TermServices services) {
             throw new UnsupportedOperationException("Cannot check exactInstanceof for " + name);
         }
@@ -125,17 +125,17 @@ public interface Sort extends Named {
     /**
      * returns the cast symbol of this Sort
      */
-    SortDependingFunction getCastSymbol(TermServices services);
+    GenericSortDependingFunction getCastSymbol(TermServices services);
     
     /**
      * returns the instanceof symbol of this Sort
      */
-    SortDependingFunction getInstanceofSymbol(TermServices services);
+    GenericSortDependingFunction getInstanceofSymbol(TermServices services);
     
     /**
      * returns the exactinstanceof symbol of this Sort
      */
-    SortDependingFunction getExactInstanceofSymbol(TermServices services);
+    GenericSortDependingFunction getExactInstanceofSymbol(TermServices services);
 
     String declarationString();
 }

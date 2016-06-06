@@ -17,13 +17,13 @@ import java.lang.ref.WeakReference;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
-import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 
 /**

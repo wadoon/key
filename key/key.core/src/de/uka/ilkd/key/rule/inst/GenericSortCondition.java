@@ -14,9 +14,9 @@
 package de.uka.ilkd.key.rule.inst;
 
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;

@@ -21,7 +21,6 @@ import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
 

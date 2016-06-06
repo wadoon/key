@@ -5,7 +5,6 @@ import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -14,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
