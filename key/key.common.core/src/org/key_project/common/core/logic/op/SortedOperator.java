@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,12 +11,22 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
-/** 
- * JavaCardDL syntactical elements implement this interface if they can
- * occur as instantiations of schema variables.
+import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
+
+/**
+ * Operator with well-defined argument and result sorts.
+ *
+ * @author Dominic Scheurer
  */
-public interface SVSubstitute {
+public interface SortedOperator extends Operator {
+
+    Sort sort();
+
+    Sort argSort(int i);
+
+    ImmutableArray<Sort> argSorts();
 
 }

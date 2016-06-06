@@ -21,6 +21,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -39,9 +43,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -1144,7 +1145,7 @@ public class TermLabelManager {
     * @param state The {@link TermLabelState} of the current rule application.
     * @param pio The {@link PosInOccurrence} to replace {@link Term} at.
     * @param newTerm The new {@link Term} to set.
-    * @param tf The {@link TermFactory} to use.
+    * @param tf The {@link GenericTermFactory} to use.
     * @param refactorings The {@link RefactoringsContainer} to consider.
     * @return The root of the {@link PosInOccurrence} containing the new {@link Term} at the specified {@link PosInOccurrence}.
     */

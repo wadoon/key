@@ -11,12 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic.op;
 
-import de.uka.ilkd.key.logic.sort.Sort;
 
-public interface Sorted {
-
-    public Sort sort();
-
+/** 
+ * This interface represents the variables that can be bound
+ * (by quantifiers or other binding operators).
+ */
+public interface QuantifiableVariable extends ParsableVariable {
 }

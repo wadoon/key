@@ -20,6 +20,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.services.TermServices;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -30,13 +34,9 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
 
@@ -415,7 +415,7 @@ public class EqualityConstraint implements Constraint {
 //        
 //        final Metavariable newMV = 
 //            new Metavariable(new Name("#MV"+(MV_COUNTER++)), intersectionSort);
-//        final Term newMVTerm = TermFactory.DEFAULT.createFunctionTerm(newMV);
+//        final Term newMVTerm = GenericTermFactory.DEFAULT.createFunctionTerm(newMV);
 //        
 //        final Constraint addFirst = normalize ( (Metavariable)t0.op (),
 //                                                newMVTerm,

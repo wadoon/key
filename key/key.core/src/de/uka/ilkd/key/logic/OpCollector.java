@@ -17,8 +17,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.key_project.common.core.logic.op.Operator;
+
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Operator;
 
 /**
  * Collects all operators occurring in the traversed term.

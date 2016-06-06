@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
+import org.key_project.common.core.logic.op.Function;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 
 public class ConstantTermFeature extends BinaryTermFeature {
 

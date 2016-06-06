@@ -14,9 +14,8 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.sort.Sort;
 
 /**
  * A schema variable which matches term labels

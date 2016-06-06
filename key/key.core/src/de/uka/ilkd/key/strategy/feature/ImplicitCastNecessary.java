@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.sort.Sort;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;

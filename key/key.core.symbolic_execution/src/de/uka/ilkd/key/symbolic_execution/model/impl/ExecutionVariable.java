@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.key_project.common.core.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
@@ -27,7 +28,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -291,7 +291,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
    /**
     * Computes the combined path condition of all {@link Goal}s which is the
     * or combination of each path condition per {@link Goal}.
-    * @param tb The {@link TermBuilder} to use passed to ensure that it is still available even if the {@link Proof} is disposed in between.
+    * @param tb The {@link GenericTermBuilder} to use passed to ensure that it is still available even if the {@link Proof} is disposed in between.
     * @param valueGoals The {@link Goal}s to compute combined path condition for.
     * @param initConfig The {@link InitConfig} to use.
     * @return The combined path condition.

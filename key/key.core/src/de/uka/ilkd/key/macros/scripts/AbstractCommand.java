@@ -5,11 +5,11 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;

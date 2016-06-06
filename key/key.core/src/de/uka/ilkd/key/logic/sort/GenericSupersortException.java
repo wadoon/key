@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import org.key_project.common.core.logic.sort.Sort;
+
 /** this exception is thrown if a generic sort has been declared with
  * an illegal supersort */
 public class GenericSupersortException extends Exception {

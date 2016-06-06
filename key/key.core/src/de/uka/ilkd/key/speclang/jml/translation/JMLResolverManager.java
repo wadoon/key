@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import org.key_project.common.core.logic.op.ParsableVariable;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
@@ -20,7 +22,6 @@ import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLAttributeResolver;
 import de.uka.ilkd.key.speclang.translation.SLMethodResolver;

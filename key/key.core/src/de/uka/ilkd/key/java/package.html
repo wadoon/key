@@ -19,7 +19,7 @@ This package contains classes that cover the Java programming language.
 The classes in the subpackages are mainly taken from the Recoder
     framework and made immutable. They are transformed into this data
     structure from a Recoder structure by {@link
-    de.uka.ilkd.key.java.Recoder2KeY} or {@link
+    org.key_project.common.core.services.Recoder2KeY} or {@link
     de.uka.ilkd.key.SchemaRecoder2KeY}. However, in some details both
     data structures might differ more.
 
@@ -28,39 +28,39 @@ The following explanations are adapted from the
 <DL>
 <DT>Source and Program Elements</DT>
 <DD>
-A {@link de.uka.ilkd.key.java.SourceElement} is a syntactical entity and not
-necessary a {@link de.uka.ilkd.key.java.ModelElement}, such as a {@link de.uka.ilkd.key.java.Comment}.
+A {@link org.key_project.common.core.services.SourceElement} is a syntactical entity and not
+necessary a {@link org.key_project.common.core.services.ModelElement}, such as a {@link org.key_project.common.core.services.Comment}.
 <P>
-A {@link de.uka.ilkd.key.java.ProgramElement} is a {@link de.uka.ilkd.key.java.SourceElement}
+A {@link org.key_project.common.core.services.ProgramElement} is a {@link org.key_project.common.core.services.SourceElement}
 and a {@link de.uka.ilkd.key.ModelElement}. It is aware of its parent in the syntax 
-tree, while a pure {@link de.uka.ilkd.key.java.SourceElement} is not considered as a
+tree, while a pure {@link org.key_project.common.core.services.SourceElement} is not considered as a
 member of the AST even though it is represented in the sources.
 <P>
-{@link de.uka.ilkd.key.java.ProgramElement}s are further
-classified into {@link de.uka.ilkd.key.java.TerminalProgramElement}s and
-{@link de.uka.ilkd.key.java.NonTerminalProgramElement}s. While {@link de.uka.ilkd.key.java.TerminalProgramElement}
-is just a tag class, {@link de.uka.ilkd.key.java.NonTerminalProgramElement}s know
+{@link org.key_project.common.core.services.ProgramElement}s are further
+classified into {@link org.key_project.common.core.services.TerminalProgramElement}s and
+{@link org.key_project.common.core.services.NonTerminalProgramElement}s. While {@link org.key_project.common.core.services.TerminalProgramElement}
+is just a tag class, {@link org.key_project.common.core.services.NonTerminalProgramElement}s know
 their AST children (while it is possible that they do not have any).
-A complete source file occurs as a {@link de.uka.ilkd.key.java.CompilationUnit}.
+A complete source file occurs as a {@link org.key_project.common.core.services.CompilationUnit}.
 <P>
-{@link de.uka.ilkd.key.java.JavaSourceElement} and 
-{@link de.uka.ilkd.key.java.JavaProgramElement} are abstract classes defining 
+{@link org.key_project.common.core.services.JavaSourceElement} and 
+{@link org.key_project.common.core.services.JavaProgramElement} are abstract classes defining 
 standard implementations that already know their 
-{@link de.uka.ilkd.key.java.JavaProgramFactory}.
+{@link org.key_project.common.core.services.JavaProgramFactory}.
 </DD>
 <P>
 <DT>Expressions and Statements</DT>
 <DD>
-{@link de.uka.ilkd.key.java.Expression} and {@link de.uka.ilkd.key.java.Statement} are
-self-explanatory. A {@link de.uka.ilkd.key.java.LoopInitializer} is a special
-{@link de.uka.ilkd.key.java.Statement} valid as initializer of
-{@link de.uka.ilkd.key.java.statement.For} loops.
-{@link de.uka.ilkd.key.java.LoopInitializer} is subtyped by
-{@link de.uka.ilkd.key.java.expression.ExpressionStatement} and
-{@link de.uka.ilkd.key.java.declaration.LocalVariableDeclaration}).
+{@link org.key_project.common.core.services.Expression} and {@link org.key_project.common.core.services.Statement} are
+self-explanatory. A {@link org.key_project.common.core.services.LoopInitializer} is a special
+{@link org.key_project.common.core.services.Statement} valid as initializer of
+{@link org.key_project.common.core.services.statement.For} loops.
+{@link org.key_project.common.core.services.LoopInitializer} is subtyped by
+{@link org.key_project.common.core.services.expression.ExpressionStatement} and
+{@link org.key_project.common.core.services.declaration.LocalVariableDeclaration}).
 <P>
 Concrete classes and further abstractions are bundled in the
-{@link de.uka.ilkd.key.java.expression} and {@link de.uka.ilkd.key.java.statement} packages.
+{@link org.key_project.common.core.services.expression} and {@link org.key_project.common.core.services.statement} packages.
 </DD>
 <P>
 <DT>Syntax Tree Parents</DT>
@@ -68,52 +68,52 @@ Concrete classes and further abstractions are bundled in the
 There are a couple of abstractions dealing with properties of being a
 parent node.
 <P>
-These are {@link de.uka.ilkd.key.java.declaration.TypeDeclarationContainer},
-{@link de.uka.ilkd.key.java.ExpressionContainer},
-{@link de.uka.ilkd.key.java.StatementContainer},
-{@link de.uka.ilkd.key.java.ParameterContainer},
-{@link de.uka.ilkd.key.java.NamedProgramElement} and
-{@link de.uka.ilkd.key.java.reference.TypeReferenceContainer}.  A
-An {@link de.uka.ilkd.key.java.ExpressionContainer} contains
-{@link de.uka.ilkd.key.java.Expression}s, a
-{@link de.uka.ilkd.key.java.StatementContainer} contains
-{@link de.uka.ilkd.key.java.Statement}s, a
-{@link de.uka.ilkd.key.java.ParameterContainer}
-(either a {@link de.uka.ilkd.key.java.declaration.MethodDeclaration} or a
-{@link de.uka.ilkd.key.java.statement.Catch} statement) contains
-{@link de.uka.ilkd.key.java.declaration.ParameterDeclaration}s.
-A {@link de.uka.ilkd.key.java.NamedProgramElement} is a subtype of
-{@link de.uka.ilkd.key.java.NamedModelElement}.
-A {@link de.uka.ilkd.key.java.reference.TypeReferenceContainer} contains one or 
+These are {@link org.key_project.common.core.services.declaration.TypeDeclarationContainer},
+{@link org.key_project.common.core.services.ExpressionContainer},
+{@link org.key_project.common.core.services.StatementContainer},
+{@link org.key_project.common.core.services.ParameterContainer},
+{@link org.key_project.common.core.services.NamedProgramElement} and
+{@link org.key_project.common.core.services.reference.TypeReferenceContainer}.  A
+An {@link org.key_project.common.core.services.ExpressionContainer} contains
+{@link org.key_project.common.core.services.Expression}s, a
+{@link org.key_project.common.core.services.StatementContainer} contains
+{@link org.key_project.common.core.services.Statement}s, a
+{@link org.key_project.common.core.services.ParameterContainer}
+(either a {@link org.key_project.common.core.services.declaration.MethodDeclaration} or a
+{@link org.key_project.common.core.services.statement.Catch} statement) contains
+{@link org.key_project.common.core.services.declaration.ParameterDeclaration}s.
+A {@link org.key_project.common.core.services.NamedProgramElement} is a subtype of
+{@link org.key_project.common.core.services.NamedModelElement}.
+A {@link org.key_project.common.core.services.reference.TypeReferenceContainer} contains one or 
 several names, but these are names of types that are referred to explicitely 
-by a {@link de.uka.ilkd.key.java.reference.TypeReference}.
+by a {@link org.key_project.common.core.services.reference.TypeReference}.
 </DD>
 <P>
 <DT>References</DT>
 <DD>
-A {@link de.uka.ilkd.key.java.Reference} is an explicite use of an entity. Most of
-these {@link de.uka.ilkd.key.java.Reference}s are 
-{@link de.uka.ilkd.key.java.reference.NameReference}s
-and as such {@link de.uka.ilkd.key.java.NamedProgramElement}s, e.g. the
-{@link de.uka.ilkd.key.java.reference.TypeReference}.
-Subtypes of {@link de.uka.ilkd.key.java.Reference}s are bundled in the
-{@link de.uka.ilkd.key.java.reference} package.
+A {@link org.key_project.common.core.services.Reference} is an explicite use of an entity. Most of
+these {@link org.key_project.common.core.services.Reference}s are 
+{@link org.key_project.common.core.services.reference.NameReference}s
+and as such {@link org.key_project.common.core.services.NamedProgramElement}s, e.g. the
+{@link org.key_project.common.core.services.reference.TypeReference}.
+Subtypes of {@link org.key_project.common.core.services.Reference}s are bundled in the
+{@link org.key_project.common.core.services.reference} package.
 </DD>
 <P>
 <DT>Modifiers and Declarations</DT>
 <DD>
-{@link de.uka.ilkd.key.java.declaration.Modifier}s are (exclusively) used in the 
-context of {@link de.uka.ilkd.key.java.Declaration}s.
-{@link de.uka.ilkd.key.java.declaration.Modifier}s occur explicitly, since they occur 
+{@link org.key_project.common.core.services.declaration.Modifier}s are (exclusively) used in the 
+context of {@link org.key_project.common.core.services.Declaration}s.
+{@link org.key_project.common.core.services.declaration.Modifier}s occur explicitly, since they occur 
 as syntactical tokens that might be indented and commented.
-{@link de.uka.ilkd.key.java.Declaration}s are either
+{@link org.key_project.common.core.services.Declaration}s are either
 declarations of types or other entities such as
-{@link de.uka.ilkd.key.java.declaration.MemberDeclaration} or
-{@link de.uka.ilkd.key.java.declaration.VariableDeclaration}.  Concrete
-{@link de.uka.ilkd.key.java.declaration.Modifier}s and 
-{@link de.uka.ilkd.key.java.Declaration}s are
-bundled in the {@link de.uka.ilkd.key.java.declaration.modifier} and
-{@link de.uka.ilkd.key.java.declaration} packages.
+{@link org.key_project.common.core.services.declaration.MemberDeclaration} or
+{@link org.key_project.common.core.services.declaration.VariableDeclaration}.  Concrete
+{@link org.key_project.common.core.services.declaration.Modifier}s and 
+{@link org.key_project.common.core.services.Declaration}s are
+bundled in the {@link org.key_project.common.core.services.declaration.modifier} and
+{@link org.key_project.common.core.services.declaration} packages.
 </DD>
 </DL>
 </BODY>

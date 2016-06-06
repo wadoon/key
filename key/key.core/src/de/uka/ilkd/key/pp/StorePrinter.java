@@ -2,9 +2,10 @@ package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
 
+import org.key_project.common.core.logic.op.Function;
+
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 
 /**
  * This class is used by LogicPrinter.java to print out store-terms, i.e. terms

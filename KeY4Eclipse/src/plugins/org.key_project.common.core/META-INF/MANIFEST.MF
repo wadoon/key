@@ -11,4 +11,6 @@ Import-Package: org.eclipse.jface.resource,
  org.eclipse.ui.plugin
 Export-Package: 
  org.key_project.common.core,
- org.key_project.common.core.logic
+ org.key_project.common.core.logic,
+ org.key_project.common.core.logic.label,
+ org.key_project.common.core.logic.op

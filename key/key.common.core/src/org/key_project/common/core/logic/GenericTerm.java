@@ -11,17 +11,15 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SVSubstitute;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
  * In contrast to the distinction of formulas and terms as made by most of the 
@@ -40,11 +38,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
  *  cannot be changed. The advantage is that we can use term sharing and
  *  saving a lot of memory space. 
  *  </li>
- *  <li> Term has to be created using the {@link TermFactory} and
+ *  <li> Term has to be created using the {@link GenericTermFactory} and
  *    <emph>not</emph> by using the constructors itself. 
  *  </li>
  *  <li> Term is subclassed, but all subclasses have to be package private, so
- *    that all other classes except {@link TermFactory} know only the class
+ *    that all other classes except {@link GenericTermFactory} know only the class
  *    Term and its interface. Even most classes of the logic package.
  *  </li>
  *  <li> as it is immutable, most (all) attributes should be declared final
@@ -58,7 +56,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * "JavaTerm" or the like; from this class here, the java specific methods
  * have been removed.
  */
-public interface GenericTerm extends SVSubstitute, Sorted {
+public interface GenericTerm<V extends Visitor<? extends GenericTerm<V>>> extends SVSubstitute, Sorted {
 
     /** 
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
@@ -74,12 +72,12 @@ public interface GenericTerm extends SVSubstitute, Sorted {
     /**
      * The subterms.
      */
-    ImmutableArray<Term> subs();
+    ImmutableArray<? extends GenericTerm<V>> subs();
 
     /** 
      * The <code>n</code>-th direct subterm.
      */
-    Term sub(int n);
+    GenericTerm<V> sub(int n);
 
     /**
      * The logical variables bound by the top level operator.
@@ -123,14 +121,14 @@ public interface GenericTerm extends SVSubstitute, Sorted {
      * the visitor is called.
      * @param visitor the Visitor
      */
-    void execPostOrder(Visitor visitor);
+    void execPostOrder(V visitor);
 
     /** 
      * The visitor walks downwards the tree, while at each downstep the method 
      * visit of the visitor is called.
      * @param visitor the Visitor
      */
-    void execPreOrder(Visitor visitor);
+    void execPreOrder(V visitor);
 
     /**
      * Compares if two terms are equal modulo bound renaming
@@ -138,7 +136,7 @@ public interface GenericTerm extends SVSubstitute, Sorted {
      * operator, sort, arity, varsBoundHere and javaBlock as this object
      * modulo bound renaming
      */
-    boolean equalsModRenaming(Term o);
+    <T extends GenericTerm<V>> boolean equalsModRenaming(T o);
 
     /**
      * returns true if the term is labeled

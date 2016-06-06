@@ -15,16 +15,17 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Map;
 
+import org.key_project.common.core.logic.GenericTermFactory;
+import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
- * The TermFactory is the <em>only</em> way to create terms using constructors 
+ * The GenericTermFactory is the <em>only</em> way to create terms using constructors 
  * of class Term or any of its subclasses. It is the only class that implements 
  * and may exploit knowledge about sub classes of {@link Term}. All other 
  * classes of the system only know about terms what the {@link Term} class 
@@ -35,7 +36,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * See {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to 
  * create terms. 
  */
-public final class TermFactory {
+public final class TermFactory implements GenericTermFactory {
     
 
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
@@ -64,7 +65,7 @@ public final class TermFactory {
 	    		   JavaBlock javaBlock,
 			   ImmutableArray<TermLabel> labels) {
         if(op == null) {
-            throw new TermCreationException("null-Operator at TermFactory");
+            throw new TermCreationException("null-Operator at GenericTermFactory");
         }
 
         if (subs == null || subs.isEmpty()) {

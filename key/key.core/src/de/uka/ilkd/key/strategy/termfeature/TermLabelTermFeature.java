@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
+import org.key_project.common.core.logic.label.TermLabel;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
 
 /**
  *  A termfeature that can be used to check whether a term has a specific label {@link #create(TermLabel)} 

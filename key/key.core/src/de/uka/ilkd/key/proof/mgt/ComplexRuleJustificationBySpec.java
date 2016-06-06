@@ -16,7 +16,8 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.TermServices;
+import org.key_project.common.core.services.TermServices;
+
 import de.uka.ilkd.key.rule.RuleApp;
 
 

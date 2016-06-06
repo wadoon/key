@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.strategy.termProjection;
 
+import org.key_project.common.core.logic.op.Operator;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 

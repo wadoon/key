@@ -29,6 +29,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.SortedOperator;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -87,23 +92,18 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -2955,7 +2955,7 @@ public final class SymbolicExecutionUtil {
     * Labels all specified skolem equalities with the {@link SymbolicExecutionUtil#RESULT_LABEL}.
     * @param sequent The {@link Sequent} to modify.
     * @param constantsToLabel The skolem constants to label.
-    * @param factory The {@link TermFactory} to use.
+    * @param factory The {@link GenericTermFactory} to use.
     * @return The modified {@link Sequent}.
     */
    protected static Sequent labelSkolemConstants(Sequent sequent, 
@@ -2993,7 +2993,7 @@ public final class SymbolicExecutionUtil {
 
    /**
     * Adds the given {@link TermLabel} to the given {@link Term} and to all of its children.
-    * @param tf The {@link TermFactory} to use.
+    * @param tf The {@link GenericTermFactory} to use.
     * @param term The {@link Term} to add label to.
     * @param label The {@link TermLabel} to add.
     * @return A new {@link Term} with the given {@link TermLabel}.
@@ -3020,7 +3020,7 @@ public final class SymbolicExecutionUtil {
    
    /**
     * Removes the given {@link TermLabel} from the given {@link Term} and from all of its children.
-    * @param tf The {@link TermFactory} to use.
+    * @param tf The {@link GenericTermFactory} to use.
     * @param term The {@link Term} to remove label from.
     * @param label The {@link TermLabel} to remove.
     * @return A new {@link Term} without the given {@link TermLabel}.
@@ -3245,7 +3245,7 @@ public final class SymbolicExecutionUtil {
             }
             if (changed) {
                if (term.op() == Junctor.NOT) {
-                  // Create new NOT term using build in simplification of TermBuilder.
+                  // Create new NOT term using build in simplification of GenericTermBuilder.
                   assert newChildren.size() == 1;
                   assert term.boundVars().isEmpty();
                   assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
@@ -3256,7 +3256,7 @@ public final class SymbolicExecutionUtil {
                   return result;
                }
                else if (term.op() == Junctor.OR) {
-                  // Create new OR term using build in simplification of TermBuilder.
+                  // Create new OR term using build in simplification of GenericTermBuilder.
                   assert term.boundVars().isEmpty();
                   assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
                   Term result = services.getTermBuilder().or(newChildren);
@@ -3266,7 +3266,7 @@ public final class SymbolicExecutionUtil {
                   return result;
                }
                else if (term.op() == Junctor.AND) {
-                  // Create new AND term using build in simplification of TermBuilder.
+                  // Create new AND term using build in simplification of GenericTermBuilder.
                   assert term.boundVars().isEmpty();
                   assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
                   Term result = services.getTermBuilder().and(newChildren);
@@ -3276,7 +3276,7 @@ public final class SymbolicExecutionUtil {
                   return result;
                }
                else if (term.op() == Junctor.IMP) {
-                  // Create new IMP term using build in simplification of TermBuilder.
+                  // Create new IMP term using build in simplification of GenericTermBuilder.
                   assert newChildren.size() == 2;
                   assert term.boundVars().isEmpty();
                   assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;

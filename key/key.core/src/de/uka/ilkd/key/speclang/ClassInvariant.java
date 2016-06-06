@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.speclang;
 
+import org.key_project.common.core.logic.op.ParsableVariable;
+import org.key_project.common.core.services.TermServices;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
 

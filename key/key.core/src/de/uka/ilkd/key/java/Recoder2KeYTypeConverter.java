@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 import java.util.List;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -49,7 +50,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
 
@@ -527,7 +527,7 @@ public class Recoder2KeYTypeConverter {
         final KeYJavaType objectType = javaInfo.getJavaLangObject();
         final HeapLDT heapLDT = javaInfo.getServices().getTheories().getHeapLDT(); 
         Sort heapSort =  heapLDT == null
-                        ? Sort.ANY
+                        ? SortImpl.ANY
                         : heapLDT.targetSort();
         int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1); 
         arrayMethodBuilder 

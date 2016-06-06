@@ -31,7 +31,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 /**
  * KeY used to model arrays using only the {@link
- * de.uka.ilkd.key.java.abstraction.ArrayType}. As the only attribute of
+ * org.key_project.common.core.services.abstraction.ArrayType}. As the only attribute of
  * an array has been the length attribute, it has been handled in a
  * different way than members of usual classes. As we need some implicit
  * fields for array creation and initialisation, the special handling of

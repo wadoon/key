@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -57,7 +58,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
@@ -107,8 +107,8 @@ public final class JavaInfo {
      * the top level. It is equivalent to a static class belonging the default
      * package. This should only be used when using KeY in academic mode, if
      * the verification conditions are generated they "must" start with a
-     * {@link de.uka.ilkd.key.java.statement.MethodBodyStatement} or a
-     * {@link de.uka.ilkd.key.java.statement.MethodFrame}, which contains a
+     * {@link org.key_project.common.core.services.statement.MethodBodyStatement} or a
+     * {@link org.key_project.common.core.services.statement.MethodFrame}, which contains a
      * valid execution context.
      */
     protected ExecutionContext defaultExecutionContext;
@@ -197,7 +197,7 @@ public final class JavaInfo {
 
     /**
      * returns the full name of a given {@link
-     * de.uka.ilkd.key.java.abstraction.KeYJavaType}.
+     * org.key_project.common.core.services.abstraction.KeYJavaType}.
      * @param t the KeYJavaType including the package prefix
      * @return the full name
      */

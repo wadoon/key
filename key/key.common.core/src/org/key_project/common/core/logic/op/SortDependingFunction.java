@@ -11,15 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 
 
 /**
@@ -104,7 +106,7 @@ public final class SortDependingFunction extends Function {
 						    sort, 
 						    new ImmutableArray<Sort>(argSorts),
 						    unique);
-	return new SortDependingFunction(template, Sort.ANY);
+	return new SortDependingFunction(template, SortImpl.ANY);
     }
     
     
@@ -113,7 +115,7 @@ public final class SortDependingFunction extends Function {
 	return (SortDependingFunction) 
 			services.getNamespaces()
 			        .functions()
-	                        .lookup(instantiateName(kind, Sort.ANY));
+	                        .lookup(instantiateName(kind, SortImpl.ANY));
     }
         
 

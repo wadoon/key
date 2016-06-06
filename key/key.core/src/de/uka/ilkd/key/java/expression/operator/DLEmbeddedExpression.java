@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.ConvertException;
@@ -28,9 +30,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 public class DLEmbeddedExpression extends Operator {
 
@@ -62,7 +62,7 @@ public class DLEmbeddedExpression extends Operator {
     }
 
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.expression.Operator#getKeYJavaType(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.java.reference.ExecutionContext)
+     * @see org.key_project.common.core.services.expression.Operator#getKeYJavaType(org.key_project.common.core.services.Services, org.key_project.common.core.services.reference.ExecutionContext)
      */
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {

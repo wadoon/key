@@ -21,9 +21,9 @@ import java.util.LinkedList;
 import junit.framework.TestCase;
 
 import org.junit.Assert;
+import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;

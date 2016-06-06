@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.GenericTerm;
+
 /**
  * {@link GenericTerm} extension for Java terms, provides methods related to
  * contained Java statements.

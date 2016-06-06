@@ -26,6 +26,10 @@ import org.antlr.runtime.Token;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -45,15 +49,12 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -982,7 +983,7 @@ public final class JMLTranslator {
                 final TermServices services = (TermServices) params[0];
                 final Term seq = ((SLExpression) params[1]).getTerm();
                 final Term idx = ((SLExpression) params[2]).getTerm();
-                return new SLExpression(tb.seqGet(Sort.ANY, seq, idx));
+                return new SLExpression(tb.seqGet(SortImpl.ANY, seq, idx));
             }
         });
 
@@ -1584,7 +1585,7 @@ public final class JMLTranslator {
                                 rangeTo.getTerm());
                         return new SLExpression(t);
                     } else {
-                        Term t = tb.seqGet(Sort.ANY,
+                        Term t = tb.seqGet(SortImpl.ANY,
                                 receiver.getTerm(),
                                 rangeFrom.getTerm());
                         return new SLExpression(t);
@@ -2497,7 +2498,7 @@ public final class JMLTranslator {
 
     /** Provide restriction terms for the declared KeYJavaType 
      *  Note that these restrictions only apply to the JML to DL translation.
-     *  See also {@link TermBuilder#reachableValue(Term, KeYJavaType)}. 
+     *  See also {@link GenericTermBuilder#reachableValue(Term, KeYJavaType)}. 
      */
     protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
         final Type type = kjt.getProgramType();

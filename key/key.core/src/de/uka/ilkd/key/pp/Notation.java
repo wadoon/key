@@ -16,19 +16,22 @@ package de.uka.ilkd.key.pp;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
 /**
  * Encapsulate the concrete syntax used to print a term. The {@link
  * NotationInfo} class associates a Notation with every {@link
- * de.uka.ilkd.key.logic.op.Operator}. The various inner classes of this class
+ * org.key_project.common.core.logic.op.Operator}. The various inner classes of this class
  * represent different kinds of concrete syntax, like prefix, infix, postfix,
  * function style, attribute style, etc.
  */

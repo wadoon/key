@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.label.TermLabel;
 
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
@@ -19,7 +20,7 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  * </ul>
  * <p>
  * Exactly one {@link TermLabelState} instance is created in each
- * {@link Rule#apply(de.uka.ilkd.key.proof.Goal, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.rule.RuleApp)}
+ * {@link Rule#apply(de.uka.ilkd.key.proof.Goal, org.key_project.common.core.services.Services, de.uka.ilkd.key.rule.RuleApp)}
  * implementation and passed to each performed {@link TermLabelManager} call
  * during rule application and thus passed to the participants.
  * @author Martin Hentschel

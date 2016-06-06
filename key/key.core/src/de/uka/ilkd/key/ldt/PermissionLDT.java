@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.ldt;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -23,7 +24,6 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 
 public class PermissionLDT extends LDT {
 
@@ -51,7 +51,7 @@ public class PermissionLDT extends LDT {
     }
 
 
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub, de.uka.ilkd.key.logic.TermServices services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub, org.key_project.common.core.services.TermServices services, ExecutionContext ec) {
         return false;
     }
 

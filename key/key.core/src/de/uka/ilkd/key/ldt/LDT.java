@@ -19,6 +19,10 @@ import java.util.TreeMap;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.services.TermServices;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -27,10 +31,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * An "LDT" or "language data type" class corresponds to a standard rule file 
@@ -174,7 +174,7 @@ public abstract class LDT implements Named {
         
     /** returns true if the LDT offers an operation for the given java
      * operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
+     * @param op the org.key_project.common.core.services.expression.Operator to
      * translate
      * @param subs the logic subterms of the java operator
      * @param services the Services
@@ -191,7 +191,7 @@ public abstract class LDT implements Named {
     
     /** returns true if the LDT offers an operation for the given
      * binary java operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
+     * @param op the org.key_project.common.core.services.expression.Operator to
      * translate
      * @param left the left subterm of the java operator
      * @param right the right subterm of the java operator
@@ -209,7 +209,7 @@ public abstract class LDT implements Named {
     
     /** returns true if the LDT offers an operation for the given
      * unary java operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
+     * @param op the org.key_project.common.core.services.expression.Operator to
      * translate
      * @param sub the logic subterms of the java operator
      * @param services the Services 

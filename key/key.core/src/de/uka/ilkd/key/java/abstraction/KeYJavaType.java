@@ -15,10 +15,12 @@ package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Comparator;
 
+import org.key_project.common.core.logic.sort.Sort;
+
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -30,7 +32,7 @@ import de.uka.ilkd.key.util.MiscTools;
 public class KeYJavaType implements Type, PorgramType2SortEntry<Type> {
 
     /** Special return "type" for void methods. */
-    public static final KeYJavaType VOID_TYPE = new KeYJavaType(null,Sort.ANY);
+    public static final KeYJavaType VOID_TYPE = new KeYJavaType(null,SortImpl.ANY);
 
     /** the AST type */
     private Type javaType=null;
@@ -66,7 +68,7 @@ public class KeYJavaType implements Type, PorgramType2SortEntry<Type> {
     }
 
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.abstraction.PorgramType2SortEntry#getJavaType()
+     * @see org.key_project.common.core.services.abstraction.PorgramType2SortEntry#getJavaType()
      */
     @Override
     public Type getProgramType() {
@@ -74,7 +76,7 @@ public class KeYJavaType implements Type, PorgramType2SortEntry<Type> {
     }
 
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.abstraction.PorgramType2SortEntry#getSort()
+     * @see org.key_project.common.core.services.abstraction.PorgramType2SortEntry#getSort()
      */
     @Override
     public Sort getSort() {

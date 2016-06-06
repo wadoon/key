@@ -15,13 +15,18 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.HashMap;
 
+import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.op.AbstractSortedOperator;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SortedOperator;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.GenericTerm;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 
 /**
  * This method performs type checking and sort inference by supplying methods
@@ -263,10 +268,10 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
                 return s1;
             }
             else if (s1 instanceof NullSort || s2 instanceof NullSort) {
-                return Sort.ANY;
+                return SortImpl.ANY;
             }
             else {
-                Sort result = Sort.ANY;
+                Sort result = SortImpl.ANY;
                 final ImmutableSet<Sort> set1 = s1.extendsSorts();
                 final ImmutableSet<Sort> set2 = s2.extendsSorts();
                 assert set1 != null : "null for sort: " + s1;
@@ -274,12 +279,12 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
 
                 for (final Sort sort1 : set1) {
                     if (set2.contains(sort1)) {
-                        if (result == Sort.ANY) {
+                        if (result == SortImpl.ANY) {
                             result = sort1;
                         }
                         else {
                             // not uniquely determinable
-                            return Sort.ANY;
+                            return SortImpl.ANY;
                         }
                     }
                 }

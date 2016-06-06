@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import org.key_project.common.core.logic.sort.Sort;
+
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;

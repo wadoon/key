@@ -11,7 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
+
+import de.uka.ilkd.key.logic.op.SortedOperator;
 
 /** 
  * This interface represents the variables that can be recognized 

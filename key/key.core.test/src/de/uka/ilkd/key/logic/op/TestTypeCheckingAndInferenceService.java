@@ -16,11 +16,12 @@ package de.uka.ilkd.key.logic.op;
 import java.io.File;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.Function;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.TestCase;
@@ -44,7 +45,7 @@ public class TestTypeCheckingAndInferenceService extends TestCase {
     }
 
     public void testFunction() {
-        final Function op = new Function(new Name("f"), Sort.ANY);
+        final Function op = new Function(new Name("f"), SortImpl.ANY);
 
         final TypeCheckingAndInferenceService<Function> service =
                 TypeCheckingAndInferenceService.getTypeCheckerFor(op);
@@ -56,11 +57,11 @@ public class TestTypeCheckingAndInferenceService extends TestCase {
                 service.getClass());
 
         assertTrue(service.validTopLevel(
-                tb.var(new LogicVariable(new Name("v"), Sort.ANY)), op));
+                tb.var(new LogicVariable(new Name("v"), SortImpl.ANY)), op));
 
         assertSame(service.getClass(),
                 TypeCheckingAndInferenceService
                         .getTypeCheckerFor(new LogicVariable(new Name("v1"),
-                                Sort.ANY)).getClass());
+                                SortImpl.ANY)).getClass());
     }
 }

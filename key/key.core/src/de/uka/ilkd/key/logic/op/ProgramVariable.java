@@ -15,7 +15,12 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
+import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.AbstractSortedOperator;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.ParsableVariable;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Comment;
@@ -36,10 +41,8 @@ import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.logic.GenericTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 

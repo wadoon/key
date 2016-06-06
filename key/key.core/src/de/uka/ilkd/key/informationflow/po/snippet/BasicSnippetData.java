@@ -45,7 +45,7 @@ class BasicSnippetData {
     final StateVars origVars;
 
     /**
-     * TermBuilder used by the FactoryMethods.
+     * GenericTermBuilder used by the FactoryMethods.
      */
     final TermBuilder tb;
 

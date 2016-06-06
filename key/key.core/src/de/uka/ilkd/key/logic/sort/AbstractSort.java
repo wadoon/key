@@ -14,12 +14,13 @@
 package de.uka.ilkd.key.logic.sort;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 /**
  * Abstract base class for implementations of the Sort interface.
@@ -40,10 +41,10 @@ public abstract class AbstractSort implements Sort {
 
     @Override    
     public final ImmutableSet<Sort> extendsSorts() {
-	return this == Sort.FORMULA || this == Sort.UPDATE || this == Sort.ANY
+	return this == Sort.FORMULA || this == Sort.UPDATE || this == SortImpl.ANY
 	       ? DefaultImmutableSet.<Sort>nil()
 	       : ext.isEmpty()
-	         ? ext.add(Sort.ANY)
+	         ? ext.add(SortImpl.ANY)
 	         : ext;
     }
     
@@ -60,7 +61,7 @@ public abstract class AbstractSort implements Sort {
             return true;
         } else if(this == Sort.FORMULA || this == Sort.UPDATE) {
             return false;
-        } else if(sort == Sort.ANY) {
+        } else if(sort == SortImpl.ANY) {
             return true;
         }
         

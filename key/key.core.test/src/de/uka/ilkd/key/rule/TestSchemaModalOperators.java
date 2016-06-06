@@ -20,6 +20,7 @@ package de.uka.ilkd.key.rule;
 import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -38,7 +39,6 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Goal;
@@ -89,7 +89,7 @@ public class TestSchemaModalOperators extends TestCase {
         
 	// proof required to test application with mv
 	/*
-       TermFactory tf=TermFactory.DEFAULT;
+       GenericTermFactory tf=GenericTermFactory.DEFAULT;
 
 	mvProof = new Proof();
 

@@ -21,8 +21,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.key_project.common.core.logic.GenericTermBuilder;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.ParsableVariable;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -38,10 +45,8 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IfExThenElse;
@@ -50,9 +55,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
@@ -63,7 +66,7 @@ import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -76,13 +79,13 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>Use this class if you intend to build complex terms by hand. It is
- * more convenient than the @link{TermFactory} class.</p>
+ * more convenient than the @link{GenericTermFactory} class.</p>
  *
  * <p>Attention: some methods of this class try to simplify some terms. So if you
  * want to be sure that the term looks exactly as you built it, you
- * will have to use the TermFactory.</p>
+ * will have to use the GenericTermFactory.</p>
  */
-public class TermBuilder {
+public class TermBuilder implements GenericTermBuilder {
 
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
@@ -1551,7 +1554,7 @@ public class TermBuilder {
 
     // The template of the well-definedness transformer for terms.
     public static final Transformer WD_ANY =
-            new Transformer(new Name("wd"), Sort.ANY);
+            new Transformer(new Name("wd"), SortImpl.ANY);
 
     // The template of the well-definedness transformer for formulas.
     public static final Transformer WD_FORMULA =
@@ -1964,11 +1967,11 @@ public class TermBuilder {
                         modAtPre),
                         and(not(equals(objVarTerm, NULL())),
                                 not(createdAtPre)),
-                                equals(select(permissionHeap ? theories.getPermissionLDT().targetSort() : Sort.ANY,
+                                equals(select(permissionHeap ? theories.getPermissionLDT().targetSort() : SortImpl.ANY,
                                         heapTerm,
                                         objVarTerm,
                                         fieldVarTerm),
-                                        select(permissionHeap ? theories.getPermissionLDT().targetSort() : Sort.ANY,
+                                        select(permissionHeap ? theories.getPermissionLDT().targetSort() : SortImpl.ANY,
                                                 or.replace(heapTerm),
                                                 objVarTerm,
                                                 fieldVarTerm))));
@@ -2003,11 +2006,11 @@ public class TermBuilder {
         boolean permissionHeap = heapTerm.op() == theories.getHeapLDT().getPermissionHeap();
 
         return all(quantVars,
-                equals(select(permissionHeap ? theories.getPermissionLDT().targetSort() : Sort.ANY,
+                equals(select(permissionHeap ? theories.getPermissionLDT().targetSort() : SortImpl.ANY,
                         heapTerm,
                         objVarTerm,
                         fieldVarTerm),
-                        select(permissionHeap ? theories.getPermissionLDT().targetSort() : Sort.ANY,
+                        select(permissionHeap ? theories.getPermissionLDT().targetSort() : SortImpl.ANY,
                                 or.replace(heapTerm),
                                 objVarTerm,
                                 fieldVarTerm)));

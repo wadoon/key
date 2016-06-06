@@ -99,8 +99,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @see #makeIterableForLoop(LocalVariableDeclaration, Expression,
      *      Statement)
      * 
-     * @see de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer#transform(de.uka.ilkd.key.java.ProgramElement,
-     *      de.uka.ilkd.key.java.Services,
+     * @see de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer#transform(org.key_project.common.core.services.ProgramElement,
+     *      org.key_project.common.core.services.Services,
      *      de.uka.ilkd.key.rule.inst.SVInstantiations)
      */
     @Override

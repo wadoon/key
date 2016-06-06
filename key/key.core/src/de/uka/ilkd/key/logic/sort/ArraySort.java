@@ -17,6 +17,7 @@ import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -77,7 +78,7 @@ public final class ArraySort extends AbstractSort {
 	
 	ImmutableSet<Sort> elemDirectSuperSorts = elemSort.extendsSorts();
 	if(elemDirectSuperSorts.equals(DefaultImmutableSet.<Sort>nil()
-		                                          .add(Sort.ANY))) {
+		                                          .add(SortImpl.ANY))) {
 	    result = result.add(objectSort)
 	                   .add(cloneableSort)
 	                   .add(serializableSort);    

@@ -14,10 +14,9 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.op.AbstractSortedOperator;
+import org.key_project.common.core.logic.op.ParsableVariable;
+import org.key_project.common.core.logic.sort.Sort;
 
 @Deprecated
 public final class Metavariable extends AbstractSortedOperator

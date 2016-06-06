@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.GenericSupersortException;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
@@ -309,7 +309,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ),
+	               .put ( G1, SortImpl.ANY ),
 	               gsi.getAllInstantiations () );
 
 	cs = ImmutableSLList.<GenericSortCondition>nil();
@@ -385,7 +385,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ).put ( G2, B4 ).put ( G4, B1 ),
+	               .put ( G1, SortImpl.ANY ).put ( G2, B4 ).put ( G4, B1 ),
 	               gsi.getAllInstantiations () );
     }
 
@@ -451,7 +451,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ).put ( G2, D4 ).put ( G4, D1 ),
+	               .put ( G1, SortImpl.ANY ).put ( G2, D4 ).put ( G4, D1 ),
 	               gsi.getAllInstantiations () );
     }
 
@@ -505,7 +505,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );	
 	assertEquals ( "Instantiations should be equal",
 	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ).put ( G2, A2 ).put ( G3, Sort.ANY ).put ( G4, B1 ),
+	               .put ( G1, SortImpl.ANY ).put ( G2, A2 ).put ( G3, SortImpl.ANY ).put ( G4, B1 ),
 	               gsi.getAllInstantiations () );
 	
 	cs =  ImmutableSLList.<GenericSortCondition>nil();
@@ -640,7 +640,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( H1, Sort.ANY ).put ( H2, A3 ),
+	               .put ( H1, SortImpl.ANY ).put ( H2, A3 ),
 	               gsi.getAllInstantiations () );
 	
 	cs = ImmutableSLList.<GenericSortCondition>nil();
@@ -794,7 +794,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ),
+	               .put ( G1, SortImpl.ANY ),
 	               gsi.getAllInstantiations () );
 
 	cs = ImmutableSLList.<GenericSortCondition>nil();
@@ -804,7 +804,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
-	               .put ( G1, Sort.ANY ),
+	               .put ( G1, SortImpl.ANY ),
 	               gsi.getAllInstantiations () );
     }
 

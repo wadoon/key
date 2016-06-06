@@ -2,13 +2,15 @@ package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
 
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.sort.Sort;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 
 /**
  * This class is used by LogicPrinter.java to print out select-terms, i.e. terms
@@ -41,7 +43,7 @@ class SelectPrinter extends FieldPrinter {
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
 
-            if (t.sort().equals(Sort.ANY)) {
+            if (t.sort().equals(SortImpl.ANY)) {
                 /*
                  * This section deals with PP of frame conditions (and similar).
                  * Select-type is any.

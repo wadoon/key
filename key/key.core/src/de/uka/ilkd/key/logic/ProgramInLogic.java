@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;

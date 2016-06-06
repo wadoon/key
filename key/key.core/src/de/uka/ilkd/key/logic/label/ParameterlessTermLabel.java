@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.label;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.label.TermLabel;
 
 /**
  * The Class {@link ParameterlessTermLabel} can be used to define labels without parameters.

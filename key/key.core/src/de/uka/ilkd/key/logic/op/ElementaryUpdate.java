@@ -17,8 +17,8 @@ import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.op.AbstractSortedOperator;
+import org.key_project.common.core.logic.sort.Sort;
 
 
 /**

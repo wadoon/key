@@ -44,6 +44,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -53,7 +54,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -1014,15 +1015,15 @@ public class InvariantConfigurator {
                 final String newObjectsAsString = invariants.get(index)[IF_OO_IDX].get(heap.toString());
                 // TODO: allow more than one term
                 preExps = parser.parse(
-                      new StringReader(preExpsAsString), Sort.ANY,
+                      new StringReader(preExpsAsString), SortImpl.ANY,
                       services, services.getNamespaces(), getAbbrevMap());
                 // TODO: allow more than one term
                 postExps = parser.parse(
-                      new StringReader(postExpsAsString), Sort.ANY,
+                      new StringReader(postExpsAsString), SortImpl.ANY,
                       services, services.getNamespaces(), getAbbrevMap());
                 // TODO: allow more than one term
                 newObjects = parser.parse(
-                      new StringReader(newObjectsAsString), Sort.ANY,
+                      new StringReader(newObjectsAsString), SortImpl.ANY,
                       services, services.getNamespaces(), getAbbrevMap());
                 ImmutableList<InfFlowSpec> result =
                     ImmutableSLList.<InfFlowSpec>nil()

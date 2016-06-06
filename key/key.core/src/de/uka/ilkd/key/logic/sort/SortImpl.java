@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.sort;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -22,6 +23,11 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public final class SortImpl extends AbstractSort {
     
+    /**
+     * Any is a supersort of all sorts.
+     */
+    public final static Sort ANY = new SortImpl(new Name("any"));
+
     public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         super(name, ext, isAbstract);
     }    

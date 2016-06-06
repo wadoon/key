@@ -9,6 +9,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.SortedOperator;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.ArrayUtil;
 
@@ -20,15 +24,11 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -420,7 +420,7 @@ public final class TruthValueTracingUtil {
     * available in case of {@link OneStepSimplifier} usage.
     * @param childNode The child {@link Node}.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-    * @param tb The {@link TermBuilder} to use.
+    * @param tb The {@link GenericTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void updatePredicateResultBasedOnNewMinorIdsOSS(final PosInOccurrence childPio,
@@ -451,7 +451,7 @@ public final class TruthValueTracingUtil {
     * @param term The {@link Term} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
-    * @param tb The {@link TermBuilder} to use.
+    * @param tb The {@link GenericTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
@@ -474,7 +474,7 @@ public final class TruthValueTracingUtil {
     * @param onlyChangedChildSF The only changed {@link SequentFormula} in the child {@link Node}.
     * @param label The {@link FormulaTermLabel} of interest.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
-    * @param tb The {@link TermBuilder} to use.
+    * @param tb The {@link GenericTermBuilder} to use.
     * @return The computed instruction {@link Term} or {@code null} if not available.
     */
    protected static Term checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
@@ -498,7 +498,7 @@ public final class TruthValueTracingUtil {
     * Updates the {@link PredicateResult}s based on minor ID changes if available.
     * @param childNode The child {@link Node}.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-    * @param tb The {@link TermBuilder} to use.
+    * @param tb The {@link GenericTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void updatePredicateResultBasedOnNewMinorIds(final Node childNode,
@@ -542,7 +542,7 @@ public final class TruthValueTracingUtil {
     * @param term The {@link Term} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
-    * @param tb The {@link TermBuilder} to use.
+    * @param tb The {@link GenericTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIds(Node childNode, 
@@ -565,7 +565,7 @@ public final class TruthValueTracingUtil {
     * @param childNode The child {@link Node}.
     * @param label The {@link FormulaTermLabel} of interest.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
-    * @param tb The {@link TermBuilder} to use.
+    * @param tb The {@link GenericTermBuilder} to use.
     * @return The computed instruction {@link Term} or {@code null} if not available.
     */
    protected static Term checkForNewMinorIds(Node childNode, 
@@ -629,7 +629,7 @@ public final class TruthValueTracingUtil {
     * @param antecedentReplacements The replacements found in the antecedent.
     * @param succedentReplacements The replacements found in the succedent.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
-    * @param tb The {@link TermBuilder} to use.
+    * @param tb The {@link GenericTermBuilder} to use.
     * @return The computed instruction {@link Term} or {@code null} if not available.
     */
    protected static Term computeInstructionTerm(List<Term> antecedentReplacements, 

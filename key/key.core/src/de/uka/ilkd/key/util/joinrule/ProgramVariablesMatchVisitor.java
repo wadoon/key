@@ -53,7 +53,7 @@ public class ProgramVariablesMatchVisitor extends SimultaneousJavaASTVisitor {
      * 
      * @see
      * de.uka.ilkd.key.util.joinrule.SimultaneousJavaASTVisitor#doDefaultAction
-     * (de.uka.ilkd.key.java.SourceElement, de.uka.ilkd.key.java.SourceElement)
+     * (org.key_project.common.core.services.SourceElement, org.key_project.common.core.services.SourceElement)
      */
     @Override
     protected void doDefaultAction(SourceElement node1, SourceElement node2) {

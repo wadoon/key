@@ -11,12 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
-
+package org.key_project.common.core.logic.op;
 
 /** 
- * This interface represents the variables that can be bound
- * (by quantifiers or other binding operators).
+ * JavaCardDL syntactical elements implement this interface if they can
+ * occur as instantiations of schema variables.
  */
-public interface QuantifiableVariable extends ParsableVariable {
+public interface SVSubstitute {
+
 }

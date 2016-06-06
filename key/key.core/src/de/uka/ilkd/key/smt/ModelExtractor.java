@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.Sort;
+
 import de.uka.ilkd.key.smt.lang.SMTFunction;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.Util;

@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 
 /**
  * Two kind of matching algorithm are coded in two nested classes BaseMatching

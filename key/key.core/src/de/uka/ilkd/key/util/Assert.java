@@ -14,8 +14,9 @@
 
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.logic.Sorted;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.Sorted;
+import org.key_project.common.core.logic.sort.Sort;
+
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 
 /**

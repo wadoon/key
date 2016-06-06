@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.pp;
 
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.sort.Sort;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.UnknownJavaTypeException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Common superclass of {@link StorePrinter} and {@link SelectPrinter}.
@@ -67,7 +68,7 @@ class FieldPrinter {
      * the associated object.
      * 
      * For more information on canonic, see
-     * {@link de.uka.ilkd.key.java.JavaInfo#getCanonicalFieldProgramVariable(String,KeYJavaType)}
+     * {@link org.key_project.common.core.services.JavaInfo#getCanonicalFieldProgramVariable(String,KeYJavaType)}
      * 
      * (Kai Wallisch 09/2014)
      */

@@ -21,19 +21,20 @@ import junit.framework.TestCase;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 
 
@@ -127,7 +128,7 @@ public class TestDeclParser extends TestCase {
         Sort P = (Sort) nss.sorts().lookup(new Name("P"));
         assertTrue(P instanceof ProxySort);
         assertEquals("P", P.name().toString());
-        assertEquals(DefaultImmutableSet.nil().add(Sort.ANY), P.extendsSorts());
+        assertEquals(DefaultImmutableSet.nil().add(SortImpl.ANY), P.extendsSorts());
 
         Sort A = (Sort) nss.sorts().lookup(new Name("A"));
         Sort B = (Sort) nss.sorts().lookup(new Name("B"));
@@ -151,7 +152,7 @@ public class TestDeclParser extends TestCase {
 	parseDecls("\\sorts { \\generic G; \\generic H \\extends G; }");
 
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil().add(SortImpl.ANY),
 			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       DefaultImmutableSet.<Sort>nil().add ( G ),
@@ -163,7 +164,7 @@ public class TestDeclParser extends TestCase {
 	
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil().add(SortImpl.ANY),
 			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( G ),
@@ -176,7 +177,7 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil().add(SortImpl.ANY),
 			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( T ) );
 	
 
@@ -186,7 +187,7 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil().add(SortImpl.ANY),
 			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
@@ -199,10 +200,10 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil().add(SortImpl.ANY),
 			       DefaultImmutableSet.<Sort>nil() );
 	checkGenericSort     ( nss.sorts().lookup(new Name("G2")),
-			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil().add(SortImpl.ANY),
 			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),

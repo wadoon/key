@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.common.core.logic.op.ParsableVariable;
+
 /**
  * This interface represents the root of a schema variable hierarchy to be
  * express termstructures that match on logical terms. Schema variables

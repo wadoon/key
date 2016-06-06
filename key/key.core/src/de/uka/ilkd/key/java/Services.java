@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
@@ -115,7 +115,7 @@ public class Services implements TermServices, ProofServices {
 
 
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#getNameRecorder()
+     * @see org.key_project.common.core.services.ProofServices#getNameRecorder()
      */
     @Override
     public NameRecorder getNameRecorder() {
@@ -124,7 +124,7 @@ public class Services implements TermServices, ProofServices {
 
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#saveNameRecorder(de.uka.ilkd.key.proof.Node)
+     * @see org.key_project.common.core.services.ProofServices#saveNameRecorder(de.uka.ilkd.key.proof.Node)
      */
     @Override
     public void saveNameRecorder(Node n) {
@@ -134,7 +134,7 @@ public class Services implements TermServices, ProofServices {
 
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#addNameProposal(de.uka.ilkd.key.logic.Name)
+     * @see org.key_project.common.core.services.ProofServices#addNameProposal(de.uka.ilkd.key.logic.Name)
      */
     @Override
     public void addNameProposal(Name proposal) {
@@ -142,7 +142,7 @@ public class Services implements TermServices, ProofServices {
     }
 
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#getTheories()
+     * @see org.key_project.common.core.services.ProofServices#getTheories()
      */
     @Override
     public TheoryServices getTheories() {
@@ -151,7 +151,7 @@ public class Services implements TermServices, ProofServices {
 
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#getSpecificationRepository()
+     * @see org.key_project.common.core.services.ProofServices#getSpecificationRepository()
      */
     @Override
     public SpecificationRepository getSpecificationRepository() {
@@ -230,7 +230,7 @@ public class Services implements TermServices, ProofServices {
     
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#setProof(de.uka.ilkd.key.proof.Proof)
+     * @see org.key_project.common.core.services.ProofServices#setProof(de.uka.ilkd.key.proof.Proof)
      */
     @Override
     public void setProof(Proof p_proof) {
@@ -262,7 +262,7 @@ public class Services implements TermServices, ProofServices {
      * returns an existing named counter, creates a new one otherwise
      */
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#getCounter(java.lang.String)
+     * @see org.key_project.common.core.services.ProofServices#getCounter(java.lang.String)
      */
     @Override
     public Counter getCounter(String name) {
@@ -274,7 +274,7 @@ public class Services implements TermServices, ProofServices {
     }
 
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#getNamespaces()
+     * @see org.key_project.common.core.services.ProofServices#getNamespaces()
      */
     @Override
     public NamespaceSet getNamespaces() {
@@ -283,7 +283,7 @@ public class Services implements TermServices, ProofServices {
     
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#setNamespaces(de.uka.ilkd.key.logic.NamespaceSet)
+     * @see org.key_project.common.core.services.ProofServices#setNamespaces(de.uka.ilkd.key.logic.NamespaceSet)
      */
     @Override
     public void setNamespaces(NamespaceSet namespaces) {
@@ -292,7 +292,7 @@ public class Services implements TermServices, ProofServices {
     
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#getProof()
+     * @see org.key_project.common.core.services.ProofServices#getProof()
      */
     @Override
     public Proof getProof() {
@@ -304,7 +304,7 @@ public class Services implements TermServices, ProofServices {
     }
 
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#getProfile()
+     * @see org.key_project.common.core.services.ProofServices#getProfile()
      */
     @Override
     public Profile getProfile() {
@@ -320,8 +320,8 @@ public class Services implements TermServices, ProofServices {
     }
     
     /**
-     * Returns the {@link TermBuilder} used to create {@link Term}s.
-     * @return The {@link TermBuilder} used to create {@link Term}s.
+     * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
+     * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
     @Override
     public TermBuilder getTermBuilder() {
@@ -329,8 +329,8 @@ public class Services implements TermServices, ProofServices {
     }
 
     /**
-     * Returns the {@link TermFactory} used to create {@link Term}s.
-     * @return The {@link TermFactory} used to create {@link Term}s.
+     * Returns the {@link GenericTermFactory} used to create {@link Term}s.
+     * @return The {@link GenericTermFactory} used to create {@link Term}s.
      */
     @Override
     public TermFactory getTermFactory() {
@@ -338,7 +338,7 @@ public class Services implements TermServices, ProofServices {
     }
 
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.java.ProofServices#getJavaServices()
+     * @see org.key_project.common.core.services.ProofServices#getJavaServices()
      */
     @Override
     public JavaServices getProgramServices() {

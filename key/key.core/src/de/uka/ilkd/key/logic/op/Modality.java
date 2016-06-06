@@ -17,8 +17,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.op.AbstractSortedOperator;
+import org.key_project.common.core.logic.sort.Sort;
 
 /** 
  * This class is used to represent a dynamic logic modality like

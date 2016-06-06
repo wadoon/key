@@ -11,21 +11,23 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic;
 
-public interface Visitor {
+import de.uka.ilkd.key.logic.Term;
+
+public interface Visitor<T extends GenericTerm> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      * @param visited The currently visited {@link Term}.
      * @return {@code true} visit sub tree, {@code false} skip sub tree.
      */
-    public boolean visitSubtree(Term visited);
+    public boolean visitSubtree(T visited);
    
     /**
      * the entry method for the visitor pattern
      * @param visited the Term to be visited
      */
-    public abstract void visit(Term visited);
+    public abstract void visit(T visited);
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term
@@ -36,7 +38,7 @@ public interface Visitor {
      * @param subtreeRoot root of the subtree which the visitor enters.
      */
 
-    public void subtreeEntered(Term subtreeRoot);
+    public void subtreeEntered(T subtreeRoot);
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term
@@ -47,5 +49,5 @@ public interface Visitor {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
 
-    public void subtreeLeft(Term subtreeRoot);
+    public void subtreeLeft(T subtreeRoot);
 }

@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.GenericTerm;
-import de.uka.ilkd.key.logic.TermServices;
+import org.key_project.common.core.logic.op.AbstractOperator;
+import org.key_project.common.core.services.TermServices;
 
 /**
  * Standard first-order substitution operator, resolving clashes but not

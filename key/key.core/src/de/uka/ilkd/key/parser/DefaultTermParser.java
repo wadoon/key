@@ -19,12 +19,12 @@ import java.io.Reader;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
 

@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.AbstractOperator;
 
-import de.uka.ilkd.key.logic.GenericTerm;
 import de.uka.ilkd.key.logic.Term;
 
 /**

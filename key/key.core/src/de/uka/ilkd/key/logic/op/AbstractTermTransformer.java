@@ -16,12 +16,14 @@ package de.uka.ilkd.key.logic.op;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.AbstractSortedOperator;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.GenericTerm;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.metaconstruct.AddCast;
 import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;

@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import org.key_project.common.core.logic.sort.Sort;
+
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 

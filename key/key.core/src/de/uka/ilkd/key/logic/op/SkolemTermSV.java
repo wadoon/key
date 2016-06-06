@@ -14,8 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.Sort;
 
 /**
  * Schema variable that is instantiated with fresh Skolem constants. At the

@@ -219,7 +219,7 @@ public class TestRecoder2KeY extends TestCase {
 //	recoder.java.StatementBlock block = (recoder.java.StatementBlock) jb;
 //	recoder.java.ProgramElement pe = block.getChildAt(2);
 //	System.out.println("Look at "+pe);
-//	//	de.uka.ilkd.key.java.CopyAssignment ca = ;
+//	//	org.key_project.common.core.services.CopyAssignment ca = ;
 //// 	System.out.println("Look at "+pe);
 //
 //    }

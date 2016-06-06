@@ -29,7 +29,7 @@ options {
     import java.util.List;
 
     import org.key_project.util.collection.*;
-    import de.uka.ilkd.key.java.Position;
+    import org.key_project.common.core.services.Position;
     import de.uka.ilkd.key.speclang.*;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.ldt.HeapLDT;

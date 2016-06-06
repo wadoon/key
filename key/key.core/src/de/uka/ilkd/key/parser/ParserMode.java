@@ -44,7 +44,7 @@ public enum ParserMode {
      * Only parse taclet definitions.
      * 
      * Used by
-     * {@link KeYParser#parseTaclet(String, de.uka.ilkd.key.java.Services)}
+     * {@link KeYParser#parseTaclet(String, org.key_project.common.core.services.Services)}
      */
     TACLET,
 

@@ -14,12 +14,12 @@
 package de.uka.ilkd.key.rule.join.procedures;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.boollattice.BooleanLattice;
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.SignAnalysisLattice;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Rule that joins two sequents based on a sign lattice for integers. Boolean

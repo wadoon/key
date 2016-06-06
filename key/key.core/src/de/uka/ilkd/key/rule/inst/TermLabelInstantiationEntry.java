@@ -13,9 +13,8 @@
 
 package de.uka.ilkd.key.rule.inst;
 
+import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.label.TermLabel;
 
 /**
  * 

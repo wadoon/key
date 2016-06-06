@@ -65,10 +65,10 @@ public class TestKeYRecoderMapping extends TestCase{
 
 
     public void testtoRecoder(){
-       Assert.assertTrue("Fehler[1] in toRecoder(de.uka.ilkd.key.java.ProgramElement)", rp.equals(mapping.toRecoder(kp)));
-//        Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ProgramElement)", null==mapping.toRecoder(kp2));
-       Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ModelElement)", rm.equals(mapping.toRecoder(km)));
-//        Assert.assertTrue("Fehler[4] in toRecoder(de.uka.ilkd.key.java.ModelElement)", null==mapping.toRecoder(km2));
+       Assert.assertTrue("Fehler[1] in toRecoder(org.key_project.common.core.services.ProgramElement)", rp.equals(mapping.toRecoder(kp)));
+//        Assert.assertTrue("Fehler[2] in toRecoder(org.key_project.common.core.services.ProgramElement)", null==mapping.toRecoder(kp2));
+       Assert.assertTrue("Fehler[2] in toRecoder(org.key_project.common.core.services.ModelElement)", rm.equals(mapping.toRecoder(km)));
+//        Assert.assertTrue("Fehler[4] in toRecoder(org.key_project.common.core.services.ModelElement)", null==mapping.toRecoder(km2));
     }
 
 

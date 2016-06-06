@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.Sort;
 
 
 public class IdDeclaration {

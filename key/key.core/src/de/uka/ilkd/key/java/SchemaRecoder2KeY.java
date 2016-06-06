@@ -171,7 +171,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     /**
      * there is no need to parse special classes in this case, so
      * this is empty
-     * @see de.uka.ilkd.key.java.Recoder2KeY#parseSpecialClasses()
+     * @see org.key_project.common.core.services.Recoder2KeY#parseSpecialClasses()
      */
     public void parseSpecialClasses() {
     }

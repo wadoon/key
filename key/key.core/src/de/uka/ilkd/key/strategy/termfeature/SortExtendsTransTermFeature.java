@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.strategy.termfeature;
 
+import org.key_project.common.core.logic.sort.Sort;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**

@@ -13,12 +13,12 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.SortedOperator;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 public class TermCreationException extends RuntimeException {
     private static final long serialVersionUID = 1L;

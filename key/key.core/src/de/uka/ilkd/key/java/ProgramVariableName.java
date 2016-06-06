@@ -27,7 +27,7 @@ public interface ProgramVariableName
 
 //     public void prettyPrint(PrettyPrinter w) throws java.io.IOException;
 
-//     public void visit(de.uka.ilkd.key.java.Visitor v);
+//     public void visit(org.key_project.common.core.services.Visitor v);
 
 //     public Position getStartPosition();
 

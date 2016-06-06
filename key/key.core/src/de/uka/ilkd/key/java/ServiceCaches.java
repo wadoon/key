@@ -16,12 +16,12 @@ package de.uka.ilkd.key.java;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
@@ -109,7 +109,7 @@ public class ServiceCaches {
    private final Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph> (1000);
 
    /**
-    * Cache used by the TermFactory to avoid unnecessary creation of terms
+    * Cache used by the GenericTermFactory to avoid unnecessary creation of terms
     */
    private final Map<Term, Term> termCache = new LRUCache<Term, Term>(20000);
 

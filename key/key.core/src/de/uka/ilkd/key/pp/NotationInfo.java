@@ -16,14 +16,18 @@ package de.uka.ilkd.key.pp;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.common.core.logic.sort.Sort;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
 
@@ -31,7 +35,7 @@ import de.uka.ilkd.key.util.UnicodeHelper;
  * <p> 
  * Stores the mapping from operators to {@link Notation}s.  Each 
  * {@link Notation} represents the concrete syntax for some 
- * {@link de.uka.ilkd.key.logic.op.Operator}.  The {@link LogicPrinter}
+ * {@link org.key_project.common.core.logic.op.Operator}.  The {@link LogicPrinter}
  * asks the NotationInfo to find out which Notation to use for a given term.
  * <p>
  * The Notation associated with an operator might change.  New Notations can

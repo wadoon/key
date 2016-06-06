@@ -14,12 +14,13 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SVSubstitute;
+import org.key_project.common.core.services.TermServices;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;

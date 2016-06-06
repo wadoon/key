@@ -22,6 +22,8 @@ import java.util.LinkedList;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -179,7 +181,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -187,7 +188,7 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -640,7 +641,7 @@ public class Recoder2KeYConverter {
      *
      * @param pe
      *            the recoder.java.ProgramElement to be converted
-     * @return the converted de.uka.ilkd.key.java.JavaProgramElement, null if
+     * @return the converted org.key_project.common.core.services.JavaProgramElement, null if
      *         there has been an exception
      */
     public ProgramElement convert(recoder.java.JavaProgramElement pe) {
@@ -1145,7 +1146,7 @@ public class Recoder2KeYConverter {
 
         final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         Sort heapSort = heapLDT == null
-                            ? Sort.ANY
+                            ? SortImpl.ANY
                             : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         IProgramMethod result
@@ -1171,7 +1172,7 @@ public class Recoder2KeYConverter {
         recoder.abstraction.ClassType cont = dc.getContainingClassType();
         final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         Sort heapSort = heapLDT == null
-                            ? Sort.ANY
+                            ? SortImpl.ANY
                             : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         IProgramMethod result = new ProgramMethod(consDecl,
@@ -1315,7 +1316,7 @@ public class Recoder2KeYConverter {
 
             final HeapLDT heapLDT = services.getTheories().getHeapLDT();
             Sort heapSort = heapLDT == null
-                            ? Sort.ANY
+                            ? SortImpl.ANY
                             : heapLDT.targetSort();
             final KeYJavaType containerType = getKeYJavaType(cont);
             assert containerType != null;

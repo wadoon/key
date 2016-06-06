@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,23 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
-
-import org.key_project.util.collection.ImmutableArray;
+package org.key_project.common.core.logic;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 
-/**
- * Operator with well-defined argument and result sorts.
- *
- * @author Dominic Scheurer
- */
-public interface SortedOperator extends Operator {
+public interface Sorted {
 
-    Sort sort();
-
-    Sort argSort(int i);
-
-    ImmutableArray<Sort> argSorts();
+    public Sort sort();
 
 }

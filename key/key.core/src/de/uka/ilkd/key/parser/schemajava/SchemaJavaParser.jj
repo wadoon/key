@@ -46,11 +46,11 @@ import recoder.io.*;
 
 import recoder.abstraction.TypeArgument.WildcardMode;
 
-import de.uka.ilkd.key.java.recoderext.*;
-import de.uka.ilkd.key.java.recoderext.adt.*;
+import org.key_project.common.core.services.recoderext.*;
+import org.key_project.common.core.services.recoderext.adt.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 /**

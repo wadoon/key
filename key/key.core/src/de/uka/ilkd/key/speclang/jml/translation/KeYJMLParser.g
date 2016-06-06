@@ -13,13 +13,13 @@ options {
     import org.key_project.common.core.logic.*;
 
     import org.key_project.util.collection.*;
-    import de.uka.ilkd.key.java.JavaInfo;
-    import de.uka.ilkd.key.java.Position;
-    import de.uka.ilkd.key.java.Services;
-    import de.uka.ilkd.key.java.abstraction.*;
-    import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-    import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-    import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+    import org.key_project.common.core.services.JavaInfo;
+    import org.key_project.common.core.services.Position;
+    import org.key_project.common.core.services.Services;
+    import org.key_project.common.core.services.abstraction.*;
+    import org.key_project.common.core.services.expression.literal.StringLiteral;
+    import org.key_project.common.core.services.expression.literal.CharLiteral;
+    import org.key_project.common.core.services.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.op.*;

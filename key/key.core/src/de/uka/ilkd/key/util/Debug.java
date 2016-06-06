@@ -36,7 +36,7 @@ public final class Debug implements DebugMBean {
      * output.
      * 
      * For example:
-     *    runProver -Dkey.debug.prefix=de.uka.ilkd.key.java,de.uka.ilkd.key.proof.ProblemLoader
+     *    runProver -Dkey.debug.prefix=org.key_project.common.core.services,de.uka.ilkd.key.proof.ProblemLoader
      *    
      * will display all debug outputs either coming from package de...java
      * (or any subpackage) or from the class ProblemLoader.

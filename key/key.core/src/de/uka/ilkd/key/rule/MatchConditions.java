@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+
 import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 

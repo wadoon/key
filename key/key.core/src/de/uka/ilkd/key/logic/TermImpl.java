@@ -16,16 +16,19 @@ package de.uka.ilkd.key.logic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Visitor;
+import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
- * The currently only class implementing the Term interface. TermFactory should
+ * The currently only class implementing the Term interface. GenericTermFactory should
  * be the only class dealing directly with the TermImpl class.
  */
 class TermImpl implements Term {

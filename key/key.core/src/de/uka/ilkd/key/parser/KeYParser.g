@@ -84,17 +84,17 @@ options {
 
   import de.uka.ilkd.key.util.*;
 
-  import de.uka.ilkd.key.java.JavaInfo;
-  import de.uka.ilkd.key.java.Services;
-  import de.uka.ilkd.key.java.JavaReader;
-  import de.uka.ilkd.key.java.SchemaJavaReader;
-  import de.uka.ilkd.key.java.abstraction.*;
-  import de.uka.ilkd.key.java.visitor.*;
-  import de.uka.ilkd.key.java.Recoder2KeY;
-  import de.uka.ilkd.key.java.SchemaRecoder2KeY;
-  import de.uka.ilkd.key.java.StatementBlock;
-  import de.uka.ilkd.key.java.declaration.VariableDeclaration;
-  import de.uka.ilkd.key.java.recoderext.*;
+  import org.key_project.common.core.services.JavaInfo;
+  import org.key_project.common.core.services.Services;
+  import org.key_project.common.core.services.JavaReader;
+  import org.key_project.common.core.services.SchemaJavaReader;
+  import org.key_project.common.core.services.abstraction.*;
+  import org.key_project.common.core.services.visitor.*;
+  import org.key_project.common.core.services.Recoder2KeY;
+  import org.key_project.common.core.services.SchemaRecoder2KeY;
+  import org.key_project.common.core.services.StatementBlock;
+  import org.key_project.common.core.services.declaration.VariableDeclaration;
+  import org.key_project.common.core.services.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
   
@@ -1035,13 +1035,13 @@ options {
             }else{
                 sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), s);
             }
-        } catch (de.uka.ilkd.key.java.PosConvertException e) {
+        } catch (org.key_project.common.core.services.PosConvertException e) {
             lineOffset=e.getLine()-1;
             colOffset=e.getColumn()+1;
             throw new RecognitionException(input);
             //throw new JavaParserException(e.getMessage(), t.getText(), 
             //    getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset);
-        } catch (de.uka.ilkd.key.java.ConvertException e) { 
+        } catch (org.key_project.common.core.services.ConvertException e) { 
             if (e.parseException()!=null
             &&  e.parseException().currentToken != null
             &&  e.parseException().currentToken.next != null) {               
@@ -3117,7 +3117,7 @@ atom returns [Term _atom = null]
     |   literal=STRING_LITERAL
         {
             String s = unescapeString(literal.getText());
-            a = getServices().getProgramServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(s));
+            a = getServices().getProgramServices().getTypeConverter().convertToLogicElement(new org.key_project.common.core.services.expression.literal.StringLiteral(s));
         }   
     ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = getServices().getTermBuilder().addLabel(a, labels);} } RGUILLEMETS)?
     ;

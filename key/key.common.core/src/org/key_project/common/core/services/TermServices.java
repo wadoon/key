@@ -11,7 +11,16 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.services;
+
+import org.key_project.common.core.logic.GenericNamespaceSet;
+import org.key_project.common.core.logic.GenericTermBuilder;
+import org.key_project.common.core.logic.GenericTermFactory;
+
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 
 /**
  * This interface defines the basic functionalities of services
@@ -24,18 +33,18 @@ public interface TermServices {
      * returns the namespaces for functions, predicates etc.
      * @return the proof specific namespaces
      */
-    public abstract NamespaceSet getNamespaces();
+    public abstract GenericNamespaceSet getNamespaces();
 
     /**
-     * Returns the {@link TermBuilder} used to create {@link Term}s.
-     * @return The {@link TermBuilder} used to create {@link Term}s.
+     * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
+     * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
-    public abstract TermBuilder getTermBuilder();
+    public abstract GenericTermBuilder getTermBuilder();
 
     /**
-     * Returns the {@link TermBuilder} used to create {@link Term}s.
-     * @return The {@link TermBuilder} used to create {@link Term}s.
+     * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
+     * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
-    public abstract TermFactory getTermFactory();
+    public abstract GenericTermFactory getTermFactory();
 
 }

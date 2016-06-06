@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.strategy.termfeature;
 
+import org.key_project.common.core.logic.op.Operator;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 
 /**
  * Term feature for checking whether the top operator of a term is

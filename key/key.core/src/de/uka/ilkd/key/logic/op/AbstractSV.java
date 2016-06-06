@@ -14,9 +14,9 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.AbstractSortedOperator;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * TODO: Document.

@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.services.TermServices;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.TermServices;
 
 
 /**
@@ -33,7 +34,7 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
     }
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.NoPosTacletApp#setupMatchConditions(de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.Constraint)
+     * @see de.uka.ilkd.key.rule.NoPosTacletApp#setupMatchConditions(de.uka.ilkd.key.logic.PosInOccurrence, org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.Constraint)
      */
     @Override
     protected MatchConditions setupMatchConditions (PosInOccurrence pos,

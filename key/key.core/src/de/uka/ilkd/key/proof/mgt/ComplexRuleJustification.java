@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import de.uka.ilkd.key.logic.TermServices;
+import org.key_project.common.core.services.TermServices;
+
 import de.uka.ilkd.key.rule.RuleApp;
 
 public interface ComplexRuleJustification extends RuleJustification {

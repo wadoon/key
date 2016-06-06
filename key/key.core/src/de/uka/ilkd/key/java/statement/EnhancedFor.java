@@ -75,15 +75,15 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
     }
 
     /**
-     * @see de.uka.ilkd.key.java.statement.For#getLastElement()
-     * @see de.uka.ilkd.key.java.JavaSourceElement#getLastElement()
+     * @see org.key_project.common.core.services.statement.For#getLastElement()
+     * @see org.key_project.common.core.services.JavaSourceElement#getLastElement()
      */
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
     }
 
     /**
-     * @see de.uka.ilkd.key.java.statement.For#isCheckedBeforeIteration
+     * @see org.key_project.common.core.services.statement.For#isCheckedBeforeIteration
      * @see recoder.java.statement.LoopStatement#isCheckedBeforeIteration()
      */
     public boolean isCheckedBeforeIteration() {

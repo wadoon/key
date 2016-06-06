@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.rule.inst;
 
+import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 
 public class ProgramList implements SVSubstitute {
 
