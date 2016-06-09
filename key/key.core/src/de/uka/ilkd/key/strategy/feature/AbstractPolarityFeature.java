@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -44,7 +44,7 @@ public abstract class AbstractPolarityFeature {
         final PIOPathIterator it = pos.iterator ();
 
         while ( it.next () != -1 ) {
-            final Term t = it.getSubTerm ();
+            final JavaDLTerm t = it.getSubTerm ();
             final Operator op = t.op ();
 
             if ( op == Junctor.NOT || op == Junctor.IMP && it.getChild () == 0 )

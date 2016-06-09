@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -42,8 +42,8 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                  LocationVariable heap, OriginalVariables origVars,
-                                 Condition requires, Term assignable, Term accessible,
-                                 Condition ensures, Term mby, Term rep, ClassInvariant inv,
+                                 Condition requires, JavaDLTerm assignable, JavaDLTerm accessible,
+                                 Condition ensures, JavaDLTerm mby, JavaDLTerm rep, ClassInvariant inv,
                                  TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
               assignable, accessible, ensures, mby, rep, tb);
@@ -51,7 +51,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target,
-                                Term accessible, Term mby, Services services) {
+                                JavaDLTerm accessible, JavaDLTerm mby, Services services) {
         super(inv.getKJT().getFullName() + "." + "JML class invariant", 0, target,
               inv.getOrigVars(), Type.CLASS_INVARIANT, services);
         assert inv != null;
@@ -69,7 +69,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    ImmutableList<Term> getRest() {
+    ImmutableList<JavaDLTerm> getRest() {
         return super.getRest();
     }
 
@@ -89,15 +89,15 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
                 SchemaVariableFactory.createTermSV(new Name("h"), heap.sort());
         final SchemaVariable sv =
                 SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
-        final Term var = TB.var(sv);
-        final Term wdSelf = TB.wd(var);
-        final Term[] heaps = new Term[] {TB.var(heapSV)};
-        final Term staticInvTerm = TB.staticInv(heaps, kjt);
-        final Term invTerm = TB.inv(heaps, var);
-        final Term wdHeaps = TB.and(TB.wd(heaps));
-        final Term wellFormed = TB.wellFormed(TB.var(heapSV));
-        final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
-        final Term staticPre = TB.and(wdHeaps, wellFormed);
+        final JavaDLTerm var = TB.var(sv);
+        final JavaDLTerm wdSelf = TB.wd(var);
+        final JavaDLTerm[] heaps = new JavaDLTerm[] {TB.var(heapSV)};
+        final JavaDLTerm staticInvTerm = TB.staticInv(heaps, kjt);
+        final JavaDLTerm invTerm = TB.inv(heaps, var);
+        final JavaDLTerm wdHeaps = TB.and(TB.wd(heaps));
+        final JavaDLTerm wellFormed = TB.wellFormed(TB.var(heapSV));
+        final JavaDLTerm pre = TB.and(wdSelf, wdHeaps, wellFormed);
+        final JavaDLTerm staticPre = TB.and(wdHeaps, wellFormed);
         final RewriteTaclet inv =
                 WellDefinednessCheck.createTaclet(prefix, var, invTerm, pre, false, services);
         final RewriteTaclet staticInv =
@@ -110,7 +110,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return this.inv;
     }
 
-    public final void addInv(Term inv) {
+    public final void addInv(JavaDLTerm inv) {
         addRequires(inv);
         addEnsures(inv);
     }
@@ -171,12 +171,12 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public Term getGlobalDefs() {
+    public JavaDLTerm getGlobalDefs() {
         return null;
     }
 
     @Override
-    public Term getAxiom() {
+    public JavaDLTerm getAxiom() {
         return null;
     }
 }

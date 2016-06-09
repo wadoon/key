@@ -37,7 +37,7 @@ public class LabeledTermImplTest extends TestCase {
         }
     
 	public void testEqualsLabelOnTop() {
-                Term unlabeledTerm = 
+                JavaDLTerm unlabeledTerm = 
 				tf.createTerm(Junctor.AND, 
 						tf.createTerm(Junctor.TRUE), 
 						tf.createTerm(Junctor.FALSE));
@@ -45,7 +45,7 @@ public class LabeledTermImplTest extends TestCase {
 		ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>(
 		      ParameterlessTermLabel.ANON_HEAP_LABEL);
 		
-		Term labeledTerm = 
+		JavaDLTerm labeledTerm = 
 				tf.createTerm(Junctor.AND, 
 						tf.createTerm(Junctor.TRUE), 
 						tf.createTerm(Junctor.FALSE), labels);
@@ -55,17 +55,17 @@ public class LabeledTermImplTest extends TestCase {
 	}
 
 	/**
-	 * Tests {@link Term#hasLabels()}, {@link Term#hasLabels()} and
-	 * {@link Term#containsLabel(TermLabel)}.
+	 * Tests {@link JavaDLTerm#hasLabels()}, {@link JavaDLTerm#hasLabels()} and
+	 * {@link JavaDLTerm#containsLabel(TermLabel)}.
 	 */
 	public void testGetHasAndContainsLabels() {
 	   // Create terms
-	   Term unlabled = services.getTermBuilder().tt();
+	   JavaDLTerm unlabled = services.getTermBuilder().tt();
 	   SymbolicExecutionTermLabel sedLabel = new SymbolicExecutionTermLabel(1);
 	   SymbolicExecutionTermLabel anotherSedLabel = new SymbolicExecutionTermLabel(2);
-	   Term oneLabel = services.getTermBuilder().label(unlabled, sedLabel);
-	   Term oneLabelChanged = services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
-	   Term twoLabels = services.getTermBuilder().label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
+	   JavaDLTerm oneLabel = services.getTermBuilder().label(unlabled, sedLabel);
+	   JavaDLTerm oneLabelChanged = services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
+	   JavaDLTerm twoLabels = services.getTermBuilder().label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
 	   // Test unlabled
 	   assertFalse(unlabled.hasLabels());
 	   assertNotNull(unlabled.getLabels());

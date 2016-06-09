@@ -40,7 +40,7 @@ import de.uka.ilkd.key.java.statement.SynchronizedBlock;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -130,9 +130,9 @@ public abstract class TacletIndex  {
     
     private static Object getIndexObj(FindTaclet tac) {
 	Object indexObj;
-	final Term indexTerm = tac.find();
-	if (!indexTerm.javaBlock().isEmpty()) {
-	    final JavaProgramElement prg = indexTerm.javaBlock().program();
+	final JavaDLTerm indexTerm = tac.find();
+	if (!indexTerm.modalContent().isEmpty()) {
+	    final JavaProgramElement prg = indexTerm.modalContent().program();
 	    indexObj = ((StatementBlock)prg).getStatementAt(0);                
             if (!(indexObj instanceof SchemaVariable)) {
 		indexObj=indexObj.getClass();       
@@ -373,20 +373,20 @@ public abstract class TacletIndex  {
     @SuppressWarnings("deprecation")
     private ImmutableList<NoPosTacletApp> getListHelp(
 	    	HashMap<Object, ImmutableList<NoPosTacletApp>> map, 
-	    	Term term,
+	    	JavaDLTerm term,
 	    	boolean ignoreUpdates) {
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 		
 	assert !(term.op() instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";
 
-	if (!term.javaBlock().isEmpty()) {
+	if (!term.modalContent().isEmpty()) {
 	    prefixOccurrences.reset();
-	    StatementBlock sb=(StatementBlock)term.javaBlock().program();
+	    StatementBlock sb=(StatementBlock)term.modalContent().program();
 	    result = getJavaTacletList(map, sb.getStatementAt(0),
 				       prefixOccurrences);
 	} 
 
-	if ( !term.javaBlock().isEmpty() ||
+	if ( !term.modalContent().isEmpty() ||
 	     term.op () instanceof ProgramVariable ) {
 	    ImmutableList<NoPosTacletApp> schemaList=map.get(DEFAULT_PROGSV_KEY);
 	    if (schemaList!=null) {
@@ -451,7 +451,7 @@ public abstract class TacletIndex  {
      * @param term the term that is used to find the selection
      */
     private ImmutableList<NoPosTacletApp> getList(HashMap<Object, ImmutableList<NoPosTacletApp>> map, 
-	    				 Term term,
+	    				 JavaDLTerm term,
 	    				 boolean ignoreUpdates) {
 	return getListHelp(map, term, ignoreUpdates);
     }

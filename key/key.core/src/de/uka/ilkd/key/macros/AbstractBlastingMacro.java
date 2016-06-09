@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.SortCollector;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -126,7 +126,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
 
             LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
-            Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
+            JavaDLTerm exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
             for(ClassAxiom c : spec.getClassAxioms(kjt)){
 
                 if(c instanceof RepresentsAxiom && c.getKJT().equals(kjt)){
@@ -134,27 +134,27 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
                     try{
 
-                        Term t = ra.getAxiom(h, o, services);
+                        JavaDLTerm t = ra.getAxiom(h, o, services);
                         //System.err.println(c.getName());
                         if(t.op().equals(Equality.EQV)){
 
-                            Term left = t.sub(0);
-                            Term right = t.sub(1);
+                            JavaDLTerm left = t.sub(0);
+                            JavaDLTerm right = t.sub(1);
 
-                            Term equivalence = t;
-                            Term implication;
+                            JavaDLTerm equivalence = t;
+                            JavaDLTerm implication;
 
-                            Term[] heaps = new Term[1];
+                            JavaDLTerm[] heaps = new JavaDLTerm[1];
                             heaps[0] = tb.var(h);
 
-                            Term inv = tb.inv(heaps, tb.var(o));
+                            JavaDLTerm inv = tb.inv(heaps, tb.var(o));
 
                             if(left.op().name().equals(inv.op().name())){
 
                                 implication = tb.imp(left, right);
 
-                                Term exactInstanceEquiv = tb.imp(exactInstance, equivalence);
-                                Term instanceImpl = implication;
+                                JavaDLTerm exactInstanceEquiv = tb.imp(exactInstance, equivalence);
+                                JavaDLTerm instanceImpl = implication;
 
                                 exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                                 instanceImpl = tb.all(h, tb.all(o, instanceImpl));
@@ -167,9 +167,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                             }
                             else if(right.op().name().equals(inv.op().name())){
 
-                                Term exactInstanceEquiv = tb.imp(exactInstance, equivalence);
+                                JavaDLTerm exactInstanceEquiv = tb.imp(exactInstance, equivalence);
                                 implication = tb.imp(right, left);
-                                Term instanceImpl = implication;
+                                JavaDLTerm instanceImpl = implication;
 
                                 exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                                 instanceImpl = tb.all(h, tb.all(o, instanceImpl));
@@ -182,13 +182,13 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
                             }
                             else{
-                                Term f = t;
+                                JavaDLTerm f = t;
                                 f = tb.all(h, tb.all(o, f));                            
                                 result.add(new SequentFormula(f));
                             }
                         }
                         else{
-                            Term f = t;
+                            JavaDLTerm f = t;
                             f = tb.all(h, tb.all(o, f));                            
                             result.add(new SequentFormula(f));
                         }
@@ -232,7 +232,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 return NumberRuleAppCost.create(10);
             }
             else if(app.rule().name().toString().equals("pullOut")){
-                Term t = pio.subTerm();
+                JavaDLTerm t = pio.subTerm();
 
                 //System.out.println(t);
 

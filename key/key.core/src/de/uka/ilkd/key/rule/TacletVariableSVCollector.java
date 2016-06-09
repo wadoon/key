@@ -15,7 +15,7 @@ package de.uka.ilkd.key.rule;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /** This class is used to collect all appearing SchemaVariables that are bound in a
  * Taclet. Duplicates are not removed becaues the use of persistent
@@ -27,11 +27,11 @@ public class TacletVariableSVCollector extends TacletSchemaVariableCollector {
 
     /**
      * visits term t in post order 
-     * ({@link Term#execPostOrder(de.uka.ilkd.key.logic.Visitor)})
+     * ({@link JavaDLTerm#execPostOrder(de.uka.ilkd.key.logic.Visitor)})
      * and collects all bound schema variables 
-     * @param t the Term to be visited (<code>t</code> must not be <code>null</code>  
+     * @param t the JavaDLTerm to be visited (<code>t</code> must not be <code>null</code>  
      */  
-    public void visit(Term t) {
+    public void visit(JavaDLTerm t) {
 	for (int j=0; j<t.arity(); j++) {
 	    for (int i=0;i<t.varsBoundHere(j).size();i++) {
 		QuantifiableVariable boundVar = t.varsBoundHere(j).

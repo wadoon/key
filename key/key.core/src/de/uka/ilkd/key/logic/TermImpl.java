@@ -15,27 +15,32 @@ package de.uka.ilkd.key.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Visitor;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
- * The currently only class implementing the Term interface. GenericTermFactory should
+ * The currently only class implementing the JavaDLTerm interface. GenericTermFactory should
  * be the only class dealing directly with the TermImpl class.
  */
-class TermImpl implements Term {
+class TermImpl implements JavaDLTerm {
 
-    private static final ImmutableArray<Term> EMPTY_TERM_LIST =
-            new ImmutableArray<Term>();
+    private static final ImmutableArray<JavaDLTerm> EMPTY_TERM_LIST =
+            new ImmutableArray<JavaDLTerm>();
 
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST =
             new ImmutableArray<QuantifiableVariable>();
@@ -49,7 +54,7 @@ class TermImpl implements Term {
     // content
     private final Operator op;
     private final Sort sort;
-    private final ImmutableArray<Term> subs;
+    private final ImmutableArray<JavaDLTerm> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
     private final JavaBlock javaBlock;
 
@@ -64,8 +69,8 @@ class TermImpl implements Term {
     private int hashcode = -1;
 
     /**
-     * This flag indicates that the {@link Term} itself or one of its children
-     * contains a non empty {@link JavaBlock}. {@link Term}s which provides a
+     * This flag indicates that the {@link JavaDLTerm} itself or one of its children
+     * contains a non empty {@link JavaBlock}. {@link JavaDLTerm}s which provides a
      * {@link JavaBlock} directly or indirectly can't be cached because it is
      * possible that the contained meta information inside the {@link JavaBlock}
      * , e.g. {@link PositionInfo}s, are different.
@@ -77,7 +82,7 @@ class TermImpl implements Term {
     // constructors
     // -------------------------------------------------------------------------
 
-    public TermImpl(Operator op, Sort sort, ImmutableArray<Term> subs,
+    public TermImpl(Operator op, Sort sort, ImmutableArray<JavaDLTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
         assert op != null;
         assert subs != null;
@@ -129,12 +134,12 @@ class TermImpl implements Term {
     }
 
     @Override
-    public ImmutableArray<Term> subs() {
+    public ImmutableArray<JavaDLTerm> subs() {
         return subs;
     }
 
     @Override
-    public Term sub(int nr) {
+    public JavaDLTerm sub(int nr) {
         return subs.get(nr);
     }
 
@@ -149,7 +154,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public JavaBlock javaBlock() {
+    public JavaBlock modalContent() {
         return javaBlock;
     }
 
@@ -206,7 +211,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public void execPostOrder(Visitor visitor) {
+    public void execPostOrder(JavaDLVisitor visitor) {
         visitor.subtreeEntered(this);
         if (visitor.visitSubtree(this)) {
             for (int i = 0, ar = arity(); i < ar; i++) {
@@ -218,7 +223,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public void execPreOrder(Visitor visitor) {
+    public void execPreOrder(JavaDLVisitor visitor) {
         visitor.subtreeEntered(this);
         visitor.visit(this);
         if (visitor.visitSubtree(this)) {
@@ -229,8 +234,10 @@ class TermImpl implements Term {
         visitor.subtreeLeft(this);
     }
 
+    
+
     @Override
-    public final boolean equalsModRenaming(Term o) {
+    public <T extends GenericTerm<JavaDLVisitor>> boolean equalsModRenaming(T o) {
         if (o == this) {
             return true;
         }
@@ -304,7 +311,7 @@ class TermImpl implements Term {
      * @return <code>true</code> is returned iff the terms are equal modulo
      *         bound renaming
      */
-    private boolean unifyHelp(Term t0, Term t1,
+    private boolean unifyHelp(GenericTerm<JavaDLVisitor> t0, GenericTerm<JavaDLVisitor> t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
             NameAbstractionTable nat) {
@@ -338,7 +345,7 @@ class TermImpl implements Term {
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
     }
 
-    private boolean handleQuantifiableVariable(Term t0, Term t1,
+    private boolean handleQuantifiableVariable(GenericTerm<JavaDLVisitor> t0, GenericTerm<JavaDLVisitor> t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars) {
         if (!((t1.op() instanceof QuantifiableVariable) && compareBoundVariables(
@@ -355,12 +362,12 @@ class TermImpl implements Term {
      */
     private static NameAbstractionTable FAILED = new NameAbstractionTable();
 
-    private static NameAbstractionTable handleJava(Term t0, Term t1,
+    private static NameAbstractionTable handleJava(GenericTerm<JavaDLVisitor> t0, GenericTerm<JavaDLVisitor> t1,
             NameAbstractionTable nat) {
 
-        if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
+        if (!t0.modalContent().isEmpty() || !t1.modalContent().isEmpty()) {
             nat = checkNat(nat);
-            if (!t0.javaBlock().equalsModRenaming(t1.javaBlock(), nat)) {
+            if (!t0.modalContent().equalsModRenaming(t1.modalContent(), nat)) {
                 return FAILED;
             }
         }
@@ -380,7 +387,7 @@ class TermImpl implements Term {
         return nat;
     }
 
-    private boolean descendRecursively(Term t0, Term t1,
+    private boolean descendRecursively(GenericTerm<JavaDLVisitor> t0, GenericTerm<JavaDLVisitor> t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
             NameAbstractionTable nat) {
@@ -463,7 +470,7 @@ class TermImpl implements Term {
         hashcode = hashcode * 17 + op().hashCode();
         hashcode = hashcode * 17 + subs().hashCode();
         hashcode = hashcode * 17 + boundVars().hashCode();
-        hashcode = hashcode * 17 + javaBlock().hashCode();
+        hashcode = hashcode * 17 + modalContent().hashCode();
 
         if (hashcode == -1) {
             hashcode = 0;
@@ -547,7 +554,7 @@ class TermImpl implements Term {
      * {@inheritDoc}
      */
     @Override
-    public boolean isContainsJavaBlockRecursive() {
+    public boolean containsModalContentRecursive() {
         if (containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN) {
             ThreeValuedTruth result = ThreeValuedTruth.FALSE;
             if (javaBlock != null && !javaBlock.isEmpty()) {
@@ -555,7 +562,7 @@ class TermImpl implements Term {
             }
             else {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {
-                    if (subs.get(i).isContainsJavaBlockRecursive()) {
+                    if (subs.get(i).containsModalContentRecursive()) {
                         result = ThreeValuedTruth.TRUE;
                         break;
                     }
@@ -565,4 +572,5 @@ class TermImpl implements Term {
         }
         return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
     }
+
 }

@@ -32,7 +32,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 
@@ -120,17 +120,17 @@ public final class SeqLDT extends LDT {
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                                 Term[] subs, 
+                                 JavaDLTerm[] subs, 
                                  Services services, 
                                  ExecutionContext ec) {
-	return isResponsible(op, (Term)null, services, ec);
+	return isResponsible(op, (JavaDLTerm)null, services, ec);
     }
     
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                		 Term left, 
-                		 Term right, 
+                		 JavaDLTerm left, 
+                		 JavaDLTerm right, 
                 		 Services services, 
                 		 ExecutionContext ec) {
 	return false;
@@ -139,7 +139,7 @@ public final class SeqLDT extends LDT {
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	    			 Term sub, 
+	    			 JavaDLTerm sub, 
 	    			 TermServices services, 
 	    			 ExecutionContext ec) {
 	return op instanceof SeqSingleton
@@ -153,7 +153,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JavaDLTerm translateLiteral(Literal lit, Services services) {
 	assert lit instanceof EmptySeqLiteral;
 	return services.getTermBuilder().func(seqEmpty);
     }
@@ -190,7 +190,7 @@ public final class SeqLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
 	if(t.op().equals(seqEmpty)) {
 	    return EmptySeqLiteral.INSTANCE;
 	}
@@ -200,7 +200,7 @@ public final class SeqLDT extends LDT {
     
     
     @Override
-    public final Type getType(Term t) {
+    public final Type getType(JavaDLTerm t) {
 	assert false;
 	return null;
     }

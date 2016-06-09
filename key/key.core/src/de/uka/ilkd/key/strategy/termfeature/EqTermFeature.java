@@ -14,11 +14,11 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 
 /**
- * Term feature for testing equality of two terms. The feature returns zero iff
+ * JavaDLTerm feature for testing equality of two terms. The feature returns zero iff
  * it is invoked on a term that is equal to the current value of
  * <code>pattern</code>.
  * 
@@ -38,7 +38,7 @@ public class EqTermFeature extends BinaryTermFeature {
         this.pattern = pattern;
     }
     
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(JavaDLTerm term, Services services) {
         return term.equalsModRenaming( pattern.getContent () );
     }
 }

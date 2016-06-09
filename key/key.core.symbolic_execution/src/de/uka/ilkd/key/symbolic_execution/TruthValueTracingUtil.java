@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -67,11 +67,11 @@ public final class TruthValueTracingUtil {
    }
    
    /**
-    * Checks if the given {@link Term} is a predicate.
-    * @param term The {@link Term} to check.
+    * Checks if the given {@link JavaDLTerm} is a predicate.
+    * @param term The {@link JavaDLTerm} to check.
     * @return {@code true} is predicate, {@code false} is something else.
     */
-   public static boolean isPredicate(Term term) {
+   public static boolean isPredicate(JavaDLTerm term) {
       return term != null ? 
              isPredicate(term.op()) : 
              false;
@@ -105,11 +105,11 @@ public final class TruthValueTracingUtil {
    }
    
    /**
-    * Checks if the given {@link Term} is a logical operator
-    * @param operator The {@link Term} to check.
+    * Checks if the given {@link JavaDLTerm} is a logical operator
+    * @param operator The {@link JavaDLTerm} to check.
     * @return {@code true} is logical operator, {@code false} is something else.
     */
-   public static boolean isLogicOperator(Term term) {
+   public static boolean isLogicOperator(JavaDLTerm term) {
       if (term != null) {
          return isLogicOperator(term.op(), term.subs());
       }
@@ -119,12 +119,12 @@ public final class TruthValueTracingUtil {
    }
    
    /**
-    * Checks if the given {@link Operator} and its sub {@link Term}s specify a logical operator.
+    * Checks if the given {@link Operator} and its sub {@link JavaDLTerm}s specify a logical operator.
     * @param operator The {@link Operator}.
-    * @param subs The sub {@link Term}s.
+    * @param subs The sub {@link JavaDLTerm}s.
     * @return {@code true} is logical operator, {@code false} is something else.
     */
-   public static boolean isLogicOperator(Operator operator, ImmutableArray<Term> subs) {
+   public static boolean isLogicOperator(Operator operator, ImmutableArray<JavaDLTerm> subs) {
       if (operator instanceof Junctor) {
          return operator != Junctor.TRUE && operator != Junctor.FALSE;
       }
@@ -140,11 +140,11 @@ public final class TruthValueTracingUtil {
    }
 
    /**
-    * Checks if the given {@link Term} is an if-then-else formula.
-    * @param term The {@link Term} to check.
+    * Checks if the given {@link JavaDLTerm} is an if-then-else formula.
+    * @param term The {@link JavaDLTerm} to check.
     * @return {@code true} is if-then-else formula, {@code false} is something else.
     */
-   public static boolean isIfThenElseFormula(Term term) {
+   public static boolean isIfThenElseFormula(JavaDLTerm term) {
       if (term != null) {
          return isIfThenElseFormula(term.op(), term.subs());
       }
@@ -154,12 +154,12 @@ public final class TruthValueTracingUtil {
    }
 
    /**
-    * Checks if the given {@link Operator} and its sub {@link Term}s specify an if-then-else formula.
+    * Checks if the given {@link Operator} and its sub {@link JavaDLTerm}s specify an if-then-else formula.
     * @param operator The {@link Operator}.
-    * @param subs The sub {@link Term}s.
+    * @param subs The sub {@link JavaDLTerm}s.
     * @return {@code true} is if-then-else formula, {@code false} is something else.
     */
-   public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<Term> subs) {
+   public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<JavaDLTerm> subs) {
       if (operator == IfThenElse.IF_THEN_ELSE) {
          Sort sort = TypeCheckingAndInferenceService.getTypeCheckerFor(operator).sort(subs, operator);
          return sort == Sort.FORMULA;
@@ -267,7 +267,7 @@ public final class TruthValueTracingUtil {
       // Analyze children
       int childCount = node.childrenCount();
       if (childCount == 0) {
-         Term condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, node, false, true);
+         JavaDLTerm condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, node, false, true);
          String conditionString = SymbolicExecutionUtil.formatTerm(condition, services, useUnicode, usePrettyPrinting);
          result.addBranchResult(new BranchResult(node, currentResults, condition, conditionString, termLabelName));
       }
@@ -307,7 +307,7 @@ public final class TruthValueTracingUtil {
       // Search for labels in find part
       PosInOccurrence pio = tacletApp.posInOccurrence();
       if (pio != null) {
-         Term term = pio.subTerm();
+         JavaDLTerm term = pio.subTerm();
          if (term != null) {
             // Check for evaluated truth values
             TermLabel label = term.getLabel(termLabelName);
@@ -320,7 +320,7 @@ public final class TruthValueTracingUtil {
          if (tacletApp.ifInstsComplete() && tacletApp.ifFormulaInstantiations() != null) {
             for (IfFormulaInstantiation ifInst : tacletApp.ifFormulaInstantiations()) {
                assert ifInst instanceof IfFormulaInstSeq;
-               Term term = ifInst.getConstrainedFormula().formula();
+               JavaDLTerm term = ifInst.getConstrainedFormula().formula();
                TermLabel label = term.getLabel(termLabelName);
                if (label instanceof FormulaTermLabel) {
                   result.add(new LabelOccurrence((FormulaTermLabel) label, ((IfFormulaInstSeq) ifInst).inAntec()));
@@ -398,8 +398,8 @@ public final class TruthValueTracingUtil {
                                            Services services,
                                            Map<String, MultiEvaluationResult> results) {
       Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
-      if (replaceObject instanceof Term) {
-         Term replaceTerm = SymbolicExecutionUtil.instantiateTerm(parent, (Term) replaceObject, tacletApp, services);
+      if (replaceObject instanceof JavaDLTerm) {
+         JavaDLTerm replaceTerm = SymbolicExecutionUtil.instantiateTerm(parent, (JavaDLTerm) replaceObject, tacletApp, services);
          if (replaceTerm.op() == Junctor.TRUE) {
             // Find term is replaced by true
             for (LabelOccurrence occurrence : labels) {
@@ -432,7 +432,7 @@ public final class TruthValueTracingUtil {
          // Check application term and all of its children and grand children
          parentPio.subTerm().execPreOrder(new DefaultVisitor() {
             @Override
-            public void visit(Term visited) {
+            public void visit(JavaDLTerm visited) {
                checkForNewMinorIdsOSS(childPio.sequentFormula(), visited, termLabelName, parentPio, tb, results);
             }
          });
@@ -448,21 +448,21 @@ public final class TruthValueTracingUtil {
    /**
     * Checks if new minor IDs are available in case of {@link OneStepSimplifier} usage.
     * @param onlyChangedChildSF The only changed {@link SequentFormula} in the child {@link Node}.
-    * @param term The {@link Term} contained in the child {@link Node} to check.
+    * @param term The {@link JavaDLTerm} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
     * @param tb The {@link GenericTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
-                                                Term term, 
+                                                JavaDLTerm term, 
                                                 Name termLabelName, 
                                                 PosInOccurrence parentPio, 
                                                 TermBuilder tb, 
                                                 Map<String, MultiEvaluationResult> results) {
       TermLabel label = term.getLabel(termLabelName);
       if (label instanceof FormulaTermLabel) {
-         Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (FormulaTermLabel) label, parentPio.isInAntec(), tb);
+         JavaDLTerm replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (FormulaTermLabel) label, parentPio.isInAntec(), tb);
          if (replacement != null) {
             updatePredicateResult((FormulaTermLabel) label, replacement, results);
          }
@@ -475,15 +475,15 @@ public final class TruthValueTracingUtil {
     * @param label The {@link FormulaTermLabel} of interest.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
     * @param tb The {@link GenericTermBuilder} to use.
-    * @return The computed instruction {@link Term} or {@code null} if not available.
+    * @return The computed instruction {@link JavaDLTerm} or {@code null} if not available.
     */
-   protected static Term checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
+   protected static JavaDLTerm checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
                                                 FormulaTermLabel label,
                                                 boolean antecedentRuleApplication,
                                                 TermBuilder tb) {
       // Search replacements
-      List<Term> antecedentReplacements = new LinkedList<Term>();
-      List<Term> succedentReplacements = new LinkedList<Term>();
+      List<JavaDLTerm> antecedentReplacements = new LinkedList<JavaDLTerm>();
+      List<JavaDLTerm> succedentReplacements = new LinkedList<JavaDLTerm>();
       if (antecedentRuleApplication) {
          listLabelReplacements(onlyChangedChildSF, label.name(), label.getId(), antecedentReplacements);
       }
@@ -513,7 +513,7 @@ public final class TruthValueTracingUtil {
             // Check application term and all of its children and grand children
             parentPio.subTerm().execPreOrder(new DefaultVisitor() {
                @Override
-               public void visit(Term visited) {
+               public void visit(JavaDLTerm visited) {
                   checkForNewMinorIds(childNode, visited, termLabelName, parentPio, tb, results);
                }
             });
@@ -539,21 +539,21 @@ public final class TruthValueTracingUtil {
    /**
     * Checks if new minor IDs are available.
     * @param childNode The child {@link Node}.
-    * @param term The {@link Term} contained in the child {@link Node} to check.
+    * @param term The {@link JavaDLTerm} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
     * @param tb The {@link GenericTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIds(Node childNode, 
-                                             Term term, 
+                                             JavaDLTerm term, 
                                              Name termLabelName, 
                                              PosInOccurrence parentPio, 
                                              TermBuilder tb, 
                                              Map<String, MultiEvaluationResult> results) {
       TermLabel label = term.getLabel(termLabelName);
       if (label instanceof FormulaTermLabel) {
-         Term replacement = checkForNewMinorIds(childNode, (FormulaTermLabel) label, parentPio.isInAntec(), tb);
+         JavaDLTerm replacement = checkForNewMinorIds(childNode, (FormulaTermLabel) label, parentPio.isInAntec(), tb);
          if (replacement != null) {
             updatePredicateResult((FormulaTermLabel) label, replacement, results);
          }
@@ -566,15 +566,15 @@ public final class TruthValueTracingUtil {
     * @param label The {@link FormulaTermLabel} of interest.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
     * @param tb The {@link GenericTermBuilder} to use.
-    * @return The computed instruction {@link Term} or {@code null} if not available.
+    * @return The computed instruction {@link JavaDLTerm} or {@code null} if not available.
     */
-   protected static Term checkForNewMinorIds(Node childNode, 
+   protected static JavaDLTerm checkForNewMinorIds(Node childNode, 
                                              FormulaTermLabel label,
                                              boolean antecedentRuleApplication,
                                              TermBuilder tb) {
       // Search replacements
-      List<Term> antecedentReplacements = new LinkedList<Term>();
-      List<Term> succedentReplacements = new LinkedList<Term>();
+      List<JavaDLTerm> antecedentReplacements = new LinkedList<JavaDLTerm>();
+      List<JavaDLTerm> succedentReplacements = new LinkedList<JavaDLTerm>();
       for (SequentFormula sf : childNode.sequent().antecedent()) {
          listLabelReplacements(sf, label.name(), label.getId(), antecedentReplacements);
       }
@@ -595,21 +595,21 @@ public final class TruthValueTracingUtil {
    protected static void listLabelReplacements(final SequentFormula sf, 
                                                final Name labelName,
                                                final String labelId, 
-                                               final List<Term> resultToFill) {
+                                               final List<JavaDLTerm> resultToFill) {
       sf.formula().execPreOrder(new DefaultVisitor() {
          @Override
-         public boolean visitSubtree(Term visited) {
+         public boolean visitSubtree(JavaDLTerm visited) {
             return !hasLabelOfInterest(visited);
          }
          
          @Override
-         public void visit(Term visited) {
+         public void visit(JavaDLTerm visited) {
             if (hasLabelOfInterest(visited)) {
                resultToFill.add(visited);
             }
          }
          
-         protected boolean hasLabelOfInterest(Term visited) {
+         protected boolean hasLabelOfInterest(JavaDLTerm visited) {
             TermLabel visitedLabel = visited.getLabel(labelName);
             if (visitedLabel instanceof FormulaTermLabel) {
                FormulaTermLabel pLabel = (FormulaTermLabel) visitedLabel;
@@ -624,21 +624,21 @@ public final class TruthValueTracingUtil {
    }
    
    /**
-    * Computes the {@link Term} with the instruction how to compute the truth
+    * Computes the {@link JavaDLTerm} with the instruction how to compute the truth
     * value based on the found replacements.
     * @param antecedentReplacements The replacements found in the antecedent.
     * @param succedentReplacements The replacements found in the succedent.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
     * @param tb The {@link GenericTermBuilder} to use.
-    * @return The computed instruction {@link Term} or {@code null} if not available.
+    * @return The computed instruction {@link JavaDLTerm} or {@code null} if not available.
     */
-   protected static Term computeInstructionTerm(List<Term> antecedentReplacements, 
-                                                List<Term> succedentReplacements, 
+   protected static JavaDLTerm computeInstructionTerm(List<JavaDLTerm> antecedentReplacements, 
+                                                List<JavaDLTerm> succedentReplacements, 
                                                 boolean antecedentRuleApplication, 
                                                 TermBuilder tb) {
       if (!antecedentReplacements.isEmpty() || !succedentReplacements.isEmpty()) {
-         Term left = tb.andPreserveLabels(antecedentReplacements);
-         Term right = tb.orPreserveLabels(succedentReplacements);
+         JavaDLTerm left = tb.andPreserveLabels(antecedentReplacements);
+         JavaDLTerm right = tb.orPreserveLabels(succedentReplacements);
          if (antecedentRuleApplication) {
             return tb.andPreserveLabels(left, tb.notPreserveLabels(right));
          }
@@ -652,14 +652,14 @@ public final class TruthValueTracingUtil {
    }
 
    /**
-    * Updates the instruction {@link Term} for the given {@link FormulaTermLabel}
+    * Updates the instruction {@link JavaDLTerm} for the given {@link FormulaTermLabel}
     * in the result {@link Map}.
-    * @param label The {@link FormulaTermLabel} to update its instruction {@link Term}.
-    * @param instructionTerm The new instruction {@link Term} to set.
+    * @param label The {@link FormulaTermLabel} to update its instruction {@link JavaDLTerm}.
+    * @param instructionTerm The new instruction {@link JavaDLTerm} to set.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void updatePredicateResult(FormulaTermLabel label, 
-                                               Term instructionTerm, 
+                                               JavaDLTerm instructionTerm, 
                                                Map<String, MultiEvaluationResult> results) {
       MultiEvaluationResult result = results.get(label.getId());
       if (result == null) {
@@ -674,7 +674,7 @@ public final class TruthValueTracingUtil {
    /**
     * Updates the evaluation result for the given {@link FormulaTermLabel}
     * in the result {@link Map}.
-    * @param label The {@link FormulaTermLabel} to update its instruction {@link Term}.
+    * @param label The {@link FormulaTermLabel} to update its instruction {@link JavaDLTerm}.
     * @param evaluationResult {@code true} label evaluates at least once to true, {@code false} label evaluates at least once to false.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
@@ -708,9 +708,9 @@ public final class TruthValueTracingUtil {
       private final boolean evaluatesToFalse;
       
       /**
-       * The instruction {@link Term}.
+       * The instruction {@link JavaDLTerm}.
        */
-      private final Term instructionTerm;
+      private final JavaDLTerm instructionTerm;
 
       /**
        * Constructor.
@@ -722,9 +722,9 @@ public final class TruthValueTracingUtil {
 
       /**
        * Constructor.
-       * @param instructionTerm The instruction {@link Term}.
+       * @param instructionTerm The instruction {@link JavaDLTerm}.
        */
-      public MultiEvaluationResult(Term instructionTerm) {
+      public MultiEvaluationResult(JavaDLTerm instructionTerm) {
          this(false, false, instructionTerm);
       }
 
@@ -732,9 +732,9 @@ public final class TruthValueTracingUtil {
        * Constructor.
        * @param evaluatesToTrue {@code true} label evaluates at least once to true, {@code false} label never evaluates to true.
        * @param evaluatesToFalse {@code true} label evaluates at least once to false, {@code false} label never evaluates to false.
-       * @param instructionTerm The instruction {@link Term}.
+       * @param instructionTerm The instruction {@link JavaDLTerm}.
        */
-      public MultiEvaluationResult(boolean evaluatesToTrue, boolean evaluatesToFalse, Term instructionTerm) {
+      public MultiEvaluationResult(boolean evaluatesToTrue, boolean evaluatesToFalse, JavaDLTerm instructionTerm) {
          this.evaluatesToTrue = evaluatesToTrue;
          this.evaluatesToFalse = evaluatesToFalse;
          this.instructionTerm = instructionTerm;
@@ -757,10 +757,10 @@ public final class TruthValueTracingUtil {
       }
 
       /**
-       * Returns the instruction {@link Term}.
-       * @return The instruction {@link Term} or {@code null} if undefined.
+       * Returns the instruction {@link JavaDLTerm}.
+       * @return The instruction {@link JavaDLTerm} or {@code null} if undefined.
        */
-      public Term getInstructionTerm() {
+      public JavaDLTerm getInstructionTerm() {
          return instructionTerm;
       }
       
@@ -802,10 +802,10 @@ public final class TruthValueTracingUtil {
       /**
        * Creates a new {@link MultiEvaluationResult} based on the current once
        * but with an update instruction term.
-       * @param newInstructionTerm The new instruction {@link Term}.
+       * @param newInstructionTerm The new instruction {@link JavaDLTerm}.
        * @return The new created {@link MultiEvaluationResult}.
        */
-      public MultiEvaluationResult newInstructionTerm(Term newInstructionTerm) {
+      public MultiEvaluationResult newInstructionTerm(JavaDLTerm newInstructionTerm) {
          return new MultiEvaluationResult(evaluatesToTrue, evaluatesToFalse, newInstructionTerm);
       }
       
@@ -855,13 +855,13 @@ public final class TruthValueTracingUtil {
       }
 
       /***
-       * Computes the {@link TruthValue} of the given instruction {@link Term}.
-       * @param term The instruction {@link Term} to evaluate.
+       * Computes the {@link TruthValue} of the given instruction {@link JavaDLTerm}.
+       * @param term The instruction {@link JavaDLTerm} to evaluate.
        * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
        * @param results All available {@link MultiEvaluationResult}s.
        * @return The computed {@link TruthValue}.
        */
-      private static TruthValue evaluateTerm(Term term, Name termLabelName, Map<String, MultiEvaluationResult> results) {
+      private static TruthValue evaluateTerm(JavaDLTerm term, Name termLabelName, Map<String, MultiEvaluationResult> results) {
          TermLabel label = term.getLabel(termLabelName);
          // Return direct label result if available
          if (label instanceof FormulaTermLabel) {
@@ -875,8 +875,8 @@ public final class TruthValueTracingUtil {
              term.op() == Junctor.IMP ||
              term.op() == Junctor.OR ||
              term.op() == Equality.EQV) {
-            Term leftTerm = TermBuilder.goBelowUpdates(term.sub(0));
-            Term rightTerm = TermBuilder.goBelowUpdates(term.sub(1));
+            JavaDLTerm leftTerm = TermBuilder.goBelowUpdates(term.sub(0));
+            JavaDLTerm rightTerm = TermBuilder.goBelowUpdates(term.sub(1));
             TermLabel leftLabel = leftTerm.getLabel(termLabelName);
             TermLabel rightLabel = rightTerm.getLabel(termLabelName);
             MultiEvaluationResult leftInstruction = leftLabel instanceof FormulaTermLabel ? results.get(((FormulaTermLabel) leftLabel).getId()) : null;
@@ -902,7 +902,7 @@ public final class TruthValueTracingUtil {
             return resultValue;
          }
          else if (term.op() == Junctor.NOT) {
-            Term argumentTerm = TermBuilder.goBelowUpdates(term.sub(0));
+            JavaDLTerm argumentTerm = TermBuilder.goBelowUpdates(term.sub(0));
             TermLabel argumentLabel = argumentTerm.getLabel(termLabelName);
             MultiEvaluationResult argumentInstruction = argumentLabel instanceof FormulaTermLabel ? results.get(((FormulaTermLabel) argumentLabel).getId()) : null;
             TruthValue argumentValue = argumentInstruction != null ? argumentInstruction.evaluate(termLabelName, results) : evaluateTerm(argumentTerm, termLabelName, results);
@@ -916,9 +916,9 @@ public final class TruthValueTracingUtil {
             return TruthValue.FALSE;
          }
          else if (isIfThenElseFormula(term)) {
-            Term conditionTerm = TermBuilder.goBelowUpdates(term.sub(0));
-            Term thenTerm = TermBuilder.goBelowUpdates(term.sub(1));
-            Term elseTerm = TermBuilder.goBelowUpdates(term.sub(2));
+            JavaDLTerm conditionTerm = TermBuilder.goBelowUpdates(term.sub(0));
+            JavaDLTerm thenTerm = TermBuilder.goBelowUpdates(term.sub(1));
+            JavaDLTerm elseTerm = TermBuilder.goBelowUpdates(term.sub(2));
             TermLabel conditionLabel = conditionTerm.getLabel(termLabelName);
             TermLabel thenLabel = thenTerm.getLabel(termLabelName);
             TermLabel elseLabel = elseTerm.getLabel(termLabelName);
@@ -1004,7 +1004,7 @@ public final class TruthValueTracingUtil {
       /**
        * The condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        */
-      private final Term condition;
+      private final JavaDLTerm condition;
       
       /**
        * The human readable condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
@@ -1026,7 +1026,7 @@ public final class TruthValueTracingUtil {
        */
       public BranchResult(Node leafNode, 
                           Map<String, MultiEvaluationResult> results,
-                          Term condition,
+                          JavaDLTerm condition,
                           String conditionString,
                           Name termLabelName) {
          assert leafNode != null;
@@ -1073,7 +1073,7 @@ public final class TruthValueTracingUtil {
        * Returns the condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        * @return The condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        */
-      public Term getCondition() {
+      public JavaDLTerm getCondition() {
          return condition;
       }
 
@@ -1094,20 +1094,20 @@ public final class TruthValueTracingUtil {
       }
       
       /**
-       * Checks if the {@link Term} has a {@link TermLabel} with {@link Name} {@link #getTermLabelName()}.
-       * @param term The {@link Term} to check.
+       * Checks if the {@link JavaDLTerm} has a {@link TermLabel} with {@link Name} {@link #getTermLabelName()}.
+       * @param term The {@link JavaDLTerm} to check.
        * @return {@code true} has {@link TermLabel}, {@code false} do not has {@link TermLabel}.
        */
-      public boolean hasPredicateLabel(Term term) {
+      public boolean hasPredicateLabel(JavaDLTerm term) {
          return getPredicateLabel(term) != null;
       }
 
       /**
        * Returns the first {@link FormulaTermLabel} with {@link Name} {@link #getTermLabelName()}.
-       * @param term The {@link Term}.
+       * @param term The {@link JavaDLTerm}.
        * @return The found {@link FormulaTermLabel} or {@code null} otherwise.
        */
-      public FormulaTermLabel getPredicateLabel(Term term) {
+      public FormulaTermLabel getPredicateLabel(JavaDLTerm term) {
          TermLabel label = term.getLabel(termLabelName);
          return label instanceof FormulaTermLabel ? (FormulaTermLabel) label : null;
       }

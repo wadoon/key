@@ -18,7 +18,7 @@ import org.key_project.util.LRUCache;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -59,7 +59,7 @@ public class IfThenElseMalusFeature implements Feature {
             final int ind = it.next ();
             if ( ind == -1 ) break;
 
-            final Term t = it.getSubTerm ();
+            final JavaDLTerm t = it.getSubTerm ();
             if ( t.op () instanceof IfThenElse) res = ind != 0 ? res + 1 : res - 1;           
         }
 

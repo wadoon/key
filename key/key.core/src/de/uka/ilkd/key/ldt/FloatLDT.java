@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * Complete this class if you want to add support for the Java float type.
@@ -42,7 +42,7 @@ public final class FloatLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    			 Term[] subs,
+	    			 JavaDLTerm[] subs,
 	    			 Services services,
 	    			 ExecutionContext ec) {
 	return false;
@@ -51,8 +51,8 @@ public final class FloatLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    		         Term left,
-	    		         Term right,
+	    		         JavaDLTerm left,
+	    		         JavaDLTerm right,
 	    		         Services services,
 	    		         ExecutionContext ec) {
 	return false;
@@ -61,7 +61,7 @@ public final class FloatLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    		         Term sub,
+	    		         JavaDLTerm sub,
 	    		         TermServices services,
 	    		         ExecutionContext ec) {
 	return false;
@@ -69,7 +69,7 @@ public final class FloatLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JavaDLTerm translateLiteral(Literal lit, Services services) {
 	    // return skolem term
         final Function sk = new Function(new Name(""+NAME+lit),targetSort());
         return services.getTermBuilder().func(sk);
@@ -92,13 +92,13 @@ public final class FloatLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
 	return null;
     }
 
 
     @Override
-    public final Type getType(Term t) {
+    public final Type getType(JavaDLTerm t) {
 	if(t.sort() == targetSort()) {
 	    return PrimitiveType.JAVA_FLOAT;
 	} else {

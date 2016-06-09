@@ -19,7 +19,7 @@ import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -44,17 +44,17 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final KeYJavaType specifiedIn;
     private final String baseName;
     private final String name;
-    private final Term origPre;
-    private final Term origMby;
-    private final Term origMod;
+    private final JavaDLTerm origPre;
+    private final JavaDLTerm origMby;
+    private final JavaDLTerm origMod;
     private final Modality modality;
-    private final Term origSelf;
-    private final ImmutableList<Term> origParams;
-    private final Term origResult;
-    private final Term origExc;
-    private final Term origAtPre;
+    private final JavaDLTerm origSelf;
+    private final ImmutableList<JavaDLTerm> origParams;
+    private final JavaDLTerm origResult;
+    private final JavaDLTerm origExc;
+    private final JavaDLTerm origAtPre;
     private final boolean toBeSaved;
-    private final Term origDep;
+    private final JavaDLTerm origDep;
     private final ImmutableList<InfFlowSpec> origInfFlowSpecs;
 
     /**
@@ -75,16 +75,16 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                           IProgramMethod pm,
                                           KeYJavaType specifiedIn,
                                           Modality modality,
-                                          Term pre,
-                                          Term mby,
-                                          Term mod,
+                                          JavaDLTerm pre,
+                                          JavaDLTerm mby,
+                                          JavaDLTerm mod,
                                           boolean hasRealMod,
-                                          Term self,
-                                          ImmutableList<Term> params,
-                                          Term result,
-                                          Term exc,
-                                          Term heapAtPre,
-                                          Term dep,
+                                          JavaDLTerm self,
+                                          ImmutableList<JavaDLTerm> params,
+                                          JavaDLTerm result,
+                                          JavaDLTerm exc,
+                                          JavaDLTerm heapAtPre,
+                                          JavaDLTerm dep,
                                           ImmutableList<InfFlowSpec> infFlowSpecs,
                                           boolean toBeSaved,
                                           int id) {
@@ -139,16 +139,16 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        IProgramMethod pm,
                                        KeYJavaType specifiedIn,
                                        Modality modality,
-                                       Term pre,
-                                       Term mby,
-                                       Term mod,
+                                       JavaDLTerm pre,
+                                       JavaDLTerm mby,
+                                       JavaDLTerm mod,
                                        boolean hasRealMod,
-                                       Term self,
-                                       ImmutableList<Term> params,
-                                       Term result,
-                                       Term exc,
-                                       Term heapAtPre,
-                                       Term dep,
+                                       JavaDLTerm self,
+                                       ImmutableList<JavaDLTerm> params,
+                                       JavaDLTerm result,
+                                       JavaDLTerm exc,
+                                       JavaDLTerm heapAtPre,
+                                       JavaDLTerm dep,
                                        ImmutableList<InfFlowSpec> infFlowSpecs,
                                        boolean toBeSaved) {
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
@@ -198,19 +198,19 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     
     @Override
-    public Term getPre() {
+    public JavaDLTerm getPre() {
         return origPre;
     }
 
     
     @Override
-    public Term getMod() {
+    public JavaDLTerm getMod() {
         return origMod;
     }
 
     
     @Override
-    public Term getMby() {
+    public JavaDLTerm getMby() {
         return origMby;
     }
 
@@ -222,7 +222,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getSelf() {
+    public JavaDLTerm getSelf() {
         if (origSelf == null){
             assert pm.isStatic() : "missing self variable in non-static method contract";
             return null;
@@ -232,25 +232,25 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     
     @Override
-    public ImmutableList<Term> getParams() {
+    public ImmutableList<JavaDLTerm> getParams() {
         return origParams;
     }
 
 
     @Override
-    public Term getResult() {
+    public JavaDLTerm getResult() {
         return origResult;
     }
     
 
     @Override
-    public Term getExc() {
+    public JavaDLTerm getExc() {
         return origExc;
     }
 
 
     @Override
-    public Term getAtPre() {
+    public JavaDLTerm getAtPre() {
         return origAtPre;
     }
 
@@ -322,7 +322,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 	}
 	sig.append(pm.getName());
 	sig.append("(");
-        for (Term pv : origParams) {
+        for (JavaDLTerm pv : origParams) {
 	    sig.append(pv.toString()).append(", ");
 	}
         if (!origParams.isEmpty()) {
@@ -336,7 +336,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
         
-    protected String getHTMLFor(Term originalTerm,
+    protected String getHTMLFor(JavaDLTerm originalTerm,
                                 String htmlName,
                                 Services services) {
         if (originalTerm == null) {
@@ -351,17 +351,17 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
 
-    private String getHTMLFor(Iterable<Term> originalTerms,
+    private String getHTMLFor(Iterable<JavaDLTerm> originalTerms,
                               Services services) {
         String result;
-        final Iterator<Term> it = originalTerms.iterator();
+        final Iterator<JavaDLTerm> it = originalTerms.iterator();
         if (!it.hasNext()) {
             result = LogicPrinter.quickPrintTerm(services.getTermBuilder().empty(), services);
         } else {
             result = "";
         }
         while (it.hasNext()) {
-            Term term = it.next();
+            JavaDLTerm term = it.next();
             final String quickPrint =
                     LogicPrinter.quickPrintTerm(term, services);
             result += LogicPrinter.escapeHTML(quickPrint, false);
@@ -518,7 +518,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public InformationFlowContract setModifies(Term modifies) {
+    public InformationFlowContract setModifies(JavaDLTerm modifies) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm,
                                                specifiedIn, modality, origPre,
                                                origMby, modifies,
@@ -530,7 +530,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getDep() {
+    public JavaDLTerm getDep() {
         return origDep;
     }
 
@@ -601,10 +601,10 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getGlobalDefs(LocationVariable heap,
-                              Term heapTerm,
-                              Term selfTerm,
-                              ImmutableList<Term> paramTerms,
+    public JavaDLTerm getGlobalDefs(LocationVariable heap,
+                              JavaDLTerm heapTerm,
+                              JavaDLTerm selfTerm,
+                              ImmutableList<JavaDLTerm> paramTerms,
                               Services services) {
         // information flow contracts do not have global defs (yet?)
         throw new UnsupportedOperationException("Not supported yet.");
@@ -622,7 +622,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     
     @Override
     @Deprecated
-    public Term getPre(LocationVariable heap,
+    public JavaDLTerm getPre(LocationVariable heap,
                        ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
@@ -633,7 +633,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getPre(List<LocationVariable> heapContext,
+    public JavaDLTerm getPre(List<LocationVariable> heapContext,
                        ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
@@ -645,11 +645,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getPre(LocationVariable heap,
-                       Term heapTerm,
-                       Term selfTerm,
-                       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable, Term> atPres,
+    public JavaDLTerm getPre(LocationVariable heap,
+                       JavaDLTerm heapTerm,
+                       JavaDLTerm selfTerm,
+                       ImmutableList<JavaDLTerm> paramTerms,
+                       Map<LocationVariable, JavaDLTerm> atPres,
                        Services services) {
         throw new UnsupportedOperationException("Not supported any more. "
                 + "Please use the POSnippetFactory instead.");
@@ -658,11 +658,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getPre(List<LocationVariable> heapContext,
-                       Map<LocationVariable, Term> heapTerms,
-                       Term selfTerm,
-                       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable, Term> atPres,
+    public JavaDLTerm getPre(List<LocationVariable> heapContext,
+                       Map<LocationVariable, JavaDLTerm> heapTerms,
+                       JavaDLTerm selfTerm,
+                       ImmutableList<JavaDLTerm> paramTerms,
+                       Map<LocationVariable, JavaDLTerm> atPres,
                        Services services) {
         throw new UnsupportedOperationException("Not supported any more. "
                 + "Please use the POSnippetFactory instead.");
@@ -671,7 +671,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getMby(ProgramVariable selfVar,
+    public JavaDLTerm getMby(ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
                        Services services) {
         throw new UnsupportedOperationException("Not supported any more. "
@@ -681,11 +681,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     
     @Override
     @Deprecated
-    public Term getMby(
-                       Map<LocationVariable, Term> heapTerms,
-                       Term selfTerm,
-                       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable, Term> atPres,
+    public JavaDLTerm getMby(
+                       Map<LocationVariable, JavaDLTerm> heapTerms,
+                       JavaDLTerm selfTerm,
+                       ImmutableList<JavaDLTerm> paramTerms,
+                       Map<LocationVariable, JavaDLTerm> atPres,
                        Services services) {
         throw new UnsupportedOperationException("Not supported any more. "
                 + "Please use the POSnippetFactory instead.");
@@ -700,7 +700,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre,
+    public JavaDLTerm getDep(LocationVariable heap, boolean atPre,
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
             Services services) {
@@ -709,33 +709,33 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm,
-            Term selfTerm, ImmutableList<Term> paramTerms,
-            Map<LocationVariable, Term> atPres, Services services) {
+    public JavaDLTerm getDep(LocationVariable heap, boolean atPre, JavaDLTerm heapTerm,
+            JavaDLTerm selfTerm, ImmutableList<JavaDLTerm> paramTerms,
+            Map<LocationVariable, JavaDLTerm> atPres, Services services) {
         return null;
     }
 
 
     @Override
-    public Term getRequires(LocationVariable heap) {
+    public JavaDLTerm getRequires(LocationVariable heap) {
         return null;
     }
 
 
     @Override
-    public Term getAssignable(LocationVariable heap) {
+    public JavaDLTerm getAssignable(LocationVariable heap) {
         return null;
     }
 
 
     @Override
-    public Term getAccessible(ProgramVariable heap) {
+    public JavaDLTerm getAccessible(ProgramVariable heap) {
         return null;
     }
 
 
     @Override
-    public Term getGlobalDefs() {
+    public JavaDLTerm getGlobalDefs() {
         // information flow contracts do not have global defs (yet?)
         throw new UnsupportedOperationException("Not supported yet.");
     }

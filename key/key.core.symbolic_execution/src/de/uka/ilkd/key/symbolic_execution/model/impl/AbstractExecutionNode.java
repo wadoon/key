@@ -26,7 +26,7 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -74,7 +74,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    /**
     * The variable value pairs of the current state under given conditions.
     */
-   private final Map<Term, IExecutionVariable[]> conditionalVariables = new HashMap<Term, IExecutionVariable[]>();
+   private final Map<JavaDLTerm, IExecutionVariable[]> conditionalVariables = new HashMap<JavaDLTerm, IExecutionVariable[]>();
    
    /**
     * The used {@link ExecutionNodeSymbolicLayoutExtractor}.
@@ -94,7 +94,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    /**
     * The already computed block completion conditions.
     */
-   private final Map<IExecutionBlockStartNode<?>, Term> blockCompletionConditions = new HashMap<IExecutionBlockStartNode<?>, Term>();
+   private final Map<IExecutionBlockStartNode<?>, JavaDLTerm> blockCompletionConditions = new HashMap<IExecutionBlockStartNode<?>, JavaDLTerm>();
 
    /**
     * The already computed human readable block completion conditions.
@@ -157,9 +157,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * {@inheritDoc}
     */
    @Override
-   public Term getPathCondition() throws ProofInputException {
+   public JavaDLTerm getPathCondition() throws ProofInputException {
       // Search path condition of the parent which is used by default.
-      Term result = null;
+      JavaDLTerm result = null;
       AbstractExecutionNode<?> parent = getParent();
       while (result == null && parent != null) {
          if (parent.isPathConditionChanged()) {
@@ -278,7 +278,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * {@inheritDoc}
     */
    @Override
-   public IExecutionVariable[] getVariables(Term condition) throws ProofInputException {
+   public IExecutionVariable[] getVariables(JavaDLTerm condition) throws ProofInputException {
       synchronized (this) {
          IExecutionVariable[] result = conditionalVariables.get(condition);
          if (result == null) {
@@ -290,13 +290,13 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    }
 
    /**
-    * Computes the variables lazily when {@link #getVariables(Term)} is 
+    * Computes the variables lazily when {@link #getVariables(JavaDLTerm)} is 
     * called the first time.
-    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @param condition A {@link JavaDLTerm} specifying some additional constraints to consider.
     * @return The {@link IExecutionVariable}s of the current state under the given condition.
     * @throws ProofInputException 
     */
-   protected IExecutionVariable[] lazyComputeVariables(Term condition) throws ProofInputException {
+   protected IExecutionVariable[] lazyComputeVariables(JavaDLTerm condition) throws ProofInputException {
       return SymbolicExecutionUtil.createExecutionVariables(this, condition);
    }
 
@@ -378,7 +378,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
       PosInOccurrence originalPio = getProofNode().getAppliedRuleApp().posInOccurrence();
       // Try to go back to the parent which provides the updates
       PosInOccurrence pio = originalPio;
-      Term term = pio.subTerm();
+      JavaDLTerm term = pio.subTerm();
       if (!pio.isTopLevel() && term.op() != UpdateApplication.UPDATE_APPLICATION) {
          pio = pio.up();
          term = pio.subTerm();
@@ -424,10 +424,10 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * {@inheritDoc}
     */
    @Override
-   public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException {
-      Term result = blockCompletionConditions.get(completedNode);
+   public JavaDLTerm getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException {
+      JavaDLTerm result = blockCompletionConditions.get(completedNode);
       if (result == null) {
-         result = (Term) lazyComputeBlockCompletionCondition(completedNode, false);
+         result = (JavaDLTerm) lazyComputeBlockCompletionCondition(completedNode, false);
       }
       return result;
    }
@@ -448,7 +448,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * Computes the condition lazily when {@link #getBlockCompletionCondition(IExecutionNode)}
     * or {@link #getFormatedBlockCompletionCondition(IExecutionNode)} is called the first time.
     * @param completedNode The completed {@link IExecutionNode} for which the condition is requested.
-    * @param returnFormatedCondition {@code true} formated condition is returned, {@code false} {@link Term} is returned.
+    * @param returnFormatedCondition {@code true} formated condition is returned, {@code false} {@link JavaDLTerm} is returned.
     * @throws ProofInputException Occurred Exception
     */
    protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode, boolean returnFormatedCondition) throws ProofInputException {
@@ -457,11 +457,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
           completedBlocks.contains(completedNode)) {
          final Services services = initConfig.getServices();
          // Collect branch conditions
-         List<Term> bcs = new LinkedList<Term>();
+         List<JavaDLTerm> bcs = new LinkedList<JavaDLTerm>();
          AbstractExecutionNode<?> parent = getParent();
          while (parent != null && parent != completedNode) {
             if (parent instanceof IExecutionBranchCondition) {
-               Term bc = ((IExecutionBranchCondition)parent).getBranchCondition();
+               JavaDLTerm bc = ((IExecutionBranchCondition)parent).getBranchCondition();
                if (bc == null) {
                   return null; // Proof disposed in between, computation not possible
                }
@@ -470,7 +470,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
             parent = parent.getParent();
          }
          // Add current branch condition to path
-         Term condition = services.getTermBuilder().and(bcs);
+         JavaDLTerm condition = services.getTermBuilder().and(bcs);
          // Simplify path condition
          if (getSettings().isSimplifyConditions()) {
             condition = SymbolicExecutionUtil.simplify(initConfig, getProof(), condition);

@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -30,12 +30,12 @@ public class ProgramVariableCollection {
     public ProgramVariable resultVar;
     public ProgramVariable excVar;
     public Map<LocationVariable,LocationVariable> atPreVars;
-    public Map<LocationVariable,Term> atPres;
+    public Map<LocationVariable,JavaDLTerm> atPres;
     
     public ProgramVariableCollection(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar, ProgramVariable excVar,
-            Map<LocationVariable,LocationVariable> atPreVars, Map<LocationVariable,Term> atPres) {
+            Map<LocationVariable,LocationVariable> atPreVars, Map<LocationVariable,JavaDLTerm> atPres) {
         super();
         this.selfVar = selfVar;
         this.paramVars = paramVars;

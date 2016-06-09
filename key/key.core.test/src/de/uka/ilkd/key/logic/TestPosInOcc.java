@@ -44,10 +44,10 @@ public class TestPosInOcc extends TestCase {
 	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});
 
 	
-	Term terms[] = new Term [ 3 ];
+	JavaDLTerm terms[] = new JavaDLTerm [ 3 ];
 	terms[0]     = TB.var ( x );
-	terms[1]     = TB.func ( f, new Term[] { terms[0] } );
-	terms[2]     = TB.func ( p, new Term[] { terms[1] } );
+	terms[1]     = TB.func ( f, new JavaDLTerm[] { terms[0] } );
+	terms[2]     = TB.func ( p, new JavaDLTerm[] { terms[1] } );
 
 	PosInOccurrence pio = new PosInOccurrence
 	    ( new SequentFormula ( terms[2] ),
@@ -102,17 +102,17 @@ public class TestPosInOcc extends TestCase {
                                     Sort.FORMULA,
                                     new Sort[] { sort1 } );
 
-        Term terms[] = new Term[3];
+        JavaDLTerm terms[] = new JavaDLTerm[3];
         terms[0] = TB.var( x );
-        terms[1] = TB.func ( f, new Term[] { terms[0] } );
-        terms[2] = TB.func ( p, new Term[] { terms[1] } );
+        terms[1] = TB.func ( f, new JavaDLTerm[] { terms[0] } );
+        terms[2] = TB.func ( p, new JavaDLTerm[] { terms[1] } );
         SequentFormula cfma = new SequentFormula ( terms[2] );
 
-        Term terms2[] = new Term[4];
+        JavaDLTerm terms2[] = new JavaDLTerm[4];
         terms2[0] = TB.func ( c );
-        terms2[1] = TB.func ( f, new Term[] { terms2[0] } );
-        terms2[2] = TB.func ( f, new Term[] { terms2[1] } );
-        terms2[3] = TB.func ( p, new Term[] { terms2[2] } );
+        terms2[1] = TB.func ( f, new JavaDLTerm[] { terms2[0] } );
+        terms2[2] = TB.func ( f, new JavaDLTerm[] { terms2[1] } );
+        terms2[3] = TB.func ( p, new JavaDLTerm[] { terms2[2] } );
         SequentFormula cfma2 = new SequentFormula ( terms2[3] );
 
         final PosInOccurrence topPIO = new PosInOccurrence ( cfma,

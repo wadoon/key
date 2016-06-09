@@ -23,7 +23,7 @@ import org.key_project.common.core.services.TermServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
@@ -37,7 +37,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     private final String displayName;
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;    
-    private final Term originalInv;
+    private final JavaDLTerm originalInv;
     private final ParsableVariable originalSelfVar;
     private final PositionedString originalSpec;
     
@@ -60,7 +60,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
                               String displayName,
                               KeYJavaType kjt, 
                               VisibilityModifier visibility,                              
-                              Term inv,
+                              JavaDLTerm inv,
                               ParsableVariable selfVar, PositionedString originalSpec) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
@@ -121,11 +121,11 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     
     
     @Override
-    public Term getClause(ParsableVariable selfVar, TermServices services) {
+    public JavaDLTerm getClause(ParsableVariable selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
-        Term res = or.replace(originalInv);
+        JavaDLTerm res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);
         return res;
     }

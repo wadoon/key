@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 public interface Trigger {
     
@@ -27,8 +27,8 @@ public interface Trigger {
      * this trigger to targeTerm.
      */
     public abstract ImmutableSet<Substitution> 
-                           getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm, 
+                           getSubstitutionsFromTerms(ImmutableSet<JavaDLTerm> targetTerm, 
                                    TermServices services);
     
-    public abstract Term getTriggerTerm();
+    public abstract JavaDLTerm getTriggerTerm();
 }

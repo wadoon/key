@@ -52,7 +52,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NameCreationInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.AbbrevException;
@@ -233,7 +233,7 @@ public class TacletMenu extends JMenu {
 	if (pos != null) {
 	    PosInOccurrence occ = pos.getPosInOccurrence();
 	    if (occ != null && occ.posInTerm() != null) {
-		Term t = occ.subTerm ();
+		JavaDLTerm t = occ.subTerm ();
 		createAbbrevSection(t, control);
 
 		if(t.op() instanceof ProgramVariable) {
@@ -398,7 +398,7 @@ public class TacletMenu extends JMenu {
     }
 
 
-    private void createAbbrevSection(Term t, MenuControl control){
+    private void createAbbrevSection(JavaDLTerm t, MenuControl control){
 	AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
 	JMenuItem sc = null;
 	if(scm.containsTerm(t)){
@@ -659,7 +659,7 @@ public class TacletMenu extends JMenu {
 		    }
 		} else if(((JMenuItem)e.getSource()).getText().
 			 startsWith("View name creation info")) {
-		    Term t = pos.getPosInOccurrence().subTerm();
+		    JavaDLTerm t = pos.getPosInOccurrence().subTerm();
 		    ProgramVariable var = (ProgramVariable)t.op();
 		    ProgramElementName name = var.getProgramElementName();
 		    NameCreationInfo info = name.getCreationInfo();
@@ -809,9 +809,9 @@ public class TacletMenu extends JMenu {
 	    if (taclet1 instanceof FindTaclet) {
                 map.put("has_find", -1);
 
-	        final Term find1 = ((FindTaclet) taclet1).find();
+	        final JavaDLTerm find1 = ((FindTaclet) taclet1).find();
 	        int findComplexity1 = find1.depth();
-	        findComplexity1 += programComplexity(find1.javaBlock());
+	        findComplexity1 += programComplexity(find1.modalContent());
                 map.put("find_complexity", -findComplexity1);
 
 	        // depth are equal. Number of schemavariables decides

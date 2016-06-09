@@ -12,7 +12,7 @@ import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -51,17 +51,17 @@ public class RewriteTacletBuilderSchemaVarCollector {
     }
 
 
-    private Set<SchemaVariable> collectSchemaVariables(Term t) {
+    private Set<SchemaVariable> collectSchemaVariables(JavaDLTerm t) {
         final Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 
         t.execPreOrder(new Visitor() {
             @Override
-            public boolean visitSubtree(Term visited) {
+            public boolean visitSubtree(JavaDLTerm visited) {
                 return true;
             }
 
             @Override
-            public void visit(Term visited) {
+            public void visit(JavaDLTerm visited) {
                 if (visited.op() instanceof SchemaVariable) {
                     result.add((SchemaVariable) visited.op());
                 }
@@ -69,13 +69,13 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
             @Override
-            public void subtreeEntered(Term subtreeRoot) {
+            public void subtreeEntered(JavaDLTerm subtreeRoot) {
                 // nothing to do
             }
 
 
             @Override
-            public void subtreeLeft(Term subtreeRoot) {
+            public void subtreeLeft(JavaDLTerm subtreeRoot) {
                 // nothing to do
             }
         });

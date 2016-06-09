@@ -20,7 +20,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -37,8 +37,8 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
 
     private BlockWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                  LocationVariable heap, OriginalVariables origVars,
-                                 Condition requires, Term assignable, Term accessible,
-                                 Condition ensures, Term mby, Term rep, BlockContract block,
+                                 Condition requires, JavaDLTerm assignable, JavaDLTerm accessible,
+                                 Condition ensures, JavaDLTerm mby, JavaDLTerm rep, BlockContract block,
                                  TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
               assignable, accessible, ensures, mby, rep, tb);
@@ -61,9 +61,9 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     @Override
     SequentFormula generateSequent(SequentTerms seq, TermServices services) {
         // wd(pre) & (pre & wf(anon) -> wd(mod) & {anon^mod}(wd(post)))
-        final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
+        final JavaDLTerm imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
                                 TB.and(seq.wdMod, seq.anonWdPost));
-        final Term wdPre = TB.wd(seq.pre);
+        final JavaDLTerm wdPre = TB.wd(seq.pre);
         return new SequentFormula(TB.apply(seq.context,
                                            TB.and(wdPre, imp)));
     }

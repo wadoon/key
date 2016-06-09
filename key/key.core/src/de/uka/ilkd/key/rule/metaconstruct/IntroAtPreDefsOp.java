@@ -35,7 +35,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -62,14 +62,14 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
 
     @Override
-    public Term transform(Term term,
+    public JavaDLTerm transform(JavaDLTerm term,
                   SVInstantiations svInst,
                   Services services) {
         final TermBuilder TB = services.getTermBuilder();
-        final Term target = term.sub(0);
+        final JavaDLTerm target = term.sub(0);
 
         //the target term should have a Java block
-        final ProgramElement pe = target.javaBlock().program();
+        final ProgramElement pe = target.modalContent().program();
         assert pe != null;
 
         //collect all loops in the innermost method frame
@@ -106,7 +106,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final ImmutableSet<LoopStatement> loops = frameAndLoopsAndBlocks.second;
 
         //determine "self"
-        Term selfTerm;
+        JavaDLTerm selfTerm;
         final ExecutionContext ec
             = (ExecutionContext) frame.getExecutionContext();
         final ReferencePrefix rp = ec.getRuntimeInstance();
@@ -119,14 +119,14 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         //create atPre heap
         final String methodName = frame.getProgramMethod().getName();
 
-        Term atPreUpdate = null;
-        Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
+        JavaDLTerm atPreUpdate = null;
+        Map<LocationVariable,JavaDLTerm> atPres = new LinkedHashMap<LocationVariable,JavaDLTerm>();
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
           final LocationVariable l = TB.heapAtPreVar(heap.name()+"Before_" + methodName, heap.sort(), true);
           // buf fix. see #1197
           services.getNamespaces().programVariables().addSafely(l);
-          final Term u = TB.elementary(l, TB.var(heap));
+          final JavaDLTerm u = TB.elementary(l, TB.var(heap));
           if(atPreUpdate == null) {
              atPreUpdate = u;
           }else{
@@ -152,7 +152,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     }
                     final LocationVariable l = TB.heapAtPreVar(var.name()+"Before_" + methodName, var.sort(), true);
                     services.getNamespaces().programVariables().addSafely(l);
-                    final Term u = TB.elementary(l, TB.var(var));
+                    final JavaDLTerm u = TB.elementary(l, TB.var(var));
                     if(atPreUpdate == null) {
                         atPreUpdate = u;
                     } else {
@@ -174,32 +174,32 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     selfTerm = null;
                 }
 
-                final Term newVariant
+                final JavaDLTerm newVariant
                     = inv.getVariant(selfTerm, atPres, services);
 
-                Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
+                Map<LocationVariable,JavaDLTerm> newMods = new LinkedHashMap<LocationVariable,JavaDLTerm>();
                 Map<LocationVariable,
                     ImmutableList<InfFlowSpec>> newInfFlowSpecs
                                  = new LinkedHashMap<LocationVariable,
                                                      ImmutableList<InfFlowSpec>>();
                 //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-                Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
+                Map<LocationVariable,JavaDLTerm> newInvariants = new LinkedHashMap<LocationVariable,JavaDLTerm>();
                 for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
                   if(heap == services.getTheories().getHeapLDT().getSavedHeap()
                      &&
                      inv.getInternalModifies().get(services.getTheories().getHeapLDT().getHeap()).equals(TB.strictlyNothing())) {
                     continue;
                   }
-                  final Term m = inv.getModifies(heap, selfTerm, atPres, services);
+                  final JavaDLTerm m = inv.getModifies(heap, selfTerm, atPres, services);
                   final ImmutableList<InfFlowSpec> infFlowSpecs =
                                  inv.getInfFlowSpecs(heap, selfTerm, atPres, services);
-                  final Term in = inv.getInvariant(heap, selfTerm, atPres, services);
+                  final JavaDLTerm in = inv.getInvariant(heap, selfTerm, atPres, services);
                   if(m != null) { newMods.put(heap, m); }
                   newInfFlowSpecs.put(heap, infFlowSpecs);
                   if(in != null) { newInvariants.put(heap, in); }
                 }
-                ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(loop, services));
-                ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(loop, services));
+                ImmutableList<JavaDLTerm> newLocalIns = TB.var(MiscTools.getLocalIns(loop, services));
+                ImmutableList<JavaDLTerm> newLocalOuts = TB.var(MiscTools.getLocalOuts(loop, services));
                 final LoopInvariant newInv
                        = inv.create(loop,
                                     frame.getProgramMethod(),
@@ -232,18 +232,18 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         atPreVars,
                         variables.remembranceLocalVariables
                 );
-                final Map<LocationVariable, Term> newPreconditions =
-                        new LinkedHashMap<LocationVariable, Term>();
-                final Map<LocationVariable, Term> newPostconditions =
-                        new LinkedHashMap<LocationVariable, Term>();
-                final Map<LocationVariable, Term> newModifiesClauses =
-                        new LinkedHashMap<LocationVariable, Term>();
-                ImmutableList<Triple<ImmutableList<Term>,
-                                     ImmutableList<Term>,
-                                     ImmutableList<Term>>> newRespectsClause =
-                        ImmutableSLList.<Triple<ImmutableList<Term>,
-                                                ImmutableList<Term>,
-                                                ImmutableList<Term>>>nil();
+                final Map<LocationVariable, JavaDLTerm> newPreconditions =
+                        new LinkedHashMap<LocationVariable, JavaDLTerm>();
+                final Map<LocationVariable, JavaDLTerm> newPostconditions =
+                        new LinkedHashMap<LocationVariable, JavaDLTerm>();
+                final Map<LocationVariable, JavaDLTerm> newModifiesClauses =
+                        new LinkedHashMap<LocationVariable, JavaDLTerm>();
+                ImmutableList<Triple<ImmutableList<JavaDLTerm>,
+                                     ImmutableList<JavaDLTerm>,
+                                     ImmutableList<JavaDLTerm>>> newRespectsClause =
+                        ImmutableSLList.<Triple<ImmutableList<JavaDLTerm>,
+                                                ImmutableList<JavaDLTerm>,
+                                                ImmutableList<JavaDLTerm>>>nil();
                 for (LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
                     newPreconditions.put(heap,
                                          contract.getPrecondition(heap, newVariables.self,

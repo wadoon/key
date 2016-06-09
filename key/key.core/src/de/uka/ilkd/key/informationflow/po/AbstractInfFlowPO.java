@@ -6,7 +6,7 @@ package de.uka.ilkd.key.informationflow.po;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -24,7 +24,7 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
     }
 
     public Proof createProof(String proofName,
-                             Term poTerm,
+                             JavaDLTerm poTerm,
                              InitConfig proofConfig) {        
         final Proof proof = super.createProof(proofName, poTerm, proofConfig);
         StrategyInfoUndoMethod undo =
@@ -42,7 +42,7 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
 
     public InfFlowProof createProofObject(String proofName,
                                    String proofHeader,
-                                   Term poTerm,
+                                   JavaDLTerm poTerm,
                                    InitConfig proofConfig) {
         final InfFlowProof proof = new InfFlowProof(proofName,
                 poTerm,

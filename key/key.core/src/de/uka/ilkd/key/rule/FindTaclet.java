@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 
@@ -37,7 +37,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 public abstract class FindTaclet extends Taclet {
 
     /** contains the find term */
-    protected Term find;
+    protected JavaDLTerm find;
 
     /** Set of schemavariables of the if and the (optional) find part */
     private ImmutableSet<SchemaVariable> ifFindVariables = null;
@@ -61,7 +61,7 @@ public abstract class FindTaclet extends Taclet {
      *      is attached to
      * @param attrs the TacletAttributes encoding if the Taclet is non-interactive,
      * recursive or something like that
-     * @param find the Term that is the pattern that has to be found in a
+     * @param find the JavaDLTerm that is the pattern that has to be found in a
      * sequent and the places where it matches the Taclet can be applied
      * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
@@ -71,7 +71,7 @@ public abstract class FindTaclet extends Taclet {
                       ImmutableList<TacletGoalTemplate> goalTemplates,
                       ImmutableList<RuleSet> ruleSets,
                       TacletAttributes attrs,
-                      Term find,
+                      JavaDLTerm find,
                       ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
                       ImmutableSet<Choice> choices,
                       boolean surviveSymbExec,
@@ -92,7 +92,7 @@ public abstract class FindTaclet extends Taclet {
      *      is attached to
      * @param attrs the TacletAttributes encoding if the Taclet is non-interactive,
      * recursive or something like that
-     * @param find the Term that is the pattern that has to be found in a
+     * @param find the JavaDLTerm that is the pattern that has to be found in a
      * sequent and the places where it matches the Taclet can be applied
      * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
@@ -100,7 +100,7 @@ public abstract class FindTaclet extends Taclet {
     protected FindTaclet(Name name, TacletApplPart applPart,  
 		      ImmutableList<TacletGoalTemplate> goalTemplates, 
 		      ImmutableList<RuleSet> ruleSets,
-		      TacletAttributes attrs, Term find,
+		      TacletAttributes attrs, JavaDLTerm find,
 		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
 		      ImmutableSet<Choice> choices,
 		      ImmutableSet<TacletAnnotation> tacletAnnotations){
@@ -109,7 +109,7 @@ public abstract class FindTaclet extends Taclet {
     }
     
     /** returns the find term of the taclet to be matched */
-    public Term find() {
+    public JavaDLTerm find() {
 	return find;
     }
     

@@ -28,7 +28,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -120,7 +120,7 @@ public class TestTermTacletAppIndex extends TestCase{
         ruleIdx.add ( remove_f );
         ruleIdx.add ( remove_zero );
 
-        Term term = TacletForTests.parseTerm ( "f(f(f(zero)))=one" );
+        JavaDLTerm term = TacletForTests.parseTerm ( "f(f(f(zero)))=one" );
         SequentFormula cfma = new SequentFormula ( term );
 
         PosInOccurrence pio = new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
@@ -141,7 +141,7 @@ public class TestTermTacletAppIndex extends TestCase{
         checkTermIndex ( pio, termIdx );
 
         // now a real change
-        Term term2 = TacletForTests.parseTerm ( "f(f(zero))=one" );
+        JavaDLTerm term2 = TacletForTests.parseTerm ( "f(f(zero))=one" );
         SequentFormula cfma2 = new SequentFormula ( term2 );
         PosInOccurrence pio2 = new PosInOccurrence ( cfma2,
                                                      PosInTerm.getTopLevel(), false );

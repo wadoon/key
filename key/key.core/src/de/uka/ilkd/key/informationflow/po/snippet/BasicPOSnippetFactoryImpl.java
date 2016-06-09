@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -55,7 +55,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     BasicPOSnippetFactoryImpl(LoopInvariant invariant,
                               ProofObligationVars poVars,
                               ExecutionContext context,
-                              Term guardTerm,
+                              JavaDLTerm guardTerm,
                               Services services) {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars = poVars;
@@ -99,7 +99,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
 
     @Override
-    public Term create(Snippet snippet) throws UnsupportedOperationException {
+    public JavaDLTerm create(Snippet snippet) throws UnsupportedOperationException {
         try {
             FactoryMethod m = factoryMethods.get(snippet);
             if (m == null) {

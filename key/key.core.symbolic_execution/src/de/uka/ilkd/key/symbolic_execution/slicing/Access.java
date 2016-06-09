@@ -3,7 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.slicing;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.ObjectUtil;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public class Access {
@@ -15,7 +15,7 @@ public class Access {
    /**
     * The accessed array index or {@code null} if it is not an array access.
     */
-   private final ImmutableArray<Term> dimensionExpressions;
+   private final ImmutableArray<JavaDLTerm> dimensionExpressions;
 
    /**
     * Constructor.
@@ -31,7 +31,7 @@ public class Access {
     * Constructor.
     * @param dimensionExpressions The accessed array index.
     */
-   public Access(ImmutableArray<Term> dimensionExpressions) {
+   public Access(ImmutableArray<JavaDLTerm> dimensionExpressions) {
       assert dimensionExpressions != null;
       this.programVariable = null;
       this.dimensionExpressions = dimensionExpressions;
@@ -41,10 +41,10 @@ public class Access {
     * Constructor.
     * @param dimensionExpressions The accessed array index.
     */
-   public Access(Term... dimensionExpressions) {
+   public Access(JavaDLTerm... dimensionExpressions) {
       assert dimensionExpressions != null;
       this.programVariable = null;
-      this.dimensionExpressions = new ImmutableArray<Term>(dimensionExpressions);
+      this.dimensionExpressions = new ImmutableArray<JavaDLTerm>(dimensionExpressions);
    }
 
    /**
@@ -59,7 +59,7 @@ public class Access {
     * Returns the accessed array index or {@code null} if it is not an array access.
     * @return The accessed array index or {@code null} if it is not an array access.
     */
-   public ImmutableArray<Term> getDimensionExpressions() {
+   public ImmutableArray<JavaDLTerm> getDimensionExpressions() {
       return dimensionExpressions;
    }
 

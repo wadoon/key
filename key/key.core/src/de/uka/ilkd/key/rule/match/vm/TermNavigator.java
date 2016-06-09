@@ -2,7 +2,7 @@ package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * An iterator that walks in first-depth order through the term. It allows to jump to siblings.
@@ -19,10 +19,10 @@ public class TermNavigator {
      * the second component is less than the arity of the term in the 
      * first component
      */
-    private final LinkedList<TermNavigator.MutablePair<Term,Integer>> stack = new LinkedList<>();
+    private final LinkedList<TermNavigator.MutablePair<JavaDLTerm,Integer>> stack = new LinkedList<>();
     
-    public TermNavigator(Term term) {
-        stack.push(new TermNavigator.MutablePair<Term,Integer>(term, 0));
+    public TermNavigator(JavaDLTerm term) {
+        stack.push(new TermNavigator.MutablePair<JavaDLTerm,Integer>(term, 0));
     }
     
     public boolean hasNext() {
@@ -34,7 +34,7 @@ public class TermNavigator {
     }
 
     
-    public Term getCurrentSubterm() {
+    public JavaDLTerm getCurrentSubterm() {
         return stack.peek().first; 
     }
     
@@ -43,7 +43,7 @@ public class TermNavigator {
             return;
         }
         do {
-            TermNavigator.MutablePair<Term, Integer> el = stack.peek();            
+            TermNavigator.MutablePair<JavaDLTerm, Integer> el = stack.peek();            
             if (el.second < el.first.arity()) {
                 final int oldPos = el.second;
                 el.second += 1;
@@ -52,7 +52,7 @@ public class TermNavigator {
                     // so it can be removed from the stack
                     stack.pop();
                 }
-                el = new TermNavigator.MutablePair<Term, Integer>(el.first.sub(oldPos), 0);
+                el = new TermNavigator.MutablePair<JavaDLTerm, Integer>(el.first.sub(oldPos), 0);
                 stack.push(el);
             } else {
                 stack.pop();  

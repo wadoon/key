@@ -101,7 +101,7 @@ public class SemisequentTacletAppIndex {
                               NewRuleListener    listener ) {
         final TermTacletAppIndex oldIndex = termIndices.get ( cfma );
         assert oldIndex != null :
-            "Term index that is supposed to be updated " +
+            "JavaDLTerm index that is supposed to be updated " +
             "does not exist";
     
         final PosInOccurrence pos =

@@ -41,7 +41,7 @@ public abstract class SubstOp <T extends GenericTerm<?>> extends AbstractOperato
     // QuantifiableVariable v =
     // term.varsBoundHere(1).getQuantifiableVariable(0);
     // ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));
-    // Term res = cfSubst.apply(term.sub(1));
+    // JavaDLTerm res = cfSubst.apply(term.sub(1));
     // return res;
     // }
 }

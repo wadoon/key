@@ -3,7 +3,7 @@ package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 
 /**
@@ -28,7 +28,7 @@ public class Pos extends SignAnalysisDomainElem {
    }
 
    @Override
-   public Term getDefiningAxiom(Term varOrConst, Services services) {
+   public JavaDLTerm getDefiningAxiom(JavaDLTerm varOrConst, Services services) {
       TermBuilder tb = services.getTermBuilder();
       return services.getTermBuilder().gt(varOrConst, tb.zero());
    }

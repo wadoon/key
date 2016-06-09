@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 class MultiTrigger implements Trigger {
 
@@ -30,17 +30,17 @@ class MultiTrigger implements Trigger {
 
     private final ImmutableSet<QuantifiableVariable> qvs;
 
-    private final Term clause;
+    private final JavaDLTerm clause;
 
     MultiTrigger(ImmutableSet<Trigger> triggers, ImmutableSet<QuantifiableVariable> qvs,
-	    Term clause) {
+	    JavaDLTerm clause) {
 	this.triggers = triggers;
 	this.qvs = qvs;
 	this.clause = clause;
     }
 
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(
-	    ImmutableSet<Term> targetTerms, TermServices services) {
+	    ImmutableSet<JavaDLTerm> targetTerms, TermServices services) {
 	ImmutableSet<Substitution> res = DefaultImmutableSet.<Substitution> nil();
 	
 	ImmutableSet<Substitution> mulsubs = setMultiSubstitution(triggers.iterator(),
@@ -57,7 +57,7 @@ class MultiTrigger implements Trigger {
 
     /** help function for getMultiSubstitution */
     private ImmutableSet<Substitution> setMultiSubstitution(
-	    Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, TermServices services) {
+	    Iterator<? extends Trigger> ts, ImmutableSet<JavaDLTerm> terms, TermServices services) {
 	ImmutableSet<Substitution> res = DefaultImmutableSet.<Substitution> nil();
 	if (ts.hasNext()) {
 	    ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(
@@ -88,12 +88,12 @@ class MultiTrigger implements Trigger {
      * substituition, otherwise return null
      */
     private Substitution unifySubstitution(Substitution sub0, Substitution sub1) {
-	final ImmutableMap<QuantifiableVariable, Term> varMap1 = sub1.getVarMap();
-	ImmutableMap<QuantifiableVariable, Term> resMap = varMap1;
+	final ImmutableMap<QuantifiableVariable, JavaDLTerm> varMap1 = sub1.getVarMap();
+	ImmutableMap<QuantifiableVariable, JavaDLTerm> resMap = varMap1;
 
-	for (final ImmutableMapEntry<QuantifiableVariable, Term> en : sub0.getVarMap()) {
+	for (final ImmutableMapEntry<QuantifiableVariable, JavaDLTerm> en : sub0.getVarMap()) {
 	    QuantifiableVariable key = en.key();
-	    Term value = en.value();
+	    JavaDLTerm value = en.value();
 	    if (varMap1.containsKey(key)) {
 		if (!(varMap1.get(key).equals(value)))
 		    return null;
@@ -119,7 +119,7 @@ class MultiTrigger implements Trigger {
 	return "" + triggers;
     }
 
-    public Term getTriggerTerm() {
+    public JavaDLTerm getTriggerTerm() {
 	return clause;
     }
 

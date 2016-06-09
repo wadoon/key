@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 
 import org.key_project.common.core.logic.op.SVSubstitute;
+import org.key_project.common.core.program.GenericNameAbstractionTable;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
 
@@ -114,7 +115,7 @@ public interface SourceElement extends SVSubstitute {
      * {int decl_1; i=0;} for the second one. These are not
      * syntactical equal, therefore false is returned. 
      */
-    boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat);
+    boolean equalsModRenaming(SourceElement se, GenericNameAbstractionTable nat);
 
     
 

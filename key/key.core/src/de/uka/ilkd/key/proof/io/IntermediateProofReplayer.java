@@ -38,7 +38,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -260,12 +260,12 @@ public class IntermediateProofReplayer {
                                     for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
                                         final Services services = currGoal.proof().getServices();
                                         
-                                        Triple<Term, Term, Term> ownSEState = sequentToSETriple(
+                                        Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> ownSEState = sequentToSETriple(
                                                 currNode, joinApp.posInOccurrence(), services);
-                                        Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
+                                        Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> partnerSEState = sequentToSETriple(
                                                 partnerNodeInfo.first, partnerNodeInfo.second, services);
                                         ProgramVariablesMatchVisitor matchVisitor = new ProgramVariablesMatchVisitor(
-                                                partnerSEState.third.javaBlock().program(), ownSEState.third.javaBlock().program(), services);
+                                                partnerSEState.third.modalContent().program(), ownSEState.third.modalContent().program(), services);
                                         matchVisitor.start();
                                         
                                         assert !matchVisitor.isIncompatible() : "Cannot join incompatible program counters";
@@ -812,7 +812,7 @@ public class IntermediateProofReplayer {
      * @throws ParserException
      *             In case of an error.
      */
-    public static Term parseTerm(String value, Proof proof, Namespace varNS,
+    public static JavaDLTerm parseTerm(String value, Proof proof, Namespace varNS,
             Namespace progVar_ns) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null,
@@ -835,7 +835,7 @@ public class IntermediateProofReplayer {
      *            Proof object (for namespaces and Services object).
      * @return The parsed term.
      */
-    public static Term parseTerm(String value, Proof proof) {
+    public static JavaDLTerm parseTerm(String value, Proof proof) {
         return parseTerm(value, proof, proof.getNamespaces().variables(), proof
                 .getNamespaces().programVariables());
     }
@@ -859,7 +859,7 @@ public class IntermediateProofReplayer {
             String value, Services services) {
         LogicVariable lv = new LogicVariable(new Name(value), app.getRealSort(
                 sv, services));
-        Term instance = services.getTermFactory().createTerm(lv);
+        JavaDLTerm instance = services.getTermFactory().createTerm(lv);
         return app.addCheckedInstantiation(sv, instance, services, true);
     }
 
@@ -901,7 +901,7 @@ public class IntermediateProofReplayer {
         else {
             Namespace varNS = p.getNamespaces().variables();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
-            Term instance = parseTerm(value, p, varNS,
+            JavaDLTerm instance = parseTerm(value, p, varNS,
                    varNS.extended(targetGoal.getGlobalProgVars()));
             result = app.addCheckedInstantiation(sv, instance, services, true);
         }

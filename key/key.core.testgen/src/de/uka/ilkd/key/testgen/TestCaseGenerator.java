@@ -28,7 +28,7 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
@@ -549,7 +549,7 @@ public class TestCaseGenerator {
 
 
 	protected String getOracleAssertion(List<OracleMethod> oracleMethods){		
-		Term postcondition = getPostCondition();
+		JavaDLTerm postcondition = getPostCondition();
 
 		OracleMethod oracle = oracleGenerator.generateOracleMethod(postcondition);
 
@@ -566,7 +566,7 @@ public class TestCaseGenerator {
 		return "assertTrue("+oracleCall.toString()+");";
 	}
 
-	private Term getPostCondition() {
+	private JavaDLTerm getPostCondition() {
 		return info.getPostCondition();
 	}
 	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers) throws IOException {
@@ -620,7 +620,7 @@ public class TestCaseGenerator {
 						.append("   //Test preamble: creating objects and intializing test data"
 								+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
 
-						Set<Term> vars = new HashSet<Term>();
+						Set<JavaDLTerm> vars = new HashSet<JavaDLTerm>();
 						info.getProgramVariables(info.getPO(), vars);         	  
 						testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
 						testMethod
@@ -685,13 +685,13 @@ public class TestCaseGenerator {
         Iterator<SequentFormula> formIter = n.sequent().iterator();
         //System.out.println("\n---------------------------------------");
         while(formIter.hasNext()){
-            Term t = formIter.next().formula();
+            JavaDLTerm t = formIter.next().formula();
             generateTypeInferenceMapHelper(t,typeInfMap);
         }
         return typeInfMap;
     }
 
-    private void generateTypeInferenceMapHelper(Term t, Map<String, Sort> map){
+    private void generateTypeInferenceMapHelper(JavaDLTerm t, Map<String, Sort> map){
         Operator op = t.op();
         if(op instanceof ProgramVariable){
             ProgramVariable pv = (ProgramVariable)t.op();
@@ -752,7 +752,7 @@ public class TestCaseGenerator {
         }
     }
     
-    private ProgramVariable getProgramVariable(Term locationTerm) {
+    private ProgramVariable getProgramVariable(JavaDLTerm locationTerm) {
         final HeapLDT heapLDT = services.getTheories().getHeapLDT();
         ProgramVariable result = null;
         if (locationTerm.op() instanceof Function) {
@@ -770,10 +770,10 @@ public class TestCaseGenerator {
         return result;
     }
 
-    private String getRemainingConstants(Collection<String> existingConstants, Collection<Term> newConstants){
+    private String getRemainingConstants(Collection<String> existingConstants, Collection<JavaDLTerm> newConstants){
 		String result = "";
 
-		for(Term c : newConstants){
+		for(JavaDLTerm c : newConstants){
 
 			if(!existingConstants.contains(c.toString())){
 

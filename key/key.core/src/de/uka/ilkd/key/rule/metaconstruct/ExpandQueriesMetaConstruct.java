@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.QueryExpand;
@@ -43,9 +43,9 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
  *  meta construct appears in a positive context wrt. to logical negation, (e.g. in the succedent or negated in the antecedent)
  *  False implies means that the meta construct appears in a negative context. (e.g. in the antecedent or negated in the succedent)
  */
-   public Term transform(Term term, SVInstantiations svInst, Services services) {
-    	Term arg1 = term.sub(0);
-    	Term arg2 = term.sub(1); //true or false. If true, than the application of the meta construct
+   public JavaDLTerm transform(JavaDLTerm term, SVInstantiations svInst, Services services) {
+    	JavaDLTerm arg1 = term.sub(0);
+    	JavaDLTerm arg2 = term.sub(1); //true or false. If true, than the application of the meta construct
     	boolean positiveContext;
     	if(arg2.op() == Junctor.TRUE){
     		positiveContext = true;
@@ -55,7 +55,7 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
     		throw new RuntimeException("Second argument of the meta construct "+name+ " must be true or false, but it is: "+arg2);
     	}
 
-    	final Term result;
+    	final JavaDLTerm result;
     	final StrategyProperties props = services.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
     	final boolean queryTreatmenIsOn = props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON;
     	if(queryTreatmenIsOn ||

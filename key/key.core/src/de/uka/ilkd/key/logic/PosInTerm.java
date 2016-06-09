@@ -206,12 +206,12 @@ public final class PosInTerm {
      * navigate to the subterm described by this position and return it
      * if the described position does not exist in the term an {@link IndexOutOfBoundsException}
      * is thrown
-     * @param t the {@link Term} 
+     * @param t the {@link JavaDLTerm} 
      * @return the sub term of term {@code t} at this position   
      * @throws an {@link IndexOutOfBoundsException} if no subterm exists at this position
      */
-    public Term getSubTerm(Term t) {
-        Term sub = t;
+    public JavaDLTerm getSubTerm(JavaDLTerm t) {
+        JavaDLTerm sub = t;
         for (int i = 0; i<size; i++) {  
             sub = sub.sub(positions[i]);
         }

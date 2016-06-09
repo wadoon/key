@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
@@ -120,7 +120,7 @@ public class TestTacletIndex extends TestCase{
      * test disabled. Since 0.632 "noninteractive" is disabled
      */
     public void disabled_testNonInteractiveIsShownOnlyIfHeuristicIsMissed() {
-	Term term_p1 = TacletForTests.parseTerm("p(one, zero)");	
+	JavaDLTerm term_p1 = TacletForTests.parseTerm("p(one, zero)");	
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
         listofHeuristic=listofHeuristic.prepend(h3);
         PosInOccurrence pos = new PosInOccurrence(new SequentFormula(term_p1),
@@ -154,7 +154,7 @@ public class TestTacletIndex extends TestCase{
         ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
 	listofHeuristic=listofHeuristic.prepend(h3).prepend(h2);
 
-	Term term_p1 = TacletForTests.parseTerm("p(one, zero)");	
+	JavaDLTerm term_p1 = TacletForTests.parseTerm("p(one, zero)");	
 
         SequentFormula cfma = new SequentFormula(term_p1);
         
@@ -188,7 +188,7 @@ public class TestTacletIndex extends TestCase{
         Services services = new Services(AbstractProfile.getDefaultProfile());
         ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
 
-	Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
+	JavaDLTerm term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 	
         PosInOccurrence posAntec = new PosInOccurrence(new SequentFormula(term_p2),
                 PosInTerm.getTopLevel(), true);
@@ -220,7 +220,7 @@ public class TestTacletIndex extends TestCase{
 	ruleIdx.add(ruleSucc);
 	ruleIdx.add(ruleMisMatch);
 
-	Term term_p4 = TacletForTests.parseTerm("p(zero, one)");
+	JavaDLTerm term_p4 = TacletForTests.parseTerm("p(zero, one)");
 
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
         PosInOccurrence posAntec = new PosInOccurrence(new SequentFormula(term_p4),
@@ -237,7 +237,7 @@ public class TestTacletIndex extends TestCase{
 	TacletIndex ruleIdx=TacletIndexKit.getKit().createTacletIndex();
 	ruleIdx.add(notfreeconflict);
 
-	Term term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
+	JavaDLTerm term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
 	SequentFormula cfma_p5 = new SequentFormula(term_p5);
 	Sequent seq_p5 = Sequent.createAnteSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p5).semisequent());
@@ -251,7 +251,7 @@ public class TestTacletIndex extends TestCase{
 			     null),
 			     notfreeconflict));
 
-	Term term_p6 = TacletForTests.
+	JavaDLTerm term_p6 = TacletForTests.
 	    parseTerm("\\forall nat z; p(zero, z)");
 
 	SequentFormula cfma_p6 = new SequentFormula(term_p6);

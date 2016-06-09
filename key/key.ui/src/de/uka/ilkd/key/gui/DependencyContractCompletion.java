@@ -22,7 +22,7 @@ import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -83,7 +83,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         extractHeaps(heapContext, steps, heaps, lp);
 
-        final Term[] resultHeaps;
+        final JavaDLTerm[] resultHeaps;
         if (!forced) {
             // open dialog
             final TermStringWrapper heapWrapper = (TermStringWrapper) JOptionPane
@@ -103,7 +103,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         return findCorrespondingStep(steps, resultHeaps);
     }
     
-    public static PosInOccurrence findCorrespondingStep(List<PosInOccurrence> steps, Term[] resultHeaps) {
+    public static PosInOccurrence findCorrespondingStep(List<PosInOccurrence> steps, JavaDLTerm[] resultHeaps) {
        // find corresponding step
        for (PosInOccurrence step : steps) {
            boolean match = true;
@@ -131,12 +131,12 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
             // subterm may either be an observer or a heap term already
             int size = (op instanceof IObserverFunction)?
                 ((IObserverFunction)op).getStateCount()*heapContext.size(): 1;
-            final Term[] heapTerms = new Term[size];
+            final JavaDLTerm[] heapTerms = new JavaDLTerm[size];
             String prettyprint = "<html><tt>" + (size > 1 ? "[" : "");
             for(int j =0 ; j < size; j++) {
                 // TODO: there may still be work to do
                 // what if we have a heap term, where the base heap lies deeper?
-                final Term heap = step.subTerm().sub(j);
+                final JavaDLTerm heap = step.subTerm().sub(j);
                 heapTerms[j] = heap;
                 lp.reset();
                 try {
@@ -153,10 +153,10 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     }
 
     public static final class TermStringWrapper {
-        public final Term[] terms;
+        public final JavaDLTerm[] terms;
         final String string;
 
-        public TermStringWrapper(Term[] terms, String string) {
+        public TermStringWrapper(JavaDLTerm[] terms, String string) {
             this.terms = terms;
             this.string = string;
         }

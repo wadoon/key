@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.op.UpdateApplication;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -98,20 +98,20 @@ public class JoinIsApplicable {
      */
     private ProspectivePartner areProspectivePartners(Goal g1,
             PosInOccurrence pio, Goal g2) {
-        Term referenceFormula = pio.subTerm();
+        JavaDLTerm referenceFormula = pio.subTerm();
 
         assert g1.proof().getServices() == g2.proof().getServices();
         TermBuilder tb = g1.proof().getServices().getTermBuilder();
 
-        Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula
+        JavaDLTerm update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula
                 .sub(0) : tb.skip();
 
         referenceFormula = referenceFormula.op() instanceof UpdateApplication ? referenceFormula
                 .sub(1) : referenceFormula;
 
         for (SequentFormula sf : g2.sequent().succedent()) {
-            Term formula = sf.formula();
-            Term update2 = tb.skip();
+            JavaDLTerm formula = sf.formula();
+            JavaDLTerm update2 = tb.skip();
             if (formula.op() instanceof UpdateApplication
                     && !formula.equalsModRenaming(referenceFormula)) {
                 update2 = formula.sub(0);// don't change the order of this and

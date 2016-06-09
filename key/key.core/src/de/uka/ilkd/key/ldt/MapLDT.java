@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * LDT for maps.
@@ -44,16 +44,16 @@ public final class MapLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-            Term[] subs,
+            JavaDLTerm[] subs,
             Services services,
             ExecutionContext ec) {
-        return isResponsible(op, (Term) null, services, ec);
+        return isResponsible(op, (JavaDLTerm) null, services, ec);
     }
 
     @Override
     public boolean isResponsible(Operator op,
-            Term left,
-            Term right,
+            JavaDLTerm left,
+            JavaDLTerm right,
             Services services,
             ExecutionContext ec) {
         return false;
@@ -61,14 +61,14 @@ public final class MapLDT extends LDT {
 
     @Override
     public boolean isResponsible(Operator op,
-            Term sub,
+            JavaDLTerm sub,
             TermServices services,
             ExecutionContext ec) {
         return false;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JavaDLTerm translateLiteral(Literal lit, Services services) {
         assert lit instanceof EmptyMapLiteral;
         return services.getTermBuilder().func(mapEmpty);
     }
@@ -87,7 +87,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
         if (t.op().equals(mapEmpty)) {
             return EmptyMapLiteral.INSTANCE;
         }
@@ -96,7 +96,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public final Type getType(Term t) {
+    public final Type getType(JavaDLTerm t) {
         assert false;
         return null;
     }

@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
@@ -31,11 +31,11 @@ public class EliminableQuantifierTF extends BinaryTermFeature {
     
     private EliminableQuantifierTF () {}
     
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(JavaDLTerm term, Services services) {
         final Operator op = term.op ();
         assert op == Quantifier.ALL || op == Quantifier.EX;
         
-        Term matrix = term;
+        JavaDLTerm matrix = term;
         do {
             matrix = matrix.sub ( 0 );
         } while ( matrix.op () == term.op () );

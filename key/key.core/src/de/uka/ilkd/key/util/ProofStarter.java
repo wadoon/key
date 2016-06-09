@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -70,7 +70,7 @@ public class ProofStarter {
             this.proofName = proofName;
         }
 
-        public UserProvidedInput(Term formula, ProofEnvironment env) {
+        public UserProvidedInput(JavaDLTerm formula, ProofEnvironment env) {
             this(Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT.insertFirst(
                     new SequentFormula(formula)).semisequent()), env);
         }
@@ -158,7 +158,7 @@ public class ProofStarter {
      *
      * @throws ProofInputException
      */
-    public void init(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
+    public void init(JavaDLTerm formulaToProve, ProofEnvironment env) throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
         proof = input.getPO().getFirstProof();
         proof.setEnv(env);

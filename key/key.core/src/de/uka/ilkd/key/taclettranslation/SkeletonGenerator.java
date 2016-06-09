@@ -30,7 +30,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -45,7 +45,7 @@ public interface SkeletonGenerator{
     * @param services TODO
      * @return returns the translation of the taclet.
      */
-    public Term translate(Taclet t, TermServices services)
+    public JavaDLTerm translate(Taclet t, TermServices services)
 	    throws IllegalTacletException;
 }
 
@@ -67,11 +67,11 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
       * @return the resulting term of the translation or <code>null</code> if
       *         both antecedent and succendent are empty.
       */
-     protected Term translate(Sequent s, TermServices services) {
+     protected JavaDLTerm translate(Sequent s, TermServices services) {
  	TermBuilder builder = services.getTermBuilder();
 
- 	ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());
- 	ImmutableList<Term> succ = getFormulaeOfSemisequent(s.succedent());
+ 	ImmutableList<JavaDLTerm> ante = getFormulaeOfSemisequent(s.antecedent());
+ 	ImmutableList<JavaDLTerm> succ = getFormulaeOfSemisequent(s.succedent());
 
  	if (ante.size() == 0 && succ.size() == 0)
  	    return null;
@@ -91,8 +91,8 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
       *            Semisequent.
       * @return A list of all formulae of the semisequent <code>s </code>.
       */
-     private ImmutableList<Term> getFormulaeOfSemisequent(Semisequent s) {
- 	ImmutableList<Term> terms = ImmutableSLList.nil();
+     private ImmutableList<JavaDLTerm> getFormulaeOfSemisequent(Semisequent s) {
+ 	ImmutableList<JavaDLTerm> terms = ImmutableSLList.nil();
  	for (SequentFormula cf : s) {
  	    terms = terms.append(cf.formula());
  	}

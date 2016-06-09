@@ -27,7 +27,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -53,7 +53,7 @@ public class TacletPrefixBuilder {
 	this.tacletBuilder=tacletBuilder;
     }
 
-    private void addVarsBoundHere(Term visited, int subTerm) {
+    private void addVarsBoundHere(JavaDLTerm visited, int subTerm) {
 	ImmutableArray<QuantifiableVariable> bdVars=visited.varsBoundHere(subTerm);
 	for (int i=0; i<bdVars.size(); i++) {
 	    QuantifiableVariable boundVar = bdVars.get(i);
@@ -86,7 +86,7 @@ public class TacletPrefixBuilder {
 	return result;
     }
 
-    private void visit(Term t) {
+    private void visit(JavaDLTerm t) {
 	if (t.op() instanceof SchemaVariable && 
             t.arity() == 0 &&
 	    !(t.op() instanceof VariableSV) &&
@@ -151,7 +151,7 @@ public class TacletPrefixBuilder {
 
         if (tacletBuilder instanceof FindTacletBuilder) {
             @SuppressWarnings("unchecked")
-            final Term find = ((FindTacletBuilder<? extends FindTaclet>)tacletBuilder).getFind();
+            final JavaDLTerm find = ((FindTacletBuilder<? extends FindTaclet>)tacletBuilder).getFind();
             visit(find);
         }
 

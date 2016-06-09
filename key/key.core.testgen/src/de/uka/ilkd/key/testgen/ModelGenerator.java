@@ -11,7 +11,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -124,7 +124,7 @@ public class ModelGenerator implements SolverLauncherListener{
 
 		TermBuilder tb = services.getTermBuilder();
 		Namespace variables = services.getNamespaces().programVariables();
-		Term tmodel=tb.tt();
+		JavaDLTerm tmodel=tb.tt();
 		for(String c : m.getConstants().keySet()){
 
 			SMTSort sort = m.getTypes().getTypeForConstant(c);
@@ -135,10 +135,10 @@ public class ModelGenerator implements SolverLauncherListener{
 				//System.out.println(val);
 				int value = Integer.parseInt(val);
 				ProgramVariable v = (ProgramVariable)variables.lookup(c);				
-				Term termConst = tb.var(v);
-				//Term termConst =  tb.func(f);
-				Term termVal = tb.zTerm(value);
-				Term termEquals = tb.equals(termConst, termVal);
+				JavaDLTerm termConst = tb.var(v);
+				//JavaDLTerm termConst =  tb.func(f);
+				JavaDLTerm termVal = tb.zTerm(value);
+				JavaDLTerm termEquals = tb.equals(termConst, termVal);
 				tmodel = tb.and(tmodel,termEquals);
 			}
 		}
@@ -146,7 +146,7 @@ public class ModelGenerator implements SolverLauncherListener{
 
 		if(!tmodel.equals(tb.tt())){
 			//System.out.println(tmodel);
-			Term notTerm = tb.not(tmodel);
+			JavaDLTerm notTerm = tb.not(tmodel);
 			SequentFormula sf = new SequentFormula(notTerm);			
 			goal.addFormula(sf, true, true);		
 			return true;
@@ -172,9 +172,9 @@ public class ModelGenerator implements SolverLauncherListener{
 
 	}
 
-	public Term sequentToTerm(Sequent s) {
+	public JavaDLTerm sequentToTerm(Sequent s) {
 
-		ImmutableList<Term> ante = ImmutableSLList.nil();
+		ImmutableList<JavaDLTerm> ante = ImmutableSLList.nil();
 
 		final TermBuilder tb = services.getTermBuilder();
 		ante = ante.append(tb.tt());
@@ -182,7 +182,7 @@ public class ModelGenerator implements SolverLauncherListener{
 			ante = ante.append(f.formula());
 		}
 
-		ImmutableList<Term> succ = ImmutableSLList.nil();
+		ImmutableList<JavaDLTerm> succ = ImmutableSLList.nil();
 		succ = succ.append(tb.ff());
 		for (SequentFormula f : s.succedent()) {
 			succ = succ.append(f.formula());

@@ -35,7 +35,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -460,7 +460,7 @@ public class OutputStreamProofSaver {
 	 
          final Object value = pair.value().getInstantiation();
 	 
-         if (!(value instanceof Term || value instanceof ProgramElement || value instanceof Name)) {
+         if (!(value instanceof JavaDLTerm || value instanceof ProgramElement || value instanceof Name)) {
              throw new RuntimeException("Saving failed.\n"+
                          "FIXME: Unhandled instantiation type: " +  value.getClass());
          }
@@ -538,12 +538,12 @@ public class OutputStreamProofSaver {
     }
 
 
-    public static StringBuffer printTerm(Term t, Services serv) {
+    public static StringBuffer printTerm(JavaDLTerm t, Services serv) {
         return printTerm(t, serv, false);
     }
 
 
-    public static StringBuffer printTerm(Term t, Services serv, 
+    public static StringBuffer printTerm(JavaDLTerm t, Services serv, 
             boolean shortAttrNotation) {
         StringBuffer result;
         LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
@@ -567,8 +567,8 @@ public class OutputStreamProofSaver {
             return printProgramElement((ProgramElement) val);
         }
         else
-            if (val instanceof Term) {
-                return printTerm((Term) val, services, shortAttrNotation);
+            if (val instanceof JavaDLTerm) {
+                return printTerm((JavaDLTerm) val, services, shortAttrNotation);
             } else if (val instanceof Sequent) {
                 return printSequent((Sequent) val, services);
             } else if (val instanceof Name) {

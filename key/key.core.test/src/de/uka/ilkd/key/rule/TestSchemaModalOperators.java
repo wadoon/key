@@ -34,7 +34,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -104,13 +104,13 @@ public class TestSchemaModalOperators extends TestCase {
 	Metavariable mv_y = new Metavariable(new Name("Y"), s);
 	Metavariable mv = new Metavariable(new Name("mv"), s);
 
- 	Term t_mv = tf.createFunctionTerm(mv, new Term[]{});
- 	Term t_mv_x = tf.createFunctionTerm(mv_x, new Term[]{});
- 	Term t_mv_y = tf.createFunctionTerm(mv_y, new Term[]{});
+ 	JavaDLTerm t_mv = tf.createFunctionTerm(mv, new JavaDLTerm[]{});
+ 	JavaDLTerm t_mv_x = tf.createFunctionTerm(mv_x, new JavaDLTerm[]{});
+ 	JavaDLTerm t_mv_y = tf.createFunctionTerm(mv_y, new JavaDLTerm[]{});
 		
- 	Term t_c = tf.createFunctionTerm(c, new Term[]{});
- 	Term t_f_X_c = tf.createFunctionTerm(f, new Term[]{t_mv_x, t_c});
- 	Term t_f_c_X = tf.createFunctionTerm(f, new Term[]{t_c, t_mv_x});
+ 	JavaDLTerm t_c = tf.createFunctionTerm(c, new JavaDLTerm[]{});
+ 	JavaDLTerm t_f_X_c = tf.createFunctionTerm(f, new JavaDLTerm[]{t_mv_x, t_c});
+ 	JavaDLTerm t_f_c_X = tf.createFunctionTerm(f, new JavaDLTerm[]{t_c, t_mv_x});
 
 	consMV_f_c_X = Constraint.BOTTOM.unify(t_mv, t_f_c_X);
 	consMV_f_X_c = Constraint.BOTTOM.unify(t_mv, t_f_X_c);
@@ -147,17 +147,17 @@ public class TestSchemaModalOperators extends TestCase {
 	modalities = modalities.add(Modality.DIA).add(Modality.BOX);
 	SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(
 	      new Name("diabox"), Sort.FORMULA, modalities);
-	Term tpost = TB.tf().createTerm(fsv, new Term[0]);
+	JavaDLTerm tpost = TB.tf().createTerm(fsv, new JavaDLTerm[0]);
 
-	Term find = TB.tf().createTerm(
+	JavaDLTerm find = TB.tf().createTerm(
 	    osv,
-	    new Term[]{tpost},
+	    new JavaDLTerm[]{tpost},
 	    null,
             JavaBlock.EMPTY_JAVABLOCK);
 
-	Term replace = TB.tf().createTerm(
+	JavaDLTerm replace = TB.tf().createTerm(
 	    osv,
-	    new Term[]{TB.tt()},
+	    new JavaDLTerm[]{TB.tt()},
 	    null,
             JavaBlock.EMPTY_JAVABLOCK);
 
@@ -170,7 +170,7 @@ public class TestSchemaModalOperators extends TestCase {
 
 	RewriteTaclet t = rtb.getRewriteTaclet();
 
-	Term goal = TB.prog(
+	JavaDLTerm goal = TB.prog(
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
             TB.ff());
@@ -185,7 +185,7 @@ public class TestSchemaModalOperators extends TestCase {
 
 	 PosInOccurrence pos = new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
 	 PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
-	 Term instReplace = 
+	 JavaDLTerm instReplace = 
 	         t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();
 	 assertNotNull(instReplace);
 	 assertTrue(instReplace.op() == Modality.DIA);

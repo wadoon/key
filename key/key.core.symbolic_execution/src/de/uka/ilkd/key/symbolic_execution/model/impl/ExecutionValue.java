@@ -26,7 +26,7 @@ import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -80,10 +80,10 @@ public class ExecutionValue extends AbstractExecutionValue {
    public ExecutionValue(Node proofNode, 
                          ExecutionVariable variable,
                          boolean valueUnknown, 
-                         Term value, 
+                         JavaDLTerm value, 
                          String valueString,
                          String typeString,
-                         Term condition,
+                         JavaDLTerm condition,
                          String conditionString) {
       super(variable.getSettings(), proofNode, variable, condition, value);
       this.valueUnknown = valueUnknown;
@@ -138,7 +138,7 @@ public class ExecutionValue extends AbstractExecutionValue {
       List<ExecutionVariable> children = new LinkedList<ExecutionVariable>();
       if (!isDisposed()) {
          final Services services = getServices();
-         Term value = getValue();
+         JavaDLTerm value = getValue();
          if (value != null && !isValueUnknown()) { // Don't show children of unknown values
             Sort valueSort = value.sort();
             if (valueSort != services.getProgramServices().getJavaInfo().getNullType().getSort()) {
@@ -159,7 +159,7 @@ public class ExecutionValue extends AbstractExecutionValue {
                                            Integer.valueOf(lengthValue.getValueString()) :
                                            Integer.valueOf(SymbolicExecutionUtil.formatTerm(lengthValue.getValue(), services, false, true));
                               for (int i = 0; i < length; i++) {
-                                 Term indexTerm = services.getTermBuilder().zTerm(i);
+                                 JavaDLTerm indexTerm = services.getTermBuilder().zTerm(i);
                                  ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, indexTerm, lengthValue, getVariable().getAdditionalCondition());
                                  children.add(childI);
                               }

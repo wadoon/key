@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 /**
@@ -9,7 +9,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
  */
 interface FactoryMethod {
 
-    Term produce(BasicSnippetData d,
+    JavaDLTerm produce(BasicSnippetData d,
                  ProofObligationVars poVars)
             throws UnsupportedOperationException;
 }

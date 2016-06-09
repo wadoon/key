@@ -36,7 +36,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -136,7 +136,7 @@ public class TestTacletParser extends TestCase {
 		services, nss);
     }
 
-    public Term parseTerm(String s) {
+    public JavaDLTerm parseTerm(String s) {
 	try {
 	    KeYParserF p = stringTacletParser(s);
 	    return p.term();
@@ -149,7 +149,7 @@ public class TestTacletParser extends TestCase {
     }
 
 
-    public Term parseFma(String s) {
+    public JavaDLTerm parseFma(String s) {
 	try {
 	    KeYParserF p = stringTacletParser(s);
 	    
@@ -407,8 +407,8 @@ public class TestTacletParser extends TestCase {
     public void testSchemaJava4() {
 	FindTaclet taclet=	(FindTaclet) parseTaclet("variable_declaration{ \\find (\\<{.. #typ #v0; ...}\\>post)"
 		  +" \\replacewith (\\<{.. #typ #v0; if (true); ...}\\>post)	}");
-	Term find=taclet.find();
-	JavaBlock jb=find.javaBlock();
+	JavaDLTerm find=taclet.find();
+	JavaBlock jb=find.modalContent();
 
 	ContextStatementBlock ct=(ContextStatementBlock)jb.program();
 	LocalVariableDeclaration lvd=(LocalVariableDeclaration)ct.getChildAt(0);
@@ -427,8 +427,8 @@ public class TestTacletParser extends TestCase {
     public void testSchemaJava6() {
 	FindTaclet taclet=	(FindTaclet) parseTaclet("xy{ \\find (\\<{.. boolean #boolv; ...}\\>post)"
 		  +" \\replacewith (\\<{.. if (true); ...}\\>post)	}");
-	Term find=taclet.find();
-	JavaBlock jb=find.javaBlock();
+	JavaDLTerm find=taclet.find();
+	JavaBlock jb=find.modalContent();
 
 	ContextStatementBlock ct=(ContextStatementBlock)jb.program();
 	LocalVariableDeclaration lvd=(LocalVariableDeclaration)ct.getChildAt(0);
@@ -441,16 +441,16 @@ public class TestTacletParser extends TestCase {
 	FindTaclet taclet=	(FindTaclet) parseTaclet
 	    ("break_test {\\find(\\<{.. #lb0:{ break #lb1; } ...}\\>post)"+ 
 	     " \\replacewith (\\<{..  ...}\\>post)}"); 
-	Term find=taclet.find();
-	JavaBlock jb=find.javaBlock();
+	JavaDLTerm find=taclet.find();
+	JavaBlock jb=find.modalContent();
 	ContextStatementBlock ct=(ContextStatementBlock)jb.program();
     }
 
     public void testSchemaJava10() {
 	FindTaclet taclet=	(FindTaclet) parseTaclet
 	    ("array_test {\\find(\\<{..#arr[#e][#e2]=#e2;...}\\>true) \\replacewith (true)}");
-	Term find=taclet.find();
-	JavaBlock jb=find.javaBlock();
+	JavaDLTerm find=taclet.find();
+	JavaBlock jb=find.modalContent();
 	ContextStatementBlock ct=(ContextStatementBlock)jb.program();
 	CopyAssignment ca=(CopyAssignment)ct.getChildAt(0);
 	ArrayReference ar=(ArrayReference)ca.getChildAt(0);

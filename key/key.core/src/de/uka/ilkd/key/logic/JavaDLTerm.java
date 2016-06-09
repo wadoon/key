@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * {@link GenericTerm} extension for Java terms, provides methods related to
@@ -21,20 +22,19 @@ import org.key_project.common.core.logic.GenericTerm;
  *
  * @author Dominic Scheurer
  */
-public interface Term extends GenericTerm {
+public interface JavaDLTerm extends GenericTerm<JavaDLVisitor> {
+
+    
+
+    @Override
+    public ImmutableArray<JavaDLTerm> subs();
+
+    @Override
+    public JavaDLTerm sub(int nr);
 
     /**
      * The Java block at top level.
      */
-    public JavaBlock javaBlock();
-
-    /**
-     * Checks if the {@link Term} or one of its direct or indirect children
-     * contains a non empty {@link JavaBlock}.
-     * 
-     * @return {@code true} The {@link Term} or one of its direct or indirect
-     *         children contains a non empty {@link JavaBlock}, {@code false} no
-     *         {@link JavaBlock} available.
-     */
-    public boolean isContainsJavaBlockRecursive();
+    @Override
+    public JavaBlock modalContent();
 }

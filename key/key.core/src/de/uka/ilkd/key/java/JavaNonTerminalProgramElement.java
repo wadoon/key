@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java;
 
+import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -71,7 +72,7 @@ public abstract class JavaNonTerminalProgramElement
      * the children.
      */
     public boolean equalsModRenaming(SourceElement se, 
-				     NameAbstractionTable nat) {
+				     GenericNameAbstractionTable nat) {
 
     if (se == this) {
         return true;

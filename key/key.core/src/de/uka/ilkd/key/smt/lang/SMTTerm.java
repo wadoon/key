@@ -121,7 +121,7 @@ public abstract class SMTTerm {
 	return new SMTTermCall(func, args);
     }
 
-    // public static Term call(Function func, List<Term> args) {
+    // public static JavaDLTerm call(Function func, List<JavaDLTerm> args) {
     // return new TermCall(func, args);
     // }
 
@@ -164,17 +164,17 @@ public abstract class SMTTerm {
 	return new SMTTermCall(func, argsList);
     }
 
-    // public static Term call(Function func, List<Term> args, Term... moreArgs)
+    // public static JavaDLTerm call(Function func, List<JavaDLTerm> args, JavaDLTerm... moreArgs)
     // {
-    // List<Term> argsList = new LinkedList<Term>();
+    // List<JavaDLTerm> argsList = new LinkedList<JavaDLTerm>();
     //
     // if (args != null) {
-    // for (Term arg : args) {
+    // for (JavaDLTerm arg : args) {
     // argsList.add(arg);
     // }
     // }
     // if (moreArgs != null) {
-    // for (Term arg : moreArgs) {
+    // for (JavaDLTerm arg : moreArgs) {
     // argsList.add(arg);
     // }
     // }
@@ -310,7 +310,7 @@ public abstract class SMTTerm {
 
     /*
      * Help object methods for building Terms. An other purpose of the methods,
-     * is to perform some (logical) simplification during the Term
+     * is to perform some (logical) simplification during the JavaDLTerm
      * generation/translation. Some very basic simplification, for sub Terms
      * equal to {TRUE, FALSE}, are already implemented.
      * 
@@ -614,7 +614,7 @@ public abstract class SMTTerm {
 	return new SMTTermMultOp(SMTTermMultOp.Op.EQUALS, args);
     }
 
-    // For Term (e.g. Boolean valued terms), the equality "=" and equivalent
+    // For JavaDLTerm (e.g. Boolean valued terms), the equality "=" and equivalent
     // "iff" are in SMT the same. (I hope)
     public SMTTerm equal(SMTTerm right) {
 	if (this == right)
@@ -1159,7 +1159,7 @@ public abstract class SMTTerm {
     // }
     //
     // // @Override
-    // public int hashCode (Term t) {
+    // public int hashCode (JavaDLTerm t) {
     // return super.hashCode();
     //
     // }

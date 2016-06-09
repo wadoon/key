@@ -34,7 +34,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -229,7 +229,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
      *            The term to check.
      * @return True iff there is a modality in the sequent of the given term.
      */
-    private static boolean hasModality(Term term) {
+    private static boolean hasModality(JavaDLTerm term) {
         if (term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
             // ignore self composition terms
             return false;
@@ -239,7 +239,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             return true;
         }
 
-        for (Term sub : term.subs()) {
+        for (JavaDLTerm sub : term.subs()) {
             if (hasModality(sub)) {
                 return true;
             }

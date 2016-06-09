@@ -145,12 +145,12 @@ public abstract class VariableNamer implements InstantiationProposer {
      * returns the subterm containing a java block, or null
      * (helper for getProgramFromPIO())
      */
-    private Term findProgramInTerm(Term term) {
-        if(!term.javaBlock().isEmpty()) {
+    private JavaDLTerm findProgramInTerm(JavaDLTerm term) {
+        if(!term.modalContent().isEmpty()) {
     	    return term;
     	}
     	for(int i = 0; i < term.arity(); i++) {
-    	    Term subterm = findProgramInTerm(term.sub(i));
+    	    JavaDLTerm subterm = findProgramInTerm(term.sub(i));
     	    if(subterm != null) {
     	    	return subterm;
     	    }
@@ -163,10 +163,10 @@ public abstract class VariableNamer implements InstantiationProposer {
      * returns the program contained in a PosInOccurrence
      */
     protected ProgramElement getProgramFromPIO(PosInOccurrence pio) {
-    	Term progTerm;
+    	JavaDLTerm progTerm;
     	if(pio != null
     	   && (progTerm = findProgramInTerm(pio.subTerm())) != null) {
-    	    return progTerm.javaBlock().program();
+    	    return progTerm.modalContent().program();
     	} else {
     	    return new EmptyStatement();
     	}
@@ -639,9 +639,9 @@ public abstract class VariableNamer implements InstantiationProposer {
 	    String name = "";
 	    while (templs.hasNext()) {
                 rwgt = (RewriteTacletGoalTemplate) templs.next();
-	        Term t = findProgramInTerm(rwgt.replaceWith());
+	        JavaDLTerm t = findProgramInTerm(rwgt.replaceWith());
 	        ContextStatementBlock c =
-                    (ContextStatementBlock) t.javaBlock().program();
+                    (ContextStatementBlock) t.modalContent().program();
 		if (c.getStatementAt(0) instanceof LocalVariableDeclaration) {
 	            VariableSpecification v =
                 	((LocalVariableDeclaration) c.getStatementAt(0)).

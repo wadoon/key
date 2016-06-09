@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
@@ -29,7 +29,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    /**
     * The return value.
     */
-   private final Term returnValue;
+   private final JavaDLTerm returnValue;
    
    /**
     * The {@link PosInOccurrence} of the modality of interest.
@@ -44,7 +44,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    /**
     * The optional condition.
     */
-   private final Term condition;
+   private final JavaDLTerm condition;
 
    /**
     * The optional condition as human readable {@link String}.
@@ -61,8 +61,8 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    public ExecutionMethodReturnValue(ITreeSettings settings,
                                      Node proofNode, 
                                      PosInOccurrence modalityPIO,
-                                     Term returnValue, 
-                                     Term condition) {
+                                     JavaDLTerm returnValue, 
+                                     JavaDLTerm condition) {
       super(settings, proofNode);
       assert returnValue != null;
       assert modalityPIO != null;
@@ -96,7 +96,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     * {@inheritDoc}
     */
    @Override
-   public Term getReturnValue() throws ProofInputException {
+   public JavaDLTerm getReturnValue() throws ProofInputException {
       return returnValue;
    }
 
@@ -132,7 +132,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     * {@inheritDoc}
     */
    @Override
-   public Term getCondition() throws ProofInputException {
+   public JavaDLTerm getCondition() throws ProofInputException {
       return condition;
    }
 

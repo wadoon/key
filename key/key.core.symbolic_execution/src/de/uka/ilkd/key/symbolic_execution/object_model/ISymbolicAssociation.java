@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
 
@@ -45,7 +45,7 @@ public interface ISymbolicAssociation extends ISymbolicElement {
     * Returns the represented array index or {@code null} if a program variable is represented..
     * @return The represented array index or {@code null} if a program variable is represented..
     */
-   public Term getArrayIndex();
+   public JavaDLTerm getArrayIndex();
    
    /**
     * Returns the human readable array index or {@code null} if a program variable is represented..
@@ -82,7 +82,7 @@ public interface ISymbolicAssociation extends ISymbolicElement {
     * </p>
     * @return The optional condition under which this association is valid.
     */
-   public Term getCondition();
+   public JavaDLTerm getCondition();
    
    /**
     * <p>

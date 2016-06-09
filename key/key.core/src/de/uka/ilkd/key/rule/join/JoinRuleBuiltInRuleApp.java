@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -38,7 +38,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     private SymbolicExecutionStateWithProgCnt thisSEState = null;
     private ImmutableList<SymbolicExecutionState> joinPartnerStates = null;
-    private Term distForm = null;
+    private JavaDLTerm distForm = null;
 
 	public JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio) {
@@ -123,7 +123,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
             final Services services = joinPartner.first.proof().getServices();
             
-            Triple<Term, Term, Term> partnerSEState =
+            Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> partnerSEState =
                   sequentToSETriple(joinPartner.first.node(), joinPartner.second, services);
             
             joinPartnerStates = joinPartnerStates.prepend(
@@ -148,7 +148,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		this.thisSEState = JoinRuleUtils.sequentToSETriple(joinNode, super.pio, joinNode.proof().getServices());
 	}
 	
-	public void setDistinguishingFormula(Term distForm) {
+	public void setDistinguishingFormula(JavaDLTerm distForm) {
 	    // null is OK: In this case, we generate the distinguishing
 	    // formula automatically. Otherwise, the term must indeed be
 	    // a formula.
@@ -157,7 +157,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 	    this.distForm  = distForm;
 	}
     
-    public Term getDistinguishingFormula() {
+    public JavaDLTerm getDistinguishingFormula() {
         return distForm;
     }
 	

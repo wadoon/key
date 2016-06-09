@@ -18,7 +18,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -92,11 +92,11 @@ public class BlockExecutionPO extends AbstractInfFlowPO
                                                  context, environmentServices);
 
         // symbolic execution
-        final Term symExec =
+        final JavaDLTerm symExec =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC_WITH_PRE);
 
         // final symbolic execution term
-        final Term finalTerm = tb.applyElementary(symbExecVars.pre.heap,
+        final JavaDLTerm finalTerm = tb.applyElementary(symbExecVars.pre.heap,
                                                   tb.not(symExec));
 
         // register final term
@@ -197,7 +197,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO
     }
 
     @Override
-    public void addIFSymbol(Term t) {
+    public void addIFSymbol(JavaDLTerm t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
@@ -209,7 +209,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO
     }
 
     @Override
-    public void addLabeledIFSymbol(Term t) {
+    public void addLabeledIFSymbol(JavaDLTerm t) {
         assert t != null;
         infFlowSymbols.addLabeled(t);
     }
@@ -227,10 +227,10 @@ public class BlockExecutionPO extends AbstractInfFlowPO
     }
 
     @Override
-    protected Term getGlobalDefs(LocationVariable heap,
-                                 Term heapTerm,
-                                 Term selfTerm,
-                                 ImmutableList<Term> paramTerms,
+    protected JavaDLTerm getGlobalDefs(LocationVariable heap,
+                                 JavaDLTerm heapTerm,
+                                 JavaDLTerm selfTerm,
+                                 ImmutableList<JavaDLTerm> paramTerms,
                                  Services services) {
         // information flow contracts do not have global defs
         return null;
@@ -271,7 +271,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO
 
     @Override
     @Deprecated
-    protected Term getPre(List<LocationVariable> modHeaps,
+    protected JavaDLTerm getPre(List<LocationVariable> modHeaps,
                           ProgramVariable selfVar,
                           ImmutableList<ProgramVariable> paramVars,
                           Map<LocationVariable, LocationVariable> atPreVars,
@@ -283,7 +283,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO
 
     @Override
     @Deprecated
-    protected Term getPost(List<LocationVariable> modHeaps,
+    protected JavaDLTerm getPost(List<LocationVariable> modHeaps,
                            ProgramVariable selfVar,
                            ImmutableList<ProgramVariable> paramVars,
                            ProgramVariable resultVar,
@@ -297,8 +297,8 @@ public class BlockExecutionPO extends AbstractInfFlowPO
 
     @Override
     @Deprecated
-    protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                    Map<Term, Term> heapToAtPre,
+    protected JavaDLTerm buildFrameClause(List<LocationVariable> modHeaps,
+                                    Map<JavaDLTerm, JavaDLTerm> heapToAtPre,
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
                                     Services services) {
@@ -309,7 +309,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO
 
     @Override
     @Deprecated
-    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
+    protected JavaDLTerm generateMbyAtPreDef(ProgramVariable selfVar,
                                        ImmutableList<ProgramVariable> paramVars,
                                        Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +

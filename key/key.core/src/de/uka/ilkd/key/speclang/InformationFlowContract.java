@@ -12,7 +12,7 @@ package de.uka.ilkd.key.speclang;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -48,28 +48,28 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the original precondition of the contract.
      */
-    Term getPre();
+    JavaDLTerm getPre();
     
 
     /**
      * Returns the original modifies clause of the contract.
      */
-    Term getMod();
+    JavaDLTerm getMod();
 
 
     /**
      * Returns the original measured_by clause of the contract.
      */
-    Term getMby();
+    JavaDLTerm getMby();
 
     
     /**
      * Get the exception-variable which is used in this contract.
      * @return used exception-variable
      */
-    public Term getExc();
+    public JavaDLTerm getExc();
 
-    public Term getAtPre();
+    public JavaDLTerm getAtPre();
 
 
     public boolean isReadOnlyContract();
@@ -87,7 +87,7 @@ public interface InformationFlowContract extends Contract {
     public InformationFlowContract setModality(Modality modality);
 
 
-    public InformationFlowContract setModifies(Term modifies);
+    public InformationFlowContract setModifies(JavaDLTerm modifies);
 
 
     /**
@@ -102,14 +102,14 @@ public interface InformationFlowContract extends Contract {
      * Get the self-variable which is used in this contract.
      * @return originally used self-variable
      */
-    Term getSelf();
+    JavaDLTerm getSelf();
 
 
     /**
      * Get the parameter-variables which is used in this contract.
      * @return originally used parameter-variables
      */
-    ImmutableList<Term> getParams();
+    ImmutableList<JavaDLTerm> getParams();
 
 
     /**
@@ -125,7 +125,7 @@ public interface InformationFlowContract extends Contract {
      * Get the result-variable which is used in this contract.
      * @return used result-variable
      */
-    Term getResult();
+    JavaDLTerm getResult();
     
     
     public boolean equals(Contract c);
@@ -141,7 +141,7 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the dependency set of the contract.
      */
-    Term getDep();
+    JavaDLTerm getDep();
 
 
     /**

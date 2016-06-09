@@ -40,7 +40,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 public class TestTermFactory extends TestCase {
     
 
-    private Term et1;
+    private JavaDLTerm et1;
     private Sort sort1  = new SortImpl(new Name("S1"));
     private Sort sort2  = new SortImpl(new Name("S2"));
     private Sort sort3  = new SortImpl(new Name("S3"));
@@ -80,28 +80,28 @@ public class TestTermFactory extends TestCase {
     }
 
     public void setUp() {
-	Term et_x=new TermImpl(x, x.sort(), new ImmutableArray<Term>(), null, null);
-	Term et_px=new TermImpl(p, p.sort(), new ImmutableArray<Term>(new Term[]{et_x}), null, null);
+	JavaDLTerm et_x=new TermImpl(x, x.sort(), new ImmutableArray<JavaDLTerm>(), null, null);
+	JavaDLTerm et_px=new TermImpl(p, p.sort(), new ImmutableArray<JavaDLTerm>(new JavaDLTerm[]{et_x}), null, null);
 	et1=et_px;       
 	TB = TacletForTests.services().getTermBuilder();
 	tf = TB.tf();
     }
 
-    private Term t1(){
-	Term t_x=tf.createTerm(x, new Term[0]);
-	Term t_px=tf.createTerm(p, new Term[]{t_x});
+    private JavaDLTerm t1(){
+	JavaDLTerm t_x=tf.createTerm(x, new JavaDLTerm[0]);
+	JavaDLTerm t_px=tf.createTerm(p, new JavaDLTerm[]{t_x});
 	return t_px;
     }
   
-    private Term t2(){
-	Term t_x=tf.createTerm(x, new Term[]{});
-	Term t_w=tf.createTerm(w, new Term[]{});
-	return tf.createTerm(r, new Term[]{t_x,t_w});
+    private JavaDLTerm t2(){
+	JavaDLTerm t_x=tf.createTerm(x, new JavaDLTerm[]{});
+	JavaDLTerm t_w=tf.createTerm(w, new JavaDLTerm[]{});
+	return tf.createTerm(r, new JavaDLTerm[]{t_x,t_w});
     }
 
-    private Term t3() {
-	Term t_y=tf.createTerm(y, new Term[]{});
-	return tf.createTerm(f, new Term[]{t_y});
+    private JavaDLTerm t3() {
+	JavaDLTerm t_y=tf.createTerm(y, new JavaDLTerm[]{});
+	return tf.createTerm(f, new JavaDLTerm[]{t_y});
     }
 
 
@@ -109,8 +109,8 @@ public class TestTermFactory extends TestCase {
       
 	Exception exc=new Exception();
 	try {
-	    Term t_z  = tf.createTerm(z, new Term[0]);
-	    Term t_pz = tf.createTerm(q, new Term[]{t_z});
+	    JavaDLTerm t_z  = tf.createTerm(z, new JavaDLTerm[0]);
+	    JavaDLTerm t_pz = tf.createTerm(q, new JavaDLTerm[]{t_z});
 	} catch (TermCreationException e) {
 	    exc=e;
 	    
@@ -126,8 +126,8 @@ public class TestTermFactory extends TestCase {
 
 	Exception exc = null;
 	try {
-	    Term t_x=tf.createTerm(x, new Term[0]);
-	    tf.createTerm(r, new Term[]{t_x});
+	    JavaDLTerm t_x=tf.createTerm(x, new JavaDLTerm[0]);
+	    tf.createTerm(r, new JavaDLTerm[]{t_x});
 	} catch (TermCreationException e) {
 	    exc=e;	   
 	}
@@ -140,10 +140,10 @@ public class TestTermFactory extends TestCase {
      * constructed anyway, as subformulae are not checked
      */
     public void testWithInvalidSubformulae() { 
-	Term invalidBuilt=new TermImpl(p, p.sort(), new ImmutableArray<Term>(new TermImpl(y, y.sort(), new ImmutableArray<Term>(), null, null)), null, null);
+	JavaDLTerm invalidBuilt=new TermImpl(p, p.sort(), new ImmutableArray<JavaDLTerm>(new TermImpl(y, y.sort(), new ImmutableArray<JavaDLTerm>(), null, null)), null, null);
 	try {
-	    Term t_px_or_py=tf.createTerm(Junctor.OR,
-						 new Term[]{invalidBuilt, 
+	    JavaDLTerm t_px_or_py=tf.createTerm(Junctor.OR,
+						 new JavaDLTerm[]{invalidBuilt, 
 							    t1()});
 	} catch (Exception e) {
 	    fail();
@@ -151,42 +151,42 @@ public class TestTermFactory extends TestCase {
     }  
 
     public void testConstantTrue() {
-        Term t_true=tf.createTerm(Junctor.TRUE);
-	Assert.assertEquals(t_true, new TermImpl(Junctor.TRUE, Sort.FORMULA, new ImmutableArray<Term>(), null, null));
+        JavaDLTerm t_true=tf.createTerm(Junctor.TRUE);
+	Assert.assertEquals(t_true, new TermImpl(Junctor.TRUE, Sort.FORMULA, new ImmutableArray<JavaDLTerm>(), null, null));
     }
 
     public void testQuantifierTerm() {
-	Term t_forallx_px=TB.all(ImmutableSLList.<QuantifiableVariable>nil().append(x),t1());
+	JavaDLTerm t_forallx_px=TB.all(ImmutableSLList.<QuantifiableVariable>nil().append(x),t1());
 	Assert.assertEquals(t_forallx_px,
-			    new TermImpl(Quantifier.ALL, Sort.FORMULA,new ImmutableArray<Term>(t1()), new ImmutableArray<QuantifiableVariable>(x), null));
+			    new TermImpl(Quantifier.ALL, Sort.FORMULA,new ImmutableArray<JavaDLTerm>(t1()), new ImmutableArray<QuantifiableVariable>(x), null));
     }
 
     public void testJunctorTerm() {
-	Term  t_px_imp_ryw= tf.createTerm(Junctor.IMP, t1(), t2());
-	Assert.assertEquals(t_px_imp_ryw, new TermImpl(Junctor.IMP, Sort.FORMULA, new ImmutableArray<Term>(new Term[]{ t1(), t2()}), null, null));
+	JavaDLTerm  t_px_imp_ryw= tf.createTerm(Junctor.IMP, t1(), t2());
+	Assert.assertEquals(t_px_imp_ryw, new TermImpl(Junctor.IMP, Sort.FORMULA, new ImmutableArray<JavaDLTerm>(new JavaDLTerm[]{ t1(), t2()}), null, null));
     }
 
     public void testNegationTerm() {
-	Term t_not_ryw=tf.createTerm(Junctor.NOT, t2());
-	Assert.assertEquals(t_not_ryw, new TermImpl(Junctor.NOT, Sort.FORMULA, new ImmutableArray<Term>( t2()), null, null));
+	JavaDLTerm t_not_ryw=tf.createTerm(Junctor.NOT, t2());
+	Assert.assertEquals(t_not_ryw, new TermImpl(Junctor.NOT, Sort.FORMULA, new ImmutableArray<JavaDLTerm>( t2()), null, null));
     }
 
     public void testDiamondTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
-	Term t_dia_ryw=tf.createTerm(Modality.DIA, new Term[]{t2()}, null, jb);
-	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.DIA, Sort.FORMULA, new ImmutableArray<Term>(t2()), null, jb));
+	JavaDLTerm t_dia_ryw=tf.createTerm(Modality.DIA, new JavaDLTerm[]{t2()}, null, jb);
+	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.DIA, Sort.FORMULA, new ImmutableArray<JavaDLTerm>(t2()), null, jb));
     }
 
     public void testBoxTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
-	Term t_dia_ryw=tf.createTerm(Modality.BOX, new ImmutableArray<Term>(t2()), null, jb);
-	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.BOX, Sort.FORMULA, new ImmutableArray<Term>(t2()), null, jb));
+	JavaDLTerm t_dia_ryw=tf.createTerm(Modality.BOX, new ImmutableArray<JavaDLTerm>(t2()), null, jb);
+	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.BOX, Sort.FORMULA, new ImmutableArray<JavaDLTerm>(t2()), null, jb));
     }
 
     public void testSubstitutionTerm() {
-	Term t_x_subst_fy_in_px=TB.subst(WarySubstOp.SUBST, x, t3(),
+	JavaDLTerm t_x_subst_fy_in_px=TB.subst(WarySubstOp.SUBST, x, t3(),
 							  t1());
-	Assert.assertEquals(new TermImpl(WarySubstOp.SUBST,t1().sort(), new ImmutableArray<Term>(new Term[]{ t3(),t1() }),
+	Assert.assertEquals(new TermImpl(WarySubstOp.SUBST,t1().sort(), new ImmutableArray<JavaDLTerm>(new JavaDLTerm[]{ t3(),t1() }),
 				    	 new ImmutableArray<QuantifiableVariable>(x), null), 
 			    t_x_subst_fy_in_px);
     }
@@ -196,7 +196,7 @@ public class TestTermFactory extends TestCase {
 	Exception exc=new Exception();
 	try {
 	    tf.createTerm(WarySubstOp.SUBST, 
-		    	  new Term[]{ t2(), t1()},
+		    	  new JavaDLTerm[]{ t2(), t1()},
 		    	  new ImmutableArray<QuantifiableVariable>(x),
 		    	  null);
 	} catch (TermCreationException e) {
@@ -208,7 +208,7 @@ public class TestTermFactory extends TestCase {
     public void testSubtermsForLogicVariable() {
 	Exception exc=new Exception();
 	try {
-	    tf.createTerm(x,new Term[]{t3()});
+	    tf.createTerm(x,new JavaDLTerm[]{t3()});
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -219,7 +219,7 @@ public class TestTermFactory extends TestCase {
 
     public void testQuantifierWithNoBoundSubTerms() {
 	Exception exc=new Exception();
-        Term result = null;
+        JavaDLTerm result = null;
 	try {
 	    result=TB.all(ImmutableSLList.<QuantifiableVariable>nil(), t1());
 	} catch (TermCreationException e) {
@@ -232,7 +232,7 @@ public class TestTermFactory extends TestCase {
     public void testJunctorTermWithWrongArity() {
 	Exception exc=new Exception();
 	try {
-	    tf.createTerm(Junctor.NOT, new Term[] {t1(), t2()});
+	    tf.createTerm(Junctor.NOT, new JavaDLTerm[] {t1(), t2()});
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -241,19 +241,19 @@ public class TestTermFactory extends TestCase {
 
 
     public void testSubSorts1() {
-	tf.createTerm(g, new Term[]{tf.createTerm(v4), tf.createTerm(v1)});
-	tf.createTerm(g, new Term[]{tf.createTerm(v4), tf.createTerm(v4)});
-	tf.createTerm(g, new Term[]{tf.createTerm(v2), tf.createTerm(v3)});
+	tf.createTerm(g, new JavaDLTerm[]{tf.createTerm(v4), tf.createTerm(v1)});
+	tf.createTerm(g, new JavaDLTerm[]{tf.createTerm(v4), tf.createTerm(v4)});
+	tf.createTerm(g, new JavaDLTerm[]{tf.createTerm(v2), tf.createTerm(v3)});
 	Exception exc=new Exception();
 	try {
-	    tf.createTerm(g, new Term[]{tf.createTerm(v1), tf.createTerm(v1)});
+	    tf.createTerm(g, new JavaDLTerm[]{tf.createTerm(v1), tf.createTerm(v1)});
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
 	assertTrue(exc instanceof TermCreationException);
 	exc=new Exception();
 	try {
-	    tf.createTerm(g, new Term[]{tf.createTerm(y), tf.createTerm(y)});
+	    tf.createTerm(g, new JavaDLTerm[]{tf.createTerm(y), tf.createTerm(y)});
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -286,10 +286,10 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testSubSortsSubst() {
-	Term t = tf.createTerm(g, new Term[]{tf.createTerm(v2), 
+	JavaDLTerm t = tf.createTerm(g, new JavaDLTerm[]{tf.createTerm(v2), 
 				             tf.createTerm(v1)});
 	Function c=new Function(new Name("c"), osort2, new Sort[0]);
-	Term st = TB.subst(WarySubstOp.SUBST, v2, 
+	JavaDLTerm st = TB.subst(WarySubstOp.SUBST, v2, 
 					    tf.createTerm(c), t);
 	c=new Function(new Name("c"), osort4, new Sort[0]);
 	st = TB.subst(WarySubstOp.SUBST, v2, 
@@ -320,23 +320,23 @@ public class TestTermFactory extends TestCase {
 
     
     /**
-     * Tests the caching of {@link Term}s with and without {@link JavaBlock}s.
+     * Tests the caching of {@link JavaDLTerm}s with and without {@link JavaBlock}s.
      */
     public void testCaching() {
        // Create Terms first time
-       Term noJB = tf.createTerm(Junctor.TRUE);
-       Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
+       JavaDLTerm noJB = tf.createTerm(Junctor.TRUE);
+       JavaDLTerm noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
        JavaBlock javaBlock = JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-       Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<Term>(noJB), null, javaBlock);
-       Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
-       Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
+       JavaDLTerm withJB = tf.createTerm(Modality.DIA, new ImmutableArray<JavaDLTerm>(noJB), null, javaBlock);
+       JavaDLTerm withJBChild = tf.createTerm(Junctor.NOT, withJB);
+       JavaDLTerm withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
        // Create Same terms again
-       Term noJBAgain = tf.createTerm(Junctor.TRUE);
-       Term noJBWithChildAgain = tf.createTerm(Junctor.NOT, noJB);
+       JavaDLTerm noJBAgain = tf.createTerm(Junctor.TRUE);
+       JavaDLTerm noJBWithChildAgain = tf.createTerm(Junctor.NOT, noJB);
        JavaBlock javaBlockAgain = JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-       Term withJBAgain = tf.createTerm(Modality.DIA, new ImmutableArray<Term>(noJB), null, javaBlockAgain);
-       Term withJBChildAgain = tf.createTerm(Junctor.NOT, withJB);
-       Term withJBChildChildAgain = tf.createTerm(Junctor.NOT, withJBChild);
+       JavaDLTerm withJBAgain = tf.createTerm(Modality.DIA, new ImmutableArray<JavaDLTerm>(noJB), null, javaBlockAgain);
+       JavaDLTerm withJBChildAgain = tf.createTerm(Junctor.NOT, withJB);
+       JavaDLTerm withJBChildChildAgain = tf.createTerm(Junctor.NOT, withJBChild);
        // Test caching
        assertSame(noJB, noJBAgain);
        assertSame(noJBWithChild, noJBWithChildAgain);

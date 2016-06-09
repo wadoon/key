@@ -18,7 +18,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
@@ -60,13 +60,13 @@ public class JoinIfThenElse extends JoinProcedure {
     static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
 
     @Override
-    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2,
-            Term valueInState2, Term distinguishingFormula, Services services) {
+    public Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinValuesInStates(
+            JavaDLTerm v, SymbolicExecutionState state1,
+            JavaDLTerm valueInState1, SymbolicExecutionState state2,
+            JavaDLTerm valueInState2, JavaDLTerm distinguishingFormula, Services services) {
 
-        return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
-                DefaultImmutableSet.<Term> nil(), createIfThenElseTerm(state1,
+        return new Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>>(
+                DefaultImmutableSet.<JavaDLTerm> nil(), createIfThenElseTerm(state1,
                         state2, valueInState1, valueInState2,
                         distinguishingFormula, services),
                 DefaultImmutableSet.<Name> nil());
@@ -103,18 +103,18 @@ public class JoinIfThenElse extends JoinProcedure {
      *         <code>\if (c1) \then (t1) \else (t2)</code>, where the cI are the
      *         path conditions of stateI.
      */
-    public static Term createIfThenElseTerm(
+    public static JavaDLTerm createIfThenElseTerm(
             final SymbolicExecutionState state1,
-            final SymbolicExecutionState state2, final Term ifTerm,
-            final Term elseTerm, Term distinguishingFormula,
+            final SymbolicExecutionState state2, final JavaDLTerm ifTerm,
+            final JavaDLTerm elseTerm, JavaDLTerm distinguishingFormula,
             final Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
-        Term cond, ifForm, elseForm;
+        JavaDLTerm cond, ifForm, elseForm;
         
         if (distinguishingFormula == null) {
-            Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd = createDistFormAndRightSidesForITEUpd(
+            Quadruple<JavaDLTerm, JavaDLTerm, JavaDLTerm, Boolean> distFormAndRightSidesForITEUpd = createDistFormAndRightSidesForITEUpd(
                         state1, state2, ifTerm, elseTerm, services);
     
             cond = distFormAndRightSidesForITEUpd.first;
@@ -161,14 +161,14 @@ public class JoinIfThenElse extends JoinProcedure {
      *         second (fourth component = true) state was used as a basis for
      *         the condition (first component).
      */
-    static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd(
+    static Quadruple<JavaDLTerm, JavaDLTerm, JavaDLTerm, Boolean> createDistFormAndRightSidesForITEUpd(
             LocationVariable v, SymbolicExecutionState state1,
             SymbolicExecutionState state2, Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
-        Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-        Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+        JavaDLTerm rightSide1 = getUpdateRightSideFor(state1.first, v);
+        JavaDLTerm rightSide2 = getUpdateRightSideFor(state2.first, v);
 
         if (rightSide1 == null) {
             rightSide1 = tb.var(v);
@@ -212,23 +212,23 @@ public class JoinIfThenElse extends JoinProcedure {
      *         second (fourth component = true) state was used as a basis for
      *         the condition (first component).
      */
-    static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd(
+    static Quadruple<JavaDLTerm, JavaDLTerm, JavaDLTerm, Boolean> createDistFormAndRightSidesForITEUpd(
             SymbolicExecutionState state1, SymbolicExecutionState state2,
-            Term ifTerm, Term elseTerm, Services services) {
+            JavaDLTerm ifTerm, JavaDLTerm elseTerm, Services services) {
 
         // We only need the distinguishing subformula; the equal part
         // is not needed. For soundness, it suffices that the "distinguishing"
         // formula is implied by the original path condition; for completeness,
         // we add the common subformula in the new path condition, if it
         // is not already implied by that.
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula1 = getDistinguishingFormula(
+        Option<Pair<JavaDLTerm, JavaDLTerm>> distinguishingAndEqualFormula1 = getDistinguishingFormula(
                 state1.second, state2.second, services);
-        Term distinguishingFormula = distinguishingAndEqualFormula1.isSome() ? distinguishingAndEqualFormula1
+        JavaDLTerm distinguishingFormula = distinguishingAndEqualFormula1.isSome() ? distinguishingAndEqualFormula1
                 .getValue().first : null;
 
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula2 = getDistinguishingFormula(
+        Option<Pair<JavaDLTerm, JavaDLTerm>> distinguishingAndEqualFormula2 = getDistinguishingFormula(
                 state2.second, state1.second, services);
-        Term distinguishingFormula2 = distinguishingAndEqualFormula2.isSome() ? distinguishingAndEqualFormula2
+        JavaDLTerm distinguishingFormula2 = distinguishingAndEqualFormula2.isSome() ? distinguishingAndEqualFormula2
                 .getValue().first : null;
 
         // NOTE (DS): This assertion does not prevent the joining of states with equal
@@ -267,15 +267,15 @@ public class JoinIfThenElse extends JoinProcedure {
         // the code below if you want to test this measure.
 
         /*
-         * Term equalSubFormula = distinguishingAndEqualFormula1.second; // Add
-         * common subformula to path condition, if necessary Term
+         * JavaDLTerm equalSubFormula = distinguishingAndEqualFormula1.second; // Add
+         * common subformula to path condition, if necessary JavaDLTerm
          * commonPartAlreadyImpliedForm = tb.imp(newPathCondition,
          * equalSubFormula); if
          * (!isProvableWithSplitting(commonPartAlreadyImpliedForm, services)) {
          * newPathCondition = tb.and(newPathCondition, equalSubFormula); }
          */
 
-        return new Quadruple<Term, Term, Term, Boolean>(distinguishingFormula,
+        return new Quadruple<JavaDLTerm, JavaDLTerm, JavaDLTerm, Boolean>(distinguishingFormula,
                 commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm
                         : elseTerm, commuteSides);
 

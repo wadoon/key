@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -129,7 +129,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
           if (Transformer.inTransformer(pio)) {
               return false;
           }
-         Term term = pio.subTerm();
+         JavaDLTerm term = pio.subTerm();
          if (term != null) {
             if (term.op() == Equality.EQUALS) {
                applicable = isApplicableQuery(goal, term.sub(0), pio) ||
@@ -144,11 +144,11 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     * Checks if the query term is supported. The functionality is identical to
     * {@link QueryExpand#isApplicable(Goal, PosInOccurrence)}.
     * @param goal The {@link Goal}.
-    * @param pmTerm The {@link Term} to with the query to check.
+    * @param pmTerm The {@link JavaDLTerm} to with the query to check.
     * @param pio The {@link PosInOccurrence} in the {@link Goal}.
     * @return {@code true} is applicable, {@code false} is not applicable
     */
-   protected boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
+   protected boolean isApplicableQuery(Goal goal, JavaDLTerm pmTerm, PosInOccurrence pio) {
       if (pmTerm.op() instanceof IProgramMethod && pmTerm.freeVars().isEmpty()) {
          IProgramMethod pm = (IProgramMethod) pmTerm.op();
          final Sort nullSort = goal.proof().getJavaInfo().nullSort();
@@ -156,7 +156,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                  !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
              PIOPathIterator it = pio.iterator();
              while ( it.next() != -1 ) {
-                 Term focus = it.getSubTerm();
+                 JavaDLTerm focus = it.getSubTerm();
                  if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
                      return false;
                  }
@@ -185,9 +185,9 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          PosInOccurrence pio = ruleApp.posInOccurrence();
          Sequent goalSequent = goal.sequent();
          SequentFormula equalitySF = pio.sequentFormula();
-         Term equalityTerm = pio.subTerm();
-         Term queryTerm;
-         Term varTerm;
+         JavaDLTerm equalityTerm = pio.subTerm();
+         JavaDLTerm queryTerm;
+         JavaDLTerm varTerm;
          boolean varFirst;
          if (equalityTerm.sub(0).op() instanceof LocationVariable) {
             queryTerm = equalityTerm.sub(1);
@@ -199,7 +199,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             varTerm = equalityTerm.sub(1);
             varFirst = false;
          }
-         Term queryConditionTerm = null;
+         JavaDLTerm queryConditionTerm = null;
          if (equalitySF.formula().op() == Junctor.IMP && equalitySF.formula().sub(1) == equalityTerm) {
             queryConditionTerm = equalitySF.formula().sub(0); 
          }
@@ -208,22 +208,22 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
          Sequent sequentToProve = SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(goalSequent, equalitySF);
          Function newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
-         Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
+         JavaDLTerm newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
          sequentToProve = sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
          // Compute results and their conditions
-         List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve, newPredicate);
+         List<Triple<JavaDLTerm, Set<JavaDLTerm>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve, newPredicate);
          // Create new single goal in which the query is replaced by the possible results
          ImmutableList<Goal> goals = goal.split(1);
          Goal resultGoal = goals.head();
          final TermBuilder tb = services.getTermBuilder();
          resultGoal.removeFormula(pio);
          if (pio.isTopLevel() || queryConditionTerm != null) {
-            for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
-               Term conditionTerm = tb.and(conditionsAndResult.second);
-               Term newEqualityTerm = varFirst ? 
+            for (Triple<JavaDLTerm, Set<JavaDLTerm>, Node> conditionsAndResult : conditionsAndResultsMap) {
+               JavaDLTerm conditionTerm = tb.and(conditionsAndResult.second);
+               JavaDLTerm newEqualityTerm = varFirst ? 
                                       tb.equals(varTerm, conditionsAndResult.first) : 
                                       tb.equals(conditionsAndResult.first, varTerm);
-               Term resultTerm = pio.isInAntec() ?
+               JavaDLTerm resultTerm = pio.isInAntec() ?
                                  tb.imp(conditionTerm, newEqualityTerm) :
                                  tb.and(conditionTerm, newEqualityTerm);
                if (queryConditionTerm != null) {
@@ -234,15 +234,15 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          }
          else {
             Function resultFunction = createResultConstant(services, varTerm.sort());
-            Term resultFunctionTerm = tb.func(resultFunction);
+            JavaDLTerm resultFunctionTerm = tb.func(resultFunction);
             resultGoal.addFormula(replace(pio, 
                                           varFirst ? tb.equals(resultFunctionTerm, varTerm) : tb.equals(resultFunctionTerm, varTerm),
                                           services), 
                                   pio.isInAntec(), 
                                   false);
-            for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
-               Term conditionTerm = tb.and(conditionsAndResult.second);
-               Term resultTerm = tb.imp(conditionTerm, varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.first) : tb.equals(conditionsAndResult.first, resultFunctionTerm));
+            for (Triple<JavaDLTerm, Set<JavaDLTerm>, Node> conditionsAndResult : conditionsAndResultsMap) {
+               JavaDLTerm conditionTerm = tb.and(conditionsAndResult.second);
+               JavaDLTerm resultTerm = tb.imp(conditionTerm, varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.first) : tb.equals(conditionsAndResult.first, resultFunctionTerm));
                resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
             }
          }

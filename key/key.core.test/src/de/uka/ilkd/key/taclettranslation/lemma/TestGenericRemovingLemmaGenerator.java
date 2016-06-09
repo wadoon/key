@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
@@ -54,8 +54,8 @@ public class TestGenericRemovingLemmaGenerator extends TestCase {
         assertTrue("There is a proxy sort of the name 'G'", found);
     }
 
-    private void collectSorts(Term term, Set<Sort> sorts) {
-        for (Term t : term.subs()) {
+    private void collectSorts(JavaDLTerm term, Set<Sort> sorts) {
+        for (JavaDLTerm t : term.subs()) {
             collectSorts(t, sorts);
         }
 

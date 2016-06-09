@@ -27,7 +27,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
@@ -108,7 +108,7 @@ public class JoinProcessor implements Runnable {
 
     private void processJoin() {
 
-        Term cutFormula = createCutFormula();
+        JavaDLTerm cutFormula = createCutFormula();
 
         DelayedCutProcessor cutProcessor = new DelayedCutProcessor(proof,
                 partner.getCommonParent(), cutFormula,
@@ -144,7 +144,7 @@ public class JoinProcessor implements Runnable {
 
     }
 
-    private SequentFormula findFormula(Sequent sequent, Term content,
+    private SequentFormula findFormula(Sequent sequent, JavaDLTerm content,
             boolean antecedent) {
         for (SequentFormula sf : (antecedent ? sequent.antecedent() : sequent
                 .succedent())) {
@@ -211,16 +211,16 @@ public class JoinProcessor implements Runnable {
 
     }
 
-    private Term createCutFormula() {
-        Term ifElseTerm = buildIfElseTerm();
-        Term phi = createPhi();
+    private JavaDLTerm createCutFormula() {
+        JavaDLTerm ifElseTerm = buildIfElseTerm();
+        JavaDLTerm phi = createPhi();
         return services.getTermBuilder().or(ifElseTerm, phi);
     }
 
-    private Term buildIfElseTerm() {
-        Term thenTerm = services.getTermBuilder().apply(partner.getUpdate(0),
+    private JavaDLTerm buildIfElseTerm() {
+        JavaDLTerm thenTerm = services.getTermBuilder().apply(partner.getUpdate(0),
                 partner.getCommonFormula(), null);
-        Term elseTerm = services.getTermBuilder().apply(partner.getUpdate(1),
+        JavaDLTerm elseTerm = services.getTermBuilder().apply(partner.getUpdate(1),
                 partner.getCommonFormula(), null);
 
         return services.getTermBuilder().ife(partner.getCommonPredicate(),
@@ -228,36 +228,36 @@ public class JoinProcessor implements Runnable {
 
     }
 
-    private Term createPhi() {
-        Collection<Term> commonDelta = computeCommonFormulas(partner
+    private JavaDLTerm createPhi() {
+        Collection<JavaDLTerm> commonDelta = computeCommonFormulas(partner
                 .getSequent(0).succedent(), partner.getSequent(1).succedent(),
                 partner.getCommonFormula());
-        Collection<Term> commonGamma = computeCommonFormulas(partner
+        Collection<JavaDLTerm> commonGamma = computeCommonFormulas(partner
                 .getSequent(0).antecedent(),
                 partner.getSequent(1).antecedent(), partner.getCommonFormula());
-        Collection<Term> delta1 = computeDifference(partner.getSequent(0)
+        Collection<JavaDLTerm> delta1 = computeDifference(partner.getSequent(0)
                 .succedent(), commonDelta, partner.getFormula(0).formula());
-        Collection<Term> delta2 = computeDifference(partner.getSequent(1)
+        Collection<JavaDLTerm> delta2 = computeDifference(partner.getSequent(1)
                 .succedent(), commonDelta, partner.getFormula(1).formula());
 
-        Collection<Term> gamma1 = computeDifference(partner.getSequent(0)
+        Collection<JavaDLTerm> gamma1 = computeDifference(partner.getSequent(0)
                 .antecedent(), commonGamma, null);
-        Collection<Term> gamma2 = computeDifference(partner.getSequent(1)
+        Collection<JavaDLTerm> gamma2 = computeDifference(partner.getSequent(1)
                 .antecedent(), commonGamma, null);
 
-        Collection<Term> constrainedGamma1 = createConstrainedTerms(gamma1,
+        Collection<JavaDLTerm> constrainedGamma1 = createConstrainedTerms(gamma1,
                 partner.getCommonPredicate(), true);
-        Collection<Term> constrainedGamma2 = createConstrainedTerms(gamma2,
+        Collection<JavaDLTerm> constrainedGamma2 = createConstrainedTerms(gamma2,
                 services.getTermBuilder().not(partner.getCommonPredicate()),
                 true);
 
-        Collection<Term> constrainedDelta1 = createConstrainedTerms(delta1,
+        Collection<JavaDLTerm> constrainedDelta1 = createConstrainedTerms(delta1,
                 partner.getCommonPredicate(), false);
-        Collection<Term> constrainedDelta2 = createConstrainedTerms(delta2,
+        Collection<JavaDLTerm> constrainedDelta2 = createConstrainedTerms(delta2,
                 services.getTermBuilder().not(partner.getCommonPredicate()),
                 false);
 
-        Term phi = services.getTermBuilder().ff();
+        JavaDLTerm phi = services.getTermBuilder().ff();
         phi = createDisjunction(phi, commonGamma, true);
         phi = createDisjunction(phi, constrainedGamma1, true);
         phi = createDisjunction(phi, constrainedGamma2, true);
@@ -269,9 +269,9 @@ public class JoinProcessor implements Runnable {
         return phi;
     }
 
-    private Term createDisjunction(Term seed, Collection<Term> formulas,
+    private JavaDLTerm createDisjunction(JavaDLTerm seed, Collection<JavaDLTerm> formulas,
             boolean needNot) {
-        for (Term formula : formulas) {
+        for (JavaDLTerm formula : formulas) {
             if (needNot) {
                 seed = services.getTermBuilder().or(seed,
                         services.getTermBuilder().not(formula));
@@ -283,10 +283,10 @@ public class JoinProcessor implements Runnable {
         return seed;
     }
 
-    private Collection<Term> createConstrainedTerms(Collection<Term> terms,
-            Term predicate, boolean gamma) {
-        Collection<Term> result = new LinkedList<Term>();
-        for (Term term : terms) {
+    private Collection<JavaDLTerm> createConstrainedTerms(Collection<JavaDLTerm> terms,
+            JavaDLTerm predicate, boolean gamma) {
+        Collection<JavaDLTerm> result = new LinkedList<JavaDLTerm>();
+        for (JavaDLTerm term : terms) {
             if (gamma) {
                 result.add(services.getTermBuilder().imp(predicate, term));
             }
@@ -297,10 +297,10 @@ public class JoinProcessor implements Runnable {
         return result;
     }
 
-    private Collection<Term> computeCommonFormulas(Semisequent s1,
-            Semisequent s2, Term exclude) {
-        TreeSet<Term> formulas1 = createTree(s1, exclude);
-        TreeSet<Term> result = createTree();
+    private Collection<JavaDLTerm> computeCommonFormulas(Semisequent s1,
+            Semisequent s2, JavaDLTerm exclude) {
+        TreeSet<JavaDLTerm> formulas1 = createTree(s1, exclude);
+        TreeSet<JavaDLTerm> result = createTree();
         for (SequentFormula sf : s2) {
             if (formulas1.contains(sf.formula())) {
                 result.add(sf.formula());
@@ -309,9 +309,9 @@ public class JoinProcessor implements Runnable {
         return result;
     }
 
-    private Collection<Term> computeDifference(Semisequent s,
-            Collection<Term> excludeSet, Term exclude) {
-        LinkedList<Term> result = new LinkedList<Term>();
+    private Collection<JavaDLTerm> computeDifference(Semisequent s,
+            Collection<JavaDLTerm> excludeSet, JavaDLTerm exclude) {
+        LinkedList<JavaDLTerm> result = new LinkedList<JavaDLTerm>();
         for (SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {
                 result.add(sf.formula());
@@ -320,8 +320,8 @@ public class JoinProcessor implements Runnable {
         return result;
     }
 
-    private TreeSet<Term> createTree(Semisequent semisequent, Term exclude) {
-        TreeSet<Term> set = createTree();
+    private TreeSet<JavaDLTerm> createTree(Semisequent semisequent, JavaDLTerm exclude) {
+        TreeSet<JavaDLTerm> set = createTree();
         for (SequentFormula sf : semisequent) {
             if (sf.formula() != exclude) {
                 set.add(sf.formula());
@@ -330,11 +330,11 @@ public class JoinProcessor implements Runnable {
         return set;
     }
 
-    private TreeSet<Term> createTree() {
-        return new TreeSet<Term>(new Comparator<Term>() {
+    private TreeSet<JavaDLTerm> createTree() {
+        return new TreeSet<JavaDLTerm>(new Comparator<JavaDLTerm>() {
 
             @Override
-            public int compare(Term o1, Term o2) {
+            public int compare(JavaDLTerm o1, JavaDLTerm o2) {
                 return o1.serialNumber() - o2.serialNumber();
             }
         });

@@ -4,7 +4,7 @@
  */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 /**
@@ -15,35 +15,35 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicFreePreSnippet implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
+    public JavaDLTerm produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         BasicPOSnippetFactory f =
                 POSnippetFactory.getBasicFactory(d, poVars);
 
         // "wellformed(heapAtPre)"
-        final Term wellFormed = d.tb.wellFormed(poVars.pre.heap);
+        final JavaDLTerm wellFormed = d.tb.wellFormed(poVars.pre.heap);
 
         // "heap == heapAtPre"
-        final Term eqHeapAndHeapAtPre =
+        final JavaDLTerm eqHeapAndHeapAtPre =
                 d.tb.equals(d.tb.getBaseHeap(), poVars.pre.heap);
 
         // "self != null"
-        final Term selfNotNull = f.create(
+        final JavaDLTerm selfNotNull = f.create(
                 BasicPOSnippetFactoryImpl.Snippet.SELF_NOT_NULL);
 
         // "self.<created> = TRUE"
-        final Term selfCreated = f.create(
+        final JavaDLTerm selfCreated = f.create(
                 BasicPOSnippetFactoryImpl.Snippet.SELF_CREATED);
 
         // "MyClass::exactInstance(self) = TRUE"
-        final Term selfExactType = f.create(
+        final JavaDLTerm selfExactType = f.create(
                 BasicPOSnippetFactoryImpl.Snippet.SELF_EXACT_TYPE);
 
         // conjunction of...
         // - "p_i.<created> = TRUE | p_i = null" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
-        Term paramsOK = f.create(BasicPOSnippetFactoryImpl.Snippet.PARAMS_OK);
+        JavaDLTerm paramsOK = f.create(BasicPOSnippetFactoryImpl.Snippet.PARAMS_OK);
 
         // measured_by clause is checked in the functional proof and does not
         // need to be checked again in information flow proofs

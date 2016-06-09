@@ -47,7 +47,7 @@ public final class PosInOccurrence {
     /**
      * The subterm this object points to, or <code>null</code>
      */
-    private Term subTermCache = null;
+    private JavaDLTerm subTermCache = null;
 
     public PosInOccurrence(SequentFormula sequentFormula,
                            PosInTerm posInTerm,
@@ -193,7 +193,7 @@ public final class PosInOccurrence {
     public PosInOccurrence replaceConstrainedFormula (SequentFormula p_newFormula) {
         assert p_newFormula != null;
         final PIOPathIterator it = iterator ();
-        Term newTerm = p_newFormula.formula ();
+        JavaDLTerm newTerm = p_newFormula.formula ();
         PosInTerm newPosInTerm = PosInTerm.getTopLevel();
 
         while ( true ) {
@@ -216,7 +216,7 @@ public final class PosInOccurrence {
     /**
      * returns the subterm this object points to
      */
-    public Term subTerm () {
+    public JavaDLTerm subTerm () {
 	if ( subTermCache == null ) {
 	    subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
 	}
@@ -237,7 +237,7 @@ public final class PosInOccurrence {
 
     /** toString */
     public String toString() {
-	String res = "Term "+
+	String res = "JavaDLTerm "+
 	    posInTerm()+" of "+ sequentFormula();
 	
 	return res;
@@ -262,7 +262,7 @@ public final class PosInOccurrence {
 	int               child;
 	int               count             = 0;
 	IntIterator       currentPathIt;
-	Term              currentSubTerm    = null;
+	JavaDLTerm              currentSubTerm    = null;
 	
 	private PIOPathIteratorImpl               () {
 	    currentPathIt = posInTerm ().iterator ();
@@ -300,7 +300,7 @@ public final class PosInOccurrence {
 	 * this method satisfies
 	 * <code>getPosInOccurrence().subTerm()==getSubTerm()</code>
 	 */
-	public Term            getSubTerm         () {
+	public JavaDLTerm            getSubTerm         () {
 	    return currentSubTerm;
 	}
 

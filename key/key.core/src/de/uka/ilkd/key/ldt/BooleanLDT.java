@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -39,9 +39,9 @@ public final class BooleanLDT extends LDT {
     
     /** the boolean literals as function symbols and terms */
     private final Function bool_true;
-    private final Term term_bool_true;
+    private final JavaDLTerm term_bool_true;
     private final Function bool_false;
-    private final Term term_bool_false;
+    private final JavaDLTerm term_bool_false;
     
     
     //-------------------------------------------------------------------------
@@ -62,12 +62,12 @@ public final class BooleanLDT extends LDT {
     //public interface
     //-------------------------------------------------------------------------
     
-    public Term getFalseTerm() {
+    public JavaDLTerm getFalseTerm() {
         return term_bool_false;
     }
 
     
-    public Term getTrueTerm() {
+    public JavaDLTerm getTrueTerm() {
         return term_bool_true;
     }
 
@@ -90,7 +90,7 @@ public final class BooleanLDT extends LDT {
     
     @Override
     public boolean isResponsible
-	(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, 
+	(de.uka.ilkd.key.java.expression.Operator op, JavaDLTerm[] subs, 
                 Services services, ExecutionContext ec) {
 	if (subs.length == 1) {
 	    return isResponsible(op, subs[0], services, ec);
@@ -103,7 +103,7 @@ public final class BooleanLDT extends LDT {
     
     @Override
     public boolean isResponsible
-	(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right, Services services, ExecutionContext ec) {
+	(de.uka.ilkd.key.java.expression.Operator op, JavaDLTerm left, JavaDLTerm right, Services services, ExecutionContext ec) {
 	return false;
 
     }
@@ -111,13 +111,13 @@ public final class BooleanLDT extends LDT {
     
     @Override
     public boolean isResponsible
-	(de.uka.ilkd.key.java.expression.Operator op, Term sub, TermServices services, ExecutionContext ec) {
+	(de.uka.ilkd.key.java.expression.Operator op, JavaDLTerm sub, TermServices services, ExecutionContext ec) {
 	return false;
     }
 
     
     @Override 
-    public Term translateLiteral(Literal lit, Services services) {
+    public JavaDLTerm translateLiteral(Literal lit, Services services) {
 	if (lit instanceof BooleanLiteral) {
 	    return (((BooleanLiteral)lit).getValue() ? 
 		    term_bool_true : term_bool_false);
@@ -143,7 +143,7 @@ public final class BooleanLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
 	if(t.op() == bool_true) {
 	    return BooleanLiteral.TRUE;
 	} else if(t.op() == bool_false) { 
@@ -156,7 +156,7 @@ public final class BooleanLDT extends LDT {
     
     
     @Override
-    public final Type getType(Term t) {
+    public final Type getType(JavaDLTerm t) {
 	if(t.sort() == targetSort()) {
 	    return PrimitiveType.JAVA_BOOLEAN;
 	} else {

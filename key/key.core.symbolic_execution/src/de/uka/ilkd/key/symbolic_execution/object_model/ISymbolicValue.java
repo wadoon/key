@@ -15,7 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model;
 
 import org.key_project.common.core.logic.sort.Sort;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
 
@@ -47,7 +47,7 @@ public interface ISymbolicValue extends ISymbolicElement {
     * Returns the represented array index or {@code null} if a program variable is represented..
     * @return The represented array index or {@code null} if a program variable is represented..
     */
-   public Term getArrayIndex();
+   public JavaDLTerm getArrayIndex();
    
    /**
     * Returns the human readable array index or {@code null} if a program variable is represented..
@@ -71,7 +71,7 @@ public interface ISymbolicValue extends ISymbolicElement {
     * Returns the value of the represented variable.
     * @return The value of the represented variable.
     */
-   public Term getValue();
+   public JavaDLTerm getValue();
    
    /**
     * Returns the value of the represented variable as human readable {@link String}.
@@ -102,7 +102,7 @@ public interface ISymbolicValue extends ISymbolicElement {
     * </p>
     * @return The optional condition under which this value is valid.
     */
-   public Term getCondition();
+   public JavaDLTerm getCondition();
    
    /**
     * <p>

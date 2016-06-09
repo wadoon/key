@@ -15,7 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAssociationValueContainer;
 
@@ -51,8 +51,8 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
     */
    public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
                                               boolean isArrayIndex, 
-                                              Term arrayIndex,
-                                              Term condition);
+                                              JavaDLTerm arrayIndex,
+                                              JavaDLTerm condition);
    
    /**
     * Returns the contained values.
@@ -70,6 +70,6 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
     */
    public ISymbolicValue getValue(IProgramVariable programVariable, 
                                   boolean isArrayIndex, 
-                                  Term arrayIndex,
-                                  Term condition);
+                                  JavaDLTerm arrayIndex,
+                                  JavaDLTerm condition);
 }

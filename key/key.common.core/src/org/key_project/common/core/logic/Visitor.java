@@ -14,7 +14,7 @@
 package org.key_project.common.core.logic;
 
 
-public interface Visitor<T extends GenericTerm<Visitor<T>>> {
+public interface Visitor<T extends GenericTerm<? extends Visitor<T>>> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      * @param visited The currently visited {@link Term}.

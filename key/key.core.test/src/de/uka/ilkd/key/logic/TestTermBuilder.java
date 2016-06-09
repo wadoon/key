@@ -38,7 +38,7 @@ public class TestTermBuilder extends TestCase {
     /**
      * Test number conversion
      */
-    private void checkDigits(Term number, int[] expected, IntegerLDT intLDT, boolean isNonNegative) {
+    private void checkDigits(JavaDLTerm number, int[] expected, IntegerLDT intLDT, boolean isNonNegative) {
         assertSame(intLDT.getNumberSymbol(), number.op());
         number = number.sub(0);
         

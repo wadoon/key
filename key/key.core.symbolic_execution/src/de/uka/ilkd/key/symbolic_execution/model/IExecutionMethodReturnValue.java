@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturnValue;
@@ -35,7 +35,7 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
     * @return The return value.
     * @throws ProofInputException Occurred Exception.
     */
-   public Term getReturnValue() throws ProofInputException;
+   public JavaDLTerm getReturnValue() throws ProofInputException;
    
    /**
     * Returns the return value as human readable {@link String}.
@@ -57,7 +57,7 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
     * @return The optional condition under which the return value is valid.
     * @throws ProofInputException Occurred Exception.
     */
-   public Term getCondition() throws ProofInputException;
+   public JavaDLTerm getCondition() throws ProofInputException;
    
    /**
     * Returns the optional condition under which the return value is valid

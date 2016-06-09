@@ -31,7 +31,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -45,13 +45,13 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 public class TriggersSet {
 
     /** Quantified formula of PCNF*/
-    private final Term allTerm;
+    private final JavaDLTerm allTerm;
     /**all <code>Trigger</code>s  for <code>allTerm</code>*/
     private ImmutableSet<Trigger> allTriggers = DefaultImmutableSet.<Trigger>nil();
-    /**a <code>HashMap</code> from <code>Term</code> to <code>Trigger</code> 
+    /**a <code>HashMap</code> from <code>JavaDLTerm</code> to <code>Trigger</code> 
      * which stores different subterms of <code>allTerm</code> 
      * with its according trigger */
-    private final Map<Term, Trigger> termToTrigger = new LinkedHashMap<Term, Trigger>();
+    private final Map<JavaDLTerm, Trigger> termToTrigger = new LinkedHashMap<JavaDLTerm, Trigger>();
     /**all universal variables of <code>allTerm</code>*/
     private final ImmutableSet<QuantifiableVariable> uniQuantifiedVariables;
     /**
@@ -60,15 +60,15 @@ public class TriggersSet {
      */
     private final Substitution replacementWithMVs;
 
-    private TriggersSet(Term allTerm, Services services) {
+    private TriggersSet(JavaDLTerm allTerm, Services services) {
         this.allTerm = allTerm;
         replacementWithMVs = ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm, services);
         uniQuantifiedVariables = getAllUQS(allTerm);
         initTriggers(services);
     }
 
-    static TriggersSet create(Term allTerm, Services services) {
-        final Map<Term, TriggersSet> triggerSetCache = services.getCaches().getTriggerSetCache();
+    static TriggersSet create(JavaDLTerm allTerm, Services services) {
+        final Map<JavaDLTerm, TriggersSet> triggerSetCache = services.getCaches().getTriggerSetCache();
 		TriggersSet trs;
 		
 		synchronized(triggerSetCache) {
@@ -89,7 +89,7 @@ public class TriggersSet {
      * @param allterm
      * @return return all univesal variables of <code>allterm</code>
      */
-    private ImmutableSet<QuantifiableVariable> getAllUQS(Term allterm) {
+    private ImmutableSet<QuantifiableVariable> getAllUQS(JavaDLTerm allterm) {
         final Operator op = allterm.op();
         if (op == Quantifier.ALL) {
             QuantifiableVariable v =
@@ -108,11 +108,11 @@ public class TriggersSet {
     private void initTriggers(Services services) {
         final QuantifiableVariable var =
                 allTerm.varsBoundHere(0).get(0);
-        final Iterator<Term> it =
+        final Iterator<JavaDLTerm> it =
                 TriggerUtils.iteratorByOperator(TriggerUtils.discardQuantifiers(allTerm),
                 Junctor.AND);
         while (it.hasNext()) {
-            final Term clause = it.next();
+            final JavaDLTerm clause = it.next();
             // a trigger should contain the first variable of allTerm
             if (clause.freeVars().contains(var)) {
                 ClauseTrigger ct = new ClauseTrigger(clause);
@@ -124,7 +124,7 @@ public class TriggersSet {
     /**
      * 
      * @param trigger
-     *            a <code>Term</code>
+     *            a <code>JavaDLTerm</code>
      * @param qvs
      *            all universal variables of <code>trigger</code>
      * @param isUnify
@@ -134,7 +134,7 @@ public class TriggersSet {
      *            element of multi-trigger
      * @return a <code>Trigger</code> with <code>trigger</code> as its term
      */
-    private Trigger createUniTrigger(Term trigger,
+    private Trigger createUniTrigger(JavaDLTerm trigger,
             ImmutableSet<QuantifiableVariable> qvs,
             boolean isUnify, boolean isElement) {
         Trigger t = termToTrigger.get(trigger);
@@ -149,12 +149,12 @@ public class TriggersSet {
      * 
      * @param trs
      * @param clause
-     *            a <code>Term</code> of clause form
+     *            a <code>JavaDLTerm</code> of clause form
      * @param qvs
      *            all universal varaibles of all <code>clause</code>
      * @return the MultTrigger for the given triggers
      */
-    private Trigger createMultiTrigger(ImmutableSet<Trigger> trs, Term clause,
+    private Trigger createMultiTrigger(ImmutableSet<Trigger> trs, JavaDLTerm clause,
             ImmutableSet<QuantifiableVariable> qvs) {
         return new MultiTrigger(trs, qvs, clause);
     }
@@ -176,7 +176,7 @@ public class TriggersSet {
      */
     private class ClauseTrigger {
 
-        final Term clause;
+        final JavaDLTerm clause;
         /**all unversal variables of <code>clause</code>*/
         final ImmutableSet<QuantifiableVariable> selfUQVS;
         /**elements which are uni-trigges and will be used to construct
@@ -184,7 +184,7 @@ public class TriggersSet {
         private ImmutableSet<Trigger> elementsOfMultiTrigger =
                 DefaultImmutableSet.<Trigger>nil();
 
-        public ClauseTrigger(Term clause) {
+        public ClauseTrigger(JavaDLTerm clause) {
             this.clause = clause;
             selfUQVS = TriggerUtils.intersect(uniQuantifiedVariables, 
                     clause.freeVars());
@@ -198,12 +198,12 @@ public class TriggersSet {
          * those elements. 
          */
         public void createTriggers(Services services) {
-            final Iterator<Term> it =
+            final Iterator<JavaDLTerm> it =
                     TriggerUtils.iteratorByOperator(clause, Junctor.OR);
             while (it.hasNext()) {
-                final Term oriTerm = it.next();
-                for (Term term : expandIfThenElse(oriTerm, services)) {
-                    Term t = term;
+                final JavaDLTerm oriTerm = it.next();
+                for (JavaDLTerm term : expandIfThenElse(oriTerm, services)) {
+                    JavaDLTerm t = term;
                     if (t.op() == Junctor.NOT) {
                         t = t.sub(0);
                     }
@@ -218,7 +218,7 @@ public class TriggersSet {
          * @param services  the Services 
          * @return true   if find any trigger from <code>term</code>
          */
-        private boolean recAddTriggers(Term term, Services services) {
+        private boolean recAddTriggers(JavaDLTerm term, Services services) {
             if (!mightContainTriggers(term)) {
                 return false;
             }
@@ -228,7 +228,7 @@ public class TriggersSet {
 
             boolean foundSubtriggers = false;
             for (int i = 0; i < term.arity(); i++) {
-                final Term subTerm = term.sub(i);
+                final JavaDLTerm subTerm = term.sub(i);
                 final boolean found = recAddTriggers(subTerm, services);
 
                 if (found && uniVarsInTerm.subset(subTerm.freeVars())) {
@@ -244,16 +244,16 @@ public class TriggersSet {
             return foundSubtriggers;
         }
 
-        private Set<Term> expandIfThenElse(Term t, TermServices services) {
-            final Set<Term>[] possibleSubs = new Set[t.arity()];
+        private Set<JavaDLTerm> expandIfThenElse(JavaDLTerm t, TermServices services) {
+            final Set<JavaDLTerm>[] possibleSubs = new Set[t.arity()];
             boolean changed = false;
             for (int i = 0; i != t.arity(); ++i) {
-                final Term oriSub = t.sub(i);
+                final JavaDLTerm oriSub = t.sub(i);
                 possibleSubs[i] = expandIfThenElse(oriSub, services);
                 changed = changed || possibleSubs[i].size() != 1 || possibleSubs[i].iterator().next() != oriSub;
             }
 
-            final Set<Term> res = new LinkedHashSet<Term>();
+            final Set<JavaDLTerm> res = new LinkedHashSet<JavaDLTerm>();
             if (t.op() == IfThenElse.IF_THEN_ELSE) {
                 res.addAll(possibleSubs[1]);
                 res.addAll(possibleSubs[2]);
@@ -264,24 +264,24 @@ public class TriggersSet {
                 return res;
             }
 
-            final Term[] chosenSubs = new Term[t.arity()];
+            final JavaDLTerm[] chosenSubs = new JavaDLTerm[t.arity()];
             res.addAll(combineSubterms(t, possibleSubs, chosenSubs,
                     t.boundVars(), 0, services));
             return res;
         }
 
-        private Set<Term> combineSubterms(Term oriTerm,
-                Set<Term>[] possibleSubs,
-                Term[] chosenSubs,
+        private Set<JavaDLTerm> combineSubterms(JavaDLTerm oriTerm,
+                Set<JavaDLTerm>[] possibleSubs,
+                JavaDLTerm[] chosenSubs,
                 ImmutableArray<QuantifiableVariable> boundVars,
                 int i, TermServices services) {
-            final HashSet<Term> set = new LinkedHashSet<Term>();
+            final HashSet<JavaDLTerm> set = new LinkedHashSet<JavaDLTerm>();
             if (i >= possibleSubs.length) {
-                final Term res =
+                final JavaDLTerm res =
                         services.getTermFactory().createTerm(oriTerm.op(),
                         chosenSubs,
                         boundVars,
-                        oriTerm.javaBlock());
+                        oriTerm.modalContent());
 
 
                 set.add(res);
@@ -289,7 +289,7 @@ public class TriggersSet {
             }
 
 
-            for (Term term : possibleSubs[i]) {
+            for (JavaDLTerm term : possibleSubs[i]) {
                 chosenSubs[i] = term;
                 set.addAll(combineSubterms(oriTerm, possibleSubs,
                         chosenSubs, boundVars,
@@ -302,7 +302,7 @@ public class TriggersSet {
          * Check whether a given term (or a subterm of the term) might be a
          * trigger candidate
          */
-        private boolean mightContainTriggers(Term term) {
+        private boolean mightContainTriggers(JavaDLTerm term) {
             if (term.freeVars().size() == 0) {
                 return false;
             }
@@ -320,7 +320,7 @@ public class TriggersSet {
          * Further criteria for triggers. This is just a HACK, there should be
          * a more general framework for characterising acceptable triggers
          */
-        private boolean isAcceptableTrigger(Term term, Services services) {
+        private boolean isAcceptableTrigger(JavaDLTerm term, Services services) {
             final Operator op = term.op();
 
             // we do not want to match on expressions a.<created>
@@ -359,7 +359,7 @@ public class TriggersSet {
          * add a uni-trigger to triggers set or add an element of
          * multi-triggers for this clause
          */
-        private void addUniTrigger(Term term, Services services) {
+        private void addUniTrigger(JavaDLTerm term, Services services) {
             if (!isAcceptableTrigger(term, services)) {
                 return;
             }
@@ -428,7 +428,7 @@ public class TriggersSet {
         }
     }
 
-    public Term getQuantifiedFormula() {
+    public JavaDLTerm getQuantifiedFormula() {
         return allTerm;
     }
 

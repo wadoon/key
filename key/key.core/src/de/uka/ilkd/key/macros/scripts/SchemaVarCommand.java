@@ -7,7 +7,7 @@ import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Proof;
@@ -46,7 +46,7 @@ public class SchemaVarCommand extends AbstractCommand {
                 sv = SchemaVariableFactory.createTermSV(new Name("_SCHEMA_" + var), sort);
             }
 
-            Term term = proof.getServices().getTermFactory().createTerm(sv);
+            JavaDLTerm term = proof.getServices().getTermFactory().createTerm(sv);
 
             abbrMap.put(term, var, true);
         } catch (Exception e) {

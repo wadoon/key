@@ -6,7 +6,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
@@ -69,10 +69,10 @@ public abstract class JoinProcedure {
      * @return A joined value for valueInState1 and valueInState2, that is a triple
      *  consisting of new constraints, the actual value and new names introduced.
      */
-    public abstract Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1, Term valueInState1,
-            SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services);
+    public abstract Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinValuesInStates(
+            JavaDLTerm v, SymbolicExecutionState state1, JavaDLTerm valueInState1,
+            SymbolicExecutionState state2, JavaDLTerm valueInState2,
+            JavaDLTerm distinguishingFormula, Services services);
 
     /**
      * @return true iff the join procedure requires distinguishable path

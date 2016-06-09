@@ -428,7 +428,7 @@ public class Sequent implements Iterable<SequentFormula> {
     /*
      * Returns names of TermLabels, that occur in term or one of its subterms.
      */
-    private static Set<Name> getLabelsForTermRecursively(Term term) {
+    private static Set<Name> getLabelsForTermRecursively(JavaDLTerm term) {
         Set<Name> result = new HashSet<Name>();
 
         if (term.hasLabels()) {
@@ -437,7 +437,7 @@ public class Sequent implements Iterable<SequentFormula> {
             }
         }
 
-        for (final Term subTerm : term.subs()) {
+        for (final JavaDLTerm subTerm : term.subs()) {
             result.addAll(getLabelsForTermRecursively(subTerm));
         }
 

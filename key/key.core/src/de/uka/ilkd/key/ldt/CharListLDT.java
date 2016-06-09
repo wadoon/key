@@ -27,7 +27,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 
 
@@ -85,7 +85,7 @@ public final class CharListLDT extends LDT {
     //internal methods
     //------------------------------------------------------------------------- 
     
-    private String translateCharTerm(Term t) {
+    private String translateCharTerm(JavaDLTerm t) {
 	char charVal = 0;
 	int intVal = 0;
 	String result = printlastfirst(t.sub(0)).toString();
@@ -102,7 +102,7 @@ public final class CharListLDT extends LDT {
     }
     
 
-    private StringBuffer printlastfirst(Term t) {
+    private StringBuffer printlastfirst(JavaDLTerm t) {
 	if (t.op().arity() == 0) {
 	    return new StringBuffer();
 	} else {
@@ -174,7 +174,7 @@ public final class CharListLDT extends LDT {
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                                 Term[] subs, 
+                                 JavaDLTerm[] subs, 
                                  Services services, 
                                  ExecutionContext ec) {
 	return false;
@@ -183,8 +183,8 @@ public final class CharListLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                		 Term left, 
-                		 Term right, 
+                		 JavaDLTerm left, 
+                		 JavaDLTerm right, 
                 		 Services services, 
                 		 ExecutionContext ec) {
 	return false;
@@ -193,7 +193,7 @@ public final class CharListLDT extends LDT {
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	    			 Term sub, 
+	    			 JavaDLTerm sub, 
 	    			 TermServices services, 
 	    			 ExecutionContext ec) {
 	return false;
@@ -201,13 +201,13 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JavaDLTerm translateLiteral(Literal lit, Services services) {
 	final SeqLDT seqLDT = services.getTheories().getSeqLDT();
     final TermBuilder tb = services.getTermBuilder();
-    final Term term_empty = tb.func(seqLDT.getSeqEmpty());
+    final JavaDLTerm term_empty = tb.func(seqLDT.getSeqEmpty());
 
 	char[] charArray;
-	Term result = term_empty;
+	JavaDLTerm result = term_empty;
 
 	if (lit instanceof StringLiteral) {
 	    charArray = ((StringLiteral) lit).getValue().toCharArray();
@@ -222,7 +222,7 @@ public final class CharListLDT extends LDT {
 	}
 
 	for (int i = charArray.length - 2; i >= 1; i--) {
-	    Term singleton = tb.seqSingleton(intLDT.translateLiteral(new CharLiteral(charArray[i]), services)); 
+	    JavaDLTerm singleton = tb.seqSingleton(intLDT.translateLiteral(new CharLiteral(charArray[i]), services)); 
 	    result = tb.seqConcat(singleton, result);
 	}
 
@@ -246,9 +246,9 @@ public final class CharListLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
 	final StringBuffer result = new StringBuffer("");
-	Term term = t;
+	JavaDLTerm term = t;
 	while (term.op().arity() != 0) {
 	    result.append(translateCharTerm(term.sub(0)));
 	    term = term.sub(1);
@@ -258,7 +258,7 @@ public final class CharListLDT extends LDT {
     
     
     @Override
-    public final Type getType(Term t) {
+    public final Type getType(JavaDLTerm t) {
 	assert false;
 	return null;
     }

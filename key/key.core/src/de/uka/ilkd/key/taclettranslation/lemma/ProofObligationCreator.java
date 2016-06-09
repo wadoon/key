@@ -22,7 +22,7 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -102,7 +102,7 @@ public class ProofObligationCreator {
                 TacletVisitor visitor = new TacletVisitor() {
      
                 @Override
-                public void visit(Term visited) {
+                public void visit(JavaDLTerm visited) {
                      collectUserDefinedSymbols(visited, userDefinedSymbols);
                         
                 }
@@ -117,8 +117,8 @@ public class ProofObligationCreator {
 
         
         
-        private void collectUserDefinedSymbols(Term term, UserDefinedSymbols userDefinedSymbols){
-                for(Term sub : term.subs()){
+        private void collectUserDefinedSymbols(JavaDLTerm term, UserDefinedSymbols userDefinedSymbols){
+                for(JavaDLTerm sub : term.subs()){
                         collectUserDefinedSymbols(sub, userDefinedSymbols);
                 }  
                 if(term.op() instanceof SortedOperator){
@@ -149,7 +149,7 @@ public class ProofObligationCreator {
                 LemmaGenerator generator = new GenericRemovingLemmaGenerator();
                 TacletFormula tacletFormula = generator.translate(taclet,
                                 initConfig.getServices());
-                Term formula = tacletFormula.getFormula(initConfig.getServices());
+                JavaDLTerm formula = tacletFormula.getFormula(initConfig.getServices());
                 String name = "Taclet: " + taclet.name().toString();
                 
                 UserDefinedSymbols userDefinedSymbols = new UserDefinedSymbols(symbolsForAxioms);

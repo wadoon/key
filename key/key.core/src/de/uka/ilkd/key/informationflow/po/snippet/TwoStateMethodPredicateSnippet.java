@@ -17,7 +17,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -33,7 +33,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
+    public JavaDLTerm produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
 
@@ -45,7 +45,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         LoopInvariant loopInv =
                 (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         String nameString = generatePredicateName(pm, targetBlock, loopInv);
-        final ImmutableList<Term> termList =
+        final ImmutableList<JavaDLTerm> termList =
                 extractTermListForPredicate(pm, poVars, d.hasMby);
         final Sort[] argSorts =
                 generateContApplArgumentSorts(termList, pm);
@@ -55,13 +55,13 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
     protected Sort[] generateContApplArgumentSorts(
-            ImmutableList<Term> termList, IProgramMethod pm) {
+            ImmutableList<JavaDLTerm> termList, IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
         ImmutableArray<Sort> pmSorts = pm.argSorts();
 
         int i = 0;
-        for (final Term arg : termList) {
+        for (final JavaDLTerm arg : termList) {
             argSorts[i] = arg.sort();
             i++;
         }
@@ -86,15 +86,15 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private Term instantiateContApplPredicate(Function pred,
-                                              ImmutableList<Term> termList,
+    private JavaDLTerm instantiateContApplPredicate(Function pred,
+                                              ImmutableList<JavaDLTerm> termList,
                                               TermBuilder tb) {
         final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
-        Term[] predArgs = new Term[predArgSorts.length];
+        JavaDLTerm[] predArgs = new JavaDLTerm[predArgSorts.length];
 
         int i = 0;
-        for (final Term arg : termList) {
+        for (final JavaDLTerm arg : termList) {
             predArgs[i] = arg;
             i++;
         }
@@ -114,12 +114,12 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      * @param poVars    The proof obligation variables.
      * @return
      */
-    private ImmutableList<Term> extractTermListForPredicate(
+    private ImmutableList<JavaDLTerm> extractTermListForPredicate(
             IProgramMethod pm,
             ProofObligationVars poVars,
             boolean hasMby) {
-        ImmutableList<Term> relevantPreVars = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> relevantPostVars = ImmutableSLList.<Term>nil();
+        ImmutableList<JavaDLTerm> relevantPreVars = ImmutableSLList.<JavaDLTerm>nil();
+        ImmutableList<JavaDLTerm> relevantPostVars = ImmutableSLList.<JavaDLTerm>nil();
 
         if (!pm.isStatic()) {
             // self is relevant in the pre and post state for constructors
@@ -131,9 +131,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         // local variables which are not changed during execution or whose
         // changes are not observable (like for parameters) are relevant only
         // in the pre state
-        Iterator<Term> localPostVarsIt = poVars.post.localVars.iterator();
-        for (Term localPreVar : poVars.pre.localVars) {
-            Term localPostVar = localPostVarsIt.next();
+        Iterator<JavaDLTerm> localPostVarsIt = poVars.post.localVars.iterator();
+        for (JavaDLTerm localPreVar : poVars.pre.localVars) {
+            JavaDLTerm localPostVar = localPostVarsIt.next();
             relevantPreVars = relevantPreVars.append(localPreVar);
             if (localPostVar != localPreVar) {
                 relevantPostVars = relevantPostVars.append(localPostVar);

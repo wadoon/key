@@ -24,11 +24,11 @@ import org.key_project.common.core.logic.sort.Sort;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
 
-/** This class wraps the default KeY-Term-Parser.
+/** This class wraps the default KeY-JavaDLTerm-Parser.
  *
  * @author Hubert Schmid
  */
@@ -43,7 +43,7 @@ public final class DefaultTermParser {
      * @throws ParserException The method throws a ParserException, if
      * the input could not be parsed correctly or the term has an
      * invalid sort. */    
-    public Term parse(Reader in, 
+    public JavaDLTerm parse(Reader in, 
 	    	      Sort sort, 
 	    	      Services services,
                       Namespace var_ns,
@@ -72,7 +72,7 @@ public final class DefaultTermParser {
      * @throws ParserException The method throws a ParserException, if
      * the input could not be parsed correctly or the term has an
      * invalid sort. */    
-    public Term parse(Reader in, 
+    public JavaDLTerm parse(Reader in, 
 	    	      Sort sort, 
 	    	      Services services,
                       NamespaceSet nss, 
@@ -88,7 +88,7 @@ public final class DefaultTermParser {
                                 nss, 
                                 scm);
 
-	    final Term result = parser.term();
+	    final JavaDLTerm result = parser.term();
 	    if (sort != null &&  ! result.sort().extendsTrans(sort))
 	        throw new ParserException("Expected sort "+sort+", but parser returns sort "+result.sort()+".", null);
         return result;

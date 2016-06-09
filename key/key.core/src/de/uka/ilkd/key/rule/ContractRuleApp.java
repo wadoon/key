@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -113,7 +113,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
       return heapContext;
     }
 
-    public Term programTerm() {
+    public JavaDLTerm programTerm() {
         if (posInOccurrence() != null) {
             return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
         }

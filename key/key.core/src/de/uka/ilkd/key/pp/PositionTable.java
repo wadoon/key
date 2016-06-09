@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 /**
  * A PositionTable describes the start and end positions of substrings of a
  * String in order to get a PosInSequent from an int describing a position in a
- * string representing a Term or a Sequent, etc. A PositionTable therefore
+ * string representing a JavaDLTerm or a Sequent, etc. A PositionTable therefore
  * represents a table consisting of two columns of type int (start and end
  * position) and a reference to another PositionTable representing the position
  * information for that substring. A PositionTable is valid (in order to support
@@ -282,7 +282,7 @@ public class PositionTable {
     /**
      * Returns a PosInSequent for a given position list, but without filling in
      * the bounds. It is assumed that this is a position table corresponding to
-     * the Term <code>term</code>, which has one child table for each subterm.
+     * the JavaDLTerm <code>term</code>, which has one child table for each subterm.
      *
      * @param filterEntry
      *            the print filter entry that contains information about which

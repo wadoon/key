@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
@@ -50,7 +50,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     private final ImmutableList<NotFreeIn> varsNotFreeIn;
     
     private final boolean ignoreTopLevelUpdates;
-    private final Term findExp;
+    private final JavaDLTerm findExp;
    
     /**
      * @param taclet the Taclet matched by this matcher
@@ -74,17 +74,17 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     /**
      * tries to match the bound variables of the given term against the one
      * described by the template
-     * @param term the Term whose bound variables are matched against the
+     * @param term the JavaDLTerm whose bound variables are matched against the
      * JavaBlock of the template
      * (marked as final to help the compiler inlining methods)
-     * @param template the Term whose bound variables are the template that have
+     * @param template the JavaDLTerm whose bound variables are the template that have
      * to be matched
      * @param matchCond the MatchConditions that has to be paid respect when
      * trying to match
      * @return the new matchconditions if a match is possible, otherwise null
      */
-    private final MatchConditions matchBoundVariables(Term term, 
-            Term template, 
+    private final MatchConditions matchBoundVariables(JavaDLTerm term, 
+            JavaDLTerm template, 
             MatchConditions matchCond,
             Services services) {
 
@@ -119,9 +119,9 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      * given term matches the schema given by the template term or null if no
      * match is possible
      * (marked as final to help the compiler inlining methods)
-     * @param term the Term whose JavaBlock is matched against the JavaBlock of
+     * @param term the JavaDLTerm whose JavaBlock is matched against the JavaBlock of
      * the template
-     * @param template the Term whose JavaBlock is the template that has to
+     * @param template the JavaDLTerm whose JavaBlock is the template that has to
      * be matched
      * @param matchCond the MatchConditions that has to be paid respect when
      * trying to match the JavaBlocks
@@ -129,11 +129,11 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      * program context
      * @return the new matchconditions if a match is possible, otherwise null
      */
-    protected final MatchConditions matchJavaBlock(Term term, 
-            Term template, MatchConditions matchCond, Services services) {
+    protected final MatchConditions matchJavaBlock(JavaDLTerm term, 
+            JavaDLTerm template, MatchConditions matchCond, Services services) {
 
-        final JavaBlock candidateJavaBlock = term.javaBlock();
-        final JavaBlock templateJavaBlock  = template.javaBlock();
+        final JavaBlock candidateJavaBlock = term.modalContent();
+        final JavaBlock templateJavaBlock  = template.modalContent();
         if (candidateJavaBlock.isEmpty()) { 
             if (templateJavaBlock.isEmpty()){
                 if (templateJavaBlock.program() instanceof ContextStatementBlock) {
@@ -152,12 +152,12 @@ public final class LegacyTacletMatcher implements TacletMatcher {
         return matchCond;
     }
 
-    /** returns a SVInstantiations object with the needed SchemaVariable to Term
-     * mappings to match the given Term template to the Term term or
+    /** returns a SVInstantiations object with the needed SchemaVariable to JavaDLTerm
+     * mappings to match the given JavaDLTerm template to the JavaDLTerm term or
      * null if no matching is possible.
      * (marked as final to help the compiler inlining methods)
-     * @param term the Term the Template should match
-     * @param template the Term tried to be instantiated so that it matches term
+     * @param term the JavaDLTerm the Template should match
+     * @param template the JavaDLTerm tried to be instantiated so that it matches term
      * @param matchCond the MatchConditions to be obeyed by a
      * successful match
      * @return the new MatchConditions needed to match template with
@@ -166,8 +166,8 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      * PRECONDITION: matchCond.getConstraint ().isSatisfiable ()
      */
 
-    private MatchConditions match(final Term             term,
-            final Term             template, 
+    private MatchConditions match(final JavaDLTerm             term,
+            final JavaDLTerm             template, 
             MatchConditions        matchCond,
             final Services         services) {
         final Operator sourceOp   =     term.op ();
@@ -219,17 +219,17 @@ public final class LegacyTacletMatcher implements TacletMatcher {
 
 
     /** (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.util.Iterator, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, org.key_project.common.core.services.Services)
+     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.util.Iterator, de.uka.ilkd.key.logic.JavaDLTerm, de.uka.ilkd.key.rule.MatchConditions, org.key_project.common.core.services.Services)
      */
     @Override
     public final IfMatchResult matchIf (   Iterable<IfFormulaInstantiation> p_toMatch,
-            Term                             p_template,
+            JavaDLTerm                             p_template,
             MatchConditions                  p_matchCond,
             Services                         p_services ) {
         ImmutableList<IfFormulaInstantiation> resFormulas = ImmutableSLList.<IfFormulaInstantiation>nil();
         ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
 
-        Term updateFormula;
+        JavaDLTerm updateFormula;
         if (p_matchCond.getInstantiations().getUpdateContext().isEmpty())
             updateFormula = p_template;
         else
@@ -338,8 +338,8 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             MatchConditions matchCond,
             Services services) {        
         if (matchCond != null) {
-            if (instantiationCandidate instanceof Term) {
-                final Term term = (Term) instantiationCandidate;
+            if (instantiationCandidate instanceof JavaDLTerm) {
+                final JavaDLTerm term = (JavaDLTerm) instantiationCandidate;
                 if (!(term.op() instanceof QuantifiableVariable)) {
                     if (varIsBound(var) || varDeclaredNotFree(var)) {
                         // match(x) is not a variable, but the corresponding template variable is bound
@@ -367,8 +367,8 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      * @param services the Services
      * @return a pair of updated match conditions and the unwrapped term without the ignored updates (Which have been added to the update context in the match conditions)
      */
-    private Pair<Term,MatchConditions> matchAndIgnoreUpdatePrefix(final Term term,
-            final Term template, MatchConditions matchCond, final TermServices services) {
+    private Pair<JavaDLTerm,MatchConditions> matchAndIgnoreUpdatePrefix(final JavaDLTerm term,
+            final JavaDLTerm template, MatchConditions matchCond, final TermServices services) {
 
         final Operator sourceOp   = term.op ();
         final Operator templateOp = template.op ();
@@ -376,14 +376,14 @@ public final class LegacyTacletMatcher implements TacletMatcher {
         if ( sourceOp instanceof UpdateApplication
                 && !(templateOp instanceof UpdateApplication) ) {
             // updates can be ignored
-            Term update = UpdateApplication.getUpdate(term);
+            JavaDLTerm update = UpdateApplication.getUpdate(term);
             matchCond = matchCond
                     .setInstantiations ( matchCond.getInstantiations ().
                             addUpdate (update, term.getLabels()) );
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), 
                     template, matchCond, services);       
         } else {
-            return new Pair<Term, MatchConditions>(term, matchCond);
+            return new Pair<JavaDLTerm, MatchConditions>(term, matchCond);
         }
     }
 
@@ -392,13 +392,13 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions matchFind(Term term, 
+    public final MatchConditions matchFind(JavaDLTerm term, 
             MatchConditions matchCond,
             Services services) {
         
         if (findExp != null) {
             if (ignoreTopLevelUpdates) {
-                Pair</* term below updates */Term, MatchConditions> resultUpdateMatch = 
+                Pair</* term below updates */JavaDLTerm, MatchConditions> resultUpdateMatch = 
                         matchAndIgnoreUpdatePrefix(term, findExp, matchCond, services);
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
@@ -416,7 +416,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions matchSV(SchemaVariable sv, Term term,
+    public MatchConditions matchSV(SchemaVariable sv, JavaDLTerm term,
             MatchConditions matchCond, Services services) {
         MatchConditions cond = matchCond;
 

@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -67,11 +67,11 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
             // Compute modified locations
             List<Location> modifiedLocations = new LinkedList<Location>();
-            Term loopConditionModalityTerm = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
+            JavaDLTerm loopConditionModalityTerm = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
             if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {
                throw new IllegalStateException("Use Loop Invariant/Operation Contract rule implementation has changed at node " + node.serialNr() + ".");
             }
-            Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
+            JavaDLTerm updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
             while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
                listModifiedLocations(UpdateApplication.getUpdate(updateTerm), 
                                      services, 

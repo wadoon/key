@@ -15,7 +15,7 @@ package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -38,7 +38,7 @@ public class SubtermProjection implements ProjectionToTerm {
         this.pit = pit;
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
         return pit.getSubTerm( completeTerm.toTerm ( app, pos, goal ) ) ;
     }
 }

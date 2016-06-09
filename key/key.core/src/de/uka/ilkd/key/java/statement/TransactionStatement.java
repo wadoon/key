@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
+import org.key_project.common.core.program.GenericNameAbstractionTable;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.java.SourceElement;
@@ -80,7 +81,7 @@ public class TransactionStatement extends JavaStatement {
         return null;
     }
     
-    public boolean equalsModRenaming(SourceElement source, NameAbstractionTable nat) {
+    public boolean equalsModRenaming(SourceElement source, GenericNameAbstractionTable nat) {
         return this.equals(source);
     }
 

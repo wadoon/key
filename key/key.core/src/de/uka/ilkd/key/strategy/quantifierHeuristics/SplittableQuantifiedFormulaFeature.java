@@ -19,7 +19,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
@@ -60,9 +60,9 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
         public ImmutableSet<QuantifiableVariable> existentialVars =
             DefaultImmutableSet.<QuantifiableVariable>nil();
         public Operator binOp;
-        public Term left, right;
+        public JavaDLTerm left, right;
         
-        public boolean analyse(Term formula) {
+        public boolean analyse(JavaDLTerm formula) {
             final Operator op = formula.op();
             
             if ( op == Quantifier.ALL ) {

@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * The bound uniqueness checker ensures that schemavariables can be bound
@@ -38,13 +38,13 @@ import de.uka.ilkd.key.logic.Term;
 public class BoundUniquenessChecker {
 
     private HashSet<QuantifiableVariable> boundVars = new LinkedHashSet<QuantifiableVariable>();
-    private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+    private ImmutableList<JavaDLTerm> terms = ImmutableSLList.<JavaDLTerm>nil();
 
     public BoundUniquenessChecker(Sequent seq) {
         addAll(seq);
     }
 
-    public BoundUniquenessChecker(Term t, Sequent seq) {
+    public BoundUniquenessChecker(JavaDLTerm t, Sequent seq) {
 	addTerm(t);
 	addAll(seq);
     }
@@ -52,9 +52,9 @@ public class BoundUniquenessChecker {
     /**
      * adds <tt>term</tt> to the list of terms to include in
      * the uniqueness check
-     * @param term a Term
+     * @param term a JavaDLTerm
      */
-    public void addTerm(Term term) {
+    public void addTerm(JavaDLTerm term) {
 	terms = terms.prepend(term);
     }
 
@@ -70,7 +70,7 @@ public class BoundUniquenessChecker {
     }
 
     //recursive helper
-    private boolean correct(Term t) {
+    private boolean correct(JavaDLTerm t) {
 	/* Note that a term can bound a variable in several
 	 * subterms.
          */
@@ -104,7 +104,7 @@ public class BoundUniquenessChecker {
      * given set of terms
      */
     public boolean correct() {
-        for (final Term term : terms) {
+        for (final JavaDLTerm term : terms) {
             if (!correct(term)) {
                 return false;
             }

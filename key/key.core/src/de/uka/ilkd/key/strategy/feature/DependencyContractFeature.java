@@ -18,7 +18,7 @@ import java.util.List;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -28,7 +28,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 public final class DependencyContractFeature extends BinaryFeature {
 
-   private void removePreviouslyUsedSteps(Term focus, Goal goal,
+   private void removePreviouslyUsedSteps(JavaDLTerm focus, Goal goal,
          List<PosInOccurrence> steps) {
       for (RuleApp app : goal.appliedRuleApps()) {
          if (app.rule() instanceof UseDependencyContractRule
@@ -44,7 +44,7 @@ public final class DependencyContractFeature extends BinaryFeature {
    @Override
    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
       IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-      final Term focus = pos.subTerm();
+      final JavaDLTerm focus = pos.subTerm();
 
       // determine possible steps
 

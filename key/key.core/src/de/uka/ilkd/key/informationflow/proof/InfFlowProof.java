@@ -6,7 +6,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
@@ -41,7 +41,7 @@ public class InfFlowProof extends Proof {
         super(name, sequent, header, rules, builtInRules, initConfig);
     }
 
-    public InfFlowProof(String name, Term problem, String header,
+    public InfFlowProof(String name, JavaDLTerm problem, String header,
             InitConfig initConfig) {
         super(name, problem, header, initConfig);
     }
@@ -63,8 +63,8 @@ public class InfFlowProof extends Proof {
 
     public void addIFSymbol(Object s) {
         assert s != null;
-        if (s instanceof Term) {
-            infFlowSymbols.add((Term)s);
+        if (s instanceof JavaDLTerm) {
+            infFlowSymbols.add((JavaDLTerm)s);
         } else if (s instanceof Named) {
             infFlowSymbols.add((Named)s);
         } else {
@@ -74,8 +74,8 @@ public class InfFlowProof extends Proof {
 
     public void addLabeledIFSymbol(Object s) {
         assert s != null;
-        if (s instanceof Term) {
-            infFlowSymbols.addLabeled((Term)s);
+        if (s instanceof JavaDLTerm) {
+            infFlowSymbols.addLabeled((JavaDLTerm)s);
         } else if (s instanceof Named) {
             infFlowSymbols.addLabeled((Named)s);
         } else {
@@ -83,12 +83,12 @@ public class InfFlowProof extends Proof {
         }
     }
 
-    public void addTotalTerm(Term p) {
+    public void addTotalTerm(JavaDLTerm p) {
         assert p != null;
         infFlowSymbols.addTotalTerm(p);
     }
 
-    public void addLabeledTotalTerm(Term p) {
+    public void addLabeledTotalTerm(JavaDLTerm p) {
         assert p != null;
         infFlowSymbols.addLabeledTotalTerm(p);
     }

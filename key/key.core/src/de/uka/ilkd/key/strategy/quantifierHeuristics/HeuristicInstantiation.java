@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
@@ -33,12 +33,12 @@ public class HeuristicInstantiation implements TermGenerator {
         
     private HeuristicInstantiation() {}
     
-    public Iterator<Term> generate(RuleApp app,
+    public Iterator<JavaDLTerm> generate(RuleApp app,
                                    PosInOccurrence pos,
                                    Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final Term qf = pos.sequentFormula ().formula ();
+        final JavaDLTerm qf = pos.sequentFormula ().formula ();
         final Instantiation ia = Instantiation.create ( qf, goal.sequent(), 
                 goal.proof().getServices() );
         final QuantifiableVariable var =
@@ -47,18 +47,18 @@ public class HeuristicInstantiation implements TermGenerator {
     }
 
 
-    private class HIIterator implements Iterator<Term> {
-        private final Iterator<Term>       instances;
+    private class HIIterator implements Iterator<JavaDLTerm> {
+        private final Iterator<JavaDLTerm>       instances;
 
         private final QuantifiableVariable quantifiedVar;
 
         private final Sort                 quantifiedVarSort;
         private final Function             quantifiedVarSortCast;
 
-        private Term                       nextInst = null;
+        private JavaDLTerm                       nextInst = null;
         private final TermServices services;
 
-        private HIIterator(Iterator<Term> it, 
+        private HIIterator(Iterator<JavaDLTerm> it, 
 					 QuantifiableVariable var, 
         	         TermServices services) {
             this.instances = it;
@@ -86,8 +86,8 @@ public class HeuristicInstantiation implements TermGenerator {
             return nextInst != null;
         }
 
-        public Term next() {
-            final Term res = nextInst;
+        public JavaDLTerm next() {
+            final JavaDLTerm res = nextInst;
             nextInst = null;
             findNextInst ();
             return res;

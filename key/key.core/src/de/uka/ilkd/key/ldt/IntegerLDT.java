@@ -47,7 +47,7 @@ import de.uka.ilkd.key.java.expression.operator.Times;
 import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -161,8 +161,8 @@ public final class IntegerLDT extends LDT {
     private final Function inLong;
     private final Function inChar;
     private final Function index;
-    private final Term one;
-    private final Term zero;
+    private final JavaDLTerm one;
+    private final JavaDLTerm zero;
 
     
     
@@ -489,7 +489,7 @@ public final class IntegerLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	                         Term[] subs, 
+	                         JavaDLTerm[] subs, 
 	                         Services services, 
 	                         ExecutionContext ec) {
         if (subs.length == 1) {
@@ -504,8 +504,8 @@ public final class IntegerLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	                         Term left, 
-	                         Term right, 
+	                         JavaDLTerm left, 
+	                         JavaDLTerm right, 
 	                         Services services, 
 	                         ExecutionContext ec) {
         if(left != null 
@@ -522,7 +522,7 @@ public final class IntegerLDT extends LDT {
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	                         Term sub, 
+	                         JavaDLTerm sub, 
 	                         TermServices services, 
 	                         ExecutionContext ec) {
         if(sub != null && sub.sort().extendsTrans(targetSort())) {
@@ -536,7 +536,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JavaDLTerm translateLiteral(Literal lit, Services services) {
         int length = 0;
         boolean minusFlag = false;
         Debug.assertTrue(lit instanceof IntLiteral || 
@@ -547,7 +547,7 @@ public final class IntegerLDT extends LDT {
 
         char[] int_ch=null;
         assert sharp != null;
-        Term result = services.getTermBuilder().func(sharp);
+        JavaDLTerm result = services.getTermBuilder().func(sharp);
 
         Function identifier=numbers;
         if (lit instanceof CharLiteral) {
@@ -632,14 +632,14 @@ public final class IntegerLDT extends LDT {
     
     
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
         if(!containsFunction((Function) t.op())) {
             return null;
         }
         Function f = (Function)t.op();
         if(isNumberLiteral(f) || f == numbers || f == charID) {     
             StringBuffer sb = new StringBuffer("");
-            Term it = t;
+            JavaDLTerm it = t;
             if (f == charID || f == numbers) {
                 it = it.sub(0); 
                 f = (Function)it.op();      
@@ -660,7 +660,7 @@ public final class IntegerLDT extends LDT {
     
     
     @Override
-    public final Type getType(Term t) {
+    public final Type getType(JavaDLTerm t) {
 	Operator op = t.op();
 	if(op == javaUnaryMinusInt
            || op == javaAddInt
@@ -1056,11 +1056,11 @@ public final class IntegerLDT extends LDT {
         return javaUnsignedShiftRightLong;
     }
     
-    public Term zero() {	
+    public JavaDLTerm zero() {	
 	return zero;
     }
 
-    public Term one() {	
+    public JavaDLTerm one() {	
 	return one;
     }
 }

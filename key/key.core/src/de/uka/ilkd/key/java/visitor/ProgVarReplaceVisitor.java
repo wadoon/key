@@ -35,7 +35,7 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -175,7 +175,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
     }
 
-    private Term replaceVariablesInTerm(Term t){
+    private JavaDLTerm replaceVariablesInTerm(JavaDLTerm t){
         if(t==null) {
             return null;
         }
@@ -188,7 +188,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             }
         } else {
             boolean changed = false;
-            Term subTerms[] = new Term[t.arity()];
+            JavaDLTerm subTerms[] = new JavaDLTerm[t.arity()];
             for(int i = 0, n = t.arity(); i < n; i++) {
                 subTerms[i] = replaceVariablesInTerm(t.sub(i));
                 changed = changed || subTerms[i] != t.sub(i);
@@ -206,16 +206,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             return changed ? services.getTermFactory().createTerm(op,
                                                         subTerms,
                                                         t.boundVars(),
-                                                        t.javaBlock(),
+                                                        t.modalContent(),
                                                         t.getLabels()) : t;
         }
     }
 
-    private ImmutableList<Term> replaceVariablesInTerms(ImmutableList<Term> terms) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+    private ImmutableList<JavaDLTerm> replaceVariablesInTerms(ImmutableList<JavaDLTerm> terms) {
+        ImmutableList<JavaDLTerm> res = ImmutableSLList.<JavaDLTerm>nil();
         boolean changed = false;
-        for (final Term term : terms) {
-            final Term newTerm = replaceVariablesInTerm(term);
+        for (final JavaDLTerm term : terms) {
+            final JavaDLTerm newTerm = replaceVariablesInTerm(term);
             changed |= newTerm != term;
             res = res.append(newTerm);
         }
@@ -229,11 +229,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     res = ImmutableSLList.<InfFlowSpec>nil();
         boolean changed = false;
         for (final InfFlowSpec innerTerms : terms) {
-            final ImmutableList<Term> renamedPreExpressions =
+            final ImmutableList<JavaDLTerm> renamedPreExpressions =
                     replaceVariablesInTerms(innerTerms.preExpressions);
-            final ImmutableList<Term> renamedPostExpressions =
+            final ImmutableList<JavaDLTerm> renamedPostExpressions =
                     replaceVariablesInTerms(innerTerms.postExpressions);
-            final ImmutableList<Term> renamedNewObjects =
+            final ImmutableList<JavaDLTerm> renamedNewObjects =
                     replaceVariablesInTerms(innerTerms.newObjects);
             
             res = res.append(
@@ -273,21 +273,21 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                  final boolean blockChanged) {
         final BlockContract.Variables newVariables =
                 replaceBlockContractVariables(oldContract.getPlaceholderVariables());
-        final Map<LocationVariable, Term> newPreconditions =
-                new LinkedHashMap<LocationVariable, Term>();
-        final Map<LocationVariable, Term> newPostconditions =
-                new LinkedHashMap<LocationVariable, Term>();
-        final Map<LocationVariable, Term> newModifiesClauses =
-                new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, JavaDLTerm> newPreconditions =
+                new LinkedHashMap<LocationVariable, JavaDLTerm>();
+        final Map<LocationVariable, JavaDLTerm> newPostconditions =
+                new LinkedHashMap<LocationVariable, JavaDLTerm>();
+        final Map<LocationVariable, JavaDLTerm> newModifiesClauses =
+                new LinkedHashMap<LocationVariable, JavaDLTerm>();
         boolean changed = blockChanged;
         for (LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
-            final Term oldPrecondition = oldContract.getPrecondition(heap, services);
-            final Term oldPostcondition = oldContract.getPostcondition(heap, services);
-            final Term oldModifies = oldContract.getModifiesClause(heap, services);
+            final JavaDLTerm oldPrecondition = oldContract.getPrecondition(heap, services);
+            final JavaDLTerm oldPostcondition = oldContract.getPostcondition(heap, services);
+            final JavaDLTerm oldModifies = oldContract.getModifiesClause(heap, services);
             
-            final Term newPrecondition = replaceVariablesInTerm(oldPrecondition);
-            final Term newPostcondition = replaceVariablesInTerm(oldPostcondition);
-            final Term newModifies = replaceVariablesInTerm(oldModifies);
+            final JavaDLTerm newPrecondition = replaceVariablesInTerm(oldPrecondition);
+            final JavaDLTerm newPostcondition = replaceVariablesInTerm(oldPostcondition);
+            final JavaDLTerm newModifies = replaceVariablesInTerm(oldModifies);
             
             newPreconditions.put(heap,
                     (newPrecondition != oldPrecondition) ? newPrecondition : oldPrecondition);
@@ -389,18 +389,18 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if(inv == null) {
             return;
         }
-        Term selfTerm = inv.getInternalSelfTerm();
-        Map<LocationVariable,Term> atPres = inv.getInternalAtPres();
+        JavaDLTerm selfTerm = inv.getInternalSelfTerm();
+        Map<LocationVariable,JavaDLTerm> atPres = inv.getInternalAtPres();
 
-        Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
-        Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
+        Map<LocationVariable,JavaDLTerm> newInvariants = new LinkedHashMap<LocationVariable,JavaDLTerm>();
+        Map<LocationVariable,JavaDLTerm> newMods = new LinkedHashMap<LocationVariable,JavaDLTerm>();
         Map<LocationVariable,
             ImmutableList<InfFlowSpec>> newInfFlowSpecs
             = new LinkedHashMap<LocationVariable,
                                 ImmutableList<InfFlowSpec>>();
 
         for (LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
-            final Term m =
+            final JavaDLTerm m =
                     replaceVariablesInTerm(inv.getModifies(heap, selfTerm,
                                                            atPres,
                                                            services));
@@ -410,7 +410,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                                           atPres,
                                                                           services));
             newInfFlowSpecs.put(heap, infFlowSpecs);
-            final Term i =
+            final JavaDLTerm i =
                     replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
                                                             atPres,
                                                             services));
@@ -418,17 +418,17 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
 
         //variant
-        Term newVariant
+        JavaDLTerm newVariant
             = replaceVariablesInTerm(inv.getVariant(selfTerm,
                                                     atPres,
                                                     services));
 
-        Term newSelfTerm = replaceVariablesInTerm(selfTerm);
+        JavaDLTerm newSelfTerm = replaceVariablesInTerm(selfTerm);
 
-        Map<LocationVariable, Term> saveCopy = new HashMap<LocationVariable, Term>(atPres);
-        for(Entry<LocationVariable, Term> h : saveCopy.entrySet()) {
+        Map<LocationVariable, JavaDLTerm> saveCopy = new HashMap<LocationVariable, JavaDLTerm>(atPres);
+        for(Entry<LocationVariable, JavaDLTerm> h : saveCopy.entrySet()) {
             LocationVariable pv = h.getKey();
-            final Term t = h.getValue();
+            final JavaDLTerm t = h.getValue();
             if(t == null) continue;
             if(replaceMap.containsKey(pv)) {
                 atPres.remove(pv);
@@ -437,8 +437,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             atPres.put(pv, replaceVariablesInTerm(t));
         }
 
-        ImmutableList<Term> newLocalIns = tb.var(MiscTools.getLocalIns(newLoop, services));
-        ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(newLoop, services));
+        ImmutableList<JavaDLTerm> newLocalIns = tb.var(MiscTools.getLocalIns(newLoop, services));
+        ImmutableList<JavaDLTerm> newLocalOuts = tb.var(MiscTools.getLocalOuts(newLoop, services));
 
         LoopInvariant newInv = inv.create(newLoop, newInvariants, newMods, newInfFlowSpecs,
                                           newVariant, newSelfTerm, newLocalIns,

@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -189,7 +189,7 @@ public class PosTacletApp extends TacletApp {
 	    Iterator<SchemaVariable> it=allVariableSV(taclet);
 	    while (it.hasNext()) {
 		SchemaVariable varSV=it.next();
-		Term inst=(Term) insts.getInstantiation(varSV);
+		JavaDLTerm inst=(JavaDLTerm) insts.getInstantiation(varSV);
 		if (inst!=null && k.contains((QuantifiableVariable)inst.op())) {
 		    insts = replaceInstantiation(taclet,
 			    			 insts,
@@ -204,11 +204,11 @@ public class PosTacletApp extends TacletApp {
 
     /** adds a new instantiation to this TacletApp
      * @param sv the SchemaVariable to be instantiated
-     * @param term the Term the SchemaVariable is instantiated with
+     * @param term the JavaDLTerm the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
     public TacletApp addInstantiation(SchemaVariable sv,
-	    			      Term term,
+	    			      JavaDLTerm term,
                                       boolean interesting,
                                       Services services) {
 

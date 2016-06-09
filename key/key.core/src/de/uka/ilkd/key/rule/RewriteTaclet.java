@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -115,7 +115,7 @@ public class RewriteTaclet extends FindTaclet {
 			 ImmutableList<TacletGoalTemplate>  goalTemplates, 
 			 ImmutableList<RuleSet>             ruleSets,
 			 TacletAttributes          attrs,
-			 Term                      find,
+			 JavaDLTerm                      find,
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_applicationRestriction,
 			 ImmutableSet<Choice> choices,
@@ -129,7 +129,7 @@ public class RewriteTaclet extends FindTaclet {
 			 ImmutableList<TacletGoalTemplate>  goalTemplates, 
 			 ImmutableList<RuleSet>             ruleSets,
 			 TacletAttributes          attrs,
-			 Term                      find,
+			 JavaDLTerm                      find,
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_applicationRestriction,
 			 ImmutableSet<Choice> choices,
@@ -172,10 +172,10 @@ public class RewriteTaclet extends FindTaclet {
      * the top level operator has to be a simultaneous update. This method 
      * checks if the assignment pairs of the update contain free logic
      * variables and gives a veto if positive
-     * @param t the Term to check
+     * @param t the JavaDLTerm to check
      * @return false if vetoing 
      */
-    private boolean veto (Term t) {
+    private boolean veto (JavaDLTerm t) {
         return t.freeVars ().size () > 0;
     }
 
@@ -197,7 +197,7 @@ public class RewriteTaclet extends FindTaclet {
 	PIOPathIterator it = p_pos.iterator ();
 	Operator        op;
 	while ( it.next () != -1 ) {
-	    final Term t = it.getSubTerm ();
+	    final JavaDLTerm t = it.getSubTerm ();
 	    op = t.op ();
 	    if (op instanceof Transformer) {
 	        return null;
@@ -207,7 +207,7 @@ public class RewriteTaclet extends FindTaclet {
 	        if ( (getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t) ) {
 	            return null;
 	        } else {
-	            Term update = UpdateApplication.getUpdate(t);
+	            JavaDLTerm update = UpdateApplication.getUpdate(t);
 	            svi = svi.addUpdate(update, t.getLabels());
 	        }
 	    } else if (getApplicationRestriction() != NONE &&

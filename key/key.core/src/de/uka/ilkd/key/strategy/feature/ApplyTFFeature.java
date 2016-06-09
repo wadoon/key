@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -66,7 +66,7 @@ public class ApplyTFFeature implements Feature {
     }
 
     public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Term te = proj.toTerm ( app, pos, goal );
+        final JavaDLTerm te = proj.toTerm ( app, pos, goal );
         if ( te == null ) {
             Debug.assertFalse ( demandInst,
                                 "ApplyTFFeature: got undefined argument (null)" );

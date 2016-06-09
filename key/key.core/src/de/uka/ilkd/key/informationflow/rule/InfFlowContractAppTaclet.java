@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -70,7 +70,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
                          ImmutableList<TacletGoalTemplate> goalTemplates,
                          ImmutableList<RuleSet> ruleSets,
                          TacletAttributes attrs,
-                         Term find,
+                         JavaDLTerm find,
                          ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
                          int p_applicationRestriction,
                          ImmutableSet<Choice> choices,
@@ -84,7 +84,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
                          ImmutableList<TacletGoalTemplate> goalTemplates,
                          ImmutableList<RuleSet> ruleSets,
                          TacletAttributes attrs,
-                         Term find,
+                         JavaDLTerm find,
                          ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
                          int p_applicationRestriction,
                          ImmutableSet<Choice> choices,

@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * The general interface for caches for accelerating
@@ -28,13 +28,13 @@ public interface ITermTacletAppIndexCache {
      *         <code>null</code> if no index for this term was found in the
      *         cache
      */
-    TermTacletAppIndex getIndexForTerm(Term t);
+    TermTacletAppIndex getIndexForTerm(JavaDLTerm t);
 
     /**
      * Put the taclet app index <code>index</code> for the term <code>t</code>
      * in the cache
      */
-    void putIndexForTerm(Term t, TermTacletAppIndex index);
+    void putIndexForTerm(JavaDLTerm t, TermTacletAppIndex index);
 
     /**
      * Determine the cache that is responsible for locations within the
@@ -44,6 +44,6 @@ public interface ITermTacletAppIndexCache {
      * <code>TermTacletAppIndex</code> when recursively constructing the index
      * for a given term.
      */
-    ITermTacletAppIndexCache descend(Term t, int subtermIndex);
+    ITermTacletAppIndexCache descend(JavaDLTerm t, int subtermIndex);
     
 }

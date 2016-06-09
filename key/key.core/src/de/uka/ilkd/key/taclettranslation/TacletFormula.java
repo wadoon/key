@@ -17,7 +17,7 @@ import java.util.Collection;
 
 import org.key_project.common.core.services.TermServices;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -44,7 +44,7 @@ public interface TacletFormula {
      *         generic sorts) the returned term is a conjunction of these 
      *         instantiations.
      */
-    Term getFormula(TermServices services);
+    JavaDLTerm getFormula(TermServices services);
 
     /**
      * @return if the taclet can not be translated the reason why. Otherwise a
@@ -57,6 +57,6 @@ public interface TacletFormula {
      * It can be that a taclet is translated into several formulas, i.e. in the case
      * that the generics are instantiated. This method returns the set of resulting formulas. 
      */
-    Collection<Term> getInstantiations();
+    Collection<JavaDLTerm> getInstantiations();
     
 }

@@ -16,12 +16,15 @@ package de.uka.ilkd.key.logic;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import org.key_project.common.core.logic.ModalContent;
+import org.key_project.common.core.program.GenericNameAbstractionTable;
+
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 
-public class JavaBlock {
+public class JavaBlock implements ModalContent<SourceElement> {
     
     /**
      * Attention using the JavaBlock below means no program not the empty program.
@@ -57,6 +60,10 @@ public class JavaBlock {
     }
     
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.ModalContent#isEmpty()
+     */
+    @Override
     public boolean isEmpty() {
 	if ((program() instanceof StatementBlock))  {
 	    return ((StatementBlock)program()).isEmpty();
@@ -97,8 +104,9 @@ public class JavaBlock {
     /** returns true if the given ProgramElement is equal to the
      * one of the JavaBlock modulo renaming (see comment in SourceElement)
      */ 
+    @Override
     public boolean equalsModRenaming(Object o, 
-				     NameAbstractionTable nat) {
+				     GenericNameAbstractionTable<SourceElement> nat) {
         if (!(o instanceof JavaBlock)) {
             return false;
         }       
@@ -110,7 +118,7 @@ public class JavaBlock {
      * one of the JavaBlock modulo renaming (see comment in SourceElement)
      */ 
     private boolean equalsModRenaming(JavaProgramElement pe,
-				     NameAbstractionTable nat) {
+				     GenericNameAbstractionTable<SourceElement> nat) {
 	if (pe == null && program() == null) {
 	    return true;
 	} else if (pe != null && program() != null) {	    

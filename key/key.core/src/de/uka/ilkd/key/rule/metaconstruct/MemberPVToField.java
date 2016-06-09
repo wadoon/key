@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -34,7 +34,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
     
 
     @Override
-    public Term transform(Term term, 
+    public JavaDLTerm transform(JavaDLTerm term, 
 	    		  SVInstantiations svInst, 
 	    		  Services services ) {
         HeapLDT heapLDT = services.getTheories().getHeapLDT();	

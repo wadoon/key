@@ -46,7 +46,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -248,11 +248,11 @@ public final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Term translate(SLTranslationExceptionManager excManager,
+            public JavaDLTerm translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, Term.class, Services.class);
-                Term ensuresTerm = (Term) params[0];
+                checkParameters(params, JavaDLTerm.class, Services.class);
+                JavaDLTerm ensuresTerm = (JavaDLTerm) params[0];
                 Services services = (Services) params[1];
 
                 BooleanLDT booleanLDT =
@@ -268,11 +268,11 @@ public final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Term translate(SLTranslationExceptionManager excManager,
+            public JavaDLTerm translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, Term.class, Services.class);
-                Term ensuresTerm = (Term) params[0];
+                checkParameters(params, JavaDLTerm.class, Services.class);
+                JavaDLTerm ensuresTerm = (JavaDLTerm) params[0];
                 Services services = (Services) params[1];
 
                 BooleanLDT booleanLDT =
@@ -288,14 +288,14 @@ public final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Triple<IObserverFunction, Term, Term> translate(
+            public Triple<IObserverFunction, JavaDLTerm, JavaDLTerm> translate(
                     SLTranslationExceptionManager excManager,
                                     Object... params)
                     throws SLTranslationException {
-                checkParameters(params, SLExpression.class, Term.class,
+                checkParameters(params, SLExpression.class, JavaDLTerm.class,
                                 SLExpression.class, Services.class);
                 SLExpression lhs = (SLExpression) params[0];
-                Term rhs = (Term) params[1];
+                JavaDLTerm rhs = (JavaDLTerm) params[1];
                 SLExpression mby = (SLExpression) params[2];
                 Services services = (Services) params[3];
 
@@ -306,7 +306,7 @@ public final class JMLTranslator {
                     || lhs.getTerm().sub(0).op() != heap) {
                     throw excManager.createException("Depends clause with unexpected lhs: " + lhs);
                 }
-                return new Triple<IObserverFunction, Term, Term>(
+                return new Triple<IObserverFunction, JavaDLTerm, JavaDLTerm>(
                         (IObserverFunction) lhs.getTerm().op(),
                         rhs,
                         mby == null ? null : mby.getTerm());
@@ -315,11 +315,11 @@ public final class JMLTranslator {
         JMLTranslationMethod termTranslationMethod = new JMLTranslationMethod() {
 
             @Override
-            public Term translate(SLTranslationExceptionManager excManager,
+            public JavaDLTerm translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, Term.class, Services.class);
-                Term term = (Term) params[0];
+                checkParameters(params, JavaDLTerm.class, Services.class);
+                JavaDLTerm term = (JavaDLTerm) params[0];
         	    @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[1];
                 return tb.convertToFormula(term);
@@ -332,15 +332,15 @@ public final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Pair<IObserverFunction, Term> translate(SLTranslationExceptionManager excManager,
+            public Pair<IObserverFunction, JavaDLTerm> translate(SLTranslationExceptionManager excManager,
                                                            Object... params)
                     throws SLTranslationException {
-                checkParameters(params, SLExpression.class, Term.class,
+                checkParameters(params, SLExpression.class, JavaDLTerm.class,
                                 Services.class);
                 SLExpression lhs = (SLExpression) params[0];
-                Term t = (Term) params[1];
+                JavaDLTerm t = (JavaDLTerm) params[1];
 
-                return new Pair<IObserverFunction, Term>(
+                return new Pair<IObserverFunction, JavaDLTerm>(
                         (IObserverFunction) lhs.getTerm().op(),
                         t);
             }
@@ -361,13 +361,13 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.SIGNALS, new JMLTranslationMethod() {
 
             @Override
-            public Term translate(SLTranslationExceptionManager excManager,
+            public JavaDLTerm translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, Term.class, LogicVariable.class,
+                checkParameters(params, JavaDLTerm.class, LogicVariable.class,
                                 ProgramVariable.class, KeYJavaType.class,
                                 Services.class);
-                Term result = (Term) params[0];
+                JavaDLTerm result = (JavaDLTerm) params[0];
                 LogicVariable eVar = (LogicVariable) params[1];
                 ProgramVariable excVar = (ProgramVariable) params[2];
                 KeYJavaType excType = (KeYJavaType) params[3];
@@ -395,7 +395,7 @@ public final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Term translate(SLTranslationExceptionManager excManager,
+            public JavaDLTerm translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
                 checkParameters(params,
@@ -409,7 +409,7 @@ public final class JMLTranslator {
                 // Build appropriate term out of the parsed list of types
                 // i.e. disjunction of "excVar instanceof ExcType"
                 // for every ExcType in the list
-                Term result = tb.ff();
+                JavaDLTerm result = tb.ff();
 
                 Iterator<KeYJavaType> it = signalsonly.iterator();
                 while (it.hasNext()) {
@@ -428,40 +428,40 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.BREAKS, new JMLTranslationMethod() {
 
             @Override
-            public Pair<Label, Term> translate(SLTranslationExceptionManager excManager, Object... params) throws SLTranslationException {
-                checkParameters(params, Term.class, String.class, Services.class);
-                Term term = (Term) params[0];
+            public Pair<Label, JavaDLTerm> translate(SLTranslationExceptionManager excManager, Object... params) throws SLTranslationException {
+                checkParameters(params, JavaDLTerm.class, String.class, Services.class);
+                JavaDLTerm term = (JavaDLTerm) params[0];
                 String label = (String) params[1];
                 @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[2];
-                Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
-                return new Pair<Label, Term>(label == null ? null : new ProgramElementName(label), formula);
+                JavaDLTerm formula = term == null ? tb.tt() : tb.convertToFormula(term);
+                return new Pair<Label, JavaDLTerm>(label == null ? null : new ProgramElementName(label), formula);
             }
         });
         translationMethods.put(JMLKeyWord.CONTINUES, new JMLTranslationMethod() {
 
             @Override
-            public Pair<Label, Term> translate(SLTranslationExceptionManager excManager,
+            public Pair<Label, JavaDLTerm> translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, Term.class, String.class, Services.class);
-                Term term = (Term) params[0];
+                checkParameters(params, JavaDLTerm.class, String.class, Services.class);
+                JavaDLTerm term = (JavaDLTerm) params[0];
                 String label = (String) params[1];
                 
                 @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[2];
-                Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
-                return new Pair<Label, Term>(label == null ? null : new ProgramElementName(label), formula);
+                JavaDLTerm formula = term == null ? tb.tt() : tb.convertToFormula(term);
+                return new Pair<Label, JavaDLTerm>(label == null ? null : new ProgramElementName(label), formula);
             }
         });
         translationMethods.put(JMLKeyWord.RETURNS, new JMLTranslationMethod() {
 
             @Override
-            public Term translate(SLTranslationExceptionManager excManager,
+            public JavaDLTerm translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
-                checkParameters(params, Term.class, Services.class);
-                Term term = (Term) params[0];
+                checkParameters(params, JavaDLTerm.class, Services.class);
+                JavaDLTerm term = (JavaDLTerm) params[0];
                 @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[1];
                 return term == null ? tb.tt() : tb.convertToFormula(term);
@@ -473,16 +473,16 @@ public final class JMLTranslator {
                                new JMLQuantifierTranslationMethod() {
 
             @Override
-            public Term translateQuantifier(QuantifiableVariable qv,
-                                            Term t)
+            public JavaDLTerm translateQuantifier(QuantifiableVariable qv,
+                                            JavaDLTerm t)
                     throws SLTranslationException {
                 return tb.all(qv, t);
             }
 
 
             @Override
-            public Term combineQuantifiedTerms(Term t1,
-                                               Term t2)
+            public JavaDLTerm combineQuantifiedTerms(JavaDLTerm t1,
+                                               JavaDLTerm t2)
                     throws SLTranslationException {
                 return tb.imp(t1, t2);
             }
@@ -497,16 +497,16 @@ public final class JMLTranslator {
                                new JMLQuantifierTranslationMethod() {
 
             @Override
-            public Term translateQuantifier(QuantifiableVariable qv,
-                                            Term t)
+            public JavaDLTerm translateQuantifier(QuantifiableVariable qv,
+                                            JavaDLTerm t)
                     throws SLTranslationException {
                 return tb.ex(qv, t);
             }
 
 
             @Override
-            public Term combineQuantifiedTerms(Term t1,
-                                               Term t2)
+            public JavaDLTerm combineQuantifiedTerms(JavaDLTerm t1,
+                                               JavaDLTerm t2)
                     throws SLTranslationException {
                 return tb.andSC(t1, t2);
             }
@@ -548,7 +548,7 @@ public final class JMLTranslator {
                             "bounded sum must declare exactly one variable");
                 }
                 LogicVariable qv = declVars.head();
-                Term resultTerm = tb.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm());
+                JavaDLTerm resultTerm = tb.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm());
                 warnings.add(new PositionedString("The keyword \\bsum is deprecated and will be removed in the future.\n" +
                 		"Please use the standard \\sum syntax."));
                 final SLExpression bsumExpr = new SLExpression(resultTerm, promo);
@@ -561,20 +561,20 @@ public final class JMLTranslator {
                                new JMLBoundedNumericalQuantifierTranslationMethod() {
 
             @Override
-            public Term translateBoundedNumericalQuantifier(
+            public JavaDLTerm translateBoundedNumericalQuantifier(
                     QuantifiableVariable qv,
-                    Term lo,
-                    Term hi,
-                    Term body) {
+                    JavaDLTerm lo,
+                    JavaDLTerm hi,
+                    JavaDLTerm body) {
                 return tb.bsum(qv, lo, hi, body);
             }
 
             @Override
-            protected Term translateUnboundedNumericalQuantifier(
+            protected JavaDLTerm translateUnboundedNumericalQuantifier(
                     KeYJavaType declsType, boolean nullable,
-                    ImmutableList<QuantifiableVariable> qvs, Term range,
-                    Term body) {
-                final Term tr = typerestrict(declsType,nullable,qvs,services);
+                    ImmutableList<QuantifiableVariable> qvs, JavaDLTerm range,
+                    JavaDLTerm body) {
+                final JavaDLTerm tr = typerestrict(declsType,nullable,qvs,services);
                 return tb.sum(qvs, tb.andSC(tr,range), body);
             }
 
@@ -584,20 +584,20 @@ public final class JMLTranslator {
                 new JMLBoundedNumericalQuantifierTranslationMethod() {
 
             @Override
-            public Term translateBoundedNumericalQuantifier(
+            public JavaDLTerm translateBoundedNumericalQuantifier(
                     QuantifiableVariable qv,
-                    Term lo,
-                    Term hi,
-                    Term body) {
+                    JavaDLTerm lo,
+                    JavaDLTerm hi,
+                    JavaDLTerm body) {
                 return tb.bprod(qv, lo, hi, body, services);
             }
 
             @Override
-            protected Term translateUnboundedNumericalQuantifier(
+            protected JavaDLTerm translateUnboundedNumericalQuantifier(
                     KeYJavaType declsType, boolean nullable,
-                    ImmutableList<QuantifiableVariable> qvs, Term range,
-                    Term body) {
-                final Term tr = typerestrict(declsType,nullable,qvs,services);
+                    ImmutableList<QuantifiableVariable> qvs, JavaDLTerm range,
+                    JavaDLTerm body) {
+                final JavaDLTerm tr = typerestrict(declsType,nullable,qvs,services);
                 return tb.prod(qvs, tb.andSC(tr,range), body, services);
             }
 
@@ -608,10 +608,10 @@ public final class JMLTranslator {
 
 
             // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
-            private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
+            private JavaDLTerm typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
                 final Type type = kjt.getProgramType();
                 final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
-                Term res = tb.tt();
+                JavaDLTerm res = tb.tt();
                 for (QuantifiableVariable qv: qvs) {
                     if (type instanceof PrimitiveType) {
                         if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
@@ -624,7 +624,7 @@ public final class JMLTranslator {
                         if (nullable) {
                             res = tb.and(res,tb.created(tb.var(qv)));
                         } else {
-                            final Term nonNull = arrayDepth > 0 ?
+                            final JavaDLTerm nonNull = arrayDepth > 0 ?
                                     tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
                                     : tb.not(tb.equals(tb.var(qv), tb.NULL()));
                             res = tb.and(res, tb.and(
@@ -641,11 +641,11 @@ public final class JMLTranslator {
                     SLTranslationExceptionManager excManager,
                     Object... params)
                             throws SLTranslationException {
-                checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
+                checkParameters(params, JavaDLTerm.class, JavaDLTerm.class, KeYJavaType.class, ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
                 final Services services = (Services) params[6];
-                Term guard = tb.convertToFormula((Term) params[0]);
+                JavaDLTerm guard = tb.convertToFormula((JavaDLTerm) params[0]);
                 assert guard.sort() == Sort.FORMULA;
-                final Term body = (Term) params[1];
+                final JavaDLTerm body = (JavaDLTerm) params[1];
                 final KeYJavaType declsType = (KeYJavaType) params[2];
                 final boolean nullable = (Boolean) params[4];
                 @SuppressWarnings("unchecked")
@@ -653,8 +653,8 @@ public final class JMLTranslator {
                 final Sort intSort = services.getTheories().getIntegerLDT().targetSort();
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\min expression must be integer type");
-                final Term tr = typerestrict(declsType,nullable,qvs,services);
-                final Term min = tb.min(qvs, tb.andSC(tr, guard), body, services);
+                final JavaDLTerm tr = typerestrict(declsType,nullable,qvs,services);
+                final JavaDLTerm min = tb.min(qvs, tb.andSC(tr, guard), body, services);
                 final KeYJavaType type = services.getProgramServices().getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
                 final SLExpression result = new SLExpression(min,type);
@@ -668,10 +668,10 @@ public final class JMLTranslator {
                 new JMLTranslationMethod() {
 
             // TODO: make subtype of JMLBoundedNumericalQuantifierTranslationMethod and remove this
-            private Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
+            private JavaDLTerm typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
                 final Type type = kjt.getProgramType();
                 final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
-                Term res = tb.tt();
+                JavaDLTerm res = tb.tt();
                 for (QuantifiableVariable qv: qvs) {
                     if (type instanceof PrimitiveType) {
                         if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
@@ -684,7 +684,7 @@ public final class JMLTranslator {
                         if (nullable) {
                             res = tb.and(res,tb.created(tb.var(qv)));
                         } else {
-                            final Term nonNull = arrayDepth > 0 ?
+                            final JavaDLTerm nonNull = arrayDepth > 0 ?
                                     tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
                                     : tb.not(tb.equals(tb.var(qv), tb.NULL()));
                             res = tb.and(res, tb.and(
@@ -700,10 +700,10 @@ public final class JMLTranslator {
                     SLTranslationExceptionManager excManager,
                     Object... params)
                             throws SLTranslationException {
-                checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
+                checkParameters(params, JavaDLTerm.class, JavaDLTerm.class, KeYJavaType.class, ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
                 final Services services = (Services) params[6];
-                Term guard = tb.convertToFormula((Term) params[0]);
-                final Term body = (Term) params[1];
+                JavaDLTerm guard = tb.convertToFormula((JavaDLTerm) params[0]);
+                final JavaDLTerm body = (JavaDLTerm) params[1];
                 final KeYJavaType declsType = (KeYJavaType) params[2];
                 final boolean nullable = (Boolean) params[4];
                 @SuppressWarnings("unchecked")
@@ -711,8 +711,8 @@ public final class JMLTranslator {
                 final Sort intSort = services.getTheories().getIntegerLDT().targetSort();
                 if (body.sort() != intSort)
                     throw excManager.createException("body of \\max expression must be integer type");
-                final Term tr = typerestrict(declsType,nullable,qvs,services);
-                final Term max = tb.max(qvs, tb.andSC(tr, guard), body, services);
+                final JavaDLTerm tr = typerestrict(declsType,nullable,qvs,services);
+                final JavaDLTerm max = tb.max(qvs, tb.andSC(tr, guard), body, services);
                 final KeYJavaType type = services.getProgramServices().getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
                 final SLExpression result = new SLExpression(max,type);
@@ -728,17 +728,17 @@ public final class JMLTranslator {
             public SLExpression translate(SLTranslationExceptionManager excManager,
                             Object... params) throws SLTranslationException {
 
-                checkParameters(params, Boolean.class, Pair.class, Term.class, Term.class, Services.class);
+                checkParameters(params, Boolean.class, Pair.class, JavaDLTerm.class, JavaDLTerm.class, Services.class);
                 final boolean nullable = (Boolean) params[0];
                 @SuppressWarnings("unchecked")
                 final Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = (Pair<KeYJavaType, ImmutableList<LogicVariable>>) params[1];
-                final Term t = (Term) params[2];
-                final Term t2 = (Term) params[3];
+                final JavaDLTerm t = (JavaDLTerm) params[2];
+                final JavaDLTerm t2 = (JavaDLTerm) params[3];
                 final Services services = (Services) params[4];
                 final JavaInfo javaInfo = services.getProgramServices().getJavaInfo();
 
-                final Term restr = JMLTranslator.this.typerestrict(declVars.first, nullable, declVars.second, services);
-                final Term guard = t2==null? restr: tb.and(restr, t2);
+                final JavaDLTerm restr = JMLTranslator.this.typerestrict(declVars.first, nullable, declVars.second, services);
+                final JavaDLTerm guard = t2==null? restr: tb.and(restr, t2);
 
                 return new SLExpression(tb.infiniteUnion(
                                 declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
@@ -777,7 +777,7 @@ public final class JMLTranslator {
                             "sequence definition must declare exactly one variable");
                 }
                 LogicVariable qv = declVars.head();
-                Term tt = t.getTerm();
+                JavaDLTerm tt = t.getTerm();
                 if (tt.sort() == Sort.FORMULA) {
                     // bugfix (CS): t.getTerm() delivers a formula instead of a
                     // boolean term; obviously the original boolean terms are
@@ -785,7 +785,7 @@ public final class JMLTranslator {
                     // boolean terms instead of formulas here
                     tt = tb.convertToBoolean(t.getTerm());
                 }
-                Term resultTerm = tb.seqDef(qv, a.getTerm(), b.getTerm(), tt);
+                JavaDLTerm resultTerm = tb.seqDef(qv, a.getTerm(), b.getTerm(), tt);
                 final KeYJavaType seqtype =
                         services.getProgramServices().getJavaInfo().getPrimitiveKeYJavaType("\\seq");
                 return new SLExpression(resultTerm, seqtype);
@@ -796,23 +796,23 @@ public final class JMLTranslator {
                                new JMLBoundedNumericalQuantifierTranslationMethod() {
 
             @Override
-            public Term translateBoundedNumericalQuantifier(
+            public JavaDLTerm translateBoundedNumericalQuantifier(
                     QuantifiableVariable qv,
-                    Term lo,
-                    Term hi,
-                    Term body) {
-                final Term cond = tb.ife(tb.convertToFormula(body),
+                    JavaDLTerm lo,
+                    JavaDLTerm hi,
+                    JavaDLTerm body) {
+                final JavaDLTerm cond = tb.ife(tb.convertToFormula(body),
                                          tb.one(), tb.zero());
                 return tb.bsum(qv, lo, hi, cond);
             }
 
             @Override
-            protected Term translateUnboundedNumericalQuantifier(
+            protected JavaDLTerm translateUnboundedNumericalQuantifier(
                     KeYJavaType declsType, boolean nullable,
-                    ImmutableList<QuantifiableVariable> qvs, Term range,
-                    Term body) {
-                final Term tr = typerestrict(declsType,nullable,qvs,services);
-                final Term cond = tb.ife(tb.convertToFormula(body),
+                    ImmutableList<QuantifiableVariable> qvs, JavaDLTerm range,
+                    JavaDLTerm body) {
+                final JavaDLTerm tr = typerestrict(declsType,nullable,qvs,services);
+                final JavaDLTerm cond = tb.ife(tb.convertToFormula(body),
                         tb.one(), tb.zero());
                 return tb.sum(qvs, tb.andSC(tr,range), cond);
             }
@@ -829,14 +829,14 @@ public final class JMLTranslator {
             @Override
             public Object translate(SLTranslationExceptionManager excManager,
                     Object... params) throws SLTranslationException {
-                checkParameters(params, Services.class, Term.class, KeYJavaType.class);
+                checkParameters(params, Services.class, JavaDLTerm.class, KeYJavaType.class);
                 @SuppressWarnings("unused")// please keep it for documentation purposes
                 final TermServices services = (TermServices)params[0];
-                final Term selfVar = (Term)params[1];
+                final JavaDLTerm selfVar = (JavaDLTerm)params[1];
                 final KeYJavaType targetType = (KeYJavaType)params[2];
                 final boolean isStatic = selfVar == null;
                 assert targetType != null || !isStatic;
-                final Term result = isStatic? tb.staticInv(targetType): tb.inv(selfVar);
+                final JavaDLTerm result = isStatic? tb.staticInv(targetType): tb.inv(selfVar);
                 return new SLExpression(result);
             }});
 
@@ -851,7 +851,7 @@ public final class JMLTranslator {
                 checkParameters(params, Services.class, SLExpression.class);
                 final Services services = (Services)params[0];
                 IObserverFunction inv = services.getProgramServices().getJavaInfo().getInv();
-                Term obj = ((SLExpression) params[1]).getTerm();
+                JavaDLTerm obj = ((SLExpression) params[1]).getTerm();
                 return new SLExpression(tb.func(inv, tb.getBaseHeap(), obj));
             }
         });
@@ -868,7 +868,7 @@ public final class JMLTranslator {
                 final Services services = (Services)params[0];
                 final TermBuilder tb = services.getTermBuilder();
                 final KeYJavaType kjt = (KeYJavaType) params[1];
-                final Term term = tb.staticInv(kjt);
+                final JavaDLTerm term = tb.staticInv(kjt);
                 return new SLExpression(term);
             }
         });
@@ -883,15 +883,15 @@ public final class JMLTranslator {
 //            /**
 //             * @param services Services
 //             * @param heapAtPre The pre-state heap (since we are in a post-condition)
-//             * @param params Must be of length 1 with a Term (store-ref expression)
+//             * @param params Must be of length 1 with a JavaDLTerm (store-ref expression)
 //             */
 //            @Override
-//            protected Term translate(Services services, Term heapAtPre, Object[] params) throws SLTranslationException {
-//                checkParameters(params, Term.class);
-//                Term t = (Term) params[0];
+//            protected JavaDLTerm translate(Services services, JavaDLTerm heapAtPre, Object[] params) throws SLTranslationException {
+//                checkParameters(params, JavaDLTerm.class);
+//                JavaDLTerm t = (JavaDLTerm) params[0];
 //
 //                // collect variables from storereflist
-//                java.util.List<Term> storeRefs = new java.util.ArrayList<Term>();
+//                java.util.List<JavaDLTerm> storeRefs = new java.util.ArrayList<JavaDLTerm>();
 //                final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 //                final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 //                while (t.op() == ldt.getUnion()){
@@ -900,10 +900,10 @@ public final class JMLTranslator {
 //                }
 //                storeRefs.add(t);
 //                // construct equality predicates
-//                Term res = TB.tt();
-//                for (Term sr: storeRefs){
+//                JavaDLTerm res = TB.tt();
+//                for (JavaDLTerm sr: storeRefs){
 //                    if (sr.op() == ldt.getSingleton()){
-//                        final Term ref = TB.dot(services, Sort.ANY, sr.sub(0), sr.sub(1));
+//                        final JavaDLTerm ref = TB.dot(services, Sort.ANY, sr.sub(0), sr.sub(1));
 //                        res = TB.and(res, TB.equals(ref,convertToOld(services, heapAtPre, ref)));
 //                    } else if (sr.op() == ldt.getEmpty()){
 //                        // do nothing
@@ -912,15 +912,15 @@ public final class JMLTranslator {
 //                        final JavaInfo ji = services.getJavaInfo();
 //                        final LogicVariable fld = new LogicVariable(new Name("f"), heapLDT.getFieldSort());
 //                        final LogicVariable obj = new LogicVariable(new Name("o"), ji.objectSort());
-//                        final Term objTerm = TB.var(obj);
-//                        final Term fldTerm = TB.var(fld);
-//                        final Term ref = TB.dot(services, Sort.ANY, objTerm, fldTerm);
-//                        final Term fresh = TB.subset(services, TB.singleton(services, objTerm, fldTerm ), TB.freshLocs(services, heapAtPre));
-//                        final Term bodyTerm = TB.or(TB.equals(ref, convertToOld(services, heapAtPre, ref)),fresh);
+//                        final JavaDLTerm objTerm = TB.var(obj);
+//                        final JavaDLTerm fldTerm = TB.var(fld);
+//                        final JavaDLTerm ref = TB.dot(services, Sort.ANY, objTerm, fldTerm);
+//                        final JavaDLTerm fresh = TB.subset(services, TB.singleton(services, objTerm, fldTerm ), TB.freshLocs(services, heapAtPre));
+//                        final JavaDLTerm bodyTerm = TB.or(TB.equals(ref, convertToOld(services, heapAtPre, ref)),fresh);
 //                        res = TB.and(res, TB.all(fld, TB.all(obj, bodyTerm)));
 //                    } else {
 //                        // all other results are not meant to occur
-//                        throw new SLTranslationException("Term "+sr+" is not a valid store-ref expression.");
+//                        throw new SLTranslationException("JavaDLTerm "+sr+" is not a valid store-ref expression.");
 //                    }
 //                }
 //                return res;
@@ -937,8 +937,8 @@ public final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
                 final Services services = (Services)params[0];
-                final Term seq = ((SLExpression)params[1]).getTerm();
-                final Term elem = ((SLExpression)params[2]).getTerm();
+                final JavaDLTerm seq = ((SLExpression)params[1]).getTerm();
+                final JavaDLTerm elem = ((SLExpression)params[2]).getTerm();
                 final KeYJavaType inttype = services.getProgramServices().getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
                 return new SLExpression(tb.indexOf(seq,elem),inttype);
             }
@@ -956,10 +956,10 @@ public final class JMLTranslator {
                         (ImmutableList<SLExpression>) params[0];
                 Services services = (Services) params[1];
 
-                ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+                ImmutableList<JavaDLTerm> terms = ImmutableSLList.<JavaDLTerm>nil();
                 for (SLExpression expr : exprList) {
                     if (expr.isTerm()) {
-                        Term t = expr.getTerm();
+                        JavaDLTerm t = expr.getTerm();
                         terms = terms.append(t);
                     } else {
                         throw excManager.createException("Not a term: " + expr);
@@ -981,8 +981,8 @@ public final class JMLTranslator {
                                 SLExpression.class);
                 @SuppressWarnings("unused")// please keep it for documentation purposes
                 final TermServices services = (TermServices) params[0];
-                final Term seq = ((SLExpression) params[1]).getTerm();
-                final Term idx = ((SLExpression) params[2]).getTerm();
+                final JavaDLTerm seq = ((SLExpression) params[1]).getTerm();
+                final JavaDLTerm idx = ((SLExpression) params[2]).getTerm();
                 return new SLExpression(tb.seqGet(SortImpl.ANY, seq, idx));
             }
         });
@@ -997,8 +997,8 @@ public final class JMLTranslator {
                 checkParameters(params, Services.class, SLExpression.class,
                                 SLExpression.class);
                 final Services services = (Services) params[0];
-                final Term seq1 = ((SLExpression) params[1]).getTerm();
-                final Term seq2 = ((SLExpression) params[2]).getTerm();
+                final JavaDLTerm seq1 = ((SLExpression) params[1]).getTerm();
+                final JavaDLTerm seq2 = ((SLExpression) params[2]).getTerm();
                 final KeYJavaType seqtype =
                         services.getProgramServices().getJavaInfo().getPrimitiveKeYJavaType("\\seq");
                 return new SLExpression(tb.seqConcat(seq1, seq2),
@@ -1013,10 +1013,10 @@ public final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager,
                                     Object... params)
                     throws SLTranslationException {
-                checkParameters(params, Term.class, SLExpression.class,
+                checkParameters(params, JavaDLTerm.class, SLExpression.class,
                                 SLExpression.class, SLExpression.class,
                                 Services.class);
-                final Term t = (Term) params[0];
+                final JavaDLTerm t = (JavaDLTerm) params[0];
                 final SLExpression e1 = (SLExpression) params[1];
                 final SLExpression e2 = (SLExpression) params[2];
                 final SLExpression e3 = (SLExpression) params[3];
@@ -1025,12 +1025,12 @@ public final class JMLTranslator {
                                               ? new LogicVariable(new Name("n"),
                                                                   services.getTheories().getIntegerLDT().targetSort())
                         : null;
-                final Term h = tb.getBaseHeap();
-                final Term s = getFields(excManager, t, services);
-                final Term o = e1.getTerm();
-                final Term o2 = e2.getTerm();
-                final Term n = e3 == null ? tb.var(stepsLV) : e3.getTerm();
-                Term reach = tb.reach(h, s, o, o2, n);
+                final JavaDLTerm h = tb.getBaseHeap();
+                final JavaDLTerm s = getFields(excManager, t, services);
+                final JavaDLTerm o = e1.getTerm();
+                final JavaDLTerm o2 = e2.getTerm();
+                final JavaDLTerm n = e3 == null ? tb.var(stepsLV) : e3.getTerm();
+                JavaDLTerm reach = tb.reach(h, s, o, o2, n);
                 if (e3 == null) {
                     reach = tb.ex(stepsLV, reach);
                 }
@@ -1045,9 +1045,9 @@ public final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager,
                                     Object... params)
             throws SLTranslationException {
-                checkParameters(params, Term.class, SLExpression.class,
+                checkParameters(params, JavaDLTerm.class, SLExpression.class,
                                 SLExpression.class, Services.class);
-                final Term t = (Term) params[0];
+                final JavaDLTerm t = (JavaDLTerm) params[0];
                 final SLExpression e1 = (SLExpression) params[1];
                 final SLExpression e3 = (SLExpression) params[2];
                 final Services services = (Services) params[3];
@@ -1060,19 +1060,19 @@ public final class JMLTranslator {
                                               ? new LogicVariable(new Name("n"),
                                                       theories.getIntegerLDT().targetSort())
                         : null;
-                final Term h = tb.getBaseHeap();
-                final Term s = getFields(excManager, t, services);
-                final Term o = e1.getTerm();
-                final Term o2 = tb.var(objLV);
-                final Term n = e3 == null ? tb.var(stepsLV) : e3.getTerm();
-                Term reach = tb.reach(h, s, o, o2, n);
+                final JavaDLTerm h = tb.getBaseHeap();
+                final JavaDLTerm s = getFields(excManager, t, services);
+                final JavaDLTerm o = e1.getTerm();
+                final JavaDLTerm o2 = tb.var(objLV);
+                final JavaDLTerm n = e3 == null ? tb.var(stepsLV) : e3.getTerm();
+                JavaDLTerm reach = tb.reach(h, s, o, o2, n);
                 if (e3 == null) {
                     reach = tb.ex(stepsLV, reach);
                 }
 
                 final LogicVariable fieldLV
                 = new LogicVariable(new Name("f"), theories.getHeapLDT().getFieldSort());
-                final Term locSet
+                final JavaDLTerm locSet
                 = tb.setComprehension(new LogicVariable[]{objLV, fieldLV},
                         reach,
                         o2,
@@ -1097,7 +1097,7 @@ public final class JMLTranslator {
                 @SuppressWarnings("unchecked")
                 final ImmutableList<SLExpression> list = (ImmutableList<SLExpression>) params[0];
                 @SuppressWarnings("unchecked")
-                final Map<LocationVariable,Term> atPres = (Map<LocationVariable, Term>) params[1];
+                final Map<LocationVariable,JavaDLTerm> atPres = (Map<LocationVariable, JavaDLTerm>) params[1];
                 final Services services = (Services) params[2];
                 final TheoryServices theories = services.getTheories();
 
@@ -1107,7 +1107,7 @@ public final class JMLTranslator {
 	            throw excManager.createException("\\fresh not allowed in this context");
 	        }
 
-	        Term t = tb.tt();
+	        JavaDLTerm t = tb.tt();
 	        final Sort objectSort = services.getProgramServices().getJavaInfo().objectSort();
 	        for(SLExpression expr: list) {
     	            if(!expr.isTerm()) {
@@ -1351,10 +1351,10 @@ public final class JMLTranslator {
 
                 // handle cases where a and b are of sort FORMULA and boolean respectively (which are incompatible, unfortunately)
                 final KeYJavaType bool = services.getProgramServices().getTypeConverter().getBooleanType();
-                Term aTerm = a.getType() == bool ? tb.convertToFormula(a.getTerm()) : a.getTerm();
-                Term bTerm = b.getType() == bool ? tb.convertToFormula(b.getTerm()) : b.getTerm();
+                JavaDLTerm aTerm = a.getType() == bool ? tb.convertToFormula(a.getTerm()) : a.getTerm();
+                JavaDLTerm bTerm = b.getType() == bool ? tb.convertToFormula(b.getTerm()) : b.getTerm();
 
-                Term ife = tb.ife(tb.convertToFormula(result.getTerm()), aTerm, bTerm);
+                JavaDLTerm ife = tb.ife(tb.convertToFormula(result.getTerm()), aTerm, bTerm);
                 if(a.getType() != null && a.getType().equals(b.getType())) {
                     result = new SLExpression(ife, a.getType());
                 } else {
@@ -1373,7 +1373,7 @@ public final class JMLTranslator {
 
                 checkParameters(params, Services.class, Token.class,
                         LocationVariable.class, LocationVariable.class,
-                        ImmutableList.class, Term.class);
+                        ImmutableList.class, JavaDLTerm.class);
 
                 TermServices services = (TermServices) params[0];
                 Token desc = (Token) params[1];
@@ -1382,7 +1382,7 @@ public final class JMLTranslator {
                 @SuppressWarnings("unchecked")
                 ImmutableList<LocationVariable> paramVars =
                     (ImmutableList<LocationVariable>) params[4];
-                Term heapAtPre = (Term) params[5];
+                JavaDLTerm heapAtPre = (JavaDLTerm) params[5];
 
                 // strip leading and trailing (* ... *)
                 String text = desc.getText();
@@ -1464,8 +1464,8 @@ public final class JMLTranslator {
 			@Override
 			public SLExpression translate(SLTranslationExceptionManager excManager,
 					Object... params) throws SLTranslationException {
-				checkParameters(params, Term.class, JavaInfo.class);
-				Term t = (Term)params[0];
+				checkParameters(params, JavaDLTerm.class, JavaInfo.class);
+				JavaDLTerm t = (JavaDLTerm)params[0];
 				return new SLExpression(t, ((JavaInfo)params[1]).getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
 			}});
         translationMethods.put(JMLKeyWord.INTERSECT, new JMLTranslationMethod() {
@@ -1473,8 +1473,8 @@ public final class JMLTranslator {
 			@Override
 			public SLExpression translate(SLTranslationExceptionManager excManager,
 					Object... params) throws SLTranslationException {
-				checkParameters(params, Term.class, JavaInfo.class);
-				Term t = (Term)params[0];
+				checkParameters(params, JavaDLTerm.class, JavaInfo.class);
+				JavaDLTerm t = (JavaDLTerm)params[0];
 				JavaInfo javaInfo = (JavaInfo)params[1];
 				return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
 			}});
@@ -1549,17 +1549,17 @@ public final class JMLTranslator {
                 if (rangeFrom == null) {
                     // We have a star. A star includes all components of an array even
                     // those out of bounds. This makes proving easier.
-                    Term t = tb.allFields(receiver.getTerm());
+                    JavaDLTerm t = tb.allFields(receiver.getTerm());
                     result = new SLExpression(t);
                 } else if (rangeTo != null) {
                     // We have "rangeFrom .. rangeTo"
-                    Term t = tb.arrayRange(receiver.getTerm(),
+                    JavaDLTerm t = tb.arrayRange(receiver.getTerm(),
                             rangeFrom.getTerm(),
                             rangeTo.getTerm());
                     result = new SLExpression(t);
                 } else {
                     // We have a regular array access
-                    Term t = tb.dotArr(receiver.getTerm(),
+                    JavaDLTerm t = tb.dotArr(receiver.getTerm(),
                             rangeFrom.getTerm());
                     ArrayType arrayType =
                             (ArrayType) receiver.getType().getProgramType();
@@ -1580,12 +1580,12 @@ public final class JMLTranslator {
                     // a star
                     return new SLExpression(tb.allFields(receiver.getTerm()));
                 } else if (rangeTo != null) {
-                        Term t = tb.seqSub(receiver.getTerm(),
+                        JavaDLTerm t = tb.seqSub(receiver.getTerm(),
                                 rangeFrom.getTerm(),
                                 rangeTo.getTerm());
                         return new SLExpression(t);
                     } else {
-                        Term t = tb.seqGet(SortImpl.ANY,
+                        JavaDLTerm t = tb.seqGet(SortImpl.ANY,
                                 receiver.getTerm(),
                                 rangeFrom.getTerm());
                         return new SLExpression(t);
@@ -1596,14 +1596,14 @@ public final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Term translate(SLTranslationExceptionManager excManager,
+            public JavaDLTerm translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
                 checkParameters(params, SLExpression.class, Services.class);
                 SLExpression expr = (SLExpression) params[0];
                 Services services = (Services) params[1];
                 if (expr.isTerm()) {
-                    Term t = expr.getTerm();
+                    JavaDLTerm t = expr.getTerm();
                     LocSetLDT locSetLDT =
                             services.getTheories().getLocSetLDT();
                     if (t.sort().equals(locSetLDT.targetSort())
@@ -1615,7 +1615,7 @@ public final class JMLTranslator {
                         ImmutableList<SLExpression> exprList =
                                 ImmutableSLList.<SLExpression>nil();
                         exprList = exprList.append(expr);
-                        return (Term) createMethod.translate(excManager,
+                        return (JavaDLTerm) createMethod.translate(excManager,
                                                              exprList, services);
 //                        throw excManager.createException("Not a valid storeref expression: "
 //                                                         + t);
@@ -1628,7 +1628,7 @@ public final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Term translate(
+            public JavaDLTerm translate(
                     SLTranslationExceptionManager excManager,
                     Object... params)
                     throws SLTranslationException {
@@ -1638,18 +1638,18 @@ public final class JMLTranslator {
                         (ImmutableList<SLExpression>) params[0];
                 Services services = (Services) params[1];
 
-                ImmutableList<Term> singletons = ImmutableSLList.<Term>nil();
+                ImmutableList<JavaDLTerm> singletons = ImmutableSLList.<JavaDLTerm>nil();
                 for (SLExpression expr : exprList) {
                     if (expr.isTerm()) {
-                        Term t = expr.getTerm();
+                        JavaDLTerm t = expr.getTerm();
                         LocSetLDT locSetLDT =
                                 services.getTheories().getLocSetLDT();
                         if (!t.op().equals(locSetLDT.getSingleton())) {
                             HeapLDT heapLDT =
                                     services.getTheories().getHeapLDT();
                             if (heapLDT.getSortOfSelect(t.op()) != null) {
-                                final Term objTerm = t.sub(1);
-                                final Term fieldTerm = t.sub(2);
+                                final JavaDLTerm objTerm = t.sub(1);
+                                final JavaDLTerm fieldTerm = t.sub(2);
                                 t = tb.singleton(objTerm, fieldTerm);
                                 singletons = singletons.append(t);
                             } else if (t.op() instanceof ProgramVariable) {
@@ -1681,17 +1681,17 @@ public final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, ImmutableList.class, Services.class);
                 @SuppressWarnings("unchecked")
-                ImmutableList<Term> list =
-                        (ImmutableList<Term>) params[0];
+                ImmutableList<JavaDLTerm> list =
+                        (ImmutableList<JavaDLTerm>) params[0];
                 @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[1];
 
-                ImmutableList<Term> disTerms = ImmutableSLList.<Term>nil();
+                ImmutableList<JavaDLTerm> disTerms = ImmutableSLList.<JavaDLTerm>nil();
                 while (!list.isEmpty()) {
-                    Term t1 = list.head();
+                    JavaDLTerm t1 = list.head();
                     list = list.tail();
-                    for (Term t2 : list) {
-                        Term dis = tb.disjoint(t1, t2);
+                    for (JavaDLTerm t2 : list) {
+                        JavaDLTerm dis = tb.disjoint(t1, t2);
                         disTerms = disTerms.append(dis);
                     }
                 }
@@ -1748,7 +1748,7 @@ public final class JMLTranslator {
                                   ImmutableList<ProgramVariable> paramVars,
                                   ProgramVariable resultVar,
                                   ProgramVariable excVar,
-                                  Map<LocationVariable,Term> atPres,
+                                  Map<LocationVariable,JavaDLTerm> atPres,
                                   Class<T> resultClass,
                                   Services services)
             throws SLTranslationException {
@@ -1765,12 +1765,12 @@ public final class JMLTranslator {
         } catch (RecognitionException e) {
             throw parser.getExceptionManager().convertException(e);
         }
-        if (resultClass.equals(Term.class)) {
+        if (resultClass.equals(JavaDLTerm.class)) {
             if (expr.hasLabels()) {
                 T o = castToReturnType(result, resultClass);
-                assert o instanceof Term;
-                Term t = (Term)o;
-                t = services.getTermBuilder().label((Term)castToReturnType(result, resultClass), expr.getLabels());
+                assert o instanceof JavaDLTerm;
+                JavaDLTerm t = (JavaDLTerm)o;
+                t = services.getTermBuilder().label((JavaDLTerm)castToReturnType(result, resultClass), expr.getLabels());
                 return castToReturnType(t, resultClass);
             }
         }
@@ -1868,7 +1868,7 @@ public final class JMLTranslator {
         while (fns.lookup(name)!=null);
         final Function sk = new Function(name,Sort.FORMULA);
         fns.add(sk);
-        final Term t = tb.func(sk);
+        final JavaDLTerm t = tb.func(sk);
         return new SLExpression(t);
     }
 
@@ -1952,7 +1952,7 @@ public final class JMLTranslator {
         while (fns.lookup(name)!= null);
         final Function sk = new Function(name,sort);
         fns.add(sk);
-        final Term t = tb.func(sk);
+        final JavaDLTerm t = tb.func(sk);
         return new SLExpression(t,type);
     }
 
@@ -2029,10 +2029,10 @@ public final class JMLTranslator {
                               Object... params)
                 throws SLTranslationException {
             checkParameters(params,
-                            Term.class, Term.class, KeYJavaType.class,
+                            JavaDLTerm.class, JavaDLTerm.class, KeYJavaType.class,
                             ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
-            Term preTerm = (Term) params[0];
-            Term bodyTerm = (Term) params[1];
+            JavaDLTerm preTerm = (JavaDLTerm) params[0];
+            JavaDLTerm bodyTerm = (JavaDLTerm) params[1];
             KeYJavaType declsType = (KeYJavaType) params[2];
             final Type type = declsType.getProgramType();
             services = (Services) params[6];
@@ -2052,7 +2052,7 @@ public final class JMLTranslator {
                                  tb.reachableValue(tb.var(lv), declsType));
                 if (lv.sort().extendsTrans(services.getProgramServices().getJavaInfo().objectSort())
                     && !nullable) {
-                    final Term nonNull = arrayDepth > 0 ?
+                    final JavaDLTerm nonNull = arrayDepth > 0 ?
                             tb.deepNonNull(tb.var(lv), tb.zTerm(arrayDepth))
                             : tb.not(tb.equals(tb.var(lv), tb.NULL()));
                     preTerm = tb.and(preTerm, nonNull);
@@ -2066,18 +2066,18 @@ public final class JMLTranslator {
 
 
         public SLExpression translateQuantifiers(Iterable<LogicVariable> qvs,
-                                         Term t1,
-                                         Term t2)
+                                         JavaDLTerm t1,
+                                         JavaDLTerm t2)
                 throws SLTranslationException {
             t2 = tb.convertToFormula(t2);
-            Term result = combineQuantifiedTerms(t1, t2);
+            JavaDLTerm result = combineQuantifiedTerms(t1, t2);
             for (LogicVariable qv : qvs) {
                 result = translateQuantifier(qv, result);
             }
             return new SLExpression(result);
         }
 
-        public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, boolean nullable, Iterable<LogicVariable> qvs, Term t1, Term t2, KeYJavaType resultType)
+        public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, boolean nullable, Iterable<LogicVariable> qvs, JavaDLTerm t1, JavaDLTerm t2, KeYJavaType resultType)
         throws SLTranslationException {
             Iterator<LogicVariable> it = qvs.iterator();
             LogicVariable qv = it.next();
@@ -2085,18 +2085,18 @@ public final class JMLTranslator {
             if (it.hasNext()) {
                 throw new SLTranslationException("Only one quantified variable is allowed in this context.");
             }
-            Term cond = tb.convertToBoolean(tb.and(t1, t2));
+            JavaDLTerm cond = tb.convertToBoolean(tb.and(t1, t2));
             return new SLExpression(translateQuantifier(qv, cond),resultType);
         }
         
 
-        public abstract Term combineQuantifiedTerms(Term t1,
-                                                    Term t2)
+        public abstract JavaDLTerm combineQuantifiedTerms(JavaDLTerm t1,
+                                                    JavaDLTerm t2)
                 throws SLTranslationException;
 
 
-        public abstract Term translateQuantifier(QuantifiableVariable qv,
-                                                 Term t)
+        public abstract JavaDLTerm translateQuantifier(QuantifiableVariable qv,
+                                                 JavaDLTerm t)
                 throws SLTranslationException;
 
         protected abstract boolean isGeneralized ();
@@ -2116,11 +2116,11 @@ public final class JMLTranslator {
          * @return allObjects term (see <code>LocSetADT</code>)
          * @throws SLTranslationException in case <code>t</code> is not a store-ref term cosisting of unions of singletons
          */
-        protected Term getFields(SLTranslationExceptionManager excManager, Term t, Services services) throws SLTranslationException {
+        protected JavaDLTerm getFields(SLTranslationExceptionManager excManager, JavaDLTerm t, Services services) throws SLTranslationException {
             final LocSetLDT locSetLDT = services.getTheories().getLocSetLDT();
             if(t.op().equals(locSetLDT.getUnion())) {
-                final Term sub0 = getFields(excManager, t.sub(0),services);
-                final Term sub1 = getFields(excManager, t.sub(1),services);
+                final JavaDLTerm sub0 = getFields(excManager, t.sub(0),services);
+                final JavaDLTerm sub1 = getFields(excManager, t.sub(1),services);
                 return tb.union(sub0, sub1);
             } else if(t.op().equals(locSetLDT.getSingleton())) {
             return tb.allObjects(t.sub(1));
@@ -2132,7 +2132,7 @@ public final class JMLTranslator {
 
     private abstract class JMLBoundedNumericalQuantifierTranslationMethod extends JMLQuantifierTranslationMethod {
 
-        private  boolean isBoundedNumerical(Term a, LogicVariable lv){
+        private  boolean isBoundedNumerical(JavaDLTerm a, LogicVariable lv){
             return lowerBound(a,lv)!=null && upperBound(a,lv)!=null;
         }
 
@@ -2142,7 +2142,7 @@ public final class JMLTranslator {
          * @param lv variable bound by quantifier
          * @return lower bound term (or null)
          */
-        private  Term lowerBound(Term a, LogicVariable lv){
+        private  JavaDLTerm lowerBound(JavaDLTerm a, LogicVariable lv){
             if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
                 a=a.sub(0);
             }
@@ -2159,7 +2159,7 @@ public final class JMLTranslator {
          * @param lv variable bound by quantifier
          * @return upper bound term (or null)
          */
-        private Term upperBound(Term a, LogicVariable lv){
+        private JavaDLTerm upperBound(JavaDLTerm a, LogicVariable lv){
             if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
                 a=a.sub(0);
             }
@@ -2176,7 +2176,7 @@ public final class JMLTranslator {
         public SLExpression translate(SLTranslationExceptionManager excManager, Object... params)
                 throws SLTranslationException {
             checkParameters(params,
-                    Term.class, Term.class, KeYJavaType.class,
+                    JavaDLTerm.class, JavaDLTerm.class, KeYJavaType.class,
                     ImmutableList.class, Boolean.class, KeYJavaType.class, Services.class);
             final KeYJavaType _declsType = (KeYJavaType) params[2];
             de.uka.ilkd.key.java.abstraction.Type declsType =
@@ -2194,25 +2194,25 @@ public final class JMLTranslator {
             else
                 return new SLExpression(
                         translateUnboundedNumericalQuantifier(_declsType, nullable, qvs,
-                                                              (Term)params[0], (Term)params[1]),
+                                                              (JavaDLTerm)params[0], (JavaDLTerm)params[1]),
                         resultType);
         }
 
         @Override
         @Deprecated
-        public SLExpression translateQuantifiers(Iterable<LogicVariable> qvs, Term t1, Term t2) {
+        public SLExpression translateQuantifiers(Iterable<LogicVariable> qvs, JavaDLTerm t1, JavaDLTerm t2) {
             assert false;
             return null;
         }
 
         @Override
         public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, boolean nullable, Iterable<LogicVariable> qvs,
-                Term t1,
-                Term t2, KeYJavaType resultType)
+                JavaDLTerm t1,
+                JavaDLTerm t2, KeYJavaType resultType)
                         throws SLTranslationException {
             Iterator<LogicVariable> it = qvs.iterator();
             LogicVariable lv = it.next();
-            Term t;
+            JavaDLTerm t;
             if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
                 // not interval range, create unbounded comprehension term
                 ImmutableList<QuantifiableVariable> _qvs = ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
@@ -2229,7 +2229,7 @@ public final class JMLTranslator {
             return jish.buildCastExpression(resultType, new SLExpression(t, resultType));
         }
 
-        protected abstract Term translateUnboundedNumericalQuantifier(KeYJavaType declsType, boolean nullable, ImmutableList<QuantifiableVariable> qvs, Term range, Term body);
+        protected abstract JavaDLTerm translateUnboundedNumericalQuantifier(KeYJavaType declsType, boolean nullable, ImmutableList<QuantifiableVariable> qvs, JavaDLTerm range, JavaDLTerm body);
 
         @Override
         protected boolean isGeneralized () {
@@ -2237,14 +2237,14 @@ public final class JMLTranslator {
         }
 
         /** Creates a term for a bounded numerical quantifier (e.g., sum).*/
-        public abstract Term translateBoundedNumericalQuantifier(QuantifiableVariable qv, Term lo, Term hi, Term body);
+        public abstract JavaDLTerm translateBoundedNumericalQuantifier(QuantifiableVariable qv, JavaDLTerm lo, JavaDLTerm hi, JavaDLTerm body);
 
 
         /** Should not be called. */
         @Override
         @Deprecated
-        public Term combineQuantifiedTerms(Term t1,
-                Term t2) {
+        public JavaDLTerm combineQuantifiedTerms(JavaDLTerm t1,
+                JavaDLTerm t2) {
             assert false;
             return null;
         }
@@ -2253,8 +2253,8 @@ public final class JMLTranslator {
         /** Should not be called. */
         @Override
         @Deprecated
-        public Term translateQuantifier(QuantifiableVariable qv,
-                Term t) {
+        public JavaDLTerm translateQuantifier(QuantifiableVariable qv,
+                JavaDLTerm t) {
             assert false;
             return null;
         }
@@ -2321,13 +2321,13 @@ public final class JMLTranslator {
         }
 
 
-        protected Term buildEqualityTerm(Term a,
-                                         Term b,
+        protected JavaDLTerm buildEqualityTerm(JavaDLTerm a,
+                                         JavaDLTerm b,
                                          SLTranslationExceptionManager excManager1,
                                          Services services)
                 throws SLTranslationException {
 
-            Term result = null;
+            JavaDLTerm result = null;
             try {
                 if (a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
                     result = tb.equals(a, b);
@@ -2419,22 +2419,22 @@ public final class JMLTranslator {
             assert symbol instanceof Function : "Expecting a function symbol in this namespace";
             Function function = (Function) symbol;
 
-            Term[] args;
+            JavaDLTerm[] args;
             if (list == null) {
                 list = ImmutableSLList.<SLExpression>nil();
             }
 
-            Term heap = tb.getBaseHeap();
+            JavaDLTerm heap = tb.getBaseHeap();
 
             // special casing "implicit heap" arguments:
             // omitting one argument means first argument is "heap"
             int i = 0;
             if (function.arity() == list.size() + 1
                     && function.argSort(0) == heap.sort()) {
-                args = new Term[list.size() + 1];
+                args = new JavaDLTerm[list.size() + 1];
                 args[i++] = heap;
             } else {
-                args = new Term[list.size()];
+                args = new JavaDLTerm[list.size()];
             }
 
             for (SLExpression expr : list) {
@@ -2446,7 +2446,7 @@ public final class JMLTranslator {
             }
 
             try {
-                Term resultTerm = tb.func(function, args, null);
+                JavaDLTerm resultTerm = tb.func(function, args, null);
                 final KeYJavaType type
                         = services.getTheories().getIntegerLDT().targetSort() == resultTerm.sort()
                         ? services.getProgramServices().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
@@ -2473,7 +2473,7 @@ public final class JMLTranslator {
         assert symbol instanceof ProgramVariable : "Expecting a program variable";
         ProgramVariable pv = (ProgramVariable) symbol;
         try {
-            Term resultTerm = tb.var(pv);
+            JavaDLTerm resultTerm = tb.var(pv);
             SLExpression result = new SLExpression(resultTerm);
             return result;
         } catch (TermCreationException ex) {
@@ -2498,12 +2498,12 @@ public final class JMLTranslator {
 
     /** Provide restriction terms for the declared KeYJavaType 
      *  Note that these restrictions only apply to the JML to DL translation.
-     *  See also {@link GenericTermBuilder#reachableValue(Term, KeYJavaType)}. 
+     *  See also {@link GenericTermBuilder#reachableValue(JavaDLTerm, KeYJavaType)}. 
      */
-    protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
+    protected JavaDLTerm typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
         final Type type = kjt.getProgramType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
-        Term res = tb.tt();
+        JavaDLTerm res = tb.tt();
         for (QuantifiableVariable qv: qvs) {
             if (type instanceof PrimitiveType) {
                 if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
@@ -2517,7 +2517,7 @@ public final class JMLTranslator {
                 if (nullable) {
                     res = tb.and(res,tb.or(tb.created(tb.var(qv)), tb.equals(tb.var(qv), tb.NULL())));
                 } else {
-                    final Term nonNull = arrayDepth > 0 ?
+                    final JavaDLTerm nonNull = arrayDepth > 0 ?
                             tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
                             : tb.not(tb.equals(tb.var(qv), tb.NULL()));
                     res = tb.and(res,tb.and(

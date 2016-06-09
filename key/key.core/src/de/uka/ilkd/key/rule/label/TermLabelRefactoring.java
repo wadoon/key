@@ -21,7 +21,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -32,8 +32,8 @@ import de.uka.ilkd.key.rule.Rule;
 /**
  * <p>
  * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, Term, Rule, Goal, Term)}
- * to refactor the labels of each visited {@link Term}.
+ * {@link TermLabelManager#refactorGoal(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, JavaDLTerm)}
+ * to refactor the labels of each visited {@link JavaDLTerm}.
  * </p>
  * <p>
  * For more information about {@link TermLabel}s and how they are maintained
@@ -48,45 +48,45 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     * Defines if a refactoring is required and if so in which {@link RefactoringScope}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
     * @return The required {@link RefactoringScope}.
     */
    public RefactoringScope defineRefactoringScope(TermLabelState state,
                                                   Services services,
                                                   PosInOccurrence applicationPosInOccurrence,
-                                                  Term applicationTerm,
+                                                  JavaDLTerm applicationTerm,
                                                   Rule rule,
                                                   Goal goal,
                                                   Object hint,
-                                                  Term tacletTerm);
+                                                  JavaDLTerm tacletTerm);
 
    /**
-    * This method is used to refactor the labels of the given {@link Term}.
+    * This method is used to refactor the labels of the given {@link JavaDLTerm}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
-    * @param term The {@link Term} which is now refactored.
-    * @param labels The new labels the {@link Term} will have after the refactoring.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
+    * @param term The {@link JavaDLTerm} which is now refactored.
+    * @param labels The new labels the {@link JavaDLTerm} will have after the refactoring.
     */
    public void refactoreLabels(TermLabelState state,
                                Services services,
                                PosInOccurrence applicationPosInOccurrence,
-                               Term applicationTerm,
+                               JavaDLTerm applicationTerm,
                                Rule rule,
                                Goal goal,
                                Object hint,
-                               Term tacletTerm,
-                               Term term,
+                               JavaDLTerm tacletTerm,
+                               JavaDLTerm term,
                                List<TermLabel> labels);
 
    /**
@@ -101,7 +101,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
 
       /**
        * Refactor the child below the updates computed via
-       * {@link GenericTermBuilder#goBelowUpdates(Term)}.
+       * {@link GenericTermBuilder#goBelowUpdates(JavaDLTerm)}.
        */
       APPLICATION_BELOW_UPDATES,
 

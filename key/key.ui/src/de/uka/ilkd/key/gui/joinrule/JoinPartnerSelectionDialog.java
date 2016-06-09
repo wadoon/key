@@ -63,7 +63,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -138,7 +138,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
     private JoinProcedure chosenRule = JoinProcedure.getJoinProcedures().head();
 
     /** The chosen distinguishing formula */
-    private Term chosenDistForm = null;
+    private JavaDLTerm chosenDistForm = null;
 
     private JEditorPane txtPartner1 = null;
     private JEditorPane txtPartner2 = null;
@@ -467,7 +467,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
      * @return The chosen distinguishing formula. If null, an automatic
      *         generation of the distinguishing formula should be performed.
      */
-    public Term getChosenDistinguishingFormula() {
+    public JavaDLTerm getChosenDistinguishingFormula() {
         return isSuitableDistFormula() ? chosenDistForm : null;
     }
 
@@ -558,14 +558,14 @@ public class JoinPartnerSelectionDialog extends JDialog {
      *            Formula to prove.
      * @return True iff formulaToProve can be proven within the given sequent.
      */
-    private static boolean checkProvability(Sequent seq, Term formulaToProve,
+    private static boolean checkProvability(Sequent seq, JavaDLTerm formulaToProve,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Semisequent antecedent = seq.antecedent();
 
         for (SequentFormula succedentFormula : seq.succedent()) {
-            if (!succedentFormula.formula().isContainsJavaBlockRecursive()) {
+            if (!succedentFormula.formula().containsModalContentRecursive()) {
                 antecedent =
                         antecedent.insertFirst(
                                 new SequentFormula(tb.not(succedentFormula

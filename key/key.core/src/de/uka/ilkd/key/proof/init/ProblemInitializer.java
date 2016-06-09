@@ -44,7 +44,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -369,7 +369,7 @@ public final class ProblemInitializer {
     }
 
 
-    private void populateNamespaces(Term term, 
+    private void populateNamespaces(JavaDLTerm term, 
                                     NamespaceSet namespaces,
                                     Goal rootGoal) {
         for(int i = 0; i < term.arity(); i++) {
@@ -389,8 +389,8 @@ public final class ProblemInitializer {
             if(namespaces.programVariables().lookup(pv.name()) == null) {
                 rootGoal.addProgramVariable(pv);
             }
-        } else if(term.javaBlock() != null && !term.javaBlock().isEmpty()) {
-            final ProgramElement pe = term.javaBlock().program();
+        } else if(term.modalContent() != null && !term.modalContent().isEmpty()) {
+            final ProgramElement pe = term.modalContent().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<ProgramVariable> freeProgVars
                 = MiscTools.getLocalIns(pe, serv)

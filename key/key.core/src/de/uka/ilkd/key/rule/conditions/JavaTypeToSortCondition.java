@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.sort.Sort;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -81,12 +81,12 @@ public final class JavaTypeToSortCondition implements VariableCondition {
         
         Debug.assertTrue ( svSubst instanceof Expression || 
                 svSubst instanceof TypeReference ||
-                svSubst instanceof Term);
+                svSubst instanceof JavaDLTerm);
         
         final SVInstantiations inst = matchCond.getInstantiations ();
         Sort type;
-        if (svSubst instanceof Term) {
-            type = ((Term)svSubst).sort();
+        if (svSubst instanceof JavaDLTerm) {
+            type = ((JavaDLTerm)svSubst).sort();
         } else if (svSubst instanceof TypeReference) {
             type = ((TypeReference)svSubst).getKeYJavaType().getSort();
         } else {

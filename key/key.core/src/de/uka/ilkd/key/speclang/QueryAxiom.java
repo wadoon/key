@@ -38,7 +38,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -178,13 +178,13 @@ public final class QueryAxiom extends ClassAxiom {
 
 	//create update and postcondition linking schema variables and 
 	//program variables
-	Term update = null;
+	JavaDLTerm update = null;
 	int hc = 0;
 	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
 		if(hc >= target.getHeapCount(services)) {
 			break;
 		}
-		Term u = TB.elementary(heap, TB.var(heapSVs.get(hc++)));
+		JavaDLTerm u = TB.elementary(heap, TB.var(heapSVs.get(hc++)));
 		if(update == null) {
 			update = u;
 		}else{
@@ -201,7 +201,7 @@ public final class QueryAxiom extends ClassAxiom {
 		                 TB.elementary(paramProgSVs[i],
 		                	       TB.var(paramSVs[i])));
 	}
-	final Term post = TB.imp(TB.reachableValue(TB.var(resultProgSV),
+	final JavaDLTerm post = TB.imp(TB.reachableValue(TB.var(resultProgSV),
 						   target.getReturnType()),
 	                  	 TB.equals(TB.var(skolemSV), TB.var(resultProgSV)));
 	
@@ -229,7 +229,7 @@ public final class QueryAxiom extends ClassAxiom {
 	if(target.isStatic()) {
 	    ifSeq = null;
 	} else {
-	    final Term ifFormula = TB.exactInstance(kjt.getSort(), TB.var(selfSV));
+	    final JavaDLTerm ifFormula = TB.exactInstance(kjt.getSort(), TB.var(selfSV));
 	    final SequentFormula ifCf = new SequentFormula(ifFormula);
 	    final Semisequent ifSemiSeq
 	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
@@ -237,7 +237,7 @@ public final class QueryAxiom extends ClassAxiom {
 	}
 
 	//create find
-	final Term[] subs = new Term[target.arity()];
+	final JavaDLTerm[] subs = new JavaDLTerm[target.arity()];
 	int offset = 0;
 	for(SchemaVariable heapSV : heapSVs) {
 		subs[offset++] = TB.var(heapSV);
@@ -248,13 +248,13 @@ public final class QueryAxiom extends ClassAxiom {
 	for(int i = 0; i < paramSVs.length; i++) {
 	    subs[offset++] = TB.var(paramSVs[i]);	    
 	}
-	final Term find = TB.func(target, subs);
+	final JavaDLTerm find = TB.func(target, subs);
 	
 	//create replacewith
-	final Term replacewith = TB.var(skolemSV);
+	final JavaDLTerm replacewith = TB.var(skolemSV);
 	
 	//create added sequent
-	final Term addedFormula 
+	final JavaDLTerm addedFormula 
 		= TB.apply(update, TB.prog(Modality.BOX, jb, post), null);
 	final SequentFormula addedCf = new SequentFormula(addedFormula);
 	final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT

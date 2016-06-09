@@ -23,7 +23,7 @@ import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -56,7 +56,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
         if(toBeChecked.isEmpty()){
             return CheckedUserInputInspector.NO_USER_INPUT;
         }
-        Term term = translate(services,toBeChecked);
+        JavaDLTerm term = translate(services,toBeChecked);
         
         Semisequent semisequent = cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? 
                 node.sequent().antecedent() : node.sequent().succedent();
@@ -85,7 +85,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
 
     }
     
-    public static Term translate(Services services, String toBeChecked){
+    public static JavaDLTerm translate(Services services, String toBeChecked){
         try {
             KeYParserF parser =
                     new KeYParserF (ParserMode.TERM,

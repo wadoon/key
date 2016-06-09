@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -65,7 +65,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return new MultiplesModEquationsGenerator ( source, target );
     }
     
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
         
         final Monomial sourceM =
@@ -79,14 +79,14 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         final List<CofactorPolynomial> cofactorPolys = extractPolys ( goal, services );
 
         if ( cofactorPolys.isEmpty () )
-            return ImmutableSLList.<Term>nil().iterator ();
+            return ImmutableSLList.<JavaDLTerm>nil().iterator ();
         
         return computeMultiples(sourceM, targetM, cofactorPolys, services)
                .iterator();
     }
 
-    private Iterator<Term> toIterator(Term quotient) {
-        return ImmutableSLList.<Term>nil().prepend ( quotient ).iterator ();
+    private Iterator<JavaDLTerm> toIterator(JavaDLTerm quotient) {
+        return ImmutableSLList.<JavaDLTerm>nil().prepend ( quotient ).iterator ();
     }
 
     /**
@@ -97,9 +97,9 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      * 
      * This method will change the object <code>cofactorPolys</code>.
      */
-    private ImmutableList<Term> computeMultiples(Monomial sourceM, Monomial targetM,
+    private ImmutableList<JavaDLTerm> computeMultiples(Monomial sourceM, Monomial targetM,
                                         List<CofactorPolynomial> cofactorPolys, Services services) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        ImmutableList<JavaDLTerm> res = ImmutableSLList.<JavaDLTerm>nil();
         
         final List<CofactorItem> cofactorMonos = new ArrayList<CofactorItem> ();
         cofactorMonos.add ( new CofactorMonomial ( targetM, Polynomial.ONE ) );
@@ -132,8 +132,8 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return res;
     }
 
-    private ImmutableList<Term> addRes(CofactorMonomial newMono, Monomial sourceM,
-                              ImmutableList<Term> res, Services services) {
+    private ImmutableList<JavaDLTerm> addRes(CofactorMonomial newMono, Monomial sourceM,
+                              ImmutableList<JavaDLTerm> res, Services services) {
         final Monomial mono = newMono.mono;
         final Polynomial cofactor = newMono.cofactor;
 
@@ -165,7 +165,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      
         for (final SequentFormula cfm : goal.sequent ().antecedent ()) {
 
-            final Term t = cfm.formula();
+            final JavaDLTerm t = cfm.formula();
             if ( t.op () != Equality.EQUALS
                  || t.sub ( 0 ).sort () != numbers.targetSort () 
                  || t.sub ( 1 ).sort () != numbers.targetSort () )

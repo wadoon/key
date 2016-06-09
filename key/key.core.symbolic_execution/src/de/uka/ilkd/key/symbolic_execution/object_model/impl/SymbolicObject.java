@@ -16,7 +16,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 
@@ -33,7 +33,7 @@ public class SymbolicObject extends AbstractSymbolicAssociationValueContainer im
    /**
     * The name.
     */
-   private final Term name;
+   private final JavaDLTerm name;
 
    /**
     * Constructor.
@@ -41,7 +41,7 @@ public class SymbolicObject extends AbstractSymbolicAssociationValueContainer im
     * @param name The name.
     * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicObject(Services services, Term name, IModelSettings settings) {
+   public SymbolicObject(Services services, JavaDLTerm name, IModelSettings settings) {
       super(settings);
       this.services = services;
       this.name = name;
@@ -51,7 +51,7 @@ public class SymbolicObject extends AbstractSymbolicAssociationValueContainer im
     * {@inheritDoc}
     */
    @Override
-   public Term getName() {
+   public JavaDLTerm getName() {
       return name;
    }
 

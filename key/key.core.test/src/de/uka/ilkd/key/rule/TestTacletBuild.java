@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -45,7 +45,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class TestTacletBuild extends TestCase {
 
-    public static final Term[] NO_SUBTERMS = new Term[0];
+    public static final JavaDLTerm[] NO_SUBTERMS = new JavaDLTerm[0];
 
    private TermFactory tf;
 
@@ -67,10 +67,10 @@ public class TestTacletBuild extends TestCase {
 	    TacletForTests.getVariables().lookup(new Name("u"));
 	SchemaVariable v=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("v"));
-	Term b=tf.createTerm((SchemaVariable) 
+	JavaDLTerm b=tf.createTerm((SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("b")), NO_SUBTERMS);
-	Term t1=tb.ex((QuantifiableVariable)u, b);
-	Term t2=tb.ex((QuantifiableVariable)v, b);
+	JavaDLTerm t1=tb.ex((QuantifiableVariable)u, b);
+	JavaDLTerm t2=tb.ex((QuantifiableVariable)v, b);
 	RewriteTacletBuilder<RewriteTaclet> sb=new RewriteTacletBuilder<RewriteTaclet>();
 	sb.setFind(t1);
 	sb.addTacletGoalTemplate
@@ -96,14 +96,14 @@ public class TestTacletBuild extends TestCase {
 	boolean thrown=false;
 	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	Term A=tf.createTerm
+	JavaDLTerm A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tb.all((QuantifiableVariable)u, A);
+	JavaDLTerm t1=tb.all((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert
 	     (0, new SequentFormula(t1)).semisequent());
-	Term t2=tb.ex((QuantifiableVariable)u, A);
+	JavaDLTerm t2=tb.ex((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setIfSequent(seq);
 	sb.setFind(t2);
@@ -121,11 +121,11 @@ public class TestTacletBuild extends TestCase {
 	boolean thrown=false;
 	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	Term A=tf.createTerm
+	JavaDLTerm A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tb.all( (QuantifiableVariable)u, A);
-	Term t2=tb.ex((QuantifiableVariable)u, A);
+	JavaDLTerm t1=tb.all( (QuantifiableVariable)u, A);
+	JavaDLTerm t2=tb.ex((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT
 	     .insert(0, new SequentFormula(t1)).semisequent()
@@ -148,10 +148,10 @@ public class TestTacletBuild extends TestCase {
 	boolean thrown=false;
 	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	Term A=tf.createTerm
+	JavaDLTerm A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tb.all((QuantifiableVariable)u, A);
+	JavaDLTerm t1=tb.all((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setFind(tf.createTerm(Junctor.AND,t1,t1));
 	try {

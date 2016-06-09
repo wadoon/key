@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -45,7 +45,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     private final String name;
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
-    private final Term originalRep;
+    private final JavaDLTerm originalRep;
     private final ProgramVariable originalSelfVar;
 
     /** JML axioms may not be declared static, but they may be used like static specifications.
@@ -57,7 +57,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     public ClassAxiomImpl(String name,
 	    KeYJavaType kjt,
 	    VisibilityModifier visibility,
-	    Term rep,
+	    JavaDLTerm rep,
 	    ProgramVariable selfVar) {
 	assert name != null;
 	assert kjt != null;
@@ -75,7 +75,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     public ClassAxiomImpl(String name, String displayName,
         KeYJavaType kjt,
         VisibilityModifier visibility,
-        Term rep,
+        JavaDLTerm rep,
         ProgramVariable selfVar) {
         this(name,kjt,visibility,rep,selfVar);
         this.displayName = displayName;
@@ -135,7 +135,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);
         }
-        Term rep = services.getTermBuilder().convertToFormula(originalRep);
+        JavaDLTerm rep = services.getTermBuilder().convertToFormula(originalRep);
         TacletGenerator TG = TacletGenerator.getInstance();
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
         final int c = services.getCounter("classAxiom").getCountPlusPlus();

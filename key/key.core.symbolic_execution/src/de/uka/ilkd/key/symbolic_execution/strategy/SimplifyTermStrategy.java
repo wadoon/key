@@ -3,7 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -22,14 +22,14 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * {@link Strategy} used to simplify {@link Term}s in side proofs.
+ * {@link Strategy} used to simplify {@link JavaDLTerm}s in side proofs.
  * @author Martin Hentschel
  */
 public class SimplifyTermStrategy extends JavaCardDLStrategy {
    /**
     * The {@link Name} of the side proof {@link Strategy}.
     */
-   public static final Name name = new Name("Simplify Term Strategy");
+   public static final Name name = new Name("Simplify JavaDLTerm Strategy");
    
    /**
     * Constructor.
@@ -59,9 +59,9 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
          public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
             boolean hasLabel = false;
             if (pos != null && app instanceof TacletApp) {
-               Term findTerm = pos.subTerm();
+               JavaDLTerm findTerm = pos.subTerm();
                if (!findTerm.containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
-                  // Term with result label is not used in find term and thus is not allowed to be used in an assumes clause
+                  // JavaDLTerm with result label is not used in find term and thus is not allowed to be used in an assumes clause
                   TacletApp ta = (TacletApp)app;
                   if (ta.ifFormulaInstantiations() != null) {
                      for (IfFormulaInstantiation ifi : ta.ifFormulaInstantiations()) {
@@ -75,7 +75,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
             return hasLabel ? TopRuleAppCost.INSTANCE : NumberRuleAppCost.create(0);
          }
       };
-      // The label feature ensures that Taclets mapping an assumes to a Term with a result label are only applicable if also a Term with the result label is used in the find clause
+      // The label feature ensures that Taclets mapping an assumes to a JavaDLTerm with a result label are only applicable if also a JavaDLTerm with the result label is used in the find clause
       return add(labelFeature, superFeature);
    }
 

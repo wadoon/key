@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -47,7 +47,7 @@ public class LetFeature implements Feature {
     }
 
     public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Term outerVarContent = var.getContent ();
+        final JavaDLTerm outerVarContent = var.getContent ();
 
         var.setContent ( value.toTerm ( app, pos, goal ) );
         final RuleAppCost res = body.compute ( app, pos, goal );

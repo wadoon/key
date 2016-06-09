@@ -27,7 +27,7 @@ import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -81,7 +81,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
                 .getExecutionContext());
     }
 
-    protected boolean filter(Term term, Services services, ExecutionContext ec) {
+    protected boolean filter(JavaDLTerm term, Services services, ExecutionContext ec) {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw
@@ -96,14 +96,14 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * active statement)
      * 
      * @param term
-     *            the Term with the program at top level
+     *            the JavaDLTerm with the program at top level
      * @return the first executable statement
      */
-    private ProgramElement getFirstExecutableStatement(Term term) {
-        if (term.javaBlock().isEmpty())
+    private ProgramElement getFirstExecutableStatement(JavaDLTerm term) {
+        if (term.modalContent().isEmpty())
             return null;
 
-        final ProgramElement jb = term.javaBlock().program();
+        final ProgramElement jb = term.modalContent().program();
         final ProgramElement fstActive;
 
         if (jb instanceof ProgramPrefix) {

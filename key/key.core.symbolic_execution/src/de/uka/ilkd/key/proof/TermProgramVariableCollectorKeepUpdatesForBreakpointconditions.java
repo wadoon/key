@@ -16,7 +16,7 @@ package de.uka.ilkd.key.proof;
 import org.key_project.common.core.logic.op.SVSubstitute;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
@@ -35,7 +35,7 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions exte
     * {@inheritDoc}
     */
    @Override
-   public void visit(Term t) {
+   public void visit(JavaDLTerm t) {
       super.visit(t);
       if (t.op() instanceof Modality) {
          addVarsToKeep();

@@ -46,13 +46,13 @@ public class TestSemisequent extends TestCase {
 	Function c=new Function(new Name("c"),Sort.FORMULA,new Sort[]{});
 
 
-	Term t_p=TB.func(p, new Term[]{});
-	Term t_q=TB.func(q, new Term[]{});
-	Term t_r=TB.func(r, new Term[]{});
+	JavaDLTerm t_p=TB.func(p, new JavaDLTerm[]{});
+	JavaDLTerm t_q=TB.func(q, new JavaDLTerm[]{});
+	JavaDLTerm t_r=TB.func(r, new JavaDLTerm[]{});
 
- 	Term t_a=TB.func(a, new Term[]{});
-	Term t_b=TB.func(b, new Term[]{});
-	Term t_c=TB.func(c, new Term[]{});
+ 	JavaDLTerm t_a=TB.func(a, new JavaDLTerm[]{});
+	JavaDLTerm t_b=TB.func(b, new JavaDLTerm[]{});
+	JavaDLTerm t_c=TB.func(c, new JavaDLTerm[]{});
 
 	
 	con=new SequentFormula[7];
@@ -66,7 +66,7 @@ public class TestSemisequent extends TestCase {
 
 	Sort s = new SortImpl(new Name("test"));
 	Function f = new Function(new Name("f"), s, new Sort[]{});
- 	Term t_f = TB.func(f, new Term[]{});
+ 	JavaDLTerm t_f = TB.func(f, new JavaDLTerm[]{});
     }
        
     public void tearDown() {

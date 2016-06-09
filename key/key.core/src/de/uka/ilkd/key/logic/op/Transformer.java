@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level
@@ -99,7 +99,7 @@ public class Transformer extends Function {
             Operator        op;
 
             while ( it.next () != -1 && !trans) {
-                final Term t = it.getSubTerm ();
+                final JavaDLTerm t = it.getSubTerm ();
                 op = t.op ();
                 trans = op instanceof Transformer;
             }
@@ -119,7 +119,7 @@ public class Transformer extends Function {
             Operator        op;
 
             while ( it.next () != -1) {
-                final Term t = it.getSubTerm ();
+                final JavaDLTerm t = it.getSubTerm ();
                 op = t.op ();
                 if (op instanceof Transformer)
                     return (Transformer)op;

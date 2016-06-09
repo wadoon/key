@@ -19,7 +19,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
@@ -56,10 +56,10 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
    private static final String DISPLAY_NAME = "JoinByIfThenElseAntecedent";
 
    @Override
-   public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1, Term valueInState1,
-            SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services) {
+   public Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinValuesInStates(
+            JavaDLTerm v, SymbolicExecutionState state1, JavaDLTerm valueInState1,
+            SymbolicExecutionState state2, JavaDLTerm valueInState2,
+            JavaDLTerm distinguishingFormula, Services services) {
       
       final TermBuilder tb = services.getTermBuilder();
       
@@ -68,7 +68,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
       ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
       newNames = newNames.add(newSkolemConst.name());
       
-      ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
+      ImmutableSet<JavaDLTerm> newConstraints = DefaultImmutableSet.nil();
       newConstraints = newConstraints.union(getIfThenElseConstraints(
             tb.func(newSkolemConst),
             valueInState1,
@@ -79,7 +79,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
             services
       ));
       
-      return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(newConstraints, tb.func(newSkolemConst), newNames);
+      return new Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>>(newConstraints, tb.func(newSkolemConst), newNames);
       
    }
    
@@ -110,29 +110,29 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
      * @return A list of if-then-else constraints for the given constrained
      *         term, states and if/else terms.
      */
-   private static ImmutableSet<Term> getIfThenElseConstraints(
-         Term constrained,
-         Term ifTerm,
-         Term elseTerm,
+   private static ImmutableSet<JavaDLTerm> getIfThenElseConstraints(
+         JavaDLTerm constrained,
+         JavaDLTerm ifTerm,
+         JavaDLTerm elseTerm,
          SymbolicExecutionState state1,
          SymbolicExecutionState state2,
-         Term distinguishingFormula,
+         JavaDLTerm distinguishingFormula,
          Services services) {
       
       final TermBuilder tb = services.getTermBuilder();
-      ImmutableSet<Term> result = DefaultImmutableSet.nil();
+      ImmutableSet<JavaDLTerm> result = DefaultImmutableSet.nil();
       
       if (distinguishingFormula == null) {
-          final Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+          final Quadruple<JavaDLTerm, JavaDLTerm, JavaDLTerm, Boolean> distFormAndRightSidesForITEUpd =
                 JoinIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
           
-          final Term cond         = distFormAndRightSidesForITEUpd.first;
-          final Term ifForm       = distFormAndRightSidesForITEUpd.second;
-          final Term elseForm     = distFormAndRightSidesForITEUpd.third;
+          final JavaDLTerm cond         = distFormAndRightSidesForITEUpd.first;
+          final JavaDLTerm ifForm       = distFormAndRightSidesForITEUpd.second;
+          final JavaDLTerm elseForm     = distFormAndRightSidesForITEUpd.third;
           final boolean isSwapped = distFormAndRightSidesForITEUpd.fourth;
           
-          final Term varEqualsIfForm   = tb.equals(constrained, ifForm);
-          final Term varEqualsElseForm = tb.equals(constrained, elseForm);
+          final JavaDLTerm varEqualsIfForm   = tb.equals(constrained, ifForm);
+          final JavaDLTerm varEqualsElseForm = tb.equals(constrained, elseForm);
           
           if (!(ifTerm.equals(constrained) && !isSwapped ||
                 elseTerm.equals(constrained) && isSwapped)) {
@@ -145,8 +145,8 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
           }
       }
       else {
-          final Term varEqualsIfForm   = tb.equals(constrained, ifTerm);
-          final Term varEqualsElseForm = tb.equals(constrained, elseTerm);
+          final JavaDLTerm varEqualsIfForm   = tb.equals(constrained, ifTerm);
+          final JavaDLTerm varEqualsElseForm = tb.equals(constrained, elseTerm);
           
           result = result.add(tb.imp(distinguishingFormula, varEqualsIfForm));
           result = result.add(tb.or(distinguishingFormula, varEqualsElseForm));

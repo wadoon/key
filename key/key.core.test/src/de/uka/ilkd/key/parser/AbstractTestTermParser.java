@@ -17,7 +17,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -76,7 +76,7 @@ public class AbstractTestTermParser extends TestCase {
         stringDeclParser.decls();
     }
 
-    public Term parseProblem(String s) {
+    public JavaDLTerm parseProblem(String s) {
         try {
             new Recoder2KeY(TacletForTests.services(),
                     nss).parseSpecialClasses();
@@ -105,11 +105,11 @@ public class AbstractTestTermParser extends TestCase {
         return new KeYParserF(ParserMode.TERM, getLexer(s), services, nss);
     }
 
-    public Term parseTerm(String s) throws Exception {
+    public JavaDLTerm parseTerm(String s) throws Exception {
         return getParser(s).term();
     }
 
-    public Term parseFormula(String s) {
+    public JavaDLTerm parseFormula(String s) {
         try {
             return getParser(s).formula();
         } catch (Exception e) {
@@ -121,11 +121,11 @@ public class AbstractTestTermParser extends TestCase {
     }
 
     /**
-     * Convert a {@link Term} into a {@link String}.
+     * Convert a {@link JavaDLTerm} into a {@link String}.
      *
-     * @param t The {@link Term} that will be converted.
+     * @param t The {@link JavaDLTerm} that will be converted.
      */
-    protected String printTerm(Term t) throws IOException {
+    protected String printTerm(JavaDLTerm t) throws IOException {
         LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services);
         lp.getNotationInfo().setHidePackagePrefix(false);
         lp.printTerm(t);
@@ -144,7 +144,7 @@ public class AbstractTestTermParser extends TestCase {
         assertEquals(message, expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
 
-    protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult) throws IOException {
+    protected void verifyPrettyPrinting(String expectedPrettySyntax, JavaDLTerm expectedParseResult) throws IOException {
         // check whether pretty-printing the parsed term yields the original pretty syntax again
         String printedSyntax = printTerm(expectedParseResult);
         String message = "\nAssertion failed while pretty-printing a term:\n"
@@ -155,9 +155,9 @@ public class AbstractTestTermParser extends TestCase {
         assertEqualsIgnoreWhitespaces(message, expectedPrettySyntax, printedSyntax);
     }
 
-    protected void verifyParsing(Term expectedParseResult, String expectedPrettySyntax) throws Exception {
+    protected void verifyParsing(JavaDLTerm expectedParseResult, String expectedPrettySyntax) throws Exception {
         // check whether parsing pretty-syntax produces the correct term
-        Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
+        JavaDLTerm parsedPrettySyntax = parseTerm(expectedPrettySyntax);
         String message = "\nAssertion failed while parsing pretty syntax. "
                 + "Parsed string \"" + expectedPrettySyntax + "\", which results in term:\n"
                 + parsedPrettySyntax + "\nBut expected parse result is:\n"
@@ -167,25 +167,25 @@ public class AbstractTestTermParser extends TestCase {
 
     /**
      * Takes two different String representations for the same term and checks
-     * whether they result in the same {@link Term} after parsing. Subsequently,
-     * the {@link Term} is printed back to a {@link String} and compared with
+     * whether they result in the same {@link JavaDLTerm} after parsing. Subsequently,
+     * the {@link JavaDLTerm} is printed back to a {@link String} and compared with
      * the first argument. The first argument is expected to be in
      * pretty-syntax.
      *
-     * @param prettySyntax {@link Term} representation in pretty-syntax.
-     * @param verboseSyntax {@link Term} in verbose syntax.
+     * @param prettySyntax {@link JavaDLTerm} representation in pretty-syntax.
+     * @param verboseSyntax {@link JavaDLTerm} in verbose syntax.
      * @param optionalStringRepresentations Optionally, additional String
      * representations will be tested for correct parsing.
      * @throws IOException
      */
     protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax,
             String... optionalStringRepresentations) throws Exception {
-        Term expectedParseResult = parseTerm(verboseSyntax);
+        JavaDLTerm expectedParseResult = parseTerm(verboseSyntax);
         compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult, optionalStringRepresentations);
     }
 
     /**
-     * Takes a {@link String} and a {@link Term} and checks whether they can be
+     * Takes a {@link String} and a {@link JavaDLTerm} and checks whether they can be
      * transformed into each other by the operations parsing and printing.
      *
      * @param prettySyntax Expected result after pretty-printing
@@ -196,7 +196,7 @@ public class AbstractTestTermParser extends TestCase {
      * representations will be tested for correct parsing.
      * @throws IOException
      */
-    protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax, Term expectedParseResult,
+    protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax, JavaDLTerm expectedParseResult,
             String... optionalStringRepresentations) throws Exception {
 
         verifyParsing(expectedParseResult, prettySyntax);

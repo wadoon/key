@@ -10,7 +10,7 @@ import java.util.Iterator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -24,22 +24,22 @@ class InfFlowContractAppInOutRelationSnippet extends InfFlowInputOutputRelationS
     // assume the identity on the newly created objects, as opposed to the
     // proof obligation where we have to show that there is an isomorphism.
     @Override
-    protected Term buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
+    protected JavaDLTerm buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
                                                     InfFlowSpec infFlowSpec2,
                                                     BasicSnippetData d,
                                                     ProofObligationVars vs1,
                                                     ProofObligationVars vs2,
-                                                    Term eqAtLocsTerm) {
+                                                    JavaDLTerm eqAtLocsTerm) {
         // build equalities for newObjects terms
-        ImmutableList<Term> newObjEqs = ImmutableSLList.<Term>nil();
-        Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();
-        Iterator<Term> newObjects2It = infFlowSpec2.newObjects.iterator();
+        ImmutableList<JavaDLTerm> newObjEqs = ImmutableSLList.<JavaDLTerm>nil();
+        Iterator<JavaDLTerm> newObjects1It = infFlowSpec1.newObjects.iterator();
+        Iterator<JavaDLTerm> newObjects2It = infFlowSpec2.newObjects.iterator();
         for (int i = 0; i < infFlowSpec1.newObjects.size(); i++) {
-            Term newObject1Term = newObjects1It.next();
-            Term newObject2Term = newObjects2It.next();
+            JavaDLTerm newObject1Term = newObjects1It.next();
+            JavaDLTerm newObject2Term = newObjects2It.next();
             newObjEqs = newObjEqs.append(d.tb.equals(newObject1Term, newObject2Term));
         }
-        final Term newObjEqsTerm = d.tb.and(newObjEqs);
+        final JavaDLTerm newObjEqsTerm = d.tb.and(newObjEqs);
 
         // build object oriented post-relation for contract applications
         return d.tb.and(eqAtLocsTerm, newObjEqsTerm);

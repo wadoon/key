@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 
@@ -12,7 +12,7 @@ class BasicSymbolicExecutionWithPreconditionSnippet extends ReplaceAndRegisterMe
         implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
+    public JavaDLTerm produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         // generate snippet factory for symbolic execution
@@ -20,14 +20,14 @@ class BasicSymbolicExecutionWithPreconditionSnippet extends ReplaceAndRegisterMe
                 POSnippetFactory.getBasicFactory(d, poVars);
 
         // precondition
-        final Term freePre =
+        final JavaDLTerm freePre =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
-        final Term contractPre =
+        final JavaDLTerm contractPre =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        final Term pre = d.tb.and(freePre, contractPre);
+        final JavaDLTerm pre = d.tb.and(freePre, contractPre);
 
         // symbolic execution
-        final Term symExec =
+        final JavaDLTerm symExec =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC);
 
         // final symbolic execution term

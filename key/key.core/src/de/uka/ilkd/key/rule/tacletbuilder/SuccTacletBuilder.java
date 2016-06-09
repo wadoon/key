@@ -15,7 +15,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import org.key_project.common.core.logic.sort.Sort;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 
@@ -30,7 +30,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * nothing happens.
      * @return this SuccTacletBuilder
      */ 
-    public SuccTacletBuilder setFind(Term findTerm) {
+    public SuccTacletBuilder setFind(JavaDLTerm findTerm) {
 	if (findTerm.sort()==Sort.FORMULA) 
 	    find=findTerm;
 	checkContainsFreeVarSV(findTerm, this.getName(), "find term");	

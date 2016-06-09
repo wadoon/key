@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
@@ -40,7 +41,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.proof.Goal;
@@ -67,12 +68,12 @@ import de.uka.ilkd.key.util.Pair;
  * <ul>
  *    <li>To list all supported {@link TermLabel} {@link Name}s via {@link #getSupportedTermLabelNames()}.</li>
  *    <li>To instantiate a {@link TermLabel} via {@link #parseLabel(String, List)}.</li>
- *    <li>To compute the {@link TermLabel}s of a {@link Term} to be created via {@link #instantiateLabels(Services, PosInOccurrence, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)} during rule application.</li>
- *    <li>To refactor existing {@link Term}s during rule application via:
+ *    <li>To compute the {@link TermLabel}s of a {@link JavaDLTerm} to be created via {@link #instantiateLabels(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)} during rule application.</li>
+ *    <li>To refactor existing {@link JavaDLTerm}s during rule application via:
  *       <ul>
- *          <li>{@link #refactorGoal(Services, PosInOccurrence, Term, Rule, Goal, Term)} : The full sequent</li>
- *          <li>{@link #refactorSequentFormula(Services, Term, PosInOccurrence, Rule, Goal, Object, Term)} : The sequent formula which contains the application term on which the rule is applied</li>
- *          <li>{@link #refactorTerm(Services, PosInOccurrence, Term, Rule, Goal, Object, Term)} : The current term.</li>
+ *          <li>{@link #refactorGoal(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, JavaDLTerm)} : The full sequent</li>
+ *          <li>{@link #refactorSequentFormula(Services, JavaDLTerm, PosInOccurrence, Rule, Goal, Object, JavaDLTerm)} : The sequent formula which contains the application term on which the rule is applied</li>
+ *          <li>{@link #refactorTerm(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, Object, JavaDLTerm)} : The current term.</li>
  *       </ul>
  *    </li>
  * </ul>
@@ -91,12 +92,12 @@ public class TermLabelManager {
    private final Map<Name, TermLabelFactory<?>> factoryMap = new LinkedHashMap<Name, TermLabelFactory<?>>();
 
    /**
-    * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelPolicy} applied on the application {@link Term}.
+    * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelPolicy} applied on the application {@link JavaDLTerm}.
     */
    private final Map<Name, TermLabelPolicy> applicationTermPolicyMap = new LinkedHashMap<Name, TermLabelPolicy>();
 
    /**
-    * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelPolicy} applied on the modality {@link Term}.
+    * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelPolicy} applied on the modality {@link JavaDLTerm}.
     */
    private final Map<Name, TermLabelPolicy> modalityTermPolicyMap = new LinkedHashMap<Name, TermLabelPolicy>();
 
@@ -367,8 +368,8 @@ public class TermLabelManager {
 
    /**
     * <p>
-    * Computes the {@link TermLabel} to add to a new {@link Term} while
-    * a {@link Rule} is currently active. The labels of the new {@link Term}
+    * Computes the {@link TermLabel} to add to a new {@link JavaDLTerm} while
+    * a {@link Rule} is currently active. The labels of the new {@link JavaDLTerm}
     * are computed just before the term is created.
     * </p>
     * <p>
@@ -377,18 +378,18 @@ public class TermLabelManager {
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
     * @param rule The {@link Rule} which is applied.
     * @param ruleApp The {@link RuleApp} which is currently performed.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-    * @param newTermSubs The optional children of the {@link Term} to create.
-    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
-    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param tacletTerm The optional {@link JavaDLTerm} in the taclet which is responsible to instantiate the new {@link JavaDLTerm} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link JavaDLTerm} to create.
+    * @param newTermSubs The optional children of the {@link JavaDLTerm} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link JavaDLTerm} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link JavaDLTerm} to create.
     * @param newTermOriginalLabels The original {@link TermLabel}s.
-    * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
+    * @return The {@link TermLabel}s to add to the new {@link JavaDLTerm} which should be created.
     */
    public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
                                                              Services services,
@@ -397,20 +398,20 @@ public class TermLabelManager {
                                                              RuleApp ruleApp,
                                                              Goal goal,
                                                              Object hint,
-                                                             Term tacletTerm,
+                                                             JavaDLTerm tacletTerm,
                                                              Operator newTermOp,
-                                                             ImmutableArray<Term> newTermSubs,
+                                                             ImmutableArray<JavaDLTerm> newTermSubs,
                                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                             JavaBlock newTermJavaBlock,
+                                                             ModalContent newTermJavaBlock,
                                                              ImmutableArray<TermLabel> newTermOriginalLabels) {
-      Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+      JavaDLTerm applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
       return instantiateLabels(state, services, applicationTerm, applicationPosInOccurrence, rule, ruleApp, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newTermOriginalLabels);
    }
 
    /**
     * <p>
-    * Computes the {@link TermLabel} to add to a new {@link Term} while
-    * a {@link Rule} is currently active. The labels of the new {@link Term}
+    * Computes the {@link TermLabel} to add to a new {@link JavaDLTerm} while
+    * a {@link Rule} is currently active. The labels of the new {@link JavaDLTerm}
     * are computed just before the term is created.
     * </p>
     * <p>
@@ -419,33 +420,33 @@ public class TermLabelManager {
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
     * @param rule The {@link Rule} which is applied.
     * @param ruleApp The {@link RuleApp} which is currently performed.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-    * @param newTermSubs The optional children of the {@link Term} to create.
-    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
-    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param tacletTerm The optional {@link JavaDLTerm} in the taclet which is responsible to instantiate the new {@link JavaDLTerm} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link JavaDLTerm} to create.
+    * @param newTermSubs The optional children of the {@link JavaDLTerm} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link JavaDLTerm} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link JavaDLTerm} to create.
     * @param newTermOriginalLabels The original {@link TermLabel}s.
-    * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
+    * @return The {@link TermLabel}s to add to the new {@link JavaDLTerm} which should be created.
     */
    public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
                                                              Services services,
-                                                             Term applicationTerm,
+                                                             JavaDLTerm applicationTerm,
                                                              PosInOccurrence applicationPosInOccurrence,
                                                              Rule rule,
                                                              RuleApp ruleApp,
                                                              Goal goal,
                                                              Object hint,
-                                                             Term tacletTerm,
+                                                             JavaDLTerm tacletTerm,
                                                              Operator newTermOp,
-                                                             ImmutableArray<Term> newTermSubs,
+                                                             ImmutableArray<JavaDLTerm> newTermSubs,
                                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                             JavaBlock newTermJavaBlock,
+                                                             ModalContent newTermJavaBlock,
                                                              ImmutableArray<TermLabel> newTermOriginalLabels) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
@@ -470,8 +471,8 @@ public class TermLabelManager {
    }
 
    /**
-    * Computes the {@link TermLabel} to add to a new {@link Term} while
-    * a {@link Rule} is currently active. The labels of the new {@link Term}
+    * Computes the {@link TermLabel} to add to a new {@link JavaDLTerm} while
+    * a {@link Rule} is currently active. The labels of the new {@link JavaDLTerm}
     * are computed just before the term is created in the following way:
     * <ol>
     *    <li>An empty result {@link List} is created.</li>
@@ -483,40 +484,40 @@ public class TermLabelManager {
     * </ol>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
     * @param ruleApp The {@link RuleApp} which is currently performed.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-    * @param newTermSubs The optional children of the {@link Term} to create.
-    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
-    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param tacletTerm The optional {@link JavaDLTerm} in the taclet which is responsible to instantiate the new {@link JavaDLTerm} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link JavaDLTerm} to create.
+    * @param newTermSubs The optional children of the {@link JavaDLTerm} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link JavaDLTerm} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link JavaDLTerm} to create.
     * @param newTermOriginalLabels The original {@link TermLabel}s.
-    * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
+    * @return The {@link TermLabel}s to add to the new {@link JavaDLTerm} which should be created.
     */
    public ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
                                                       Services services,
                                                       PosInOccurrence applicationPosInOccurrence,
-                                                      Term applicationTerm,
+                                                      JavaDLTerm applicationTerm,
                                                       Rule rule,
                                                       RuleApp ruleApp,
                                                       Goal goal,
                                                       Object hint,
-                                                      Term tacletTerm,
+                                                      JavaDLTerm tacletTerm,
                                                       Operator newTermOp,
-                                                      ImmutableArray<Term> newTermSubs,
+                                                      ImmutableArray<JavaDLTerm> newTermSubs,
                                                       ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                      JavaBlock newTermJavaBlock,
+                                                      ModalContent newTermJavaBlock,
                                                       ImmutableArray<TermLabel> newTermOriginalLabels) {
       // Compute current rule specific updates
       ImmutableList<TermLabelUpdate> currentRuleSpecificUpdates = rule != null ?
                                                                   ruleSpecificUpdates.get(rule.name()) :
                                                                   null;
       // Compute modality term if required
-      Term modalityTerm = applicationTerm != null && (!modalityTermPolicyMap.isEmpty() ||
+      JavaDLTerm modalityTerm = applicationTerm != null && (!modalityTermPolicyMap.isEmpty() ||
                                                       !allRulesUpdates.isEmpty() ||
                                                       currentRuleSpecificUpdates != null) ?
                           TermBuilder.goBelowUpdates(applicationTerm) :
@@ -560,15 +561,15 @@ public class TermLabelManager {
 
    /**
     * <p>
-    * Performs the {@link TermLabel}s provided by the taclet {@link Term}.
+    * Performs the {@link TermLabel}s provided by the taclet {@link JavaDLTerm}.
     * </p>
     * <p>
-    * This is a helper {@link Map} of {@link #instantiateLabels(Services, PosInOccurrence, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
+    * This is a helper {@link Map} of {@link #instantiateLabels(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
     * </p>
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+    * @param tacletTerm The optional {@link JavaDLTerm} in the taclet which is responsible to instantiate the new {@link JavaDLTerm} for the new proof node or {@code null} in case of built in rules.
+    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JavaDLTerm}.
     */
-   protected void performTacletTerm(Term tacletTerm, Set<TermLabel> newLabels) {
+   protected void performTacletTerm(JavaDLTerm tacletTerm, Set<TermLabel> newLabels) {
       for (TermLabel label : tacletTerm.getLabels()) {
          newLabels.add(label);
       }
@@ -579,36 +580,36 @@ public class TermLabelManager {
     * Performs the given {@link TermLabelPolicy} instances.
     * </p>
     * <p>
-    * This is a helper method of {@link #instantiateLabels(Services, PosInOccurrence, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
+    * This is a helper method of {@link #instantiateLabels(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-    * @param newTermSubs The optional children of the {@link Term} to create.
-    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
-    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param tacletTerm The optional {@link JavaDLTerm} in the taclet which is responsible to instantiate the new {@link JavaDLTerm} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link JavaDLTerm} to create.
+    * @param newTermSubs The optional children of the {@link JavaDLTerm} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link JavaDLTerm} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link JavaDLTerm} to create.
     * @param newTermOriginalLabels The original {@link TermLabel}s.
     * @param policies The {@link TermLabelPolicy} instances to perform.
-    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JavaDLTerm}.
     */
    protected void performTermLabelPolicies(TermLabelState state,
                                            Services services,
                                            PosInOccurrence applicationPosInOccurrence,
-                                           Term applicationTerm,
+                                           JavaDLTerm applicationTerm,
                                            Rule rule,
                                            Goal goal,
                                            Object hint,
-                                           Term tacletTerm,
+                                           JavaDLTerm tacletTerm,
                                            Operator newTermOp,
-                                           ImmutableArray<Term> newTermSubs,
+                                           ImmutableArray<JavaDLTerm> newTermSubs,
                                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                           JavaBlock newTermJavaBlock,
+                                           ModalContent newTermJavaBlock,
                                            ImmutableArray<TermLabel> newTermOriginalLabels,
                                            Map<Name, TermLabelPolicy> policies,
                                            Set<TermLabel> newLabels) {
@@ -629,37 +630,37 @@ public class TermLabelManager {
     * Performs the given {@link TermLabelPolicy} instances.
     * </p>
     * <p>
-    * This is a helper method of {@link #performTermLabelPolicies(Services, PosInOccurrence, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock, ImmutableArray, Map, List)}.
+    * This is a helper method of {@link #performTermLabelPolicies(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock, ImmutableArray, Map, List)}.
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-    * @param newTermSubs The optional children of the {@link Term} to create.
-    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
-    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param tacletTerm The optional {@link JavaDLTerm} in the taclet which is responsible to instantiate the new {@link JavaDLTerm} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link JavaDLTerm} to create.
+    * @param newTermSubs The optional children of the {@link JavaDLTerm} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link JavaDLTerm} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link JavaDLTerm} to create.
     * @param newTermOriginalLabels The original {@link TermLabel}s.
     * @param policies The {@link TermLabelPolicy} instances to perform.
-    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JavaDLTerm}.
     * @param label The current {@link TermLabel} to ask its {@link TermLabelPolicy}.
     */
    protected void performTermLabelPolicies(TermLabelState state,
                                            Services services,
                                            PosInOccurrence applicationPosInOccurrence,
-                                           Term applicationTerm,
+                                           JavaDLTerm applicationTerm,
                                            Rule rule,
                                            Goal goal,
                                            Object hint,
-                                           Term tacletTerm,
+                                           JavaDLTerm tacletTerm,
                                            Operator newTermOp,
-                                           ImmutableArray<Term> newTermSubs,
+                                           ImmutableArray<JavaDLTerm> newTermSubs,
                                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                           JavaBlock newTermJavaBlock,
+                                           ModalContent newTermJavaBlock,
                                            ImmutableArray<TermLabel> newTermOriginalLabels,
                                            Map<Name, TermLabelPolicy> policies,
                                            Set<TermLabel> newLabels,
@@ -678,34 +679,34 @@ public class TermLabelManager {
     * Computes active {@link ChildTermLabelPolicy} instances which have to be executed during the given rule application.
     * </p>
     * <p>
-    * This is a helper {@link Map} of {@link #instantiateLabels(Services, PosInOccurrence, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
+    * This is a helper {@link Map} of {@link #instantiateLabels(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
     * </p>
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-    * @param newTermSubs The optional children of the {@link Term} to create.
-    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
-    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param tacletTerm The optional {@link JavaDLTerm} in the taclet which is responsible to instantiate the new {@link JavaDLTerm} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link JavaDLTerm} to create.
+    * @param newTermSubs The optional children of the {@link JavaDLTerm} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link JavaDLTerm} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link JavaDLTerm} to create.
     * @param ruleSpecificPolicies Rule specific {@link ChildTermLabelPolicy} instances.
     * @param ruleIndependentPolicies All rules {@link ChildTermLabelPolicy} instances.
     * @returnThe active {@link ChildTermLabelPolicy} which have to be performed.
     */
    protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices services,
                                                                         PosInOccurrence applicationPosInOccurrence,
-                                                                        Term applicationTerm,
+                                                                        JavaDLTerm applicationTerm,
                                                                         Rule rule,
                                                                         Goal goal,
                                                                         Object hint,
-                                                                        Term tacletTerm,
+                                                                        JavaDLTerm tacletTerm,
                                                                         Operator newTermOp,
-                                                                        ImmutableArray<Term> newTermSubs,
+                                                                        ImmutableArray<JavaDLTerm> newTermSubs,
                                                                         ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                                        JavaBlock newTermJavaBlock,
+                                                                        ModalContent newTermJavaBlock,
                                                                         Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicies,
                                                                         Map<Name, ChildTermLabelPolicy> ruleIndependentPolicies) {
       Map<Name, ChildTermLabelPolicy> activeDirectChildPolicies = new LinkedHashMap<Name, ChildTermLabelPolicy>();
@@ -734,36 +735,36 @@ public class TermLabelManager {
     * Performs the given direct {@link ChildTermLabelPolicy} instances.
     * </p>
     * <p>
-    * This is a helper {@link Map} of {@link #instantiateLabels(Services, PosInOccurrence, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
+    * This is a helper {@link Map} of {@link #instantiateLabels(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
     * </p>
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-    * @param newTermSubs The optional children of the {@link Term} to create.
-    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
-    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param tacletTerm The optional {@link JavaDLTerm} in the taclet which is responsible to instantiate the new {@link JavaDLTerm} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link JavaDLTerm} to create.
+    * @param newTermSubs The optional children of the {@link JavaDLTerm} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link JavaDLTerm} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link JavaDLTerm} to create.
     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
-    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JavaDLTerm}.
     */
    protected void performDirectChildPolicies(TermServices services,
                                              PosInOccurrence applicationPosInOccurrence,
-                                             Term applicationTerm,
+                                             JavaDLTerm applicationTerm,
                                              Rule rule,
                                              Goal goal,
                                              Object hint,
-                                             Term tacletTerm,
+                                             JavaDLTerm tacletTerm,
                                              Operator newTermOp,
-                                             ImmutableArray<Term> newTermSubs,
+                                             ImmutableArray<JavaDLTerm> newTermSubs,
                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                             JavaBlock newTermJavaBlock,
+                                             ModalContent newTermJavaBlock,
                                              Map<Name, ChildTermLabelPolicy> policies,
                                              Set<TermLabel> newLabels) {
-      for (Term child : applicationTerm.subs()) {
+      for (JavaDLTerm child : applicationTerm.subs()) {
          for (TermLabel label : child.getLabels()) {
             ChildTermLabelPolicy policy = policies.get(label.name());
             if (policy != null && policy.addLabel(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, child, label)) {
@@ -778,38 +779,38 @@ public class TermLabelManager {
     * Performs the given child and grandchild {@link ChildTermLabelPolicy} instances.
     * </p>
     * <p>
-    * This is a helper {@link Map} of {@link #instantiateLabels(Services, PosInOccurrence, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
+    * This is a helper {@link Map} of {@link #instantiateLabels(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
     * </p>
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-    * @param newTermSubs The optional children of the {@link Term} to create.
-    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
-    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param tacletTerm The optional {@link JavaDLTerm} in the taclet which is responsible to instantiate the new {@link JavaDLTerm} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link JavaDLTerm} to create.
+    * @param newTermSubs The optional children of the {@link JavaDLTerm} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link JavaDLTerm} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link JavaDLTerm} to create.
     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
-    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JavaDLTerm}.
     */
    protected void performChildAndGrandchildPolicies(final TermServices services,
                                                     final PosInOccurrence applicationPosInOccurrence,
-                                                    final Term applicationTerm,
+                                                    final JavaDLTerm applicationTerm,
                                                     final Rule rule,
                                                     final Goal goal,
                                                     final Object hint,
-                                                    final Term tacletTerm,
+                                                    final JavaDLTerm tacletTerm,
                                                     final Operator newTermOp,
-                                                    final ImmutableArray<Term> newTermSubs,
+                                                    final ImmutableArray<JavaDLTerm> newTermSubs,
                                                     final ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                    final JavaBlock newTermJavaBlock,
+                                                    final ModalContent newTermJavaBlock,
                                                     final Map<Name, ChildTermLabelPolicy> policies,
                                                     final Set<TermLabel> newLabels) {
       applicationTerm.execPreOrder(new DefaultVisitor() {
          @Override
-         public void visit(Term visited) {
+         public void visit(JavaDLTerm visited) {
             if (visited != applicationTerm) {
                for (TermLabel label : visited.getLabels()) {
                   ChildTermLabelPolicy policy = policies.get(label.name());
@@ -827,39 +828,39 @@ public class TermLabelManager {
     * Performs the given child and grandchild {@link TermLabelUpdate} instances.
     * </p>
     * <p>
-    * This is a helper {@link Map} of {@link #instantiateLabels(Services, PosInOccurrence, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
+    * This is a helper {@link Map} of {@link #instantiateLabels(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
-    * @param modalityTerm The optional modality {@link Term}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param modalityTerm The optional modality {@link JavaDLTerm}.
     * @param rule The {@link Rule} which is applied.
     * @param ruleApp The {@link RuleApp} which is currently performed.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-    * @param newTermSubs The optional children of the {@link Term} to create.
-    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
-    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param tacletTerm The optional {@link JavaDLTerm} in the taclet which is responsible to instantiate the new {@link JavaDLTerm} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link JavaDLTerm} to create.
+    * @param newTermSubs The optional children of the {@link JavaDLTerm} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link JavaDLTerm} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link JavaDLTerm} to create.
     * @param updater The {@link TermLabelUpdate} instances to perform.
-    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JavaDLTerm}.
     */
    protected void performUpdater(TermLabelState state,
                                  Services services,
                                  PosInOccurrence applicationPosInOccurrence,
-                                 Term applicationTerm,
-                                 Term modalityTerm,
+                                 JavaDLTerm applicationTerm,
+                                 JavaDLTerm modalityTerm,
                                  Rule rule,
                                  RuleApp ruleApp,
                                  Goal goal,
                                  Object hint,
-                                 Term tacletTerm,
+                                 JavaDLTerm tacletTerm,
                                  Operator newTermOp,
-                                 ImmutableArray<Term> newTermSubs,
+                                 ImmutableArray<JavaDLTerm> newTermSubs,
                                  ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                 JavaBlock newTermJavaBlock,
+                                 ModalContent newTermJavaBlock,
                                  ImmutableList<TermLabelUpdate> updater,
                                  Set<TermLabel> newLabels) {
       for (TermLabelUpdate update : updater) {
@@ -868,24 +869,24 @@ public class TermLabelManager {
    }
    
    /**
-    * Refactors all labels on the {@link PosInOccurrence} in the given {@link Term} of a {@link SequentFormula}.
+    * Refactors all labels on the {@link PosInOccurrence} in the given {@link JavaDLTerm} of a {@link SequentFormula}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
-    * @return The updated application {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
+    * @return The updated application {@link JavaDLTerm}.
     */
-   public static Term refactorSequentFormula(TermLabelState state,
+   public static JavaDLTerm refactorSequentFormula(TermLabelState state,
                                              Services services,
-                                             Term sequentFormula,
+                                             JavaDLTerm sequentFormula,
                                              PosInOccurrence applicationPosInOccurrence,
                                              Rule rule,
                                              Goal goal,
                                              Object hint,
-                                             Term tacletTerm) {
+                                             JavaDLTerm tacletTerm) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
          return manager.refactorSequentFormula(state, services, sequentFormula, applicationPosInOccurrence, goal, hint, rule, tacletTerm);
@@ -896,30 +897,30 @@ public class TermLabelManager {
    }
 
    /**
-    * Refactors all labels on the {@link PosInOccurrence} in the given {@link Term} of a {@link SequentFormula}.
+    * Refactors all labels on the {@link PosInOccurrence} in the given {@link JavaDLTerm} of a {@link SequentFormula}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
     * @param rule The {@link Rule} which is applied.
-    * @param tacletTerm The optional taclet {@link Term}.
-    * @return The updated application {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
+    * @return The updated application {@link JavaDLTerm}.
     */
-   public Term refactorSequentFormula(TermLabelState state,
+   public JavaDLTerm refactorSequentFormula(TermLabelState state,
                                       Services services,
-                                      Term sequentFormula,
+                                      JavaDLTerm sequentFormula,
                                       PosInOccurrence applicationPosInOccurrence,
                                       Goal goal,
                                       Object hint,
                                       Rule rule,
-                                      Term tacletTerm) {
+                                      JavaDLTerm tacletTerm) {
       final PosInTerm pos = applicationPosInOccurrence.posInTerm();
-      final Term oldTerm = pos.getSubTerm(sequentFormula);
+      final JavaDLTerm oldTerm = pos.getSubTerm(sequentFormula);
       // Compute active refactorings
       RefactoringsContainer refactorings = computeRefactorings(state, services, applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
       // Perform refactoring
-      Term newTerm = refactorApplicationTerm(state, services, applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm, refactorings, services.getTermFactory());
+      JavaDLTerm newTerm = refactorApplicationTerm(state, services, applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm, refactorings, services.getTermFactory());
       if (newTerm != null && !newTerm.equals(oldTerm)) {
          return replaceTerm(state, applicationPosInOccurrence, newTerm, services.getTermFactory(), refactorings.getChildAndGrandchildRefactoringsAndParents(), services, applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
       }
@@ -942,21 +943,21 @@ public class TermLabelManager {
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
-    * @return The updated application {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
+    * @return The updated application {@link JavaDLTerm}.
     */
-   public static Term refactorTerm(TermLabelState state,
+   public static JavaDLTerm refactorTerm(TermLabelState state,
                                    Services services,
                                    PosInOccurrence applicationPosInOccurrence,
-                                   Term applicationTerm,
+                                   JavaDLTerm applicationTerm,
                                    Rule rule,
                                    Goal goal,
                                    Object hint,
-                                   Term tacletTerm) {
+                                   JavaDLTerm tacletTerm) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
          return manager.refactorTerm(state, services, applicationPosInOccurrence, applicationTerm, goal, hint, rule, tacletTerm);
@@ -967,29 +968,29 @@ public class TermLabelManager {
    }
 
    /**
-    * Refactors all labels in the given application {@link Term}.
+    * Refactors all labels in the given application {@link JavaDLTerm}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
     * @param rule The {@link Rule} which is applied.
-    * @param tacletTerm The optional taclet {@link Term}.
-    * @return The updated application {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
+    * @return The updated application {@link JavaDLTerm}.
     */
-   public Term refactorTerm(TermLabelState state,
+   public JavaDLTerm refactorTerm(TermLabelState state,
                             Services services,
                             PosInOccurrence applicationPosInOccurrence,
-                            Term applicationTerm,
+                            JavaDLTerm applicationTerm,
                             Goal goal,
                             Object hint,
                             Rule rule,
-                            Term tacletTerm) {
+                            JavaDLTerm tacletTerm) {
       // Compute active refactorings
       RefactoringsContainer refactorings = computeRefactorings(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
       // Refactor application term
-      Term newApplicationTerm = refactorApplicationTerm(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, refactorings, services.getTermFactory());
+      JavaDLTerm newApplicationTerm = refactorApplicationTerm(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, refactorings, services.getTermFactory());
       return newApplicationTerm != null ? newApplicationTerm : applicationTerm;
    }
 
@@ -1004,11 +1005,11 @@ public class TermLabelManager {
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
     */
    public static void refactorGoal(TermLabelState state,
                                    Services services,
@@ -1016,10 +1017,10 @@ public class TermLabelManager {
                                    Rule rule,
                                    Goal goal,
                                    Object hint,
-                                   Term tacletTerm) {
+                                   JavaDLTerm tacletTerm) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
-         Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+         JavaDLTerm applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
          manager.refactorGoal(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
       }
    }
@@ -1035,32 +1036,32 @@ public class TermLabelManager {
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
     */
    public void refactorGoal(TermLabelState state,
                             Services services,
                             PosInOccurrence applicationPosInOccurrence,
-                            Term applicationTerm,
+                            JavaDLTerm applicationTerm,
                             Rule rule,
                             Goal goal,
                             Object hint,
-                            Term tacletTerm) {
+                            JavaDLTerm tacletTerm) {
       // Compute active refactorings
       RefactoringsContainer refactorings = computeRefactorings(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
       // Refactor application term
       final TermFactory tf = services.getTermFactory();
-      Term newApplicationTerm = refactorApplicationTerm(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, refactorings, tf);
+      JavaDLTerm newApplicationTerm = refactorApplicationTerm(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, refactorings, tf);
       if (newApplicationTerm != null && !newApplicationTerm.equals(applicationTerm)) {
-         Term root = replaceTerm(state, applicationPosInOccurrence, newApplicationTerm, tf, refactorings.getChildAndGrandchildRefactoringsAndParents(), services, applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
+         JavaDLTerm root = replaceTerm(state, applicationPosInOccurrence, newApplicationTerm, tf, refactorings.getChildAndGrandchildRefactoringsAndParents(), services, applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
          goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
       }
       else if (!refactorings.getChildAndGrandchildRefactoringsAndParents().isEmpty()) {
-         Term root = replaceTerm(state, applicationPosInOccurrence, applicationTerm, tf, refactorings.getChildAndGrandchildRefactoringsAndParents(), services, applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
+         JavaDLTerm root = replaceTerm(state, applicationPosInOccurrence, applicationTerm, tf, refactorings.getChildAndGrandchildRefactoringsAndParents(), services, applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
          goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
       }
       // Do sequent refactoring if required
@@ -1083,11 +1084,11 @@ public class TermLabelManager {
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
     */
    public static void refactorSequent(TermLabelState state,
                                       Services services,
@@ -1095,10 +1096,10 @@ public class TermLabelManager {
                                       Rule rule,
                                       Goal goal,
                                       Object hint,
-                                      Term tacletTerm) {
+                                      JavaDLTerm tacletTerm) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
-         Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+         JavaDLTerm applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
          manager.refactorSequent(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
       }
    }
@@ -1115,21 +1116,21 @@ public class TermLabelManager {
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
     */
    public void refactorSequent(TermLabelState state,
                                Services services,
                                PosInOccurrence applicationPosInOccurrence,
-                               Term applicationTerm,
+                               JavaDLTerm applicationTerm,
                                Rule rule,
                                Goal goal,
                                Object hint,
-                               Term tacletTerm) {
+                               JavaDLTerm tacletTerm) {
       // Compute active refactorings
       RefactoringsContainer refactorings = computeRefactorings(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
       // Do sequent refactoring if required
@@ -1141,26 +1142,26 @@ public class TermLabelManager {
    }
    
    /**
-    * Replaces the {@link Term} at the specified {@link PosInOccurrence}.
+    * Replaces the {@link JavaDLTerm} at the specified {@link PosInOccurrence}.
     * @param state The {@link TermLabelState} of the current rule application.
-    * @param pio The {@link PosInOccurrence} to replace {@link Term} at.
-    * @param newTerm The new {@link Term} to set.
+    * @param pio The {@link PosInOccurrence} to replace {@link JavaDLTerm} at.
+    * @param newTerm The new {@link JavaDLTerm} to set.
     * @param tf The {@link GenericTermFactory} to use.
     * @param refactorings The {@link RefactoringsContainer} to consider.
-    * @return The root of the {@link PosInOccurrence} containing the new {@link Term} at the specified {@link PosInOccurrence}.
+    * @return The root of the {@link PosInOccurrence} containing the new {@link JavaDLTerm} at the specified {@link PosInOccurrence}.
     */
-   protected Term replaceTerm(TermLabelState state,
+   protected JavaDLTerm replaceTerm(TermLabelState state,
                               PosInOccurrence pio, 
-                              Term newTerm, 
+                              JavaDLTerm newTerm, 
                               TermFactory tf, 
                               ImmutableList<TermLabelRefactoring> parentRefactorings,
                               Services services,
                               PosInOccurrence applicationPosInOccurrence,
-                              Term applicationTerm,
+                              JavaDLTerm applicationTerm,
                               Rule rule,
                               Goal goal,
                               Object hint,
-                              Term tacletTerm) {
+                              JavaDLTerm tacletTerm) {
       do {
          if (pio.isTopLevel()) {
             pio = null;
@@ -1168,7 +1169,7 @@ public class TermLabelManager {
          else {
             int childIndex = pio.getIndex();
             pio = pio.up();
-            Term newChild = newTerm;
+            JavaDLTerm newChild = newTerm;
             newTerm = pio.subTerm();
             ImmutableArray<TermLabel> newLabels;
             if (!parentRefactorings.isEmpty()) {
@@ -1177,12 +1178,12 @@ public class TermLabelManager {
             else {
                newLabels = newTerm.getLabels();
             }
-            Term[] newSubs = newTerm.subs().toArray(new Term[newTerm.arity()]);
+            JavaDLTerm[] newSubs = newTerm.subs().toArray(new JavaDLTerm[newTerm.arity()]);
             newSubs[childIndex] = newChild;
-            ImmutableArray<Term> newSubsImmutable = new ImmutableArray<Term>(newSubs);
+            ImmutableArray<JavaDLTerm> newSubsImmutable = new ImmutableArray<JavaDLTerm>(newSubs);
 
             if (!newSubsImmutable.equals(newTerm.subs()) || !newLabels.equals(newTerm.getLabels())) {
-               newTerm = tf.createTerm(newTerm.op(), newSubsImmutable, newTerm.boundVars(), newTerm.javaBlock(), newLabels);
+               newTerm = tf.createTerm(newTerm.op(), newSubsImmutable, newTerm.boundVars(), newTerm.modalContent(), newLabels);
             }
          }
       } while (pio != null);
@@ -1193,22 +1194,22 @@ public class TermLabelManager {
     * Computes the {@link TermLabelRefactoring} to consider.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
     * @return The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
     */
    protected RefactoringsContainer computeRefactorings(TermLabelState state,
                                                        Services services,
                                                        PosInOccurrence applicationPosInOccurrence,
-                                                       Term applicationTerm,
+                                                       JavaDLTerm applicationTerm,
                                                        Rule rule,
                                                        Goal goal,
                                                        Object hint,
-                                                       Term tacletTerm) {
+                                                       JavaDLTerm tacletTerm) {
       ImmutableList<TermLabelRefactoring> sequentRefactorings = ImmutableSLList.nil();
       ImmutableList<TermLabelRefactoring> belowUpdatesRefactorings = ImmutableSLList.nil();      
       ImmutableList<TermLabelRefactoring> childAndGrandchildRefactorings = ImmutableSLList.nil();
@@ -1259,7 +1260,7 @@ public class TermLabelManager {
    }
    
    /**
-    * Utility class used by {@link TermLabelManager#computeRefactorings(TermServices, PosInOccurrence, Term, Rule, Goal, Term)}.
+    * Utility class used by {@link TermLabelManager#computeRefactorings(TermServices, PosInOccurrence, JavaDLTerm, Rule, Goal, JavaDLTerm)}.
     * @author Martin Hentschel
     */
    protected static class RefactoringsContainer {
@@ -1362,52 +1363,52 @@ public class TermLabelManager {
     * Refactors the labels of the application term.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
     * @param refactorings The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
-    * @return The new application {@link Term} or {@code null} if no refactoring was performed.
+    * @return The new application {@link JavaDLTerm} or {@code null} if no refactoring was performed.
     */
-   protected Term refactorApplicationTerm(TermLabelState state,
+   protected JavaDLTerm refactorApplicationTerm(TermLabelState state,
                                           Services services,
                                           PosInOccurrence applicationPosInOccurrence,
-                                          Term applicationTerm,
+                                          JavaDLTerm applicationTerm,
                                           Rule rule,
                                           Goal goal,
                                           Object hint,
-                                          Term tacletTerm,
+                                          JavaDLTerm tacletTerm,
                                           RefactoringsContainer refactorings,
                                           TermFactory tf) {
       if (applicationTerm != null && 
           (!refactorings.getDirectChildRefactorings().isEmpty() || 
            !refactorings.getChildAndGrandchildRefactorings().isEmpty() ||
            !refactorings.getBelowUpdatesRefactorings().isEmpty())) {
-         Term newApplicationTerm = applicationTerm;
+         JavaDLTerm newApplicationTerm = applicationTerm;
          // Do direct child refactoring if required
          if (!refactorings.getDirectChildRefactorings().isEmpty()) {
             boolean changed = false;
-            Term[] newSubs = new Term[newApplicationTerm.arity()];
+            JavaDLTerm[] newSubs = new JavaDLTerm[newApplicationTerm.arity()];
             for (int i = 0; i < newSubs.length; i++) {
-               Term sub = newApplicationTerm.sub(i);
+               JavaDLTerm sub = newApplicationTerm.sub(i);
                ImmutableArray<TermLabel> newLabels = performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sub, refactorings.getDirectChildRefactorings());
-               newSubs[i] = tf.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.javaBlock(), newLabels);
+               newSubs[i] = tf.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.modalContent(), newLabels);
                if (!newSubs[i].equals(sub)) {
                   changed = true;
                }
             }
             newApplicationTerm = changed ?
-                                 tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels()) :
+                                 tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.modalContent(), newApplicationTerm.getLabels()) :
                                  applicationTerm;
          }
          // Do below updates refactoring
          if (!refactorings.getBelowUpdatesRefactorings().isEmpty()) {
-            Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(newApplicationTerm);
+            Pair<ImmutableList<JavaDLTerm>,JavaDLTerm> pair = TermBuilder.goBelowUpdates2(newApplicationTerm);
             ImmutableArray<TermLabel> newLabels = performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, pair.second, refactorings.getBelowUpdatesRefactorings());
             if (!newLabels.equals(pair.second.getLabels())) {
-               Term newModality = tf.createTerm(pair.second.op(), pair.second.subs(), pair.second.boundVars(), pair.second.javaBlock(), newLabels);
+               JavaDLTerm newModality = tf.createTerm(pair.second.op(), pair.second.subs(), pair.second.boundVars(), pair.second.modalContent(), newLabels);
                ImmutableArray<TermLabel> applicationLabels = newApplicationTerm.getLabels();
                newApplicationTerm = services.getTermBuilder().applyParallel(pair.first, newModality);
                if (!applicationLabels.isEmpty()) {
@@ -1419,16 +1420,16 @@ public class TermLabelManager {
          ImmutableList<TermLabelRefactoring> allChildAndGrandchildRefactorings = refactorings.getAllApplicationChildAndGrandchildRefactorings();
          if (!allChildAndGrandchildRefactorings.isEmpty()) {
             boolean changed = false;
-            Term[] newSubs = new Term[newApplicationTerm.arity()];
+            JavaDLTerm[] newSubs = new JavaDLTerm[newApplicationTerm.arity()];
             for (int i = 0; i < newSubs.length; i++) {
-               Term sub = newApplicationTerm.sub(i);
+               JavaDLTerm sub = newApplicationTerm.sub(i);
                newSubs[i] = refactorLabelsRecursive(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sub, allChildAndGrandchildRefactorings);
                if (!newSubs[i].equals(sub)) {
                   changed = true;
                }
             }
             newApplicationTerm = changed ?
-                                 tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels()) :
+                                 tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.modalContent(), newApplicationTerm.getLabels()) :
                                  applicationTerm;
          }
          return newApplicationTerm;
@@ -1442,12 +1443,12 @@ public class TermLabelManager {
     * Performs a {@link TermLabel} refactoring on the given {@link Semisequent}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
     * @param semisequent The {@link Semisequent} to refactor.
     * @param inAntec {@code true} antecedent, {@code false} succedent.
     * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
@@ -1455,49 +1456,49 @@ public class TermLabelManager {
    protected void refactorSemisequent(TermLabelState state,
                                       Services services,
                                       PosInOccurrence applicationPosInOccurrence,
-                                      Term applicationTerm,
+                                      JavaDLTerm applicationTerm,
                                       Rule rule,
                                       Goal goal,
                                       Object hint,
-                                      Term tacletTerm,
+                                      JavaDLTerm tacletTerm,
                                       Semisequent semisequent,
                                       boolean inAntec,
                                       ImmutableList<TermLabelRefactoring> activeRefactorings) {
       for (SequentFormula sfa : semisequent) {
-         Term updatedTerm = refactorLabelsRecursive(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(), activeRefactorings);
+         JavaDLTerm updatedTerm = refactorLabelsRecursive(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(), activeRefactorings);
          goal.changeFormula(new SequentFormula(updatedTerm),
                             new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
       }
    }
 
    /**
-    * Performs a {@link TermLabel} refactoring recursively on the given {@link Term}.
+    * Performs a {@link TermLabel} refactoring recursively on the given {@link JavaDLTerm}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
-    * @param term The {@link Term} to refactor.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
+    * @param term The {@link JavaDLTerm} to refactor.
     * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
-    * @return The refactored {@link Term} in which the {@link TermLabel}s may have changed.
+    * @return The refactored {@link JavaDLTerm} in which the {@link TermLabel}s may have changed.
     */
-   protected Term refactorLabelsRecursive(TermLabelState state,
+   protected JavaDLTerm refactorLabelsRecursive(TermLabelState state,
                                           Services services,
                                           PosInOccurrence applicationPosInOccurrence,
-                                          Term applicationTerm,
+                                          JavaDLTerm applicationTerm,
                                           Rule rule,
                                           Goal goal,
                                           Object hint,
-                                          Term tacletTerm,
-                                          Term term,
+                                          JavaDLTerm tacletTerm,
+                                          JavaDLTerm term,
                                           ImmutableList<TermLabelRefactoring> activeRefactorings) {
       boolean subsChanged = false;
-      Term[] newSubs = new Term[term.arity()];
+      JavaDLTerm[] newSubs = new JavaDLTerm[term.arity()];
       for (int i = 0; i < newSubs.length; i++) {
-         Term oldSub = term.sub(i);
+         JavaDLTerm oldSub = term.sub(i);
          newSubs[i] = refactorLabelsRecursive(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, oldSub, activeRefactorings);
          if (!newSubs[i].equals(oldSub)) {
             subsChanged = true;
@@ -1505,33 +1506,33 @@ public class TermLabelManager {
       }
       ImmutableArray<TermLabel> newLabels = performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, term, activeRefactorings);
       return subsChanged || !newLabels.equals(term.getLabels()) ? 
-             services.getTermFactory().createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), newLabels) :
+             services.getTermFactory().createTerm(term.op(), newSubs, term.boundVars(), term.modalContent(), newLabels) :
              term;
    }
 
    /**
-    * Computes the new labels as part of the refactoring for the given {@link Term}.
+    * Computes the new labels as part of the refactoring for the given {@link JavaDLTerm}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional taclet {@link Term}.
-    * @param term The {@link Term} to refactor.
+    * @param tacletTerm The optional taclet {@link JavaDLTerm}.
+    * @param term The {@link JavaDLTerm} to refactor.
     * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
-    * @return The new {@link TermLabel} which should be used for the given {@link Term}.
+    * @return The new {@link TermLabel} which should be used for the given {@link JavaDLTerm}.
     */
    protected ImmutableArray<TermLabel> performRefactoring(TermLabelState state,
                                                           Services services,
                                                           PosInOccurrence applicationPosInOccurrence,
-                                                          Term applicationTerm,
+                                                          JavaDLTerm applicationTerm,
                                                           Rule rule,
                                                           Goal goal,
                                                           Object hint,
-                                                          Term tacletTerm,
-                                                          Term term,
+                                                          JavaDLTerm tacletTerm,
+                                                          JavaDLTerm term,
                                                           ImmutableList<TermLabelRefactoring> activeRefactorings) {
       // Create list with all old labels
       List<TermLabel> newLabels = new LinkedList<TermLabel>();
@@ -1721,7 +1722,7 @@ public class TermLabelManager {
    public static TermLabel findInnerMostParentLabel(PosInOccurrence pio, Name termLabelName) {
       TermLabel label = null;
       while (label == null && pio != null) {
-         Term subTerm = pio.subTerm();
+         JavaDLTerm subTerm = pio.subTerm();
          label = subTerm.getLabel(termLabelName);
          pio = pio.isTopLevel() ? null : pio.up();
       }
@@ -1765,7 +1766,7 @@ public class TermLabelManager {
                               Services services, 
                               SequentFormula rejectedSF, 
                               boolean inAntecedent) {
-      final Term rejectedTerm = rejectedSF.formula();
+      final JavaDLTerm rejectedTerm = rejectedSF.formula();
       if (rejectedTerm.hasLabels()) {
          // Search existing SequentFormula
          Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
@@ -1777,7 +1778,7 @@ public class TermLabelManager {
          });
          if (existingSF != null) {
             // Create list of new labels
-            Term existingTerm = existingSF.formula();
+            JavaDLTerm existingTerm = existingSF.formula();
             List<TermLabel> mergedLabels = new LinkedList<TermLabel>();
             CollectionUtil.addAll(mergedLabels, existingTerm.getLabels());
             boolean labelsChanged = false;
@@ -1794,7 +1795,7 @@ public class TermLabelManager {
             }
             // Replace sequent formula
             if (labelsChanged) {
-               Term newTerm = services.getTermFactory().createTerm(existingTerm.op(), existingTerm.subs(), existingTerm.boundVars(), existingTerm.javaBlock(), new ImmutableArray<TermLabel>(mergedLabels));
+               JavaDLTerm newTerm = services.getTermFactory().createTerm(existingTerm.op(), existingTerm.subs(), existingTerm.boundVars(), existingTerm.modalContent(), new ImmutableArray<TermLabel>(mergedLabels));
                SequentChangeInfo sci = currentSequent.sequent().changeFormula(new SequentFormula(newTerm), new PosInOccurrence(existingSF, PosInTerm.getTopLevel(), inAntecedent));
                currentSequent.combine(sci);
             }

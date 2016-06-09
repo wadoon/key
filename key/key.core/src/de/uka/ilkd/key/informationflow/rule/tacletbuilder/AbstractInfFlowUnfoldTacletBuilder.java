@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -49,7 +49,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
     private IFProofObligationVars ifVars;
 
-    private Term replacewith;
+    private JavaDLTerm replacewith;
 
 
     public AbstractInfFlowUnfoldTacletBuilder(Services services) {
@@ -62,7 +62,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     }
 
 
-    public void setReplacewith(Term replacewith) {
+    public void setReplacewith(JavaDLTerm replacewith) {
         this.replacewith = replacewith;
     }
 
@@ -77,12 +77,12 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         // create find term and replace information flow variables by
         // schema variables
-        final Term find = createFindTerm(ifVars);
-        Term schemaFind = replace(find, ifVars, schemaVars, services);
+        final JavaDLTerm find = createFindTerm(ifVars);
+        JavaDLTerm schemaFind = replace(find, ifVars, schemaVars, services);
 
         // create replacewith term and replace information flow variables by
         // schema variables in the replacewith term, too
-        Term schemaReplaceWith = replace(replacewith, ifVars, schemaVars, services);
+        JavaDLTerm schemaReplaceWith = replace(replacewith, ifVars, schemaVars, services);
 
         // collect quantifiable variables of the find term and replacewith term
         // and replace all quantifiable variables by schema variables
@@ -126,32 +126,32 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         Function n = services.getTheories().getHeapLDT().getNull();
 
         // generate a new schema variable for any pre variable
-        Term selfAtPreSV =
+        JavaDLTerm selfAtPreSV =
                 createTermSV(poVars.pre.self, schemaPrefix, services);
-        ImmutableList<Term> localVarsAtPreSVs =
+        ImmutableList<JavaDLTerm> localVarsAtPreSVs =
                 createTermSV(poVars.pre.localVars, schemaPrefix, services);
-        Term guardAtPreSV =
+        JavaDLTerm guardAtPreSV =
                 createTermSV(poVars.pre.guard, schemaPrefix, services);
-        Term resAtPreSV = null;
-        Term excAtPreSV = null;
-        Term heapAtPreSV =
+        JavaDLTerm resAtPreSV = null;
+        JavaDLTerm excAtPreSV = null;
+        JavaDLTerm heapAtPreSV =
                 createTermSV(poVars.pre.heap, schemaPrefix, services);
-        Term mbyAtPreSV =
+        JavaDLTerm mbyAtPreSV =
                 createTermSV(poVars.pre.mbyAtPre, schemaPrefix, services);
 
         // generate a new schema variable only for those post variables
         // which do not equal the corresponding pre variable; else use
         // the pre schema variable
-        Term selfAtPostSV = (poVars.pre.self == poVars.post.self ?
+        JavaDLTerm selfAtPostSV = (poVars.pre.self == poVars.post.self ?
                              selfAtPreSV :
                              createTermSV(poVars.post.self, schemaPrefix, services));
 
-        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
-        Iterator<Term> appDataPreLocalVarsIt = poVars.pre.localVars.iterator();
-        Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
-        for (Term appDataPostLocalVar : poVars.post.localVars) {
-            Term appDataPreLocalVar = appDataPreLocalVarsIt.next();
-            Term localPreVar = schemaLocalVarsAtPreIt.next();
+        ImmutableList<JavaDLTerm> localVarsAtPostSVs = ImmutableSLList.<JavaDLTerm>nil();
+        Iterator<JavaDLTerm> appDataPreLocalVarsIt = poVars.pre.localVars.iterator();
+        Iterator<JavaDLTerm> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
+        for (JavaDLTerm appDataPostLocalVar : poVars.post.localVars) {
+            JavaDLTerm appDataPreLocalVar = appDataPreLocalVarsIt.next();
+            JavaDLTerm localPreVar = schemaLocalVarsAtPreIt.next();
             if (appDataPostLocalVar == appDataPreLocalVar) {
                 localVarsAtPostSVs = localVarsAtPostSVs.append(localPreVar);
             } else {
@@ -162,18 +162,18 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             }
         }
 
-        Term guardAtPostSV = (poVars.pre.guard == poVars.post.guard) ?
+        JavaDLTerm guardAtPostSV = (poVars.pre.guard == poVars.post.guard) ?
                              guardAtPreSV :
                              createTermSV(poVars.post.guard, schemaPrefix, services);
-        Term resAtPostSV = (poVars.post.result == null ||
+        JavaDLTerm resAtPostSV = (poVars.post.result == null ||
                             poVars.post.result.op().equals(n)) ?
                            null :
                            createTermSV(poVars.post.result, schemaPrefix, services);
-        Term excAtPostSV = (poVars.post.exception == null ||
+        JavaDLTerm excAtPostSV = (poVars.post.exception == null ||
                             poVars.post.exception.op().equals(n)) ?
                            null :
                            createTermSV(poVars.post.exception, schemaPrefix, services);
-        Term heapAtPostSV = (poVars.pre.heap == poVars.post.heap ?
+        JavaDLTerm heapAtPostSV = (poVars.pre.heap == poVars.post.heap ?
                              heapAtPreSV :
                              createTermSV(poVars.post.heap, schemaPrefix, services));
 
@@ -193,39 +193,39 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     }
 
 
-    private static Term replace(Term term,
+    private static JavaDLTerm replace(JavaDLTerm term,
                                 IFProofObligationVars origVars,
                                 IFProofObligationVars schemaVars,
                                 Services services) {
-        Term intermediateResult = replace(term, origVars.c1, schemaVars.c1, services);
+        JavaDLTerm intermediateResult = replace(term, origVars.c1, schemaVars.c1, services);
         return replace(intermediateResult, origVars.c2, schemaVars.c2, services);
     }
 
 
-    private static Term replace(Term term,
+    private static JavaDLTerm replace(JavaDLTerm term,
                                 ProofObligationVars origVars,
                                 ProofObligationVars schemaVars,
                                 Services services) {
-        Term intermediateResult = replace(term, origVars.pre, schemaVars.pre, services);
+        JavaDLTerm intermediateResult = replace(term, origVars.pre, schemaVars.pre, services);
         return replace(intermediateResult, origVars.post, schemaVars.post, services);
     }
 
 
-    private static Term replace(Term term,
+    private static JavaDLTerm replace(JavaDLTerm term,
                                 StateVars origVars,
                                 StateVars schemaVars,
                                 Services services) {
-        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
+        LinkedHashMap<JavaDLTerm, JavaDLTerm> map = new LinkedHashMap<JavaDLTerm, JavaDLTerm>();
 
         Pair<StateVars, StateVars> vars = filter(origVars, schemaVars);
         origVars = vars.first;
         schemaVars = vars.second;
         assert origVars.termList.size() == schemaVars.termList.size();
-        Iterator<Term> origVarsIt = origVars.termList.iterator();
-        Iterator<Term> schemaVarsIt = schemaVars.termList.iterator();
+        Iterator<JavaDLTerm> origVarsIt = origVars.termList.iterator();
+        Iterator<JavaDLTerm> schemaVarsIt = schemaVars.termList.iterator();
         while (origVarsIt.hasNext()) {
-            Term origTerm = origVarsIt.next();
-            Term svTerm = schemaVarsIt.next();
+            JavaDLTerm origTerm = origVarsIt.next();
+            JavaDLTerm svTerm = schemaVarsIt.next();
             if (origTerm != null && svTerm != null) {
                 assert svTerm.sort().equals(origTerm.sort()) ||
                        svTerm.sort().extendsSorts().contains(origTerm.sort()) :
@@ -237,7 +237,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             }
         }
         OpReplacer or = new OpReplacer(map, services.getTermFactory());
-        Term result = or.replace(term);
+        JavaDLTerm result = or.replace(term);
 
         return result;
     }
@@ -256,13 +256,13 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         if (origVars.termList.size() == schemaVars.termList.size()) {
             return schemaVars;
         }
-        Term self = schemaVars.self;
-        Term guard = schemaVars.guard;
-        ImmutableList<Term> localVars = schemaVars.localVars;
-        Term result = schemaVars.result;
-        Term exception = schemaVars.exception;
-        Term heap = schemaVars.heap;
-        Term mbyAtPre = schemaVars.mbyAtPre;
+        JavaDLTerm self = schemaVars.self;
+        JavaDLTerm guard = schemaVars.guard;
+        ImmutableList<JavaDLTerm> localVars = schemaVars.localVars;
+        JavaDLTerm result = schemaVars.result;
+        JavaDLTerm exception = schemaVars.exception;
+        JavaDLTerm heap = schemaVars.heap;
+        JavaDLTerm mbyAtPre = schemaVars.mbyAtPre;
         if (origVars.self == null) {
             self = null;
         }
@@ -272,7 +272,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         if (origVars.localVars == null) {
             localVars = null;
         } else if (origVars.localVars.isEmpty()) {
-            localVars = ImmutableSLList.<Term>nil();
+            localVars = ImmutableSLList.<JavaDLTerm>nil();
         }
         if (origVars.result == null) {
             result = null;
@@ -293,5 +293,5 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     abstract Name getTacletName();
 
 
-    abstract Term createFindTerm(IFProofObligationVars ifVars);
+    abstract JavaDLTerm createFindTerm(IFProofObligationVars ifVars);
 }

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.rule.label;
 
 import java.util.Set;
 
+import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
@@ -27,9 +28,8 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -61,17 +61,17 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
    public void updateLabels(TermLabelState state,
                             Services services,
                             PosInOccurrence applicationPosInOccurrence,
-                            Term applicationTerm,
-                            Term modalityTerm,
+                            JavaDLTerm applicationTerm,
+                            JavaDLTerm modalityTerm,
                             Rule rule,
                             RuleApp ruleApp,
                             Goal goal,
                             Object hint,
-                            Term tacletTerm,
+                            JavaDLTerm tacletTerm,
                             Operator newTermOp,
-                            ImmutableArray<Term> newTermSubs,
+                            ImmutableArray<JavaDLTerm> newTermSubs,
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                            JavaBlock newTermJavaBlock,
+                            ModalContent newTermJavaBlock,
                             Set<TermLabel> labels) {
       if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint) ||
           rule instanceof BlockContractRule && StringUtil.startsWith(hint, "ValidityModality: exceptionVar=")) {

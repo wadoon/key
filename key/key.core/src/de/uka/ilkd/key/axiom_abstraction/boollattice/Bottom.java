@@ -4,7 +4,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
@@ -30,7 +30,7 @@ public class Bottom extends BooleanDomainElem {
    }
 
    @Override
-   public Term getDefiningAxiom(Term varOrConst, Services services) {
+   public JavaDLTerm getDefiningAxiom(JavaDLTerm varOrConst, Services services) {
       TermBuilder tb = services.getTermBuilder();
       
       final Name freshVarName = new Name(tb.newName(varOrConst.sort()));
@@ -42,7 +42,7 @@ public class Bottom extends BooleanDomainElem {
       });
       LogicVariable freshVar = new LogicVariable(freshVarName, varOrConst.sort());
       
-      Term axiom = tb.equals(varOrConst, tb.var(freshVar));
+      JavaDLTerm axiom = tb.equals(varOrConst, tb.var(freshVar));
       axiom = tb.not(axiom);
       axiom = tb.all(freshVar, axiom);
       

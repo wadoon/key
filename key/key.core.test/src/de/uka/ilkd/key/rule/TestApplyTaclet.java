@@ -32,7 +32,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
@@ -143,7 +143,7 @@ public class TestApplyTaclet extends TestCase{
     
     
     public void testSuccTacletWithoutIf() {
-	Term fma = proof[0].root().sequent().succedent().getFirst().formula();
+	JavaDLTerm fma = proof[0].root().sequent().succedent().getFirst().formula();
 	NoPosTacletApp impright=TacletForTests.getRules().lookup("imp_right");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( impright );
@@ -168,7 +168,7 @@ public class TestApplyTaclet extends TestCase{
     
 
     public void testAddingRule() {
-	Term fma=proof[0].root().sequent().succedent().getFirst().formula();
+	JavaDLTerm fma=proof[0].root().sequent().succedent().getFirst().formula();
 	NoPosTacletApp imprightadd 
 	    = TacletForTests.getRules().lookup("TestApplyTaclet_imp_right_add");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
@@ -196,7 +196,7 @@ public class TestApplyTaclet extends TestCase{
 	ImmutableList<NoPosTacletApp> nfapp=goals.head().indexOfTaclets().getNoFindTaclet
 	    (new IHTacletFilter ( true, ImmutableSLList.<RuleSet>nil() ), 
 	     null);
-	Term aimpb=TacletForTests.parseTerm("A -> B");
+	JavaDLTerm aimpb=TacletForTests.parseTerm("A -> B");
 	assertTrue("Cut Rule should be inserted to TacletIndex.", nfapp.size()==1);
 	assertTrue("Inserted cut rule's b should be instantiated to A -> B.",
 		   nfapp.head().instantiations().getInstantiation
@@ -283,7 +283,7 @@ public class TestApplyTaclet extends TestCase{
 
     
     public void testAntecTacletWithoutIf() {
-	Term fma=proof[3].root().sequent().antecedent().getFirst().formula();
+	JavaDLTerm fma=proof[3].root().sequent().antecedent().getFirst().formula();
 	NoPosTacletApp impleft = TacletForTests.getRules().lookup("imp_left");
  	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( impleft );
@@ -344,7 +344,7 @@ public class TestApplyTaclet extends TestCase{
 	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
 	assertTrue("Too many or zero goals for contradiction.",goals.size()==1);	
 	Sequent seq=goals.head().sequent();
-	Term term=seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
+	JavaDLTerm term=seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
 	assertTrue(term.equals(TacletForTests.parseTerm("!B -> !A")));
     }
 
@@ -352,7 +352,7 @@ public class TestApplyTaclet extends TestCase{
     public void testNoFindTacletWithoutIf() {
 	NoPosTacletApp cut = TacletForTests.getRules().lookup("TestApplyTaclet_cut");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
-	Term t_c=TacletForTests.parseTerm("D");
+	JavaDLTerm t_c=TacletForTests.parseTerm("D");
  	tacletIndex.add ( cut );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
 	PosInOccurrence pos
@@ -432,7 +432,7 @@ public class TestApplyTaclet extends TestCase{
 	    goals=goals.tail();
 	    boolean executed=false;
 	    while (!executed && !rapplist.isEmpty()) {
-		IList<ImmMap<SchemaVariable,Term>>
+		IList<ImmMap<SchemaVariable,JavaDLTerm>>
 		    mrlist=((Taclet)(rapplist.head().rule())).matchIf(goal.node().sequent(), 
 								    rapplist.head().instantiations());
 		out="\n"+out+("List of if-seq matches:"+mrlist);
@@ -754,7 +754,7 @@ public class TestApplyTaclet extends TestCase{
 
 	assertTrue("Did not expect a match.", appList.size()==0);
 
-	Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
+	JavaDLTerm ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
 	SequentFormula ifformula =
 	    new SequentFormula ( ifterm );
 	ImmutableList<IfFormulaInstantiation> ifInsts =
@@ -896,8 +896,8 @@ public class TestApplyTaclet extends TestCase{
 	
 	Sequent correctSeq = proof[p_proof+1].root ().sequent ();
 
-	Term resultFormula  = goals.head().sequent().getFormulabyNr ( 1 ).formula ();
-	Term correctFormula = correctSeq.getFormulabyNr ( 1 ).formula ();
+	JavaDLTerm resultFormula  = goals.head().sequent().getFormulabyNr ( 1 ).formula ();
+	JavaDLTerm correctFormula = correctSeq.getFormulabyNr ( 1 ).formula ();
 
 	assertTrue("Wrong result. Expected:" + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + 
 	        " But was:"+ 
@@ -973,8 +973,8 @@ public class TestApplyTaclet extends TestCase{
         assertTrue("Expected one goal.",goals.size()==1);
         
         // the content of the diamond must not have changed 
-        ProgramElement expected = proof[22].root().sequent().getFormulabyNr(1).formula().javaBlock().program();
-        ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().sub(0).javaBlock().program();
+        ProgramElement expected = proof[22].root().sequent().getFormulabyNr(1).formula().modalContent().program();
+        ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().sub(0).modalContent().program();
         assertEquals("Context has been thrown away.",expected, is);
        
     }
@@ -1007,7 +1007,7 @@ public class TestApplyTaclet extends TestCase{
         ProgramElement expected = TacletForTests.parsePrg("{try{ ; while (1==1) {if (1==2) {break;}} return 1==3; " +
                         "int i=17; } catch (Exception e) { return null;}}");
                         
-        ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
+        ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().modalContent().program();
         assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable()));      
     }
     
@@ -1039,7 +1039,7 @@ public class TestApplyTaclet extends TestCase{
         ProgramElement expected = TacletForTests.parsePrg("{try{while (1==1) {if (1==2) {break;}} return 1==3; " +
                         "int i=17; } catch (Exception e) { return null;}}");
         
-        ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
+        ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().modalContent().program();
         assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable()));
     }
     

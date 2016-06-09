@@ -41,7 +41,7 @@ public interface PIOPathIterator extends IntIterator {
      * this method satisfies
      * <code>getPosInOccurrence().subTerm()==getSubTerm()</code>
      */
-    Term            getSubTerm         ();
+    JavaDLTerm            getSubTerm         ();
 
     /**
      * @return the number of the next child on the path, or

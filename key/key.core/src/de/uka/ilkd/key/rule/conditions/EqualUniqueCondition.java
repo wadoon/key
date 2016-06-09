@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -41,14 +41,14 @@ public final class EqualUniqueCondition implements VariableCondition {
     }
     
     
-    private static Term equalUnique(Term t1, Term t2, TermServices services) {
+    private static JavaDLTerm equalUnique(JavaDLTerm t1, JavaDLTerm t2, TermServices services) {
 	if(!(t1.op() instanceof Function 
 	     && t2.op() instanceof Function
 	     && ((Function)t1.op()).isUnique()
 	     && ((Function)t2.op()).isUnique())) {
 	    return null;
 	} else if(t1.op() == t2.op()) {
-	    Term result = services.getTermBuilder().tt();
+	    JavaDLTerm result = services.getTermBuilder().tt();
 	    for(int i = 0, n = t1.arity(); i < n; i++) {
 		result = services.getTermBuilder().and(result, services.getTermBuilder().equals(t1.sub(i), t2.sub(i)));
 	    }
@@ -65,14 +65,14 @@ public final class EqualUniqueCondition implements VariableCondition {
 	    		  	 MatchConditions mc, 
 	    		  	 Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
-	Term tInst   = (Term) svInst.getInstantiation(t);
-	Term t2Inst  = (Term) svInst.getInstantiation(t2);
-	Term resInst = (Term) svInst.getInstantiation(res);
+	JavaDLTerm tInst   = (JavaDLTerm) svInst.getInstantiation(t);
+	JavaDLTerm t2Inst  = (JavaDLTerm) svInst.getInstantiation(t2);
+	JavaDLTerm resInst = (JavaDLTerm) svInst.getInstantiation(res);
 	if(tInst == null || t2Inst == null) {
 	    return mc;
 	}
 	
-	Term properResInst = equalUnique(tInst, t2Inst, services);
+	JavaDLTerm properResInst = equalUnique(tInst, t2Inst, services);
 	if(properResInst == null) {
 	    return null;
 	} else if(resInst == null) {

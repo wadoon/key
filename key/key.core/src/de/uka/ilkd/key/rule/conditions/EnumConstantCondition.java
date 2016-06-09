@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.op.SchemaVariable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -61,9 +61,9 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
 
             if (subst instanceof FieldReference) {
                 progvar = ((FieldReference) subst).getProgramVariable();
-            } else if (subst instanceof Term
-                    && ((Term) subst).op() instanceof ProgramVariable) {
-                progvar = (ProgramVariable) ((Term) subst).op();
+            } else if (subst instanceof JavaDLTerm
+                    && ((JavaDLTerm) subst).op() instanceof ProgramVariable) {
+                progvar = (ProgramVariable) ((JavaDLTerm) subst).op();
             } else {
                 return false;
             }

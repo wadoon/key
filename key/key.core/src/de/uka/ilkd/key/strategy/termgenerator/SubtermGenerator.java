@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
@@ -28,7 +28,7 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 /**
- * Term generator that enumerates the subterms or subformulas of a given term.
+ * JavaDLTerm generator that enumerates the subterms or subformulas of a given term.
  * Similarly to <code>RecSubTermFeature</code>, a term feature can be given
  * that determines when traversal should be stopped, i.e., when one should not
  * descend further into a term.
@@ -50,7 +50,7 @@ public abstract class SubtermGenerator implements TermGenerator {
     public static TermGenerator leftTraverse(ProjectionToTerm cTerm,
                                              TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+            public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
                 return new LeftIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
             }
         };
@@ -63,27 +63,27 @@ public abstract class SubtermGenerator implements TermGenerator {
     public static TermGenerator rightTraverse(ProjectionToTerm cTerm,
                                               TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+            public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
                 return new RightIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
             }
         };
     }
 
-    protected Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected JavaDLTerm getTermInst(RuleApp app, PosInOccurrence pos, Goal goal) {
         return completeTerm.toTerm ( app, pos, goal );
     }
     
-    private boolean descendFurther(Term t, Services services) {
+    private boolean descendFurther(JavaDLTerm t, Services services) {
         return ! ( cond.compute ( t, services ) instanceof TopRuleAppCost );
     }
         
-    abstract class SubIterator implements Iterator<Term> {
-        protected ImmutableList<Term> termStack;
+    abstract class SubIterator implements Iterator<JavaDLTerm> {
+        protected ImmutableList<JavaDLTerm> termStack;
         
         protected final Services services;
 
-        public SubIterator(Term t, Services services) {
-            termStack = ImmutableSLList.<Term>nil().prepend ( t );
+        public SubIterator(JavaDLTerm t, Services services) {
+            termStack = ImmutableSLList.<JavaDLTerm>nil().prepend ( t );
             this.services = services;
         }
 
@@ -93,12 +93,12 @@ public abstract class SubtermGenerator implements TermGenerator {
     }
 
     class LeftIterator extends SubIterator {
-        public LeftIterator(Term t, Services services) {
+        public LeftIterator(JavaDLTerm t, Services services) {
             super ( t, services );
         }
 
-        public Term next() {
-            final Term res = termStack.head ();
+        public JavaDLTerm next() {
+            final JavaDLTerm res = termStack.head ();
             termStack = termStack.tail ();
             
             if ( descendFurther ( res, services ) ) {
@@ -119,12 +119,12 @@ public abstract class SubtermGenerator implements TermGenerator {
     }
 
     class RightIterator extends SubIterator {
-        public RightIterator(Term t, Services services) {
+        public RightIterator(JavaDLTerm t, Services services) {
             super ( t, services );
         }
 
-        public Term next() {
-            final Term res = termStack.head ();
+        public JavaDLTerm next() {
+            final JavaDLTerm res = termStack.head ();
             termStack = termStack.tail ();
             
             if ( descendFurther ( res, services ) ) {

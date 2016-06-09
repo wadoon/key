@@ -52,7 +52,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -659,24 +659,24 @@ public final class JavaInfo {
 	return getToplevelPM(kjt, methodName, sig);
     }
 
-    private List<List<KeYJavaType>> termArrayToSignature(Term[] args) {
+    private List<List<KeYJavaType>> termArrayToSignature(JavaDLTerm[] args) {
         List<List<KeYJavaType>> signature = new LinkedList<List<KeYJavaType>>();
-        for (Term arg : args) {
+        for (JavaDLTerm arg : args) {
             signature.add(lookupSort2KJTCache(arg.sort()));
         }
         return signature;
     }
 
-    public Term getStaticProgramMethodTerm(String methodName, Term[] args, String className) {
+    public JavaDLTerm getStaticProgramMethodTerm(String methodName, JavaDLTerm[] args, String className) {
         List<List<KeYJavaType>> signature = termArrayToSignature(args);
         KeYJavaType classKJT = getTypeByClassName(className);
         IProgramMethod pm = getProgramMethod(classKJT, methodName, signature, classKJT);
         return getTermFromProgramMethod(pm, methodName, className, args, null);
     }
 
-    public Term getProgramMethodTerm(Term prefix,
+    public JavaDLTerm getProgramMethodTerm(JavaDLTerm prefix,
             String methodName,
-            Term[] args,
+            JavaDLTerm[] args,
             String className,
             boolean traverseHierarchy) {
 
@@ -721,12 +721,12 @@ public final class JavaInfo {
         return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
 
-    private Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className, Term[] args, Term prefix) throws IllegalArgumentException {
+    private JavaDLTerm getTermFromProgramMethod(IProgramMethod pm, String methodName, String className, JavaDLTerm[] args, JavaDLTerm prefix) throws IllegalArgumentException {
         if (pm == null) {
             throw new IllegalArgumentException("Program method " + methodName
                     + " in " + className + " not found.");
         }
-        Term[] subs = new Term[pm.getHeapCount(services) * pm.getStateCount() + args.length + (pm.isStatic() ? 0 : 1)];
+        JavaDLTerm[] subs = new JavaDLTerm[pm.getHeapCount(services) * pm.getStateCount() + args.length + (pm.isStatic() ? 0 : 1)];
         int offset = 0;
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             if (offset >= pm.getHeapCount(services)) {

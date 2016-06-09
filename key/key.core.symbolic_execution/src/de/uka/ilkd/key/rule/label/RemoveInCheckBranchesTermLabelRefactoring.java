@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractRule;
@@ -74,11 +74,11 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
    public RefactoringScope defineRefactoringScope(TermLabelState state,
                                                   Services services,
                                                   PosInOccurrence applicationPosInOccurrence,
-                                                  Term applicationTerm,
+                                                  JavaDLTerm applicationTerm,
                                                   Rule rule,
                                                   Goal goal,
                                                   Object hint, 
-                                                  Term tacletTerm) {
+                                                  JavaDLTerm tacletTerm) {
       if (goal != null) {
          if (rule instanceof UseOperationContractRule &&
                (goal.node().getNodeInfo().getBranchLabel().startsWith("Pre") ||
@@ -109,12 +109,12 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
    public void refactoreLabels(TermLabelState state,
                                Services services,
                                PosInOccurrence applicationPosInOccurrence,
-                               Term applicationTerm,
+                               JavaDLTerm applicationTerm,
                                Rule rule,
                                Goal goal,
                                Object hint, 
-                               Term tacletTerm,
-                               Term term,
+                               JavaDLTerm tacletTerm,
+                               JavaDLTerm term,
                                List<TermLabel> labels) {
       Iterator<TermLabel> iter = labels.iterator();
       while (iter.hasNext()) {

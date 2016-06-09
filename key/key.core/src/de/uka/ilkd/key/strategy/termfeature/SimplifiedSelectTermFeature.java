@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.op.Function;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 
 
@@ -36,7 +36,7 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter (Term t, Services services) {
+    protected boolean filter (JavaDLTerm t, Services services) {
             Boolean isSelectOp = heapLDT.getSortOfSelect(t.op()) != null;
             return  // either the operator is not a select operator
                     !isSelectOp ||

@@ -22,7 +22,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
@@ -61,7 +61,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
     * @param conditionEnabled flag if the condition is enabled
     * @param containerType the type of the element containing the breakpoint
     * @param suspendOnTrue the flag if the condition needs to evaluate to true or just be satisfiable
-    * @throws SLTranslationException if the condition could not be parsed to a valid Term
+    * @throws SLTranslationException if the condition could not be parsed to a valid JavaDLTerm
     */
    public KeYWatchpoint(int hitCount, Proof proof, String condition, boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
       super(hitCount, null, proof, enabled, conditionEnabled, -1, -1, containerType);
@@ -92,21 +92,21 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
       }else{
          ApplyStrategyInfo info = null;
          try {
-            Term negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
+            JavaDLTerm negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
             //initialize values
             PosInOccurrence pio = ruleApp.posInOccurrence();
-            Term term = pio.subTerm();
+            JavaDLTerm term = pio.subTerm();
             term = TermBuilder.goBelowUpdates(term);
-            IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+            IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.modalContent(), proof.getServices());
             //put values into map which have to be replaced
             if(ec!=null){
                getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
             }
             //replace renamings etc.
             OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
-            Term termForSideProof = replacer.replace(negatedCondition);
+            JavaDLTerm termForSideProof = replacer.replace(negatedCondition);
             //start side proof
-            Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+            JavaDLTerm toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
             Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
             info = SymbolicExecutionSideProofUtil.startSideProof(proof, 

@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -14,9 +14,9 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
  */
 public class ExecutionConstraint extends AbstractExecutionElement implements IExecutionConstraint {
    /**
-    * The {@link Term} representing the constraint.
+    * The {@link JavaDLTerm} representing the constraint.
     */
-   private final Term term;
+   private final JavaDLTerm term;
    
    /**
     * The {@link PosInOccurrence} of the modality of interest.
@@ -27,9 +27,9 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
-    * @param term The {@link Term} representing the constraint.
+    * @param term The {@link JavaDLTerm} representing the constraint.
     */
-   public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO, Term term) {
+   public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO, JavaDLTerm term) {
       super(settings, proofNode);
       assert term != null;
       assert modalityPIO != null;
@@ -57,7 +57,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     * {@inheritDoc}
     */
    @Override
-   public Term getTerm() {
+   public JavaDLTerm getTerm() {
       return term;
    }
 

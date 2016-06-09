@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -35,7 +35,7 @@ public final class ConstantValue extends AbstractTermTransformer {
     }
 
 
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public JavaDLTerm transform(JavaDLTerm term, SVInstantiations svInst, Services services) {
 	term = term.sub ( 0 );
 	Operator op = term.op ();
 

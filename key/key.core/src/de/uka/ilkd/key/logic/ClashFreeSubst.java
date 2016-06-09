@@ -24,11 +24,11 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 
 public class ClashFreeSubst {
     protected QuantifiableVariable v;
-    protected Term s;
+    protected JavaDLTerm s;
     protected ImmutableSet<QuantifiableVariable> svars;
     protected final TermServices services;
 
-    public ClashFreeSubst(QuantifiableVariable v,Term s, TermServices services) {
+    public ClashFreeSubst(QuantifiableVariable v,JavaDLTerm s, TermServices services) {
        this.services = services;
        this.v = v;
        this.s = s;
@@ -39,7 +39,7 @@ public class ClashFreeSubst {
 	return v;
     }
 
-    protected Term getSubstitutedTerm () {
+    protected JavaDLTerm getSubstitutedTerm () {
 	return s;
     }
 
@@ -47,7 +47,7 @@ public class ClashFreeSubst {
      * avoiding collisions by replacing bound variables in
      * <code>t</code> if necessary.
      */
-    public Term apply(Term t) {
+    public JavaDLTerm apply(JavaDLTerm t) {
 	if ( ! t.freeVars().contains(v) ) {
 	    return t;
 	} else
@@ -59,7 +59,7 @@ public class ClashFreeSubst {
      * variables in <code>t</code> if necessary.  It is
      * assumed, that <code>t</code> contains a free occurrence of
      * <code>v</code>. */
-    protected Term apply1(Term t) {
+    protected JavaDLTerm apply1(JavaDLTerm t) {
 	if ( t.op() == v ) {
 	    return s;
 	} else {
@@ -90,16 +90,16 @@ public class ClashFreeSubst {
      * It is assumed, that one of the subterms contains a free occurrence
      * of <code>v</code>, and that the case <code>v==t<code> is already
      * handled. */
-    private Term applyOnSubterms(Term t) {
+    private JavaDLTerm applyOnSubterms(JavaDLTerm t) {
 	final int arity = t.arity();
-	final Term[] newSubterms = new Term[arity];
+	final JavaDLTerm[] newSubterms = new JavaDLTerm[arity];
 	@SuppressWarnings("unchecked")
     final ImmutableArray<QuantifiableVariable>[] newBoundVars =
 	    new ImmutableArray[arity];
 	for ( int i=0; i<arity; i++ ) {
 	    applyOnSubterm ( t, i, newSubterms, newBoundVars );
         }
-	return services.getTermBuilder().tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(), t.getLabels());
+	return services.getTermBuilder().tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.modalContent(), t.getLabels());
     }
 
     /**
@@ -108,9 +108,9 @@ public class ClashFreeSubst {
      * <code>newSubterms</code> and <code>newBoundVars</code> (at index
      * <code>subtermIndex</code>)
      */
-    protected void applyOnSubterm (Term completeTerm,
+    protected void applyOnSubterm (JavaDLTerm completeTerm,
                                    int subtermIndex,
-                                   Term[] newSubterms,
+                                   JavaDLTerm[] newSubterms,
                                    ImmutableArray<QuantifiableVariable>[] newBoundVars) {
         if ( subTermChanges ( completeTerm.varsBoundHere ( subtermIndex ),
                               completeTerm.sub ( subtermIndex ) ) ) {
@@ -144,8 +144,8 @@ public class ClashFreeSubst {
 				ImmutableArray<QuantifiableVariable> boundVars,
 				QuantifiableVariable[] newBoundVars,
 				int subInd,
-				Term subTerm,
-				Term[] newSubterms
+				JavaDLTerm subTerm,
+				JavaDLTerm[] newSubterms
 				) {
 	if ( varInd >= boundVars.size() ) {
 	    newSubterms[subInd] = apply1(subTerm);
@@ -192,8 +192,8 @@ public class ClashFreeSubst {
 				 ImmutableArray<QuantifiableVariable> boundVars,
 				 QuantifiableVariable[] newBoundVars,
 				 int subInd,
-				 Term subTerm,
-				 Term[] newSubterms
+				 JavaDLTerm subTerm,
+				 JavaDLTerm[] newSubterms
 				 ) {
 	if ( varInd >= boundVars.size() ) {
 	    newSubterms[subInd] = apply(subTerm);
@@ -221,7 +221,7 @@ public class ClashFreeSubst {
      * substitution
      */
     protected boolean subTermChanges(ImmutableArray<QuantifiableVariable> boundVars,
-                                     Term subTerm) {
+                                     JavaDLTerm subTerm) {
 	if ( !subTerm.freeVars().contains(v) ) {
 	    return false;
 	} else {
@@ -273,7 +273,7 @@ public class ClashFreeSubst {
 	    vars = DefaultImmutableSet.<QuantifiableVariable>nil();
 	}
 
-	public void visit(Term t) {
+	public void visit(JavaDLTerm t) {
 	    if (t.op() instanceof QuantifiableVariable) {
 		vars=vars.add((QuantifiableVariable)t.op());
 	    } else {

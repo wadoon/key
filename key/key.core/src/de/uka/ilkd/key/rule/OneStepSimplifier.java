@@ -35,7 +35,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -86,7 +86,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private Proof lastProof;
     private ImmutableList<NoPosTacletApp> appsTakenOver;
     private TacletIndex[] indices;
-    private Map<Term,Term> notSimplifiableCaches[];
+    private Map<JavaDLTerm,JavaDLTerm> notSimplifiableCaches[];
     private boolean active;
 
     //-------------------------------------------------------------------------
@@ -190,7 +190,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             lastProof = proof;
             appsTakenOver = ImmutableSLList.<NoPosTacletApp>nil();
             indices = new TacletIndex[ruleSets.size()];
-            notSimplifiableCaches = (Map<Term,Term>[]) new LRUCache[indices.length];
+            notSimplifiableCaches = (Map<JavaDLTerm,JavaDLTerm>[]) new LRUCache[indices.length];
             int i = 0;
             ImmutableList<String> done = ImmutableSLList.<String>nil();
             for(String ruleSet : ruleSets) {
@@ -198,7 +198,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                                 ruleSet,
                                 done);
                 indices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
-                notSimplifiableCaches[i] = new LRUCache<Term,Term>(DEFAULT_CACHE_SIZE);
+                notSimplifiableCaches[i] = new LRUCache<JavaDLTerm,JavaDLTerm>(DEFAULT_CACHE_SIZE);
                 i++;
                 done = done.prepend(ruleSet);
             }
@@ -299,7 +299,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private SequentFormula simplifyPosOrSub(Goal goal, Services services,
                     PosInOccurrence pos,
                     int indexNr, Protocol protocol) {
-        final Term term = pos.subTerm();
+        final JavaDLTerm term = pos.subTerm();
         if(notSimplifiableCaches[indexNr].get(term) != null) {
             return null;
         }
@@ -330,8 +330,8 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      * @param services TODO
      */
-    private Term replaceKnownHelper(Map<TermReplacementKey,PosInOccurrence> map,
-                                    Term in,
+    private JavaDLTerm replaceKnownHelper(Map<TermReplacementKey,PosInOccurrence> map,
+                                    JavaDLTerm in,
                                     boolean inAntecedent,
                                     /*out*/ List<PosInOccurrence> ifInsts,
                                     Protocol protocol,
@@ -344,7 +344,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             if(protocol != null) {
                 protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
             }
-            Term result = pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
+            JavaDLTerm result = pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
             ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
                                                                                   services,
                                                                                   in,
@@ -357,7 +357,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                                                                                   result.op(),
                                                                                   result.subs(),
                                                                                   result.boundVars(),
-                                                                                  result.javaBlock(),
+                                                                                  result.modalContent(),
                                                                                   result.getLabels());
             if (labels != null && !labels.isEmpty()) {
                result = services.getTermBuilder().label(result, labels);
@@ -368,7 +368,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                         || in.op() instanceof Transformer) {
             return in;
         } else {
-            Term[] subs = new Term[in.arity()];
+            JavaDLTerm[] subs = new JavaDLTerm[in.arity()];
             boolean changed = false;
             for(int i = 0; i < subs.length; i++) {
                 subs[i] = replaceKnownHelper(map, in.sub(i), inAntecedent, ifInsts, protocol, services, goal, ruleApp);
@@ -380,7 +380,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                 return services.getTermBuilder().tf().createTerm(in.op(),
                                 subs,
                                 in.boundVars(),
-                                in.javaBlock(),
+                                in.modalContent(),
                                 in.getLabels());
             } else {
                 return in;
@@ -409,8 +409,8 @@ public final class OneStepSimplifier implements BuiltInRule {
         if(context == null) {
             return null;
         }
-        final Term formula = cf.formula();
-        final Term simplifiedFormula
+        final JavaDLTerm formula = cf.formula();
+        final JavaDLTerm simplifiedFormula
             = replaceKnownHelper(context, formula, inAntecedent, ifInsts, protocol, services, goal, ruleApp);
         if(simplifiedFormula.equals(formula)) {
             return null;
@@ -419,7 +419,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private RuleApp makeReplaceKnownTacletApp(Term formula, boolean inAntecedent, PosInOccurrence pio) {
+    private RuleApp makeReplaceKnownTacletApp(JavaDLTerm formula, boolean inAntecedent, PosInOccurrence pio) {
         FindTaclet taclet;
         if(pio.isInAntec()) {
             taclet = (FindTaclet) lastProof.getInitConfig().lookupActiveTaclet(new Name("replace_known_left"));
@@ -727,15 +727,15 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private static class TermReplacementKey {
        /**
-        * The {@link Term} to represent.
+        * The {@link JavaDLTerm} to represent.
         */
-       private final Term term;
+       private final JavaDLTerm term;
 
        /**
         * Constructor.
-        * @param term The {@link Term} to represent.
+        * @param term The {@link JavaDLTerm} to represent.
         */
-       public TermReplacementKey(Term term) {
+       public TermReplacementKey(JavaDLTerm term) {
           assert term != null;
           this.term = term;
        }
@@ -756,8 +756,8 @@ public final class OneStepSimplifier implements BuiltInRule {
          if (obj instanceof TermReplacementKey) {
             obj = ((TermReplacementKey) obj).term;
          }
-         if (obj instanceof Term) {
-            Term t = (Term) obj;
+         if (obj instanceof JavaDLTerm) {
+            JavaDLTerm t = (JavaDLTerm) obj;
             return term.equalsModRenaming(t); // Ignore naming and term labels in the way a taclet rule does.
          }
          else {

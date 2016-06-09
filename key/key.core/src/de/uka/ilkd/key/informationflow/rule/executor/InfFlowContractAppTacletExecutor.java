@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
@@ -28,9 +28,9 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
      * formulas resulting from information flow contract applications.
      */
     @SuppressWarnings("unchecked")
-    public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
-            new Properties.Property<ImmutableList<Term>>(
-                    (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
+    public static final Properties.Property<ImmutableList<JavaDLTerm>> INF_FLOW_CONTRACT_APPL_PROPERTY =
+            new Properties.Property<ImmutableList<JavaDLTerm>>(
+                    (Class<ImmutableList<JavaDLTerm>>) (Class<?>) ImmutableList.class,
                      "information flow contract applicaton property");
 
     
@@ -66,18 +66,18 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
      * @param applFormula   the information contract application formula added
      *                      by this taclet
      */
-    private void updateStrategyInfo(Goal goal, final Term applFormula) {
-        ImmutableList<Term> applFormulas =
+    private void updateStrategyInfo(Goal goal, final JavaDLTerm applFormula) {
+        ImmutableList<JavaDLTerm> applFormulas =
                 goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (applFormulas == null) {
-            applFormulas = ImmutableSLList.<Term>nil();
+            applFormulas = ImmutableSLList.<JavaDLTerm>nil();
         }
         applFormulas = applFormulas.append(applFormula);
         StrategyInfoUndoMethod undo = new StrategyInfoUndoMethod() {
 
             @Override
             public void undo(Properties strategyInfos) {
-                ImmutableList<Term> applFormulas =
+                ImmutableList<JavaDLTerm> applFormulas =
                         strategyInfos.get(INF_FLOW_CONTRACT_APPL_PROPERTY);
                 strategyInfos.put(INF_FLOW_CONTRACT_APPL_PROPERTY, applFormulas.removeAll(applFormula));
             }

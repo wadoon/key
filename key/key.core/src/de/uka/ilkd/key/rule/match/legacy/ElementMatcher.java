@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -106,7 +106,7 @@ public abstract class ElementMatcher<T extends Operator> {
                 }
             } else {
                 Object peForCompare = pe;
-                if (inMap instanceof Term) {
+                if (inMap instanceof JavaDLTerm) {
                     try {
                         peForCompare = services.getProgramServices().getTypeConverter()
                                 .convertToLogicElement(
@@ -133,7 +133,7 @@ public abstract class ElementMatcher<T extends Operator> {
          * is possible e.g. if this schemavariable has been already matched to a
          * term <tt>t2</tt> which is not unifiable with the given term.
          */
-        protected final MatchConditions addInstantiation(AbstractSV op, Term term,
+        protected final MatchConditions addInstantiation(AbstractSV op, JavaDLTerm term,
                 MatchConditions matchCond, 
                 Services services) {
 
@@ -144,7 +144,7 @@ public abstract class ElementMatcher<T extends Operator> {
 
             final SVInstantiations inst = matchCond.getInstantiations();
 
-            final Term t = inst.getTermInstantiation(op, 
+            final JavaDLTerm t = inst.getTermInstantiation(op, 
                     inst.getExecutionContext(), 
                     services);
             if(t != null) {
@@ -201,8 +201,8 @@ public abstract class ElementMatcher<T extends Operator> {
         public MatchConditions match(FormulaSV op, 
                 SVSubstitute subst,
                 MatchConditions mc, Services services) {
-            if (subst instanceof Term) {
-                return addInstantiation(op, (Term) subst, mc, services);
+            if (subst instanceof JavaDLTerm) {
+                return addInstantiation(op, (JavaDLTerm) subst, mc, services);
             }
             Debug.out("FAILED. Schemavariable of this kind only match terms.");
             return null;
@@ -298,8 +298,8 @@ public abstract class ElementMatcher<T extends Operator> {
 
             final ProgramSVSort svSort = (ProgramSVSort)op.sort();
 
-            if (substitute instanceof Term && svSort.canStandFor((Term)substitute)) {
-                return addInstantiation(op, (Term)substitute, mc, services);
+            if (substitute instanceof JavaDLTerm && svSort.canStandFor((JavaDLTerm)substitute)) {
+                return addInstantiation(op, (JavaDLTerm)substitute, mc, services);
             } else if (substitute instanceof ProgramElement && 
                     svSort.canStandFor((ProgramElement)substitute, 
                             mc.getInstantiations().getExecutionContext(), services)) {
@@ -414,11 +414,11 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(TermLabelSV op, SVSubstitute subst,
                 MatchConditions mc, Services services) {
-            if (!(subst instanceof Term)) {
+            if (!(subst instanceof JavaDLTerm)) {
                 return null;
             }
 
-            final Term t = (Term)subst;
+            final JavaDLTerm t = (JavaDLTerm)subst;
             /*if (!t.hasLabels()) { statements about the non-existence
             return null;        of term labels should also be
         }                       possible.*/
@@ -444,8 +444,8 @@ public abstract class ElementMatcher<T extends Operator> {
         public MatchConditions match(TermSV op, 
                 SVSubstitute subst,
                 MatchConditions mc, Services services) {   
-            if(subst instanceof Term) {
-                return addInstantiation(op, (Term) subst, mc, services);
+            if(subst instanceof JavaDLTerm) {
+                return addInstantiation(op, (JavaDLTerm) subst, mc, services);
             }
             Debug.out("FAILED. Schemavariable of this kind only match terms.");
             return null;
@@ -458,8 +458,8 @@ public abstract class ElementMatcher<T extends Operator> {
         public MatchConditions match(UpdateSV op, 
                 SVSubstitute subst,
                 MatchConditions mc, Services services) {
-            if (subst instanceof Term) {
-                return addInstantiation(op, (Term) subst, mc, services);
+            if (subst instanceof JavaDLTerm) {
+                return addInstantiation(op, (JavaDLTerm) subst, mc, services);
             }
             Debug.out("FAILED. Schemavariable of this kind only match terms.");
             return null;
@@ -472,19 +472,19 @@ public abstract class ElementMatcher<T extends Operator> {
         public MatchConditions match(VariableSV op, 
                 SVSubstitute subst, 
                 MatchConditions mc, Services services) {                
-            final Term substTerm;
+            final JavaDLTerm substTerm;
             if(subst instanceof LogicVariable) {
                 substTerm = services.getTermBuilder().var((LogicVariable)subst);
-            } else if(subst instanceof Term && 
-                    ((Term)subst).op() instanceof QuantifiableVariable) {
-                substTerm = (Term) subst;
+            } else if(subst instanceof JavaDLTerm && 
+                    ((JavaDLTerm)subst).op() instanceof QuantifiableVariable) {
+                substTerm = (JavaDLTerm) subst;
             } else {
                 Debug.out("Strange Exit of match in VariableSV. Check for bug");
                 return null;
             }
 
-            final Term foundMapping 
-            = (Term)mc.getInstantiations().getInstantiation(op);
+            final JavaDLTerm foundMapping 
+            = (JavaDLTerm)mc.getInstantiations().getInstantiation(op);
             if(foundMapping == null) {
                 return addInstantiation(op, substTerm, mc, services);
             } else if (foundMapping.op() == substTerm.op()) {

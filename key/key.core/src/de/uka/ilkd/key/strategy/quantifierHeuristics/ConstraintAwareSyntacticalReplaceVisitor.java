@@ -2,7 +2,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
@@ -33,7 +33,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
         this.metavariableInst = metavariableInst;
     }
     
-    protected Term toTerm(Term t) {
+    protected JavaDLTerm toTerm(JavaDLTerm t) {
         if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
             // use the visitor recursively for replacing metavariables that
             // might occur in the term (if possible)
@@ -47,7 +47,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
         }
     }
 
-    public void visited(Term visited) {
+    public void visited(JavaDLTerm visited) {
         if (visited.op() instanceof Metavariable
                 && metavariableInst.getInstantiation((Metavariable) visited.op(), services)
                         .op() != visited.op()) {

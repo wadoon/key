@@ -55,7 +55,7 @@ public class TestClashFreeSubst extends TestCase {
     Function p,q;
 
     LogicVariable v,x,y,z;
-    Term t_v,t_x,t_y,t_z;
+    JavaDLTerm t_v,t_x,t_y,t_z;
 
     ProgramVariable pv0;
 
@@ -168,7 +168,7 @@ public class TestClashFreeSubst extends TestCase {
 		new AbbrevMap());
     }
 
-    public Term parseTerm(String s) {
+    public JavaDLTerm parseTerm(String s) {
 	try {
 	    KeYParserF p = stringTermParser(s);
  	    return p.term();
@@ -181,7 +181,7 @@ public class TestClashFreeSubst extends TestCase {
     }
 
 
-    public Term parseFma(String s) {
+    public JavaDLTerm parseFma(String s) {
 	try {
 	    KeYParserF p = stringTermParser(s);
 
@@ -197,24 +197,24 @@ public class TestClashFreeSubst extends TestCase {
 
     /** transform sequences all x. all y. ... bla to  all x,y... . bla).
      * no rulevars, no javaBlocks.*/
-    private Term toMulti(Term t) {
+    private JavaDLTerm toMulti(JavaDLTerm t) {
 	ToMultiVisitor v = new ToMultiVisitor();
 	t.execPostOrder(v);
 	return v.getResult();
     }
 
     private class ToMultiVisitor extends DefaultVisitor {
-	private Stack<Term> subStack;
+	private Stack<JavaDLTerm> subStack;
 
 	ToMultiVisitor() {
 	    subStack = new Stack<>();
 	}
 
-	public void visit(Term visited) {
+	public void visit(JavaDLTerm visited) {
 	    Operator op = visited.op();
 	    int arity = visited.arity();
 	    if ( op == Quantifier.ALL ) {
-		Term top = (Term) subStack.peek();
+		JavaDLTerm top = (JavaDLTerm) subStack.peek();
 		if ( top.op() == Quantifier.ALL )  {
 		    QuantifiableVariable[] bv =
 			new QuantifiableVariable[visited.varsBoundHere(0).size()
@@ -232,23 +232,23 @@ public class TestClashFreeSubst extends TestCase {
 		    return;
 		}
 	    }
-	    Term[] sub = new Term[arity];
+	    JavaDLTerm[] sub = new JavaDLTerm[arity];
 	    for ( int i = arity-1; i>=0; i-- ) {
-		sub[i] = (Term) (subStack.pop());
+		sub[i] = (JavaDLTerm) (subStack.pop());
 	    }
 	    subStack.push(tf.createTerm(op, sub, visited.boundVars(), null));
 	}
 
-	Term getResult() {
-	    return (Term) subStack.pop();
+	JavaDLTerm getResult() {
+	    return (JavaDLTerm) subStack.pop();
 	}
     }
 
     // Test Cases
 
     public void testSubst() {
-	Term s = parseTerm("f(x)");
-	Term t = parseTerm("g(v,x)");
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = parseTerm("g(v,x)");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	assertEquals("substitution",
 		     parseTerm("g(f(x),x)"),
@@ -256,8 +256,8 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     public void testSubstWary() {
-	Term s = parseTerm("f(x)");
-	Term t = parseTerm("q(v,x)");
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = parseTerm("q(v,x)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
 	assertEquals("substitution",
 		     parseTerm("q(f(x),x)"),
@@ -265,16 +265,16 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     public void testShare() {
-	Term s = parseTerm("f(x)");
-	Term t = parseTerm("g(v,f(x))");
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = parseTerm("g(v,f(x))");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	assertSame("share unchanged subterms",
 		   t.sub(1), cfs.apply(t).sub(1));
     }
 
     public void testShareWary() {
-	Term s = parseTerm("f(x)");
-	Term t = parseTerm("q(v,f(x))");
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = parseTerm("q(v,f(x))");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
 	assertSame("share unchanged subterms",
 		   t.sub(1), cfs.apply(t).sub(1));
@@ -282,16 +282,16 @@ public class TestClashFreeSubst extends TestCase {
 
     /*
     public void testShareBound() {
-	Term s = parseTerm("f(x)");
-	Term t = parseTerm("g(v,eps v.q(x,v))");
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = parseTerm("g(v,eps v.q(x,v))");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
 	assertSame("sharing with bound variables",
 		   t.sub(1), cfs.apply(t).sub(1));
     }
 
     public void testShareAll() {
-	Term s = parseTerm("f(x)");
-	Term t = parseTerm("eps x.g(x,eps v.q(x,v))");
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = parseTerm("eps x.g(x,eps v.q(x,v))");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
 	assertSame("sharing whole term despite clash",
 		   t, cfs.apply(t));
@@ -299,10 +299,10 @@ public class TestClashFreeSubst extends TestCase {
     */
 
     public void testClash() {
-	Term s = parseTerm("f(x)");
-	Term t = parseTerm("\\exists x; q(x,v)");
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = parseTerm("\\exists x; q(x,v)");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
-	Term res = cfs.apply(t);
+	JavaDLTerm res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(0).get(0);
 	nss.setVariables(new Namespace(nss.variables(), x1));
@@ -313,8 +313,8 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     public void testSubstInSubstTerm() {
-	Term s = parseTerm("f(x)");
-	Term t = parseTerm("{\\subst y; f(v)}g(y,v)");
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = parseTerm("{\\subst y; f(v)}g(y,v)");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	assertEquals("substitute into substitution term",
 		     parseTerm("{\\subst y; f(f(x))}g(y,f(x))"),
@@ -322,10 +322,10 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     public void testClashInSubstTerm() {
-	Term s = parseTerm("f(x)");
-	Term t = parseTerm("{\\subst x; f(v)}g(x,v)");
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = parseTerm("{\\subst x; f(v)}g(x,v)");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
-	Term res = cfs.apply(t);
+	JavaDLTerm res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(1).get(0);
 	nss.setVariables(new Namespace(nss.variables(), x1));
@@ -337,8 +337,8 @@ public class TestClashFreeSubst extends TestCase {
 
 
     public void testMultiSubst() {
-	Term s = parseTerm("f(x)");
-	Term t = toMulti(parseFma("\\forall y; \\forall z; q(y,g(v,z))"));
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = toMulti(parseFma("\\forall y; \\forall z; q(y,g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	assertEquals("substitution on multi",
 		     toMulti(parseFma("\\forall y; \\forall z; q(y,g(f(x),z))")),
@@ -346,8 +346,8 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     public void testMultiShareBound() {
-	Term s = parseTerm("f(x)");
-	Term t = toMulti(parseFma("\\forall y; \\forall v; \\forall z; q(y,g(v,z))"));
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = toMulti(parseFma("\\forall y; \\forall v; \\forall z; q(y,g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
 	assertSame("sharing on multi",
 		   cfs.apply(t), t);
@@ -356,10 +356,10 @@ public class TestClashFreeSubst extends TestCase {
     // disabled. multi vars at quantifier currently not supported by
     // KeY and feature of data structures suppressed by GenericTermFactory. /AR 040420
     public void xtestMultiClash() {
-	Term s = parseTerm("f(x)");
-	Term t = toMulti(parseFma("\\forall y; \\forall x; \\forall z; q(g(x,y),g(v,z))"));
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = toMulti(parseFma("\\forall y; \\forall x; \\forall z; q(g(x,y),g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
-	Term res = cfs.apply(t);
+	JavaDLTerm res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(0).get(1);
 	nss.setVariables(new Namespace(nss.variables(), x1));
@@ -373,10 +373,10 @@ public class TestClashFreeSubst extends TestCase {
     // disabled. multi vars at quantifier currently not supported by
     // KeY and feature of data structures suppressed by GenericTermFactory. /AR 040420
     public void xtestMultiClash1() {
-	Term s = parseTerm("f(x)");
-	Term t = toMulti(parseFma("\\forall y; \\forall x;\\forall z; q(g(x,y),g(v,z))"));
+	JavaDLTerm s = parseTerm("f(x)");
+	JavaDLTerm t = toMulti(parseFma("\\forall y; \\forall x;\\forall z; q(g(x,y),g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
-	Term res = cfs.apply(t);
+	JavaDLTerm res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(0).get(2);
 	nss.setVariables(new Namespace(nss.variables(), x1));
@@ -389,8 +389,8 @@ public class TestClashFreeSubst extends TestCase {
 
 
     public void testWary0() {
-	Term s = parseTerm("f(pv0)");
-	Term t = parseTerm("q(v,x)");
+	JavaDLTerm s = parseTerm("f(pv0)");
+	JavaDLTerm t = parseTerm("q(v,x)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
 	assertEquals("substitution",
 		     parseTerm("q(f(pv0),x)"),
@@ -398,8 +398,8 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     public void testWary1() {
-	Term s = parseTerm("f(pv0)");
-	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,x)");
+	JavaDLTerm s = parseTerm("f(pv0)");
+	JavaDLTerm t = parseTerm("q(v,x) & {pv0:=v}q(x,x)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
 	assertEquals("substitution",
 		     parseTerm("q(f(pv0),x) & {pv0:=f(pv0)}q(x,x)"),
@@ -407,10 +407,10 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     public void testWary2() {
-	Term s = parseTerm("f(pv0)");
-	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,v)");
+	JavaDLTerm s = parseTerm("f(pv0)");
+	JavaDLTerm t = parseTerm("q(v,x) & {pv0:=v}q(x,v)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
-	Term res = cfs.apply(t);
+	JavaDLTerm res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(1).get(0);
 	nss.setVariables(new Namespace(nss.variables(), x1));

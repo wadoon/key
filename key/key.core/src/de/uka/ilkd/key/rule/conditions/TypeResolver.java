@@ -24,7 +24,7 @@ import org.key_project.common.core.services.TermServices;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -161,9 +161,9 @@ public abstract class TypeResolver {
             if (inst instanceof ProgramVariable) {
                 s = ((ProgramVariable)inst).sort();
             } else {              
-                Term gsTerm = null;
-                if (inst instanceof Term) {
-                    gsTerm = (Term) inst;
+                JavaDLTerm gsTerm = null;
+                if (inst instanceof JavaDLTerm) {
+                    gsTerm = (JavaDLTerm) inst;
                 } else if (inst instanceof ProgramElement) {
                     gsTerm = services.getProgramServices().getTypeConverter().
                     convertToLogicElement((ProgramElement)inst, instMap.getExecutionContext());
@@ -216,8 +216,8 @@ public abstract class TypeResolver {
                     result = getContainerSort
                     (services.getProgramServices().getTypeConverter().convertToLogicElement((Expression)inst, 
                             instMap.getExecutionContext()).op(), services);
-                } else if (inst instanceof Term) {
-                    result = getContainerSort(((Term)inst).op(), services);
+                } else if (inst instanceof JavaDLTerm) {
+                    result = getContainerSort(((JavaDLTerm)inst).op(), services);
                 } else {
                     Debug.fail("Unexpected instantiation for SV " + memberSV + ":" + inst);
                     result = null;

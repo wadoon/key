@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.op.Function;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
@@ -63,7 +63,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
+    protected boolean lessThan(JavaDLTerm t1, JavaDLTerm t2, ServiceCaches caches) {
         if ( t1.op () == Z ) {
             if ( t2.op () != Z ) return true;
             return super.lessThan ( t1, t2, caches );

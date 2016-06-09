@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.executor.javadl.SuccTacletExecutor;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
@@ -50,7 +50,7 @@ public class SuccTaclet extends FindTaclet {
 		    ImmutableList<TacletGoalTemplate> goalTemplates, 
 		    ImmutableList<RuleSet> heuristics,
 		    TacletAttributes attrs,
-		    Term find,
+		    JavaDLTerm find,
                      boolean ignoreTopLevelUpdates,
 		     ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, ImmutableSet<Choice> choices,
 		     ImmutableSet<TacletAnnotation> tacletAnnotations){

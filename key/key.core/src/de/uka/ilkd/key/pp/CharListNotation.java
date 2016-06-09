@@ -15,7 +15,7 @@ package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 
 public final class CharListNotation extends Notation {
@@ -24,7 +24,7 @@ public final class CharListNotation extends Notation {
     }
 
     @Override
-    public void print(Term t, LogicPrinter sp) throws IOException {
+    public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
 	if(sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
 	    sp.printTerm(t);
 	} else {
@@ -36,7 +36,7 @@ public final class CharListNotation extends Notation {
 	}
     }
 
-    private StringBuffer printlastfirst(Term t) {
+    private StringBuffer printlastfirst(JavaDLTerm t) {
 	if (t.op().arity()==0) {
 	    return new StringBuffer();
 	} else {
@@ -44,11 +44,11 @@ public final class CharListNotation extends Notation {
 	}
     }
 
-    private String translateCharTerm(Term t) {
+    private String translateCharTerm(JavaDLTerm t) {
 	char charVal=0;
 	int intVal=0;
 	if (t.op().arity() == 0)
-	    throw new IllegalArgumentException("Term is not a value!");
+	    throw new IllegalArgumentException("JavaDLTerm is not a value!");
 	String result = printlastfirst(t.sub(0)).toString();
 	try {
 	    intVal = Integer.parseInt(result);
@@ -65,12 +65,12 @@ public final class CharListNotation extends Notation {
     /** translates a term that represents a string literal into a string
      *  that is enclosed by quotation marks 
      */
-    private String translateTerm(Term t) {
+    private String translateTerm(JavaDLTerm t) {
 	final StringBuffer result = new StringBuffer("");
-	Term term = t;
+	JavaDLTerm term = t;
 	while (!term.op().name().toString().equals("clEmpty")){
 	    if (!term.op().name().toString().equals("clCons"))
-		throw new IllegalArgumentException("Term does not represent a String Literal!");
+		throw new IllegalArgumentException("JavaDLTerm does not represent a String Literal!");
 	    result.append(translateCharTerm(term.sub(0)));
 	    term = term.sub(1);
 	}

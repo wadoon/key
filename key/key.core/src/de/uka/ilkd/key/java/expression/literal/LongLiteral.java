@@ -14,9 +14,9 @@
 package de.uka.ilkd.key.java.expression.literal;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -72,7 +72,7 @@ public class LongLiteral extends Literal {
     /** tests if equals
      */
     public boolean equalsModRenaming(	SourceElement o, 
-										NameAbstractionTable nat){
+										GenericNameAbstractionTable nat){
 		if (!(o instanceof LongLiteral)) {
 		    return false;
 		}

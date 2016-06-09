@@ -27,7 +27,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -106,10 +106,10 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
           if (Transformer.inTransformer(pio)) {
               return false;
           }
-          Term term = pio.subTerm();
+          JavaDLTerm term = pio.subTerm();
           term = TermBuilder.goBelowUpdates(term);
           if (term.op() instanceof Modality && SymbolicExecutionUtil.getSymbolicExecutionLabel(term) == null) {
-              Term equalityTerm = term.sub(0);
+              JavaDLTerm equalityTerm = term.sub(0);
               if (equalityTerm.op() == Junctor.IMP) {
                  equalityTerm = equalityTerm.sub(0);
               }
@@ -144,12 +144,12 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
       try {
          // Extract required Terms from goal
          PosInOccurrence pio = ruleApp.posInOccurrence();
-         Term topLevelTerm = pio.subTerm();
-         Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.goBelowUpdates2(topLevelTerm);
-         Term modalityTerm = updatesAndTerm.second;
-         ImmutableList<Term> updates = updatesAndTerm.first;
+         JavaDLTerm topLevelTerm = pio.subTerm();
+         Pair<ImmutableList<JavaDLTerm>,JavaDLTerm> updatesAndTerm = TermBuilder.goBelowUpdates2(topLevelTerm);
+         JavaDLTerm modalityTerm = updatesAndTerm.second;
+         ImmutableList<JavaDLTerm> updates = updatesAndTerm.first;
          boolean inImplication = false;
-         Term equalityTerm = modalityTerm.sub(0);
+         JavaDLTerm equalityTerm = modalityTerm.sub(0);
          if (equalityTerm.op() == Junctor.IMP) {
             inImplication = true;
             equalityTerm = equalityTerm.sub(0);
@@ -159,8 +159,8 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             negation = true;
             equalityTerm = equalityTerm.sub(0);
          }
-         Term otherTerm;
-         Term varTerm;
+         JavaDLTerm otherTerm;
+         JavaDLTerm varTerm;
          boolean varFirst;
          if (equalityTerm.sub(0).op() instanceof LocationVariable) {
             otherTerm = equalityTerm.sub(1);
@@ -178,24 +178,24 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          Sequent sequentToProve = SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(goal.sequent(), pio.sequentFormula());
          Function newPredicate = createResultFunction(sideProofServices, varTerm.sort());
          final TermBuilder tb = sideProofServices.getTermBuilder();
-         Term newTerm = tb.func(newPredicate, varTerm);
-         Term newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(), new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(), modalityTerm.javaBlock(), modalityTerm.getLabels());
-         Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
+         JavaDLTerm newTerm = tb.func(newPredicate, varTerm);
+         JavaDLTerm newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(), new ImmutableArray<JavaDLTerm>(newTerm), modalityTerm.boundVars(), modalityTerm.modalContent(), modalityTerm.getLabels());
+         JavaDLTerm newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
          sequentToProve = sequentToProve.addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false).sequent();
          // Compute results and their conditions
-         List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve, newPredicate);
+         List<Triple<JavaDLTerm, Set<JavaDLTerm>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve, newPredicate);
          // Create new single goal in which the query is replaced by the possible results
          ImmutableList<Goal> goals = goal.split(1);
          Goal resultGoal = goals.head();
          resultGoal.removeFormula(pio);
          // Create results
-         Set<Term> resultTerms = new LinkedHashSet<Term>();
-         for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
-            Term conditionTerm = tb.and(conditionsAndResult.second);
-            Term resultEqualityTerm = varFirst ?
+         Set<JavaDLTerm> resultTerms = new LinkedHashSet<JavaDLTerm>();
+         for (Triple<JavaDLTerm, Set<JavaDLTerm>, Node> conditionsAndResult : conditionsAndResultsMap) {
+            JavaDLTerm conditionTerm = tb.and(conditionsAndResult.second);
+            JavaDLTerm resultEqualityTerm = varFirst ?
                                       tb.equals(conditionsAndResult.first, otherTerm) :
                                       tb.equals(otherTerm, conditionsAndResult.first);
-            Term resultTerm = pio.isInAntec() ?
+            JavaDLTerm resultTerm = pio.isInAntec() ?
                               tb.imp(conditionTerm, resultEqualityTerm) :
                               tb.and(conditionTerm, resultEqualityTerm);
             resultTerms.add(resultTerm);
@@ -203,17 +203,17 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          // Add results to goal
          if (inImplication) {
             // Change implication
-            Term newCondition = tb.or(resultTerms);
+            JavaDLTerm newCondition = tb.or(resultTerms);
             if (negation) {
                newCondition = tb.not(newCondition);
             }
-            Term newImplication = tb.imp(newCondition, modalityTerm.sub(0).sub(1));
-            Term newImplicationWithUpdates = tb.applySequential(updates, newImplication);
+            JavaDLTerm newImplication = tb.imp(newCondition, modalityTerm.sub(0).sub(1));
+            JavaDLTerm newImplicationWithUpdates = tb.applySequential(updates, newImplication);
             resultGoal.addFormula(new SequentFormula(newImplicationWithUpdates), pio.isInAntec(), false);
          }
          else {
             // Add result directly as new top level formula
-            for (Term result : resultTerms) {
+            for (JavaDLTerm result : resultTerms) {
                resultGoal.addFormula(new SequentFormula(result), pio.isInAntec(), false);
             }
          }

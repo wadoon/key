@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -15,7 +15,7 @@ public class MatchModalOperatorSVInstruction extends MatchSchemaVariableInstruct
     }
 
     @Override
-    public MatchConditions match(Term subst, MatchConditions mc, Services services) {                
+    public MatchConditions match(JavaDLTerm subst, MatchConditions mc, Services services) {                
         if (subst.op() instanceof Modality) {
             final Modality modality = (Modality) subst.op();
             if(op.getModalities().contains(modality)) {

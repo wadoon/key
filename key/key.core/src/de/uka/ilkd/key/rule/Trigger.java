@@ -16,18 +16,18 @@ package de.uka.ilkd.key.rule;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 public class Trigger {
 
     /** trigger related information */
-    private final Term trigger;
-    private final ImmutableList<Term> avoidConditions;
+    private final JavaDLTerm trigger;
+    private final ImmutableList<JavaDLTerm> avoidConditions;
     private final SchemaVariable triggerVar;
     
     
-    public Trigger(SchemaVariable triggerVar, Term trigger,  
-            ImmutableList<Term> avoidConditions) {
+    public Trigger(SchemaVariable triggerVar, JavaDLTerm trigger,  
+            ImmutableList<JavaDLTerm> avoidConditions) {
         assert triggerVar != null;
         assert trigger != null;
         assert avoidConditions != null;
@@ -42,11 +42,11 @@ public class Trigger {
         return triggerVar;
     }
 
-    public Term getTerm() {
+    public JavaDLTerm getTerm() {
         return trigger;
     }
 
-    public ImmutableList<Term> getAvoidConditions() {
+    public ImmutableList<JavaDLTerm> getAvoidConditions() {
         return avoidConditions;
     }
 

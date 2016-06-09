@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.util.joinrule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Triple;
@@ -14,7 +14,7 @@ import de.uka.ilkd.key.util.Triple;
  * 
  * @author Dominic Scheurer
  */
-public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> {
+public class SymbolicExecutionStateWithProgCnt extends Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> {
 
     private Node correspondingNode = null;
 
@@ -27,8 +27,8 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
      *            The program counter: Formula with non-empty Java block and
      *            post condition as only sub term.
      */
-    public SymbolicExecutionStateWithProgCnt(Term symbolicState,
-            Term pathCondition, Term programCounter) {
+    public SymbolicExecutionStateWithProgCnt(JavaDLTerm symbolicState,
+            JavaDLTerm pathCondition, JavaDLTerm programCounter) {
         super(symbolicState, pathCondition, programCounter);
     }
 
@@ -43,8 +43,8 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
      * @param correspondingNode
      *            The node corresponding to this SE state.
      */
-    public SymbolicExecutionStateWithProgCnt(Term symbolicState,
-            Term pathCondition, Term programCounter, Node correspondingNode) {
+    public SymbolicExecutionStateWithProgCnt(JavaDLTerm symbolicState,
+            JavaDLTerm pathCondition, JavaDLTerm programCounter, Node correspondingNode) {
         this(symbolicState, pathCondition, programCounter);
         this.correspondingNode = correspondingNode;
     }
@@ -52,21 +52,21 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
     /**
      * @return The symbolic state.
      */
-    public Term getSymbolicState() {
+    public JavaDLTerm getSymbolicState() {
         return first;
     }
 
     /**
      * @return The path condition.
      */
-    public Term getPathCondition() {
+    public JavaDLTerm getPathCondition() {
         return second;
     }
 
     /**
      * @return The program counter (and post condition).
      */
-    public Term getProgramCounter() {
+    public JavaDLTerm getProgramCounter() {
         return third;
     }
 

@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
@@ -170,7 +170,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             Operator op;
 
             while (it.next() != -1) {
-                final Term t = it.getSubTerm();
+                final JavaDLTerm t = it.getSubTerm();
                 op = t.op();
 
                 for (PrefixChecker prefixChecker : prefixCheckers) {

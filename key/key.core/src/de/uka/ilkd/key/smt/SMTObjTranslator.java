@@ -32,7 +32,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -476,7 +476,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	}
 
 	@Override
-	public StringBuffer translateProblem(Term problem, Services services,
+	public StringBuffer translateProblem(JavaDLTerm problem, Services services,
 	        SMTSettings settings) throws IllegalFormulaException {
 		this.settings = settings;
 		this.services = services;
@@ -1084,7 +1084,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param term
 	 *            the term where we look for the sorts
 	 */
-	private void findSorts(Set<Sort> sorts, Term term) {
+	private void findSorts(Set<Sort> sorts, JavaDLTerm term) {
 		Sort s = term.sort();
 		
 		
@@ -1095,7 +1095,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			addSingleSort(sorts, d);
 		}
 		
-		for (Term sub : term.subs()) {
+		for (JavaDLTerm sub : term.subs()) {
 			findSorts(sorts, sub);
 		}
 	}
@@ -1126,7 +1126,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @return
 	 * @throws IllegalFormulaException 
 	 */
-	public SMTFile translateProblem(Term problem) throws IllegalFormulaException {
+	public SMTFile translateProblem(JavaDLTerm problem) throws IllegalFormulaException {
 		SMTFile file = new SMTFile();
 		// initialize smt sorts
 		cc.countConstants(problem);
@@ -1222,7 +1222,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @return the SMT term.
 	 * @throws IllegalFormulaException 
 	 */
-	public SMTTerm translateTerm(Term term) throws IllegalFormulaException {
+	public SMTTerm translateTerm(JavaDLTerm term) throws IllegalFormulaException {
 		// System.err.println("Translate: "+term);
 		Operator op = term.op();
 		if (opTable.containsKey(op)) {
@@ -1398,7 +1398,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	// services, settings);
 	//
 	// for (TacletFormula tf : tacletSetTranslation.getTranslation(javaSorts)) {
-	// for (Term tacletTerm : tf.getInstantiations()) {
+	// for (JavaDLTerm tacletTerm : tf.getInstantiations()) {
 	// tacletAssertions.add(translateTerm(tacletTerm));
 	// }
 	// }
@@ -1715,7 +1715,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @return
 	 * @throws IllegalFormulaException 
 	 */
-	private SMTTerm translateCall(Function fun, ImmutableArray<Term> subs) throws IllegalFormulaException {
+	private SMTTerm translateCall(Function fun, ImmutableArray<JavaDLTerm> subs) throws IllegalFormulaException {
 		String name = fun.name().toString();
 		// handle sort constants
 		if (fun.sort().equals(fieldSort) && subs.isEmpty()) {
@@ -2060,10 +2060,10 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @return
 	 * @throws IllegalFormulaException 
 	 */
-	private SMTTerm call(SMTFunction function, ImmutableArray<Term> subs) throws IllegalFormulaException {
+	private SMTTerm call(SMTFunction function, ImmutableArray<JavaDLTerm> subs) throws IllegalFormulaException {
 		List<SMTTerm> subTerms = new LinkedList<SMTTerm>();
 		int i = 0;
-		for (Term t : subs) {
+		for (JavaDLTerm t : subs) {
 			SMTTerm sub = translateTerm(t);
 			SMTSort target = function.getDomainSorts().get(i);
 			sub = castTermIfNecessary(sub, target);
@@ -2107,7 +2107,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			fields = new HashSet<String>();
 		}
 
-		public void countConstants(Term t) {
+		public void countConstants(JavaDLTerm t) {
 			
 			
 			
@@ -2122,7 +2122,7 @@ public class SMTObjTranslator implements SMTTranslator {
 					fields.add(str);
 				}
 			} else {
-				for (Term sub : t.subs()) {
+				for (JavaDLTerm sub : t.subs()) {
 					countConstants(sub);
 				}
 			}

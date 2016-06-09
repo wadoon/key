@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -49,10 +49,10 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SVSubstitute instCandidate,
                          SVInstantiations instMap, Services services) {
         final Object o = instMap.getInstantiation(field);
-        if (o == null || !(o instanceof Term)) {
+        if (o == null || !(o instanceof JavaDLTerm)) {
             return false;
         }
-        final Term f = (Term)o;
+        final JavaDLTerm f = (JavaDLTerm)o;
         final Operator op = f.op();
         if (op instanceof Function) {
             final String name = op.name().toString();

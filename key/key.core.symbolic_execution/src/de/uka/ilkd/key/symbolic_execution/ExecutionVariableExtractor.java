@@ -15,7 +15,7 @@ import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -42,12 +42,12 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
    /**
     * An optional additional condition.
     */
-   private final Term additionalCondition;
+   private final JavaDLTerm additionalCondition;
    
    /**
     * The layout term.
     */
-   private final Term layoutTerm;
+   private final JavaDLTerm layoutTerm;
    
    /**
     * The current locations.
@@ -57,7 +57,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
    /**
     * The objects to ignore.
     */
-   private final Set<Term> objectsToIgnore;
+   private final Set<JavaDLTerm> objectsToIgnore;
    
    /**
     * The found {@link IExecutionVariable}s available via {@link #analyse()}.
@@ -81,20 +81,20 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
    public ExecutionVariableExtractor(Node node, 
                                      PosInOccurrence modalityPio, 
                                      IExecutionNode<?> executionNode, 
-                                     Term condition,
+                                     JavaDLTerm condition,
                                      boolean simplifyConditions) throws ProofInputException {
       super(node, modalityPio);
       this.executionNode = executionNode;
       this.additionalCondition = condition;
       this.simplifyConditions = simplifyConditions;
       // Get path condition
-      Term pathCondition = SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), simplifyConditions, false);
+      JavaDLTerm pathCondition = SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), simplifyConditions, false);
       pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
       // Extract locations from updates
       Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
       objectsToIgnore = computeInitialObjectsToIgnore(false, false); // Contains all objects which should be ignored, like exc of the proof obligation.
-      Set<Term> updateCreatedObjects = new LinkedHashSet<Term>(); // Contains all objects which are created during symbolic execution
-      Set<Term> updateValueObjects = new LinkedHashSet<Term>(); // Contains all objects which are the value of an update
+      Set<JavaDLTerm> updateCreatedObjects = new LinkedHashSet<JavaDLTerm>(); // Contains all objects which are created during symbolic execution
+      Set<JavaDLTerm> updateValueObjects = new LinkedHashSet<JavaDLTerm>(); // Contains all objects which are the value of an update
       collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations, updateCreatedObjects, updateValueObjects, objectsToIgnore);
       objectsToIgnore.addAll(updateCreatedObjects);
       Set<ExtractLocationParameter> initialLocations = extractLocationsFromTerm(pathCondition, objectsToIgnore);
@@ -173,14 +173,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     * @param pairs The {@link ExecutionVariableValuePair}s to represent.
     * @param contentMap The {@link Map} providing child content information.
     * @param parentValue The optional parent {@link IExecutionValue}.
-    * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the current path in the variable-value-hierarchy.
+    * @param alreadyVisitedObjects The value {@link JavaDLTerm}s of already visited objects on the current path in the variable-value-hierarchy.
     * @return The created {@link IExecutionVariable}.
     * @throws ProofInputException Occurred Exception.
     */
    protected IExecutionVariable createVariablesValueStructure(final List<ExecutionVariableValuePair> pairs, 
                                                               final Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap,
                                                               final ExtractedExecutionValue parentValue,
-                                                              final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
+                                                              final ImmutableList<JavaDLTerm> alreadyVisitedObjects) throws ProofInputException {
       assert !pairs.isEmpty();
       // Create variable
       ExecutionVariableValuePair firstPair = pairs.get(0);
@@ -208,7 +208,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     * @param firstPair The first entry in the {@link ExecutionVariableValuePair}s.
     * @param contentMap The content {@link Map}.
     * @param valueListToFill The result {@link List} to fill.
-    * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the current path in the variable-value-hierarchy.
+    * @param alreadyVisitedObjects The value {@link JavaDLTerm}s of already visited objects on the current path in the variable-value-hierarchy.
     * @throws ProofInputException Occurred Exception.
     */
    protected void createValues(final IExecutionVariable variable, 
@@ -216,9 +216,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                final ExecutionVariableValuePair firstPair, 
                                final Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap,
                                final List<IExecutionValue> valueListToFill,
-                               final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
+                               final ImmutableList<JavaDLTerm> alreadyVisitedObjects) throws ProofInputException {
       // Group pairs with same value but with different conditions
-      Map<Term, List<ExecutionVariableValuePair>> groupedPairs = new LinkedHashMap<Term, List<ExecutionVariableValuePair>>();
+      Map<JavaDLTerm, List<ExecutionVariableValuePair>> groupedPairs = new LinkedHashMap<JavaDLTerm, List<ExecutionVariableValuePair>>();
       for (ExecutionVariableValuePair pair : pairs) {
          assert firstPair.getProgramVariable() == pair.getProgramVariable();
          assert firstPair.getArrayIndex() == pair.getArrayIndex();
@@ -240,7 +240,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                                                         pair.getCondition(), 
                                                                         pair.getValue());
             valueListToFill.add(value);
-            Pair<Boolean, ImmutableList<Term>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, pair.getValue());
+            Pair<Boolean, ImmutableList<JavaDLTerm>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, pair.getValue());
             if (!cycleCheckResult.first) { // No cycle detected
                ParentDefinition parentDef = new ParentDefinition(pair.getValue(), pair.getGoalNode());
                Map<LocationDefinition, List<ExecutionVariableValuePair>> content = contentMap.get(parentDef);
@@ -252,7 +252,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             }
          }
          else {
-            List<Term> conditions = new LinkedList<Term>();
+            List<JavaDLTerm> conditions = new LinkedList<JavaDLTerm>();
             Map<LocationDefinition, List<ExecutionVariableValuePair>> childContentMap = new LinkedHashMap<ExecutionVariableExtractor.LocationDefinition, List<ExecutionVariableValuePair>>();
             for (ExecutionVariableValuePair pair : group) {
                conditions.add(pair.getCondition());
@@ -270,7 +270,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                }
             }
             final Services services = getServices();
-            Term comboundPathCondition = services.getTermBuilder().or(conditions);
+            JavaDLTerm comboundPathCondition = services.getTermBuilder().or(conditions);
             if (simplifyConditions) {
                comboundPathCondition = SymbolicExecutionUtil.simplify(getProof().getInitConfig(), getProof(), comboundPathCondition);
             }
@@ -281,7 +281,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                                                         comboundPathCondition, 
                                                                         group.get(0).getValue());
             valueListToFill.add(value);
-            Pair<Boolean, ImmutableList<Term>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, group.get(0).getValue());
+            Pair<Boolean, ImmutableList<JavaDLTerm>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, group.get(0).getValue());
             if (!cycleCheckResult.first) { // No cycle detected
                if (!childContentMap.isEmpty()) {
                   for (List<ExecutionVariableValuePair> child : childContentMap.values()) {
@@ -295,12 +295,12 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
    
    /**
     * Updates the already visited objects list if required.
-    * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the current path in the variable-value-hierarchy.
+    * @param alreadyVisitedObjects The value {@link JavaDLTerm}s of already visited objects on the current path in the variable-value-hierarchy.
     * @param value The current value.
     * @return The new already visited objects list or the original one if the current value is not an object.
     */
-   protected Pair<Boolean, ImmutableList<Term>> updateAlreadyVisitedObjects(final ImmutableList<Term> alreadyVisitedObjects, Term value) {
-      ImmutableList<Term> alreadyVisitedObjectsForChildren = alreadyVisitedObjects;
+   protected Pair<Boolean, ImmutableList<JavaDLTerm>> updateAlreadyVisitedObjects(final ImmutableList<JavaDLTerm> alreadyVisitedObjects, JavaDLTerm value) {
+      ImmutableList<JavaDLTerm> alreadyVisitedObjectsForChildren = alreadyVisitedObjects;
       boolean cycleDetected = false;
       if (value != null &&
           SymbolicExecutionUtil.hasReferenceSort(getServices(), value) &&
@@ -312,7 +312,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             cycleDetected = true;
          }
       }
-      return new Pair<Boolean, ImmutableList<Term>>(cycleDetected, alreadyVisitedObjectsForChildren);
+      return new Pair<Boolean, ImmutableList<JavaDLTerm>>(cycleDetected, alreadyVisitedObjectsForChildren);
    }
    
    /**
@@ -323,7 +323,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       /**
        * The parent.
        */
-      private final Term parent;
+      private final JavaDLTerm parent;
       
       /**
        * The {@link Node} on which this result is based on.
@@ -335,7 +335,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        * @param parent The parent.
        * @param goalNode The {@link Node} on which this result is based on.
        */
-      public ParentDefinition(Term parent, Node goalNode) {
+      public ParentDefinition(JavaDLTerm parent, Node goalNode) {
          this.parent = parent;
          this.goalNode = goalNode;
       }
@@ -380,14 +380,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       /**
        * The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      private final Term arrayIndex;
+      private final JavaDLTerm arrayIndex;
 
       /**
        * Constructor.
        * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is used instead.
        * @param arrayIndex The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      public LocationDefinition(ProgramVariable programVariable, Term arrayIndex) {
+      public LocationDefinition(ProgramVariable programVariable, JavaDLTerm arrayIndex) {
          this.programVariable = programVariable;
          this.arrayIndex = arrayIndex;
       }
@@ -442,8 +442,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                     Node proofNode, 
                                     PosInOccurrence modalityPIO,
                                     IProgramVariable programVariable,
-                                    Term arrayIndex,
-                                    Term additionalCondition) {
+                                    JavaDLTerm arrayIndex,
+                                    JavaDLTerm additionalCondition) {
          super(parentNode.getSettings(),
                proofNode, 
                programVariable, 
@@ -473,7 +473,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                      List<IExecutionValue> values = new LinkedList<IExecutionValue>();
                      StateExecutionVariable variable = allStateVariables.get(new LocationDefinition(firstPair.getProgramVariable(), firstPair.getArrayIndex()));
                      assert variable != null;
-                     createValues(variable, pairsList, firstPair, contentMap, values, ImmutableSLList.<Term>nil());
+                     createValues(variable, pairsList, firstPair, contentMap, values, ImmutableSLList.<JavaDLTerm>nil());
                      variable.values = values.toArray(new IExecutionValue[values.size()]);
                   }
                }
@@ -486,7 +486,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        * {@inheritDoc}
        */
       @Override
-      public Term createSelectTerm() {
+      public JavaDLTerm createSelectTerm() {
          return SymbolicExecutionUtil.createSelectTerm(this);
       }
    }
@@ -515,8 +515,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                         Node proofNode, 
                                         PosInOccurrence modalityPIO,
                                         IProgramVariable programVariable,
-                                        Term arrayIndex,
-                                        Term additionalCondition,
+                                        JavaDLTerm arrayIndex,
+                                        JavaDLTerm additionalCondition,
                                         ExtractedExecutionValue parentValue) {
          super(parentNode.getSettings(),
                proofNode, 
@@ -547,7 +547,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        * {@inheritDoc}
        */
       @Override
-      public Term createSelectTerm() {
+      public JavaDLTerm createSelectTerm() {
          return SymbolicExecutionUtil.createSelectTerm(this);
       }
    }
@@ -578,8 +578,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       public ExtractedExecutionValue(IExecutionNode<?> parentNode, 
                                      Node proofNode, 
                                      IExecutionVariable variable, 
-                                     Term condition, 
-                                     Term value) {
+                                     JavaDLTerm condition, 
+                                     JavaDLTerm value) {
          super(parentNode.getSettings(), proofNode, variable, condition, value);
          this.parentNode = parentNode;
       }

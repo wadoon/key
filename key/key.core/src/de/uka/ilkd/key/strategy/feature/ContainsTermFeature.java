@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.feature;
 import org.key_project.common.core.logic.Visitor;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -68,8 +68,8 @@ public class ContainsTermFeature implements Feature {
     public RuleAppCost compute(RuleApp app,
                                PosInOccurrence pos,
                                Goal goal) {
-        final Term t1 = proj1.toTerm(app, pos, goal);
-        final Term t2 = proj2.toTerm(app, pos, goal);
+        final JavaDLTerm t1 = proj1.toTerm(app, pos, goal);
+        final JavaDLTerm t2 = proj2.toTerm(app, pos, goal);
         ContainsTermVisitor visitor = new ContainsTermVisitor(t2);
         t1.execPreOrder(visitor);
         if (visitor.found) {
@@ -82,30 +82,30 @@ public class ContainsTermFeature implements Feature {
 
     private class ContainsTermVisitor implements Visitor {
         boolean found = false;
-        Term term;
+        JavaDLTerm term;
 
 
-        public ContainsTermVisitor(Term term) {
+        public ContainsTermVisitor(JavaDLTerm term) {
             this.term = term;
         }
 
         @Override
-        public boolean visitSubtree(Term visited) {
+        public boolean visitSubtree(JavaDLTerm visited) {
             return true;
         }
 
         @Override
-        public void visit(Term visited) {
+        public void visit(JavaDLTerm visited) {
             found = found || visited.equalsModRenaming(term);
         }
 
         @Override
-        public void subtreeEntered(Term subtreeRoot) {
+        public void subtreeEntered(JavaDLTerm subtreeRoot) {
             // nothing to do
         }
 
         @Override
-        public void subtreeLeft(Term subtreeRoot) {
+        public void subtreeLeft(JavaDLTerm subtreeRoot) {
             // nothing to do
         }
     }

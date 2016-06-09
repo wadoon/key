@@ -21,7 +21,7 @@ import java.util.Map;
 import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 
@@ -52,11 +52,11 @@ public class HeapContext {
     return result;
   }
   
-  public static Map<LocationVariable,Term> getAtPres(Map<LocationVariable,LocationVariable> atPreVars, Services services) {
-    final Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
+  public static Map<LocationVariable,JavaDLTerm> getAtPres(Map<LocationVariable,LocationVariable> atPreVars, Services services) {
+    final Map<LocationVariable,JavaDLTerm> result = new LinkedHashMap<LocationVariable,JavaDLTerm>();
     for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
        final LocationVariable lv = atPreVars.get(heap);
-       final Term t = lv == null ? null : services.getTermBuilder().var(lv);
+       final JavaDLTerm t = lv == null ? null : services.getTermBuilder().var(lv);
        result.put(heap, t);
     }
     return result;

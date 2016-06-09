@@ -16,7 +16,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -31,9 +31,9 @@ public final class DivideLCRMonomials extends AbstractTermTransformer {
 
 
     /** calculates the resulting term. */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
-        final Term arg1 = term.sub ( 0 );
-        final Term arg2 = term.sub ( 1 );
+    public JavaDLTerm transform(JavaDLTerm term, SVInstantiations svInst, Services services) {
+        final JavaDLTerm arg1 = term.sub ( 0 );
+        final JavaDLTerm arg2 = term.sub ( 1 );
 
         final Monomial m1 = Monomial.create ( arg1, services );
         final Monomial m2 = Monomial.create ( arg2, services );

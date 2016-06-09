@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -34,7 +34,7 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 
 /**
- * Term generator for infering the range of values that a variable can have from
+ * JavaDLTerm generator for infering the range of values that a variable can have from
  * a given non-linear (in)equation. The generator may only be called on formulas
  * of the form
  * <tt>v^n = l</code>, <tt>v^n <= l</code>, <tt>v^n >= l</code>,
@@ -60,11 +60,11 @@ public class RootsGenerator implements TermGenerator {
         this.tb = tb;
     }
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
         final IntegerLDT numbers = services.getTheories().getIntegerLDT();
         
-        final Term powerRel = powerRelation.toTerm ( app, pos, goal );
+        final JavaDLTerm powerRel = powerRelation.toTerm ( app, pos, goal );
         
         final Operator op = powerRel.op ();
         
@@ -80,7 +80,7 @@ public class RootsGenerator implements TermGenerator {
         if ( pow <= 1 || !mon.getCoefficient ().equals ( one ) )
             return emptyIterator ();
 
-        final Term var = mon.getParts ().head ();
+        final JavaDLTerm var = mon.getParts ().head ();
         if ( !mon.getParts ().removeAll ( var ).isEmpty () )
             return emptyIterator ();
         
@@ -95,18 +95,18 @@ public class RootsGenerator implements TermGenerator {
         return emptyIterator ();        
     }
 
-    private Iterator<Term> emptyIterator() {
-        return ImmutableSLList.<Term>nil().iterator ();
+    private Iterator<JavaDLTerm> emptyIterator() {
+        return ImmutableSLList.<JavaDLTerm>nil().iterator ();
     }
 
-    private Iterator<Term> toIterator(Term res) {
+    private Iterator<JavaDLTerm> toIterator(JavaDLTerm res) {
         if ( res.equals ( tb.ff () ) ) return emptyIterator ();
-        return ImmutableSLList.<Term>nil().prepend ( res ).iterator ();
+        return ImmutableSLList.<JavaDLTerm>nil().prepend ( res ).iterator ();
     }
 
-    private Term breakDownEq(Term var, BigInteger lit, int pow,
+    private JavaDLTerm breakDownEq(JavaDLTerm var, BigInteger lit, int pow,
                              TermServices services) {
-        final Term zero = tb.zero();
+        final JavaDLTerm zero = tb.zero();
 
         if ( ( pow % 2 == 0 ) ) {
             // the even case
@@ -122,8 +122,8 @@ public class RootsGenerator implements TermGenerator {
                 final BigInteger r = root ( lit, pow );
                 if ( power ( r, pow ).equals ( lit ) ) {
                     // two solutions
-                    final Term rTerm = tb.zTerm ( r.toString () );
-                    final Term rNegTerm = tb.zTerm ( r.negate ().toString () );
+                    final JavaDLTerm rTerm = tb.zTerm ( r.toString () );
+                    final JavaDLTerm rNegTerm = tb.zTerm ( r.negate ().toString () );
                     return tb.or ( tb.or ( tb.lt ( var, rNegTerm ),
                                            tb.gt ( var, rTerm ) ),
                                    tb.and ( tb.gt ( var, rNegTerm ),
@@ -139,7 +139,7 @@ public class RootsGenerator implements TermGenerator {
             final BigInteger r = root ( lit, pow );
             if ( power ( r, pow ).equals ( lit ) ) {
                 // one solution
-                final Term rTerm = tb.zTerm ( r.toString () );
+                final JavaDLTerm rTerm = tb.zTerm ( r.toString () );
                 return tb.equals ( var, rTerm );
             } else {
                 // no solution
@@ -151,7 +151,7 @@ public class RootsGenerator implements TermGenerator {
         return null;
     }
 
-    private Term breakDownGeq(Term var, BigInteger lit, int pow, TermServices services) {
+    private JavaDLTerm breakDownGeq(JavaDLTerm var, BigInteger lit, int pow, TermServices services) {
         if ( ( pow % 2 == 0 ) ) {
             // the even case
             
@@ -162,8 +162,8 @@ public class RootsGenerator implements TermGenerator {
                 return tb.ff ();
             case 1:
                 final BigInteger r = rootRoundingUpwards ( lit, pow );
-                final Term rTerm = tb.zTerm ( r.toString () );
-                final Term rNegTerm = tb.zTerm ( r.negate ().toString () );
+                final JavaDLTerm rTerm = tb.zTerm ( r.toString () );
+                final JavaDLTerm rNegTerm = tb.zTerm ( r.negate ().toString () );
                 return tb.or ( tb.leq ( var, rNegTerm ),
                                tb.geq ( var, rTerm ) );
             }
@@ -178,7 +178,7 @@ public class RootsGenerator implements TermGenerator {
         return null;
     }
 
-    private Term breakDownLeq(Term var, BigInteger lit, int pow, TermServices services) {
+    private JavaDLTerm breakDownLeq(JavaDLTerm var, BigInteger lit, int pow, TermServices services) {
         if ( ( pow % 2 == 0 ) ) {
             // the even case
             
@@ -190,8 +190,8 @@ public class RootsGenerator implements TermGenerator {
                 return tb.equals ( var, tb.zero( ) );
             case 1:
                 final BigInteger r = root ( lit, pow );
-                final Term rTerm = tb.zTerm ( r.toString () );
-                final Term rNegTerm = tb.zTerm ( r.negate ().toString () );
+                final JavaDLTerm rTerm = tb.zTerm ( r.toString () );
+                final JavaDLTerm rNegTerm = tb.zTerm ( r.negate ().toString () );
                 return tb.and ( tb.geq ( var, rNegTerm ),
                                 tb.leq ( var, rTerm ) );
             }

@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -29,12 +29,12 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
    /**
     * The index in the parent array.
     */
-   private final Term arrayIndex;
+   private final JavaDLTerm arrayIndex;
    
    /**
     * An optional additional condition to consider.
     */
-   private final Term additionalCondition;
+   private final JavaDLTerm additionalCondition;
    
    /**
     * The {@link PosInOccurrence} of the modality of interest.
@@ -55,8 +55,8 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
                                     Node proofNode, 
                                     IProgramVariable programVariable, 
                                     IExecutionValue parentValue, 
-                                    Term arrayIndex, 
-                                    Term additionalCondition,
+                                    JavaDLTerm arrayIndex, 
+                                    JavaDLTerm additionalCondition,
                                     PosInOccurrence modalityPIO) {
       super(settings, proofNode);
       this.programVariable = programVariable;
@@ -70,7 +70,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * {@inheritDoc}
     */
    @Override
-   public Term getAdditionalCondition() {
+   public JavaDLTerm getAdditionalCondition() {
       return additionalCondition;
    }
 
@@ -100,7 +100,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * {@inheritDoc}
     */
    @Override
-   public Term getArrayIndex() {
+   public JavaDLTerm getArrayIndex() {
       return arrayIndex;
    }
 

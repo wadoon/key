@@ -32,7 +32,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -160,7 +160,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term generateMbyAtPreDef(ProgramVariable selfVar,
+   protected JavaDLTerm generateMbyAtPreDef(ProgramVariable selfVar,
                                       ImmutableList<ProgramVariable> paramVars, Services services) {
       return tb.tt();
    }
@@ -169,7 +169,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term getPre(List<LocationVariable> modHeaps,
+   protected JavaDLTerm getPre(List<LocationVariable> modHeaps,
                          ProgramVariable selfVar,
                          ImmutableList<ProgramVariable> paramVars,
                          Map<LocationVariable, LocationVariable> atPreVars,
@@ -200,7 +200,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term getPost(List<LocationVariable> modHeaps,
+   protected JavaDLTerm getPost(List<LocationVariable> modHeaps,
                           ProgramVariable selfVar,
                           ImmutableList<ProgramVariable> paramVars,
                           ProgramVariable resultVar,
@@ -214,8 +214,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                   Map<Term, Term> heapToAtPre,
+   protected JavaDLTerm buildFrameClause(List<LocationVariable> modHeaps,
+                                   Map<JavaDLTerm, JavaDLTerm> heapToAtPre,
                                    ProgramVariable selfVar,
                                    ImmutableList<ProgramVariable> paramVars, Services services) {
       return tb.tt();
@@ -405,8 +405,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
    }
 
     @Override
-    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm,
-            Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+    protected JavaDLTerm getGlobalDefs(LocationVariable heap, JavaDLTerm heapTerm,
+            JavaDLTerm selfTerm, ImmutableList<JavaDLTerm> paramTerms, Services services) {
         // TODO Auto-generated method stub
         return null;
     }

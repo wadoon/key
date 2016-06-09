@@ -8,7 +8,7 @@ import javax.script.ScriptEngineManager;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -31,7 +31,7 @@ public class JavascriptCommand extends AbstractCommand {
             return getFirstOpenGoal(proof, state).sequent();
         }
 
-        public void setVar(String var, Term term) throws ScriptException {
+        public void setVar(String var, JavaDLTerm term) throws ScriptException {
 
             if(!var.matches("@[a-zA-Z0-9_]") ) {
                 throw new ScriptException("Is not a variable name: " +var);

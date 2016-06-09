@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
@@ -134,7 +134,7 @@ public final class GenericSortInstantiations {
 	    GenericSortCondition.createCondition ( sv, p_entry );
 	if ( c != null ) return checkCondition ( c );
 	
-        final Term term = ( (TermInstantiation)p_entry ).getInstantiation ();
+        final JavaDLTerm term = ( (TermInstantiation)p_entry ).getInstantiation ();
         
         if(GenericSortCondition.subSortsAllowed(sv)) {
             return term.sort().extendsTrans(sv.sort());

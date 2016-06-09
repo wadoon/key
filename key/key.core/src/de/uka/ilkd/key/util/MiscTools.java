@@ -41,7 +41,7 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -85,7 +85,7 @@ public final class MiscTools {
      * Returns the receiver term of the passed method frame, or null if
      * the frame belongs to a static method.
      */
-    public static Term getSelfTerm(MethodFrame mf, Services services) {
+    public static JavaDLTerm getSelfTerm(MethodFrame mf, Services services) {
 	ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
 	ReferencePrefix rp = ec.getRuntimeInstance();
 	if(!(rp instanceof TypeReference) && rp != null) {
@@ -113,7 +113,7 @@ public final class MiscTools {
 
 
     public static ImmutableSet<Pair<Sort,IObserverFunction>>
-    						collectObservers(Term t) {
+    						collectObservers(JavaDLTerm t) {
 	ImmutableSet<Pair<Sort, IObserverFunction>> result
 		= DefaultImmutableSet.nil();
 	if(t.op() instanceof IObserverFunction) {
@@ -123,7 +123,7 @@ public final class MiscTools {
 	                   : t.sub(1).sort();
 	    result = result.add(new Pair<Sort,IObserverFunction>(s, obs));
 	}
-	for(Term sub : t.subs()) {
+	for(JavaDLTerm sub : t.subs()) {
 	    result = result.union(collectObservers(sub));
 	}
 	return result;
@@ -652,12 +652,12 @@ public final class MiscTools {
 	}
     }
 
-    public static ImmutableList<Term> toTermList(Iterable<ProgramVariable> list,
+    public static ImmutableList<JavaDLTerm> toTermList(Iterable<ProgramVariable> list,
                                                  TermBuilder tb) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
         for (ProgramVariable pv : list) {
             if (pv != null) {
-                Term t = tb.var(pv);
+                JavaDLTerm t = tb.var(pv);
                 result = result.append(t);
             }
         }
@@ -682,10 +682,10 @@ public final class MiscTools {
         return sb.toString();
     }
 
-    public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
-                                                          ImmutableList<Term> localOuts) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (Term localIn : localIns) {
+    public static ImmutableList<JavaDLTerm> filterOutDuplicates(ImmutableList<JavaDLTerm> localIns,
+                                                          ImmutableList<JavaDLTerm> localOuts) {
+        ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
+        for (JavaDLTerm localIn : localIns) {
             if (!localOuts.contains(localIn)) {
                 result = result.append(localIn);
             }

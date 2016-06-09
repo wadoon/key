@@ -4,7 +4,7 @@
  */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 /**
@@ -15,15 +15,15 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicPostconditionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
+    public JavaDLTerm produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         if (d.get(BasicSnippetData.Key.POSTCONDITION) == null) {
             throw new UnsupportedOperationException("Tried to produce a "
                     + "postcondition for a contract without postcondition.");
         }
-        assert Term.class.equals(BasicSnippetData.Key.POSTCONDITION.getType());
-        Term origPost = (Term) d.get(
+        assert JavaDLTerm.class.equals(BasicSnippetData.Key.POSTCONDITION.getType());
+        JavaDLTerm origPost = (JavaDLTerm) d.get(
                 BasicSnippetData.Key.POSTCONDITION);
         return replace(origPost, d.origVars, poVars.post, d.tb);
     }

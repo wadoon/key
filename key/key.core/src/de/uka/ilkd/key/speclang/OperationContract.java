@@ -19,7 +19,7 @@ import java.util.Map;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -40,7 +40,7 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      */
-    public Term getMod(LocationVariable heapVar, ProgramVariable selfVar, 
+    public JavaDLTerm getMod(LocationVariable heapVar, ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Services services);
     
@@ -48,27 +48,27 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      */
-    public Term getMod(LocationVariable heapVar, Term heapTerm,
-	               Term selfTerm, 
-	    	       ImmutableList<Term> paramTerms,
+    public JavaDLTerm getMod(LocationVariable heapVar, JavaDLTerm heapTerm,
+	               JavaDLTerm selfTerm, 
+	    	       ImmutableList<JavaDLTerm> paramTerms,
                        Services services);
 
-    public Term getFreePre(LocationVariable heap,
+    public JavaDLTerm getFreePre(LocationVariable heap,
                            ProgramVariable selfVar,
                            ImmutableList<ProgramVariable> paramVars,
                            Map<LocationVariable,? extends ProgramVariable> atPreVars,
                            Services services);
 
-    public Term getFreePre(List<LocationVariable> heapContext,
+    public JavaDLTerm getFreePre(List<LocationVariable> heapContext,
                            ProgramVariable selfVar,
                            ImmutableList<ProgramVariable> paramVars,
                            Map<LocationVariable,? extends ProgramVariable> atPreVars,
                            Services services);
     
-    public Term getFreePre(LocationVariable heap,
-                           Term heapTerm,
-                           Term selfTerm,
-                           ImmutableList<Term> paramTerms,
-                           Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getFreePre(LocationVariable heap,
+                           JavaDLTerm heapTerm,
+                           JavaDLTerm selfTerm,
+                           ImmutableList<JavaDLTerm> paramTerms,
+                           Map<LocationVariable,JavaDLTerm> atPres,
                            Services services);
 }

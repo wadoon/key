@@ -25,7 +25,7 @@ import org.key_project.common.core.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
@@ -100,12 +100,12 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     /*
      * recursively descent into the term to detect a modality.
      */
-    private static boolean hasModality(Term term) {
+    private static boolean hasModality(JavaDLTerm term) {
         if(term.op() instanceof Modality) {
             return true;
         }
 
-        for (Term sub : term.subs()) {
+        for (JavaDLTerm sub : term.subs()) {
             if(hasModality(sub)) {
                 return true;
             }
@@ -181,7 +181,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             
             // apply OSS to <inv>() calls.
             if(rule instanceof OneStepSimplifier) {
-                Term target = pio.subTerm();
+                JavaDLTerm target = pio.subTerm();
                 if(target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();
                     if(updatedOp instanceof ObserverFunction) {

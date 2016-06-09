@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -45,38 +45,38 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return "Finish auxiliary computation.";
     }
 
-    static Term calculateResultingTerm(Proof proof,
+    static JavaDLTerm calculateResultingTerm(Proof proof,
                                        IFProofObligationVars ifVars,
                                        Goal initGoal) {
-        final Term[] goalFormulas1 =
+        final JavaDLTerm[] goalFormulas1 =
                 buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1),
                                proof.openGoals(), initGoal);
-        final Term[] goalFormulas2 =
+        final JavaDLTerm[] goalFormulas2 =
                 buildExecution(ifVars.c2, ifVars.getMapFor(ifVars.c2),
                                proof.openGoals(), initGoal);
         final TermBuilder tb = proof.getServices().getTermBuilder();
-        Term composedStates = tb.ff();
+        JavaDLTerm composedStates = tb.ff();
         for (int i = 0; i < goalFormulas1.length; i++) {
             for (int j = i; j < goalFormulas2.length; j++) {
-                final Term composedState = tb.and(goalFormulas1[i], goalFormulas2[j]);
+                final JavaDLTerm composedState = tb.and(goalFormulas1[i], goalFormulas2[j]);
                 composedStates = tb.or(composedStates, composedState);
             }
         }
         return composedStates;
     }
 
-    private static Term[] buildExecution(ProofObligationVars c,
-                                         Map<Term, Term> vsMap,
+    private static JavaDLTerm[] buildExecution(ProofObligationVars c,
+                                         Map<JavaDLTerm, JavaDLTerm> vsMap,
                                          ImmutableList<Goal> symbExecGoals,
                                          Goal initGoal) {
         Services services = initGoal.proof().getServices();
-        final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
+        final JavaDLTerm[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         final InfFlowProgVarRenamer renamer =
                         new InfFlowProgVarRenamer(goalFormulas, vsMap,
                                                   c.postfix, initGoal, services);
-        final Term[] renamedGoalFormulas =
+        final JavaDLTerm[] renamedGoalFormulas =
                 renamer.renameVariablesAndSkolemConstants();
-        Term[] result = new Term[renamedGoalFormulas.length];
+        JavaDLTerm[] result = new JavaDLTerm[renamedGoalFormulas.length];
         final TermBuilder tb = services.getTermBuilder();
         for (int i = 0; i < renamedGoalFormulas.length; i++) {
             result[i] =
@@ -85,8 +85,8 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return result;
     }
 
-    private static Term[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
-        Term[] result = new Term[symbExecGoals.size()];
+    private static JavaDLTerm[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
+        JavaDLTerm[] result = new JavaDLTerm[symbExecGoals.size()];
         int i = 0;
         for (final Goal symbExecGoal : symbExecGoals) {
             result[i] = buildFormulaFromGoal(symbExecGoal);
@@ -95,9 +95,9 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return result;
     }
 
-    private static Term buildFormulaFromGoal(Goal symbExecGoal) {
+    private static JavaDLTerm buildFormulaFromGoal(Goal symbExecGoal) {
         final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
-        Term result = tb.tt();
+        JavaDLTerm result = tb.tt();
         for (final SequentFormula f : symbExecGoal.sequent().antecedent()) {
             result = tb.and(result, f.formula());
         }

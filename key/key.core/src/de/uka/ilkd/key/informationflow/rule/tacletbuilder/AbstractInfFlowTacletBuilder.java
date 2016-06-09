@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -46,18 +46,18 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    ImmutableList<Term> createTermSV(ImmutableList<Term> ts,
+    ImmutableList<JavaDLTerm> createTermSV(ImmutableList<JavaDLTerm> ts,
                                      String schemaPrefix,
                                      Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (Term t : ts) {
+        ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
+        for (JavaDLTerm t : ts) {
             result = result.append(createTermSV(t, schemaPrefix, services));
         }
         return result;
     }
 
 
-    Term createTermSV(Term t,
+    JavaDLTerm createTermSV(JavaDLTerm t,
                       String schemaPrefix,
                       Services services) {
         if (t == null) {
@@ -105,7 +105,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    Map<QuantifiableVariable, SchemaVariable> collectQuantifiableVariables(Term replaceWithTerm,
+    Map<QuantifiableVariable, SchemaVariable> collectQuantifiableVariables(JavaDLTerm replaceWithTerm,
                                                                            Services services) {
         QuantifiableVariableVisitor qvVisitor =
                 new QuantifiableVariableVisitor();
@@ -126,12 +126,12 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
         private LinkedList<QuantifiableVariable> vars = new LinkedList<QuantifiableVariable>();
 
         @Override
-        public boolean visitSubtree(Term visited) {
+        public boolean visitSubtree(JavaDLTerm visited) {
             return true;
         }
 
         @Override
-        public void visit(Term visited) {
+        public void visit(JavaDLTerm visited) {
             final ImmutableArray<QuantifiableVariable> boundVars =
                     visited.boundVars();
             for (QuantifiableVariable var : boundVars) {
@@ -141,13 +141,13 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
 
         @Override
-        public void subtreeEntered(Term subtreeRoot) {
+        public void subtreeEntered(JavaDLTerm subtreeRoot) {
             // nothing to do
         }
 
 
         @Override
-        public void subtreeLeft(Term subtreeRoot) {
+        public void subtreeLeft(JavaDLTerm subtreeRoot) {
             // nothing to do
         }
 

@@ -29,7 +29,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 public class DLEmbeddedExpression extends Operator {
@@ -163,14 +163,14 @@ public class DLEmbeddedExpression extends Operator {
         }
     }
 
-    public Term makeTerm(LocationVariable heap, Term[] subs, Services services) {
+    public JavaDLTerm makeTerm(LocationVariable heap, JavaDLTerm[] subs, Services services) {
         Function f = getFunctionSymbol();
         // we silently assume that check has been called earlier
 
         if(f.arity() == subs.length) {
             return services.getTermFactory().createTerm(f, subs); 
         } else {
-            Term[] extSubs = new Term[subs.length + 1];
+            JavaDLTerm[] extSubs = new JavaDLTerm[subs.length + 1];
             System.arraycopy(subs, 0, extSubs, 1, subs.length);
             extSubs[0] = services.getTermBuilder().var(heap);
             return services.getTermFactory().createTerm(f, extSubs);

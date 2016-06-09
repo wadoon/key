@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -63,13 +63,13 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the precondition of the contract.
      */
-    public Term getPre(LocationVariable heap,
+    public JavaDLTerm getPre(LocationVariable heap,
                        ProgramVariable selfVar,
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	       Services services);
 
-    public Term getPre(List<LocationVariable> heapContext,
+    public JavaDLTerm getPre(List<LocationVariable> heapContext,
                        ProgramVariable selfVar,
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
@@ -78,24 +78,24 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the precondition of the contract.
      */
-    public Term getPre(LocationVariable heap,
-                       Term heapTerm,
-	               Term selfTerm,
-	    	       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getPre(LocationVariable heap,
+                       JavaDLTerm heapTerm,
+	               JavaDLTerm selfTerm,
+	    	       ImmutableList<JavaDLTerm> paramTerms,
+                       Map<LocationVariable,JavaDLTerm> atPres,
 	    	       Services services);
 
-    public Term getPre(List<LocationVariable> heapContext,
-                       Map<LocationVariable,Term> heapTerms,
-	               Term selfTerm,
-	    	       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getPre(List<LocationVariable> heapContext,
+                       Map<LocationVariable,JavaDLTerm> heapTerms,
+	               JavaDLTerm selfTerm,
+	    	       ImmutableList<JavaDLTerm> paramTerms,
+                       Map<LocationVariable,JavaDLTerm> atPres,
 	    	       Services services);    
 
     /**
      * Returns the dependency set of the contract.
      */
-    public Term getDep(LocationVariable heap, boolean atPre,
+    public JavaDLTerm getDep(LocationVariable heap, boolean atPre,
                        ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
@@ -104,40 +104,40 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the dependency set of the contract.
      */
-    public Term getDep(LocationVariable heap, boolean atPre,
-                       Term heapTerm,
-                       Term selfTerm,
-                       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable, Term> atPres,
+    public JavaDLTerm getDep(LocationVariable heap, boolean atPre,
+                       JavaDLTerm heapTerm,
+                       JavaDLTerm selfTerm,
+                       ImmutableList<JavaDLTerm> paramTerms,
+                       Map<LocationVariable, JavaDLTerm> atPres,
                        Services services);
 
-    public Term getRequires(LocationVariable heap);
+    public JavaDLTerm getRequires(LocationVariable heap);
 
-    public Term getAssignable(LocationVariable heap);
+    public JavaDLTerm getAssignable(LocationVariable heap);
 
-    public Term getAccessible(ProgramVariable heap);
+    public JavaDLTerm getAccessible(ProgramVariable heap);
 
-    public Term getGlobalDefs();
+    public JavaDLTerm getGlobalDefs();
 
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-                              ImmutableList<Term> paramTerms, Services services);
+    public JavaDLTerm getGlobalDefs(LocationVariable heap, JavaDLTerm heapTerm, JavaDLTerm selfTerm,
+                              ImmutableList<JavaDLTerm> paramTerms, Services services);
 
-    public Term getMby();
+    public JavaDLTerm getMby();
 
     /**
      * Returns the measured_by clause of the contract.
      */
-    public Term getMby(ProgramVariable selfVar,
+    public JavaDLTerm getMby(ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
 	               Services services);
 
     /**
      * Returns the measured_by clause of the contract.
      */
-    public Term getMby(Map<LocationVariable,Term> heapTerms,
-	               Term selfTerm,
-	               ImmutableList<Term> paramTerms,
-	               Map<LocationVariable, Term> atPres,
+    public JavaDLTerm getMby(Map<LocationVariable,JavaDLTerm> heapTerms,
+	               JavaDLTerm selfTerm,
+	               ImmutableList<JavaDLTerm> paramTerms,
+	               Map<LocationVariable, JavaDLTerm> atPres,
 	               Services services);
 
     /**

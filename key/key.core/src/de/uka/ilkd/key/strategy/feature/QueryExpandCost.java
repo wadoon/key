@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -81,7 +81,7 @@ public class QueryExpandCost implements Feature {
 	public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
 		final Services services = goal.proof().getServices();
 		final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
-		final Term t = pos.subTerm();
+		final JavaDLTerm t = pos.subTerm();
 
 		// System.out.print("G:"+goal.hashCode()+"   ");
 		long cost=baseCost; 
@@ -128,13 +128,13 @@ public class QueryExpandCost implements Feature {
 	 * @return Cost that is computed base on the integer literals occurring in the numerical arguments of the query t.
 	 * @see <code>literalsToCost</code>
 	 */
-	private static int maxIntliteralInArgumentsTimesTwo(Term t, IntegerLDT iLDT, Services serv){
+	private static int maxIntliteralInArgumentsTimesTwo(JavaDLTerm t, IntegerLDT iLDT, Services serv){
 		final Namespace sorts = serv.getNamespaces().sorts();
 		final Sort intSort = (Sort) sorts.lookup(IntegerLDT.NAME);
 		int cost=0;
 		//The computation is limited to arguments that have an arithmetic type. E.g., don't calculate int literals in the heap parameter. 
 		for(int i=0;i<t.arity();i++){  
-			Term arg = t.sub(i);
+			JavaDLTerm arg = t.sub(i);
 			if(arg.sort()==intSort){
 				cost = Math.max(cost, sumOfAbsLiteralsTimesTwo(arg, iLDT, serv));
 			}
@@ -151,7 +151,7 @@ public class QueryExpandCost implements Feature {
               (*) The sum is modified by extrapolating negative numbers from zero by one. The
                   cost of a query f(n-1) a slightly higher cost than the cost of f(n+1).
      */
-	private static int sumOfAbsLiteralsTimesTwo(Term t, IntegerLDT iLDT, Services serv){
+	private static int sumOfAbsLiteralsTimesTwo(JavaDLTerm t, IntegerLDT iLDT, Services serv){
 		//if(t.op() instanceof Function && iLDT.hasLiteralFunction((Function)t.op())){
 		if(t.op() == iLDT.getNumberSymbol()){
 			String strVal = AbstractTermTransformer.convertToDecimalString(t, serv);
@@ -183,8 +183,8 @@ public class QueryExpandCost implements Feature {
 	        		RuleApp appliedRuleApp = appliedRuleAppIter.next();
 	        		final PosInOccurrence pio = appliedRuleApp.posInOccurrence();
 	        		if(pio!=null){
-		        		final Term oldterm = pio.subTerm();
-		        		final Term curterm = pos.subTerm();
+		        		final JavaDLTerm oldterm = pio.subTerm();
+		        		final JavaDLTerm curterm = pos.subTerm();
 		        		if(appliedRuleApp.rule().equals(QueryExpand.INSTANCE) && 
 		        				oldterm.equals(curterm)){
 		        			count++;

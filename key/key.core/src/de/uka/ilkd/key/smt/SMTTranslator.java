@@ -16,7 +16,7 @@ package de.uka.ilkd.key.smt;
 import java.util.Collection;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 
 /**
@@ -29,14 +29,14 @@ public interface SMTTranslator {
     
     /**
      * Translates a problem into the given syntax. The only difference to
-     * <code>translate(Term t, Services services)</code> is that assumptions
+     * <code>translate(JavaDLTerm t, Services services)</code> is that assumptions
      * will be added.
      * @param problem the problem to be translated.
      * @param services 
      * @return a StringBuffer representing the term in the given syntax.
      * @throws IllegalFormulaException
      */
-    public StringBuffer translateProblem(Term problem, Services services,SMTSettings settings) 
+    public StringBuffer translateProblem(JavaDLTerm problem, Services services,SMTSettings settings) 
            throws IllegalFormulaException;
     
 

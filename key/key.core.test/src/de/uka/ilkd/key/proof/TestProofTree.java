@@ -26,7 +26,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -66,25 +66,25 @@ public class TestProofTree extends TestCase {
 
 	TermFactory tf = TacletForTests.services().getTermFactory();
 	
-	Term t_b1=tf.createTerm(Equality.EQUALS,
+	JavaDLTerm t_b1=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b1),
 		                tf.createTerm(b1));
-	Term t_b2=tf.createTerm(Equality.EQUALS,
+	JavaDLTerm t_b2=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b2),
 		                tf.createTerm(b2));
-	Term t_b3=tf.createTerm(Equality.EQUALS,
+	JavaDLTerm t_b3=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b3),
 		                tf.createTerm(b3));
-	Term t_b4=tf.createTerm(Equality.EQUALS,
+	JavaDLTerm t_b4=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b4),
 		                tf.createTerm(b4));
-	Term t_b5=tf.createTerm(Equality.EQUALS,
+	JavaDLTerm t_b5=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b5),
 		                tf.createTerm(b5));
-	Term t_b6=tf.createTerm(Equality.EQUALS,
+	JavaDLTerm t_b6=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b6),
 		                tf.createTerm(b6));
-	Term t_b7=tf.createTerm(Equality.EQUALS,
+	JavaDLTerm t_b7=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b7),
 		                tf.createTerm(b7));
 

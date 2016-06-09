@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.profile;
 
+import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
@@ -24,9 +25,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -41,14 +41,14 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * An extended {@link JavaProfile} used in side proofs to simplify a {@link Term}.
+ * An extended {@link JavaProfile} used in side proofs to simplify a {@link JavaDLTerm}.
  * @author Martin Hentschel
  */
 public class SimplifyTermProfile extends JavaProfile {
    /**
     * The {@link Name} of this {@link Profile}.
     */
-   public static final String NAME = "Java Profile for Term Simplification";
+   public static final String NAME = "Java Profile for JavaDLTerm Simplification";
    
    /**
     * The used {@link StrategyFactory} of the {@link SymbolicExecutionStrategy}.
@@ -83,11 +83,11 @@ public class SimplifyTermProfile extends JavaProfile {
          @Override
          public TermLabel keepLabel(TermLabelState state, Services services,
                PosInOccurrence applicationPosInOccurrence,
-               Term applicationTerm, Rule rule, Goal goal, Object hint,
-               Term tacletTerm, Operator newTermOp,
-               ImmutableArray<Term> newTermSubs,
+               JavaDLTerm applicationTerm, Rule rule, Goal goal, Object hint,
+               JavaDLTerm tacletTerm, Operator newTermOp,
+               ImmutableArray<JavaDLTerm> newTermSubs,
                ImmutableArray<QuantifiableVariable> newTermBoundVars,
-               JavaBlock newTermJavaBlock, ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
+               ModalContent newTermJavaBlock, ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
             return label;
          }
        });

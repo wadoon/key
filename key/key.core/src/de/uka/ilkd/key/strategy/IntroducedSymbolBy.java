@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy;
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -57,8 +57,8 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
 		final TacletApp ta = (TacletApp) ra;
 		if (ta.taclet().getRuleSets().contains(new RuleSet(ruleSetName))) {
 		    final Object svInstValue = ta.instantiations().lookupValue(schemaVar);
-		    if ( svInstValue instanceof Term ) {
-			return term.toTerm(app, pos, goal).op() == ((Term)svInstValue).op();
+		    if ( svInstValue instanceof JavaDLTerm ) {
+			return term.toTerm(app, pos, goal).op() == ((JavaDLTerm)svInstValue).op();
 		    }
 		}
 	    }	    	    

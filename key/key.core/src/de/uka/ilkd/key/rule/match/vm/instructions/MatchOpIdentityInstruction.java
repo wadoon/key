@@ -3,7 +3,7 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
@@ -22,7 +22,7 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions, Services services) {
+    public final MatchConditions match(JavaDLTerm instantiationCandidate, MatchConditions matchConditions, Services services) {
         if(instantiationCandidate.op() == op) {
             return matchConditions;
         }

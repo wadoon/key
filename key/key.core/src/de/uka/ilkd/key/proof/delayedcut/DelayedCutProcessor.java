@@ -26,7 +26,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -93,7 +93,7 @@ public class DelayedCutProcessor implements Runnable {
     private final LinkedList<DelayedCutListener> listeners = new LinkedList<DelayedCutListener>();
     private final Proof proof;
     private final Node node;
-    private final Term descisionPredicate;
+    private final JavaDLTerm descisionPredicate;
     private final int mode;
     private boolean used = false;
 
@@ -111,7 +111,7 @@ public class DelayedCutProcessor implements Runnable {
         return list;
     }
 
-    public DelayedCutProcessor(Proof proof, Node node, Term descisionPredicate,
+    public DelayedCutProcessor(Proof proof, Node node, JavaDLTerm descisionPredicate,
             int mode) {
         super();
         this.proof = proof;
@@ -318,7 +318,7 @@ public class DelayedCutProcessor implements Runnable {
             while (svIt.hasNext()) {
                 final SchemaVariable sv = svIt.next();
                 if (sv instanceof SkolemTermSV) {
-                    final Term inst = (Term) insts.getInstantiation(sv);
+                    final JavaDLTerm inst = (JavaDLTerm) insts.getInstantiation(sv);
                     services.getNamespaces().functions()
                             .remove(inst.op().name());
                 }

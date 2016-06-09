@@ -31,7 +31,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -84,26 +84,26 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                 // // variables
                 // // and do not quantify the variables.
 
-                Term term = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(t, services);
+                JavaDLTerm term = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(t, services);
 
                 // rebuild the term to exchange schema variables with logic
                 // varibales.
                 term = rebuildTerm(term);
 
-                Collection<Term> result = new LinkedList<Term>();
+                Collection<JavaDLTerm> result = new LinkedList<JavaDLTerm>();
                 result.add(term);
 
-                Collection<Term> result2 = new LinkedList<Term>();
+                Collection<JavaDLTerm> result2 = new LinkedList<JavaDLTerm>();
 
                 // step: quantify all free variables.
-                for (Term te : result) {
+                for (JavaDLTerm te : result) {
                         te = quantifyTerm(te, services);
                         result2.add(te);
                 }
 
                 // step: translate the generics sorts.
-                result = new LinkedList<Term>();
-                for (Term te : result2) {
+                result = new LinkedList<JavaDLTerm>();
+                for (JavaDLTerm te : result2) {
                         result.addAll(genericTranslator.translate(te, sorts, t,
                                         conditions, services, maxGeneric));
                 }
@@ -123,9 +123,9 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
          * @return returns the new term.
          */
 
-        private Term rebuildTerm(Term term) {
+        private JavaDLTerm rebuildTerm(JavaDLTerm term) {
 
-                Term[] subTerms = new Term[term.arity()];
+                JavaDLTerm[] subTerms = new JavaDLTerm[term.arity()];
 
             ImmutableArray<QuantifiableVariable> variables = term.boundVars();
                 for (int i = 0; i < term.arity(); i++) {
@@ -152,7 +152,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         }
         
         @SuppressWarnings("unused") // this method is only for testing, and is not used normally.
-        private void print(Term term){
+        private void print(JavaDLTerm term){
                 System.out.println(term.op().name());
                 System.out.println(term.op().getClass());
                 System.out.println(term.sort());
@@ -183,13 +183,13 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         }
 
-        static public HashSet<GenericSort> collectGenerics(Term term) {
+        static public HashSet<GenericSort> collectGenerics(JavaDLTerm term) {
                 HashSet<GenericSort> genericSorts = new LinkedHashSet<GenericSort>();
                 collectGenerics(term, genericSorts);
                 return genericSorts;
         }
 
-        static private void collectGenerics(Term term,
+        static private void collectGenerics(JavaDLTerm term,
                         HashSet<GenericSort> genericSorts) {
 
                 if (term.op() instanceof SortDependingFunction) {
@@ -372,7 +372,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
        * @param services TODO
          * @return the quantified term.
          */
-        protected static Term quantifyTerm(Term term, TermServices services)
+        protected static JavaDLTerm quantifyTerm(JavaDLTerm term, TermServices services)
                         throws IllegalTacletException {
                 TermBuilder tb = services.getTermBuilder();
                 // Quantify over all free variables.
@@ -469,7 +469,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
          *                the term to be changed.
          * @return the new term.
          */
-        protected Term changeTerm(Term term) {
+        protected JavaDLTerm changeTerm(JavaDLTerm term) {
 
                 TermBuilder tb = services.getTermBuilder();
 

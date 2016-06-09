@@ -10,7 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 
@@ -25,7 +25,7 @@ public class IFProofObligationVars {
 
     public final ProofObligationVars c1, c2, symbExecVars;
 
-    private final Map<ProofObligationVars, Map<Term, Term>> infFlowToSymbExecVarsMaps;
+    private final Map<ProofObligationVars, Map<JavaDLTerm, JavaDLTerm>> infFlowToSymbExecVarsMaps;
 
 
     public IFProofObligationVars(ProofObligationVars symbExecVars,
@@ -45,9 +45,9 @@ public class IFProofObligationVars {
 
         assert symbExecVars != null;
         infFlowToSymbExecVarsMaps =
-                new HashMap<ProofObligationVars, Map<Term, Term>>();
-        infFlowToSymbExecVarsMaps.put(c1, new HashMap<Term, Term>());
-        infFlowToSymbExecVarsMaps.put(c2, new HashMap<Term, Term>());
+                new HashMap<ProofObligationVars, Map<JavaDLTerm, JavaDLTerm>>();
+        infFlowToSymbExecVarsMaps.put(c1, new HashMap<JavaDLTerm, JavaDLTerm>());
+        infFlowToSymbExecVarsMaps.put(c2, new HashMap<JavaDLTerm, JavaDLTerm>());
         linkSymbExecVarsToCopies();
     }
 
@@ -70,10 +70,10 @@ public class IFProofObligationVars {
 
     private void linkStateVarsToCopies(StateVars ifVars,
                                        StateVars seVars,
-                                       Map<Term, Term> map) {
-        final Iterator<Term> ifVarsIt = ifVars.termList.iterator();
-        for (final Term symbTerm : seVars.termList) {
-            final Term ifTerm = ifVarsIt.next();
+                                       Map<JavaDLTerm, JavaDLTerm> map) {
+        final Iterator<JavaDLTerm> ifVarsIt = ifVars.termList.iterator();
+        for (final JavaDLTerm symbTerm : seVars.termList) {
+            final JavaDLTerm ifTerm = ifVarsIt.next();
             if (symbTerm != null) {
                 map.put(symbTerm, ifTerm);
             }
@@ -81,7 +81,7 @@ public class IFProofObligationVars {
     }
 
 
-    public Map<Term, Term> getMapFor(ProofObligationVars vars) {
+    public Map<JavaDLTerm, JavaDLTerm> getMapFor(ProofObligationVars vars) {
         return infFlowToSymbExecVarsMaps.get(vars);
     }
 

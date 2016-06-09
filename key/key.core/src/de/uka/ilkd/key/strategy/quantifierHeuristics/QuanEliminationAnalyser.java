@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -31,14 +31,14 @@ public class QuanEliminationAnalyser {
      *         <code>Integer.MAX_VALUE</code> if the subformula is not an
      *         eliminable definition
      */
-    public int eliminableDefinition(Term definition, PosInOccurrence envPIO) {
+    public int eliminableDefinition(JavaDLTerm definition, PosInOccurrence envPIO) {
         final PosInOccurrence matrixPIO = walkUpMatrix ( envPIO );
-        final Term matrix = matrixPIO.subTerm ();
+        final JavaDLTerm matrix = matrixPIO.subTerm ();
 
         if ( matrixPIO.isTopLevel () ) return Integer.MAX_VALUE;
         
         PosInOccurrence quantPIO = matrixPIO.up ();
-        Term quantTerm = quantPIO.subTerm ();
+        JavaDLTerm quantTerm = quantPIO.subTerm ();
         final boolean ex;
         if ( quantTerm.op () == Quantifier.EX ) {
             ex = true;
@@ -71,12 +71,12 @@ public class QuanEliminationAnalyser {
         }
     }
 
-    private boolean isDefinitionCandidate(Term t, Term env, boolean ex) {
+    private boolean isDefinitionCandidate(JavaDLTerm t, JavaDLTerm env, boolean ex) {
         if ( !hasDefinitionShape ( t, ex ) ) return false;
         return !ex || !isBelowOr ( t, env );
     }
 
-    private boolean isBelowOr(Term t, Term env) {
+    private boolean isBelowOr(JavaDLTerm t, JavaDLTerm env) {
         final Operator envOp = env.op ();
         if ( envOp == Junctor.OR && ( env.sub ( 0 ) == t || env.sub ( 1 ) == t ) )
             return true;
@@ -86,7 +86,7 @@ public class QuanEliminationAnalyser {
         return false;
     }
     
-    private boolean hasDefinitionShape(Term t, boolean ex) {
+    private boolean hasDefinitionShape(JavaDLTerm t, boolean ex) {
         for (QuantifiableVariable quantifiableVariable : t.freeVars()) {
             if (isDefinition(t, quantifiableVariable, ex)) return true;
         }
@@ -109,7 +109,7 @@ public class QuanEliminationAnalyser {
      * (depending on whether <code>ex</code> is true/false)
      */
     public boolean isEliminableVariableSomePaths(QuantifiableVariable var,
-                                                 Term matrix,
+                                                 JavaDLTerm matrix,
                                                  boolean ex) {
         if ( !matrix.freeVars ().contains ( var ) ) return true;
         
@@ -138,7 +138,7 @@ public class QuanEliminationAnalyser {
      * whether <code>ex</code> is true/false)
      */
     public boolean isEliminableVariableAllPaths(QuantifiableVariable var,
-                                                Term matrix,
+                                                JavaDLTerm matrix,
                                                 boolean ex) {
         final Operator op = matrix.op ();
 
@@ -156,14 +156,14 @@ public class QuanEliminationAnalyser {
             return isDefiningEquationAll ( matrix, var );
     }
     
-    private boolean isDefinition(Term t, QuantifiableVariable var, boolean ex) {
+    private boolean isDefinition(JavaDLTerm t, QuantifiableVariable var, boolean ex) {
         if ( ex )
             return isDefinitionEx ( t, var );
         else
             return isDefiningEquationAll ( t, var );
     }
     
-    private boolean isDefinitionEx(Term t, QuantifiableVariable var) {
+    private boolean isDefinitionEx(JavaDLTerm t, QuantifiableVariable var) {
         if ( t.op () == Junctor.OR ) {
             return isDefinitionEx ( t.sub ( 0 ), var )
                    && isDefinitionEx ( t.sub ( 1 ), var );
@@ -171,19 +171,19 @@ public class QuanEliminationAnalyser {
         return isDefiningEquationEx ( t, var );
     }
     
-    private boolean isDefiningEquationAll(Term t, QuantifiableVariable var) {
+    private boolean isDefiningEquationAll(JavaDLTerm t, QuantifiableVariable var) {
         if ( t.op () != Junctor.NOT ) return false;
         return isDefiningEquation ( t.sub ( 0 ), var );
     }
 
-    private boolean isDefiningEquationEx(Term t, QuantifiableVariable var) {
+    private boolean isDefiningEquationEx(JavaDLTerm t, QuantifiableVariable var) {
         return isDefiningEquation ( t, var );
     }
 
-    private boolean isDefiningEquation(Term t, QuantifiableVariable var) {
+    private boolean isDefiningEquation(JavaDLTerm t, QuantifiableVariable var) {
         if ( t.op () != Equality.EQUALS ) return false;
-        final Term left = t.sub ( 0 );
-        final Term right = t.sub ( 1 );
+        final JavaDLTerm left = t.sub ( 0 );
+        final JavaDLTerm right = t.sub ( 1 );
         final Operator leftOp = left.op ();
         final Operator rightOp = right.op ();
         return leftOp == var && !right.freeVars ().contains ( var )

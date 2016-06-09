@@ -27,7 +27,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -47,15 +47,15 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private final LoopStatement loop;
     private final IProgramMethod pm;
     private final KeYJavaType kjt;
-    private final Map<LocationVariable,Term> originalInvariants;
-    private final Map<LocationVariable,Term> originalModifies;
+    private final Map<LocationVariable,JavaDLTerm> originalInvariants;
+    private final Map<LocationVariable,JavaDLTerm> originalModifies;
     private final Map<LocationVariable,
                       ImmutableList<InfFlowSpec>> originalInfFlowSpecs;
-    private final Term originalVariant;
-    private final Term originalSelfTerm;
-    private final ImmutableList<Term> localIns;
-    private final ImmutableList<Term> localOuts;
-    private final Map<LocationVariable,Term> originalAtPres;
+    private final JavaDLTerm originalVariant;
+    private final JavaDLTerm originalSelfTerm;
+    private final ImmutableList<JavaDLTerm> localIns;
+    private final ImmutableList<JavaDLTerm> localOuts;
+    private final Map<LocationVariable,JavaDLTerm> originalAtPres;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -74,14 +74,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariantImpl(LoopStatement loop,
                              IProgramMethod pm,
                              KeYJavaType kjt,
-                             Map<LocationVariable, Term> invariants,
-                             Map<LocationVariable, Term> modifies,
+                             Map<LocationVariable, JavaDLTerm> invariants,
+                             Map<LocationVariable, JavaDLTerm> modifies,
                              Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs,
-                             Term variant,
-                             Term selfTerm,
-                             ImmutableList<Term> localIns,
-                             ImmutableList<Term> localOuts,
-                             Map<LocationVariable, Term> atPres) {
+                             JavaDLTerm variant,
+                             JavaDLTerm selfTerm,
+                             ImmutableList<JavaDLTerm> localIns,
+                             ImmutableList<JavaDLTerm> localOuts,
+                             Map<LocationVariable, JavaDLTerm> atPres) {
         assert loop != null;
         //assert modifies != null;
         //assert heapAtPre != null;
@@ -89,10 +89,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.pm                         = pm;
         this.kjt                        = kjt;
         this.originalInvariants         =
-                invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
+                invariants == null ? new LinkedHashMap<LocationVariable,JavaDLTerm>() : invariants;
         this.originalVariant            = variant;
         this.originalModifies           =
-                modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
+                modifies == null ? new LinkedHashMap<LocationVariable,JavaDLTerm>() : modifies;
         this.originalInfFlowSpecs       =
                 infFlowSpecs == null ? new LinkedHashMap<LocationVariable,
                                                          ImmutableList<InfFlowSpec>>()
@@ -101,7 +101,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.localIns                   = localIns;
         this.localOuts                  = localOuts;
         this.originalAtPres             =
-                atPres == null ? new LinkedHashMap<LocationVariable,Term>() : atPres;
+                atPres == null ? new LinkedHashMap<LocationVariable,JavaDLTerm>() : atPres;
     }
 
 
@@ -111,8 +111,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariantImpl(LoopStatement loop,
                              IProgramMethod pm,
                              KeYJavaType kjt,
-	    		     Term selfTerm, 
-	    		     Map<LocationVariable,Term> atPres) {
+	    		     JavaDLTerm selfTerm, 
+	    		     Map<LocationVariable,JavaDLTerm> atPres) {
         this(loop, pm, kjt, null, null, null, null, selfTerm, null, null, atPres);
     }
 
@@ -121,11 +121,11 @@ public final class LoopInvariantImpl implements LoopInvariant {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Map /*Operator, Operator, Term -> Term*/<Term, Term> getReplaceMap(
-            Term selfTerm,
-            Map<LocationVariable,Term> atPres,
+    private Map /*Operator, Operator, JavaDLTerm -> JavaDLTerm*/<JavaDLTerm, JavaDLTerm> getReplaceMap(
+            JavaDLTerm selfTerm,
+            Map<LocationVariable,JavaDLTerm> atPres,
             Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+        final Map<JavaDLTerm, JavaDLTerm> result = new LinkedHashMap<JavaDLTerm, JavaDLTerm>();
         
         //self
         if(selfTerm != null) {
@@ -140,10 +140,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
         // date by the ProgVarReplaceVisitor
 
         if(atPres != null) {
-            for (Map.Entry<LocationVariable, Term> en : originalAtPres.entrySet()) {
+            for (Map.Entry<LocationVariable, JavaDLTerm> en : originalAtPres.entrySet()) {
                 LocationVariable var = en.getKey();
-                Term replace = atPres.get(var);
-                Term origReplace = en.getValue();
+                JavaDLTerm replace = atPres.get(var);
+                JavaDLTerm origReplace = en.getValue();
                 if(replace != null && origReplace != null) {
                     assert replace.sort().equals(origReplace.sort());
                     result.put(origReplace, replace);
@@ -155,12 +155,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     
-    private Map<Term,Term> getInverseReplaceMap(Term selfTerm,
-                                                Map<LocationVariable,Term> atPres,
+    private Map<JavaDLTerm,JavaDLTerm> getInverseReplaceMap(JavaDLTerm selfTerm,
+                                                Map<LocationVariable,JavaDLTerm> atPres,
                                                 Services services) {
-       final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
-       final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-       for(Map.Entry<Term, Term> next: replaceMap.entrySet()) {
+       final Map<JavaDLTerm,JavaDLTerm> result = new LinkedHashMap<JavaDLTerm,JavaDLTerm>();
+       final Map<JavaDLTerm, JavaDLTerm> replaceMap = getReplaceMap(selfTerm, atPres, services);
+       for(Map.Entry<JavaDLTerm, JavaDLTerm> next: replaceMap.entrySet()) {
            result.put(next.getValue(), next.getKey());
        }
        return result;
@@ -178,47 +178,47 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override    
-    public Term getInvariant(LocationVariable heap,
-                             Term selfTerm,
-            		     Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getInvariant(LocationVariable heap,
+                             JavaDLTerm selfTerm,
+            		     Map<LocationVariable,JavaDLTerm> atPres,
             		     Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
+        Map<JavaDLTerm, JavaDLTerm> replaceMap = getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalInvariants.get(heap));
     }
     
     @Override
-    public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services){
+    public JavaDLTerm getInvariant(JavaDLTerm selfTerm, Map<LocationVariable,JavaDLTerm> atPres, Services services){
         assert (selfTerm == null) == (originalSelfTerm == null);
         LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
-        Map<Term, Term> replaceMap = 
+        Map<JavaDLTerm, JavaDLTerm> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalModifies.get(baseHeap));
     }
     
     @Override
-    public Term getInvariant(Services services) {
+    public JavaDLTerm getInvariant(Services services) {
         return originalInvariants.get(services.getTheories().getHeapLDT().getHeap());
     }
     
     @Override
-    public Term getModifies(LocationVariable heap, Term selfTerm,
-            		    Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getModifies(LocationVariable heap, JavaDLTerm selfTerm,
+            		    Map<LocationVariable,JavaDLTerm> atPres,
             		    Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> replaceMap = 
+        Map<JavaDLTerm, JavaDLTerm> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalModifies.get(heap));
     }
     
     @Override
-    public Term getModifies(Term selfTerm, Map<LocationVariable,Term> atPres, Services services) {
+    public JavaDLTerm getModifies(JavaDLTerm selfTerm, Map<LocationVariable,JavaDLTerm> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
-        Map<Term, Term> replaceMap = 
+        Map<JavaDLTerm, JavaDLTerm> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalModifies.get(baseHeap));
@@ -226,11 +226,11 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap,
-                                                      Term selfTerm,
-                                                      Map<LocationVariable, Term> atPres,
+                                                      JavaDLTerm selfTerm,
+                                                      Map<LocationVariable, JavaDLTerm> atPres,
                                                       Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> replaceMap = 
+        Map<JavaDLTerm, JavaDLTerm> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replaceInfFlowSpec(originalInfFlowSpecs.get(heap));
@@ -248,28 +248,28 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public Term getVariant(Term selfTerm, 
-            		   Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getVariant(JavaDLTerm selfTerm, 
+            		   Map<LocationVariable,JavaDLTerm> atPres,
             		   Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> replaceMap = 
+        Map<JavaDLTerm, JavaDLTerm> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalVariant);
     }
 
     @Override
-    public Map<LocationVariable,Term> getInternalInvariants() {
+    public Map<LocationVariable,JavaDLTerm> getInternalInvariants() {
         return originalInvariants;
     }
 
     @Override
-    public Term getInternalVariant() {
+    public JavaDLTerm getInternalVariant() {
         return originalVariant;
     }
 
     @Override
-    public Map<LocationVariable,Term> getInternalModifies(){
+    public Map<LocationVariable,JavaDLTerm> getInternalModifies(){
     	return originalModifies;
     }
     
@@ -280,18 +280,18 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
-    public Term getInternalSelfTerm() {
+    public JavaDLTerm getInternalSelfTerm() {
         return originalSelfTerm;
     }
 
     @Override
-    public Term getModifies() {
+    public JavaDLTerm getModifies() {
         return originalModifies.values().iterator().next();
     }
     
     @Override
-    public Map<LocationVariable,Term> getInternalAtPres() {
-        Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
+    public Map<LocationVariable,JavaDLTerm> getInternalAtPres() {
+        Map<LocationVariable,JavaDLTerm> result = new LinkedHashMap<LocationVariable,JavaDLTerm>();
 //        for(LocationVariable h : originalAtPres.keySet()) {
 //          result.put(h, originalAtPres.get(h));
 //        }
@@ -303,15 +303,15 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariant create(LoopStatement loop,
                                 IProgramMethod pm,
                                 KeYJavaType kjt,
-                                Map<LocationVariable,Term> invariants,
-                                Map<LocationVariable,Term> modifies,
+                                Map<LocationVariable,JavaDLTerm> invariants,
+                                Map<LocationVariable,JavaDLTerm> modifies,
                                 Map<LocationVariable,
                                     ImmutableList<InfFlowSpec>> infFlowSpecs,
-                                Term variant,
-                                Term selfTerm,
-                                ImmutableList<Term> localIns,
-                                ImmutableList<Term> localOuts,
-                                Map<LocationVariable,Term> atPres) {
+                                JavaDLTerm variant,
+                                JavaDLTerm selfTerm,
+                                ImmutableList<JavaDLTerm> localIns,
+                                ImmutableList<JavaDLTerm> localOuts,
+                                Map<LocationVariable,JavaDLTerm> atPres) {
         return new LoopInvariantImpl(loop, pm, kjt, invariants,
                                      modifies, infFlowSpecs, variant, selfTerm,
                                      localIns, localOuts, atPres);
@@ -319,31 +319,31 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public LoopInvariant create(LoopStatement loop,
-                                Map<LocationVariable,Term> invariants,
-                                Map<LocationVariable,Term> modifies,
+                                Map<LocationVariable,JavaDLTerm> invariants,
+                                Map<LocationVariable,JavaDLTerm> modifies,
                                 Map<LocationVariable,
                                     ImmutableList<InfFlowSpec>> infFlowSpecs,
-                                Term variant,
-                                Term selfTerm,
-                                ImmutableList<Term> localIns,
-                                ImmutableList<Term> localOuts,
-                                Map<LocationVariable,Term> atPres) {
+                                JavaDLTerm variant,
+                                JavaDLTerm selfTerm,
+                                ImmutableList<JavaDLTerm> localIns,
+                                ImmutableList<JavaDLTerm> localOuts,
+                                Map<LocationVariable,JavaDLTerm> atPres) {
         return create(loop, pm, kjt, invariants, modifies, infFlowSpecs,
                       variant, selfTerm, localIns, localOuts, atPres);
     }
 
     @Override
-    public LoopInvariant instantiate(Map<LocationVariable,Term> invariants,
-                                     Term variant) {
+    public LoopInvariant instantiate(Map<LocationVariable,JavaDLTerm> invariants,
+                                     JavaDLTerm variant) {
         return configurate(invariants, originalModifies, originalInfFlowSpecs, variant);
     }
 
     @Override
-    public LoopInvariant configurate(Map<LocationVariable,Term> invariants,
-                                     Map<LocationVariable,Term> modifies,
+    public LoopInvariant configurate(Map<LocationVariable,JavaDLTerm> invariants,
+                                     Map<LocationVariable,JavaDLTerm> modifies,
                                      Map<LocationVariable,
                                          ImmutableList<InfFlowSpec>> infFlowSpecs,
-                                     Term variant) {
+                                     JavaDLTerm variant) {
         return create(loop, invariants, modifies, infFlowSpecs, variant,
                       originalSelfTerm, localIns, localOuts, originalAtPres);
     }
@@ -379,15 +379,15 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
-            			      Term selfTerm,
-            			      Map<LocationVariable,Term> atPres,
+    public LoopInvariant setInvariant(Map<LocationVariable,JavaDLTerm> invariants, 
+            			      JavaDLTerm selfTerm,
+            			      Map<LocationVariable,JavaDLTerm> atPres,
             			      Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> inverseReplaceMap 
+        Map<JavaDLTerm, JavaDLTerm> inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(inverseReplaceMap, services.getTermFactory());
-        Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
+        Map<LocationVariable,JavaDLTerm> newInvariants = new LinkedHashMap<LocationVariable,JavaDLTerm>();
         for(LocationVariable heap : invariants.keySet()) {
            newInvariants.put(heap, or.replace(invariants.get(heap)));
         }

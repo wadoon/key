@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -77,7 +77,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
    
    /**
     * <p>
-    * Starts the side proof and extracts the result {@link Term} and conditions.
+    * Starts the side proof and extracts the result {@link JavaDLTerm} and conditions.
     * </p>
     * <p>
     * New used names are automatically added to the {@link Namespace} of the {@link Services}.
@@ -87,10 +87,10 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to prove in a side proof.
     * @param newPredicate The {@link Function} which is used to compute the result.
-    * @return The found result {@link Term} and the conditions.
+    * @return The found result {@link JavaDLTerm} and the conditions.
     * @throws ProofInputException Occurred Exception.
     */
-   protected List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services, 
+   protected List<Triple<JavaDLTerm, Set<JavaDLTerm>, Node>> computeResultsAndConditions(Services services, 
                                                                              Goal goal, 
                                                                              ProofEnvironment sideProofEnvironment,
                                                                              Sequent sequentToProve, 
@@ -109,29 +109,29 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
    }
    
    /**
-    * Replaces the {@link Term} defined by the given {@link PosInOccurrence}
-    * with the given new {@link Term}.
-    * @param pio The {@link PosInOccurrence} which defines the {@link Term} to replace.
-    * @param newTerm The new {@link Term}.
-    * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
+    * Replaces the {@link JavaDLTerm} defined by the given {@link PosInOccurrence}
+    * with the given new {@link JavaDLTerm}.
+    * @param pio The {@link PosInOccurrence} which defines the {@link JavaDLTerm} to replace.
+    * @param newTerm The new {@link JavaDLTerm}.
+    * @return The created {@link SequentFormula} in which the {@link JavaDLTerm} is replaced.
     */
-   protected static SequentFormula replace(PosInOccurrence pio, Term newTerm, Services services) {
+   protected static SequentFormula replace(PosInOccurrence pio, JavaDLTerm newTerm, Services services) {
       // Iterate along the PosInOccurrence and collect the parents and indices
-      Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<Pair<Integer, Term>>();
-      Term root = pio.sequentFormula().formula();
+      Deque<Pair<Integer, JavaDLTerm>> indexAndParents = new LinkedList<Pair<Integer, JavaDLTerm>>();
+      JavaDLTerm root = pio.sequentFormula().formula();
       final PosInTerm pit = pio.posInTerm();
       for (int i = 0, sz=pit.depth(); i<sz; i++) { 
          int next = pit.getIndexAt(i);
-         indexAndParents.addFirst(new Pair<Integer, Term>(Integer.valueOf(next), root));
+         indexAndParents.addFirst(new Pair<Integer, JavaDLTerm>(Integer.valueOf(next), root));
          root = root.sub(next);
       }
       // Iterate over the collected parents and replace terms
       root = newTerm;
-      for (Pair<Integer, Term> pair : indexAndParents) {
-         Term parent = pair.second;
-         Term[] newSubs = parent.subs().toArray(new Term[parent.arity()]);
+      for (Pair<Integer, JavaDLTerm> pair : indexAndParents) {
+         JavaDLTerm parent = pair.second;
+         JavaDLTerm[] newSubs = parent.subs().toArray(new JavaDLTerm[parent.arity()]);
          newSubs[pair.first] = root;
-         root =  services.getTermFactory().createTerm(parent.op(), newSubs, parent.boundVars(), parent.javaBlock(), parent.getLabels());
+         root =  services.getTermFactory().createTerm(parent.op(), newSubs, parent.boundVars(), parent.modalContent(), parent.getLabels());
       }
       return new SequentFormula(root);
    }

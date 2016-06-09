@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
@@ -38,11 +38,11 @@ import de.uka.ilkd.key.rule.TacletApp;
 public class InstantiateCommand extends AbstractCommand {
 
     private static class Parameters {
-        Term formula;
+        JavaDLTerm formula;
         String var;
         int occ = 1;
         boolean hide;
-        public Term with;
+        public JavaDLTerm with;
     }
 
     @Override
@@ -167,7 +167,7 @@ public class InstantiateCommand extends AbstractCommand {
         Sequent seq = n.sequent();
         int occ = params.occ;
         for(SequentFormula form : seq.antecedent().asList()) {
-            Term term = form.formula();
+            JavaDLTerm term = form.formula();
             if(term.op() == Quantifier.ALL) {
                 String varName = term.boundVars().get(0).name().toString();
                 if(params.var.equals(varName)) {
@@ -181,7 +181,7 @@ public class InstantiateCommand extends AbstractCommand {
         }
 
         for(SequentFormula form : seq.succedent().asList()) {
-            Term term = form.formula();
+            JavaDLTerm term = form.formula();
             if(term.op() == Quantifier.EX) {
                 String varName = term.boundVars().get(0).name().toString();
                 if(params.var.equals(varName)) {

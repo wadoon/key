@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionValue;
 
@@ -38,7 +38,7 @@ public interface IExecutionValue extends IExecutionElement {
     * @return The condition.
     * @throws ProofInputException Occurred Exception.
     */
-   public Term getCondition() throws ProofInputException;
+   public JavaDLTerm getCondition() throws ProofInputException;
    
    /**
     * Returns the condition under which the variable ({@link #getVariable()})
@@ -81,7 +81,7 @@ public interface IExecutionValue extends IExecutionElement {
     * Returns the value of the variable.
     * @return The value of the variable.
     */
-   public Term getValue() throws ProofInputException;
+   public JavaDLTerm getValue() throws ProofInputException;
    
    /**
     * Returns the value of the variable as human readable string representation.

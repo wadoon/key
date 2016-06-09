@@ -38,7 +38,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -171,16 +171,16 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
         
         //key is the term to identify the bsum, value is the name used for that function.
-        private final HashMap<Term, StringBuffer> usedBsumTerms = new LinkedHashMap<Term, StringBuffer>();
+        private final HashMap<JavaDLTerm, StringBuffer> usedBsumTerms = new LinkedHashMap<JavaDLTerm, StringBuffer>();
 
         //key is the term to identify the bprod, value is the name used for that function.
-        private final HashMap<Term, StringBuffer> usedBprodTerms = new LinkedHashMap<Term, StringBuffer>();
+        private final HashMap<JavaDLTerm, StringBuffer> usedBprodTerms = new LinkedHashMap<JavaDLTerm, StringBuffer>();
         
         //key is the term to identify the function binding vars, value is the name used for the function
-        private HashMap<Term, StringBuffer> uninterpretedBindingFunctionNames = new LinkedHashMap<Term, StringBuffer>();
+        private HashMap<JavaDLTerm, StringBuffer> uninterpretedBindingFunctionNames = new LinkedHashMap<JavaDLTerm, StringBuffer>();
         
         //key is the term to identify the predicate binding vars, value is the name used for the predicate
-        private HashMap<Term, StringBuffer> uninterpretedBindingPredicateNames = new LinkedHashMap<Term, StringBuffer>();
+        private HashMap<JavaDLTerm, StringBuffer> uninterpretedBindingPredicateNames = new LinkedHashMap<JavaDLTerm, StringBuffer>();
         
         private HashMap<Operator, ArrayList<Sort>> functionDecls = new LinkedHashMap<Operator, ArrayList<Sort>>();
 
@@ -203,10 +203,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private HashMap<Sort, StringBuffer> typePredicates = new LinkedHashMap<Sort, StringBuffer>();
 
         // used type predicates for constant values, e.g. 1, 2, ...
-        private HashMap<Term, StringBuffer> constantTypePreds = new LinkedHashMap<Term, StringBuffer>();
+        private HashMap<JavaDLTerm, StringBuffer> constantTypePreds = new LinkedHashMap<JavaDLTerm, StringBuffer>();
 
         /** map used for storing predicates representing modalities or updates */
-        private HashMap<Term, StringBuffer> modalityPredicates = new LinkedHashMap<Term, StringBuffer>();
+        private HashMap<JavaDLTerm, StringBuffer> modalityPredicates = new LinkedHashMap<JavaDLTerm, StringBuffer>();
 
         /**
          * If a integer is not supported by a solver because it is too big, the
@@ -281,7 +281,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 this(null, s, config);
         }
 
-        public final StringBuffer translateProblem(Term problem,
+        public final StringBuffer translateProblem(JavaDLTerm problem,
                         Services services, SMTSettings settings)
                         throws IllegalFormulaException {
                 smtSettings = settings;
@@ -798,7 +798,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
                 
                 // add the type definition for uninterpreted binding functions
-                for (Term t: uninterpretedBindingFunctionNames.keySet()) {
+                for (JavaDLTerm t: uninterpretedBindingFunctionNames.keySet()) {
                     ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
                     element.add(uninterpretedBindingFunctionNames.get(t));
                     Function f = (Function)t.op();
@@ -874,7 +874,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
 
                 //add the uninterpreted predicates binding vars
-                for (Term t: this.uninterpretedBindingPredicateNames.keySet()) {
+                for (JavaDLTerm t: this.uninterpretedBindingPredicateNames.keySet()) {
                     ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
                     element.add(uninterpretedBindingPredicateNames.get(t));
                     for (int i = 0; i < t.op().arity(); i++) {
@@ -987,7 +987,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         
      
 
-        private Term createLogicalVar(TermServices services, String baseName,
+        private JavaDLTerm createLogicalVar(TermServices services, String baseName,
                         Sort sort) {
                 return tb.var(new LogicVariable(new Name(
                                 tb.newName(baseName)),
@@ -1000,13 +1000,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 Sort sort = services.getTheories().getIntegerLDT()
                                 .getMul().sort();
                 Function mult = getMultiplicationFunction(services);
-                Term zero = tb.zero();
-                Term one = tb.one();
-                LinkedList<Term> multAssumptions = new LinkedList<Term>();
+                JavaDLTerm zero = tb.zero();
+                JavaDLTerm one = tb.one();
+                LinkedList<JavaDLTerm> multAssumptions = new LinkedList<JavaDLTerm>();
 
-                Term x = createLogicalVar(services, "x", sort);
-                Term y = createLogicalVar(services, "y", sort);
-                Term z = createLogicalVar(services, "z", sort);
+                JavaDLTerm x = createLogicalVar(services, "x", sort);
+                JavaDLTerm y = createLogicalVar(services, "y", sort);
+                JavaDLTerm z = createLogicalVar(services, "z", sort);
                 multAssumptions.add(tb.equals(tb.func(mult, x, zero), zero));
                 multAssumptions.add(tb.equals(tb.func(mult, zero, x), zero));
                 multAssumptions.add(tb.equals(tb.func(mult, x, one), x));
@@ -1021,7 +1021,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 tb.or(tb.equals(x, zero), tb.equals(y, zero))));
                 multAssumptions.add(tb.imp(tb.equals(tb.func(mult, x, y), one),
                                 tb.and(tb.equals(x, one), tb.equals(y, one))));
-                for (Term assumption : multAssumptions) {
+                for (JavaDLTerm assumption : multAssumptions) {
                         assumption = tb.allClose(assumption);
                         result.add(translateTerm(assumption,
                                         new Vector<QuantifiableVariable>(),
@@ -1065,7 +1065,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          	
          		//Do not add Assumptions for Boolean or integer sorts
              		if(!isSomeIntegerSort(sort) && sort != Sort.FORMULA ){
-             			Term var = createLogicalVar(services, "x", sort);
+             			JavaDLTerm var = createLogicalVar(services, "x", sort);
              			StringBuffer sVar = translateVariable(var.op());
             			//StringBuffer var = this.makeUnique(new StringBuffer("x"));
              			StringBuffer typePredicate = this.getTypePredicate(sort, sVar);
@@ -1083,7 +1083,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 : constantsForBigIntegers;
         }
 
-        private Term getRightBorderAsTerm(long integer, TermServices services) {
+        private JavaDLTerm getRightBorderAsTerm(long integer, TermServices services) {
                 return tb.zTerm(Long
                                 .toString(getRightBorderAsInteger(integer,
                                                 services)));
@@ -1112,7 +1112,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 services, integer));
                 buf = translateFunction(name, new ArrayList<StringBuffer>());
                 map.put(integer, buf);
-                Term term = getRightBorderAsTerm(integer, services);
+                JavaDLTerm term = getRightBorderAsTerm(integer, services);
                 addConstantTypePredicate(
                                 term,
                                 translateIntegerValue(getRightBorderAsInteger(
@@ -1758,7 +1758,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return translateLogicalAll(var, translateSort(sort), result);
         }
 
-        private final StringBuffer translateTermIte(Term iteTerm,
+        private final StringBuffer translateTermIte(JavaDLTerm iteTerm,
                         Vector<QuantifiableVariable> quantifiedVars,
                         Services services) throws IllegalFormulaException {
 
@@ -1789,7 +1789,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 //                        LogicVariable c = new LogicVariable(
 //                                        new Name("iteConst"), iteTerm.sort());
 //                        // translate the constant
-//                        Term t = GenericTermBuilder.DF.var(c);
+//                        JavaDLTerm t = GenericTermBuilder.DF.var(c);
 //                        StringBuffer cstr = this.translateTerm(t,
 //                                        quantifiedVars, services);
 //                        // build an assumption used to specify how c can be used
@@ -1807,7 +1807,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 //                }
         }
 
-        private void addConstantTypePredicate(Term term, StringBuffer name) {
+        private void addConstantTypePredicate(JavaDLTerm term, StringBuffer name) {
                 if (!this.constantTypePreds.containsKey(term)) {
                         this.translateSort(term.sort());
                         StringBuffer typePred = this.getTypePredicate(
@@ -1822,14 +1822,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * string to the StringBuffer sb.
          * 
          * @param term
-         *                the Term which should be written in Simplify syntax
+         *                the JavaDLTerm which should be written in Simplify syntax
          * @param quantifiedVars
          *                a Vector containing all variables that have been bound
          *                in super-terms. It is only used for the translation of
          *                modulo terms, but must be looped through until we get
          *                there.
          */
-        protected StringBuffer translateTerm(Term term,
+        protected StringBuffer translateTerm(JavaDLTerm term,
                         Vector<QuantifiableVariable> quantifiedVars,
                         Services services) throws IllegalFormulaException {
 
@@ -2265,14 +2265,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
         }
         
-        private StringBuffer translateAsBindingUninterpretedPredicate(Term term, Function fun,
+        private StringBuffer translateAsBindingUninterpretedPredicate(JavaDLTerm term, Function fun,
                 Vector<QuantifiableVariable> quantifiedVars,
-                ImmutableArray<Term> subs, Services services) throws IllegalFormulaException {
+                ImmutableArray<JavaDLTerm> subs, Services services) throws IllegalFormulaException {
             
             ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
             for (int i = 0; i < term.arity(); i++) {
                 if (!fun.bindVarsAt(i)) {
-                    Term sub = term.sub(i);
+                    JavaDLTerm sub = term.sub(i);
                     // make type casts, if neccessary
                     StringBuffer subterm = translateTerm(sub,
                                     quantifiedVars, services);
@@ -2285,8 +2285,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             }
             
             //check whether an equal term was already used.
-            Term used = null;
-            for (Term t: uninterpretedBindingPredicateNames.keySet()) {
+            JavaDLTerm used = null;
+            for (JavaDLTerm t: uninterpretedBindingPredicateNames.keySet()) {
                 boolean termsMatch = ((t.op() == term.op()) && (t.arity() == term.arity()));
                 for (int i = 0; i < t.arity(); i++) {
                     //the terms only have to match on those positions where functions are defined
@@ -2375,14 +2375,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @return A stringBuffer representing the translation of the function.
          * @throws IllegalFormulaException
          */
-        private StringBuffer translateAsBindingUninterpretedFunction(Term term, Function fun,
+        private StringBuffer translateAsBindingUninterpretedFunction(JavaDLTerm term, Function fun,
                 Vector<QuantifiableVariable> quantifiedVars,
-                ImmutableArray<Term> subs, Services services) throws IllegalFormulaException {
+                ImmutableArray<JavaDLTerm> subs, Services services) throws IllegalFormulaException {
             
             ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
             for (int i = 0; i < term.arity(); i++) {
                 if (!fun.bindVarsAt(i)) {
-                    Term sub = term.sub(i);
+                    JavaDLTerm sub = term.sub(i);
                     // make type casts, if neccessary
                     StringBuffer subterm = translateTerm(sub,
                                     quantifiedVars, services);
@@ -2395,8 +2395,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             }
             
             //check whether an equal term was already used.
-            Term used = null;
-            for (Term t: uninterpretedBindingFunctionNames.keySet()) {
+            JavaDLTerm used = null;
+            for (JavaDLTerm t: uninterpretedBindingFunctionNames.keySet()) {
                 boolean termsMatch = ((t.op() == term.op()) && (t.arity() == term.arity()));
                 for (int i = 0; i < t.arity(); i++) {
                     //the terms only have to match on those positions where functions are defined
@@ -2476,7 +2476,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         private StringBuffer translateAsUninterpretedFunction(Function fun,
                         Vector<QuantifiableVariable> quantifiedVars,
-                        ImmutableArray<Term> subs, Services services)
+                        ImmutableArray<JavaDLTerm> subs, Services services)
                         throws IllegalFormulaException {
             // an uninterpreted function. just
             // translate it as such
@@ -2484,7 +2484,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             
                 ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
                 int i = 0;
-                for (Term sub : subs) {
+                for (JavaDLTerm sub : subs) {
                         // make type casts, if neccessary
                         StringBuffer subterm = translateTerm(sub,
                                         quantifiedVars, services);
@@ -2506,8 +2506,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 .getNumberSymbol();
         }
 
-        private boolean isComplexMultiplication(Services services, Term t1,
-                        Term t2) {
+        private boolean isComplexMultiplication(Services services, JavaDLTerm t1,
+                        JavaDLTerm t2) {
                 return !isNumberSymbol(services, t1.op())
                                 && !isNumberSymbol(services, t2.op());
 
@@ -2598,11 +2598,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          *                the services object to use.
          * @return a unique predicate representing a modality.
          */
-        private StringBuffer getModalityPredicate(Term t,
+        private StringBuffer getModalityPredicate(JavaDLTerm t,
                         Vector<QuantifiableVariable> quantifiedVars,
                         Services services) throws IllegalFormulaException {
                 // check, if the modality was already translated.
-                for (Term toMatch : modalityPredicates.keySet()) {
+                for (JavaDLTerm toMatch : modalityPredicates.keySet()) {
                         if (toMatch.equalsModRenaming(t)) {
                                 return modalityPredicates.get(toMatch);
                         }
@@ -2616,7 +2616,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 QuantifiableVariable[] args = freeVars
                                 .toArray(new QuantifiableVariable[freeVars
                                                 .size()]);
-                Term[] subs = new Term[args.length];
+                JavaDLTerm[] subs = new JavaDLTerm[args.length];
                 Sort[] argsorts = new Sort[args.length];
                 for (int i = 0; i < args.length; i++) {
                         QuantifiableVariable qv = args[i];
@@ -2636,7 +2636,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 argsorts);
 
                 // Build the final predicate
-                Term temp = tb.func(fun, subs);
+                JavaDLTerm temp = tb.func(fun, subs);
 
                 // translate the predicate
                 StringBuffer cstr = this.translateTerm(temp, quantifiedVars,
@@ -2686,10 +2686,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * warning, nothing more. It is provided as a hook for subclasses.
          * 
          * @param term
-         *                The Term given to translate
+         *                The JavaDLTerm given to translate
          * @throws IllegalFormulaException
          */
-        protected final StringBuffer translateUnknown(Term term,
+        protected final StringBuffer translateUnknown(JavaDLTerm term,
                         Vector<QuantifiableVariable> quantifiedVars,
                         Services services) throws IllegalFormulaException {
 
@@ -2783,9 +2783,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @pram sub The two terms used as first and second argument of the bsum operator.
          * @return
          */
-        protected final StringBuffer translateBsumFunction(Term bsumterm, ArrayList<StringBuffer> sub) {
+        protected final StringBuffer translateBsumFunction(JavaDLTerm bsumterm, ArrayList<StringBuffer> sub) {
             StringBuffer name = null;
-            for (Term t: usedBsumTerms.keySet()) {                          
+            for (JavaDLTerm t: usedBsumTerms.keySet()) {                          
                 if (t.equalsModRenaming(bsumterm)) {                  
                     name = usedBsumTerms.get(t);
                     continue;
@@ -2818,9 +2818,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @pram sub The two terms used as first and second argument of the bsum operator.
          * @return
          */
-        protected final StringBuffer translateBprodFunction(Term bprodterm, ArrayList<StringBuffer> sub) {
+        protected final StringBuffer translateBprodFunction(JavaDLTerm bprodterm, ArrayList<StringBuffer> sub) {
             StringBuffer name = null;
-            for (Term t: usedBprodTerms.keySet()) {               
+            for (JavaDLTerm t: usedBprodTerms.keySet()) {               
                 if (t.equalsModRenaming(bprodterm)) {                  
                     name = usedBprodTerms.get(t);
                     continue;
@@ -3068,7 +3068,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 for (TacletFormula tf : tacletSetTranslation
                                 .getTranslation(sorts)) {
 
-                        for (Term subterm : tf.getInstantiations()) {
+                        for (JavaDLTerm subterm : tf.getInstantiations()) {
                                 try {
                                 		StringBuffer term = translateComment(1,tf.getTaclet().displayName()+":\n");		
                                 				

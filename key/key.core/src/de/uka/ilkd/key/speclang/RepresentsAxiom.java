@@ -28,7 +28,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -52,8 +52,8 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final IObserverFunction target;
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
-    private final Term originalPre;
-    private final Term originalRep;
+    private final JavaDLTerm originalPre;
+    private final JavaDLTerm originalRep;
     private final ProgramVariable originalSelfVar;
     private final Map<LocationVariable,ProgramVariable> atPreVars;
     private final ImmutableList<ProgramVariable> originalParamVars;
@@ -63,8 +63,8 @@ public final class RepresentsAxiom extends ClassAxiom {
 			   IObserverFunction target,
 	                   KeYJavaType kjt,
 	                   VisibilityModifier visibility,
-	                   Term pre,
-	                   Term rep,
+	                   JavaDLTerm pre,
+	                   JavaDLTerm rep,
 	                   ProgramVariable selfVar,
 	                   ImmutableList<ProgramVariable> paramVars,
 	                   Map<LocationVariable,ProgramVariable> atPreVars) {
@@ -77,8 +77,8 @@ public final class RepresentsAxiom extends ClassAxiom {
                            IObserverFunction target,
                            KeYJavaType kjt,
                            VisibilityModifier visibility,
-                           Term pre,
-                           Term rep,
+                           JavaDLTerm pre,
+                           JavaDLTerm rep,
                            ProgramVariable selfVar,
                            ImmutableList<ProgramVariable> paramVars,
                            Map<LocationVariable,ProgramVariable> atPreVars) {
@@ -126,7 +126,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 		           .op().equals(originalSelfVar));
     }
     
-    public Term getAxiom(ParsableVariable heapVar,
+    public JavaDLTerm getAxiom(ParsableVariable heapVar,
                          ParsableVariable selfVar,
                          Services services) {
 	assert heapVar != null;
@@ -253,8 +253,8 @@ public final class RepresentsAxiom extends ClassAxiom {
         VisibilityModifier minVisibility = visibility == null ?
                 (VisibilityModifier.isPrivate(ax.visibility) ? ax.visibility : null)
                         : (visibility.compareTo(ax.visibility) >= 0 ? visibility : ax.visibility);
-        Term newRep = tb.and(originalRep, ax.originalRep);
-        Term newPre = null;
+        JavaDLTerm newRep = tb.and(originalRep, ax.originalRep);
+        JavaDLTerm newPre = null;
         if(originalPre == null) newPre = ax.originalPre;
         else if(ax.originalPre == null) newPre = originalPre;
         else newPre = tb.and(originalPre, ax.originalPre);

@@ -68,7 +68,7 @@ import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Switch;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -337,7 +337,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	name2sort.put(name, this);
     }
 
-    public boolean canStandFor(Term t) {
+    public boolean canStandFor(JavaDLTerm t) {
  	return true;
     }
 
@@ -376,7 +376,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    super(name);
 	}
 
-	public boolean canStandFor(Term t) {
+	public boolean canStandFor(JavaDLTerm t) {
 	    return t.op() instanceof ProgramVariable;
 	    }
 
@@ -422,7 +422,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    super(new Name("Variable"));
 	}
 
-	public boolean canStandFor(Term t) {
+	public boolean canStandFor(JavaDLTerm t) {
 	    return t.op() instanceof ProgramVariable;
 	}
 
@@ -455,7 +455,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    super (new Name("StaticVariable"));
 	}
 
-	public boolean canStandFor(Term t) {	   
+	public boolean canStandFor(JavaDLTerm t) {	   
 	    return t.op() instanceof ProgramVariable &&
                ((ProgramVariable)t.op()).isStatic();
 	}
@@ -487,7 +487,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super (new Name("LocalVariable"));
         }
 
-        public boolean canStandFor(Term t) {       
+        public boolean canStandFor(JavaDLTerm t) {       
             return t.op() instanceof ProgramVariable &&
             !((ProgramVariable)t.op()).isStatic();
         }
@@ -519,7 +519,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    super(n);
 	}
 
-	public boolean canStandFor(Term t) {
+	public boolean canStandFor(JavaDLTerm t) {
 	    return true;
 	}
 	
@@ -650,7 +650,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
 
 	// do not match a term
-	public boolean canStandFor(Term t) {
+	public boolean canStandFor(JavaDLTerm t) {
 	    return false;
 	}
 
@@ -675,7 +675,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
 
 	// not designed to match on terms
-	public boolean canStandFor(Term t) {
+	public boolean canStandFor(JavaDLTerm t) {
 	    return false;
 	}
 	
@@ -789,7 +789,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    return (pe instanceof SpecialConstructorReference);
 	}
 
-	public boolean canStandFor(Term t) {
+	public boolean canStandFor(JavaDLTerm t) {
 	    return (t.op() instanceof IProgramMethod && 
 		    !((IProgramMethod) t.op()).isModel());
 	}
@@ -915,7 +915,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    return false;
 	}
 
-	public boolean canStandFor(Term t) {
+	public boolean canStandFor(JavaDLTerm t) {
 	    return (t.op() instanceof IProgramMethod);
 	}
     }
@@ -1287,7 +1287,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
 
 	
-	public boolean canStandFor(Term t) {	   
+	public boolean canStandFor(JavaDLTerm t) {	   
 	    return t.op () instanceof ProgramConstant && 
 	    	isString == t.sort().name().equals(type);
 	}

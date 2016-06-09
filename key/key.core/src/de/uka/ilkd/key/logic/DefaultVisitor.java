@@ -20,15 +20,15 @@ import org.key_project.common.core.logic.Visitor;
  */
 public abstract class DefaultVisitor implements Visitor {	
     @Override
-    public boolean visitSubtree(Term visited) {
+    public boolean visitSubtree(JavaDLTerm visited) {
         return true;
     }
 
     @Override
-    public void subtreeEntered(Term subtreeRoot){
+    public void subtreeEntered(JavaDLTerm subtreeRoot){
     }
 
     @Override
-    public void subtreeLeft(Term subtreeRoot){
+    public void subtreeLeft(JavaDLTerm subtreeRoot){
     }    
 }

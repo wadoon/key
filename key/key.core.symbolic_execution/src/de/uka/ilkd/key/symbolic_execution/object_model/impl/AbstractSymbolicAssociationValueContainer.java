@@ -19,7 +19,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
@@ -71,8 +71,8 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
    @Override
    public ISymbolicAssociation getAssociation(final IProgramVariable programVariable, 
                                               final boolean isArrayIndex, 
-                                              final Term arrayIndex,
-                                              final Term condition) {
+                                              final JavaDLTerm arrayIndex,
+                                              final JavaDLTerm condition) {
       return CollectionUtil.search(associations, new IFilter<ISymbolicAssociation>() {
          @Override
          public boolean select(ISymbolicAssociation element) {
@@ -106,8 +106,8 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
    @Override
    public ISymbolicValue getValue(final IProgramVariable programVariable, 
                                   final boolean isArrayIndex, 
-                                  final Term arrayIndex,
-                                  final Term condition) {
+                                  final JavaDLTerm arrayIndex,
+                                  final JavaDLTerm condition) {
       return CollectionUtil.search(values, new IFilter<ISymbolicValue>() {
          @Override
          public boolean select(ISymbolicValue element) {

@@ -11,7 +11,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -72,13 +72,13 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
         }
         final ExecutionContext executionContext =
                 loopInvRuleApp.getExecutionContext();
-        final Term guardTerm = loopInvRuleApp.getGuard();
+        final JavaDLTerm guardTerm = loopInvRuleApp.getGuard();
 
         final InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
                                                    ifVars.c2, executionContext,
                                                    guardTerm, services);
-        final Term selfComposedExec =
+        final JavaDLTerm selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
@@ -100,7 +100,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
                 loopInvRuleApp.getInformationFlowProofObligationVars();
         final ExecutionContext executionContext =
                 loopInvRuleApp.getExecutionContext();
-        final Term guardTerm = loopInvRuleApp.getGuard();
+        final JavaDLTerm guardTerm = loopInvRuleApp.getGuard();
 
         final LoopInvExecutionPO loopInvExecPO =
                 new LoopInvExecutionPO(initConfig, loopInv,

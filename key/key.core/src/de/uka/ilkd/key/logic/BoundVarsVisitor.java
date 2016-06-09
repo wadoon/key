@@ -36,9 +36,9 @@ public class BoundVarsVisitor extends DefaultVisitor{
     }
 
     /**
-     * only called by execPostOrder in Term.
+     * only called by execPostOrder in JavaDLTerm.
      */
-    public void visit(Term visited) {        
+    public void visit(JavaDLTerm visited) {        
         for (int i = 0, ar = visited.arity(); i<ar; i++) {
             for (int j = 0, boundVarsSize = 
                 visited.varsBoundHere(i).size(); j<boundVarsSize; j++) {

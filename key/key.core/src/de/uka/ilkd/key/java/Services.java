@@ -23,7 +23,7 @@ import org.key_project.common.core.services.TermServices;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.proof.Counter;
@@ -320,8 +320,8 @@ public class Services implements TermServices, ProofServices {
     }
     
     /**
-     * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
-     * @return The {@link GenericTermBuilder} used to create {@link Term}s.
+     * Returns the {@link GenericTermBuilder} used to create {@link JavaDLTerm}s.
+     * @return The {@link GenericTermBuilder} used to create {@link JavaDLTerm}s.
      */
     @Override
     public TermBuilder getTermBuilder() {
@@ -329,8 +329,8 @@ public class Services implements TermServices, ProofServices {
     }
 
     /**
-     * Returns the {@link GenericTermFactory} used to create {@link Term}s.
-     * @return The {@link GenericTermFactory} used to create {@link Term}s.
+     * Returns the {@link GenericTermFactory} used to create {@link JavaDLTerm}s.
+     * @return The {@link GenericTermFactory} used to create {@link JavaDLTerm}s.
      */
     @Override
     public TermFactory getTermFactory() {

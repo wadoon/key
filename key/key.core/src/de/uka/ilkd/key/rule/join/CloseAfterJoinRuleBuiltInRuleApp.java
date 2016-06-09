@@ -3,7 +3,7 @@ package de.uka.ilkd.key.rule.join;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
@@ -22,12 +22,12 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private SymbolicExecutionState joinNodeState = null;
     private SymbolicExecutionState partnerState = null;
-    private Term pc = null;
+    private JavaDLTerm pc = null;
 
     public CloseAfterJoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio, Node thePartnerNode,
             Node correspondingJoinNode, SymbolicExecutionState joinNodeState,
-            SymbolicExecutionState partnerState, Term pc) {
+            SymbolicExecutionState partnerState, JavaDLTerm pc) {
         this(builtInRule, pio);
         setThePartnerNode(thePartnerNode);
         setCorrespondingJoinNode(correspondingJoinNode);
@@ -97,11 +97,11 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.partnerState = thisSEState;
     }
 
-    public Term getPc() {
+    public JavaDLTerm getPc() {
         return pc;
     }
 
-    public void setPc(Term pc) {
+    public void setPc(JavaDLTerm pc) {
         this.pc = pc;
     }
 

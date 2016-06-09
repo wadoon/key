@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -25,5 +25,5 @@ import de.uka.ilkd.key.rule.RuleApp;
  * returning <code>null</code>
  */
 public interface ProjectionToTerm {
-    Term toTerm ( RuleApp app, PosInOccurrence pos, Goal goal );
+    JavaDLTerm toTerm ( RuleApp app, PosInOccurrence pos, Goal goal );
 }

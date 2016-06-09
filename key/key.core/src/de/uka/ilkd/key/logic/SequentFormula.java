@@ -28,23 +28,23 @@ import org.key_project.common.core.logic.sort.Sort;
  */
 public class SequentFormula {
 
-    private final Term term;
+    private final JavaDLTerm term;
    
     private final int hashCode;
     
     /** creates a new SequentFormula 
-     * @param term a Term of sort Sort.FORMULA
+     * @param term a JavaDLTerm of sort Sort.FORMULA
      */ 
-    public SequentFormula(Term term) {
+    public SequentFormula(JavaDLTerm term) {
 	if (term.sort() != Sort.FORMULA) {
-	    throw new RuntimeException("A Term instead of a formula: " + term);
+	    throw new RuntimeException("A JavaDLTerm instead of a formula: " + term);
 	}
 	this.term = term;	
 	this.hashCode = term.hashCode () * 13;
     }
 
-    /** @return the stored Term */
-    public Term formula() {
+    /** @return the stored JavaDLTerm */
+    public JavaDLTerm formula() {
 	return term;
     }
 

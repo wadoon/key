@@ -52,7 +52,7 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.DefaultTermParser;
@@ -141,13 +141,13 @@ public class InvariantConfigurator {
             private JPanel errorPanel;
             private List<JTabbedPane> heapPanes = new ArrayList<JTabbedPane>();
 
-            private Term variantTerm = null;
-            private Map<LocationVariable,Term> modifiesTerm = new LinkedHashMap<LocationVariable,Term>();
+            private JavaDLTerm variantTerm = null;
+            private Map<LocationVariable,JavaDLTerm> modifiesTerm = new LinkedHashMap<LocationVariable,JavaDLTerm>();
             private Map<LocationVariable,
                         ImmutableList<InfFlowSpec>> infFlowSpecs
                     = new LinkedHashMap<LocationVariable,
                                         ImmutableList<InfFlowSpec>>();
-            private Map<LocationVariable,Term> invariantTerm = new LinkedHashMap<LocationVariable,Term>();
+            private Map<LocationVariable,JavaDLTerm> invariantTerm = new LinkedHashMap<LocationVariable,JavaDLTerm>();
 
             private static final String INVARIANTTITLE = "Invariant%s: ";
             private static final String VARIANTTITLE = "Variant%s: ";
@@ -277,10 +277,10 @@ public class InvariantConfigurator {
                 Map<String,String>[] loopInvTexts = new Map[IF_OO_IDX+1];
 
                 loopInvTexts[INV_IDX] = new LinkedHashMap<String,String>();
-                final Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();
+                final Map<LocationVariable,JavaDLTerm> atPres = loopInv.getInternalAtPres();
 
                 for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
-                    final Term i = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
+                    final JavaDLTerm i = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
                     if (i == null) {
                         // FIXME check again and think what is the default for savedHeap
@@ -293,7 +293,7 @@ public class InvariantConfigurator {
                 loopInvTexts[MOD_IDX] = new LinkedHashMap<String,String>();
 
                 for(LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
-                    final Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
+                    final JavaDLTerm modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
                     if (modifies == null) {
                         // FIXME check again and think what is the default for savedHeap
@@ -305,7 +305,7 @@ public class InvariantConfigurator {
                 }
 
                 loopInvTexts[VAR_IDX] = new LinkedHashMap<String,String>();
-                final Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
+                final JavaDLTerm variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
                 if (variant == null) {
                     loopInvTexts[VAR_IDX].put(DEFAULT,"");
                 } else {                    
@@ -322,7 +322,7 @@ public class InvariantConfigurator {
                     loopInvTexts[IF_PRE_IDX].put(heap.toString(), "true");
                   } else {
                       for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                          for (Term t : infFlowSpec.preExpressions) {
+                          for (JavaDLTerm t : infFlowSpec.preExpressions) {
                               loopInvTexts[IF_PRE_IDX].put(heap.toString(), printTerm(t, false));
                           }
                       }
@@ -339,7 +339,7 @@ public class InvariantConfigurator {
                     loopInvTexts[IF_POST_IDX].put(heap.toString(), "true");
                   } else {
                       for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                          for (Term t : infFlowSpec.postExpressions) {
+                          for (JavaDLTerm t : infFlowSpec.postExpressions) {
                               loopInvTexts[IF_POST_IDX].put(heap.toString(), printTerm(t, false));
                           }
                       }
@@ -356,7 +356,7 @@ public class InvariantConfigurator {
                     loopInvTexts[IF_OO_IDX].put(heap.toString(), "true");
                   } else {
                       for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                          for (Term t : infFlowSpec.newObjects) {
+                          for (JavaDLTerm t : infFlowSpec.newObjects) {
                               loopInvTexts[IF_OO_IDX].put(heap.toString(), printTerm(t, false));
                           }
                       }
@@ -388,9 +388,9 @@ public class InvariantConfigurator {
              * just a Wrapper for the pretty Printer
              * 
              * @param t
-             * @return the String Representation of the Term
+             * @return the String Representation of the JavaDLTerm
              */
-            private String printTerm(Term t, boolean pretty) {                
+            private String printTerm(JavaDLTerm t, boolean pretty) {                
                 return ProofSaver.printTerm(t, services, pretty).toString();
 
             }
@@ -741,7 +741,7 @@ public class InvariantConfigurator {
             }
 
             /**
-             * Updates the String that hold the invariant Term.
+             * Updates the String that hold the invariant JavaDLTerm.
              * 
              * @param d
              */
@@ -977,8 +977,8 @@ public class InvariantConfigurator {
              * @return invariant term
              * @throws Exception
              */
-            protected Term parseInvariant(LocationVariable heap) throws ParserException {
-                Term result = null;
+            protected JavaDLTerm parseInvariant(LocationVariable heap) throws ParserException {
+                JavaDLTerm result = null;
                 index = inputPane.getSelectedIndex();
                 // might throw parserException
 
@@ -992,8 +992,8 @@ public class InvariantConfigurator {
                 return MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap();
             }
 
-            protected Term parseModifies(LocationVariable heap) throws ParserException {
-                Term result = null;
+            protected JavaDLTerm parseModifies(LocationVariable heap) throws ParserException {
+                JavaDLTerm result = null;
                 index = inputPane.getSelectedIndex();
                 final Sort locSetSort = services.getTheories().getLocSetLDT().targetSort();
                 result = parser.parse(
@@ -1003,10 +1003,10 @@ public class InvariantConfigurator {
             }
             
             protected ImmutableList<InfFlowSpec> parseInfFlowSpec(LocationVariable heap) throws Exception {
-                Term preExps = null;
-                Term postExps = null;
-                Term newObjects = null;
-                //ImmutableList<ImmutableList<Term>> result = null;
+                JavaDLTerm preExps = null;
+                JavaDLTerm postExps = null;
+                JavaDLTerm newObjects = null;
+                //ImmutableList<ImmutableList<JavaDLTerm>> result = null;
                 index = inputPane.getSelectedIndex();
                 // might throw parserException or some obscure
                 // antlr
@@ -1028,14 +1028,14 @@ public class InvariantConfigurator {
                 ImmutableList<InfFlowSpec> result =
                     ImmutableSLList.<InfFlowSpec>nil()
                                    .append(new InfFlowSpec
-                                                     (ImmutableSLList.<Term>nil().append(preExps),
-                                                      ImmutableSLList.<Term>nil().append(postExps),
-                                                      ImmutableSLList.<Term>nil().append(newObjects)));
+                                                     (ImmutableSLList.<JavaDLTerm>nil().append(preExps),
+                                                      ImmutableSLList.<JavaDLTerm>nil().append(postExps),
+                                                      ImmutableSLList.<JavaDLTerm>nil().append(newObjects)));
                 return result;
             }
 
-            protected Term parseVariant() throws ParserException {
-                Term result = null;
+            protected JavaDLTerm parseVariant() throws ParserException {
+                JavaDLTerm result = null;
                 index = inputPane.getSelectedIndex();
                 final Sort intSort = services.getTheories().getIntegerLDT().targetSort();
                 result = parser.parse(

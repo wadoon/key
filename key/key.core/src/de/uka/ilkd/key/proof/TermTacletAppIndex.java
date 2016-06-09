@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.rulefilter.AndRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
@@ -41,7 +41,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public class TermTacletAppIndex {
     /** the term for which NoPosTacletApps are kept in this index node */
-    private final Term term;
+    private final JavaDLTerm term;
     /** NoPosTacletApps for this term */
     private final ImmutableList<NoPosTacletApp> localTacletApps;
     /** indices for subterms */
@@ -52,7 +52,7 @@ public class TermTacletAppIndex {
     /**
      * Create a TermTacletAppIndex
      */
-    private TermTacletAppIndex( Term term,
+    private TermTacletAppIndex( JavaDLTerm term,
                                 ImmutableList<NoPosTacletApp> localTacletApps,
                                 ImmutableList<TermTacletAppIndex> subtermIndices,
                                 RuleFilter ruleFilter ) {
@@ -167,7 +167,7 @@ public class TermTacletAppIndex {
                                      RuleFilter      filter,
                                      ITermTacletAppIndexCache indexCache) {
         ImmutableList<TermTacletAppIndex> result = ImmutableSLList.<TermTacletAppIndex>nil();
-        final Term localTerm = pos.subTerm ();
+        final JavaDLTerm localTerm = pos.subTerm ();
 
         int i = localTerm.arity();
 
@@ -223,7 +223,7 @@ public class TermTacletAppIndex {
                                                  NewRuleListener listener,
                                                  RuleFilter      filter,
                                                  ITermTacletAppIndexCache indexCache) {
-        final Term localTerm = pos.subTerm ();
+        final JavaDLTerm localTerm = pos.subTerm ();
 
         final TermTacletAppIndex cached = indexCache.getIndexForTerm ( localTerm );
         if ( cached != null ) {
@@ -339,7 +339,7 @@ public class TermTacletAppIndex {
             return updateCompleteRebuild ( pos, services, tacletIndex,
                                            listener, indexCache );
 
-        final Term newTerm = pathToModification.getSubTerm ();
+        final JavaDLTerm newTerm = pathToModification.getSubTerm ();
 
         final TermTacletAppIndex cached = indexCache.getIndexForTerm ( newTerm );
         if ( cached != null ) {
@@ -365,7 +365,7 @@ public class TermTacletAppIndex {
                                                      TacletIndex tacletIndex,
                                                      NewRuleListener listener,
                                                      ITermTacletAppIndexCache indexCache) {
-        final Term newTerm = pos.subTerm ();
+        final JavaDLTerm newTerm = pos.subTerm ();
         final Operator newOp = newTerm.op ();
         
         if ( newOp instanceof Modality && newOp == term.op ()
@@ -384,7 +384,7 @@ public class TermTacletAppIndex {
 
 
     private TermTacletAppIndex updateLocalApps(PosInOccurrence pos,
-                                               Term newSubterm,
+                                               JavaDLTerm newSubterm,
                                                Services services,
                                                TacletIndex tacletIndex,
                                                NewRuleListener listener,
@@ -408,7 +408,7 @@ public class TermTacletAppIndex {
                                 ITermTacletAppIndexCache indexCache) {
         ImmutableList<TermTacletAppIndex> newSubIndices = subtermIndices;
         
-        final Term newTerm = pathToModification.getSubTerm ();
+        final JavaDLTerm newTerm = pathToModification.getSubTerm ();
         final int child = pathToModification.getChild ();
         
         if ( newTerm.op () instanceof UpdateApplication ) {
@@ -448,7 +448,7 @@ public class TermTacletAppIndex {
 
         ImmutableList<TermTacletAppIndex> subindices = oldSubindices.take ( updateTarget );                              
         final TermTacletAppIndex toBeRemoved = subindices.head ();
-        final Term targetTerm = toBeRemoved.term;
+        final JavaDLTerm targetTerm = toBeRemoved.term;
         subindices = subindices.tail ();
 
         final TermTacletAppIndex newSubIndex;
@@ -699,7 +699,7 @@ public class TermTacletAppIndex {
             // assert collectedApps.get(pos) == null;
             collectedApps = collectedApps.put(pos, index.localTacletApps);
 
-            final Term subTerm = pos.subTerm ();
+            final JavaDLTerm subTerm = pos.subTerm ();
             final int nextSubtermIndex = pathToModification.getChild ();
 
             if ( subTerm.op () instanceof UpdateApplication ) {

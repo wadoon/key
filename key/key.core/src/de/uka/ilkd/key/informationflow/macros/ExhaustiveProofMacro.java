@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -55,7 +55,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
         } else if (macro.canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
             return posInOcc;
         } else {
-            final Term subTerm = posInOcc.subTerm();
+            final JavaDLTerm subTerm = posInOcc.subTerm();
             PosInOccurrence res = null;
             for (int i = 0; i < subTerm.arity() && res == null; i++) {
                 res = getApplicablePosInOcc(proof, goal, posInOcc.down(i), macro);

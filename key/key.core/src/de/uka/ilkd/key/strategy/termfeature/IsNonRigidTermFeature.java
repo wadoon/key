@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * this termfeature returns <tt>ZERO</tt> costs if the given term 
@@ -26,7 +26,7 @@ public class IsNonRigidTermFeature extends BinaryTermFeature {
     
     private IsNonRigidTermFeature () {}
     
-    protected boolean filter(Term term, Services services) {        
+    protected boolean filter(JavaDLTerm term, Services services) {        
         return !term.isRigid();
     }
 

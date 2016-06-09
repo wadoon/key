@@ -18,7 +18,7 @@ import java.util.LinkedList;
 
 import org.key_project.common.core.services.TermServices;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
@@ -34,9 +34,9 @@ public interface LemmaGenerator extends TacletTranslator {
 
 class LemmaFormula implements TacletFormula {
         private Taclet taclet;
-        private LinkedList<Term> formula = new LinkedList<Term>();
+        private LinkedList<JavaDLTerm> formula = new LinkedList<JavaDLTerm>();
 
-        public LemmaFormula(Taclet taclet, Term formula) {
+        public LemmaFormula(Taclet taclet, JavaDLTerm formula) {
                 this.taclet = taclet;
                 this.formula.add(formula);
         }
@@ -47,7 +47,7 @@ class LemmaFormula implements TacletFormula {
         }
 
         @Override
-        public Term getFormula(TermServices services) {
+        public JavaDLTerm getFormula(TermServices services) {
                 return formula.getFirst();
         }
 
@@ -57,7 +57,7 @@ class LemmaFormula implements TacletFormula {
         }
 
         @Override
-        public Collection<Term> getInstantiations() {
+        public Collection<JavaDLTerm> getInstantiations() {
                 return formula;
         }
 

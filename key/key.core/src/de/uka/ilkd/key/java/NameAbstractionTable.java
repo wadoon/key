@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.key_project.common.core.program.GenericNameAbstractionTable;
+
 /** 
  * This class is used for the equals modulo renaming method in
  * SourceElement. The purpose of this class is to abstract from
@@ -26,7 +28,7 @@ import java.util.List;
  * o2 instead of their real name. For this comparision a method is
  * offered so that the assigned name is not given outside.
  */
-public class NameAbstractionTable {
+public class NameAbstractionTable implements GenericNameAbstractionTable<SourceElement> {
 
     /**
      * The order in which symbols are declared in the two terms or programs that
@@ -35,11 +37,10 @@ public class NameAbstractionTable {
      */
     private List<SourceElement> declarations0 = null, declarations1 = null;
     
-    /** 
-     * adds the given two elements to the table
-     * @param pe1 SourceElement to be added
-     * @param pe2 SourceElement to be added     
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.GenericNameAbstractionTable#add(de.uka.ilkd.key.java.SourceElement, de.uka.ilkd.key.java.SourceElement)
      */
+    @Override
     public void add(SourceElement pe1, SourceElement pe2) {
         if ( declarations0 == null ) {
             declarations0 = new LinkedList<SourceElement> ();
@@ -50,14 +51,10 @@ public class NameAbstractionTable {
         declarations1.add ( 0, pe2 );
     }
 
-    /** 
-     * tests if the given elements have been assigned to the same
-     * abstract name. 
-     * @param pe0 SourceElement 
-     * @param pe1 SourceElement 
-     * @returns true if the pe1 and pe2 have been assigned to the same
-     * name
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.java.GenericNameAbstractionTable#sameAbstractName(de.uka.ilkd.key.java.SourceElement, de.uka.ilkd.key.java.SourceElement)
      */
+    @Override
     public boolean sameAbstractName(SourceElement pe0, SourceElement pe1) {
         if ( declarations0 != null ) {
             final Iterator<SourceElement> it0 = declarations0.iterator ();

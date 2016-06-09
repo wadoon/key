@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -53,14 +53,14 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
             return NumberRuleAppCost.getZeroCost();
         }
 
-        final Term focusFor = pos.sequentFormula().formula();
-        ImmutableList<Term> contractAppls =
+        final JavaDLTerm focusFor = pos.sequentFormula().formula();
+        ImmutableList<JavaDLTerm> contractAppls =
                 goal.getStrategyInfo(InfFlowContractAppTacletExecutor.INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (contractAppls == null) {
             return TopRuleAppCost.INSTANCE;
         }
 
-        for (Term appl : contractAppls) {
+        for (JavaDLTerm appl : contractAppls) {
             if (isSubFormula(focusFor, appl)) {
                 return NumberRuleAppCost.getZeroCost();
             }
@@ -70,8 +70,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     }
 
 
-    private boolean isSubFormula(Term f1,
-                                 Term f2) {
+    private boolean isSubFormula(JavaDLTerm f1,
+                                 JavaDLTerm f2) {
         SubFormulaVisitor v = new SubFormulaVisitor(f1);
         f2.execPreOrder(v);
         return v.getIsSubFormula();
@@ -80,18 +80,18 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
     private class SubFormulaVisitor extends DefaultVisitor {
 
-        final Term potentialSub;
+        final JavaDLTerm potentialSub;
 
         boolean isSubFormula = false;
 
 
-        public SubFormulaVisitor(Term potentialSub) {
+        public SubFormulaVisitor(JavaDLTerm potentialSub) {
             this.potentialSub = potentialSub;
         }
 
 
         @Override
-        public void visit(Term visited) {
+        public void visit(JavaDLTerm visited) {
             isSubFormula |= visited.equalsModRenaming(potentialSub);
         }
 

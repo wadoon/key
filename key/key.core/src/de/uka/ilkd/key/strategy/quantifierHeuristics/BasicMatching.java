@@ -21,7 +21,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
@@ -35,7 +35,7 @@ class BasicMatching {
      * @param targetTerm    a gound term
      * @return all substitution found from this matching
      */
-    static ImmutableSet<Substitution> getSubstitutions(Term trigger, Term targetTerm) {
+    static ImmutableSet<Substitution> getSubstitutions(JavaDLTerm trigger, JavaDLTerm targetTerm) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         if ( targetTerm.freeVars ().size () > 0
              || targetTerm.op () instanceof Quantifier ) return allsubs;
@@ -57,9 +57,9 @@ class BasicMatching {
    	 * @return all substitution that a given pattern(ex: a term of a uniTrigger)
    	 * match in the instance. 
    	 */
-	private static Substitution match(Term pattern, Term instance) {
-        final ImmutableMap<QuantifiableVariable,Term> map =
-            matchRec ( DefaultImmutableMap.<QuantifiableVariable,Term>nilMap(),
+	private static Substitution match(JavaDLTerm pattern, JavaDLTerm instance) {
+        final ImmutableMap<QuantifiableVariable,JavaDLTerm> map =
+            matchRec ( DefaultImmutableMap.<QuantifiableVariable,JavaDLTerm>nilMap(),
                        pattern, instance );
         if ( map == null ) return null;
         return new Substitution ( map );
@@ -68,9 +68,9 @@ class BasicMatching {
 	/**
 	 * match the pattern to instance recursively.
 	 */
-	private static ImmutableMap<QuantifiableVariable,Term>
-                   matchRec(ImmutableMap<QuantifiableVariable,Term> varMap,
-                            Term pattern, Term instance) {
+	private static ImmutableMap<QuantifiableVariable,JavaDLTerm>
+                   matchRec(ImmutableMap<QuantifiableVariable,JavaDLTerm> varMap,
+                            JavaDLTerm pattern, JavaDLTerm instance) {
 		final Operator patternOp = pattern.op ();
     
 		if ( patternOp instanceof QuantifiableVariable )
@@ -90,10 +90,10 @@ class BasicMatching {
 	 *  @return true if it is a new vaiable or the instance it matched is
      *  the same as that it matched before.
 	 */
-	private static ImmutableMap<QuantifiableVariable,Term>
-                   mapVarWithCheck(ImmutableMap<QuantifiableVariable,Term> varMap,
-                                   QuantifiableVariable var, Term instance) {
-		final Term oldTerm = varMap.get ( var );
+	private static ImmutableMap<QuantifiableVariable,JavaDLTerm>
+                   mapVarWithCheck(ImmutableMap<QuantifiableVariable,JavaDLTerm> varMap,
+                                   QuantifiableVariable var, JavaDLTerm instance) {
+		final JavaDLTerm oldTerm = varMap.get ( var );
         if ( oldTerm == null ) return varMap.put ( var, instance );
 
         if ( oldTerm.equals ( instance ) ) return varMap;

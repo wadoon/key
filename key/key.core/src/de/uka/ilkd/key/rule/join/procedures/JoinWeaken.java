@@ -21,7 +21,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.util.Triple;
@@ -50,10 +50,10 @@ public class JoinWeaken extends JoinProcedure {
     private static final String DISPLAY_NAME = "JoinByFullAnonymization";
 
     @Override
-    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1, Term valueInState1,
-            SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services) {
+    public Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinValuesInStates(
+            JavaDLTerm v, SymbolicExecutionState state1, JavaDLTerm valueInState1,
+            SymbolicExecutionState state2, JavaDLTerm valueInState2,
+            JavaDLTerm distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -62,8 +62,8 @@ public class JoinWeaken extends JoinProcedure {
         ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
         newNames = newNames.add(newSkolemConstant.name());
 
-        return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
-                DefaultImmutableSet.<Term> nil(), tb.func(newSkolemConstant),
+        return new Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>>(
+                DefaultImmutableSet.<JavaDLTerm> nil(), tb.func(newSkolemConstant),
                 newNames);
 
     }

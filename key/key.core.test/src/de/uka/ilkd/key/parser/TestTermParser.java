@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -39,8 +39,8 @@ public class TestTermParser extends AbstractTestTermParser {
 
     private static LogicVariable x,y,z,xs,ys;
 
-    private static Term t_x,t_y,t_z,t_xs,t_ys;
-    private static Term t_headxs,t_tailys,t_nil;
+    private static JavaDLTerm t_x,t_y,t_z,t_xs,t_ys;
+    private static JavaDLTerm t_headxs,t_tailys,t_nil;
     
     private final Recoder2KeY r2k;
 
@@ -123,8 +123,8 @@ public class TestTermParser extends AbstractTestTermParser {
 	xs = declareVar("xs",list); t_xs = tf.createTerm(xs);
 	ys = declareVar("ys",list); t_ys = tf.createTerm(ys);
 	
-	t_headxs = tf.createTerm(head,new Term[]{t_xs}, null, null);
-	t_tailys = tf.createTerm(tail,new Term[]{t_ys}, null, null);
+	t_headxs = tf.createTerm(head,new JavaDLTerm[]{t_xs}, null, null);
+	t_tailys = tf.createTerm(tail,new JavaDLTerm[]{t_ys}, null, null);
 	t_nil = tf.createTerm(nil);
     }
     
@@ -152,14 +152,14 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     public void test3() throws Exception {
-	Term t = tf.createTerm(cons,t_headxs,t_tailys);
+	JavaDLTerm t = tf.createTerm(cons,t_headxs,t_tailys);
 	
 	assertEquals("parse cons(head(xs),tail(ys))",
 		     t,parseTerm("cons(head(xs),tail(ys))"));
     }
 
     public void test5() {
-	Term t = tf.createTerm(Equality.EQUALS,
+	JavaDLTerm t = tf.createTerm(Equality.EQUALS,
 	    tf.createTerm
 	     (head,
 	      tf.createTerm(cons, t_x, t_xs)),
@@ -174,7 +174,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     public void testNotEqual() {
-	Term t = tf.createTerm(Junctor.NOT,
+	JavaDLTerm t = tf.createTerm(Junctor.NOT,
 	    tf.createTerm(Equality.EQUALS,
 	    tf.createTerm
 	     (head,
@@ -189,9 +189,9 @@ public class TestTermParser extends AbstractTestTermParser {
 
 
     public void test6() {
-	Term t = tf.createTerm
+	JavaDLTerm t = tf.createTerm
 	    (Equality.EQV,
-	     new Term[]{tf.createTerm(Junctor.IMP,
+	     new JavaDLTerm[]{tf.createTerm(Junctor.IMP,
 		     			     tf.createTerm(Junctor.OR,
 		     				     		  tf.createTerm(Equality.EQUALS, t_x, t_x),
 		     				     		  tf.createTerm(Equality.EQUALS, t_y,t_y)),
@@ -212,14 +212,14 @@ public class TestTermParser extends AbstractTestTermParser {
 	 * then build the formulae. */
 	
 	String s = "\\forall list x; \\forall list l1; ! x = l1";
-	Term t = parseFormula(s);
+	JavaDLTerm t = parseFormula(s);
 	
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .get(0);
 	LogicVariable l1 = (LogicVariable) t.sub(0).varsBoundHere(0)
 	    .get(0);
 
-	Term t1 = tb.all(thisx,
+	JavaDLTerm t1 = tb.all(thisx,
 	     tb.all(l1,
 	      tf.createTerm
 	      (Junctor.NOT,
@@ -237,16 +237,16 @@ public class TestTermParser extends AbstractTestTermParser {
 
 	{
 	    String s = "{\\subst elem xs; head(xs)} cons(xs,ys)";
-	    Term t = parseTerm(s);
+	    JavaDLTerm t = parseTerm(s);
 
 	    LogicVariable thisxs = (LogicVariable) t.varsBoundHere(1)
 		.get(0);
 	
-	    Term t1 = tf.createTerm
+	    JavaDLTerm t1 = tf.createTerm
 		(WarySubstOp.SUBST,
-		 new Term[]{t_headxs, tf.createTerm
+		 new JavaDLTerm[]{t_headxs, tf.createTerm
         		 (cons, 
-        		  new Term[]{tf.createTerm(thisxs), t_ys},
+        		  new JavaDLTerm[]{tf.createTerm(thisxs), t_ys},
         		  	     null,
         		  	     null)},
 		new ImmutableArray<QuantifiableVariable>(thisxs),
@@ -261,15 +261,15 @@ public class TestTermParser extends AbstractTestTermParser {
 	/* Try something with a prediate */
 	
 	String s = "\\exists list x; !isempty(x)";
-	Term t = parseFormula(s);
+	JavaDLTerm t = parseFormula(s);
 	
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .get(0);
 
-	Term t1 = tb.ex(thisx,
+	JavaDLTerm t1 = tb.ex(thisx,
 	     tf.createTerm
 	     (Junctor.NOT,
-	      tf.createTerm(isempty,new Term[]{tf.createTerm(thisx)}, null, null)));
+	      tf.createTerm(isempty,new JavaDLTerm[]{tf.createTerm(thisx)}, null, null)));
 	      
 	assertTrue("new variable in quantifier", thisx != x);
 	assertEquals("parse \\forall list x; \\forall list l1; ! x = l1", t1,t);
@@ -281,7 +281,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	// <{ int x = 2; {String x = "\"}";} }> true
 	//	String s = "< { int x = 1; {String s = \"\\\"}\";} } > true";
 	String s = "\\<{ int x = 1; {int s = 2;} }\\> x=x";
-	Term t = parseTerm(s);
+	JavaDLTerm t = parseTerm(s);
 	
 	// for now, just check that the parser doesn't crash
 	
@@ -298,21 +298,21 @@ public class TestTermParser extends AbstractTestTermParser {
 
     public void test12() throws Exception {
 	    String s="\\<{int i; i=0;}\\> \\<{ while (i>0) ;}\\>true";
-	    Term t = parseTerm(s);
+	    JavaDLTerm t = parseTerm(s);
     }
 
     public void test13() throws Exception{
-       Term t1 = parseTerm("\\exists elem x; \\forall list ys; \\forall list xs; ( xs ="
+       JavaDLTerm t1 = parseTerm("\\exists elem x; \\forall list ys; \\forall list xs; ( xs ="
 		                    			+" cons(x,ys))");
-	Term t2 = parseTerm("\\exists elem y; \\forall list xs; \\forall list ys; ( ys ="
+	JavaDLTerm t2 = parseTerm("\\exists elem y; \\forall list xs; \\forall list ys; ( ys ="
                                         +" cons(y,xs))");
-        Term t3 = parseTerm("\\exists int_sort bi; (\\<{ int p_x = 1;"
+        JavaDLTerm t3 = parseTerm("\\exists int_sort bi; (\\<{ int p_x = 1;"
                             +" {int s = 2;} }\\>"
                             +" true ->"
                             +"\\<{ int p_x = 1;boolean p_y=2<1;"
                             +" while(p_y){ int s=3 ;} }\\>"
                             +" true)");
-        Term t4 = parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;"
+        JavaDLTerm t4 = parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;"
                             +" {int s = 2;} }\\>"
                             +" true ->"
                             +"\\<{ int p_y = 1;boolean p_x = 2<1;"
@@ -323,39 +323,39 @@ public class TestTermParser extends AbstractTestTermParser {
 
     public void test14() throws Exception {
 	String s="\\<{int[] i;i=new int[5];}\\>true";
-	Term t=parseTerm(s);
+	JavaDLTerm t=parseTerm(s);
 	s="\\<{int[] i;}\\>\\<{}\\>true";
 	t=parseTerm(s);
     }
 
     public void xtestBindingUpdateTermOldBindingAlternative() throws Exception {
 	String s="\\<{int i,j;}\\> {i:=j} i = j";
-	Term t = parseTerm(s);
+	JavaDLTerm t = parseTerm(s);
 	assertTrue("expected {i:=j}(i=j) but is ({i:=j}i)=j)", 
 		t.sub(0).op() instanceof UpdateApplication);
     }
 
     public void testBindingUpdateTerm() throws Exception {
 	String s="\\forall int j; {globalIntPV:=j} globalIntPV = j";
-	Term t = parseTerm(s);
+	JavaDLTerm t = parseTerm(s);
 	assertFalse("expected ({globalIntPV:=j}globalIntPV)=j) but is {globalIntPV:=j}(globalIntPV=j)", 
 		t.sub(0).op() instanceof UpdateApplication);
     }
 
     public void testParsingArray() throws Exception {
 	String s="\\forall int[][] i; \\forall int j; i[j][j] = j";
-	Term t = parseTerm(s);
+	JavaDLTerm t = parseTerm(s);
     }
 
 
     public void xtestParsingArrayWithSpaces() throws Exception {
 	String s="\\<{int[][] i; int j;}\\> i[ j ][ j ] = j";
-	Term t = parseTerm(s);
+	JavaDLTerm t = parseTerm(s);
     }
 
     public void testParsingArrayCombination() throws Exception {
 	String s="\\forall int[][] i; \\forall int j; i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j";
-	Term t = parseTerm(s);
+	JavaDLTerm t = parseTerm(s);
     }
 
     
@@ -411,7 +411,7 @@ public class TestTermParser extends AbstractTestTermParser {
 
     public void testNegativeLiteralParsing() {
 	String s1 = "-1234";
-	Term t = null;
+	JavaDLTerm t = null;
 	try {
 	    t = parseTerm(s1);
 	} catch (Exception e) {fail();}
@@ -439,7 +439,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     public void testIfThenElse () throws Exception {
-        Term t=null, t2=null;
+        JavaDLTerm t=null, t2=null;
         
         String s1 = "\\if (3=4) \\then (1) \\else (2)";
         try {
@@ -509,7 +509,7 @@ public class TestTermParser extends AbstractTestTermParser {
 //        // First register the labels ...
 //        TermLabels.registerSymbolicExecutionTermLabels(serv.getProfile().getTermLabelManager());
 //
-//        Term t = parseTerm("(3 + 2)<<" + SimpleTermLabel.LOOP_BODY_LABEL_NAME + ">>");
+//        JavaDLTerm t = parseTerm("(3 + 2)<<" + SimpleTermLabel.LOOP_BODY_LABEL_NAME + ">>");
 //        assertTrue(t.hasLabels());
 //        t = parseTerm("3 + 2<<" + SimpleTermLabel.LOOP_BODY_LABEL_NAME + ">>");
 //        assertFalse(t.hasLabels());
@@ -517,7 +517,7 @@ public class TestTermParser extends AbstractTestTermParser {
 //
 //        try {
 //            t = parseTerm("(3 + 2)<<unknownLabel>>");
-//            fail("Term " + t + " should not have been parsed");
+//            fail("JavaDLTerm " + t + " should not have been parsed");
 //        } catch(Exception ex) {
 //            // expected
 //        }

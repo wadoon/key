@@ -16,11 +16,11 @@ package de.uka.ilkd.key.strategy.termfeature;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 
 /**
- * Term feature for testing whether the sort of a term is a subsort of a given
+ * JavaDLTerm feature for testing whether the sort of a term is a subsort of a given
  * sort (or exactly the given sort).
  */
 public class SortExtendsTransTermFeature extends BinaryTermFeature {
@@ -35,7 +35,7 @@ public class SortExtendsTransTermFeature extends BinaryTermFeature {
         this.sort = sort;
     }
     
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(JavaDLTerm term, Services services) {
         return term.sort ().extendsTrans ( sort );
     }
 

@@ -6,7 +6,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -48,7 +48,7 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
         ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> chosenCandidates =
                 null;
         final JoinProcedure chosenRule;
-        Term chosenDistForm = null; // null is admissible standard ==> auto
+        JavaDLTerm chosenDistForm = null; // null is admissible standard ==> auto
                                     // generation
 
         if (forced) {

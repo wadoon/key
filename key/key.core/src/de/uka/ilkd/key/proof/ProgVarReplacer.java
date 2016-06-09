@@ -35,7 +35,7 @@ import de.uka.ilkd.key.logic.SemisequentChangeInfo;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
@@ -207,8 +207,8 @@ public final class ProgVarReplacer {
 		    result = result.replace(sv, newA, services);
 		}
 	    } else if(ie instanceof TermInstantiation) {
-		Term t = (Term) inst;
-		Term newT = replace(t);
+		JavaDLTerm t = (JavaDLTerm) inst;
+		JavaDLTerm newT = replace(t);
 		if(newT != t) {
 		    result = result.replace(sv, newT, services);
 		}
@@ -268,7 +268,7 @@ public final class ProgVarReplacer {
     public SequentFormula replace(SequentFormula cf) {
         SequentFormula result = cf;
 
-	final Term newFormula = replace(cf.formula());
+	final JavaDLTerm newFormula = replace(cf.formula());
 
 	if(newFormula != cf.formula()) {
             result = new SequentFormula(newFormula);
@@ -277,34 +277,34 @@ public final class ProgVarReplacer {
     }
     
     
-    private Term replaceProgramVariable(Term t) {
+    private JavaDLTerm replaceProgramVariable(JavaDLTerm t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
         Object o = map.get(pv);
         if (o instanceof ProgramVariable) {
             return services.getTermFactory().createTerm((ProgramVariable)o, t.getLabels());
-        } else if (o instanceof Term) {
-            return (Term) o;
+        } else if (o instanceof JavaDLTerm) {
+            return (JavaDLTerm) o;
         }
         return t;
     }
     
     
-    private Term standardReplace(Term t) {
-        Term result = t;
+    private JavaDLTerm standardReplace(JavaDLTerm t) {
+        JavaDLTerm result = t;
         
-        final Term newSubTerms[] = new Term[t.arity()];
+        final JavaDLTerm newSubTerms[] = new JavaDLTerm[t.arity()];
 
         boolean changedSubTerm = false;
         
         for(int i = 0, ar = t.arity(); i < ar; i++) {
-            final Term subTerm = t.sub(i);
+            final JavaDLTerm subTerm = t.sub(i);
             newSubTerms[i] = replace(subTerm);
             if(newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
             }
         }
 
-        final JavaBlock jb = t.javaBlock();
+        final JavaBlock jb = t.modalContent();
         JavaBlock newJb = jb;
         if (!jb.isEmpty()) {
             Statement s = (Statement)jb.program();
@@ -327,7 +327,7 @@ public final class ProgVarReplacer {
     /**
      * replaces in a term
      */
-    public Term replace(Term t) {
+    public JavaDLTerm replace(JavaDLTerm t) {
         final Operator op = t.op();
         if (op instanceof ProgramVariable) {
             return replaceProgramVariable(t);       

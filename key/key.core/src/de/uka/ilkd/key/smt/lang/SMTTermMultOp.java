@@ -276,8 +276,8 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm substitute (SMTTermVariable a, SMTTerm b) {		
-	//		LinkedList<Term> newSubs = new LinkedList<Term>();		
-	//		for(Term sub : subs){
+	//		LinkedList<JavaDLTerm> newSubs = new LinkedList<JavaDLTerm>();		
+	//		for(JavaDLTerm sub : subs){
 	//			newSubs.add(sub.substitute(a, b));
 	//		}
 	//		return new TermMultOp(operator, newSubs);
@@ -303,8 +303,8 @@ public class SMTTermMultOp extends SMTTerm {
 	if (this.equals(a))
 	    return b;
 
-	//		LinkedList<Term> newSubs = new LinkedList<Term>();
-	//		for(Term sub : subs){
+	//		LinkedList<JavaDLTerm> newSubs = new LinkedList<JavaDLTerm>();
+	//		for(JavaDLTerm sub : subs){
 	//			newSubs.add(sub.substitute(a, b));
 	//		}
 	//		return new TermMultOp(operator, newSubs);
@@ -320,8 +320,8 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm replace (SMTTermCall a, SMTTerm b) {
-	//		LinkedList<Term> newSubs = new LinkedList<Term>();
-	//		for(Term sub : subs){
+	//		LinkedList<JavaDLTerm> newSubs = new LinkedList<JavaDLTerm>();
+	//		for(JavaDLTerm sub : subs){
 	//			newSubs.add(sub.replace(a, b));
 	//		}
 	//		return new TermMultOp(operator, newSubs);
@@ -339,8 +339,8 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm instantiate (SMTTermVariable a, SMTTerm b) {
-	//		LinkedList<Term> newSubs = new LinkedList<Term>();
-	//		for(Term sub : subs){
+	//		LinkedList<JavaDLTerm> newSubs = new LinkedList<JavaDLTerm>();
+	//		for(JavaDLTerm sub : subs){
 	//			newSubs.add(sub.instantiate(a, b));
 	//		}
 	//		return new TermMultOp(operator, newSubs);
@@ -394,7 +394,7 @@ public class SMTTermMultOp extends SMTTerm {
 	return true;
     }
 
-    //	public boolean equals (Term term) {
+    //	public boolean equals (JavaDLTerm term) {
     //		
     //		if (term == null)
     //			return false;

@@ -28,7 +28,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -62,7 +62,7 @@ public abstract class AbstractPO implements IPersistablePO {
     protected ImmutableSet<NoPosTacletApp> taclets;
     private String header;
     private ProofAggregate proofAggregate;
-    protected Term[] poTerms;
+    protected JavaDLTerm[] poTerms;
     protected String[] poNames;
 
 
@@ -326,7 +326,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * Creates a Proof (helper for getPO()).
      */
     protected Proof createProof(String proofName,
-                              Term poTerm,
+                              JavaDLTerm poTerm,
                               InitConfig proofConfig) {
         if (proofConfig == null) {
             proofConfig = environmentConfig.deepCopy();
@@ -345,7 +345,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected Proof createProofObject(String proofName, String proofHeader, Term poTerm,
+    protected Proof createProofObject(String proofName, String proofHeader, JavaDLTerm poTerm,
             InitConfig proofConfig) {
         Proof proof = new Proof(proofName,
                                 poTerm,
@@ -390,7 +390,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected void assignPOTerms(Term... poTerms) {
+    protected void assignPOTerms(JavaDLTerm... poTerms) {
         this.poTerms = poTerms;
     }
 

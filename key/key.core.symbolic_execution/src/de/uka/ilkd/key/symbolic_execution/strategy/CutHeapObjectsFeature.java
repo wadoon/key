@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
@@ -47,18 +47,18 @@ public class CutHeapObjectsFeature extends BinaryFeature {
     */
    @Override
    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-      Term cutFormula = SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal);
+      JavaDLTerm cutFormula = SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal);
       if (cutFormula != null) {
          if (cutFormula.op() == Junctor.NOT) {
             cutFormula = cutFormula.sub(0);
          }
          if (cutFormula.op() == Equality.EQUALS) {
-            Term cutFormulaC0 = cutFormula.sub(0);
-            Term cutFormulaC1 = cutFormula.sub(1);
+            JavaDLTerm cutFormulaC0 = cutFormula.sub(0);
+            JavaDLTerm cutFormulaC1 = cutFormula.sub(1);
             boolean contains = false;
             Iterator<SequentFormula> iter = goal.sequent().iterator();
             while (!contains && iter.hasNext()) {
-               Term formula = iter.next().formula();
+               JavaDLTerm formula = iter.next().formula();
                if (formula.op() == Junctor.NOT) {
                   formula = formula.sub(0);
                }

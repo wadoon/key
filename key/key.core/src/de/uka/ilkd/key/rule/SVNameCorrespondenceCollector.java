@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -56,11 +56,11 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
 
 
     /** is called by the execPostOrder-method of a term 
-     * @param t the Term if the toplevel operator of this term is a
+     * @param t the JavaDLTerm if the toplevel operator of this term is a
      * substitution of schema variables, then this pair is added to
      * the map "nameCorrespondences"
      */  
-    public void visit ( Term t ) {	
+    public void visit ( JavaDLTerm t ) {	
 
 	final Operator top = t.op ();
     
@@ -120,7 +120,7 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
         SchemaVariable findSV = null;
 	visit(taclet.ifSequent());
 	if (taclet instanceof FindTaclet) {
-	    final Term findTerm = ( (FindTaclet)taclet ).find ();
+	    final JavaDLTerm findTerm = ( (FindTaclet)taclet ).find ();
             findTerm.execPostOrder ( this );
             if ( findTerm.op () instanceof SchemaVariable ) {
                 findSV = (SchemaVariable)findTerm.op ();
@@ -133,7 +133,7 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
             TacletGoalTemplate gt = tacletGoalTemplate;
             visit(gt.sequent());
             if (gt instanceof RewriteTacletGoalTemplate) {
-                final Term replaceWithTerm = ((RewriteTacletGoalTemplate) gt).replaceWith();
+                final JavaDLTerm replaceWithTerm = ((RewriteTacletGoalTemplate) gt).replaceWith();
                 replaceWithTerm.execPostOrder(this);
                 if (findSV != null
                         && replaceWithTerm.op() instanceof SchemaVariable)

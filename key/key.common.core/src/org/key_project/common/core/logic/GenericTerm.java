@@ -69,6 +69,23 @@ public interface GenericTerm<V extends Visitor<? extends GenericTerm<V>>> extend
      */
     <T> T op(Class<T> opClass) throws IllegalArgumentException;
 
+    
+    /**
+     * The modal content 
+     */
+    public ModalContent<?> modalContent();
+
+    /**
+     * Checks if the {@link ModalContent} or one of its direct or indirect children
+     * contains a non empty {@link ModalContent}.
+     * 
+     * @return {@code true} The {@link ModalContent} or one of its direct or indirect
+     *         children contains a non empty {@link ModalContent}, {@code false} no
+     *         {@link ModalContent} available.
+     */
+    public boolean containsModalContentRecursive();
+
+    
     /**
      * The subterms.
      */

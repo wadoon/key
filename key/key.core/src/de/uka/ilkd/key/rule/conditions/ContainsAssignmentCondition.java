@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -63,7 +63,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
         
         
         final ProgramElement pe;
-        if (instCandidate instanceof Term) {
+        if (instCandidate instanceof JavaDLTerm) {
             return true;
         } else {
             pe = (ProgramElement) instCandidate;

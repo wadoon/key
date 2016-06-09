@@ -17,12 +17,12 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * Term generator that enumerates the formulas of the current
+ * JavaDLTerm generator that enumerates the formulas of the current
  * sequent/antecedent/succedent.
  */
 public abstract class SequentFormulasGenerator implements TermGenerator {
@@ -55,18 +55,18 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     
     protected abstract Iterator<SequentFormula> generateForIt(Goal goal);
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         return new SFIterator ( generateForIt ( goal ) );
     }
 
-    private static class SFIterator implements Iterator<Term> {
+    private static class SFIterator implements Iterator<JavaDLTerm> {
         private final Iterator<SequentFormula> forIt;
 
         public boolean hasNext() {
             return forIt.hasNext ();
         }
 
-        public Term next() {
+        public JavaDLTerm next() {
             return forIt.next ().formula ();
         }
 

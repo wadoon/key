@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -38,11 +38,11 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
     public final static TermFeature PROGRAMS_OR_QUERIES =
         new ContainsExecutableCodeTermFeature ( true );
     
-    protected boolean filter(Term t, Services services) {
+    protected boolean filter(JavaDLTerm t, Services services) {
         return containsExec ( t, services );
     }
 
-    private boolean containsExec(Term t, Services services) {
+    private boolean containsExec(JavaDLTerm t, Services services) {
         if ( t.isRigid () ) return false;
         //if ( t.isContainsJavaBlockRecursive() ) return true;
         

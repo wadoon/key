@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 
 
@@ -39,13 +39,13 @@ public class TermHelper {
      * will become a fixed signature. But currently there ar eto many chnages 
      * pending (new sort hierarchy for integers, new pos) that much of the work would be 
      * for made new. That is the reason for this HACK 
-     * @param term the Term of which a part of the <tt>i</tt>-th sub term 
+     * @param term the JavaDLTerm of which a part of the <tt>i</tt>-th sub term 
      * may be replaced
      * @param i an int giving the position of sub term of which a part is to be replaced
      * @param services the Services object
      * @return the maximal sort allowed at the i-th position
      */
-    public static Sort getMaxSort(Term term, int i, TermServices services) {     
+    public static Sort getMaxSort(JavaDLTerm term, int i, TermServices services) {     
         if (term.sub(i).sort() == Sort.FORMULA) return Sort.FORMULA;
         
         if (term.op() instanceof IfThenElse && i > 0) {

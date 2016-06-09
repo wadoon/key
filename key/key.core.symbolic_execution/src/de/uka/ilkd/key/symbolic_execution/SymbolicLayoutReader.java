@@ -34,7 +34,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
@@ -572,8 +572,8 @@ public class SymbolicLayoutReader {
       @Override
       public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
                                                  boolean isArrayIndex, 
-                                                 Term arrayIndex,
-                                                 Term condition) {
+                                                 JavaDLTerm arrayIndex,
+                                                 JavaDLTerm condition) {
          return null;
       }
 
@@ -583,8 +583,8 @@ public class SymbolicLayoutReader {
       @Override
       public ISymbolicValue getValue(IProgramVariable programVariable, 
                                      boolean isArrayIndex, 
-                                     Term arrayIndex,
-                                     Term condition) {
+                                     JavaDLTerm arrayIndex,
+                                     JavaDLTerm condition) {
          return null;
       }
    }
@@ -620,7 +620,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public Term getName() {
+      public JavaDLTerm getName() {
          return null;
       }
 
@@ -654,8 +654,8 @@ public class SymbolicLayoutReader {
       @Override
       public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
                                                  boolean isArrayIndex, 
-                                                 Term arrayIndex,
-                                                 Term condition) {
+                                                 JavaDLTerm arrayIndex,
+                                                 JavaDLTerm condition) {
          return null;
       }
 
@@ -665,8 +665,8 @@ public class SymbolicLayoutReader {
       @Override
       public ISymbolicValue getValue(IProgramVariable programVariable, 
                                      boolean isArrayIndex, 
-                                     Term arrayIndex,
-                                     Term condition) {
+                                     JavaDLTerm arrayIndex,
+                                     JavaDLTerm condition) {
          return null;
       }
    }
@@ -753,7 +753,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public Term getValue() {
+      public JavaDLTerm getValue() {
          return null;
       }
 
@@ -801,7 +801,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public Term getArrayIndex() {
+      public JavaDLTerm getArrayIndex() {
          return null;
       }
 
@@ -817,7 +817,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public Term getCondition() {
+      public JavaDLTerm getCondition() {
          return null;
       }
 
@@ -949,7 +949,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public Term getArrayIndex() {
+      public JavaDLTerm getArrayIndex() {
          return null;
       }
 
@@ -965,7 +965,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public Term getCondition() {
+      public JavaDLTerm getCondition() {
          return null;
       }
 
@@ -1016,7 +1016,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public ImmutableList<Term> getTerms() {
+      public ImmutableList<JavaDLTerm> getTerms() {
          return null;
       }
 
@@ -1040,7 +1040,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public Term getRepresentative() {
+      public JavaDLTerm getRepresentative() {
          return null;
       }
 
@@ -1056,7 +1056,7 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public boolean containsTerm(Term term) {
+      public boolean containsTerm(JavaDLTerm term) {
          return false;
       }
    }

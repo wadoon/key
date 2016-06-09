@@ -20,7 +20,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -42,9 +42,9 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
    private final String additionalBranchLabel;
    
    /**
-    * The {@link Term} which represents the branch condition.
+    * The {@link JavaDLTerm} which represents the branch condition.
     */
-   private Term branchCondition;
+   private JavaDLTerm branchCondition;
    
    /**
     * The human readable branch condition.
@@ -54,7 +54,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
    /**
     * The path condition to reach this node.
     */
-   private Term pathCondition;
+   private JavaDLTerm pathCondition;
    
    /**
     * The human readable path condition to reach this node.
@@ -69,7 +69,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
    /**
     * Contains the merged branch conditions.
     */
-   private Term[] mergedBranchCondtions;
+   private JavaDLTerm[] mergedBranchCondtions;
    
    /**
     * Constructor.
@@ -123,7 +123,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     * {@inheritDoc}
     */
    @Override
-   public Term getBranchCondition() throws ProofInputException {
+   public JavaDLTerm getBranchCondition() throws ProofInputException {
       if (branchCondition == null) {
          lazyComputeBranchCondition();
       }
@@ -142,7 +142,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
          // Compute branch condition
          if (isMergedBranchCondition()) {
             // Add all merged branch conditions
-            Term[] mergedConditions = getMergedBranchCondtions();
+            JavaDLTerm[] mergedConditions = getMergedBranchCondtions();
             branchCondition = services.getTermBuilder().and(mergedBranchCondtions);
             // Simplify merged branch conditions
             if (mergedConditions.length >= 2) {
@@ -172,7 +172,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     * {@inheritDoc}
     */
    @Override
-   public Term getPathCondition() throws ProofInputException {
+   public JavaDLTerm getPathCondition() throws ProofInputException {
       if (pathCondition == null) {
          lazyComputePathCondition();
       }
@@ -200,7 +200,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
       if (initConfig != null) { // Otherwise proof is disposed.
          final Services services = initConfig.getServices();
          // Get path to parent
-         Term parentPath;
+         JavaDLTerm parentPath;
          if (getParent() != null) {
             parentPath = getParent().getPathCondition();
          }
@@ -208,7 +208,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             parentPath = services.getTermBuilder().tt();
          }
          // Add current branch condition to path
-         Term branchCondition = getBranchCondition();
+         JavaDLTerm branchCondition = getBranchCondition();
          if (branchCondition == null) {
             return; // Proof disposed in between.
          }
@@ -247,7 +247,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     * {@inheritDoc}
     */
    @Override
-   public Term[] getMergedBranchCondtions() throws ProofInputException {
+   public JavaDLTerm[] getMergedBranchCondtions() throws ProofInputException {
       if (mergedBranchCondtions == null) {
          mergedBranchCondtions = lazyComputeMergedBranchCondtions();
       }
@@ -259,9 +259,9 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     * is called the first time.
     * @throws ProofInputException Occurred Exception
     */
-   protected Term[] lazyComputeMergedBranchCondtions() throws ProofInputException  {
+   protected JavaDLTerm[] lazyComputeMergedBranchCondtions() throws ProofInputException  {
       if (isMergedBranchCondition()) {
-         Term[] result = new Term[mergedProofNodes.size()];
+         JavaDLTerm[] result = new JavaDLTerm[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
             result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), getSettings().isSimplifyConditions(), true);
@@ -269,7 +269,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
          return result;
       }
       else {
-         return new Term[0];
+         return new JavaDLTerm[0];
       }
    }
 
@@ -310,8 +310,8 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     */
    @Override
    public SourceElement getActiveStatement() {
-      Term modalityTerm = getModalityPIO().subTerm();
-      SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
+      JavaDLTerm modalityTerm = getModalityPIO().subTerm();
+      SourceElement firstStatement = modalityTerm.modalContent().program().getFirstElement();
       return NodeInfo.computeActiveStatement(firstStatement);
    }
 }

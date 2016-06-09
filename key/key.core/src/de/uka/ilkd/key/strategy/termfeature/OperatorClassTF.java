@@ -16,10 +16,10 @@ package de.uka.ilkd.key.strategy.termfeature;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
- * Term feature for checking whether the top operator of a term has an instance
+ * JavaDLTerm feature for checking whether the top operator of a term has an instance
  * of a certain class
  */
 public class OperatorClassTF extends BinaryTermFeature {
@@ -34,7 +34,7 @@ public class OperatorClassTF extends BinaryTermFeature {
         return new OperatorClassTF ( op );
     }
 
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(JavaDLTerm term, Services services) {
         return opClass.isInstance ( term.op () );
     }
 }

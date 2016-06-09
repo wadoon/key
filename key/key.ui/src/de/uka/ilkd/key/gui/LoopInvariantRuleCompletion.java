@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -45,12 +45,12 @@ public class LoopInvariantRuleCompletion implements
                 ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
 
         // leading update?
-        Term progPost = loopApp.programTerm();
+        JavaDLTerm progPost = loopApp.programTerm();
         final While loop = loopApp.getLoopStatement();
 
         LoopInvariant inv = loopApp.getInvariant();
         if (inv == null) { // no invariant present, get it interactively
-            MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
+            MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.modalContent(),
                                                                services);
             inv = new LoopInvariantImpl(loop,
                                         mf == null ?
@@ -59,7 +59,7 @@ public class LoopInvariantRuleCompletion implements
                                                 null : mf.getProgramMethod().getContainerType(),
                                         mf == null ? null : MiscTools
                                                 .getSelfTerm(JavaTools.getInnermostMethodFrame(
-                                                                progPost.javaBlock(), services),
+                                                                progPost.modalContent(), services),
                                                              services),
                                         null);
             try {

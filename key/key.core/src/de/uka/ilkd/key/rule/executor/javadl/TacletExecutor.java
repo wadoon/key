@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SemisequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -64,7 +64,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     /** 
      * a new term is created by replacing variables of term whose replacement is
      * found in the given SVInstantiations 
-     * @param term the {@link Term} the syntactical replacement is performed on
+     * @param term the {@link JavaDLTerm} the syntactical replacement is performed on
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param labelHint the hint used to maintain {@link TermLabel}s.
      * @param applicationPosInOccurrence the {@link PosInOccurrence} of the find term 
@@ -76,7 +76,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param services the {@link Services} with the Java model information
      * @return the (partially) instantiated term  
      */
-    protected Term syntacticalReplace(Term term, TermLabelState termLabelState,
+    protected JavaDLTerm syntacticalReplace(JavaDLTerm term, TermLabelState termLabelState,
             TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence,
             MatchConditions mc,
@@ -128,7 +128,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param services the Services object carrying ja related information
      * @param matchCond the MatchConditions object with the instantiations of
      * the schemavariables, constraints etc.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link JavaDLTerm} which is rewritten
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      * @return the as far as possible instantiated SequentFormula
      */
@@ -143,7 +143,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
         final SVInstantiations svInst = matchCond.getInstantiations ();
 
-        Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), termLabelState, 
+        JavaDLTerm instantiatedFormula = syntacticalReplace(schemaFormula.formula(), termLabelState, 
                 new TacletLabelHint(labelHint, schemaFormula), applicationPosInOccurrence, matchCond, 
                 goal, tacletApp, services);
 
@@ -161,7 +161,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param semi the Semisequent to be instantiated
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param labelHint The hint used to maintain {@link TermLabel}s.
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link JavaDLTerm} which is rewritten
      * @param matchCond the MatchConditions including the mapping 
      * Schemavariables to concrete logic elements
      * @param services the Services
@@ -218,7 +218,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param pos the PosInOccurrence describing the place in the sequent
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link JavaDLTerm} which is rewritten
      * @param antec boolean true(false) if elements have to be added to the
      * antecedent(succedent) (only looked at if pos == null)
      * @param labelHint The hint used to maintain {@link TermLabel}s.
@@ -259,7 +259,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param pos the PosInOccurrence describing the place in the
      * sequent or null for head of antecedent
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link JavaDLTerm} which is rewritten
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
      * @param services the Services encapsulating all java information
@@ -289,7 +289,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      * @param pos the PosInOccurrence describing the place in the
      * sequent or null for head of antecedent
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link JavaDLTerm} which is rewritten
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
      * @param goal the Goal that knows the node the formulae have to be added
@@ -438,7 +438,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         Iterator<SequentChangeInfo> itNewGoalSequents;
 
         // proof obligation for the if formulas
-        Term           ifObl  = null;
+        JavaDLTerm           ifObl  = null;
 
         // always create at least one new goal
         if ( p_numberOfNewGoals == 0 )
@@ -446,7 +446,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
         if ( p_list != null ) {
             int i = taclet.ifSequent ().antecedent ().size ();
-            Term ifPart;
+            JavaDLTerm ifPart;
 
             for (final IfFormulaInstantiation inst : p_list) {
                 if ( !( inst instanceof IfFormulaInstSeq ) ) {

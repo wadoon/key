@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.ApplyStrategy;
@@ -74,7 +74,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                             Node proofNode, 
                             PosInOccurrence modalityPIO, 
                             IProgramVariable programVariable,
-                            Term additionalCondition) {
+                            JavaDLTerm additionalCondition) {
       this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
    }
    
@@ -91,7 +91,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                             PosInOccurrence modalityPIO, 
                             ExecutionValue parentValue, 
                             IProgramVariable programVariable,
-                            Term additionalCondition) {
+                            JavaDLTerm additionalCondition) {
       super(parentNode.getSettings(), 
             proofNode, 
             programVariable, 
@@ -117,9 +117,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                             Node proofNode, 
                             PosInOccurrence modalityPIO, 
                             ExecutionValue parentValue, 
-                            Term arrayIndex,
+                            JavaDLTerm arrayIndex,
                             ExecutionValue lengthValue,
-                            Term additionalCondition) {
+                            JavaDLTerm additionalCondition) {
       super(parentNode.getSettings(), 
             proofNode, 
             null, 
@@ -158,8 +158,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
          final TermBuilder tb = services.getTermBuilder();
          // Start site proof to extract the value of the result variable.
          SiteProofVariableValueInput sequentToProve;
-         Term siteProofSelectTerm = null;
-         Term siteProofCondition;
+         JavaDLTerm siteProofSelectTerm = null;
+         JavaDLTerm siteProofCondition;
          if (getAdditionalCondition() != null) {
             siteProofCondition = getAdditionalCondition();
          }
@@ -189,18 +189,18 @@ public class ExecutionVariable extends AbstractExecutionVariable {
          try {
             List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
             // Group values of the branches
-            Map<Term, List<Goal>> valueMap = new LinkedHashMap<Term, List<Goal>>();
+            Map<JavaDLTerm, List<Goal>> valueMap = new LinkedHashMap<JavaDLTerm, List<Goal>>();
             List<Goal> unknownValues = new LinkedList<Goal>();
             groupGoalsByValue(info.getProof().openGoals(), sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition, valueMap, unknownValues, services);
             // Instantiate child values
-            for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
-               Term value = valueEntry.getKey();
+            for (Entry<JavaDLTerm, List<Goal>> valueEntry : valueMap.entrySet()) {
+               JavaDLTerm value = valueEntry.getKey();
                // Format return vale
                String valueString = formatTerm(value, services);
                // Determine type
                String typeString = value.sort().toString();
                // Compute value condition
-               Term condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
+               JavaDLTerm condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
                String conditionString = null;
                if (condition != null) {
                   conditionString = formatTerm(condition, services);
@@ -218,7 +218,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             // Instantiate unknown child values
             if (!unknownValues.isEmpty()) {
                // Compute value condition
-               Term condition = computeValueCondition(tb, unknownValues, initConfig);
+               JavaDLTerm condition = computeValueCondition(tb, unknownValues, initConfig);
                String conditionString = null;
                if (condition != null) {
                   conditionString = formatTerm(condition, services);
@@ -248,19 +248,19 @@ public class ExecutionVariable extends AbstractExecutionVariable {
    /**
     * Groups all {@link Goal}s which provides the same value.
     * @param goals All available {@link Goal}s to group.
-    * @param operator The {@link Operator} of the {@link Term} which provides the value.
+    * @param operator The {@link Operator} of the {@link JavaDLTerm} which provides the value.
     * @param services The {@link Services} to use.
     */
    protected void groupGoalsByValue(ImmutableList<Goal> goals, 
                                     Operator operator, 
-                                    Term siteProofSelectTerm,
-                                    Term siteProofCondition,
-                                    Map<Term, List<Goal>> valueMap,
+                                    JavaDLTerm siteProofSelectTerm,
+                                    JavaDLTerm siteProofCondition,
+                                    Map<JavaDLTerm, List<Goal>> valueMap,
                                     List<Goal> unknownValues,
                                     Services services) throws ProofInputException {
       for (Goal goal : goals) {
          // Extract value
-         Term value = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, operator);
+         JavaDLTerm value = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, operator);
          assert value != null;
          value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, services);
          // Compute unknown flag if required
@@ -297,15 +297,15 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     * @return The combined path condition.
     * @throws ProofInputException Occurred Exception.
     */
-   protected Term computeValueCondition(TermBuilder tb, List<Goal> valueGoals, InitConfig initConfig) throws ProofInputException {
+   protected JavaDLTerm computeValueCondition(TermBuilder tb, List<Goal> valueGoals, InitConfig initConfig) throws ProofInputException {
       if (!valueGoals.isEmpty()) {
-         List<Term> pathConditions = new LinkedList<Term>();
+         List<JavaDLTerm> pathConditions = new LinkedList<JavaDLTerm>();
          Proof proof = null;
          for (Goal valueGoal : valueGoals) {
             pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), getSettings().isSimplifyConditions(), false));
             proof = valueGoal.node().proof();
          }
-         Term comboundPathCondition = tb.or(pathConditions);
+         JavaDLTerm comboundPathCondition = tb.or(pathConditions);
          if (getSettings().isSimplifyConditions()) {
             comboundPathCondition = SymbolicExecutionUtil.simplify(initConfig, proof, comboundPathCondition);
          }
@@ -321,7 +321,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     * {@inheritDoc}
     */
    @Override
-   public Term createSelectTerm() {
+   public JavaDLTerm createSelectTerm() {
       return SymbolicExecutionUtil.createSelectTerm(this);
    }
 

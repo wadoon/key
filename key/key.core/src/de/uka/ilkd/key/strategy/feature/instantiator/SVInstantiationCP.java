@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -111,7 +111,7 @@ public class SVInstantiationCP implements Feature {
             final TacletApp tapp = (TacletApp)oldApp;
             
             final SchemaVariable sv = findSVWithName ( tapp );
-            final Term instTerm = value.toTerm ( app, pos, goal );
+            final JavaDLTerm instTerm = value.toTerm ( app, pos, goal );
 
             final RuleApp newApp =
                 tapp.addCheckedInstantiation ( sv,

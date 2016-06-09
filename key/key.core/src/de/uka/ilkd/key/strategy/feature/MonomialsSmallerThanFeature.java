@@ -20,7 +20,7 @@ import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -90,7 +90,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
+    protected boolean lessThan(JavaDLTerm t1, JavaDLTerm t2, ServiceCaches caches) {
 
         // here, the ordering is graded concerning multiplication on integers
         final int t1Deg = degree ( t1 );
@@ -108,8 +108,8 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             if ( v < 0 ) return true;
             if ( v > 0 ) return false;
         } else {
-            final ImmutableList<Term> atoms1 = collectAtoms ( t1 );
-            final ImmutableList<Term> atoms2 = collectAtoms ( t2 );
+            final ImmutableList<JavaDLTerm> atoms1 = collectAtoms ( t1 );
+            final ImmutableList<JavaDLTerm> atoms2 = collectAtoms ( t2 );
 
             if ( atoms1.size () < atoms2.size () ) return false;
             if ( atoms1.size () > atoms2.size () ) return true;
@@ -122,10 +122,10 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         return super.lessThan ( t1, t2, caches );
     }
 
-    private int compareLexNewSyms(ImmutableList<Term> atoms1, ImmutableList<Term> atoms2, ServiceCaches caches) {
+    private int compareLexNewSyms(ImmutableList<JavaDLTerm> atoms1, ImmutableList<JavaDLTerm> atoms2, ServiceCaches caches) {
         while ( !atoms1.isEmpty() ) {
-            final Term t1 = atoms1.head ();
-            final Term t2 = atoms2.head ();
+            final JavaDLTerm t1 = atoms1.head ();
+            final JavaDLTerm t2 = atoms2.head ();
             atoms1 = atoms1.tail ();
             atoms2 = atoms2.tail ();
             
@@ -145,7 +145,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
      *         <tt>f(a*b)=a*b</tt> are handled properly, we simply count the
      *         total number of multiplication operators in the term.
      */
-    private int degree(Term t) {
+    private int degree(JavaDLTerm t) {
         int res = 0;
         
         if ( t.op () == mul
@@ -159,7 +159,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     private class MonomialCollector extends Collector {
-        protected void collect(Term te, Services services) {
+        protected void collect(JavaDLTerm te, Services services) {
             if ( te.op () == add ) {
                 collect ( te.sub ( 0 ), services );
                 collect ( te.sub ( 1 ), services );
@@ -170,7 +170,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             }
         }
 
-        private Term stripOffLiteral(Term te, Services services) {
+        private JavaDLTerm stripOffLiteral(JavaDLTerm te, Services services) {
             if ( ! ( hasCoeff.compute ( te, services ) instanceof TopRuleAppCost ) )
                 // we leave out literals/coefficients on the right, because we
                 // do not want to compare these literals

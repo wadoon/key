@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -44,9 +44,9 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
      * reference array sort or a term with an <tt>exactInstance</tt> symbol as top level 
      * depending on a reference array sort.
      */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
-        final Term array = term.sub(0);
-        final Term element = term.sub(1);
+    public JavaDLTerm transform(JavaDLTerm term, SVInstantiations svInst, Services services) {
+        final JavaDLTerm array = term.sub(0);
+        final JavaDLTerm element = term.sub(1);
 
         final Sort arraySort;
         if(array.op() instanceof SortDependingFunction

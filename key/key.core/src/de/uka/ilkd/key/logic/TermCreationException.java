@@ -27,14 +27,14 @@ public class TermCreationException extends RuntimeException {
         super(errorMessage);
     }
 
-    public TermCreationException(Operator op, Term failed) {
+    public TermCreationException(Operator op, JavaDLTerm failed) {
         super(getErrorMessage(op, failed));
     }
 
-    private static String getErrorMessage(Operator op, Term failed) {
-        ImmutableArray<Term> subs = failed.subs();
+    private static String getErrorMessage(Operator op, JavaDLTerm failed) {
+        ImmutableArray<JavaDLTerm> subs = failed.subs();
         for (int i = 0, n = subs.size(); i < n; i++) {
-            Term sub = subs.get(i);
+            JavaDLTerm sub = subs.get(i);
             assert sub == failed.subs().get(i);
         }
 
@@ -67,11 +67,11 @@ public class TermCreationException extends RuntimeException {
         return sb.toString();
     }
 
-    private static String subsToString(ImmutableArray<Term> subs) {
+    private static String subsToString(ImmutableArray<JavaDLTerm> subs) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0, n = subs.size(); i < n; i++) {
             sb.append((i + 1) + ".) ");
-            Term subi = subs.get(i);
+            JavaDLTerm subi = subs.get(i);
             if (subi != null) {
                 sb.append(subi);
                 Sort subiSort = subi.sort();

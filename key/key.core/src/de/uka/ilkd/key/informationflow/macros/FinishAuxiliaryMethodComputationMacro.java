@@ -14,7 +14,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.MethodInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -64,7 +64,7 @@ public class FinishAuxiliaryMethodComputationMacro
         final InformationFlowContract ifContract = ifPO.getContract();
 
         // create and register resulting taclets
-        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        final JavaDLTerm result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final MethodInfFlowUnfoldTacletBuilder tacletBuilder =
                 new MethodInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(ifContract);

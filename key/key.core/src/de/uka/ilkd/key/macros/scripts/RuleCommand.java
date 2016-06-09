@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
@@ -33,8 +33,8 @@ public class RuleCommand extends AbstractCommand {
 
     private static class Parameters {
         String rulename;
-        Term on;
-        Term formula;
+        JavaDLTerm on;
+        JavaDLTerm formula;
         int occ = -1;
     }
 

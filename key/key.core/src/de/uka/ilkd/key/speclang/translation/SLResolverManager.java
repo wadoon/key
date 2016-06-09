@@ -27,7 +27,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -103,7 +103,7 @@ public abstract class SLResolverManager {
         for(Namespace ns : localVariablesNamespaces) {
             ParsableVariable localVar = (ParsableVariable) ns.lookup(n);
             if(localVar != null) {
-                Term varTerm = tb.var(localVar);
+                JavaDLTerm varTerm = tb.var(localVar);
                 return new SLExpression(varTerm, kjts.get(localVar));
             }
         }

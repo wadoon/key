@@ -61,7 +61,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     * @param conditionEnabled flag if the condition is enabled
     * @param methodStart the line the containing method of this breakpoint starts at
     * @param methodEnd the line the containing method of this breakpoint ends at
-    * @throws SLTranslationException if the condition could not be parsed to a valid Term
+    * @throws SLTranslationException if the condition could not be parsed to a valid JavaDLTerm
     */
    public LineBreakpoint(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
       super(hitCount, pm, proof,  enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());

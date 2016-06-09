@@ -242,7 +242,7 @@ public class SMTTermBinOp extends SMTTerm {
 	/** {@inheritDoc} */
 	@Override
 	public SMTTerm instantiate (SMTTermVariable a, SMTTerm b) {
-		//		return new TermBinOp(operator, (Term) left.instantiate(a, b), (Term) right.instantiate(a, b)); //TODO
+		//		return new TermBinOp(operator, (JavaDLTerm) left.instantiate(a, b), (JavaDLTerm) right.instantiate(a, b)); //TODO
 		return left.instantiate(a, b).binOp(operator, right.instantiate(a, b));
 	}
 

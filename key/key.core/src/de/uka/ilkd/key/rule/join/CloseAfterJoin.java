@@ -34,7 +34,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -147,7 +147,7 @@ public class CloseAfterJoin implements BuiltInRule {
             final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
             ruleIsWeakeningGoal.setBranchLabel(JOINED_NODE_IS_WEAKENING_TITLE);
 
-            final Term isWeakeningForm = getSyntacticWeakeningFormula(services,
+            final JavaDLTerm isWeakeningForm = getSyntacticWeakeningFormula(services,
                     closeApp);
             // Delete previous sequents
             clearSemisequent(ruleIsWeakeningGoal, true);
@@ -170,7 +170,7 @@ public class CloseAfterJoin implements BuiltInRule {
      * @return The syntactic weakening formula for this.joinState and
      *         this.thisSEState.
      */
-    private Term getSyntacticWeakeningFormula(Services services,
+    private JavaDLTerm getSyntacticWeakeningFormula(Services services,
             CloseAfterJoinRuleBuiltInRuleApp closeApp) {
         TermBuilder tb = services.getTermBuilder();
 
@@ -184,7 +184,7 @@ public class CloseAfterJoin implements BuiltInRule {
         allLocs = allLocs.union(getLocationVariables(closeApp.getJoinState()
                 .getPathCondition(), services));
 
-        final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
+        final LinkedList<JavaDLTerm> origQfdVarTerms = new LinkedList<JavaDLTerm>();
 
         // Collect sorts and create logical variables for
         // closing over program variables.
@@ -203,8 +203,8 @@ public class CloseAfterJoin implements BuiltInRule {
         services.getNamespaces().functions().add(predicateSymb);
 
         // Create the predicate term
-        final Term predTerm = tb.func(predicateSymb,
-                origQfdVarTerms.toArray(new Term[] {}));
+        final JavaDLTerm predTerm = tb.func(predicateSymb,
+                origQfdVarTerms.toArray(new JavaDLTerm[] {}));
 
         // Obtain set of new Skolem constants in join state
         HashSet<Function> constantsOrigState = JoinRuleUtils
@@ -216,7 +216,7 @@ public class CloseAfterJoin implements BuiltInRule {
 
         // Create the formula \forall v1,...,vn. (C2 -> {U2} P(...)) -> (C1 ->
         // {U1} P(...))
-        Term result = tb.imp(
+        JavaDLTerm result = tb.imp(
                 allClosure(tb.imp(closeApp.getJoinState().getPathCondition(),
                         tb.apply(closeApp.getJoinState().getSymbolicState(),
                                 predTerm)), newConstants, services), tb.imp(
@@ -234,7 +234,7 @@ public class CloseAfterJoin implements BuiltInRule {
      * variable.
      * 
      * @param term
-     *            Term to universally close.
+     *            JavaDLTerm to universally close.
      * @param constsToReplace
      *            Skolem constants to replace before the universal closure.
      * @param services
@@ -243,11 +243,11 @@ public class CloseAfterJoin implements BuiltInRule {
      *         argument term, with Skolem constants in constsToReplace having
      *         been replaced by fresh variables before.
      */
-    private Term allClosure(final Term term,
+    private JavaDLTerm allClosure(final JavaDLTerm term,
             final HashSet<Function> constsToReplace, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        Term termWithReplConstants = substConstantsByFreshVars(term,
+        JavaDLTerm termWithReplConstants = substConstantsByFreshVars(term,
                 constsToReplace, new HashMap<Function, LogicVariable>(),
                 services);
 
@@ -294,7 +294,7 @@ public class CloseAfterJoin implements BuiltInRule {
     public CloseAfterJoinRuleBuiltInRuleApp createApp(PosInOccurrence pio,
             Node thePartnerNode, Node correspondingJoinNode,
             SymbolicExecutionState joinNodeState,
-            SymbolicExecutionState partnerState, Term pc) {
+            SymbolicExecutionState partnerState, JavaDLTerm pc) {
         return new CloseAfterJoinRuleBuiltInRuleApp(this, pio, thePartnerNode,
                 correspondingJoinNode, joinNodeState, partnerState, pc);
     }

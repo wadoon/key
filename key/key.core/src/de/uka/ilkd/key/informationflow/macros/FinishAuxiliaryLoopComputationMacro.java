@@ -9,7 +9,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.LoopInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -66,7 +66,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
 
         // create and register resulting taclets
-        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        final JavaDLTerm result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final LoopInfFlowUnfoldTacletBuilder tacletBuilder =
                 new LoopInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setLoopInv(loopInv);

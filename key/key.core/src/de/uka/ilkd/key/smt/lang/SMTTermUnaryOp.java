@@ -117,7 +117,7 @@ public class SMTTermUnaryOp extends SMTTerm{
 	/** {@inheritDoc} */
 	@Override
 	public SMTTerm substitute (SMTTermVariable a, SMTTerm b) {
-//		return new TermUnaryOp(operator, (Term) sub.substitute(a, b));
+//		return new TermUnaryOp(operator, (JavaDLTerm) sub.substitute(a, b));
 		return sub.substitute(a, b).unaryOp(operator);
 	}
 
@@ -127,21 +127,21 @@ public class SMTTermUnaryOp extends SMTTerm{
 		if (this.equals(a))
 			return b;
 		
-//		return new TermUnaryOp(operator, (Term) sub.substitute(a, b));
+//		return new TermUnaryOp(operator, (JavaDLTerm) sub.substitute(a, b));
 		return sub.substitute(a, b).unaryOp(operator);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public SMTTerm replace (SMTTermCall a, SMTTerm b) {
-//		return new TermUnaryOp(operator, (Term) sub.replace(a, b));
+//		return new TermUnaryOp(operator, (JavaDLTerm) sub.replace(a, b));
 		return sub.replace(a, b).unaryOp(operator);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public SMTTerm instantiate (SMTTermVariable a, SMTTerm b) {
-//		return new TermUnaryOp(operator, (Term) sub.instantiate(a, b));
+//		return new TermUnaryOp(operator, (JavaDLTerm) sub.instantiate(a, b));
 		return sub.instantiate(a, b).unaryOp(operator);
 	}
 	
@@ -166,7 +166,7 @@ public class SMTTermUnaryOp extends SMTTerm{
 				this.sub.equals(ut.sub);
 	}
 
-//	public boolean equals (Term term) {
+//	public boolean equals (JavaDLTerm term) {
 //		if (term == null)
 //			return false;
 //		

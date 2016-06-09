@@ -7,7 +7,7 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -20,7 +20,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicSelfExactTypeSnippet implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
+    public JavaDLTerm produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         IObserverFunction targetMethod =
@@ -32,7 +32,7 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
         }
         final IProgramMethod pm = (IProgramMethod) targetMethod;
         KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
-        Term result = d.tb.tt();
+        JavaDLTerm result = d.tb.tt();
         if (forClass != null) {
             final Sort contractSort = forClass.getSort();
             result = (poVars.pre.self == null || pm.isConstructor())

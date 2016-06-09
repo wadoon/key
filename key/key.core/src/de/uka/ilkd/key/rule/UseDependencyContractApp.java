@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -123,13 +123,13 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
     
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
-        final Term focus = posInOccurrence().subTerm();
+        final JavaDLTerm focus = posInOccurrence().subTerm();
         if (! (focus.op() instanceof IObserverFunction))
             // TODO: find more appropriate exception
             throw new RuntimeException("Dependency contract rule is not applicable to term "+focus);
         final IObserverFunction target = (IObserverFunction) focus.op();
 
-        final Term selfTerm;
+        final JavaDLTerm selfTerm;
         final KeYJavaType kjt;
 
         if (target.isStatic()) {

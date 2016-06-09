@@ -43,7 +43,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -230,7 +230,7 @@ public class Proof implements Named {
             fireProofClosed();
     }
 
-    public Proof(String name, Term problem, String header, InitConfig initConfig ) {
+    public Proof(String name, JavaDLTerm problem, String header, InitConfig initConfig ) {
         this ( name, Sequent.createSuccSequent
                         (Semisequent.EMPTY_SEMISEQUENT.insert(0,
                                         new SequentFormula(problem)).semisequent()),

@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -44,7 +44,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
  */
 abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTacletBuilder {
 
-    private Term[] contextUpdates;
+    private JavaDLTerm[] contextUpdates;
     private ProofObligationVars poVars;
     static final String USE_IF = InfFlowContractAppTaclet.USE_IF;
     private static final String IF_CONTRACT_APPLICATION = "information_flow_contract_appl";
@@ -53,7 +53,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         super(services);
     }
 
-    public void setContextUpdate(Term... contextUpdates) {
+    public void setContextUpdate(JavaDLTerm... contextUpdates) {
         this.contextUpdates = contextUpdates;
     }
 
@@ -63,10 +63,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     }
 
 
-    public Term buildContractApplPredTerm() {
+    public JavaDLTerm buildContractApplPredTerm() {
         ProofObligationVars appData = poVars;
-        Term contractApplPredTerm = getContractApplPred(appData);
-        for (Term update : contextUpdates) {
+        JavaDLTerm contractApplPredTerm = getContractApplPred(appData);
+        for (JavaDLTerm update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
         }
         return contractApplPredTerm;
@@ -91,49 +91,49 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         return name;
     }
 
-    abstract Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
+    abstract JavaDLTerm generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
                                         Services services);
 
 
-    abstract Term generateSchemaFind(ProofObligationVars schemaDataFind,
+    abstract JavaDLTerm generateSchemaFind(ProofObligationVars schemaDataFind,
                                      Services services);
 
 
-    abstract Term getContractApplPred(ProofObligationVars appData);
+    abstract JavaDLTerm getContractApplPred(ProofObligationVars appData);
 
 
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
                                                    ProofObligationVars appData,
                                                    Services services) {
         // generate a new schema variable for any pre variable
-        Term selfAtPreSV =
+        JavaDLTerm selfAtPreSV =
                 createTermSV(appData.pre.self, schemaPrefix, services);
-        ImmutableList<Term> localVarsAtPreSVs =
+        ImmutableList<JavaDLTerm> localVarsAtPreSVs =
                 createTermSV(appData.pre.localVars, schemaPrefix, services);
-        Term guardAtPreSV =
+        JavaDLTerm guardAtPreSV =
                 createTermSV(appData.pre.guard, schemaPrefix, services);
-        Term resAtPreSV =
+        JavaDLTerm resAtPreSV =
                 createTermSV(appData.pre.result, schemaPrefix, services);
-        Term excAtPreSV =
+        JavaDLTerm excAtPreSV =
                 createTermSV(appData.pre.exception, schemaPrefix, services);
-        Term heapAtPreSV =
+        JavaDLTerm heapAtPreSV =
                 createTermSV(appData.pre.heap, schemaPrefix, services);
-        Term mbyAtPreSV =
+        JavaDLTerm mbyAtPreSV =
                 createTermSV(appData.pre.mbyAtPre, schemaPrefix, services);
 
         // generate a new schema variable only for those post variables
         // which do not equal the corresponding pre variable; else use
         // the pre schema variable
-        Term selfAtPostSV = (appData.pre.self == appData.post.self ?
+        JavaDLTerm selfAtPostSV = (appData.pre.self == appData.post.self ?
                 selfAtPreSV :
                 createTermSV(appData.post.self, schemaPrefix, services));
 
-        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
-        Iterator<Term> appDataPreLocalVarsIt = appData.pre.localVars.iterator();
-        Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
-        for (Term appDataPostLocalVar : appData.post.localVars) {
-            Term appDataPreLocalVar = appDataPreLocalVarsIt.next();
-            Term localPreVar = schemaLocalVarsAtPreIt.next();
+        ImmutableList<JavaDLTerm> localVarsAtPostSVs = ImmutableSLList.<JavaDLTerm>nil();
+        Iterator<JavaDLTerm> appDataPreLocalVarsIt = appData.pre.localVars.iterator();
+        Iterator<JavaDLTerm> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
+        for (JavaDLTerm appDataPostLocalVar : appData.post.localVars) {
+            JavaDLTerm appDataPreLocalVar = appDataPreLocalVarsIt.next();
+            JavaDLTerm localPreVar = schemaLocalVarsAtPreIt.next();
             if (appDataPostLocalVar == appDataPreLocalVar) {
                 localVarsAtPostSVs = localVarsAtPostSVs.append(localPreVar);
             } else {
@@ -144,16 +144,16 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             }
         }
 
-        Term guardAtPostSV = (appData.pre.guard == appData.post.guard ?
+        JavaDLTerm guardAtPostSV = (appData.pre.guard == appData.post.guard ?
                 guardAtPreSV :
                 createTermSV(appData.post.guard, schemaPrefix, services));
-        Term resAtPostSV = (appData.pre.result == appData.post.result ?
+        JavaDLTerm resAtPostSV = (appData.pre.result == appData.post.result ?
                 resAtPreSV :
                 createTermSV(appData.post.result, schemaPrefix, services));
-        Term excAtPostSV = (appData.pre.exception == appData.post.exception ?
+        JavaDLTerm excAtPostSV = (appData.pre.exception == appData.post.exception ?
                 excAtPreSV :
                 createTermSV(appData.post.exception, schemaPrefix, services));
-        Term heapAtPostSV = (appData.pre.heap == appData.post.heap ?
+        JavaDLTerm heapAtPostSV = (appData.pre.heap == appData.post.heap ?
                 heapAtPreSV :
                 createTermSV(appData.post.heap, schemaPrefix, services));
 
@@ -181,13 +181,13 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             // generate schemaFind and schemaAssumes terms
             ProofObligationVars schemaDataFind =
                     generateApplicationDataSVs("find_", appData, services);
-            Term schemaFind = generateSchemaFind(schemaDataFind, services);
+            JavaDLTerm schemaFind = generateSchemaFind(schemaDataFind, services);
             ProofObligationVars schemaDataAssumes =
                     generateApplicationDataSVs("assumes_", appData, services);
-            Term schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
+            JavaDLTerm schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
 
             // generate post term
-            Term replaceWithTerm =
+            JavaDLTerm replaceWithTerm =
                     buildContractApplications(schemaDataFind,
                                               schemaDataAssumes, services);
 
@@ -230,7 +230,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     }
 
 
-    abstract Term buildContractApplications(ProofObligationVars contAppData,
+    abstract JavaDLTerm buildContractApplications(ProofObligationVars contAppData,
                                             ProofObligationVars contAppData2,
                                             Services services);
 

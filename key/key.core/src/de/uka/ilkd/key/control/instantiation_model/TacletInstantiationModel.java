@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IfMismatchException;
@@ -128,7 +128,7 @@ public class TacletInstantiationModel {
 	return proof;
     }
 
-    public Term ifFma(int i) {
+    public JavaDLTerm ifFma(int i) {
 	return ifChoiceModel(i).ifFma();
     }
 
@@ -144,7 +144,7 @@ public class TacletInstantiationModel {
 		IfFormulaInstSeq.createList ( seq, false );
 
 	    Iterator<SequentFormula> it        = ifseq.iterator();
-	    Term                         ifFma;
+	    JavaDLTerm                         ifFma;
 	    MatchConditions              matchCond = app.matchConditions ();
 
 	    ifChoiceModel                          = new TacletAssumesModel[size];

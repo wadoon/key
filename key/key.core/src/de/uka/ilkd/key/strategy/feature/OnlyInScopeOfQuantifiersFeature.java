@@ -15,7 +15,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -36,7 +36,7 @@ public class OnlyInScopeOfQuantifiersFeature extends BinaryTacletAppFeature {
 
         final PIOPathIterator it = pos.iterator ();
         while ( it.next () != -1 ) {
-            final Term subterm = it.getSubTerm ();
+            final JavaDLTerm subterm = it.getSubTerm ();
             if ( ! ( subterm.op () instanceof Quantifier ) ) return false;
         }
         

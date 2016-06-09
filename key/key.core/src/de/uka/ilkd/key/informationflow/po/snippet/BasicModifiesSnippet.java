@@ -4,7 +4,7 @@
  */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 /**
@@ -15,15 +15,15 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicModifiesSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
+    public JavaDLTerm produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         if (d.get(BasicSnippetData.Key.MODIFIES) == null) {
             throw new UnsupportedOperationException("Tried to produce a "
                     + "modifies-term for a contract without modifies.");
         }
-        assert Term.class.equals(BasicSnippetData.Key.MODIFIES.getType());
-        Term origMod = (Term) d.get(BasicSnippetData.Key.MODIFIES);
+        assert JavaDLTerm.class.equals(BasicSnippetData.Key.MODIFIES.getType());
+        JavaDLTerm origMod = (JavaDLTerm) d.get(BasicSnippetData.Key.MODIFIES);
         return replace(origMod, d.origVars, poVars.pre, d.tb);
     }
 }

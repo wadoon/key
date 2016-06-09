@@ -9,7 +9,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -83,12 +83,12 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
     }
 
     /**
-     * tries to match the schema variable of this instruction with the specified {@link Term} {@code instantiationCandidate}
+     * tries to match the schema variable of this instruction with the specified {@link JavaDLTerm} {@code instantiationCandidate}
      * w.r.t. the given constraints by {@link MatchConditions} 
-     * @param instantiationCandidate the {@link Term} to be matched
+     * @param instantiationCandidate the {@link JavaDLTerm} to be matched
      * @param matchCond the {@link MatchConditions} with additional constraints (e.g. previous matches of this schemavariable)
      * @param services the {@link Services}
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with the pair {@link (sv, instantiationCandidate)} added
      */
-    public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond, Services services);
+    public abstract MatchConditions match(JavaDLTerm instantiationCandidate, MatchConditions matchCond, Services services);
 }

@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -45,7 +45,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 public final class DependencyContractPO extends AbstractPO 
                                         implements ContractPO {
     
-    private Term mbyAtPre;    
+    private JavaDLTerm mbyAtPre;    
     
     private DependencyContract contract;
 
@@ -70,25 +70,25 @@ public final class DependencyContractPO extends AbstractPO
     //internal methods
     //-------------------------------------------------------------------------    
     
-    private Term buildFreePre(
+    private JavaDLTerm buildFreePre(
     		              List<LocationVariable> heaps,
     		              ProgramVariable selfVar,
 	                      KeYJavaType selfKJT,
 	                      ImmutableList<ProgramVariable> paramVars,
-	                      Term wellFormedHeaps, Services services) 
+	                      JavaDLTerm wellFormedHeaps, Services services) 
     		throws ProofInputException {
         //"self != null"
-	final Term selfNotNull 
+	final JavaDLTerm selfNotNull 
             = selfVar == null
               ? tb.tt()
               : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
               
         //"self.<created> = TRUE" for all heaps
 
-        Term selfCreated = null;
+        JavaDLTerm selfCreated = null;
         if (selfVar != null) {
             for(LocationVariable h : heaps) {
-                final Term sc = tb.created(tb.var(h), tb.var(selfVar));
+                final JavaDLTerm sc = tb.created(tb.var(h), tb.var(selfVar));
                 if (selfCreated == null) {
                     selfCreated = sc;
                 }else{
@@ -100,7 +100,7 @@ public final class DependencyContractPO extends AbstractPO
         }
 
         //"MyClass::exactInstance(self) = TRUE"
-        final Term selfExactType
+        final JavaDLTerm selfExactType
            = selfVar == null
              ? tb.tt()
              : tb.exactInstance(selfKJT.getSort(), 
@@ -110,13 +110,13 @@ public final class DependencyContractPO extends AbstractPO
         //conjunction of... 
         //- "p_i = null | p_i.<created> = TRUE" for object parameters, and
         //- "inBounds(p_i)" for integer parameters
-        Term paramsOK = tb.tt();
+        JavaDLTerm paramsOK = tb.tt();
         for(ProgramVariable paramVar : paramVars) {
             paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar));
         }
 
         //initial value of measured_by clause
-        final Term mbyAtPreDef;
+        final JavaDLTerm mbyAtPreDef;
         if (contract.hasMby()) {
 /*
             final Function mbyAtPreFunc
@@ -127,7 +127,7 @@ public final class DependencyContractPO extends AbstractPO
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
 */
-            final Term mby = contract.getMby(selfVar, paramVars, services);
+            final JavaDLTerm mby = contract.getMby(selfVar, paramVars, services);
 //            mbyAtPreDef = TB.equals(mbyAtPre, mby);
             mbyAtPreDef = tb.measuredBy(mby);
         } else {
@@ -189,13 +189,13 @@ public final class DependencyContractPO extends AbstractPO
                 }
        }
 
-       Term permsFor = tb.tt();
+       JavaDLTerm permsFor = tb.tt();
        if(heapCount == 2 && proofServices.getTheories().getHeapLDT().getPermissionHeap() != null) {
            int stateCount = contract.getTarget().getStateCount();
            for(int i=0;i<stateCount;i++) {
                LocationVariable h = heaps.get(i);
                LocationVariable p = heaps.get(i+stateCount);
-               final Term pf = tb.permissionsFor(p, h);
+               final JavaDLTerm pf = tb.permissionsFor(p, h);
                permsFor = tb.and(permsFor, pf);
            }
        }
@@ -205,10 +205,10 @@ public final class DependencyContractPO extends AbstractPO
        register(selfVar, proofServices);	
        register(paramVars, proofServices);
 
-       Term wellFormedHeaps = null;
-       Term update = null;
+       JavaDLTerm wellFormedHeaps = null;
+       JavaDLTerm update = null;
        for(LocationVariable h : heaps) {
-          final Term wellFormedHeap = tb.wellFormed(h);
+          final JavaDLTerm wellFormedHeap = tb.wellFormed(h);
           if(wellFormedHeaps == null) {
              wellFormedHeaps = wellFormedHeap;
           } else {
@@ -218,8 +218,8 @@ public final class DependencyContractPO extends AbstractPO
           final Name anonHeapName = new Name(tb.newName("anon_"+h.toString()));
           final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
           register(anonHeapFunc, proofServices);
-          final Term anonHeap = tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
-          final Term wellFormedAnonHeap = tb.wellFormed(anonHeap);
+          final JavaDLTerm anonHeap = tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+          final JavaDLTerm wellFormedAnonHeap = tb.wellFormed(anonHeap);
           if(wellFormedHeaps == null) {
              wellFormedHeaps = wellFormedAnonHeap;
           } else {
@@ -227,12 +227,12 @@ public final class DependencyContractPO extends AbstractPO
           }
           //prepare update
           final boolean atPre = preHeapVars.values().contains(h);
-          final Term dep = getContract().getDep(atPre ?
+          final JavaDLTerm dep = getContract().getDep(atPre ?
                 preHeapVarsReverse.get(h) : h, atPre, selfVar, paramVars, preHeapVars, proofServices);
-          final Term changedHeap =
+          final JavaDLTerm changedHeap =
                 tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep),
                       anonHeap);
-          final Term u = tb.elementary(h, changedHeap);
+          final JavaDLTerm u = tb.elementary(h, changedHeap);
           if (update == null) {
              update = u;
           } else {
@@ -241,7 +241,7 @@ public final class DependencyContractPO extends AbstractPO
        }
 
        //translate contract
-       final Term pre = tb.and(
+       final JavaDLTerm pre = tb.and(
              buildFreePre(heaps, selfVar,
                    contract.getKJT(), paramVars, wellFormedHeaps, proofServices),
                    permsFor, contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
@@ -249,8 +249,8 @@ public final class DependencyContractPO extends AbstractPO
 
        assert heaps.size() == heapCount * contract.getTarget().getStateCount();
        //prepare target term
-       final Term[] subs
-       = new Term[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
+       final JavaDLTerm[] subs
+       = new JavaDLTerm[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
        int offset = 0;
        for(LocationVariable heap : heaps) {
           subs[offset++] = tb.var(heap);
@@ -261,10 +261,10 @@ public final class DependencyContractPO extends AbstractPO
        for(ProgramVariable paramVar : paramVars) {
           subs[offset++] = tb.var(paramVar);
        }
-       final Term targetTerm = tb.func(target, subs);
+       final JavaDLTerm targetTerm = tb.func(target, subs);
 
        //build po
-       final Term po = tb.imp(pre,
+       final JavaDLTerm po = tb.imp(pre,
              tb.equals(targetTerm, 
                    tb.apply(update, targetTerm, null)));
 
@@ -302,7 +302,7 @@ public final class DependencyContractPO extends AbstractPO
 
 
     @Override
-    public Term getMbyAtPre() {
+    public JavaDLTerm getMbyAtPre() {
        return mbyAtPre;
     }
 

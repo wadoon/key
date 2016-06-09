@@ -13,23 +13,23 @@
 
 package de.uka.ilkd.key.rule.label;
 
+import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link TermLabel} as long
- * the new {@link Term} has the same {@link Operator} as the
- * previous best matching {@link Term} from which it was created.
+ * the new {@link JavaDLTerm} has the same {@link Operator} as the
+ * previous best matching {@link JavaDLTerm} from which it was created.
  * @author Martin Hentschel
  */
 public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
@@ -40,15 +40,15 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
    public TermLabel keepLabel(TermLabelState state,
                               Services services,
                               PosInOccurrence applicationPosInOccurrence,
-                              Term applicationTerm,
+                              JavaDLTerm applicationTerm,
                               Rule rule,
                               Goal goal,
                               Object hint,
-                              Term tacletTerm,
+                              JavaDLTerm tacletTerm,
                               Operator newTermOp,
-                              ImmutableArray<Term> newTermSubs,
+                              ImmutableArray<JavaDLTerm> newTermSubs,
                               ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                              JavaBlock newTermJavaBlock,
+                              ModalContent newTermJavaBlock,
                               ImmutableArray<TermLabel> newTermOriginalLabels,
                               TermLabel label) {
       return applicationTerm != null && newTermOp == applicationTerm.op() ? label : null;

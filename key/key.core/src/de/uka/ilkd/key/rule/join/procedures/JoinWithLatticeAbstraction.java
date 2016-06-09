@@ -28,7 +28,7 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.util.Triple;
@@ -61,14 +61,14 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
             Sort s, Services services);
 
     @Override
-    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1, Term valueInState1,
-            SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services) {
+    public Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinValuesInStates(
+            JavaDLTerm v, SymbolicExecutionState state1, JavaDLTerm valueInState1,
+            SymbolicExecutionState state2, JavaDLTerm valueInState2,
+            JavaDLTerm distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
-        ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
+        ImmutableSet<JavaDLTerm> newConstraints = DefaultImmutableSet.nil();
 
         AbstractDomainLattice<?> lattice = getAbstractDomainForSort(
                 valueInState1.sort(), services);
@@ -104,14 +104,14 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
                     .func(newSkolemConst), JoinIfThenElse.createIfThenElseTerm(
                     state1, state2, valueInState1, valueInState2, distinguishingFormula, services)));
 
-            return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+            return new Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>>(
                     newConstraints, tb.func(newSkolemConst), newNames);
 
         }
         else {
 
-            return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
-                    DefaultImmutableSet.<Term> nil(),
+            return new Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>>(
+                    DefaultImmutableSet.<JavaDLTerm> nil(),
                     JoinIfThenElse.createIfThenElseTerm(state1, state2,
                             valueInState1, valueInState2, distinguishingFormula, services),
                     DefaultImmutableSet.<Name> nil());
@@ -142,7 +142,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
      * @return A suitable abstract element for the given location variable.
      */
     private AbstractDomainElement determineAbstractElem(
-            SymbolicExecutionState state, Term term,
+            SymbolicExecutionState state, JavaDLTerm term,
             AbstractDomainLattice<?> lattice, Services services) {
 
         TermBuilder tb = services.getTermBuilder();
@@ -151,9 +151,9 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
         while (it.hasNext()) {
             AbstractDomainElement elem = it.next();
 
-            Term axiom = elem.getDefiningAxiom(term, services);
-            Term appl = tb.apply(state.first, axiom);
-            Term toProve = tb.imp(state.second, appl);
+            JavaDLTerm axiom = elem.getDefiningAxiom(term, services);
+            JavaDLTerm appl = tb.apply(state.first, axiom);
+            JavaDLTerm toProve = tb.imp(state.second, appl);
 
             if (isProvableWithSplitting(toProve, services, AXIOM_PROVE_TIMEOUT_MS)) {
                 return elem;

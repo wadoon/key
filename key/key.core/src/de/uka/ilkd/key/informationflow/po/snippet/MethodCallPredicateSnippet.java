@@ -9,7 +9,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.MiscTools;
@@ -33,13 +33,13 @@ class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
     protected Sort[] generateContApplArgumentSorts(
-            ImmutableList<Term> termList, IProgramMethod pm) {
+            ImmutableList<JavaDLTerm> termList, IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
         ImmutableArray<Sort> pmSorts = pm.argSorts();
 
         int i = 0;
-        for (final Term arg : termList) {
+        for (final JavaDLTerm arg : termList) {
             // bugfix: Take the first argument sorts from the definition of
             // the method rather than from the actually provided arguments.
             // aug 2015 SG + MU

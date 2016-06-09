@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
@@ -24,7 +24,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
  */
 public class BinarySumTermFeature implements TermFeature {
 
-    public RuleAppCost compute(Term term, Services services) {
+    public RuleAppCost compute(JavaDLTerm term, Services services) {
         RuleAppCost f0Cost = f0.compute ( term, services );
         if ( f0Cost instanceof TopRuleAppCost ) return f0Cost;
         return f0Cost.add ( f1.compute ( term, services ) );

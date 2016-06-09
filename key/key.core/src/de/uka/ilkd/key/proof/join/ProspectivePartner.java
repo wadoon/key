@@ -15,7 +15,7 @@ package de.uka.ilkd.key.proof.join;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -24,11 +24,11 @@ import de.uka.ilkd.key.proof.Node;
  * @author Benjamin Niedermann
  */
 public class ProspectivePartner {
-    private final Term[] updates = new Term[2];
-    private final Term commonFormula;
+    private final JavaDLTerm[] updates = new JavaDLTerm[2];
+    private final JavaDLTerm commonFormula;
     private final SequentFormula[] formula = new SequentFormula[2];
     private final Node[] nodes = new Node[2];
-    private Term commonPredicate = null;
+    private JavaDLTerm commonPredicate = null;
     private Node commonParent = null;
     private SequentFormula formulaForHiding = null;
 
@@ -46,9 +46,9 @@ public class ProspectivePartner {
      * @param formula2 The second join formula.
      * @param update2 The second symbolic state.
      */
-    public ProspectivePartner(Term commonFormula, Node node1,
-            SequentFormula formula1, Term update1, Node node2,
-            SequentFormula formula2, Term update2) {
+    public ProspectivePartner(JavaDLTerm commonFormula, Node node1,
+            SequentFormula formula1, JavaDLTerm update1, Node node2,
+            SequentFormula formula2, JavaDLTerm update2) {
         super();
         this.commonFormula = commonFormula;
         formula[0] = formula1;
@@ -59,7 +59,7 @@ public class ProspectivePartner {
         nodes[1] = node2;
     }
 
-    public Term getCommonFormula() {
+    public JavaDLTerm getCommonFormula() {
         return commonFormula;
     }
 
@@ -67,15 +67,15 @@ public class ProspectivePartner {
         return nodes[index];
     }
 
-    public Term getUpdate(int index) {
+    public JavaDLTerm getUpdate(int index) {
         return updates[index];
     }
 
-    public void setCommonPredicate(Term commonPredicate) {
+    public void setCommonPredicate(JavaDLTerm commonPredicate) {
         this.commonPredicate = commonPredicate;
     }
 
-    public Term getCommonPredicate() {
+    public JavaDLTerm getCommonPredicate() {
         return commonPredicate;
     }
 

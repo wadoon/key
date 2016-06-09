@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -34,8 +34,8 @@ public class HeapGenerator implements TermGenerator {
     }
     
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-        LinkedHashSet<Term> heaps = new LinkedHashSet<>();
+    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+        LinkedHashSet<JavaDLTerm> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();
         for (SequentFormula sf : seq) {
             collectHeaps(sf.formula(), heaps, goal.proof().getServices());
@@ -43,7 +43,7 @@ public class HeapGenerator implements TermGenerator {
         return heaps.iterator();
     }
 
-    private void collectHeaps(Term term, LinkedHashSet<Term> heaps, Services services) {
+    private void collectHeaps(JavaDLTerm term, LinkedHashSet<JavaDLTerm> heaps, Services services) {
         if (term.sort().equals(services.getTheories().getHeapLDT().targetSort())) {
             heaps.add(term);
         } else {

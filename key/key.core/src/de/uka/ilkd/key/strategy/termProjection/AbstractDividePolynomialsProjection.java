@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.op.Function;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -35,9 +35,9 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
         this.polynomial = polynomial;
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Term coeffT = leftCoefficient.toTerm ( app, pos, goal );
-        final Term polyT = polynomial.toTerm ( app, pos, goal );
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+        final JavaDLTerm coeffT = leftCoefficient.toTerm ( app, pos, goal );
+        final JavaDLTerm polyT = polynomial.toTerm ( app, pos, goal );
 
         final Services services = goal.proof ().getServices ();
         final BigInteger coeff =
@@ -47,16 +47,16 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
         return quotient ( coeff, polyT, services );
     }
 
-    protected abstract Term divide(Monomial numerator, BigInteger denominator,
+    protected abstract JavaDLTerm divide(Monomial numerator, BigInteger denominator,
                                    Services services);
 
-    private Term quotient(BigInteger monoCoeff, Term rightPoly, Services services) {
+    private JavaDLTerm quotient(BigInteger monoCoeff, JavaDLTerm rightPoly, Services services) {
         final Function add = 
             services.getTheories().getIntegerLDT().getAdd ();
         if ( rightPoly.op () == add ) {
-            final Term left = quotient ( monoCoeff, rightPoly.sub ( 0 ),
+            final JavaDLTerm left = quotient ( monoCoeff, rightPoly.sub ( 0 ),
                                          services );
-            final Term right = quotient ( monoCoeff, rightPoly.sub ( 1 ),
+            final JavaDLTerm right = quotient ( monoCoeff, rightPoly.sub ( 1 ),
                                           services );
             return services.getTermBuilder().func ( add, left, right );
         }

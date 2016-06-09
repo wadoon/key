@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -30,12 +30,12 @@ import de.uka.ilkd.key.proof.VariableNameProposer;
  */
 public class InfFlowProgVarRenamer extends TermBuilder {
     /** The set of terms on which the renaming should be applied. */
-    private final Term[] terms;
+    private final JavaDLTerm[] terms;
 
     /** Link between program variables / skolem constants and their renamed
      *  counterparts. This map may be pre-initialised.
      */
-    private final Map<Term, Term> replaceMap;
+    private final Map<JavaDLTerm, JavaDLTerm> replaceMap;
 
     /** The postfix used for renaming, if a program variable / skolem constant
      *  is found which is not yet in the replaceMap.
@@ -46,8 +46,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private final Goal goalForVariableRegistration;
 
 
-    public InfFlowProgVarRenamer(Term[] terms,
-                                 Map<Term, Term> preInitialisedReplaceMap,
+    public InfFlowProgVarRenamer(JavaDLTerm[] terms,
+                                 Map<JavaDLTerm, JavaDLTerm> preInitialisedReplaceMap,
                                  String postfix,
                                  Goal goalForVariableRegistration,
                                  Services services) {
@@ -56,7 +56,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         this.postfix = postfix;
         this.goalForVariableRegistration = goalForVariableRegistration;
         if (preInitialisedReplaceMap == null) {
-            this.replaceMap = new HashMap<Term, Term>();
+            this.replaceMap = new HashMap<JavaDLTerm, JavaDLTerm>();
         } else {
             this.replaceMap = preInitialisedReplaceMap;
         }
@@ -67,7 +67,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
     
 
-    public InfFlowProgVarRenamer(Term[] terms,
+    public InfFlowProgVarRenamer(JavaDLTerm[] terms,
                                  String postfix,
                                  Goal goalForVariableRegistration,
                                  Services services) {
@@ -75,8 +75,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
     
-    public Term[] renameVariablesAndSkolemConstants() {
-        Term[] result = new Term[terms.length];
+    public JavaDLTerm[] renameVariablesAndSkolemConstants() {
+        JavaDLTerm[] result = new JavaDLTerm[terms.length];
         for (int i = 0; i < terms.length; i++) {
             result[i] = renameVariablesAndSkolemConstants(terms[i]);
         }
@@ -84,15 +84,15 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
 
-    private Term renameVariablesAndSkolemConstants(Term term) {
-        final Term temp = renameFormulasWithoutPrograms(term);
+    private JavaDLTerm renameVariablesAndSkolemConstants(JavaDLTerm term) {
+        final JavaDLTerm temp = renameFormulasWithoutPrograms(term);
         final Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
                 restrictToProgramVariables(replaceMap);
         return applyRenamingsToPrograms(temp, progVarReplaceMap);
     }
 
 
-    private Term renameFormulasWithoutPrograms(Term term) {
+    private JavaDLTerm renameFormulasWithoutPrograms(JavaDLTerm term) {
         if (term == null) {
             return null;
         }
@@ -104,7 +104,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
 
-    private void renameAndAddToReplaceMap(Term term) {
+    private void renameAndAddToReplaceMap(JavaDLTerm term) {
         if (term.op() instanceof ProgramVariable) {
             renameProgramVariable(term);
         } else if (term.op() instanceof Function &&
@@ -118,7 +118,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
 
-    private void renameProgramVariable(Term term) {
+    private void renameProgramVariable(JavaDLTerm term) {
         assert term.arity() == 0;
         final ProgramVariable pv = (ProgramVariable) term.op();
         final Name newName =
@@ -132,13 +132,13 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         // namespace); adds the renamedPv also to the namespace
         goalForVariableRegistration.addProgramVariable((ProgramVariable)renamedPv);
 
-        final Term pvTerm = label(var((ProgramVariable)renamedPv),
+        final JavaDLTerm pvTerm = label(var((ProgramVariable)renamedPv),
                                   term.getLabels());
         replaceMap.put(term, pvTerm);
     }
 
 
-    private void renameSkolemConstant(Term term) {
+    private void renameSkolemConstant(JavaDLTerm term) {
         final Function f = (Function) term.op();
         final Name newName =
                 VariableNameProposer.DEFAULT.getNewName(services,
@@ -146,39 +146,39 @@ public class InfFlowProgVarRenamer extends TermBuilder {
                                                                  postfix));
         final Function renamedF = f.rename(newName);
         services.getNamespaces().functions().addSafely(renamedF);
-        final Term fTerm =
+        final JavaDLTerm fTerm =
                 label(func(renamedF),
                       term.getLabels());
         replaceMap.put(term, fTerm);
     }
 
 
-    private void applyRenamingsOnUpdate(Term term) {
+    private void applyRenamingsOnUpdate(JavaDLTerm term) {
         final ElementaryUpdate u = (ElementaryUpdate) term.op();
-        final Term lhsTerm = var(u.lhs());
-        final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
-        final Term[] renamedSubs = renameSubs(term);
+        final JavaDLTerm lhsTerm = var(u.lhs());
+        final JavaDLTerm renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
+        final JavaDLTerm[] renamedSubs = renameSubs(term);
         final ElementaryUpdate renamedU =
                 ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
-        final Term uTerm =
+        final JavaDLTerm uTerm =
                 label(tf().createTerm(renamedU, renamedSubs),
                       term.getLabels());
         replaceMap.put(term, uTerm);
     }
 
 
-    private void applyRenamingsOnSubterms(Term term) {
-        final Term[] renamedSubs = renameSubs(term);
-        final Term renamedTerm =
+    private void applyRenamingsOnSubterms(JavaDLTerm term) {
+        final JavaDLTerm[] renamedSubs = renameSubs(term);
+        final JavaDLTerm renamedTerm =
                 tf().createTerm(term.op(), renamedSubs,
-                                term.boundVars(), term.javaBlock(),
+                                term.boundVars(), term.modalContent(),
                                 term.getLabels());
         replaceMap.put(term, renamedTerm);
     }
 
 
-    private Term[] renameSubs(Term term) {
-        Term[] renamedSubs = new Term[term.arity()];
+    private JavaDLTerm[] renameSubs(JavaDLTerm term) {
+        JavaDLTerm[] renamedSubs = new JavaDLTerm[term.arity()];
         for (int i = 0; i < renamedSubs.length; i++) {
             renamedSubs[i] = renameFormulasWithoutPrograms(term.sub(i));
         }
@@ -186,16 +186,16 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
 
-    private Term applyRenamingsToPrograms(Term term,
+    private JavaDLTerm applyRenamingsToPrograms(JavaDLTerm term,
                                           Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
 
         if (term != null) {
             final JavaBlock renamedJavaBlock =
                     renameJavaBlock(progVarReplaceMap, term, services);
-            final Term[] appliedSubs =
+            final JavaDLTerm[] appliedSubs =
                     applyProgramRenamingsToSubs(term, progVarReplaceMap);
 
-            final Term renamedTerm =
+            final JavaDLTerm renamedTerm =
                     tf().createTerm(term.op(), appliedSubs,
                                     term.boundVars(), renamedJavaBlock,
                                     term.getLabels());
@@ -206,9 +206,9 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
 
-    private Term[] applyProgramRenamingsToSubs(Term term,
+    private JavaDLTerm[] applyProgramRenamingsToSubs(JavaDLTerm term,
                                                Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
-        Term[] appliedSubs = new Term[term.arity()];
+        JavaDLTerm[] appliedSubs = new JavaDLTerm[term.arity()];
         for (int i = 0; i < appliedSubs.length; i++) {
             appliedSubs[i] = applyRenamingsToPrograms(term.sub(i),
                     progVarReplaceMap);
@@ -218,9 +218,9 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private JavaBlock renameJavaBlock(Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
-                                      Term term, Services services) {
+                                      JavaDLTerm term, Services services) {
         final ProgVarReplaceVisitor paramRepl =
-                new ProgVarReplaceVisitor(term.javaBlock().program(), progVarReplaceMap, services);
+                new ProgVarReplaceVisitor(term.modalContent().program(), progVarReplaceMap, services);
         paramRepl.start();
         final JavaBlock renamedJavaBlock =
                 JavaBlock.createJavaBlock((StatementBlock) paramRepl.result());
@@ -229,10 +229,10 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private Map<ProgramVariable, ProgramVariable>
-                        restrictToProgramVariables(Map<Term, Term> replaceMap) {
+                        restrictToProgramVariables(Map<JavaDLTerm, JavaDLTerm> replaceMap) {
         Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
                 new HashMap<ProgramVariable, ProgramVariable>();
-        for (final Term t : replaceMap.keySet()) {
+        for (final JavaDLTerm t : replaceMap.keySet()) {
             if (t.op() instanceof ProgramVariable) {
                 progVarReplaceMap.put((ProgramVariable) t.op(),
                                       (ProgramVariable) replaceMap.get(t).op());

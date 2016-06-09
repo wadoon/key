@@ -27,7 +27,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
@@ -138,8 +138,8 @@ public class NodeInfo {
        if (ruleApp instanceof PosTacletApp) {
            PosTacletApp pta = (PosTacletApp) ruleApp;
            if (!isSymbolicExecution(pta.taclet())) return null;
-           Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
-           final ProgramElement pe = t.javaBlock().program();
+           JavaDLTerm t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
+           final ProgramElement pe = t.modalContent().program();
            if (pe != null) {
                firstStatement = pe.getFirstElement();
            }

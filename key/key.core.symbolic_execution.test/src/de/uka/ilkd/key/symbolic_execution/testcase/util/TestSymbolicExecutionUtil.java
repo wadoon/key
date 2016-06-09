@@ -23,7 +23,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -37,7 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase {
    /**
-    * Tests {@link SymbolicExecutionUtil#improveReadability(de.uka.ilkd.key.logic.Term)}
+    * Tests {@link SymbolicExecutionUtil#improveReadability(de.uka.ilkd.key.logic.JavaDLTerm)}
     */
    public void testImproveReadability() throws ProblemLoaderException {
       KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/readability/InnerAndAnonymousTypeTest.java"), null, null, null);
@@ -46,32 +46,32 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
       Sort intSort = integerLDT.targetSort();
       final TermBuilder TB = services.getTermBuilder();
       // Create test terms
-      Term a = TB.var(new LogicVariable(new Name("a"), intSort));
-      Term b = TB.var(new LogicVariable(new Name("b"), intSort));
-      Term aleqb = TB.leq(a, b);
-      Term altb = TB.lt(a, b);
-      Term agtb = TB.gt(a, b);
-      Term ageqb = TB.geq(a, b);
-      Term notAleqb = TB.not(aleqb);
-      Term notAltb = TB.not(altb);
-      Term notAgtb = TB.not(agtb);
-      Term notAgeqb = TB.not(ageqb);
-      Term onePlusB = TB.add(TB.one(), b);
-      Term bPlusOne = TB.add(b, TB.one());
-      Term altOnePlusB = TB.lt(a, onePlusB);
-      Term altBPlusOne = TB.lt(a, bPlusOne);
-      Term ageqOnePlusB = TB.geq(a, onePlusB);
-      Term ageqBPlusOne = TB.geq(a, bPlusOne);
-      Term minusOne = services.getTheories().getIntegerLDT().translateLiteral(new IntLiteral(-1), services);
-      Term minusOnePlusB = TB.add(minusOne, b);
-      Term bPlusMinusOne = TB.add(b, minusOne);
-      Term bMinusOne = TB.func(integerLDT.getSub(), b, TB.one());
-      Term aleqMinusOnePlusB = TB.leq(a, minusOnePlusB);
-      Term aleqBPlusMinusOne = TB.leq(a, bPlusMinusOne);
-      Term aleqBMinusOne = TB.leq(a, bMinusOne);
-      Term agtMinusOnePlusB = TB.gt(a, minusOnePlusB);
-      Term agtBPlusMinusOne = TB.gt(a, bPlusMinusOne);
-      Term agtBMinusOne = TB.gt(a, bMinusOne);
+      JavaDLTerm a = TB.var(new LogicVariable(new Name("a"), intSort));
+      JavaDLTerm b = TB.var(new LogicVariable(new Name("b"), intSort));
+      JavaDLTerm aleqb = TB.leq(a, b);
+      JavaDLTerm altb = TB.lt(a, b);
+      JavaDLTerm agtb = TB.gt(a, b);
+      JavaDLTerm ageqb = TB.geq(a, b);
+      JavaDLTerm notAleqb = TB.not(aleqb);
+      JavaDLTerm notAltb = TB.not(altb);
+      JavaDLTerm notAgtb = TB.not(agtb);
+      JavaDLTerm notAgeqb = TB.not(ageqb);
+      JavaDLTerm onePlusB = TB.add(TB.one(), b);
+      JavaDLTerm bPlusOne = TB.add(b, TB.one());
+      JavaDLTerm altOnePlusB = TB.lt(a, onePlusB);
+      JavaDLTerm altBPlusOne = TB.lt(a, bPlusOne);
+      JavaDLTerm ageqOnePlusB = TB.geq(a, onePlusB);
+      JavaDLTerm ageqBPlusOne = TB.geq(a, bPlusOne);
+      JavaDLTerm minusOne = services.getTheories().getIntegerLDT().translateLiteral(new IntLiteral(-1), services);
+      JavaDLTerm minusOnePlusB = TB.add(minusOne, b);
+      JavaDLTerm bPlusMinusOne = TB.add(b, minusOne);
+      JavaDLTerm bMinusOne = TB.func(integerLDT.getSub(), b, TB.one());
+      JavaDLTerm aleqMinusOnePlusB = TB.leq(a, minusOnePlusB);
+      JavaDLTerm aleqBPlusMinusOne = TB.leq(a, bPlusMinusOne);
+      JavaDLTerm aleqBMinusOne = TB.leq(a, bMinusOne);
+      JavaDLTerm agtMinusOnePlusB = TB.gt(a, minusOnePlusB);
+      JavaDLTerm agtBPlusMinusOne = TB.gt(a, bPlusMinusOne);
+      JavaDLTerm agtBMinusOne = TB.gt(a, bMinusOne);
       // Test null
       assertNull(SymbolicExecutionUtil.improveReadability(null, services));
       assertTerm(notAleqb, SymbolicExecutionUtil.improveReadability(notAleqb, null));
@@ -100,9 +100,9 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
       assertTerm(ageqb, SymbolicExecutionUtil.improveReadability(TB.not(aleqBPlusMinusOne), services));
       assertTerm(altb, SymbolicExecutionUtil.improveReadability(TB.not(agtBMinusOne), services));
       // Test complex term
-      Term complex = TB.and(altOnePlusB,
+      JavaDLTerm complex = TB.and(altOnePlusB,
                             TB.or(ageqBPlusOne, agtMinusOnePlusB));
-      Term expectedComplex = TB.and(aleqb,
+      JavaDLTerm expectedComplex = TB.and(aleqb,
                                     TB.or(agtb, ageqb));
       assertTerm(expectedComplex, SymbolicExecutionUtil.improveReadability(complex, services));
       environment.dispose();

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
@@ -16,10 +17,9 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -53,17 +53,17 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
    public void updateLabels(TermLabelState state,
                             Services services, 
                             PosInOccurrence applicationPosInOccurrence, 
-                            Term applicationTerm, 
-                            Term modalityTerm, 
+                            JavaDLTerm applicationTerm, 
+                            JavaDLTerm modalityTerm, 
                             Rule rule, 
                             RuleApp ruleApp,
                             Goal goal, 
                             Object hint, 
-                            Term tacletTerm, 
+                            JavaDLTerm tacletTerm, 
                             Operator newTermOp, 
-                            ImmutableArray<Term> newTermSubs, 
+                            ImmutableArray<JavaDLTerm> newTermSubs, 
                             ImmutableArray<QuantifiableVariable> newTermBoundVars, 
-                            JavaBlock newTermJavaBlock, 
+                            ModalContent newTermJavaBlock, 
                             Set<TermLabel> labels) {
       if (hint instanceof TacletLabelHint) {
          TacletLabelHint tacletHint = (TacletLabelHint) hint;

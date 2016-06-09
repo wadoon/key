@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /** Generic data type, which has no predefined theory.
  * It is meant as a basis to implement an additional abstract data type,
@@ -46,28 +46,28 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs, Services services,
+    public boolean isResponsible(Operator op, JavaDLTerm[] subs, Services services,
             ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JavaDLTerm left, JavaDLTerm right,
             Services services, ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub, TermServices services,
+    public boolean isResponsible(Operator op, JavaDLTerm sub, TermServices services,
             ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JavaDLTerm translateLiteral(Literal lit, Services services) {
         return services.getTermBuilder().func(atom);
     }
 
@@ -85,7 +85,7 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
         if(t.op() instanceof Function && hasLiteralFunction((Function)t.op())) {
             return FreeLiteral.INSTANCE;
         }
@@ -94,7 +94,7 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JavaDLTerm t) {
         assert false;
         return null;
     }

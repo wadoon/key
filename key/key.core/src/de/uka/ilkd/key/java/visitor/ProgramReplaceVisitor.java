@@ -21,7 +21,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.ProgramInLogic;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
@@ -94,9 +94,9 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 	    // the assertion ensures the intended instanceof check from above
 	    assert instArray.size() == 0 || instArray.last() instanceof ProgramElement;
 	    addChildren(instArray);
-	} else if (inst instanceof Term
-		   && ((Term)inst).op() instanceof ProgramInLogic) {
-	    addChild(services.getProgramServices().getTypeConverter().convertToProgramElement((Term)inst));
+	} else if (inst instanceof JavaDLTerm
+		   && ((JavaDLTerm)inst).op() instanceof ProgramInLogic) {
+	    addChild(services.getProgramServices().getTypeConverter().convertToProgramElement((JavaDLTerm)inst));
 	} else {
 	    throw new IllegalStateException("programreplacevisitor: Instantiation missing " + 
 		       "for schema variable " + sv);

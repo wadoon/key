@@ -18,7 +18,7 @@ import java.math.BigInteger;
 
 import org.key_project.common.core.logic.op.Operator;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -34,11 +34,11 @@ public final class NumberTranslation {
      * @param term term with sort "numbers"
      * @return An instance of BigInteger representing the number
     */
-    public static BigInteger translate(Term term) {
+    public static BigInteger translate(JavaDLTerm term) {
 	if (!term.sort().name().toString().trim().equals("numbers")) {
 	    throw new IllegalArgumentException
 		("Only terms with sort \"numbers\" may be translated.\n"+
-		 "Term "+term+" is  of sort "+term.sort().name().toString().trim());
+		 "JavaDLTerm "+term+" is  of sort "+term.sort().name().toString().trim());
 	}
 	Operator op = term.op();
 	String name = op.name().toString();

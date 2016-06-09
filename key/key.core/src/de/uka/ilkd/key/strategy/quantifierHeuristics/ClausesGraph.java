@@ -23,7 +23,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
@@ -36,14 +36,14 @@ public class ClausesGraph {
     private final ImmutableSet<QuantifiableVariable> exVars;
     
     /**
-     * Map from <code>Term</code> to <code>ImmutableSet<Term></code>
+     * Map from <code>JavaDLTerm</code> to <code>ImmutableSet<JavaDLTerm></code>
      */
-    private final Map<Term, ImmutableSet<Term>> connections = new LinkedHashMap<Term, ImmutableSet<Term>>();
+    private final Map<JavaDLTerm, ImmutableSet<JavaDLTerm>> connections = new LinkedHashMap<JavaDLTerm, ImmutableSet<JavaDLTerm>>();
     
-    private final ImmutableSet<Term> clauses;
+    private final ImmutableSet<JavaDLTerm> clauses;
     
-    static ClausesGraph create(Term quantifiedFormula, ServiceCaches caches) {
-        final Map<Term, ClausesGraph> graphCache = caches.getGraphCache();
+    static ClausesGraph create(JavaDLTerm quantifiedFormula, ServiceCaches caches) {
+        final Map<JavaDLTerm, ClausesGraph> graphCache = caches.getGraphCache();
         ClausesGraph graph;
         synchronized (graphCache) {
             graph = graphCache.get ( quantifiedFormula );            
@@ -57,7 +57,7 @@ public class ClausesGraph {
         return graph;
     }
 
-    private ClausesGraph(Term quantifiedFormula) {
+    private ClausesGraph(JavaDLTerm quantifiedFormula) {
         exVars = existentialVars ( quantifiedFormula );
         clauses = computeClauses ( TriggerUtils.discardQuantifiers ( quantifiedFormula ) );
         buildInitialGraph ();
@@ -69,10 +69,10 @@ public class ClausesGraph {
         do {
             changed = false;
 
-            for (Term clause : clauses) {
-                final Term formula = clause;
-                final ImmutableSet<Term> oldConnections = getConnections(formula);
-                final ImmutableSet<Term> newConnections =
+            for (JavaDLTerm clause : clauses) {
+                final JavaDLTerm formula = clause;
+                final ImmutableSet<JavaDLTerm> oldConnections = getConnections(formula);
+                final ImmutableSet<JavaDLTerm> newConnections =
                         getTransitiveConnections(oldConnections);
 
                 if (newConnections.size() > oldConnections.size()) {
@@ -84,8 +84,8 @@ public class ClausesGraph {
         } while ( changed );
     }
 
-    private ImmutableSet<Term> getTransitiveConnections(ImmutableSet<Term> formulas) {
-        for (Term formula : formulas) formulas = formulas.union(getConnections(formula));
+    private ImmutableSet<JavaDLTerm> getTransitiveConnections(ImmutableSet<JavaDLTerm> formulas) {
+        for (JavaDLTerm formula : formulas) formulas = formulas.union(getConnections(formula));
         return formulas;
     }
 
@@ -96,9 +96,9 @@ public class ClausesGraph {
      * @return ture if clause of formula0 and clause of formula1 
      *         are connected.
      */
-    boolean connected(Term formula0, Term formula1) {
-        final ImmutableSet<Term> subFormulas1 = computeClauses ( formula1 );
-        for (Term term : computeClauses(formula0)) {
+    boolean connected(JavaDLTerm formula0, JavaDLTerm formula1) {
+        final ImmutableSet<JavaDLTerm> subFormulas1 = computeClauses ( formula1 );
+        for (JavaDLTerm term : computeClauses(formula0)) {
             if (intersect(getConnections(term),
                     subFormulas1).size() > 0)
                 return true;
@@ -107,7 +107,7 @@ public class ClausesGraph {
     }
     
     boolean isFullGraph() {
-        final Iterator<Term> it = clauses.iterator ();
+        final Iterator<JavaDLTerm> it = clauses.iterator ();
         if ( it.hasNext () ) {
             if ( getConnections ( it.next () ).size () < clauses.size () )
                 return false;
@@ -120,7 +120,7 @@ public class ClausesGraph {
      * @param formula
      * @return set of terms that connect to the formula.
      */
-    private ImmutableSet<Term> getConnections(Term formula) {
+    private ImmutableSet<JavaDLTerm> getConnections(JavaDLTerm formula) {
         return connections.get ( formula );
     }
 
@@ -129,8 +129,8 @@ public class ClausesGraph {
      * 
      */
     private void buildInitialGraph() {
-        for (Term clause1 : clauses) {
-            final Term clause = clause1;
+        for (JavaDLTerm clause1 : clauses) {
+            final JavaDLTerm clause = clause1;
             connections.put(clause, directConnections(clause));
         }
     }
@@ -140,10 +140,10 @@ public class ClausesGraph {
      * @param formula
      * @return set of term that connect to formula.
      */
-    private ImmutableSet<Term> directConnections(Term formula) {
-        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
-        for (Term clause1 : clauses) {
-            final Term clause = clause1;
+    private ImmutableSet<JavaDLTerm> directConnections(JavaDLTerm formula) {
+        ImmutableSet<JavaDLTerm> res = DefaultImmutableSet.<JavaDLTerm>nil();
+        for (JavaDLTerm clause1 : clauses) {
+            final JavaDLTerm clause = clause1;
             if (directlyConnected(clause, formula))
                 res = res.add(clause);
         }
@@ -166,7 +166,7 @@ public class ClausesGraph {
      * @return true if formula0 and formula1 have one or more exists varaible
      *         that are the same.
      */
-    private boolean directlyConnected(Term formula0, Term formula1) {
+    private boolean directlyConnected(JavaDLTerm formula0, JavaDLTerm formula1) {
         return containsExistentialVariables ( intersectQV ( formula0.freeVars (),
                                                             formula1.freeVars () ) );
     }
@@ -176,7 +176,7 @@ public class ClausesGraph {
      * @return retrun set of terms of all clauses under the formula
      */
 
-    private ImmutableSet<Term> computeClauses(Term formula) {
+    private ImmutableSet<JavaDLTerm> computeClauses(JavaDLTerm formula) {
         final Operator op = formula.op ();
         if ( op == Junctor.NOT )
             return computeClauses ( formula.sub ( 0 ) );
@@ -184,7 +184,7 @@ public class ClausesGraph {
             return computeClauses ( formula.sub ( 0 ) )
                    .union ( computeClauses ( formula.sub ( 1 ) ) );
         } else {
-            return DefaultImmutableSet.<Term>nil().add ( formula );
+            return DefaultImmutableSet.<JavaDLTerm>nil().add ( formula );
         }
     }
 
@@ -192,7 +192,7 @@ public class ClausesGraph {
      * return the exists variables bound in the top level of 
      * a given cnf formula. 
      */
-    private ImmutableSet<QuantifiableVariable> existentialVars(Term formula) {
+    private ImmutableSet<QuantifiableVariable> existentialVars(JavaDLTerm formula) {
         final Operator op = formula.op ();
         if ( op == Quantifier.ALL ) return existentialVars ( formula.sub ( 0 ) );
         if ( op == Quantifier.EX )
@@ -218,11 +218,11 @@ public class ClausesGraph {
      * @param set1
      * @return a set of terms which are belonged to both set0 and set1.
      */
-    private ImmutableSet<Term> intersect(ImmutableSet<Term> set0, ImmutableSet<Term> set1) {
-        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
+    private ImmutableSet<JavaDLTerm> intersect(ImmutableSet<JavaDLTerm> set0, ImmutableSet<JavaDLTerm> set1) {
+        ImmutableSet<JavaDLTerm> res = DefaultImmutableSet.<JavaDLTerm>nil();
         if ( set0 == null || set1 == null ) return res;
-        for (Term aSet0 : set0) {
-            final Term el = aSet0;
+        for (JavaDLTerm aSet0 : set0) {
+            final JavaDLTerm el = aSet0;
             if (set1.contains(el)) res = res.add(el);
         }
         return res;

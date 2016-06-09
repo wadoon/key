@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
@@ -87,31 +87,31 @@ public class ServiceCaches {
     * Table of formulas which could be splitted using the beta rule
     * This is the cache the method "isBetaCandidate" uses
     *
-    *    keys: Term              values: TermInfo
+    *    keys: JavaDLTerm              values: TermInfo
     */
-   private final LRUCache<Term, TermInfo> betaCandidates = new LRUCache<Term, TermInfo> (1000);
+   private final LRUCache<JavaDLTerm, TermInfo> betaCandidates = new LRUCache<JavaDLTerm, TermInfo> (1000);
 
    private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache = new LRUCache<PosInOccurrence, RuleAppCost>(1000); 
 
    private final LRUCache<Operator, Integer> introductionTimeCache = new LRUCache<Operator, Integer> ( 10000 );
    
-   private final LRUCache<Term, Monomial> monomialCache =  new LRUCache<Term, Monomial> ( 2000 );
+   private final LRUCache<JavaDLTerm, Monomial> monomialCache =  new LRUCache<JavaDLTerm, Monomial> ( 2000 );
 
-   private final LRUCache<Term, Polynomial> polynomialCache = new LRUCache<Term, Polynomial> ( 2000 );
+   private final LRUCache<JavaDLTerm, Polynomial> polynomialCache = new LRUCache<JavaDLTerm, Polynomial> ( 2000 );
 
-   /**a <code>HashMap</code> from <code>Term</code> to 
+   /**a <code>HashMap</code> from <code>JavaDLTerm</code> to 
     * <code>TriggersSet</code> uses to cache all created TriggersSets*/
-   private final Map<Term, TriggersSet> triggerSetCache = new LRUCache<Term, TriggersSet>(1000);
+   private final Map<JavaDLTerm, TriggersSet> triggerSetCache = new LRUCache<JavaDLTerm, TriggersSet>(1000);
 
    /**
-    * Map from  <code>Term</code>(allTerm) to <code>ClausesGraph</code> 
+    * Map from  <code>JavaDLTerm</code>(allTerm) to <code>ClausesGraph</code> 
     */
-   private final Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph> (1000);
+   private final Map<JavaDLTerm, ClausesGraph> graphCache = new LRUCache<JavaDLTerm, ClausesGraph> (1000);
 
    /**
     * Cache used by the GenericTermFactory to avoid unnecessary creation of terms
     */
-   private final Map<Term, Term> termCache = new LRUCache<Term, Term>(20000);
+   private final Map<JavaDLTerm, JavaDLTerm> termCache = new LRUCache<JavaDLTerm, JavaDLTerm>(20000);
 
    /**
     * Cache used by TypeComparisonCondition
@@ -121,14 +121,14 @@ public class ServiceCaches {
    /**
     * Cache used by HandleArith for caching formatted terms
     */   
-   private final LRUCache<Term, Term> formattedTermCache = new LRUCache<Term, Term>(5000);
+   private final LRUCache<JavaDLTerm, JavaDLTerm> formattedTermCache = new LRUCache<JavaDLTerm, JavaDLTerm>(5000);
 
    /**
     * Caches used bu HandleArith to cache proof results
     */
-   private LRUCache<Term, Term> provedByArithFstCache = new LRUCache<Term, Term>(5000);
+   private LRUCache<JavaDLTerm, JavaDLTerm> provedByArithFstCache = new LRUCache<JavaDLTerm, JavaDLTerm>(5000);
 
-   private LRUCache<Pair<Term, Term>, Term> provedByArithSndCache = new LRUCache<Pair<Term, Term>, Term>(5000);
+   private LRUCache<Pair<JavaDLTerm, JavaDLTerm>, JavaDLTerm> provedByArithSndCache = new LRUCache<Pair<JavaDLTerm, JavaDLTerm>, JavaDLTerm>(5000);
 
    /** Cache used by the exhaustive macro */
    private Map<Node, PosInOccurrence> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence>();;
@@ -142,7 +142,7 @@ public class ServiceCaches {
       return termTacletAppIndexCache;
    }
 
-   public final LRUCache<Term, TermInfo> getBetaCandidates() {
+   public final LRUCache<JavaDLTerm, TermInfo> getBetaCandidates() {
       return betaCandidates;
    }
 
@@ -154,23 +154,23 @@ public class ServiceCaches {
       return introductionTimeCache;
    }
    
-   public final LRUCache<Term, Monomial> getMonomialCache() {
+   public final LRUCache<JavaDLTerm, Monomial> getMonomialCache() {
       return monomialCache;
    }
 
-   public final LRUCache<Term, Polynomial> getPolynomialCache() {
+   public final LRUCache<JavaDLTerm, Polynomial> getPolynomialCache() {
       return polynomialCache;
    }
 
-   public final Map<Term, TriggersSet> getTriggerSetCache() {
+   public final Map<JavaDLTerm, TriggersSet> getTriggerSetCache() {
       return triggerSetCache;
    }
 
-   public final Map<Term, ClausesGraph> getGraphCache() {
+   public final Map<JavaDLTerm, ClausesGraph> getGraphCache() {
       return graphCache;
    }
 
-   public final Map<Term, Term> getTermFactoryCache() {
+   public final Map<JavaDLTerm, JavaDLTerm> getTermFactoryCache() {
        return termCache;
    }
 
@@ -178,15 +178,15 @@ public class ServiceCaches {
        return disjointnessCache;
    }
 
-   public final LRUCache<Term, Term> getFormattedTermCache() {
+   public final LRUCache<JavaDLTerm, JavaDLTerm> getFormattedTermCache() {
       return formattedTermCache;
    }
 
-   public final LRUCache<Term, Term> getProvedByArithFstCache() {
+   public final LRUCache<JavaDLTerm, JavaDLTerm> getProvedByArithFstCache() {
       return provedByArithFstCache;
    }
 
-   public final LRUCache<Pair<Term, Term>, Term> getProvedByArithSndCache() {
+   public final LRUCache<Pair<JavaDLTerm, JavaDLTerm>, JavaDLTerm> getProvedByArithSndCache() {
       return provedByArithSndCache;
    }
 

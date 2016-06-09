@@ -13,7 +13,7 @@
 
 /** class contains a pair of SchemaVariables, the first part has to be 
  * match a QuantifiableVariable, the second one a
- * Term in order to model a pair of the not-free-in relation of
+ * JavaDLTerm in order to model a pair of the not-free-in relation of
  * an Taclet.*/
 
 package de.uka.ilkd.key.rule;

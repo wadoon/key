@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.termProjection;
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -43,21 +43,21 @@ public class SVInstantiationProjection implements ProjectionToTerm {
     }
     
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
         if ( ! ( app instanceof TacletApp ) )
             Debug.fail ( "Projection is only applicable to taclet apps," +
                          " but got " + app );
        
         final TacletApp tapp = (TacletApp)app;
         final Object instObj = tapp.instantiations ().lookupValue ( svName );
-        if ( ! ( instObj instanceof Term ) ) {
+        if ( ! ( instObj instanceof JavaDLTerm ) ) {
             Debug.assertFalse ( demandInst,
                                 "Did not find schema variable "
                                 + svName + " that I was supposed to examine" +
                                 " (taclet " + tapp.taclet().name() + ")" );
             return null;
         }
-        return (Term)instObj;
+        return (JavaDLTerm)instObj;
     }
 
 

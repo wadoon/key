@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -40,9 +40,9 @@ public final class ContractAxiom extends ClassAxiom {
     private final IObserverFunction target;
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
-    private final Term originalPre;
-    private final Term originalPost;
-    private final Term originalMby;
+    private final JavaDLTerm originalPre;
+    private final JavaDLTerm originalPost;
+    private final JavaDLTerm originalMby;
     private final ProgramVariable originalSelfVar;
     private final ProgramVariable originalResultVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
@@ -52,9 +52,9 @@ public final class ContractAxiom extends ClassAxiom {
                          IObserverFunction target,
                          KeYJavaType kjt,
                          VisibilityModifier visibility,
-                         Term pre,
-                         Term post,
-                         Term mby,
+                         JavaDLTerm pre,
+                         JavaDLTerm post,
+                         JavaDLTerm mby,
                          Map<LocationVariable,ProgramVariable> atPreVars,
                          ProgramVariable selfVar,
                          ProgramVariable resultVar,
@@ -67,9 +67,9 @@ public final class ContractAxiom extends ClassAxiom {
             IObserverFunction target,
                 KeYJavaType kjt,
                 VisibilityModifier visibility,
-                Term originalPre,
-                Term originalPost,
-                Term originalMby,
+                JavaDLTerm originalPre,
+                JavaDLTerm originalPost,
+                JavaDLTerm originalMby,
                 Map<LocationVariable,ProgramVariable> atPreVars,
                 ProgramVariable selfVar, ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
 

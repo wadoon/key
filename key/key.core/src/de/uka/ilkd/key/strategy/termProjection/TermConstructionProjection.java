@@ -16,13 +16,13 @@ package de.uka.ilkd.key.strategy.termProjection;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * Term projection for constructing a bigger term from a sequence of direct
+ * JavaDLTerm projection for constructing a bigger term from a sequence of direct
  * subterms and an operator.
  * 
  * NB: this is a rather restricted version of term construction, one can think
@@ -46,8 +46,8 @@ public class TermConstructionProjection implements ProjectionToTerm {
         return new TermConstructionProjection ( op, subTerms );
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Term[] subs = new Term[subTerms.length];
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+        final JavaDLTerm[] subs = new JavaDLTerm[subTerms.length];
         for ( int i = 0; i != subTerms.length; ++i ) {
             subs[i] = subTerms[i].toTerm ( app, pos, goal );           
         }

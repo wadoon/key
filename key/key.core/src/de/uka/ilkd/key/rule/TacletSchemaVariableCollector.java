@@ -30,7 +30,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
@@ -92,16 +92,16 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
     
     
     /** 
-     * visits the Term in post order {@link Term#execPostOrder(Visitor)} and 
+     * visits the JavaDLTerm in post order {@link JavaDLTerm#execPostOrder(Visitor)} and 
      * collects all found schema variables 
-     * @param t the Term whose schema variables are collected 
+     * @param t the JavaDLTerm whose schema variables are collected 
      */  
     @Override
-    public void visit(Term t) {	
+    public void visit(JavaDLTerm t) {	
 	final Operator op = t.op();
         if (op instanceof Modality || 
                 op instanceof ModalOperatorSV) {
-	    varList = collectSVInProgram(t.javaBlock(), varList);
+	    varList = collectSVInProgram(t.modalContent(), varList);
 	} else if (op instanceof ElementaryUpdate) {
             varList = collectSVInElementaryUpdate((ElementaryUpdate)op, varList);
         } 

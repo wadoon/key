@@ -40,7 +40,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -70,7 +70,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
    /**
     * The condition  for this Breakpoint (set by user).
     */
-   private Term condition;
+   private JavaDLTerm condition;
    
    /**
     * The flag if the the condition for the associated Breakpoint is enabled
@@ -283,12 +283,12 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
    }
    
    /**
-    * Computes the Term that can be evaluated, from the user given condition
+    * Computes the JavaDLTerm that can be evaluated, from the user given condition
     * @param condition the condition given by the user
-    * @return the {@link Term} that represents the condition
-    * @throws SLTranslationException if the Term could not be parsed
+    * @return the {@link JavaDLTerm} that represents the condition
+    * @throws SLTranslationException if the JavaDLTerm could not be parsed
     */
-   private Term computeTermForCondition(String condition) throws SLTranslationException {
+   private JavaDLTerm computeTermForCondition(String condition) throws SLTranslationException {
       if(condition==null){
          return getProof().getServices().getTermBuilder().tt();
       }
@@ -353,19 +353,19 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
       try {
          //initialize values
          PosInOccurrence pio = ruleApp.posInOccurrence();
-         Term term = pio.subTerm();
+         JavaDLTerm term = pio.subTerm();
          getProof().getServices().getTermBuilder();
          term = TermBuilder.goBelowUpdates(term);
-         IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+         IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.modalContent(), proof.getServices());
          //put values into map which have to be replaced
          if(ec!=null){
             getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
          }
          //replace renamings etc.
          OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
-         Term termForSideProof = replacer.replace(condition);
+         JavaDLTerm termForSideProof = replacer.replace(condition);
          //start side proof
-         Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+         JavaDLTerm toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
          final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
          Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
          info = SymbolicExecutionSideProofUtil.startSideProof(proof, 
@@ -444,7 +444,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * Returns the condition of the associated Breakpoint.
     * @return the condition of the associated Breakpoint
     */
-   public Term getCondition() {
+   public JavaDLTerm getCondition() {
       return condition;
    }
 
@@ -457,7 +457,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
    }
    
    /**
-    * Sets the condition to the Term that is parsed from the given String.
+    * Sets the condition to the JavaDLTerm that is parsed from the given String.
     * @param condition the String to be parsed
     * @throws SLTranslationException if the parsing failed
     */

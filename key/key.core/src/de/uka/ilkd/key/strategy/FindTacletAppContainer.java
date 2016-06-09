@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
@@ -128,7 +128,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
             if ( appIndex == -1 ) return false;
             
             if ( changeIndex == -1 ) {
-                final Term beforeChangeTerm = changePIO.getSubTerm ();
+                final JavaDLTerm beforeChangeTerm = changePIO.getSubTerm ();
                 final Operator beforeChangeOp = beforeChangeTerm.op ();
 
                 // special case: a taclet application is not affected by changes
@@ -139,7 +139,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 if ( beforeChangeOp instanceof Modality ) {
                     final PosInOccurrence afterChangePos =
                         changePos.replaceConstrainedFormula ( newFormula );
-                    final Term afterChangeTerm = afterChangePos.subTerm ();
+                    final JavaDLTerm afterChangeTerm = afterChangePos.subTerm ();
                     return beforeChangeOp == afterChangeTerm.op ()
                            && beforeChangeTerm.sub ( 0 )
                               .equals ( afterChangeTerm.sub ( 0 ) );

@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableMapEntry;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -91,7 +91,7 @@ public abstract class AbstractMonomialSmallerThanFeature
         while ( it.hasNext () ) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> entry = it.next ();
             if ( !(entry.key () instanceof SkolemTermSV) ) continue;
-            if ( op == ( (Term)entry.value ().getInstantiation () ).op () )
+            if ( op == ( (JavaDLTerm)entry.value ().getInstantiation () ).op () )
                 return true;
         }
         return false;
@@ -107,14 +107,14 @@ public abstract class AbstractMonomialSmallerThanFeature
         return false;
     }
 
-    protected ImmutableList<Term> collectAtoms(Term t) {
+    protected ImmutableList<JavaDLTerm> collectAtoms(JavaDLTerm t) {
         final AtomCollector m = new AtomCollector ();
         m.collect ( t );
         return m.getResult ();
     }
     
     private class AtomCollector extends Collector {
-        protected void collect(Term te) {
+        protected void collect(JavaDLTerm te) {
             if ( te.op () == mul ) {
                 collect ( te.sub ( 0 ) );
                 collect ( te.sub ( 1 ) );

@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * The abstract superclass of caches for taclet app indexes that are separated
@@ -46,7 +46,7 @@ abstract class PrefixTermTacletAppIndexCache implements
         return res;
     }
 
-    protected ImmutableList<QuantifiableVariable> getExtendedPrefix(Term t, int subtermIndex) {
+    protected ImmutableList<QuantifiableVariable> getExtendedPrefix(JavaDLTerm t, int subtermIndex) {
         return getExtendedPrefix ( t.varsBoundHere ( subtermIndex ) );
     }
     

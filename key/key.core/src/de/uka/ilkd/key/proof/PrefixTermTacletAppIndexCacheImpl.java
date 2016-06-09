@@ -18,7 +18,7 @@ import java.util.Map;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * The abstract superclass of caches for taclet app indexes that are implemented
@@ -42,7 +42,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         this.cache = cache;
     }
 
-    public TermTacletAppIndex getIndexForTerm(Term t) {
+    public TermTacletAppIndex getIndexForTerm(JavaDLTerm t) {
         final TermTacletAppIndex res = cache.get ( getQueryKey ( t ) );
         
 //       countAccess ( res != null );
@@ -61,7 +61,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         }
     }
 
-    public void putIndexForTerm(Term t, TermTacletAppIndex index) {
+    public void putIndexForTerm(JavaDLTerm t, TermTacletAppIndex index) {
         cache.put ( getNewKey ( t ), index );
     }
 
@@ -74,7 +74,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
      * @return a freshly created key for the term <code>t</code> that can be
      *         stored in the <code>cache</code>
      */
-    private CacheKey getNewKey(Term t) {
+    private CacheKey getNewKey(JavaDLTerm t) {
         return new CacheKey ( this, t );
     }
     
@@ -84,7 +84,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
      *         (with different attribute values), i.e., the result is not
      *         supposed to be stored anywhere
      */
-    private CacheKey getQueryKey(Term t) {
+    private CacheKey getQueryKey(JavaDLTerm t) {
         queryCacheKey.analysedTerm = t;
         return queryCacheKey;
     }
@@ -93,9 +93,9 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
     
     public final static class CacheKey {
         private final PrefixTermTacletAppIndexCacheImpl parent;
-        public Term analysedTerm;
+        public JavaDLTerm analysedTerm;
 
-        public CacheKey(PrefixTermTacletAppIndexCacheImpl parent, Term analysedTerm) {
+        public CacheKey(PrefixTermTacletAppIndexCacheImpl parent, JavaDLTerm analysedTerm) {
             this.parent = parent;
             this.analysedTerm = analysedTerm;
         }

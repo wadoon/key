@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
@@ -104,8 +104,8 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement> impleme
     */
    @Override
    public SourceElement getActiveStatement() {
-      Term modalityTerm = getModalityPIO().subTerm();
-      SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
+      JavaDLTerm modalityTerm = getModalityPIO().subTerm();
+      SourceElement firstStatement = modalityTerm.modalContent().program().getFirstElement();
       return NodeInfo.computeActiveStatement(firstStatement);
    }
    

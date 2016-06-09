@@ -8,7 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.UnknownJavaTypeException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -34,10 +34,10 @@ class FieldPrinter {
      * object.(package.class::field)
      *
      * Remark: This method is declared static because it is also used in method
-     * {@link StorePrinter#printStoreOnFieldConstant(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, boolean) }
+     * {@link StorePrinter#printStoreOnFieldConstant(de.uka.ilkd.key.logic.JavaDLTerm, de.uka.ilkd.key.logic.JavaDLTerm, de.uka.ilkd.key.logic.JavaDLTerm, de.uka.ilkd.key.logic.JavaDLTerm, boolean) }
      */
-    protected String getPrettySyntaxForFieldConstant(Term objectTerm,
-            Term fieldTerm) {
+    protected String getPrettySyntaxForFieldConstant(JavaDLTerm objectTerm,
+            JavaDLTerm fieldTerm) {
 
         JavaInfo javaInfo = lp.services.getProgramServices().getJavaInfo();
 
@@ -72,8 +72,8 @@ class FieldPrinter {
      * 
      * (Kai Wallisch 09/2014)
      */
-    private boolean isCanonicField(Term objectTerm,
-            Term fieldTerm,
+    private boolean isCanonicField(JavaDLTerm objectTerm,
+            JavaDLTerm fieldTerm,
             JavaInfo javaInfo) {
         Sort sort = objectTerm.sort();
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
@@ -101,7 +101,7 @@ class FieldPrinter {
     /*
      * Determine whether a term is a constant function symbol of type field.
      */
-    protected static boolean isFieldConstant(Term fieldTerm, HeapLDT heapLDT) {
+    protected static boolean isFieldConstant(JavaDLTerm fieldTerm, HeapLDT heapLDT) {
         return fieldTerm.op() instanceof Function
                 && ((Function) fieldTerm.op()).isUnique()
                 && fieldTerm.sort() == heapLDT.getFieldSort()
@@ -109,18 +109,18 @@ class FieldPrinter {
                 && fieldTerm.boundVars().isEmpty();
     }
 
-    protected boolean isFieldConstant(Term fieldTerm) {
+    protected boolean isFieldConstant(JavaDLTerm fieldTerm) {
         return isFieldConstant(fieldTerm, lp.getHeapLDT());
     }
 
     /**
-     * Find out whether a {@link Term} represents a field symbol, declared in a
+     * Find out whether a {@link JavaDLTerm} represents a field symbol, declared in a
      * Java class.
      *
      * @return Returns true iff the given parameter represents a field constant.
      * @param fieldTerm The target field.
      */
-    protected static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT, Services services) {
+    protected static boolean isJavaFieldConstant(JavaDLTerm fieldTerm, HeapLDT heapLDT, Services services) {
         String name = fieldTerm.op().name().toString();
         if(name.contains("::$") && isFieldConstant(fieldTerm, heapLDT)) {
             String pvName = name.replace("::$", "::");
@@ -135,7 +135,7 @@ class FieldPrinter {
         return false;
     }
 
-    protected boolean isJavaFieldConstant(Term fieldTerm) {
+    protected boolean isJavaFieldConstant(JavaDLTerm fieldTerm) {
         return isJavaFieldConstant(fieldTerm, lp.getHeapLDT(), lp.services);
     }
 
@@ -143,7 +143,7 @@ class FieldPrinter {
      * Determine whether the field constant is a generic object property.
      * Those are surrounded by angle brackets, e.g. o.<created>
      */
-    protected boolean isBuiltinObjectProperty(Term fieldTerm) {
+    protected boolean isBuiltinObjectProperty(JavaDLTerm fieldTerm) {
         return fieldTerm.op().name().toString().contains("::<")
                 && isFieldConstant(fieldTerm, lp.getHeapLDT());
     }
@@ -153,7 +153,7 @@ class FieldPrinter {
      * Field constants are considered static if reference object
      * is null.
      */
-    protected boolean isStaticFieldConstant(Term objectTerm, Term fieldTerm) {
+    protected boolean isStaticFieldConstant(JavaDLTerm objectTerm, JavaDLTerm fieldTerm) {
         return objectTerm.equals(lp.services.getTermBuilder().NULL())
                 && isFieldConstant(fieldTerm, lp.getHeapLDT());
     }

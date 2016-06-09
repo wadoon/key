@@ -3,7 +3,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 import org.key_project.common.core.logic.op.Function;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 public class ConstantTermFeature extends BinaryTermFeature {
 
@@ -13,7 +13,7 @@ public class ConstantTermFeature extends BinaryTermFeature {
     }
     
     @Override
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(JavaDLTerm term, Services services) {
         return term.op() instanceof Function && term.arity() == 0;
     }
 

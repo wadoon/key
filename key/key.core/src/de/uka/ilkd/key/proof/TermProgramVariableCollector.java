@@ -19,7 +19,7 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 public class TermProgramVariableCollector extends DefaultVisitor {
@@ -35,17 +35,17 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     
 
     /** is called by the execPostOrder-method of a term 
-     * @param t the Term to checked if it is a program variable and if true the
+     * @param t the JavaDLTerm to checked if it is a program variable and if true the
      * variable is added to the list of found variables
      */  
-    public void visit(Term t) {
+    public void visit(JavaDLTerm t) {
 	if ( t.op() instanceof LocationVariable ) {
 	    result.add ( (LocationVariable) t.op() );
 	} 
 	
-	if ( !t.javaBlock ().isEmpty() ) {
+	if ( !t.modalContent ().isEmpty() ) {
 	    ProgramVariableCollector pvc
-		= new ProgramVariableCollector ( t.javaBlock ().program (), services );
+		= new ProgramVariableCollector ( t.modalContent ().program (), services );
 	    pvc.start();
 	    result.addAll ( pvc.result () );
 	}

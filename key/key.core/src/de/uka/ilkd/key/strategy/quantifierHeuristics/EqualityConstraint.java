@@ -24,6 +24,7 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -34,7 +35,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -45,7 +46,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
  * contains pairs of Metavariables X and Terms t meaning X=t. It
  * offers services like joining two Constraint objects, adding new
  * constraints to this one by unfying two terms and creating all
- * necessary Metavariable - Term pairs. There are no public
+ * necessary Metavariable - JavaDLTerm pairs. There are no public
  * constructors to build up a new Constraint use the BOTTOM constraint
  * of the Constraint interface (static final class variable) and add
  * the needed constraints. If a constraint would not be satisfiable
@@ -60,30 +61,30 @@ public class EqualityConstraint implements Constraint {
 	CONSTRAINTBOOLEANCONTAINER=new BooleanContainer();
 
     /** stores constraint content as a mapping from Metavariable to
-     * Term */
-    private HashMap<Metavariable, Term> map;
+     * JavaDLTerm */
+    private HashMap<Metavariable, JavaDLTerm> map;
 
     /** cache for return values of getInstantiation */
-    private HashMap<Metavariable, Term> instantiationCache        = null;
+    private HashMap<Metavariable, JavaDLTerm> instantiationCache        = null;
 
     private Integer hashCode = null;
     
     /** Don't use this constructor, use Constraint.BOTTOM instead */
     public EqualityConstraint() {
-	this ( new LinkedHashMap<Metavariable, Term> () );
+	this ( new LinkedHashMap<Metavariable, JavaDLTerm> () );
     }
 
-    private EqualityConstraint( HashMap<Metavariable, Term> map ) {
+    private EqualityConstraint( HashMap<Metavariable, JavaDLTerm> map ) {
 	this.map = map;
     }
 
 
     /* cache to speed up meta variable search */
-    private static WeakHashMap<Term, ImmutableSet<Metavariable>> mvCache = 
-	new WeakHashMap<Term, ImmutableSet<Metavariable>>(2000);
+    private static WeakHashMap<JavaDLTerm, ImmutableSet<Metavariable>> mvCache = 
+	new WeakHashMap<JavaDLTerm, ImmutableSet<Metavariable>>(2000);
     
     
-    public static ImmutableSet<Metavariable> metaVars(Term t) {
+    public static ImmutableSet<Metavariable> metaVars(JavaDLTerm t) {
 	
 	if (mvCache.containsKey(t)) {
 	    return mvCache.get(t);
@@ -110,11 +111,11 @@ public class EqualityConstraint implements Constraint {
     
     protected synchronized Object clone () {
 	EqualityConstraint res        =
-	    new EqualityConstraint ( (HashMap<Metavariable, Term>)map.clone () );
+	    new EqualityConstraint ( (HashMap<Metavariable, JavaDLTerm>)map.clone () );
 	res.instantiationCache        =
 	    instantiationCache == null ?
 	    null :
-	    (HashMap<Metavariable, Term>)instantiationCache.clone ();
+	    (HashMap<Metavariable, JavaDLTerm>)instantiationCache.clone ();
 	return res;
     }
     
@@ -150,7 +151,7 @@ public class EqualityConstraint implements Constraint {
      * valid (or null if the constraint allows arbitrary
      * instantiations of p_mv). This is just the entry of map.
      */
-    public Term getDirectInstantiation ( Metavariable p_mv ) {
+    public JavaDLTerm getDirectInstantiation ( Metavariable p_mv ) {
 	return map.get ( p_mv );
     }
 
@@ -159,10 +160,10 @@ public class EqualityConstraint implements Constraint {
      * @return the term by which p_mv is instantiated by the most
      * general substitution satisfying the constraint
      */
-    public synchronized Term getInstantiation (Metavariable p_mv, TermServices services) {
-        Term t = null;
+    public synchronized JavaDLTerm getInstantiation (Metavariable p_mv, TermServices services) {
+        JavaDLTerm t = null;
         if ( instantiationCache == null )
-            instantiationCache = new LinkedHashMap<Metavariable, Term> ();
+            instantiationCache = new LinkedHashMap<Metavariable, JavaDLTerm> ();
         else
             t = instantiationCache.get ( p_mv );
 
@@ -179,7 +180,7 @@ public class EqualityConstraint implements Constraint {
         return t;
     }
     
-    private synchronized Term getInstantiationIfExisting (Metavariable p_mv) {
+    private synchronized JavaDLTerm getInstantiationIfExisting (Metavariable p_mv) {
         if ( instantiationCache == null )
             return null;
         return instantiationCache.get ( p_mv );
@@ -188,10 +189,10 @@ public class EqualityConstraint implements Constraint {
     /**
      * instantiatiates term <code>p</code> according to the instantiations
      * of the metavariables described by this constraint. 
-     * @param p the Term p to be instantiated
+     * @param p the JavaDLTerm p to be instantiated
      * @return the instantiated term 
      */
-    private Term instantiate ( Term p ) {
+    private JavaDLTerm instantiate ( JavaDLTerm p ) {
 	ConstraintAwareSyntacticalReplaceVisitor srVisitor =
 	    new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(),
 	                                  new Services(new JavaProfile()), // Any services can be used because it is only used for allquantor instantiation. TODO: Rewrite quantifier heuristics and strategies 
@@ -208,29 +209,29 @@ public class EqualityConstraint implements Constraint {
 
     /** 
      * unifies terms t1 and t2
-     * @param t1 Term to be unified 
+     * @param t1 JavaDLTerm to be unified 
      * @param t2 term to be unified
      * @param services the Services providing access to the type model
      * (e.g. necessary when introducing intersection sorts) 
      * @return TOP if not possible, else a new constraint with after
      * unification of t1 and t2
      */
-    public Constraint unify ( Term t1, Term t2, TermServices services  ) {
+    public Constraint unify ( JavaDLTerm t1, JavaDLTerm t2, TermServices services  ) {
 	return unify(t1, t2, services, CONSTRAINTBOOLEANCONTAINER);
     }
 
         
     /** executes unification for terms t1 and t2. 
-     * @param t1 Term to be unfied 
-     * @param t2 Term to be unfied
+     * @param t1 JavaDLTerm to be unfied 
+     * @param t2 JavaDLTerm to be unfied
      * @param services the Services providing access to the type model
      * (e.g. necessary when introducing intersection sorts) 
      * @param unchanged true iff the new constraint equals this one
      * @return TOP if not possible, else a new constraint unifying t1
      * and t2 ( == this iff this subsumes the unification )
      */
-    public Constraint unify ( Term             t1,
-			      Term             t2,
+    public Constraint unify ( JavaDLTerm             t1,
+			      JavaDLTerm             t2,
                               TermServices        services,
 			      BooleanContainer unchanged ) {
 	final Constraint newConstraint = unifyHelp ( t1, t2, false, services );
@@ -320,11 +321,11 @@ public class EqualityConstraint implements Constraint {
      *         <code>Constraint.TOP</code> is always returned for ununifiable
      *         terms
      */
-    private Constraint unifyHelp ( Term                       t0,
-                                   Term                       t1,
+    private Constraint unifyHelp ( JavaDLTerm                       t0,
+                                   JavaDLTerm                       t1,
                                    ImmutableList<QuantifiableVariable> ownBoundVars, 
                                    ImmutableList<QuantifiableVariable> cmpBoundVars,
-                                   NameAbstractionTable       nat,
+                                   GenericNameAbstractionTable       nat,
                                    boolean                    modifyThis, 
                                    TermServices services ) {
 
@@ -394,8 +395,8 @@ public class EqualityConstraint implements Constraint {
      * @param services
      * @return the constraint 
      */
-    private Constraint introduceNewMV (Term t0,
-                                       Term t1,
+    private Constraint introduceNewMV (JavaDLTerm t0,
+                                       JavaDLTerm t1,
                                        boolean modifyThis,
                                        TermServices services) {
 /*        if (services == null) return Constraint.TOP;
@@ -415,7 +416,7 @@ public class EqualityConstraint implements Constraint {
 //        
 //        final Metavariable newMV = 
 //            new Metavariable(new Name("#MV"+(MV_COUNTER++)), intersectionSort);
-//        final Term newMVTerm = GenericTermFactory.DEFAULT.createFunctionTerm(newMV);
+//        final JavaDLTerm newMVTerm = GenericTermFactory.DEFAULT.createFunctionTerm(newMV);
 //        
 //        final Constraint addFirst = normalize ( (Metavariable)t0.op (),
 //                                                newMVTerm,
@@ -434,17 +435,17 @@ public class EqualityConstraint implements Constraint {
      * used to encode that <tt>handleJava</tt> results in an unsatisfiable constraint
      * (faster than using exceptions)
      */
-    private static NameAbstractionTable FAILED = new NameAbstractionTable();
+    private static GenericNameAbstractionTable FAILED = new NameAbstractionTable();
     
-    private static NameAbstractionTable handleJava (Term t0,
-                                                    Term t1,
-                                                    NameAbstractionTable nat) {
+    private static GenericNameAbstractionTable handleJava (JavaDLTerm t0,
+                                                    JavaDLTerm t1,
+                                                    GenericNameAbstractionTable nat) {
 
 
-        if ( !t0.javaBlock ().isEmpty()
-                || !t1.javaBlock ().isEmpty() ) {
+        if ( !t0.modalContent ().isEmpty()
+                || !t1.modalContent ().isEmpty() ) {
             nat = checkNat ( nat );
-            if ( ! t0.javaBlock ().equalsModRenaming ( t1.javaBlock (), nat ) ) {
+            if ( ! t0.modalContent ().equalsModRenaming ( t1.modalContent (), nat ) ) {
                 return FAILED; 
             }
         }
@@ -465,11 +466,11 @@ public class EqualityConstraint implements Constraint {
     }
 
     private Constraint descendRecursively 
-                      (Term t0,
-                       Term t1,
+                      (JavaDLTerm t0,
+                       JavaDLTerm t1,
                        ImmutableList<QuantifiableVariable> ownBoundVars,
                        ImmutableList<QuantifiableVariable> cmpBoundVars,
-                       NameAbstractionTable nat,
+                       GenericNameAbstractionTable nat,
                        boolean modifyThis,
                        TermServices services) {
         Constraint newConstraint = this;
@@ -503,13 +504,13 @@ public class EqualityConstraint implements Constraint {
         return newConstraint;
     }
 
-    private static NameAbstractionTable checkNat (NameAbstractionTable nat) {
+    private static GenericNameAbstractionTable checkNat (GenericNameAbstractionTable nat) {
         if ( nat == null ) return new NameAbstractionTable ();
         return nat;
     }
 
-    private Constraint handleTwoMetavariables (Term t0,
-                                               Term t1,
+    private Constraint handleTwoMetavariables (JavaDLTerm t0,
+                                               JavaDLTerm t1,
                                                boolean modifyThis,
                                                TermServices services) {
         final Metavariable mv0 = (Metavariable)t0.op ();
@@ -534,8 +535,8 @@ public class EqualityConstraint implements Constraint {
     }
 
     private Constraint handleQuantifiableVariable 
-                          (Term t0,
-                           Term t1,
+                          (JavaDLTerm t0,
+                           JavaDLTerm t1,
                            ImmutableList<QuantifiableVariable> ownBoundVars,
                            ImmutableList<QuantifiableVariable> cmpBoundVars) {
         if ( ! ( ( t1.op () instanceof QuantifiableVariable ) && 
@@ -563,7 +564,7 @@ public class EqualityConstraint implements Constraint {
      *         <code>Constraint.TOP</code> is always returned for ununifiable
      *         terms
      */
-    private Constraint unifyHelp (Term t1, Term t2, boolean modifyThis, TermServices services) {
+    private Constraint unifyHelp (JavaDLTerm t1, JavaDLTerm t2, boolean modifyThis, TermServices services) {
 	return unifyHelp ( t1, t2,
 			   ImmutableSLList.<QuantifiableVariable>nil(), 
 			   ImmutableSLList.<QuantifiableVariable>nil(),
@@ -580,13 +581,13 @@ public class EqualityConstraint implements Constraint {
      * correct (using Metavariable.compareTo)
      *
      * @param mv Metavariable asked to be mapped to the term t
-     * @param t the Term the metavariable should be mapped to (if there
+     * @param t the JavaDLTerm the metavariable should be mapped to (if there
      * are no cycles )
      * @param services the Services providing access to the type model
      * @return the resulting Constraint ( == this iff this subsumes
      * the new constraint )
      */ 
-    private Constraint normalize(Metavariable mv, Term t,
+    private Constraint normalize(Metavariable mv, JavaDLTerm t,
                                  boolean modifyThis, 
                                  TermServices services) {
 	// MV cycles are impossible if the orders of MV pairs are
@@ -609,7 +610,7 @@ public class EqualityConstraint implements Constraint {
 
     private EqualityConstraint getMutableConstraint (boolean modifyThis) {
         if ( modifyThis ) return this;
-        return new EqualityConstraint ( (HashMap<Metavariable, Term>)map.clone () );
+        return new EqualityConstraint ( (HashMap<Metavariable, JavaDLTerm>)map.clone () );
     }
  
     /**
@@ -741,7 +742,7 @@ public class EqualityConstraint implements Constraint {
     private Constraint joinHelp (EqualityConstraint co, TermServices services) {
         Constraint newConstraint = this;
         boolean newCIsNew = false;
-        for (Map.Entry<Metavariable, Term> entry : co.map.entrySet ()) {
+        for (Map.Entry<Metavariable, JavaDLTerm> entry : co.map.entrySet ()) {
             newConstraint = ( (EqualityConstraint)newConstraint )
                 .normalize ( entry.getKey (), entry.getValue (),
                              newCIsNew, services );
@@ -756,23 +757,23 @@ public class EqualityConstraint implements Constraint {
         return newConstraint;
     }
 
-    /** checks if there is a cycle if the metavariable mv and Term
+    /** checks if there is a cycle if the metavariable mv and JavaDLTerm
      * term would be added to this constraint e.g. X=g(Y), Y=f(X) 
      * @param mv the Metavariable   
-     * @param term The Term 
+     * @param term The JavaDLTerm 
      * @return a boolean that is true iff. adding a mapping (mv,term)
      * would cause a cycle 
      */
-    private boolean hasCycle ( Metavariable mv, Term term ) {
+    private boolean hasCycle ( Metavariable mv, JavaDLTerm term ) {
         ImmutableList<Metavariable> body          = ImmutableSLList.<Metavariable>nil();
-        ImmutableList<Term>         fringe        = ImmutableSLList.<Term>nil();
-        Term               checkForCycle = term;
+        ImmutableList<JavaDLTerm>         fringe        = ImmutableSLList.<JavaDLTerm>nil();
+        JavaDLTerm               checkForCycle = term;
         
         while ( true ) {
             for (Metavariable metavariable : metaVars(checkForCycle)) {
                 final Metavariable termMV = metavariable;
                 if (!body.contains(termMV)) {
-                    final Term termMVterm = getInstantiationIfExisting(termMV);
+                    final JavaDLTerm termMVterm = getInstantiationIfExisting(termMV);
                     if (termMVterm != null) {
                         if (metaVars(termMVterm).contains(mv))
                             return true;
@@ -794,12 +795,12 @@ public class EqualityConstraint implements Constraint {
         }        
     }
 
-    private boolean hasCycleByInst (Metavariable mv, Term term) {
+    private boolean hasCycleByInst (Metavariable mv, JavaDLTerm term) {
 
         for (Metavariable metavariable : metaVars(term)) {
             final Metavariable termMV = metavariable;
             if (termMV == mv) return true;
-            final Term termMVterm = getInstantiationIfExisting(termMV);
+            final JavaDLTerm termMVterm = getInstantiationIfExisting(termMV);
             if (termMVterm != null) {
                 if (metaVars(termMVterm).contains(mv)) return true;
             } else {
@@ -823,7 +824,7 @@ public class EqualityConstraint implements Constraint {
     
     /** ONLY FOR TESTS DONT USE THEM IN ANOTHER WAY 
      * @return mapping to mv */
-    Term valueOf ( Metavariable mv ) {
+    JavaDLTerm valueOf ( Metavariable mv ) {
 	return map.get ( mv );
     }
 

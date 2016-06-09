@@ -17,7 +17,7 @@ import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -140,7 +140,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
             Polynomial.create ( polyProj.toTerm ( app, pos, goal ), services );
 
         if (coeffProj == null) return poly;
-        final Term coeffT = coeffProj.toTerm ( app, pos, goal );
+        final JavaDLTerm coeffT = coeffProj.toTerm ( app, pos, goal );
         if ( coeffT == null ) return poly;
         
         final BigInteger coeff =

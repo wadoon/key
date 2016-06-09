@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -41,12 +41,12 @@ public interface FunctionalOperationContract extends OperationContract {
 
     public boolean isReadOnlyContract(Services services);
 
-    public Term getEnsures(LocationVariable heap);
+    public JavaDLTerm getEnsures(LocationVariable heap);
 
     /**
      * Returns the postcondition of the contract.
      */
-    public Term getPost(LocationVariable heap,
+    public JavaDLTerm getPost(LocationVariable heap,
                         ProgramVariable selfVar, 
 	    	        ImmutableList<ProgramVariable> paramVars, 
 	    	        ProgramVariable resultVar, 
@@ -54,7 +54,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	        Services services);
 
-    public Term getPost(List<LocationVariable> heapContext,
+    public JavaDLTerm getPost(List<LocationVariable> heapContext,
                         ProgramVariable selfVar, 
 	    	        ImmutableList<ProgramVariable> paramVars, 
 	    	        ProgramVariable resultVar, 
@@ -65,25 +65,25 @@ public interface FunctionalOperationContract extends OperationContract {
     /**
      * Returns the postcondition of the contract.
      */
-    public Term getPost(LocationVariable heap,
-                        Term heapTerm,
-                        Term selfTerm,
-                        ImmutableList<Term> paramTerms,
-                        Term resultTerm,
-                        Term excTerm,
-	    	        Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getPost(LocationVariable heap,
+                        JavaDLTerm heapTerm,
+                        JavaDLTerm selfTerm,
+                        ImmutableList<JavaDLTerm> paramTerms,
+                        JavaDLTerm resultTerm,
+                        JavaDLTerm excTerm,
+	    	        Map<LocationVariable,JavaDLTerm> atPres,
 	    	        Services services);
 
-    public Term getPost(List<LocationVariable> heapContext,
-                        Map<LocationVariable,Term> heapTerms,
-                        Term selfTerm,
-                        ImmutableList<Term> paramTerms,
-                        Term resultTerm,
-	    	        Term excTerm,
-	    	        Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getPost(List<LocationVariable> heapContext,
+                        Map<LocationVariable,JavaDLTerm> heapTerms,
+                        JavaDLTerm selfTerm,
+                        ImmutableList<JavaDLTerm> paramTerms,
+                        JavaDLTerm resultTerm,
+	    	        JavaDLTerm excTerm,
+	    	        Map<LocationVariable,JavaDLTerm> atPres,
 	    	        Services services);
 
-    public Term getFreePost(LocationVariable heap,
+    public JavaDLTerm getFreePost(LocationVariable heap,
                             ProgramVariable selfVar,
                             ImmutableList<ProgramVariable> paramVars,
                             ProgramVariable resultVar,
@@ -91,52 +91,52 @@ public interface FunctionalOperationContract extends OperationContract {
                             Map<LocationVariable,? extends ProgramVariable> atPreVars,
                             Services services);
 
-    public Term getFreePost(LocationVariable heap,
-                            Term heapTerm,
-                            Term selfTerm,
-                            ImmutableList<Term> paramTerms,
-                            Term resultTerm,
-                            Term excTerm,
-                            Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getFreePost(LocationVariable heap,
+                            JavaDLTerm heapTerm,
+                            JavaDLTerm selfTerm,
+                            ImmutableList<JavaDLTerm> paramTerms,
+                            JavaDLTerm resultTerm,
+                            JavaDLTerm excTerm,
+                            Map<LocationVariable,JavaDLTerm> atPres,
                             Services services);
 
-    public Term getFreePost(List<LocationVariable> heapContext,
-                            Map<LocationVariable,Term> heapTerms,
-                            Term selfTerm,
-                            ImmutableList<Term> paramTerms,
-                            Term resultTerm,
-                            Term excTerm,
-                            Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getFreePost(List<LocationVariable> heapContext,
+                            Map<LocationVariable,JavaDLTerm> heapTerms,
+                            JavaDLTerm selfTerm,
+                            ImmutableList<JavaDLTerm> paramTerms,
+                            JavaDLTerm resultTerm,
+                            JavaDLTerm excTerm,
+                            Map<LocationVariable,JavaDLTerm> atPres,
                             Services services);
 
     /**
       * Returns the model method definition for model method contracts
       */
-    public Term getRepresentsAxiom(LocationVariable heap,
+    public JavaDLTerm getRepresentsAxiom(LocationVariable heap,
         ProgramVariable selfVar,
         ImmutableList<ProgramVariable> paramVars,
         ProgramVariable resultVar,
         Map<LocationVariable,? extends ProgramVariable> atPreVars,
         Services services);
 
-    public Term getRepresentsAxiom(LocationVariable heap,
-                                   Term heapTerm,
-                                   Term selfTerm,
-                                   ImmutableList<Term> paramTerms,
-                                   Term resultTerm,
-                                   Term excTerm,
-                                   Map<LocationVariable,Term> atPres,
+    public JavaDLTerm getRepresentsAxiom(LocationVariable heap,
+                                   JavaDLTerm heapTerm,
+                                   JavaDLTerm selfTerm,
+                                   ImmutableList<JavaDLTerm> paramTerms,
+                                   JavaDLTerm resultTerm,
+                                   JavaDLTerm excTerm,
+                                   Map<LocationVariable,JavaDLTerm> atPres,
                                    Services services);
 
     public String getBaseName();
-    public Term getPre();
-    public Term getPost();
-    public Term getMod();
-    public Term getMby();
-    public Term getSelf();
-    public ImmutableList<Term> getParams();
-    public Term getResult();
-    public Term getExc();
+    public JavaDLTerm getPre();
+    public JavaDLTerm getPost();
+    public JavaDLTerm getMod();
+    public JavaDLTerm getMby();
+    public JavaDLTerm getSelf();
+    public ImmutableList<JavaDLTerm> getParams();
+    public JavaDLTerm getResult();
+    public JavaDLTerm getExc();
     public KeYJavaType getSpecifiedIn();
 
     public boolean hasResultVar();

@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -28,7 +28,7 @@ public class AtomTermFeature extends BinaryTermFeature {
     
     private AtomTermFeature () {}
     
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(JavaDLTerm term, Services services) {
         final Operator op = term.op ();
         return ! ( op instanceof Junctor
                    || op == Equality.EQV

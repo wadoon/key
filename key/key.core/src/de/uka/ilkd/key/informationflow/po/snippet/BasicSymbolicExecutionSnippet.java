@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -41,13 +41,13 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
+    public JavaDLTerm produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         assert poVars.exceptionParameter.op() instanceof LocationVariable :
                 "Something is wrong with the catch variable";
 
-        ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
+        ImmutableList<JavaDLTerm> posts = ImmutableSLList.<JavaDLTerm>nil();
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
@@ -58,13 +58,13 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         posts = posts.append(d.tb.equals(poVars.post.exception,
                                          poVars.pre.exception));
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
-        final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
+        final JavaDLTerm prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
         return prog;
     }
 
-    private Term buildProgramTerm(BasicSnippetData d,
+    private JavaDLTerm buildProgramTerm(BasicSnippetData d,
                                   ProofObligationVars vs,
-                                  Term postTerm,
+                                  JavaDLTerm postTerm,
                                   TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a "
@@ -95,18 +95,18 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         } else {
             symbExecMod = Modality.BOX;
         }
-        final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
-        //final Term programTerm = tb.not(tb.prog(modality, jb, tb.not(postTerm)));
+        final JavaDLTerm programTerm = tb.prog(symbExecMod, jb, postTerm);
+        //final JavaDLTerm programTerm = tb.not(tb.prog(modality, jb, tb.not(postTerm)));
 
         //create update
-        Term update = tb.skip();
-        Iterator<Term> formalParamIt = vs.formalParams.iterator();
-        Iterator<Term> paramIt = vs.pre.localVars.iterator();
+        JavaDLTerm update = tb.skip();
+        Iterator<JavaDLTerm> formalParamIt = vs.formalParams.iterator();
+        Iterator<JavaDLTerm> paramIt = vs.pre.localVars.iterator();
         while (formalParamIt.hasNext()) {
-            Term formalParam = formalParamIt.next();
+            JavaDLTerm formalParam = formalParamIt.next();
             LocationVariable formalParamVar =
                     formalParam.op(LocationVariable.class);
-            Term paramUpdate = tb.elementary(formalParamVar,
+            JavaDLTerm paramUpdate = tb.elementary(formalParamVar,
                                              paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
@@ -115,7 +115,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
     }
 
     private JavaBlock buildJavaBlock(BasicSnippetData d,
-                                     ImmutableList<Term> formalPars,
+                                     ImmutableList<JavaDLTerm> formalPars,
                                      ProgramVariable selfVar,
                                      ProgramVariable resultVar,
                                      ProgramVariable exceptionVar,
@@ -180,11 +180,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
 
 
     private ProgramVariable[] extractProgramVariables(
-                                                      ImmutableList<Term> formalPars)
+                                                      ImmutableList<JavaDLTerm> formalPars)
             throws IllegalArgumentException {
         ProgramVariable[] formalParVars = new ProgramVariable[formalPars.size()];
         int i = 0;
-        for(Term formalPar : formalPars) {
+        for(JavaDLTerm formalPar : formalPars) {
             formalParVars[i++] = formalPar.op(ProgramVariable.class);
         }
         return formalParVars;

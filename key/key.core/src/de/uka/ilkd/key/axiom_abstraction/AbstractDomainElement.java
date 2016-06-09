@@ -3,7 +3,7 @@ package de.uka.ilkd.key.axiom_abstraction;
 import org.key_project.common.core.logic.Named;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * An element of an abstract domain. Elements are described by
@@ -17,7 +17,7 @@ public abstract class AbstractDomainElement implements Named {
 
    /**
     * <p>Return the defining axiom, instantiated for a given
-    * Term (skolem constant or logical / program variable).
+    * JavaDLTerm (skolem constant or logical / program variable).
     * The term can be seen as a representative of this abstract
     * domain element; the returned formula must formally specify
     * this.</p>
@@ -34,7 +34,7 @@ public abstract class AbstractDomainElement implements Named {
     *    or constant represents an instance of this abstract domain
     *    element.
     */
-   public abstract Term getDefiningAxiom(Term varOrConst, Services services);
+   public abstract JavaDLTerm getDefiningAxiom(JavaDLTerm varOrConst, Services services);
    
    @Override
    public String toString() {

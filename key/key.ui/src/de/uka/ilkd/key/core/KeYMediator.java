@@ -34,7 +34,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
@@ -749,7 +749,7 @@ public class KeYMediator {
                 return false;
             }
 
-            Term formula = InspectorForDecisionPredicates.translate(getSelectedProof().getServices(),result);
+            JavaDLTerm formula = InspectorForDecisionPredicates.translate(getSelectedProof().getServices(),result);
 
             DelayedCutProcessor processor = new DelayedCutProcessor(getSelectedProof(),
                     invokedNode,

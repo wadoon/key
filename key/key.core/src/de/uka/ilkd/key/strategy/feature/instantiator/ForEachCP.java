@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -70,7 +70,7 @@ public class ForEachCP implements Feature {
     public RuleAppCost compute(final RuleApp app,
                                final PosInOccurrence pos,
                                final Goal goal) {
-        final Term outerVarContent = var.getContent ();
+        final JavaDLTerm outerVarContent = var.getContent ();
         var.setContent ( null );
         
         manager.passChoicePoint ( new CP ( app, pos, goal ), this );
@@ -87,10 +87,10 @@ public class ForEachCP implements Feature {
 
     private final class CP implements ChoicePoint {
         private final class BranchIterator implements Iterator<CPBranch> {
-            private final Iterator<Term> terms;
+            private final Iterator<JavaDLTerm> terms;
             private final RuleApp        oldApp;
 
-            private BranchIterator(Iterator<Term> terms, RuleApp oldApp) {
+            private BranchIterator(Iterator<JavaDLTerm> terms, RuleApp oldApp) {
                 this.terms = terms;
                 this.oldApp = oldApp;
             }
@@ -100,7 +100,7 @@ public class ForEachCP implements Feature {
             }
 
             public CPBranch next() {
-                final Term generatedTerm = terms.next ();
+                final JavaDLTerm generatedTerm = terms.next ();
                 return new CPBranch () {
                     public void choose() {
                         var.setContent ( generatedTerm );

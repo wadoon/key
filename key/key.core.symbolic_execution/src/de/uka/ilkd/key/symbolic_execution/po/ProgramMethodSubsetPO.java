@@ -39,7 +39,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -230,7 +230,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term getPre(List<LocationVariable> modHeaps,
+   protected JavaDLTerm getPre(List<LocationVariable> modHeaps,
                          ProgramVariable selfVar,
                          ImmutableList<ProgramVariable> paramVars,
                          Map<LocationVariable, LocationVariable> atPreVars,
@@ -243,7 +243,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term buildFreePre(ProgramVariable selfVar,
+   protected JavaDLTerm buildFreePre(ProgramVariable selfVar,
                                KeYJavaType selfKJT,
                                ImmutableList<ProgramVariable> paramVars,
                                List<LocationVariable> heaps,
@@ -256,7 +256,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * {@inheritDoc}
     */
    @Override
-   protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
+   protected JavaDLTerm ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
                                               ImmutableList<LocationVariable> formalParamVars,
                                               ProgramVariable exceptionVar,
                                               String name,

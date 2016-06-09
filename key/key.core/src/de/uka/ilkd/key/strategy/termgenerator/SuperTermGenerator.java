@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -41,7 +41,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator ( cond ) {
-            protected Iterator<Term> createIterator(PosInOccurrence focus) {
+            protected Iterator<JavaDLTerm> createIterator(PosInOccurrence focus) {
                 return new UpwardsIterator ( focus, services );
             }
         };
@@ -49,23 +49,23 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
         return new SuperTermWithIndexGenerator ( cond ) {
-            protected Iterator<Term> createIterator(PosInOccurrence focus) {
+            protected Iterator<JavaDLTerm> createIterator(PosInOccurrence focus) {
                 return new UpwardsIterator ( focus, services );
             }
         };
     }
     
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         return createIterator ( pos );
     }
 
-    protected abstract Iterator<Term> createIterator(PosInOccurrence focus);
+    protected abstract Iterator<JavaDLTerm> createIterator(PosInOccurrence focus);
     
-    protected Term generateOneTerm(Term superterm, int child) {
+    protected JavaDLTerm generateOneTerm(JavaDLTerm superterm, int child) {
         return superterm;
     }
 
-    private boolean generateFurther(Term t, Services services) {
+    private boolean generateFurther(JavaDLTerm t, Services services) {
         return ! ( cond.compute ( t, services ) instanceof TopRuleAppCost );
     }
 
@@ -77,7 +77,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             super ( cond );
         }
 
-        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+        public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
             if ( services == null ) {
                 services = goal.proof ().getServices ();
                 final IntegerLDT numbers = services.getTheories().getIntegerLDT();
@@ -92,7 +92,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 	return 2;
                     }
 
-                    public Sort sort(ImmutableArray<Term> terms) {
+                    public Sort sort(ImmutableArray<JavaDLTerm> terms) {
                 	return SortImpl.ANY;
                     }
                     
@@ -116,7 +116,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 	return true;
                     }
 
-                    public boolean validTopLevel(Term term) {
+                    public boolean validTopLevel(JavaDLTerm term) {
                 	return term.arity() == 2
                 	       && term.sub(1).sort().extendsTrans(numbers.getNumberSymbol ().sort ());
                     }
@@ -136,13 +136,13 @@ public abstract class SuperTermGenerator implements TermGenerator {
             return createIterator ( pos );
         }
 
-        protected Term generateOneTerm(Term superterm, int child) {
-            final Term index = services.getTermBuilder().zTerm ( "" + child );
+        protected JavaDLTerm generateOneTerm(JavaDLTerm superterm, int child) {
+            final JavaDLTerm index = services.getTermBuilder().zTerm ( "" + child );
             return services.getTermBuilder().tf().createTerm( binFunc, superterm, index );
         }
     }
     
-    class UpwardsIterator implements Iterator<Term> {
+    class UpwardsIterator implements Iterator<JavaDLTerm> {
         private PosInOccurrence currentPos;
         
         private final Services services;
@@ -156,10 +156,10 @@ public abstract class SuperTermGenerator implements TermGenerator {
             return currentPos != null && !currentPos.isTopLevel ();
         }
 
-        public Term next() {
+        public JavaDLTerm next() {
             final int child = currentPos.getIndex ();
             currentPos = currentPos.up ();
-            final Term res = generateOneTerm ( currentPos.subTerm (), child );
+            final JavaDLTerm res = generateOneTerm ( currentPos.subTerm (), child );
             if ( !generateFurther ( res, services ) ) currentPos = null;
             return res;
         }
