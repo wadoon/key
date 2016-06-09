@@ -72,7 +72,7 @@ public abstract class JavaNonTerminalProgramElement
      * the children.
      */
     public boolean equalsModRenaming(SourceElement se, 
-				     GenericNameAbstractionTable nat) {
+				     GenericNameAbstractionTable<SourceElement> nat) {
 
     if (se == this) {
         return true;

@@ -13,12 +13,10 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.Visitor;
-
 /**
  * This abstract Vistor class declares the interface for a common term visitor.
  */
-public abstract class DefaultVisitor implements Visitor {	
+public abstract class DefaultVisitor implements JavaDLVisitor {	
     @Override
     public boolean visitSubtree(JavaDLTerm visited) {
         return true;

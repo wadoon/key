@@ -126,7 +126,7 @@ public final class TermFactory implements GenericTermFactory {
     }    
 
     public JavaDLTerm createTerm(Operator op, JavaDLTerm sub1, JavaDLTerm sub2, ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, new JavaDLTerm[]{sub1, sub2}, null, null, labels);
+    	return createTerm(op, new JavaDLTerm[] { sub1, sub2 }, null, null, labels);
     }    
 
 

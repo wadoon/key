@@ -601,7 +601,7 @@ public class BlockContractRule implements BuiltInRule {
     private Map<LocationVariable, Function>
                 createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables,
                                                         final BlockContract contract,
-                                                        final TermServices services) {
+                                                        final Services services) {
         Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
@@ -819,11 +819,11 @@ public class BlockContractRule implements BuiltInRule {
 
         private final Goal goal;
         private final BlockContract.Variables placeholderVariables;
-        private final TermServices services;
+        private final Services services;
 
         public VariablesCreatorAndRegistrar(final Goal goal,
                                             final BlockContract.Variables placeholderVariables,
-                                            final TermServices services) {
+                                            final Services services) {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;
             this.services = services;

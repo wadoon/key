@@ -24,8 +24,6 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public interface JavaDLTerm extends GenericTerm<JavaDLVisitor> {
 
-    
-
     @Override
     public ImmutableArray<JavaDLTerm> subs();
 
@@ -37,4 +35,8 @@ public interface JavaDLTerm extends GenericTerm<JavaDLVisitor> {
      */
     @Override
     public JavaBlock modalContent();
+
+    @Override
+    void execPostOrder(JavaDLVisitor visitor);
+
 }

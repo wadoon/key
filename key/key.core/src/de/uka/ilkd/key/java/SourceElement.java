@@ -115,7 +115,7 @@ public interface SourceElement extends SVSubstitute {
      * {int decl_1; i=0;} for the second one. These are not
      * syntactical equal, therefore false is returned. 
      */
-    boolean equalsModRenaming(SourceElement se, GenericNameAbstractionTable nat);
+    boolean equalsModRenaming(SourceElement se, GenericNameAbstractionTable<SourceElement> nat);
 
     
 

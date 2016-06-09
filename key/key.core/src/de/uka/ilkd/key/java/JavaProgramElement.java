@@ -129,7 +129,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
      */
     @Override    
     public boolean equalsModRenaming(SourceElement se, 
-				     GenericNameAbstractionTable nat) {
+				     GenericNameAbstractionTable<SourceElement> nat) {
     	return (this.getClass() == se.getClass());
     }
     

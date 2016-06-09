@@ -44,5 +44,5 @@ public interface GenericNamespaceSet {
      *             {@link #getNamespace(String)} instead to be compatible with
      *             other logics than JavaDL.
      */
-    GenericNamespaceSet functions();
+    Namespace functions();
 }
