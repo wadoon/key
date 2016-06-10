@@ -28,6 +28,7 @@ import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
@@ -61,7 +62,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * an instance serves as representation of a Java model underlying a DL

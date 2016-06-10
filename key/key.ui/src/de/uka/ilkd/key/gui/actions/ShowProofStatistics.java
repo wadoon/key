@@ -28,6 +28,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
+import org.key_project.util.collection.Pair;
+
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -35,7 +37,6 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.Pair;
 
 public class ShowProofStatistics extends MainWindowAction {
 

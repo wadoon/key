@@ -21,13 +21,15 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
+
 public class ClashFreeSubst {
     protected QuantifiableVariable v;
     protected JavaDLTerm s;
     protected ImmutableSet<QuantifiableVariable> svars;
-    protected final TermServices services;
+    protected final JavaDLTermServices services;
 
-    public ClashFreeSubst(QuantifiableVariable v,JavaDLTerm s, TermServices services) {
+    public ClashFreeSubst(QuantifiableVariable v,JavaDLTerm s, JavaDLTermServices services) {
        this.services = services;
        this.v = v;
        this.s = s;

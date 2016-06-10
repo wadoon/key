@@ -87,7 +87,7 @@ public abstract class AbstractSort implements Sort {
     
 
     @Override
-    public final SortDependingFunction getCastSymbol(TermServices services) {
+    public final SortDependingFunction getCastSymbol(TermServices<?,?,?,?, ?> services) {
         SortDependingFunction result
             = SortDependingFunction.getFirstInstance(CAST_NAME, services)
         			   .getInstanceFor(this, services);
@@ -97,7 +97,7 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override    
-    public final SortDependingFunction getInstanceofSymbol(TermServices services) {
+    public final SortDependingFunction getInstanceofSymbol(TermServices<?,?,?,?, ?> services) {
 	SortDependingFunction result
 	    = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
                                    .getInstanceFor(this, services);
@@ -107,7 +107,7 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override
-    public final SortDependingFunction getExactInstanceofSymbol(TermServices services) {
+    public final SortDependingFunction getExactInstanceofSymbol(TermServices<?,?,?,?, ?> services) {
 	SortDependingFunction result
             = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
                                    .getInstanceFor(this, services);

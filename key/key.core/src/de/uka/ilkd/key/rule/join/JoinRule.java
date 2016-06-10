@@ -38,6 +38,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -63,7 +64,6 @@ import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithSignLattice;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.ProgramVariablesMatchVisitor;

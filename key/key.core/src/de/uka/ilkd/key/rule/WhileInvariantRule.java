@@ -30,6 +30,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
@@ -76,7 +77,6 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 public final class WhileInvariantRule implements BuiltInRule {

@@ -39,6 +39,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Sequent;
@@ -588,8 +589,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private StringBuffer buildInstantiatedHierarchyPredicate(
                         SortWrapper child, SortWrapper parent,
                         StringBuffer constant) {
-                StringBuffer form = new StringBuffer();
-
                 ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
                 varlist.add(constant);
 
@@ -759,7 +758,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * 
          * @return structured List of declaration.
          */
-        private ArrayList<ArrayList<StringBuffer>> buildTranslatedFuncDecls(TermServices services) {
+        private ArrayList<ArrayList<StringBuffer>> buildTranslatedFuncDecls(JavaDLTermServices services) {
                 ArrayList<ArrayList<StringBuffer>> toReturn = new ArrayList<ArrayList<StringBuffer>>();
                 // add the function declarations for each used function
                 for (Operator op : this.functionDecls.keySet()) {
@@ -987,7 +986,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         
      
 
-        private JavaDLTerm createLogicalVar(TermServices services, String baseName,
+        private JavaDLTerm createLogicalVar(JavaDLTermServices services, String baseName,
                         Sort sort) {
                 return tb.var(new LogicVariable(new Name(
                                 tb.newName(baseName)),
@@ -1058,7 +1057,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return result;
         }
         
-        private ArrayList<StringBuffer> buildAssumptionsForSorts(TermServices services){
+        private ArrayList<StringBuffer> buildAssumptionsForSorts(JavaDLTermServices services){
         	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
         	if(this.isMultiSorted()){
          		for(Sort sort : usedRealSort.keySet()){
@@ -1083,17 +1082,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 : constantsForBigIntegers;
         }
 
-        private JavaDLTerm getRightBorderAsTerm(long integer, TermServices services) {
+        private JavaDLTerm getRightBorderAsTerm(long integer, JavaDLTermServices services) {
                 return tb.zTerm(Long
                                 .toString(getRightBorderAsInteger(integer,
                                                 services)));
         }
 
-        private Long getRightBorderAsInteger(long integer, TermServices services) {
+        private Long getRightBorderAsInteger(long integer, JavaDLTermServices services) {
                 return integer < 0 ? getMinNumber() : getMaxNumber();
         }
 
-        private StringBuffer getNameForIntegerConstant(TermServices services,
+        private StringBuffer getNameForIntegerConstant(JavaDLTermServices services,
                         long integer) {
                 String val = integer < 0 ? "negative_value" : "positive_value";
                 return new StringBuffer(tb.newName("i")
@@ -1101,7 +1100,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         }
 
-        private StringBuffer buildUniqueConstant(long integer, TermServices services)
+        private StringBuffer buildUniqueConstant(long integer, JavaDLTermServices services)
                         throws IllegalFormulaException {
                 HashMap<Long, StringBuffer> map = getRightConstantContainer(integer);
                 StringBuffer buf = map.get(integer);

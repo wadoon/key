@@ -17,6 +17,7 @@ import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.services.TermServices;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.UpdateSV;
@@ -40,7 +41,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     }
     
     
-    private static JavaDLTerm applyUpdateOnRigid(JavaDLTerm update, JavaDLTerm target, TermServices services) {
+    private static JavaDLTerm applyUpdateOnRigid(JavaDLTerm update, JavaDLTerm target, JavaDLTermServices services) {
 	JavaDLTerm[] updatedSubs = new JavaDLTerm[target.arity()];
 	for(int i = 0; i < updatedSubs.length; i++) {
 	    updatedSubs[i] = services.getTermBuilder().apply(update, target.sub(i), null);

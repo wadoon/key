@@ -23,6 +23,7 @@ import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -32,8 +33,8 @@ import de.uka.ilkd.key.java.statement.Continue;
 import de.uka.ilkd.key.java.statement.LabelJumpStatement;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -139,7 +140,7 @@ public interface BlockContract extends SpecificationElement {
      * Returns the term internally used for self or a newly instantiated one.
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
-    public JavaDLTerm getInstantiationSelfTerm(TermServices services);
+    public JavaDLTerm getInstantiationSelfTerm(JavaDLTermServices services);
 
 
     /**

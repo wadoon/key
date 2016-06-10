@@ -38,6 +38,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Expression;
@@ -71,7 +72,6 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.Pair;
 
 
 

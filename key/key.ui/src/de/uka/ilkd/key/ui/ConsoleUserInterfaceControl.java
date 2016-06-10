@@ -19,6 +19,7 @@ import java.io.IOException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -49,7 +50,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.

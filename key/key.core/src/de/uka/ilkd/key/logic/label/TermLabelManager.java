@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.key_project.common.core.logic.ModalContent;
+import org.key_project.common.core.logic.GenericTermFactory;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
@@ -29,19 +29,21 @@ import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,7 +58,6 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>
@@ -402,7 +403,7 @@ public class TermLabelManager {
                                                              Operator newTermOp,
                                                              ImmutableArray<JavaDLTerm> newTermSubs,
                                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                             ModalContent newTermJavaBlock,
+                                                             JavaBlock newTermJavaBlock,
                                                              ImmutableArray<TermLabel> newTermOriginalLabels) {
       JavaDLTerm applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
       return instantiateLabels(state, services, applicationTerm, applicationPosInOccurrence, rule, ruleApp, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newTermOriginalLabels);
@@ -446,7 +447,7 @@ public class TermLabelManager {
                                                              Operator newTermOp,
                                                              ImmutableArray<JavaDLTerm> newTermSubs,
                                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                             ModalContent newTermJavaBlock,
+                                                             JavaBlock newTermJavaBlock,
                                                              ImmutableArray<TermLabel> newTermOriginalLabels) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
@@ -510,7 +511,7 @@ public class TermLabelManager {
                                                       Operator newTermOp,
                                                       ImmutableArray<JavaDLTerm> newTermSubs,
                                                       ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                      ModalContent newTermJavaBlock,
+                                                      JavaBlock newTermJavaBlock,
                                                       ImmutableArray<TermLabel> newTermOriginalLabels) {
       // Compute current rule specific updates
       ImmutableList<TermLabelUpdate> currentRuleSpecificUpdates = rule != null ?
@@ -609,7 +610,7 @@ public class TermLabelManager {
                                            Operator newTermOp,
                                            ImmutableArray<JavaDLTerm> newTermSubs,
                                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                           ModalContent newTermJavaBlock,
+                                           JavaBlock newTermJavaBlock,
                                            ImmutableArray<TermLabel> newTermOriginalLabels,
                                            Map<Name, TermLabelPolicy> policies,
                                            Set<TermLabel> newLabels) {
@@ -660,7 +661,7 @@ public class TermLabelManager {
                                            Operator newTermOp,
                                            ImmutableArray<JavaDLTerm> newTermSubs,
                                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                           ModalContent newTermJavaBlock,
+                                           JavaBlock newTermJavaBlock,
                                            ImmutableArray<TermLabel> newTermOriginalLabels,
                                            Map<Name, TermLabelPolicy> policies,
                                            Set<TermLabel> newLabels,
@@ -696,7 +697,7 @@ public class TermLabelManager {
     * @param ruleIndependentPolicies All rules {@link ChildTermLabelPolicy} instances.
     * @returnThe active {@link ChildTermLabelPolicy} which have to be performed.
     */
-   protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices services,
+   protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(JavaDLTermServices services,
                                                                         PosInOccurrence applicationPosInOccurrence,
                                                                         JavaDLTerm applicationTerm,
                                                                         Rule rule,
@@ -706,7 +707,7 @@ public class TermLabelManager {
                                                                         Operator newTermOp,
                                                                         ImmutableArray<JavaDLTerm> newTermSubs,
                                                                         ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                                        ModalContent newTermJavaBlock,
+                                                                        JavaBlock newTermJavaBlock,
                                                                         Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicies,
                                                                         Map<Name, ChildTermLabelPolicy> ruleIndependentPolicies) {
       Map<Name, ChildTermLabelPolicy> activeDirectChildPolicies = new LinkedHashMap<Name, ChildTermLabelPolicy>();
@@ -751,7 +752,7 @@ public class TermLabelManager {
     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JavaDLTerm}.
     */
-   protected void performDirectChildPolicies(TermServices services,
+   protected void performDirectChildPolicies(JavaDLTermServices services,
                                              PosInOccurrence applicationPosInOccurrence,
                                              JavaDLTerm applicationTerm,
                                              Rule rule,
@@ -761,7 +762,7 @@ public class TermLabelManager {
                                              Operator newTermOp,
                                              ImmutableArray<JavaDLTerm> newTermSubs,
                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                             ModalContent newTermJavaBlock,
+                                             JavaBlock newTermJavaBlock,
                                              Map<Name, ChildTermLabelPolicy> policies,
                                              Set<TermLabel> newLabels) {
       for (JavaDLTerm child : applicationTerm.subs()) {
@@ -795,7 +796,7 @@ public class TermLabelManager {
     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link JavaDLTerm}.
     */
-   protected void performChildAndGrandchildPolicies(final TermServices services,
+   protected void performChildAndGrandchildPolicies(final JavaDLTermServices services,
                                                     final PosInOccurrence applicationPosInOccurrence,
                                                     final JavaDLTerm applicationTerm,
                                                     final Rule rule,
@@ -805,7 +806,7 @@ public class TermLabelManager {
                                                     final Operator newTermOp,
                                                     final ImmutableArray<JavaDLTerm> newTermSubs,
                                                     final ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                    final ModalContent newTermJavaBlock,
+                                                    final JavaBlock newTermJavaBlock,
                                                     final Map<Name, ChildTermLabelPolicy> policies,
                                                     final Set<TermLabel> newLabels) {
       applicationTerm.execPreOrder(new DefaultVisitor() {
@@ -860,7 +861,7 @@ public class TermLabelManager {
                                  Operator newTermOp,
                                  ImmutableArray<JavaDLTerm> newTermSubs,
                                  ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                 ModalContent newTermJavaBlock,
+                                 JavaBlock newTermJavaBlock,
                                  ImmutableList<TermLabelUpdate> updater,
                                  Set<TermLabel> newLabels) {
       for (TermLabelUpdate update : updater) {

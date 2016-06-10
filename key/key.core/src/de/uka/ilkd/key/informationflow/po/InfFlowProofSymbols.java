@@ -16,6 +16,7 @@ import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
 public class InfFlowProofSymbols {

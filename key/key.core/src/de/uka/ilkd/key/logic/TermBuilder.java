@@ -42,8 +42,11 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.TheoryServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -74,7 +77,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
-import de.uka.ilkd.key.util.Pair;
 
 
 /**
@@ -85,7 +87,7 @@ import de.uka.ilkd.key.util.Pair;
  * want to be sure that the term looks exactly as you built it, you
  * will have to use the GenericTermFactory.</p>
  */
-public class TermBuilder implements GenericTermBuilder {
+public class TermBuilder implements GenericTermBuilder<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> {
 
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
@@ -109,6 +111,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public TermFactory tf() {
         return tf;
     }
@@ -125,10 +128,9 @@ public class TermBuilder implements GenericTermBuilder {
      * @param s
      *            the String to parse
      */
-    public JavaDLTerm parseTerm(String s)
-        throws ParserException
-    {
-    return parseTerm(s, services.getNamespaces());
+//    @Override
+    public JavaDLTerm parseTerm(String s) throws ParserException {
+        return parseTerm(s, services.getNamespaces());
     }
 
     /**
@@ -141,6 +143,7 @@ public class TermBuilder implements GenericTermBuilder {
      *            the namespaces used for name lookup.
      * @throws de.uka.ilkd.key.parser.ParserException
      */
+//    @Override
     public JavaDLTerm parseTerm(String s, NamespaceSet namespaces)
         throws ParserException
     {
@@ -155,6 +158,7 @@ public class TermBuilder implements GenericTermBuilder {
     //naming
     //-------------------------------------------------------------------------
 
+    @Override
     public String shortBaseName(Sort s) {
     String result = s.name().toString();
     int index = result.lastIndexOf(".");
@@ -170,6 +174,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Returns an available name constructed by affixing a counter to the passed
      * base name.
      */
+    @Override
     public String newName(String baseName) {
         final Name savedName = services.getNameRecorder().getProposal();
         if (savedName != null) {
@@ -200,6 +205,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Returns an available name constructed by affixing a counter to a self-
      * chosen base name for the passed sort.
      */
+    @Override
     public String newName(Sort sort) {
         return newName(shortBaseName(sort));
     }
@@ -215,6 +221,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a program variable for "self". Take care to register it
      * in the namespaces!
      */
+//    @Override
     public LocationVariable selfVar(KeYJavaType kjt,
                                     boolean makeNameUnique) {
         return selfVar(kjt, makeNameUnique, "");
@@ -225,6 +232,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a program variable for "self". Take care to register it
      * in the namespaces!
      */
+//    @Override
     public LocationVariable selfVar(KeYJavaType kjt,
                                     boolean makeNameUnique,
                                     String postfix) {
@@ -240,6 +248,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a program variable for "self". Take care to register it
      * in the namespaces!
      */
+//    @Override
     public LocationVariable selfVar(IProgramMethod pm,
                                     KeYJavaType kjt,
                                     boolean makeNameUnique,
@@ -255,6 +264,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a program variable for "self". Take care to register it
      * in the namespaces!
      */
+//    @Override
     public LocationVariable selfVar(IProgramMethod pm,
                                     KeYJavaType kjt,
                                     boolean makeNameUnique) {
@@ -270,6 +280,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates program variables for the parameters. Take care to register them
      * in the namespaces!
      */
+//    @Override
     public ImmutableList<ProgramVariable> paramVars(IObserverFunction obs,
                                                     boolean makeNamesUnique) {
         ImmutableList<ProgramVariable> result
@@ -299,6 +310,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates program variables for the parameters. Take care to register them
      * in the namespaces!
      */
+//    @Override
     public ImmutableList<ProgramVariable> paramVars(String postfix,
         IObserverFunction obs, boolean makeNamesUnique) {
     final ImmutableList<ProgramVariable> paramVars
@@ -320,6 +332,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a program variable for the result. Take care to register it
      * in the namespaces.
      */
+//    @Override
     public LocationVariable resultVar(IProgramMethod pm,
                                       boolean makeNameUnique) {
     return resultVar("result", pm, makeNameUnique);
@@ -330,6 +343,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a program variable for the result with passed name. Take care to
      * register it in the namespaces.
      */
+//    @Override
     public LocationVariable resultVar(String name, IProgramMethod pm,
         boolean makeNameUnique) {
     if(pm.isVoid() || pm.isConstructor()) {
@@ -348,6 +362,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a program variable for the thrown exception. Take care to
      * register it in the namespaces.
      */
+//    @Override
     public LocationVariable excVar(IProgramMethod pm,
                                    boolean makeNameUnique) {
     return excVar("exc", pm, makeNameUnique);
@@ -358,6 +373,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a program variable for the thrown exception. Take care to
      * register it in the namespaces.
      */
+//    @Override
     public LocationVariable excVar(String name,
                        IProgramMethod pm,
                                    boolean makeNameUnique) {
@@ -373,6 +389,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a program variable for the atPre heap. Take care to register it
      * in the namespaces.
      */
+//    @Override
     public LocationVariable heapAtPreVar(String baseName,
                                          boolean makeNameUnique) {
         HeapLDT heapLDT = theories.getHeapLDT();
@@ -383,6 +400,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a program variable for the atPre heap. Take care to register it
      * in the namespaces.
      */
+//    @Override
     public LocationVariable heapAtPreVar(String baseName,
                                          Sort sort,
                                          boolean makeNameUnique) {
@@ -399,11 +417,13 @@ public class TermBuilder implements GenericTermBuilder {
     //constructors for special classes of term operators
     //-------------------------------------------------------------------------
 
+    @Override
     public JavaDLTerm var(LogicVariable v) {
         return tf.createTerm(v);
     }
 
 
+//    @Override
     public JavaDLTerm var(ProgramVariable v) {
 //  if(v.isMember()) {
 //      throw new TermCreationException(
@@ -415,6 +435,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+//    @Override
     public ImmutableList<JavaDLTerm> var(ProgramVariable ... vs) {
         ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
         for (ProgramVariable v : vs) {
@@ -424,6 +445,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+//    @Override
     public ImmutableList<JavaDLTerm> var(Iterable<ProgramVariable> vs) {
     ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
     for (ProgramVariable v : vs) {
@@ -433,39 +455,47 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm var(SchemaVariable v) {
     return tf.createTerm(v);
     }
 
 
+    @Override
     public JavaDLTerm var(ParsableVariable v) {
     return tf.createTerm(v);
     }
 
 
+    @Override
     public JavaDLTerm func(Function f) {
         return tf.createTerm(f);
     }
 
 
+    @Override
     public JavaDLTerm func(Function f, JavaDLTerm s) {
         return tf.createTerm(f, s);
     }
 
 
+    @Override
     public JavaDLTerm func(Function f, JavaDLTerm s1, JavaDLTerm s2) {
         return tf.createTerm(f, s1, s2);
     }
 
 
+    @Override
     public JavaDLTerm func(Function f, JavaDLTerm ... s) {
         return tf.createTerm(f, s, null, null);
     }
 
+//    @Override
     public JavaDLTerm func(IObserverFunction f, JavaDLTerm ... s) {
        return tf.createTerm(f, s, null, null);
    }
 
+    @Override
     public JavaDLTerm func(Function f,
                  JavaDLTerm[] s,
                  ImmutableArray<QuantifiableVariable> boundVars) {
@@ -473,32 +503,38 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+//    @Override
     public JavaDLTerm prog(Modality mod, JavaBlock jb, JavaDLTerm t) {
     return tf.createTerm(mod, new JavaDLTerm[]{t}, null, jb);
     }
 
 
+//    @Override
     public JavaDLTerm prog(Modality mod, JavaBlock jb, JavaDLTerm t, ImmutableArray<TermLabel> labels) {
     return tf.createTerm(mod, new JavaDLTerm[]{t}, null, jb, labels);
     }
 
 
+    @Override
     public JavaDLTerm box(JavaBlock jb, JavaDLTerm t) {
         return prog(Modality.BOX, jb, t);
     }
 
 
+    @Override
     public JavaDLTerm dia(JavaBlock jb, JavaDLTerm t) {
         return prog(Modality.DIA, jb, t);
     }
 
 
+    @Override
     public JavaDLTerm ife(JavaDLTerm cond, JavaDLTerm _then, JavaDLTerm _else) {
         return tf.createTerm(IfThenElse.IF_THEN_ELSE,
                          new JavaDLTerm[]{cond, _then, _else});
     }
 
     /** Construct a term with the \ifEx operator. */
+    @Override
     public JavaDLTerm ifEx(QuantifiableVariable qv, JavaDLTerm cond, JavaDLTerm _then, JavaDLTerm _else) {
         return tf.createTerm(IfExThenElse.IF_EX_THEN_ELSE,
                             new ImmutableArray<JavaDLTerm>(cond,_then,_else),
@@ -507,6 +543,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
     /** Construct a term with the \ifEx operator. */
+    @Override
     public JavaDLTerm ifEx(ImmutableList<QuantifiableVariable> qvs, JavaDLTerm cond, JavaDLTerm _then, JavaDLTerm _else) {
         if (qvs.isEmpty()) throw new TermCreationException("no quantifiable variables in ifEx term");
         if (qvs.size()==1) {
@@ -516,21 +553,25 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm cast(Sort s, JavaDLTerm t) {
     return tf.createTerm(s.getCastSymbol(services), t);
     }
 
 
+    @Override
     public JavaDLTerm tt() {
         return tt;
     }
 
 
+    @Override
     public JavaDLTerm ff() {
         return ff;
     }
 
 
+    @Override
     public JavaDLTerm all(QuantifiableVariable qv, JavaDLTerm t) {
         return tf.createTerm(Quantifier.ALL,
                              new ImmutableArray<JavaDLTerm>(t),
@@ -539,6 +580,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm all(Iterable<QuantifiableVariable> qvs, JavaDLTerm t) {
         JavaDLTerm result = t;
         for (QuantifiableVariable fv : qvs) {
@@ -548,6 +590,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm allClose(JavaDLTerm t) {
     return all(t.freeVars(), t);
     }
@@ -555,6 +598,7 @@ public class TermBuilder implements GenericTermBuilder {
     /**
      * Removes universal quantifiers from a formula.
      */
+    @Override
     public JavaDLTerm open(JavaDLTerm formula) {
     assert formula.sort() == Sort.FORMULA;
     if(formula.op() == Quantifier.ALL) {
@@ -565,6 +609,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm ex(QuantifiableVariable qv, JavaDLTerm t) {
     return tf.createTerm(Quantifier.EX,
                  new ImmutableArray<JavaDLTerm>(t),
@@ -573,6 +618,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm ex(Iterable<QuantifiableVariable> qvs, JavaDLTerm t) {
         JavaDLTerm result = t;
         for (QuantifiableVariable fv : qvs) {
@@ -582,6 +628,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm bsum(QuantifiableVariable qv,
                      JavaDLTerm a,
                      JavaDLTerm b,
@@ -593,6 +640,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
     /** General (unbounded) sum */
+    @Override
     public JavaDLTerm sum (ImmutableList<QuantifiableVariable> qvs, JavaDLTerm range, JavaDLTerm t) {
         final Function sum = (Function)services.getNamespaces().functions().lookup("sum");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
@@ -605,11 +653,12 @@ public class TermBuilder implements GenericTermBuilder {
 
 
     /** Constructs a bounded product comprehension expression. */
+    @Override
     public JavaDLTerm bprod(QuantifiableVariable qv,
                      JavaDLTerm a,
                      JavaDLTerm b,
                      JavaDLTerm t,
-                     Services services) {
+                     TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services) {
         Function bprod = theories.getIntegerLDT().getBprod();
         return func(bprod,
                     new JavaDLTerm[]{a, b, t},
@@ -618,41 +667,75 @@ public class TermBuilder implements GenericTermBuilder {
 
 
     /** General (unbounded) product */
-    public JavaDLTerm prod (ImmutableList<QuantifiableVariable> qvs, JavaDLTerm range, JavaDLTerm t, TermServices services) {
-        final Function prod = (Function)services.getNamespaces().functions().lookup("prod");
+    @Override
+    public JavaDLTerm prod(
+            ImmutableList<QuantifiableVariable> qvs,
+            JavaDLTerm range,
+            JavaDLTerm t,
+            TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services) {
+        @SuppressWarnings("deprecation")
+        final Function prod =
+                (Function) services.getNamespaces().functions().lookup("prod");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
-        JavaDLTerm res = func(prod, new JavaDLTerm[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        JavaDLTerm res =
+                func(prod, new JavaDLTerm[] { convertToBoolean(range), t },
+                        new ImmutableArray<QuantifiableVariable>(it.next()));
         while (it.hasNext()) {
-            res = func(prod, new JavaDLTerm[]{TRUE(), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+            res =
+                    func(prod, new JavaDLTerm[] { TRUE(), res },
+                            new ImmutableArray<QuantifiableVariable>(it.next()));
         }
         return res;
     }
 
 
     /** minimum operator */
-    public JavaDLTerm min (ImmutableList<QuantifiableVariable> qvs, JavaDLTerm range, JavaDLTerm t, TermServices services) {
-        final Function min = (Function)services.getNamespaces().functions().lookup("min");
+    @Override
+    public JavaDLTerm min(
+            ImmutableList<QuantifiableVariable> qvs,
+            JavaDLTerm range,
+            JavaDLTerm t,
+            TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services) {
+        @SuppressWarnings("deprecation")
+        final Function min =
+                (Function) services.getNamespaces().functions().lookup("min");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
-        JavaDLTerm res = func(min, new JavaDLTerm[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        JavaDLTerm res =
+                func(min, new JavaDLTerm[] { convertToBoolean(range), t },
+                        new ImmutableArray<QuantifiableVariable>(it.next()));
         while (it.hasNext()) {
-            res = func(min, new JavaDLTerm[]{TRUE(), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+            res =
+                    func(min, new JavaDLTerm[] { TRUE(), res },
+                            new ImmutableArray<QuantifiableVariable>(it.next()));
         }
         return res;
     }
 
 
     /** minimum operator */
-    public JavaDLTerm max (ImmutableList<QuantifiableVariable> qvs, JavaDLTerm range, JavaDLTerm t, TermServices services) {
-        final Function max = (Function)services.getNamespaces().functions().lookup("max");
+    @Override
+    public JavaDLTerm max(
+            ImmutableList<QuantifiableVariable> qvs,
+            JavaDLTerm range,
+            JavaDLTerm t,
+            TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services) {
+        @SuppressWarnings("deprecation")
+        final Function max =
+                (Function) services.getNamespaces().functions().lookup("max");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
-        JavaDLTerm res = func(max, new JavaDLTerm[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        JavaDLTerm res =
+                func(max, new JavaDLTerm[] { convertToBoolean(range), t },
+                        new ImmutableArray<QuantifiableVariable>(it.next()));
         while (it.hasNext()) {
-            res = func(max, new JavaDLTerm[]{TRUE(), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+            res =
+                    func(max, new JavaDLTerm[] { TRUE(), res },
+                            new ImmutableArray<QuantifiableVariable>(it.next()));
         }
         return res;
     }
 
 
+    @Override
     public JavaDLTerm not(JavaDLTerm t) {
         if(t.op() == Junctor.TRUE) {
             return ff();
@@ -666,6 +749,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm and(JavaDLTerm t1, JavaDLTerm t2) {
         if(t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) {
             return ff();
@@ -678,6 +762,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm andSC(JavaDLTerm t1, JavaDLTerm t2) {
         if(t1.op() == Junctor.TRUE || t1.op() == Junctor.FALSE
                 || t2.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
@@ -687,6 +772,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm and(JavaDLTerm ... subTerms) {
         JavaDLTerm result = tt();
         for(JavaDLTerm sub : subTerms) {
@@ -695,6 +781,7 @@ public class TermBuilder implements GenericTermBuilder {
         return result;
     }
 
+    @Override
     public JavaDLTerm andSC(JavaDLTerm ... subTerms) {
         JavaDLTerm result = tt();
         if (subTerms.length == 1) {
@@ -706,6 +793,7 @@ public class TermBuilder implements GenericTermBuilder {
         return result;
     }
 
+    @Override
     public JavaDLTerm and(Iterable<JavaDLTerm> subTerms) {
         JavaDLTerm result = tt();
         for(JavaDLTerm sub : subTerms) {
@@ -714,6 +802,7 @@ public class TermBuilder implements GenericTermBuilder {
         return result;
     }
 
+    @Override
     public JavaDLTerm andSC(Iterable<JavaDLTerm> subTerms) {
         JavaDLTerm result = tt();
         int i = 0;
@@ -727,6 +816,7 @@ public class TermBuilder implements GenericTermBuilder {
         return result;
     }
 
+    @Override
     public JavaDLTerm or(JavaDLTerm t1, JavaDLTerm t2) {
         if(t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
             return tt();
@@ -739,6 +829,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm orSC(JavaDLTerm t1, JavaDLTerm t2) {
         if(t1.op() == Junctor.TRUE || t1.op() == Junctor.FALSE
                 || t2.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
@@ -748,6 +839,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm or(JavaDLTerm... subTerms) {
         JavaDLTerm result = ff();
         for(JavaDLTerm sub : subTerms) {
@@ -756,6 +848,7 @@ public class TermBuilder implements GenericTermBuilder {
         return result;
     }
 
+    @Override
     public JavaDLTerm orSC(JavaDLTerm... subTerms) {
         JavaDLTerm result = ff();
         if (subTerms.length == 1) {
@@ -767,6 +860,7 @@ public class TermBuilder implements GenericTermBuilder {
         return result;
     }
 
+    @Override
     public JavaDLTerm or(Iterable<JavaDLTerm> subTerms) {
         JavaDLTerm result = ff();
         for(JavaDLTerm sub : subTerms) {
@@ -775,6 +869,7 @@ public class TermBuilder implements GenericTermBuilder {
         return result;
     }
 
+    @Override
     public JavaDLTerm orSC(Iterable<JavaDLTerm> subTerms) {
         JavaDLTerm result = ff();
         int i = 0;
@@ -788,11 +883,13 @@ public class TermBuilder implements GenericTermBuilder {
         return result;
     }
 
+    @Override
     public JavaDLTerm imp(JavaDLTerm t1, JavaDLTerm t2) {
         return imp(t1, t2, null);
     }
 
 
+    @Override
     public JavaDLTerm imp(JavaDLTerm t1, JavaDLTerm t2, ImmutableArray<TermLabel> labels) {
         if(t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
             return tt();
@@ -810,6 +907,7 @@ public class TermBuilder implements GenericTermBuilder {
      * Creates a term with the correct equality symbol for
      * the sorts involved
      */
+    @Override
     public JavaDLTerm equals(JavaDLTerm t1, JavaDLTerm t2) {
         if(t1.sort() == Sort.FORMULA) {
             if(t1.op() == Junctor.TRUE) {
@@ -835,6 +933,7 @@ public class TermBuilder implements GenericTermBuilder {
      * @param substTerm the JavaDLTerm that replaces substVar
      * @param origTerm the JavaDLTerm that is substituted
      */
+//    @Override
     public JavaDLTerm subst(SubstOp op,
                       QuantifiableVariable substVar,
                       JavaDLTerm substTerm,
@@ -845,6 +944,7 @@ public class TermBuilder implements GenericTermBuilder {
                              null);
     }
 
+    @Override
     public JavaDLTerm subst(QuantifiableVariable substVar,
                   JavaDLTerm substTerm,
                   JavaDLTerm origTerm) {
@@ -855,12 +955,14 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm instance(Sort s, JavaDLTerm t) {
     return equals(func(s.getInstanceofSymbol(services), t),
               TRUE());
     }
 
 
+    @Override
     public JavaDLTerm exactInstance(Sort s, JavaDLTerm t) {
     return equals(func(s.getExactInstanceofSymbol(services), t),
               TRUE());
@@ -869,6 +971,7 @@ public class TermBuilder implements GenericTermBuilder {
     // Functions for wellfoundedness
     //------------------------------
 
+    @Override
     public JavaDLTerm pair(JavaDLTerm first, JavaDLTerm second) {
         final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name("pair"));
@@ -880,6 +983,7 @@ public class TermBuilder implements GenericTermBuilder {
 
     }
 
+    @Override
     public JavaDLTerm prec(JavaDLTerm mby, JavaDLTerm mbyAtPre) {
         final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name("prec"));
@@ -890,6 +994,7 @@ public class TermBuilder implements GenericTermBuilder {
         return func(f, mby, mbyAtPre);
     }
 
+    @Override
     public JavaDLTerm measuredByCheck(JavaDLTerm mby) {
         final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name("measuredByCheck"));
@@ -899,6 +1004,7 @@ public class TermBuilder implements GenericTermBuilder {
         return func(f, mby);
     }
 
+    @Override
     public JavaDLTerm measuredBy(JavaDLTerm mby) {
         final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name("measuredBy"));
@@ -907,6 +1013,7 @@ public class TermBuilder implements GenericTermBuilder {
                                 "It seems that there are definitions missing from the .key files.");
         return func(f, mby);
     }
+    @Override
     public Function getMeasuredByEmpty(){
        final Namespace funcNS = services.getNamespaces().functions();
        final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
@@ -915,6 +1022,7 @@ public class TermBuilder implements GenericTermBuilder {
                                "It seems that there are definitions missing from the .key files.");
        return f;
     }
+    @Override
     public JavaDLTerm measuredByEmpty() {
         return func(getMeasuredByEmpty());
     }
@@ -922,6 +1030,7 @@ public class TermBuilder implements GenericTermBuilder {
     /**
      * If a is a boolean literal, the method returns the literal as a Formula.
      */
+    @Override
     public JavaDLTerm convertToFormula(JavaDLTerm a) {
         BooleanLDT booleanLDT = theories.getBooleanLDT();
         if (a.sort() == Sort.FORMULA) {
@@ -944,6 +1053,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
     /** For a formula a, convert it to a boolean expression. */
+    @Override
     public JavaDLTerm convertToBoolean(JavaDLTerm a){
         BooleanLDT booleanLDT = theories.getBooleanLDT();
         if (a.sort() == booleanLDT.targetSort()) {
@@ -965,12 +1075,14 @@ public class TermBuilder implements GenericTermBuilder {
     //updates
     //-------------------------------------------------------------------------
 
+    @Override
     public JavaDLTerm elementary(UpdateableOperator lhs, JavaDLTerm rhs) {
     ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
     return tf.createTerm(eu, rhs);
     }
 
 
+    @Override
     public JavaDLTerm elementary(JavaDLTerm lhs, JavaDLTerm rhs) {
         HeapLDT heapLDT = theories.getHeapLDT();
     if(lhs.op() instanceof UpdateableOperator) {
@@ -997,11 +1109,13 @@ public class TermBuilder implements GenericTermBuilder {
         return elementary(getBaseHeap(), heapTerm);
     }
 
+    @Override
     public JavaDLTerm skip() {
     return tf.createTerm(UpdateJunctor.SKIP);
     }
 
 
+    @Override
     public JavaDLTerm parallel(JavaDLTerm u1, JavaDLTerm u2) {
     if(u1.sort() != Sort.UPDATE) {
         throw new TermCreationException("Not an update: " + u1);
@@ -1017,6 +1131,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm parallel(JavaDLTerm... updates) {
     JavaDLTerm result = skip();
     for(int i = 0; i < updates.length; i++) {
@@ -1026,11 +1141,13 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm parallel(ImmutableList<JavaDLTerm> updates) {
     return parallel(updates.toArray(new JavaDLTerm[updates.size()]));
     }
 
 
+    @Override
     public JavaDLTerm parallel(JavaDLTerm[] lhss, JavaDLTerm[] values) {
     if(lhss.length != values.length) {
         throw new TermCreationException(
@@ -1045,6 +1162,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm parallel(Iterable<JavaDLTerm> lhss,
                          Iterable<JavaDLTerm> values) {
         ImmutableList<JavaDLTerm> updates = ImmutableSLList.<JavaDLTerm>nil();
@@ -1058,11 +1176,13 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm sequential(JavaDLTerm u1, JavaDLTerm u2) {
     return parallel(u1, apply(u1, u2, null));
     }
 
 
+    @Override
     public JavaDLTerm sequential(JavaDLTerm[] updates) {
     if(updates.length == 0) {
         return skip();
@@ -1076,6 +1196,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm sequential(ImmutableList<JavaDLTerm> updates) {
         if(updates.isEmpty()) {
             return skip();
@@ -1086,10 +1207,12 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm apply(JavaDLTerm update, JavaDLTerm target) {
         return apply(update,target,null);
     }
 
+    @Override
     public ImmutableList<JavaDLTerm> apply(JavaDLTerm update,
             ImmutableList<JavaDLTerm> targets) {
         ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
@@ -1099,6 +1222,7 @@ public class TermBuilder implements GenericTermBuilder {
         return result;
     }
 
+    @Override
     public JavaDLTerm apply(JavaDLTerm update, JavaDLTerm target, ImmutableArray<TermLabel> labels) {
         if(update.sort() != Sort.UPDATE) {
             throw new TermCreationException("Not an update: " + update);
@@ -1115,6 +1239,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm applyElementary(JavaDLTerm loc,
                             JavaDLTerm value,
                             JavaDLTerm target) {
@@ -1122,12 +1247,14 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm applyElementary(JavaDLTerm heap,
                             JavaDLTerm target) {
     return apply(elementary(heap), target, null);
     }
 
 
+    @Override
     public ImmutableList<JavaDLTerm> applyElementary(JavaDLTerm heap,
                             Iterable<JavaDLTerm> targets) {
         ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
@@ -1138,16 +1265,19 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm applyParallel(JavaDLTerm[] updates, JavaDLTerm target) {
     return apply(parallel(updates), target, null);
     }
 
 
+    @Override
     public JavaDLTerm applyParallel(ImmutableList<JavaDLTerm> updates, JavaDLTerm target) {
     return apply(parallel(updates), target, null);
     }
 
 
+    @Override
     public JavaDLTerm applyParallel(JavaDLTerm[] lhss,
                           JavaDLTerm[] values,
                           JavaDLTerm target) {
@@ -1155,6 +1285,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm applySequential(JavaDLTerm[] updates, JavaDLTerm target) {
     if(updates.length == 0) {
         return target;
@@ -1168,6 +1299,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm applySequential(ImmutableList<JavaDLTerm> updates, JavaDLTerm target) {
     if(updates.isEmpty()) {
         return target;
@@ -1177,6 +1309,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
     }
 
+//    @Override
     public JavaDLTerm applyUpdatePairsSequential(ImmutableList<UpdateLabelPair> updates, JavaDLTerm target) {
        if(updates.isEmpty()) {
            return target;
@@ -1190,11 +1323,13 @@ public class TermBuilder implements GenericTermBuilder {
     //boolean operators
     //-------------------------------------------------------------------------
 
+    @Override
     public JavaDLTerm TRUE() {
         return theories.getBooleanLDT().getTrueTerm();
     }
 
 
+    @Override
     public JavaDLTerm FALSE() {
         return theories.getBooleanLDT().getFalseTerm();
     }
@@ -1205,35 +1340,41 @@ public class TermBuilder implements GenericTermBuilder {
     //integer operators
     //-------------------------------------------------------------------------
 
+    @Override
     public JavaDLTerm geq(JavaDLTerm t1, JavaDLTerm t2) {
         final IntegerLDT integerLDT = theories.getIntegerLDT();
         return func(integerLDT.getGreaterOrEquals(), t1, t2);
     }
 
 
+    @Override
     public JavaDLTerm gt(JavaDLTerm t1, JavaDLTerm t2) {
         final IntegerLDT integerLDT = theories.getIntegerLDT();
         return func(integerLDT.getGreaterThan(), t1, t2);
     }
 
 
+    @Override
     public JavaDLTerm lt(JavaDLTerm t1, JavaDLTerm t2) {
         final IntegerLDT integerLDT = theories.getIntegerLDT();
         return func(integerLDT.getLessThan(), t1, t2);
     }
 
 
+    @Override
     public JavaDLTerm leq(JavaDLTerm t1, JavaDLTerm t2) {
         final IntegerLDT integerLDT = theories.getIntegerLDT();
         return func(integerLDT.getLessOrEquals(), t1, t2);
     }
 
 
+    @Override
     public JavaDLTerm zero() {
     return theories.getIntegerLDT().zero();
     }
 
 
+    @Override
     public JavaDLTerm one() {
         return theories.getIntegerLDT().one();
     }
@@ -1243,6 +1384,7 @@ public class TermBuilder implements GenericTermBuilder {
      * @return JavaDLTerm in Z-Notation representing the given number
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
+    @Override
     public JavaDLTerm zTerm(String numberString) {
 
         if (numberString == null || numberString.isEmpty()) {
@@ -1291,11 +1433,13 @@ public class TermBuilder implements GenericTermBuilder {
      * @param number an integer
      * @return JavaDLTerm in Z-Notation representing the given number
      */
+    @Override
     public JavaDLTerm zTerm(long number) {
         return zTerm(""+number);
     }
 
 
+    @Override
     public JavaDLTerm add(JavaDLTerm t1, JavaDLTerm t2) {
         final IntegerLDT integerLDT = theories.getIntegerLDT();
         final JavaDLTerm zero = integerLDT.zero();
@@ -1308,6 +1452,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm inByte(JavaDLTerm var) {
         Function f =
                 (Function) services.getNamespaces().functions().lookup(
@@ -1315,6 +1460,7 @@ public class TermBuilder implements GenericTermBuilder {
         return func(f, var);
     }
 
+    @Override
     public JavaDLTerm inShort(JavaDLTerm var) {
         Function f =
                 (Function) services.getNamespaces().functions().lookup(
@@ -1322,6 +1468,7 @@ public class TermBuilder implements GenericTermBuilder {
         return func(f, var);
     }
 
+    @Override
     public JavaDLTerm inChar(JavaDLTerm var) {
         Function f =
                 (Function) services.getNamespaces().functions().lookup(
@@ -1329,6 +1476,7 @@ public class TermBuilder implements GenericTermBuilder {
         return func(f, var);
     }
 
+    @Override
     public JavaDLTerm inInt(JavaDLTerm var) {
         Function f =
                 (Function) services.getNamespaces().functions().lookup(
@@ -1338,6 +1486,7 @@ public class TermBuilder implements GenericTermBuilder {
 
 
 
+    @Override
     public JavaDLTerm inLong(JavaDLTerm var) {
         Function f =
                 (Function) services.getNamespaces().functions().lookup(
@@ -1345,6 +1494,7 @@ public class TermBuilder implements GenericTermBuilder {
         return func(f, var);
     }
 
+    @Override
     public JavaDLTerm index(){
         return func(theories.getIntegerLDT().getIndex());
     }
@@ -1362,20 +1512,24 @@ public class TermBuilder implements GenericTermBuilder {
      *
      * @return an arbitrary but fixed term.
      */
+    @Override
     public JavaDLTerm strictlyNothing() {
         return ff();
     }
 
+    @Override
     public JavaDLTerm empty() {
     return func(theories.getLocSetLDT().getEmpty());
     }
 
 
+    @Override
     public JavaDLTerm allLocs() {
     return func(theories.getLocSetLDT().getAllLocs());
     }
 
 
+    @Override
     public JavaDLTerm singleton(JavaDLTerm o, JavaDLTerm f) {
     return func(theories.getLocSetLDT().getSingleton(),
             o,
@@ -1383,6 +1537,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm union(JavaDLTerm s1, JavaDLTerm s2) {
         final LocSetLDT ldt = theories.getLocSetLDT();
         if(s1.op() == ldt.getEmpty()) {
@@ -1395,6 +1550,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm union(JavaDLTerm ... subTerms) {
         JavaDLTerm result = empty();
         for(JavaDLTerm sub : subTerms) {
@@ -1404,6 +1560,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm union(Iterable<JavaDLTerm> subTerms) {
         JavaDLTerm result = empty();
         for(JavaDLTerm sub : subTerms) {
@@ -1413,6 +1570,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm intersect(JavaDLTerm s1, JavaDLTerm s2) {
         final LocSetLDT ldt = theories.getLocSetLDT();
         if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
@@ -1423,6 +1581,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm intersect(JavaDLTerm ... subTerms) {
         JavaDLTerm result = empty();
         for(JavaDLTerm sub : subTerms) {
@@ -1432,6 +1591,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm intersect(Iterable<JavaDLTerm> subTerms) {
         JavaDLTerm result = empty();
         for(JavaDLTerm sub : subTerms) {
@@ -1441,6 +1601,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm setMinus(JavaDLTerm s1, JavaDLTerm s2) {
         final LocSetLDT ldt = theories.getLocSetLDT();
         if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
@@ -1451,6 +1612,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm infiniteUnion(QuantifiableVariable[] qvs,
                               JavaDLTerm s) {
         final LocSetLDT ldt = theories.getLocSetLDT();
@@ -1461,6 +1623,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm infiniteUnion(QuantifiableVariable[] qvs,
                          JavaDLTerm guard,
                          JavaDLTerm s) {
@@ -1469,6 +1632,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm setComprehension(QuantifiableVariable[] qvs,
                                  JavaDLTerm o,
                                  JavaDLTerm f) {
@@ -1476,6 +1640,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm setComprehension(QuantifiableVariable[] qvs,
                                 JavaDLTerm guard,
                                 JavaDLTerm o,
@@ -1486,27 +1651,32 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm allFields(JavaDLTerm o) {
         return func(theories.getLocSetLDT().getAllFields(), o);
     }
 
 
+    @Override
     public JavaDLTerm allObjects(JavaDLTerm f) {
         return func(theories.getLocSetLDT().getAllObjects(), f);
     }
 
 
+    @Override
     public JavaDLTerm arrayRange(JavaDLTerm o, JavaDLTerm lower, JavaDLTerm upper) {
         return func(theories.getLocSetLDT().getArrayRange(),
                 o, lower, upper);
     }
 
 
+    @Override
     public JavaDLTerm freshLocs(JavaDLTerm h) {
         return func(theories.getLocSetLDT().getFreshLocs(), h);
     }
 
 
+    @Override
     public JavaDLTerm elementOf(JavaDLTerm o, JavaDLTerm f, JavaDLTerm s) {
         final LocSetLDT ldt = theories.getLocSetLDT();
         if(s.op() == ldt.getEmpty()) {
@@ -1517,6 +1687,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm subset(JavaDLTerm s1, JavaDLTerm s2) {
         final LocSetLDT ldt = theories.getLocSetLDT();
         if(s1.op() == ldt.getEmpty()) {
@@ -1527,6 +1698,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm disjoint(JavaDLTerm s1, JavaDLTerm s2) {
         final LocSetLDT ldt = theories.getLocSetLDT();
         if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
@@ -1537,6 +1709,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm createdInHeap(JavaDLTerm s, JavaDLTerm h) {
         final LocSetLDT ldt = theories.getLocSetLDT();
         if(s.op() == ldt.getEmpty()) {
@@ -1547,6 +1720,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm createdLocs() {
         return setMinus(allLocs(),
                     freshLocs(getBaseHeap()));
@@ -1560,6 +1734,7 @@ public class TermBuilder implements GenericTermBuilder {
     public static final Transformer WD_FORMULA =
             new Transformer(new Name("WD"), Sort.FORMULA);
 
+    @Override
     public JavaDLTerm wd(JavaDLTerm t) {
         if(t.op() == Junctor.FALSE || t.op() == Junctor.TRUE) {
             return tt();
@@ -1570,6 +1745,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public ImmutableList<JavaDLTerm> wd(Iterable<JavaDLTerm> l) {
         ImmutableList<JavaDLTerm> res = ImmutableSLList.<JavaDLTerm>nil();
         for (JavaDLTerm t: l) {
@@ -1578,6 +1754,7 @@ public class TermBuilder implements GenericTermBuilder {
         return res;
     }
 
+    @Override
     public JavaDLTerm[] wd(JavaDLTerm[] l) {
         JavaDLTerm[] res = new JavaDLTerm[l.length];
         for(int i = 0; i < l.length; i++) {
@@ -1591,6 +1768,7 @@ public class TermBuilder implements GenericTermBuilder {
     //heap operators
     //-------------------------------------------------------------------------
 
+    @Override
     public JavaDLTerm NULL() {
         return func(theories.getHeapLDT().getNull());
     }
@@ -1599,29 +1777,35 @@ public class TermBuilder implements GenericTermBuilder {
      * Deep non null means that it is recursively defined for arrays.
      * See bug #1392.
      */
+    @Override
     public JavaDLTerm deepNonNull(JavaDLTerm o, JavaDLTerm d) {
         final Function nonNull = (Function) services.getNamespaces().functions().lookup("nonNull");
         final JavaDLTerm heap = getBaseHeap();
         return func(nonNull, heap, o, d);
     }
 
+    @Override
     public JavaDLTerm wellFormed(JavaDLTerm heap) {
         return func(theories.getHeapLDT().getWellFormed(), heap);
     }
 
+//    @Override
     public JavaDLTerm wellFormed(LocationVariable heap) {
         return wellFormed(var(heap));
     }
 
+    @Override
     public JavaDLTerm permissionsFor(JavaDLTerm permHeap, JavaDLTerm regularHeap) {
         return func(theories.getPermissionLDT().getPermissionsFor(),
                 permHeap, regularHeap);
     }
 
+//    @Override
     public JavaDLTerm permissionsFor(LocationVariable permHeap, LocationVariable regularHeap) {
         return permissionsFor(var(permHeap),var(regularHeap));
     }
 
+    @Override
     public JavaDLTerm inv(JavaDLTerm[] h, JavaDLTerm o) {
         JavaDLTerm[] p = new JavaDLTerm[h.length + 1];
         System.arraycopy(h, 0, p, 0, h.length);
@@ -1630,6 +1814,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm inv(JavaDLTerm o) {
         List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         JavaDLTerm[] hs = new JavaDLTerm[heaps.size()];
@@ -1640,10 +1825,12 @@ public class TermBuilder implements GenericTermBuilder {
         return inv(hs, o);
     }
 
+//    @Override
     public JavaDLTerm staticInv(JavaDLTerm[] h, KeYJavaType t){
         return func(services.getProgramServices().getJavaInfo().getStaticInv(t), h);
     }
 
+//    @Override
     public JavaDLTerm staticInv(KeYJavaType t){
         List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         JavaDLTerm[] hs = new JavaDLTerm[heaps.size()];
@@ -1655,6 +1842,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm select(Sort asSort, JavaDLTerm h, JavaDLTerm o, JavaDLTerm f) {
     return func(theories.getHeapLDT().getSelect(
             asSort,
@@ -1666,20 +1854,24 @@ public class TermBuilder implements GenericTermBuilder {
      * Get the select expression for a location variabe
      * representing the field.
      */
+//    @Override
     public JavaDLTerm select(Sort asSort, JavaDLTerm h, JavaDLTerm o, LocationVariable field) {
         final Function f = theories.getHeapLDT().getFieldSymbolForPV(field, services);
         return select(asSort, h, o, func(f));
     }
 
 
+    @Override
     public JavaDLTerm dot(Sort asSort, JavaDLTerm o, JavaDLTerm f) {
         return select(asSort, getBaseHeap(), o, f);
     }
 
+    @Override
     public JavaDLTerm getBaseHeap() {
         return var(theories.getHeapLDT().getHeap());
     }
 
+    @Override
     public JavaDLTerm dot(Sort asSort, JavaDLTerm o, Function f) {
     final Sort fieldSort
         = theories.getHeapLDT().getFieldSort();
@@ -1688,17 +1880,20 @@ public class TermBuilder implements GenericTermBuilder {
                : func(f, getBaseHeap(), o);
     }
     
+//    @Override
     public JavaDLTerm dot (Sort asSort, JavaDLTerm o, LocationVariable field) {
         final Function f = theories.getHeapLDT().getFieldSymbolForPV(field, services);
         return dot(asSort, o, f);
     }
 
 
+    @Override
     public JavaDLTerm staticDot(Sort asSort, JavaDLTerm f) {
         return dot(asSort, NULL(), f);
     }
 
 
+    @Override
     public JavaDLTerm staticDot(Sort asSort, Function f) {
     final Sort fieldSort
         = theories.getHeapLDT().getFieldSort();
@@ -1708,10 +1903,12 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm arr(JavaDLTerm idx) {
     return func(theories.getHeapLDT().getArr(), idx);
     }
 
+    @Override
     public JavaDLTerm addLabel(JavaDLTerm term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())
                 && !term.hasLabels()) {
@@ -1735,6 +1932,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm addLabel(JavaDLTerm term, TermLabel label) {
         if (label == null && !term.hasLabels()) {
             return term;
@@ -1743,6 +1941,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm label(JavaDLTerm term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
@@ -1758,6 +1957,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm label(JavaDLTerm term, TermLabel label) {
         if (label == null) {
             return term;
@@ -1766,6 +1966,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm shortcut(JavaDLTerm term) {
         if ((term.op().equals(Junctor.AND)
                         || term.op().equals(Junctor.OR))
@@ -1776,10 +1977,12 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm unlabel(JavaDLTerm term) {
         return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.modalContent());
     }
 
+    @Override
     public JavaDLTerm unlabelRecursive(JavaDLTerm term) {
         JavaDLTerm[] subs = new JavaDLTerm[term.arity()];
         for (int i = 0; i < subs.length; i++) {
@@ -1788,6 +1991,7 @@ public class TermBuilder implements GenericTermBuilder {
         return tf.createTerm(term.op(), subs, term.boundVars(), term.modalContent());
     }
 
+    @Override
     public JavaDLTerm dotArr(JavaDLTerm ref, JavaDLTerm idx) {
         if(ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+
@@ -1812,11 +2016,13 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm dotLength(JavaDLTerm a) {
         return func(theories.getHeapLDT().getLength(), a);
     }
 
 
+    @Override
     public JavaDLTerm created(JavaDLTerm h, JavaDLTerm o) {
         return equals(select(theories.getBooleanLDT().targetSort(),
                              h,
@@ -1826,10 +2032,12 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm created(JavaDLTerm o) {
         return created(getBaseHeap(), o);
     }
 
+    @Override
     public JavaDLTerm initialized(JavaDLTerm o) {
         return equals(dot(theories.getBooleanLDT().targetSort(),
                 o,
@@ -1838,6 +2046,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm classPrepared(Sort classSort) {
         return equals(staticDot(theories.getBooleanLDT().targetSort(),
                 theories.getHeapLDT().getClassPrepared(classSort,
@@ -1845,6 +2054,7 @@ public class TermBuilder implements GenericTermBuilder {
                         TRUE());
     }
 
+    @Override
     public JavaDLTerm classInitialized(Sort classSort) {
         return equals(staticDot(theories.getBooleanLDT().targetSort(),
                 theories.getHeapLDT().getClassInitialized(classSort,
@@ -1852,6 +2062,7 @@ public class TermBuilder implements GenericTermBuilder {
                         TRUE());
     }
 
+    @Override
     public JavaDLTerm classInitializationInProgress(Sort classSort) {
         return equals(staticDot(theories.getBooleanLDT().targetSort(),
                 theories.getHeapLDT()
@@ -1861,6 +2072,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm classErroneous(Sort classSort) {
         return equals(staticDot(theories.getBooleanLDT().targetSort(),
                 theories.getHeapLDT().getClassErroneous(classSort,
@@ -1869,34 +2081,42 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm store(JavaDLTerm h, JavaDLTerm o, JavaDLTerm f, JavaDLTerm v) {
         return func(theories.getHeapLDT().getStore(),
                 h, o, f, v);
     }
 
 
+    @Override
     public JavaDLTerm create(JavaDLTerm h, JavaDLTerm o) {
         return func(theories.getHeapLDT().getCreate(),
                  new JavaDLTerm[]{h, o});
     }
 
 
+    @Override
     public JavaDLTerm anon(JavaDLTerm h1, JavaDLTerm s, JavaDLTerm h2) {
     return func(theories.getHeapLDT().getAnon(),
             h1, s, h2);
     }
 
 
-    public JavaDLTerm fieldStore(TermServices services, JavaDLTerm o, Function f, JavaDLTerm v) {
+    @Override
+    public JavaDLTerm fieldStore(
+            TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services,
+            JavaDLTerm o, Function f, JavaDLTerm v) {
         return store(getBaseHeap(), o, func(f), v);
     }
 
 
+    @Override
     public JavaDLTerm staticFieldStore(Function f, JavaDLTerm v) {
     return fieldStore(services, NULL(), f, v);
     }
 
 
+    @Override
     public JavaDLTerm arrayStore(JavaDLTerm o, JavaDLTerm i, JavaDLTerm v) {
         return store(getBaseHeap(),
                 o,
@@ -1905,6 +2125,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+//    @Override
     public JavaDLTerm reachableValue(JavaDLTerm h,
                                JavaDLTerm t,
                                KeYJavaType kjt) {
@@ -1924,16 +2145,19 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+//    @Override
     public JavaDLTerm reachableValue(JavaDLTerm t, KeYJavaType kjt) {
         return reachableValue(getBaseHeap(), t, kjt);
     }
 
 
+//    @Override
     public JavaDLTerm reachableValue(ProgramVariable pv) {
         return reachableValue(var(pv), pv.getKeYJavaType());
     }
 
 
+    @Override
     public JavaDLTerm frame(JavaDLTerm heapTerm, Map<JavaDLTerm,JavaDLTerm> normalToAtPre,
                   JavaDLTerm mod) {
         final Sort objectSort = services.getProgramServices().getJavaInfo().objectSort();
@@ -1983,6 +2207,7 @@ public class TermBuilder implements GenericTermBuilder {
      *
      * @see #frame(JavaDLTerm, Map, JavaDLTerm)
      */
+    @Override
     public JavaDLTerm frameStrictlyEmpty(JavaDLTerm heapTerm, Map<JavaDLTerm,JavaDLTerm> normalToAtPre) {
         final Sort objectSort = services.getProgramServices().getJavaInfo().objectSort();
         final Sort fieldSort = theories.getHeapLDT()
@@ -2016,12 +2241,14 @@ public class TermBuilder implements GenericTermBuilder {
                                 fieldVarTerm)));
     }
 
+//    @Override
     public JavaDLTerm anonUpd(LocationVariable heap, JavaDLTerm mod, JavaDLTerm anonHeap) {
         return elementary(heap, anon(var(heap), mod, anonHeap));
     }
 
 
-    public JavaDLTerm forallHeaps(Services services, JavaDLTerm t) {
+    @Override
+    public JavaDLTerm forallHeaps(TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services, JavaDLTerm t) {
         final HeapLDT heapLDT = theories.getHeapLDT();
         final LogicVariable heapLV
         = new LogicVariable(new Name("h"), heapLDT.targetSort());
@@ -2038,12 +2265,14 @@ public class TermBuilder implements GenericTermBuilder {
     //reachability operators
     //-------------------------------------------------------------------------
 
+    @Override
     public JavaDLTerm acc(JavaDLTerm h, JavaDLTerm s, JavaDLTerm o1, JavaDLTerm o2) {
     return func(theories.getHeapLDT().getAcc(),
             h, s, o1, o2);
     }
 
 
+    @Override
     public JavaDLTerm reach(JavaDLTerm h,
                   JavaDLTerm s,
                   JavaDLTerm o1,
@@ -2058,6 +2287,7 @@ public class TermBuilder implements GenericTermBuilder {
     //sequence operators
     //-------------------------------------------------------------------------
 
+    @Override
     public JavaDLTerm seqGet(Sort asSort, JavaDLTerm s, JavaDLTerm idx) {
         return func(theories.getSeqLDT().getSeqGet(asSort, services),
                     s,
@@ -2065,24 +2295,29 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm seqLen(JavaDLTerm s) {
         return func(theories.getSeqLDT().getSeqLen(), s);
     }
 
     /** Function representing the least index of an element x in a sequence s (or underspecified) */
+    @Override
     public JavaDLTerm indexOf(JavaDLTerm s, JavaDLTerm x){
         return func(theories.getSeqLDT().getSeqIndexOf(),s,x);
     }
 
 
+    @Override
     public JavaDLTerm seqEmpty() {
         return func(theories.getSeqLDT().getSeqEmpty());
     }
 
+    @Override
     public JavaDLTerm seqSingleton(JavaDLTerm x) {
         return func(theories.getSeqLDT().getSeqSingleton(), x);
     }
 
+    @Override
     public JavaDLTerm seqConcat(JavaDLTerm s, JavaDLTerm s2) {
         if (s == seqEmpty()) {
             return s2;
@@ -2095,6 +2330,7 @@ public class TermBuilder implements GenericTermBuilder {
         }
     }
 
+    @Override
     public JavaDLTerm seq(JavaDLTerm... terms) {
         JavaDLTerm result = seqEmpty();
         for (JavaDLTerm term : terms) {
@@ -2104,6 +2340,7 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
+    @Override
     public JavaDLTerm seq(ImmutableList<JavaDLTerm> terms) {
         JavaDLTerm result = seqEmpty();
         for (JavaDLTerm term : terms) {
@@ -2112,10 +2349,12 @@ public class TermBuilder implements GenericTermBuilder {
         return result;
     }
 
+    @Override
     public JavaDLTerm seqSub(JavaDLTerm s, JavaDLTerm from, JavaDLTerm to) {
     return func(theories.getSeqLDT().getSeqSub(), s, from, to);
     }
 
+    @Override
     public JavaDLTerm seqReverse(JavaDLTerm s) {
     return func(theories.getSeqLDT().getSeqReverse(), s);
     }
@@ -2126,6 +2365,7 @@ public class TermBuilder implements GenericTermBuilder {
 
 
 
+    @Override
     public ImmutableSet<JavaDLTerm> unionToSet(JavaDLTerm s) {
     final LocSetLDT setLDT = theories.getLocSetLDT();
     assert s.sort().equals(setLDT.targetSort());
@@ -2150,28 +2390,28 @@ public class TermBuilder implements GenericTermBuilder {
      * Removes leading updates from the passed term.
      */
     public static JavaDLTerm goBelowUpdates(JavaDLTerm term) {
-        while(term.op() instanceof UpdateApplication) {
+        while (term.op() instanceof UpdateApplication) {
             term = UpdateApplication.getTarget(term);
         }
         return term;
     }
 
-
-
     /**
      * Removes leading updates from the passed term.
      */
-    public static Pair<ImmutableList<JavaDLTerm>,JavaDLTerm> goBelowUpdates2(JavaDLTerm term) {
-    ImmutableList<JavaDLTerm> updates = ImmutableSLList.<JavaDLTerm>nil();
-        while(term.op() instanceof UpdateApplication) {
+    public static Pair<ImmutableList<JavaDLTerm>, JavaDLTerm> goBelowUpdates2(
+            JavaDLTerm term) {
+        ImmutableList<JavaDLTerm> updates = ImmutableSLList.<JavaDLTerm> nil();
+        while (term.op() instanceof UpdateApplication) {
             updates = updates.append(UpdateApplication.getUpdate(term));
             term = UpdateApplication.getTarget(term);
         }
-        return new Pair<ImmutableList<JavaDLTerm>,JavaDLTerm>(updates, term);
+        return new Pair<ImmutableList<JavaDLTerm>, JavaDLTerm>(updates, term);
     }
 
 
 
+    @Override
     public JavaDLTerm seqDef(QuantifiableVariable qv,
                        JavaDLTerm a,
                        JavaDLTerm b,
@@ -2181,6 +2421,7 @@ public class TermBuilder implements GenericTermBuilder {
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
 
+    @Override
     public JavaDLTerm values(){
         return func(theories.getSeqLDT().getValues());
     }
@@ -2190,6 +2431,7 @@ public class TermBuilder implements GenericTermBuilder {
       * @param terms The given {@link JavaDLTerm}s.
       * @return The {@link JavaDLTerm} {@link Sort}s.
       */
+    @Override
     public ImmutableList<Sort> getSorts(Iterable<JavaDLTerm> terms) {
        ImmutableList<Sort> result = ImmutableSLList.<Sort>nil();
        for (JavaDLTerm t : terms) {
@@ -2205,7 +2447,8 @@ public class TermBuilder implements GenericTermBuilder {
     * @param t2 The right side.
     * @return The created {@link JavaDLTerm}.
     */
-   public JavaDLTerm impPreserveLabels(JavaDLTerm t1, JavaDLTerm t2) {
+   @Override
+public JavaDLTerm impPreserveLabels(JavaDLTerm t1, JavaDLTerm t2) {
       if ((t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) &&
           (!t1.hasLabels() && !t2.hasLabels())) {
          return tt();
@@ -2227,7 +2470,8 @@ public class TermBuilder implements GenericTermBuilder {
     * @param t The child {@link JavaDLTerm}.
     * @return The created {@link JavaDLTerm}.
     */
-   public JavaDLTerm notPreserveLabels(JavaDLTerm t) {
+   @Override
+public JavaDLTerm notPreserveLabels(JavaDLTerm t) {
       if (t.op() == Junctor.TRUE && !t.hasLabels()) {
          return ff();
       }
@@ -2248,7 +2492,8 @@ public class TermBuilder implements GenericTermBuilder {
     * @param subTerms The sub {@link JavaDLTerm}s.
     * @return The created {@link JavaDLTerm}.
     */
-   public JavaDLTerm andPreserveLabels(Iterable<JavaDLTerm> subTerms) {
+   @Override
+public JavaDLTerm andPreserveLabels(Iterable<JavaDLTerm> subTerms) {
       JavaDLTerm result = tt();
       for (JavaDLTerm sub : subTerms) {
          result = andPreserveLabels(result, sub);
@@ -2263,7 +2508,8 @@ public class TermBuilder implements GenericTermBuilder {
     * @param t2 The right side.
     * @return The created {@link JavaDLTerm}.
     */
-   public JavaDLTerm andPreserveLabels(JavaDLTerm t1, JavaDLTerm t2) {
+   @Override
+public JavaDLTerm andPreserveLabels(JavaDLTerm t1, JavaDLTerm t2) {
       if ((t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) &&
           (!t1.hasLabels() && !t2.hasLabels())) {
          return ff();
@@ -2285,7 +2531,8 @@ public class TermBuilder implements GenericTermBuilder {
     * @param subTerms The sub {@link JavaDLTerm}s.
     * @return The created {@link JavaDLTerm}.
     */
-   public JavaDLTerm orPreserveLabels(Iterable<JavaDLTerm> subTerms) {
+   @Override
+public JavaDLTerm orPreserveLabels(Iterable<JavaDLTerm> subTerms) {
       JavaDLTerm result = ff();
       for (JavaDLTerm sub : subTerms) {
          result = orPreserveLabels(result, sub);
@@ -2300,7 +2547,8 @@ public class TermBuilder implements GenericTermBuilder {
     * @param t2 The right side.
     * @return The created {@link JavaDLTerm}.
     */
-   public JavaDLTerm orPreserveLabels(JavaDLTerm t1, JavaDLTerm t2) {
+   @Override
+public JavaDLTerm orPreserveLabels(JavaDLTerm t1, JavaDLTerm t2) {
       if ((t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) &&
           (!t1.hasLabels() && !t2.hasLabels())) {
          return tt();
@@ -2320,7 +2568,9 @@ public class TermBuilder implements GenericTermBuilder {
     // information flow operators
     //-------------------------------------------------------------------------
 
-    public JavaDLTerm eqAtLocs(Services services,
+    @SuppressWarnings("deprecation")
+    @Override
+    public JavaDLTerm eqAtLocs(TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services,
                          JavaDLTerm heap1,
                          JavaDLTerm locset1,
                          JavaDLTerm heap2,
@@ -2334,7 +2584,9 @@ public class TermBuilder implements GenericTermBuilder {
     }
 
 
-    public JavaDLTerm eqAtLocsPost(Services services,
+    @SuppressWarnings("deprecation")
+    @Override
+    public JavaDLTerm eqAtLocsPost(TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services,
                              JavaDLTerm heap1_pre,
                              JavaDLTerm heap1_post,
                              JavaDLTerm locset1,

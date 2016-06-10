@@ -55,6 +55,7 @@ import javax.swing.text.html.HTMLDocument;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.WrapLayout;
@@ -71,7 +72,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 

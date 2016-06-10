@@ -17,6 +17,7 @@ import java.util.Collection;
 
 import org.key_project.common.core.services.TermServices;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
@@ -53,7 +54,7 @@ public class AssumptionFormula implements TacletFormula {
 
     }
 
-    public JavaDLTerm getFormula(TermServices services) {
+    public JavaDLTerm getFormula(JavaDLTermServices services) {
 	return services.getTermBuilder().and(formula.toArray(new JavaDLTerm[formula.size()]));
 	// return formula;
     }

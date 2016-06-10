@@ -6,6 +6,7 @@ import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.SourceElement;
@@ -26,7 +27,6 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.slicing.ThinBackwardSlicer;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Tests for {@link ThinBackwardSlicer}.

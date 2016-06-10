@@ -22,6 +22,7 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -44,7 +45,6 @@ import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
-import de.uka.ilkd.key.util.Pair;
 
 
 

@@ -63,6 +63,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -85,7 +86,6 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.Pair;
 
 public class ProofTreeView extends JPanel {
 

@@ -19,6 +19,7 @@ import java.util.WeakHashMap;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.LRUCache;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -33,7 +34,6 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>

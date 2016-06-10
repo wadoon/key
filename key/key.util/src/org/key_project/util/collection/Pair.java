@@ -11,9 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.util;
-
-import static de.uka.ilkd.key.util.MiscTools.equalsOrNull;
+package org.key_project.util.collection;
 
 import java.util.Collection;
 import java.util.Map;
@@ -89,5 +87,13 @@ public class Pair<T1, T2> {
             res.add(p.second);
         }
         return res;
+    }
+    
+    public static <T> boolean equalsOrNull(T a, Object b){
+        if (a == null) {
+            return b == null;
+        } else {
+            return a.equals(b);
+        }
     }
 }

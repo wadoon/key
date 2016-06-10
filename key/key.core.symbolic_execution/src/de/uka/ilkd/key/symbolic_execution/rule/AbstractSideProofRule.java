@@ -22,6 +22,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -37,7 +38,6 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 /**

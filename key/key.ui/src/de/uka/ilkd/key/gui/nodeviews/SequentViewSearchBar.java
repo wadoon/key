@@ -24,9 +24,10 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JCheckBox;
 
+import org.key_project.util.collection.Pair;
+
 import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.util.Pair;
 
 /*
  * Search bar implementing search function for SequentView.

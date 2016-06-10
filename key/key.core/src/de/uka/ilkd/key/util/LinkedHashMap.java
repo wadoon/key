@@ -15,6 +15,8 @@ package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
 
+import org.key_project.util.collection.Pair;
+
 public class LinkedHashMap<K, V>
 	extends java.util.LinkedHashMap<K, V>
     implements Iterable<Pair<K,V>> {

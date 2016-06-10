@@ -13,18 +13,17 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -65,7 +64,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
     * @param label The {@link TermLabel} to decide if it should be kept or dropped.
     * @return {@code true} keep {@link TermLabel} and add it to the new {@link JavaDLTerm}. {@code false} drop {@link TermLabel} and do not need it to the new {@link JavaDLTerm}.
     */
-   public boolean isRuleApplicationSupported(TermServices services,
+   public boolean isRuleApplicationSupported(JavaDLTermServices services,
                                              PosInOccurrence applicationPosInOccurrence,
                                              JavaDLTerm applicationTerm,
                                              Rule rule,
@@ -75,7 +74,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
                                              Operator newTermOp,
                                              ImmutableArray<JavaDLTerm> newTermSubs,
                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                             ModalContent newTermJavaBlock);
+                                             JavaBlock newTermJavaBlock);
 
    /**
     * <p>
@@ -102,7 +101,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
     * @param label The {@link TermLabel} to decide if it should be kept or dropped.
     * @return {@code true} add {@link TermLabel} to new {@link JavaDLTerm}. {@code false} do not add {@link TermLabel} to new {@link JavaDLTerm}.
     */
-   public boolean addLabel(TermServices services,
+   public boolean addLabel(JavaDLTermServices services,
                            PosInOccurrence applicationPosInOccurrence,
                            JavaDLTerm applicationTerm,
                            Rule rule,
@@ -112,7 +111,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
                            Operator newTermOp,
                            ImmutableArray<JavaDLTerm> newTermSubs,
                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                           ModalContent newTermJavaBlock,
+                           JavaBlock newTermJavaBlock,
                            JavaDLTerm childTerm,
                            TermLabel label);
 }

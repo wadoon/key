@@ -19,14 +19,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.key_project.util.collection.Pair;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
-
 import static de.uka.ilkd.key.util.rifl.SpecificationEntity.*;
 import static de.uka.ilkd.key.util.MiscTools.apply;
 

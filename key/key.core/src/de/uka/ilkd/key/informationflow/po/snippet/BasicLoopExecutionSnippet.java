@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -18,7 +19,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.util.Pair;
 
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {

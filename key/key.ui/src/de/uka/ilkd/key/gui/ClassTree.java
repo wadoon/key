@@ -34,6 +34,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
@@ -47,7 +48,6 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.util.KeYTypeUtil;
-import de.uka.ilkd.key.util.Pair;
 
 
 public class ClassTree extends JTree {

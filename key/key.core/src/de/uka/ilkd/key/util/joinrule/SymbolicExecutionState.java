@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.util.joinrule;
 
+import org.key_project.util.collection.Pair;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * A symbolic execution state is a pair of a symbolic state in form of a

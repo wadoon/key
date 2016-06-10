@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -94,7 +95,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>

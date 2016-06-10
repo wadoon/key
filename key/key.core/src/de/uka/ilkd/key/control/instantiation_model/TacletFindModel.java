@@ -29,6 +29,7 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -64,7 +65,6 @@ import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.RigidnessException;
 import de.uka.ilkd.key.rule.inst.SortException;
-import de.uka.ilkd.key.util.Pair;
 
 
 public class TacletFindModel extends AbstractTableModel {

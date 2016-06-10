@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.antlr.runtime.MismatchedTokenException;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -49,7 +50,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 /**
