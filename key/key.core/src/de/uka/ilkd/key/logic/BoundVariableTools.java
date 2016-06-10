@@ -18,10 +18,10 @@ import java.util.Map;
 
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -44,7 +44,7 @@ public class BoundVariableTools {
     public JavaDLTerm renameVariables (JavaDLTerm originalTerm,
                                  ImmutableArray<QuantifiableVariable> oldBoundVars,
                                  ImmutableArray<QuantifiableVariable> newBoundVars, 
-                                 TermServices services) {
+                                 JavaDLTermServices services) {
         JavaDLTerm res = originalTerm;
         for (int i = 0; i != oldBoundVars.size(); ++i) {
             if ( oldBoundVars.get ( i )
@@ -64,7 +64,7 @@ public class BoundVariableTools {
     public JavaDLTerm[] renameVariables (JavaDLTerm[] originalTerms,
                                    ImmutableArray<QuantifiableVariable> oldBoundVars,
                                    ImmutableArray<QuantifiableVariable> newBoundVars, 
-                                   TermServices services) {
+                                   JavaDLTermServices services) {
         final JavaDLTerm[] res = new JavaDLTerm [originalTerms.length];
         for ( int i = 0; i != res.length; ++i )
             res[i] = renameVariables ( originalTerms[i],
@@ -139,7 +139,7 @@ public class BoundVariableTools {
     public boolean resolveCollisions (JavaDLTerm originalTerm,
                                       ImmutableSet<QuantifiableVariable> criticalVars,
                                       ImmutableArray<QuantifiableVariable>[] newBoundVars,
-                                      JavaDLTerm[] newSubs, TermServices services) {
+                                      JavaDLTerm[] newSubs, JavaDLTermServices services) {
         boolean changed = false;
 
         for ( int i = 0; i != originalTerm.arity (); ++i ) {
@@ -182,7 +182,7 @@ public class BoundVariableTools {
                 unifyBoundVariables (ImmutableArray<QuantifiableVariable>[] boundVarsPerSub,
                                      JavaDLTerm[] subs,
                                      int subtermsBegin,
-                                     int subtermsEnd, TermServices services) {
+                                     int subtermsEnd, JavaDLTermServices services) {
         // at least one subterms belongs to the entry (value)
         ImmutableArray<QuantifiableVariable> unifiedVariable = boundVarsPerSub[subtermsBegin];
 
@@ -234,7 +234,7 @@ public class BoundVariableTools {
     public boolean equalsModRenaming (ImmutableArray<QuantifiableVariable> vars0,
 				      JavaDLTerm term0,
 				      ImmutableArray<QuantifiableVariable> vars1,
-				      JavaDLTerm term1, TermServices services) {
+				      JavaDLTerm term1, JavaDLTermServices services) {
         if ( !consistentVariableArrays ( vars0, vars1 ) ) return false;
         if ( vars0.size () == 0 ) return term0.equalsModRenaming ( term1 );
         

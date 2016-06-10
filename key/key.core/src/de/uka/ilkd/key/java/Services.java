@@ -17,14 +17,15 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import org.key_project.common.core.logic.GenericTermBuilder;
+import org.key_project.common.core.logic.GenericTermFactory;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.services.ProgramServices;
-import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.proof.Counter;
@@ -41,7 +42,7 @@ import de.uka.ilkd.key.util.Debug;
  * include information on the underlying Java model and a converter to
  * transform Java program elements to logic (where possible) and back.
  */
-public class Services implements TermServices, ProofServices {
+public class Services implements JavaDLTermServices, ProofServices {
    /**
      * the proof
      */

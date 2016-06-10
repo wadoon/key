@@ -22,6 +22,8 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
 
 /** 
@@ -36,7 +38,7 @@ import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
  * See {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to 
  * create terms. 
  */
-public final class TermFactory implements GenericTermFactory {
+public final class TermFactory implements GenericTermFactory<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> {
     
 
     private static final ImmutableArray<JavaDLTerm> NO_SUBTERMS = new ImmutableArray<JavaDLTerm>();
@@ -59,6 +61,7 @@ public final class TermFactory implements GenericTermFactory {
      * Master method for term creation. Should be the only place where terms 
      * are created in the entire system.
      */
+    @Override
     public JavaDLTerm createTerm(Operator op, 
 	    		   ImmutableArray<JavaDLTerm> subs, 
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
@@ -75,6 +78,7 @@ public final class TermFactory implements GenericTermFactory {
         return doCreateTerm(op, subs, boundVars, javaBlock, labels);
     }
     
+    @Override
     public JavaDLTerm createTerm(Operator op, 
 	    		   ImmutableArray<JavaDLTerm> subs, 
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
@@ -83,7 +87,7 @@ public final class TermFactory implements GenericTermFactory {
     	return createTerm(op, subs, boundVars, javaBlock, null);
     }
 
-
+    @Override
     public JavaDLTerm createTerm(Operator op,
                            JavaDLTerm[] subs,
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
@@ -91,11 +95,12 @@ public final class TermFactory implements GenericTermFactory {
 	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null);
     }
     
- 
+    @Override
     public JavaDLTerm createTerm(Operator op, JavaDLTerm... subs) {
         return createTerm(op, subs, null, null);
     }
     
+    @Override
     public JavaDLTerm createTerm(Operator op,
                            JavaDLTerm[] subs,
                            ImmutableArray<QuantifiableVariable> boundVars,
@@ -104,6 +109,7 @@ public final class TermFactory implements GenericTermFactory {
     	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels);
     }
 
+    @Override
     public JavaDLTerm createTerm(Operator op,
             JavaDLTerm[] subs,
             ImmutableArray<QuantifiableVariable> boundVars,
@@ -113,23 +119,27 @@ public final class TermFactory implements GenericTermFactory {
                 javaBlock, new ImmutableArray<TermLabel>(label));
     }
 
+    @Override
     public JavaDLTerm createTerm(Operator op, JavaDLTerm[] subs, TermLabel label) {
         return createTerm(op, subs, null, null, label);
     }
-       
+   
+    @Override
     public JavaDLTerm createTerm(Operator op, JavaDLTerm[] subs, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, createSubtermArray(subs), null, null, labels);
     }
 
+    @Override
     public JavaDLTerm createTerm(Operator op, JavaDLTerm sub, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, new ImmutableArray<JavaDLTerm>(sub), null, null, labels);
     }    
 
+    @Override
     public JavaDLTerm createTerm(Operator op, JavaDLTerm sub1, JavaDLTerm sub2, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, new JavaDLTerm[] { sub1, sub2 }, null, null, labels);
     }    
 
-
+    @Override
     public JavaDLTerm createTerm(Operator op, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, NO_SUBTERMS, null, null, labels);
     }

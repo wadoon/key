@@ -57,7 +57,8 @@ import org.key_project.util.collection.ImmutableSet;
  * "JavaTerm" or the like; from this class here, the java specific methods
  * have been removed.
  */
-public interface GenericTerm<S, T extends GenericTerm<S,T,V,N>, V extends Visitor<S, V, T, N>, N extends GenericNameAbstractionTable<S>> extends SVSubstitute, Sorted {
+public interface GenericTerm<S, T extends GenericTerm<S, T, V, N>, V extends Visitor<S, V, T, N>, N extends GenericNameAbstractionTable<S>>
+        extends SVSubstitute, Sorted {
 
     /** 
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
