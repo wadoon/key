@@ -15,6 +15,7 @@ package de.uka.ilkd.key.parser;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
@@ -26,7 +27,6 @@ import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletForTests;

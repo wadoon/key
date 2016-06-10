@@ -2,11 +2,11 @@ package de.uka.ilkd.key.axiom_abstraction.boollattice;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.op.LogicVariable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 
 /**
  * The Bottom element of the boolean lattice, representing

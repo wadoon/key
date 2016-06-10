@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;

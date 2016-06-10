@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
@@ -24,7 +25,6 @@ import de.uka.ilkd.key.logic.SortCollector;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;

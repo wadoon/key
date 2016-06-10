@@ -17,6 +17,7 @@ import java.io.File;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.LogicVariable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;

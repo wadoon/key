@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java;
 
 
 import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.GenericSortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -288,7 +289,7 @@ public final class TypeConverter {
 	    getKeYJavaType();
 	final JavaDLTerm obj = convertToLogicElement(io.getChildAt(0), ec);
 	final Sort s = type.getSort();
-	final Function instanceOfSymbol = s.getInstanceofSymbol(services);
+	final GenericSortDependingFunction instanceOfSymbol = s.getInstanceofSymbol(services);
 
 	// in JavaDL S::instance(o) is also true if o (for reference types S)
 	// is null in opposite to Java

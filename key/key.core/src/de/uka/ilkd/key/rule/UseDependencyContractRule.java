@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
@@ -38,7 +39,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.proof.Goal;

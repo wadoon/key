@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule.match.legacy;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SVSubstitute;
@@ -23,7 +24,6 @@ import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.IfMatchResult;
