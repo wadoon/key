@@ -16,12 +16,12 @@ package de.uka.ilkd.key.taclettranslation;
 
 
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -51,7 +51,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
        ASSUM,
        FIND;
        
-       public JavaDLTerm getDefaultValue(TermServices services) {
+       public JavaDLTerm getDefaultValue(JavaDLTermServices services) {
           return services.getTermBuilder().ff();
        }
     }
@@ -72,7 +72,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * @return translation
      */
     private JavaDLTerm translateReplaceAndAddTerm(TacletGoalTemplate template,
-	    JavaDLTerm find, TermServices services) {
+	    JavaDLTerm find, JavaDLTermServices services) {
 	TermBuilder tb = services.getTermBuilder();
 	JavaDLTerm replace = find;
 	if(template instanceof RewriteTacletGoalTemplate){
@@ -107,7 +107,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * @return translation
      */
     private JavaDLTerm translateReplaceAndAddFormula(
-	    TacletGoalTemplate template, JavaDLTerm find, int polarity, TermServices services) {
+	    TacletGoalTemplate template, JavaDLTerm find, int polarity, JavaDLTermServices services) {
 	TermBuilder tb = services.getTermBuilder();
 	
 	JavaDLTerm replace = find;
@@ -130,7 +130,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
     }
     
-    private JavaDLTerm translateEquivalence(JavaDLTerm find, JavaDLTerm replace, int polarity, TermServices services){
+    private JavaDLTerm translateEquivalence(JavaDLTerm find, JavaDLTerm replace, int polarity, JavaDLTermServices services){
 	TermBuilder tb = services.getTermBuilder();
 	switch(polarity) {
 	case 0: return tb.equals(find, replace);
@@ -140,7 +140,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 	}
     }
     
-    private JavaDLTerm translateReplaceAndAddSequent(TacletGoalTemplate template, int type, TermServices services){
+    private JavaDLTerm translateReplaceAndAddSequent(TacletGoalTemplate template, int type, JavaDLTermServices services){
 	
 	TermBuilder tb = services.getTermBuilder();
 	Sequent replace=null;
@@ -165,7 +165,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * Translates a RewriteTaclet to a formula.
      */
     @Override
-    public JavaDLTerm translate(Taclet taclet, TermServices services)
+    public JavaDLTerm translate(Taclet taclet, JavaDLTermServices services)
     	throws IllegalTacletException {
 	
 

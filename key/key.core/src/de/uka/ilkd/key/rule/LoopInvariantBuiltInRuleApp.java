@@ -17,12 +17,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -33,8 +33,8 @@ import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -56,15 +56,15 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private ExecutionContext executionContext;
     private JavaDLTerm guard;
 
-   private final TermServices services;
+   private final JavaDLTermServices services;
 
-    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos, TermServices services) {
+    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos, JavaDLTermServices services) {
         this(rule, pos, null, null, null, services);
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-            LoopInvariant inv, List<LocationVariable> heapContext, TermServices services) {
+            LoopInvariant inv, List<LocationVariable> heapContext, JavaDLTermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
         this.loop = (While) JavaTools.getActiveStatement(programTerm()
@@ -86,7 +86,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * otherwise <code>rawInv</code> is returned.
     * @param services TODO
      */
-    private LoopInvariant instantiateIndexValues(LoopInvariant rawInv, TermServices services){
+    private LoopInvariant instantiateIndexValues(LoopInvariant rawInv, JavaDLTermServices services){
     	if (rawInv == null) return null;
     	Map<LocationVariable,JavaDLTerm> invs = rawInv.getInternalInvariants();
     	JavaDLTerm var = rawInv.getInternalVariant();
@@ -215,7 +215,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, LoopInvariant inv, TermServices services) {
+            PosInOccurrence pio, LoopInvariant inv, JavaDLTermServices services) {
         this(rule, pio, null, inv, null, services);
     }
 

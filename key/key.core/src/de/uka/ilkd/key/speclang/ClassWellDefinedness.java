@@ -16,11 +16,11 @@ package de.uka.ilkd.key.speclang;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -126,7 +126,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public ClassWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
+    public ClassWellDefinedness combine(WellDefinednessCheck wdc, JavaDLTermServices services) {
         assert wdc instanceof ClassWellDefinedness;
         final ClassWellDefinedness cwd = (ClassWellDefinedness)wdc;
         assert this.getInvariant().getKJT().equals(cwd.getInvariant().getKJT());

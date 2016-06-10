@@ -55,4 +55,14 @@ public interface GenericNamespaceSet {
      *             other logics than JavaDL.
      */
     Namespace sorts();
+
+    /**
+     * TODO: Document.
+     *
+     * @return The program variables set.
+     * @deprecated Is here for backwards compatibility; you should use
+     *             {@link #getNamespace(String)} instead to be compatible with
+     *             other logics than JavaDL.
+     */
+    Namespace programVariables();
 }

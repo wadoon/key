@@ -28,10 +28,10 @@ import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -372,7 +372,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
        * @param services TODO
          * @return the quantified term.
          */
-        protected static JavaDLTerm quantifyTerm(JavaDLTerm term, TermServices services)
+        protected static JavaDLTerm quantifyTerm(JavaDLTerm term, JavaDLTermServices services)
                         throws IllegalTacletException {
                 TermBuilder tb = services.getTermBuilder();
                 // Quantify over all free variables.

@@ -17,14 +17,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -68,7 +68,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return
      */
-    abstract SequentFormula generateSequent(SequentTerms seqTerms, TermServices services);
+    abstract SequentFormula generateSequent(SequentTerms seqTerms, JavaDLTermServices services);
 
     public abstract SpecificationElement getStatement();
 
@@ -201,7 +201,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final JavaDLTerm anonWdPost;
 
         private SequentTerms(JavaDLTerm context, JavaDLTerm pre, JavaDLTerm anonHeap, JavaDLTerm mod,
-                             ImmutableList<JavaDLTerm> rest, JavaDLTerm anonWdPost, TermServices services) {
+                             ImmutableList<JavaDLTerm> rest, JavaDLTerm anonWdPost, JavaDLTermServices services) {
             this.context = context;
             this.pre = pre;
             this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap) : TB.tt();

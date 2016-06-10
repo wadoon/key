@@ -18,15 +18,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -310,7 +310,8 @@ public class DelayedCutProcessor implements Runnable {
      * @param app
      * @return
      */
-    private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services) {
+    @SuppressWarnings("deprecation")
+    private LinkedList<Goal> apply(Goal goal, RuleApp app, JavaDLTermServices services) {
         if (app instanceof TacletApp) {
             TacletApp tapp = (TacletApp) app;
             final SVInstantiations insts = tapp.instantiations();
@@ -339,7 +340,7 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app,
-            TermServices services) {
+            JavaDLTermServices services) {
         try {
             return apply(goal, app, services);
         }
@@ -432,7 +433,7 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private PosInOccurrence translate(NodeGoalPair pair, TermServices services) {
+    private PosInOccurrence translate(NodeGoalPair pair, JavaDLTermServices services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if (oldRuleApp == null || oldRuleApp.posInOccurrence() == null) {
             return null;

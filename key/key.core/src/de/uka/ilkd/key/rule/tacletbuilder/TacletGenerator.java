@@ -32,7 +32,6 @@ import org.key_project.common.core.logic.op.ParsableVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -42,6 +41,7 @@ import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -49,12 +49,12 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -114,7 +114,7 @@ public class TacletGenerator {
                                       ImmutableList<ProgramVariable> programVars,
                                       KeYJavaType kjt,
                                       RuleSet ruleSet,
-                                      TermServices services) {
+                                      JavaDLTermServices services) {
         // create schema terms
         final ImmutableList<SchemaVariable> schemaVars =
                 createSchemaVariables(programVars);
@@ -136,7 +136,7 @@ public class TacletGenerator {
                                         JavaDLTerm originalAxiom,
                                         ImmutableList<ProgramVariable> programVars,
                                         RuleSet ruleSet,
-                                        TermServices services) {
+                                        JavaDLTermServices services) {
         // create schema terms
         final ImmutableList<SchemaVariable> schemaVars =
                 createSchemaVariables(programVars);
@@ -167,7 +167,7 @@ public class TacletGenerator {
                                                      ImmutableList<ProgramVariable> paramVars,
                                                      Map<LocationVariable,ProgramVariable> atPreVars,
                                                      boolean satisfiabilityGuard,
-                                                     TermServices services) {
+                                                     JavaDLTermServices services) {
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         
         TermBuilder tb = services.getTermBuilder();
@@ -413,7 +413,7 @@ public class TacletGenerator {
 
 
     private void functionalRepresentsAddSatisfiabilityBranch(
-            IObserverFunction target, TermServices services,
+            IObserverFunction target, JavaDLTermServices services,
             List<SchemaVariable> heapSVs, final SchemaVariable selfSV, ImmutableList<SchemaVariable> paramSVs,
             final TermAndBoundVarPair schemaRepresents,
             final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder) {
@@ -447,7 +447,7 @@ public class TacletGenerator {
 
 
     private JavaDLTerm functionalRepresentsSatisfiability(IObserverFunction target,
-            TermServices services, List<SchemaVariable> heapSVs,
+            JavaDLTermServices services, List<SchemaVariable> heapSVs,
             final SchemaVariable selfSV,
             ImmutableList<SchemaVariable> paramSVs,
             final TermAndBoundVarPair schemaRepresents,
@@ -517,7 +517,7 @@ public class TacletGenerator {
             ImmutableList<ProgramVariable> originalParamVars,
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             boolean satisfiabilityGuard,
-            TermServices services) {
+            JavaDLTermServices services) {
 
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
         ImmutableList<SchemaVariable> svs = ImmutableSLList.<SchemaVariable>nil();
@@ -639,10 +639,6 @@ public class TacletGenerator {
 
         final ProgramSV selfProgSV = target.isStatic() ? null
             : SchemaVariableFactory.createProgramSV(new ProgramElementName("#self_sv"), ProgramSVSort.VARIABLE, false);
-
-        final ProgramSV heapProgSV = target.getStateCount() == 2 ?
-                 SchemaVariableFactory.createProgramSV(new ProgramElementName("#heap_sv"), ProgramSVSort.VARIABLE, false)
-            : null;
 
         final ProgramSV[] paramProgSVs = new ProgramSV[target.getNumParams()];
         for(int i = 0; i < paramProgSVs.length; i++) {
@@ -787,7 +783,7 @@ public class TacletGenerator {
 
     @SuppressWarnings("unused")
     private TermAndBoundVarPair createSchemaTerm(JavaDLTerm term,
-                                                 TermServices services, Pair<ProgramVariable, SchemaVariable>... varPairs) {
+                                                 JavaDLTermServices services, @SuppressWarnings("unchecked") Pair<ProgramVariable, SchemaVariable>... varPairs) {
         ImmutableList<ProgramVariable> progVars =
                 ImmutableSLList.<ProgramVariable>nil();
         ImmutableList<SchemaVariable> schemaVars =
@@ -802,7 +798,7 @@ public class TacletGenerator {
 
     private TermAndBoundVarPair createSchemaTerm(JavaDLTerm term,
                                                  ImmutableList<ProgramVariable> programVars,
-                                                 ImmutableList<SchemaVariable> schemaVars, TermServices services) {
+                                                 ImmutableList<SchemaVariable> schemaVars, JavaDLTermServices services) {
         final OpReplacer or = createOpReplacer(programVars, schemaVars, services);
         final JavaDLTerm rawTerm = or.replace(term);
         final TermAndBoundVarPair schemaTerm = replaceBoundLogicVars(rawTerm, services);
@@ -837,7 +833,7 @@ public class TacletGenerator {
 
     private OpReplacer createOpReplacer(
             ImmutableList<ProgramVariable> programVars,
-            ImmutableList<SchemaVariable> schemaVars, TermServices services) {
+            ImmutableList<SchemaVariable> schemaVars, JavaDLTermServices services) {
         assert programVars.size() == schemaVars.size();
         final Map<ProgramVariable, ParsableVariable> map =
                 new LinkedHashMap<ProgramVariable, ParsableVariable>();
@@ -857,7 +853,7 @@ public class TacletGenerator {
      * (necessary for proof saving/loading, if t occurs as part of a taclet).
     * @param services TODO
      */
-    private TermAndBoundVarPair replaceBoundLogicVars(JavaDLTerm t, TermServices services) {
+    private TermAndBoundVarPair replaceBoundLogicVars(JavaDLTerm t, JavaDLTermServices services) {
         //recursive replacement process
         final TermAndBoundVarPair intermediateRes = replaceBoundLVsWithSVsHelper(
                 t, services);
@@ -910,7 +906,7 @@ public class TacletGenerator {
     }
 
 
-    private TermAndBoundVarPair replaceBoundLVsWithSVsHelper(JavaDLTerm t, TermServices services) {
+    private TermAndBoundVarPair replaceBoundLVsWithSVsHelper(JavaDLTerm t, JavaDLTermServices services) {
         ImmutableSet<VariableSV> svs = DefaultImmutableSet.<VariableSV>nil();
 
         //prepare op replacer, new bound vars
@@ -1006,7 +1002,7 @@ public class TacletGenerator {
 
     private SequentFormula generateGuard(KeYJavaType kjt,
                                          IObserverFunction target,
-                                         TermServices services,
+                                         JavaDLTermServices services,
                                          final SchemaVariable selfSV,
                                          List<SchemaVariable> heapSVs,
                                          ImmutableList<SchemaVariable> paramSVs,
@@ -1034,7 +1030,7 @@ public class TacletGenerator {
                                             ImmutableList<SchemaVariable> paramSVs,
                                             final JavaDLTerm schemaAxiom,
                                             final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder,
-                                            TermServices services) {
+                                            JavaDLTermServices services) {
 
       final TermBuilder TB = services.getTermBuilder();
     	ImmutableList<JavaDLTerm> vars = ImmutableSLList.<JavaDLTerm>nil();
@@ -1093,7 +1089,7 @@ public class TacletGenerator {
 
     private JavaDLTerm prepareExactInstanceGuard(KeYJavaType kjt,
                                            IObserverFunction target,
-                                           TermServices services,
+                                           JavaDLTermServices services,
                                            final SchemaVariable selfSV) {
         final boolean finalClass =
                 kjt.getProgramType() instanceof ClassDeclaration

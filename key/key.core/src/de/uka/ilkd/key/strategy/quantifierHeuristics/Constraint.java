@@ -13,8 +13,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import org.key_project.common.core.services.TermServices;
-
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 
@@ -63,7 +62,7 @@ public interface Constraint {
      *         substitutes the metavariable with can always be unified with the
      *         returned term).
      */
-    JavaDLTerm getInstantiation(Metavariable p_mv, TermServices services);
+    JavaDLTerm getInstantiation(Metavariable p_mv, JavaDLTermServices services);
 
     /**
      * tries to unify the terms t1 and t2
@@ -81,7 +80,7 @@ public interface Constraint {
      * @return TOP if not possible, else a new constraint with after unification
      *         of t1 and t2
      */
-    Constraint unify(JavaDLTerm t1, JavaDLTerm t2, TermServices services);
+    Constraint unify(JavaDLTerm t1, JavaDLTerm t2, JavaDLTermServices services);
 
     /**
      * tries to unify terms t1 and t2.
@@ -97,7 +96,7 @@ public interface Constraint {
      * @return TOP if not possible, else a new constraint with after unification
      *         of t1 and t2
      */
-    Constraint unify(JavaDLTerm t1, JavaDLTerm t2, TermServices services,
+    Constraint unify(JavaDLTerm t1, JavaDLTerm t2, JavaDLTermServices services,
 	    BooleanContainer unchanged);
 
     /**
@@ -132,7 +131,7 @@ public interface Constraint {
      *            the Services providing access to the type model
      * @return the joined constraint
      */
-    Constraint join(Constraint co, TermServices services);
+    Constraint join(Constraint co, JavaDLTermServices services);
 
     /**
      * joins constraint co with this constraint and returns the joint new
@@ -150,7 +149,7 @@ public interface Constraint {
      *            strong as co
      * @return the joined constraint
      */
-    Constraint join(Constraint co, TermServices services, BooleanContainer unchanged);
+    Constraint join(Constraint co, JavaDLTermServices services, BooleanContainer unchanged);
 
     /** @return String representation of the constraint */
     String toString();
@@ -172,7 +171,7 @@ public interface Constraint {
 	    return false;
 	}
 
-	public JavaDLTerm getInstantiation(Metavariable p_mv, TermServices services) {
+	public JavaDLTerm getInstantiation(Metavariable p_mv, JavaDLTermServices services) {
 	    // As there is in fact no instantiation satisfying this
 	    // constraint, we could return everything
 	    return services.getTermBuilder().var(p_mv);
@@ -184,11 +183,11 @@ public interface Constraint {
 	 * 
 	 * @return always this
 	 */
-	public Constraint unify(JavaDLTerm t1, JavaDLTerm t2, TermServices services) {
+	public Constraint unify(JavaDLTerm t1, JavaDLTerm t2, JavaDLTermServices services) {
 	    return this;
 	}
 
-	public Constraint unify(JavaDLTerm t1, JavaDLTerm t2, TermServices services,
+	public Constraint unify(JavaDLTerm t1, JavaDLTerm t2, JavaDLTermServices services,
 		BooleanContainer unchanged) {
 	    unchanged.setVal(true);
 	    return this;
@@ -214,7 +213,7 @@ public interface Constraint {
 	 * 
 	 * @return this
 	 */
-	public Constraint join(Constraint co, TermServices services) {
+	public Constraint join(Constraint co, JavaDLTermServices services) {
 	    return this;
 	}
 
@@ -223,7 +222,7 @@ public interface Constraint {
 	 * 
 	 * @return this
 	 */
-	public Constraint join(Constraint co, TermServices services,
+	public Constraint join(Constraint co, JavaDLTermServices services,
 		BooleanContainer c) {
 	    c.setVal(true);
 	    return this;

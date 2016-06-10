@@ -22,10 +22,10 @@ import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -52,7 +52,7 @@ public abstract class LDT implements Named {
     // constructors
     //-------------------------------------------------------------------------
     
-    protected LDT(Name name, TermServices services) {
+    protected LDT(Name name, JavaDLTermServices services) {
         sort = (Sort) services.getNamespaces().sorts().lookup(name);
 	    if (sort == null)
 	        throw new RuntimeException("LDT "+name+" not found.\n"+
@@ -87,7 +87,7 @@ public abstract class LDT implements Named {
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final Function addFunction(TermServices services, String funcName) {
+    protected final Function addFunction(JavaDLTermServices services, String funcName) {
 	final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
         if (f == null)
@@ -97,7 +97,7 @@ public abstract class LDT implements Named {
     }
     
     protected final SortDependingFunction addSortDependingFunction(
-	    					TermServices services, 
+            JavaDLTermServices services, 
 	    					String kind) {	
 	final SortDependingFunction f 
 		= SortDependingFunction.getFirstInstance(new Name(kind), 
@@ -220,7 +220,7 @@ public abstract class LDT implements Named {
     public abstract boolean isResponsible(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
 	    		JavaDLTerm sub, 
-	    		TermServices services, 
+	    		JavaDLTermServices services, 
 	    		ExecutionContext ec);
 
 

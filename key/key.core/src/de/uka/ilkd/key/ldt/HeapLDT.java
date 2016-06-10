@@ -20,13 +20,13 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -101,7 +101,8 @@ public final class HeapLDT extends LDT {
     //constructors
     //------------------------------------------------------------------------- 
     
-    public HeapLDT(TermServices services) {
+    @SuppressWarnings("deprecation")
+    public HeapLDT(JavaDLTermServices services) {
 	super(NAME, services);
 	final Namespace sorts    = services.getNamespaces().sorts();
 	final Namespace progVars = services.getNamespaces().programVariables();
@@ -207,7 +208,7 @@ public final class HeapLDT extends LDT {
     /**
      * Returns the select function for the given sort.
      */
-    public Function getSelect(Sort instanceSort, TermServices services) {
+    public Function getSelect(Sort instanceSort, JavaDLTermServices services) {
 	return select.getInstanceFor(instanceSort, services);
     }
     
@@ -266,24 +267,24 @@ public final class HeapLDT extends LDT {
     }
     
         
-    public Function getClassPrepared(Sort instanceSort, TermServices services) {
+    public Function getClassPrepared(Sort instanceSort, JavaDLTermServices services) {
 	return classPrepared.getInstanceFor(instanceSort, services);
     }
     
     
-    public Function getClassInitialized(Sort instanceSort, TermServices services) {
+    public Function getClassInitialized(Sort instanceSort, JavaDLTermServices services) {
 	return classInitialized.getInstanceFor(instanceSort, services);
     }
     
     
     public Function getClassInitializationInProgress(Sort instanceSort, 
-	    					     TermServices services) {
+	    					     JavaDLTermServices services) {
 	return classInitializationInProgress.getInstanceFor(instanceSort, 
 							    services);
     }
     
     
-    public Function getClassErroneous(Sort instanceSort, TermServices services) {
+    public Function getClassErroneous(Sort instanceSort, JavaDLTermServices services) {
 	return classErroneous.getInstanceFor(instanceSort, services);
     }
     
@@ -446,7 +447,7 @@ public final class HeapLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 JavaDLTerm sub, 
-	    			 TermServices services, 
+	    			 JavaDLTermServices services, 
 	    			 ExecutionContext ec) {
 	return false;
     }

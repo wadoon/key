@@ -18,10 +18,10 @@ import java.util.Iterator;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermCreationException;
@@ -70,7 +70,7 @@ public class Substitution {
     }   
   
     
-    public JavaDLTerm apply(JavaDLTerm t, TermServices services) {
+    public JavaDLTerm apply(JavaDLTerm t, JavaDLTermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
@@ -87,7 +87,7 @@ public class Substitution {
         return t;
     }
 
-    private JavaDLTerm applySubst(QuantifiableVariable var, JavaDLTerm instance, JavaDLTerm t, TermServices services) {
+    private JavaDLTerm applySubst(QuantifiableVariable var, JavaDLTerm instance, JavaDLTerm t, JavaDLTermServices services) {
         final ClashFreeSubst subst = new ClashFreeSubst ( var,  instance, services);
         return subst.apply ( t );
     }
@@ -96,7 +96,7 @@ public class Substitution {
      * Try to apply the substitution to a term, introducing casts if
      * necessary (may never be the case any more, XXX)
      */
-    public JavaDLTerm applyWithoutCasts(JavaDLTerm t, TermServices services) {
+    public JavaDLTerm applyWithoutCasts(JavaDLTerm t, JavaDLTermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();

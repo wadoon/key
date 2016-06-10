@@ -19,9 +19,9 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -63,7 +63,7 @@ public abstract class TypeResolver {
     public abstract boolean isComplete(SchemaVariable sv, 
             			       SVSubstitute instCandidate, 
             			       SVInstantiations instMap, 
-            			       TermServices services);
+            			       JavaDLTermServices services);
     
     public abstract Sort resolveSort(SchemaVariable sv, 
             			     SVSubstitute instCandidate, 
@@ -89,7 +89,7 @@ public abstract class TypeResolver {
         
         @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, TermServices services) {            
+                SVInstantiations instMap, JavaDLTermServices services) {            
             return instMap.getGenericSortInstantiations().getInstantiation(gs) != null;
         }
 
@@ -115,7 +115,7 @@ public abstract class TypeResolver {
 
         @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, TermServices services) {            
+                SVInstantiations instMap, JavaDLTermServices services) {            
             return true;
         }
 
@@ -145,7 +145,7 @@ public abstract class TypeResolver {
         
         @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, TermServices services) {       
+                SVInstantiations instMap, JavaDLTermServices services) {       
             return resolveSV == sv || instMap.getInstantiation(resolveSV) != null;
         }
 
@@ -194,7 +194,7 @@ public abstract class TypeResolver {
         @Override
         public boolean isComplete(SchemaVariable sv,
                 SVSubstitute instCandidate, SVInstantiations instMap,
-                TermServices services) {
+                JavaDLTermServices services) {
             
             return sv == memberSV || instMap.getInstantiation(memberSV) != null;
         }
@@ -226,7 +226,8 @@ public abstract class TypeResolver {
             return result;
         }
     
-        private Sort getContainerSort(Operator op, TermServices services) {
+        @SuppressWarnings("deprecation")
+        private Sort getContainerSort(Operator op, JavaDLTermServices services) {
             Sort result = null;
             if (op instanceof ProgramVariable) {
                 result  = ((ProgramVariable)op).getContainerType().getSort();

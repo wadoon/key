@@ -19,6 +19,7 @@ import org.key_project.common.core.services.TermServices;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -48,7 +49,7 @@ public final class BooleanLDT extends LDT {
     //constructors
     //-------------------------------------------------------------------------    
 
-    public BooleanLDT(TermServices services) {
+    public BooleanLDT(JavaDLTermServices services) {
         super(NAME, services);
         
         bool_true       = addFunction(services, "TRUE");
@@ -110,9 +111,9 @@ public final class BooleanLDT extends LDT {
 
     
     @Override
-    public boolean isResponsible
-	(de.uka.ilkd.key.java.expression.Operator op, JavaDLTerm sub, TermServices services, ExecutionContext ec) {
-	return false;
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
+            JavaDLTerm sub, JavaDLTermServices services, ExecutionContext ec) {
+        return false;
     }
 
     

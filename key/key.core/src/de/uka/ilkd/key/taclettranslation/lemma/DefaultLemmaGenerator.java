@@ -26,12 +26,12 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -59,7 +59,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         private HashMap<SchemaVariable, JavaDLTerm> mapping = new LinkedHashMap<SchemaVariable, JavaDLTerm>();
        
         @Override
-        public TacletFormula translate(Taclet taclet, TermServices services) {
+        public TacletFormula translate(Taclet taclet, JavaDLTermServices services) {
                 String result = checkTaclet(taclet);
                 if(result != null){
                         throw new IllegalTacletException(result);
@@ -75,7 +75,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return new LemmaFormula(taclet, formula);
         }
         
-        private JavaDLTerm replace(Taclet taclet, JavaDLTerm term, TermServices services) {
+        private JavaDLTerm replace(Taclet taclet, JavaDLTerm term, JavaDLTermServices services) {
                 if (term.op() instanceof SchemaVariable) {
                         return getInstantiation(taclet,
                                         (SchemaVariable) term.op(), services);
@@ -160,7 +160,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @return instantiation of the schema variable <code>var</code>.
          */
         protected final JavaDLTerm getInstantiation(Taclet owner, SchemaVariable var,
-                        TermServices services) {
+                        JavaDLTermServices services) {
                 JavaDLTerm instantiation = mapping.get(var);
                 if (instantiation == null) {
                         instantiation = createInstantiation(owner, var,
@@ -182,7 +182,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * 
          */
         private JavaDLTerm getInstantation(Taclet owner, VariableSV var,
-                        TermServices services) {
+                        JavaDLTermServices services) {
                 JavaDLTerm instantiation = mapping.get(var);
                 if (instantiation == null) {
                         instantiation = createInstantiation(owner, var,
@@ -193,7 +193,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         }
 
         private JavaDLTerm createInstantiation(Taclet owner, SchemaVariable sv,
-                        TermServices services) {
+                        JavaDLTermServices services) {
                 if (sv instanceof VariableSV) {
                         return createInstantiation(owner, (VariableSV) sv,
                                         services);
@@ -228,7 +228,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          *         variable.
          */
         private JavaDLTerm createInstantiation(Taclet owner, VariableSV sv,
-                        TermServices services) {
+                        JavaDLTermServices services) {
                 Name name = createUniqueName(services, "v_"+sv.name().toString());
                 Sort sort = replaceSort(sv.sort(), services);
                 LogicVariable variable = new LogicVariable(name, sort);
@@ -241,7 +241,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * <code>sv</code>.
          */
         private JavaDLTerm createInstantiation(Taclet owner, TermSV sv,
-                        TermServices services) {
+                        JavaDLTermServices services) {
                 return createSimpleInstantiation(owner, sv, services);
         }
 
@@ -251,7 +251,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * <code>sv</code>.
          */
         private JavaDLTerm createInstantiation(Taclet owner, FormulaSV sv,
-                        TermServices services) {
+                        JavaDLTermServices services) {
                 return createSimpleInstantiation(owner, sv, services);
         }
 
@@ -263,7 +263,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * and JavaDLTerm schema variables.
          */
         private JavaDLTerm createSimpleInstantiation(Taclet owner, SchemaVariable sv,
-                        TermServices services) {
+                        JavaDLTermServices services) {
                 ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv)
                                 .prefix();
 
@@ -275,11 +275,11 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return services.getTermBuilder().func(function, args);
         }
 
-        private Name createUniqueName(TermServices services, String baseName) {
+        private Name createUniqueName(JavaDLTermServices services, String baseName) {
                 return new Name(services.getTermBuilder().newName(baseName));
         }
 
-        private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, TermServices services) {
+        private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, JavaDLTermServices services) {
                 Sort[] argSorts = new Sort[svSet.size()];
                 int i = 0;
                 for (SchemaVariable sv : svSet) {
@@ -290,7 +290,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         }
 
         private JavaDLTerm[] computeArgs(Taclet owner,
-                        ImmutableSet<SchemaVariable> svSet, TermServices services) {
+                        ImmutableSet<SchemaVariable> svSet, JavaDLTermServices services) {
                 JavaDLTerm[] args = new JavaDLTerm[svSet.size()];
                 int i = 0;
                 for (SchemaVariable sv : svSet) {
@@ -304,7 +304,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * Rebuilds a term recursively and replaces all schema variables with
          * skolem terms/variables. 
          *   */
-        private JavaDLTerm rebuild(Taclet taclet, JavaDLTerm term, TermServices services,
+        private JavaDLTerm rebuild(Taclet taclet, JavaDLTerm term, JavaDLTermServices services,
                         HashSet<QuantifiableVariable> boundedVariables) {
                 JavaDLTerm[] newSubs = new JavaDLTerm[term.arity()];
                 int i = 0;
@@ -349,7 +349,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @param services A services object for lookups
          * @return the replacement operator, not <code>null</code>
          */
-        protected Operator replaceOp(Operator op, TermServices services) {
+        protected Operator replaceOp(Operator op, JavaDLTermServices services) {
             return op;
         }
 
@@ -364,7 +364,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @param services A services object for lookups
          * @return the replacement sort, not <code>null</code>
          */
-        protected Sort replaceSort(Sort sort, TermServices services) {
+        protected Sort replaceSort(Sort sort, JavaDLTermServices services) {
             return sort;
         }
 }

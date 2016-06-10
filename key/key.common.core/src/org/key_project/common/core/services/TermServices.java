@@ -45,12 +45,12 @@ public interface TermServices<S, T extends GenericTerm<S, T, V, N>, V extends Vi
      * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
      * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
-    public abstract GenericTermBuilder<S, T, V, N, P> getTermBuilder();
+    public abstract <TB extends GenericTermBuilder<S, T, V, N, P>> TB getTermBuilder();
 
     /**
      * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
      * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
-    public abstract GenericTermFactory<S,T,V,N,P> getTermFactory();
+    public abstract <TF extends GenericTermFactory<S,T,V,N,P>> TF getTermFactory();
 
 }

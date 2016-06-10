@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Sorted;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -737,7 +737,7 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
-    public JavaDLTerm getInstantiationSelfTerm(TermServices services) {
+    public JavaDLTerm getInstantiationSelfTerm(JavaDLTermServices services) {
         if (instantiationSelf != null) {
             return instantiationSelf;
         } else if (variables.self != null) {
@@ -757,7 +757,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         private static final long serialVersionUID = -2339350643000987576L;
 
-        public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, TermServices services)
+        public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, JavaDLTermServices services)
         {
             if (newSelf != null) {
                 assert newSelf.sort().extendsTrans(oldSelf.sort());
@@ -767,7 +767,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
                                  final Map<Label, S> newFlags,
-                                 TermServices services) {
+                                 JavaDLTermServices services) {
             if (newFlags != null) {
                 assert newFlags.size() == oldFlags.size();
                 for (Map.Entry<Label, ProgramVariable> oldFlag : oldFlags.entrySet()) {
@@ -776,7 +776,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
 
-        public void replaceVariable(final ProgramVariable oldVariable, final S newVariable, TermServices services)
+        public void replaceVariable(final ProgramVariable oldVariable, final S newVariable, JavaDLTermServices services)
         {
             if (newVariable != null) {
                 assert oldVariable.sort().equals(newVariable.sort());
@@ -805,7 +805,7 @@ public final class SimpleBlockContract implements BlockContract {
                                                                       oldRemembranceLocalVariables,
                                                      final Map<LocationVariable, ? extends S>
                                                                       newRemembranceLocalVariables, 
-                                                     final TermServices services)
+                                                     final JavaDLTermServices services)
         {
             if (newRemembranceLocalVariables != null) {
                 for (LocationVariable localVariable : oldRemembranceLocalVariables.keySet()) {
@@ -822,7 +822,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
 
-        protected abstract S convert(ProgramVariable variable, TermServices services);
+        protected abstract S convert(ProgramVariable variable, JavaDLTermServices services);
 
     }
 
@@ -830,7 +830,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         private static final long serialVersionUID = 8964634070766482218L;
 
-        protected ProgramVariable convert(ProgramVariable variable, TermServices services)
+        protected ProgramVariable convert(ProgramVariable variable, JavaDLTermServices services)
         {
             return variable;
         }
@@ -849,7 +849,7 @@ public final class SimpleBlockContract implements BlockContract {
         }
 
         @Override
-        protected JavaDLTerm convert(ProgramVariable variable, TermServices services)
+        protected JavaDLTerm convert(ProgramVariable variable, JavaDLTermServices services)
         {
             return services.getTermBuilder().var(variable);
         }

@@ -16,12 +16,12 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Modality;
 
@@ -43,7 +43,7 @@ class TwoSidedMatching {
     private final Substitution triggerSubstWithMVs;
     private final JavaDLTerm targetWithMVs;
     
-    TwoSidedMatching(UniTrigger trigger, JavaDLTerm targetTerm, TermServices services) {
+    TwoSidedMatching(UniTrigger trigger, JavaDLTerm targetTerm, JavaDLTermServices services) {
         this.trigger = trigger;
         this.targetSubstWithMVs =
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm, services );
@@ -64,7 +64,7 @@ class TwoSidedMatching {
         }
     }
     
-    ImmutableSet<Substitution> getSubstitutions(TermServices services) {
+    ImmutableSet<Substitution> getSubstitutions(JavaDLTermServices services) {
         if (triggerWithMVs == null || targetWithMVs == null) {
             // non ground subs not supported yet
             return DefaultImmutableSet.<Substitution>nil();
@@ -72,7 +72,7 @@ class TwoSidedMatching {
 	return getAllSubstitutions ( targetWithMVs, services );
     }
     
-    private ImmutableSet<Substitution> getAllSubstitutions(JavaDLTerm target, TermServices services) {
+    private ImmutableSet<Substitution> getAllSubstitutions(JavaDLTerm target, JavaDLTermServices services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         Substitution sub = match ( triggerWithMVs, target, services );
         if ( sub != null
@@ -93,7 +93,7 @@ class TwoSidedMatching {
     
     /** find a substitution in a allterm by using unification */
     private Substitution match(JavaDLTerm triggerTerm, JavaDLTerm targetTerm, 
-            TermServices services) {
+            JavaDLTermServices services) {
         final Constraint c =
             Constraint.BOTTOM.unify ( targetTerm, triggerTerm,
                                       services );

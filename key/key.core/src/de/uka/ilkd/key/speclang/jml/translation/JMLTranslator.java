@@ -23,6 +23,7 @@ import java.util.TreeMap;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.key_project.common.core.logic.GenericTermBuilder;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
@@ -31,11 +32,11 @@ import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -47,9 +48,9 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -77,7 +78,7 @@ public final class JMLTranslator {
 
     private final TermBuilder tb; 
     private final String fileName;
-    private TermServices services;                          // to be used in future
+    private JavaDLTermServices services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
     private List<PositionedString> warnings = new ArrayList<PositionedString>();
 
@@ -214,13 +215,13 @@ public final class JMLTranslator {
         }
     }
 
-    public JMLTranslator(SLTranslationExceptionManager excManager, TermServices services) {
+    public JMLTranslator(SLTranslationExceptionManager excManager, JavaDLTermServices services) {
         this(excManager,null,services);
     }
 
     public JMLTranslator(SLTranslationExceptionManager excManager,
                          String fileName,
-                         TermServices services) {
+                         JavaDLTermServices services) {
         this.excManager = excManager;
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -321,7 +322,7 @@ public final class JMLTranslator {
                 checkParameters(params, JavaDLTerm.class, Services.class);
                 JavaDLTerm term = (JavaDLTerm) params[0];
         	    @SuppressWarnings("unused")// please keep it for documentation purposes
-                TermServices services = (TermServices) params[1];
+                JavaDLTermServices services = (JavaDLTermServices) params[1];
                 return tb.convertToFormula(term);
         	}
         };
@@ -371,7 +372,7 @@ public final class JMLTranslator {
                 LogicVariable eVar = (LogicVariable) params[1];
                 ProgramVariable excVar = (ProgramVariable) params[2];
                 KeYJavaType excType = (KeYJavaType) params[3];
-                TermServices services = (TermServices) params[4];
+                JavaDLTermServices services = (JavaDLTermServices) params[4];
 
                 if (result == null) {
                     result = tb.tt();
@@ -405,7 +406,7 @@ public final class JMLTranslator {
                 ImmutableList<KeYJavaType> signalsonly =
                         (ImmutableList<KeYJavaType>) params[0];
                 ProgramVariable excVar = (ProgramVariable) params[1];
-                TermServices services = (TermServices) params[2];
+                JavaDLTermServices services = (JavaDLTermServices) params[2];
                 // Build appropriate term out of the parsed list of types
                 // i.e. disjunction of "excVar instanceof ExcType"
                 // for every ExcType in the list
@@ -433,7 +434,7 @@ public final class JMLTranslator {
                 JavaDLTerm term = (JavaDLTerm) params[0];
                 String label = (String) params[1];
                 @SuppressWarnings("unused")// please keep it for documentation purposes
-                TermServices services = (TermServices) params[2];
+                JavaDLTermServices services = (JavaDLTermServices) params[2];
                 JavaDLTerm formula = term == null ? tb.tt() : tb.convertToFormula(term);
                 return new Pair<Label, JavaDLTerm>(label == null ? null : new ProgramElementName(label), formula);
             }
@@ -449,7 +450,7 @@ public final class JMLTranslator {
                 String label = (String) params[1];
                 
                 @SuppressWarnings("unused")// please keep it for documentation purposes
-                TermServices services = (TermServices) params[2];
+                JavaDLTermServices services = (JavaDLTermServices) params[2];
                 JavaDLTerm formula = term == null ? tb.tt() : tb.convertToFormula(term);
                 return new Pair<Label, JavaDLTerm>(label == null ? null : new ProgramElementName(label), formula);
             }
@@ -463,7 +464,7 @@ public final class JMLTranslator {
                 checkParameters(params, JavaDLTerm.class, Services.class);
                 JavaDLTerm term = (JavaDLTerm) params[0];
                 @SuppressWarnings("unused")// please keep it for documentation purposes
-                TermServices services = (TermServices) params[1];
+                JavaDLTermServices services = (JavaDLTermServices) params[1];
                 return term == null ? tb.tt() : tb.convertToFormula(term);
             }
         });
@@ -831,7 +832,7 @@ public final class JMLTranslator {
                     Object... params) throws SLTranslationException {
                 checkParameters(params, Services.class, JavaDLTerm.class, KeYJavaType.class);
                 @SuppressWarnings("unused")// please keep it for documentation purposes
-                final TermServices services = (TermServices)params[0];
+                final JavaDLTermServices services = (JavaDLTermServices)params[0];
                 final JavaDLTerm selfVar = (JavaDLTerm)params[1];
                 final KeYJavaType targetType = (KeYJavaType)params[2];
                 final boolean isStatic = selfVar == null;
@@ -980,7 +981,7 @@ public final class JMLTranslator {
                 checkParameters(params, Services.class, SLExpression.class,
                                 SLExpression.class);
                 @SuppressWarnings("unused")// please keep it for documentation purposes
-                final TermServices services = (TermServices) params[0];
+                final JavaDLTermServices services = (JavaDLTermServices) params[0];
                 final JavaDLTerm seq = ((SLExpression) params[1]).getTerm();
                 final JavaDLTerm idx = ((SLExpression) params[2]).getTerm();
                 return new SLExpression(tb.seqGet(SortImpl.ANY, seq, idx));
@@ -1375,7 +1376,7 @@ public final class JMLTranslator {
                         LocationVariable.class, LocationVariable.class,
                         ImmutableList.class, JavaDLTerm.class);
 
-                TermServices services = (TermServices) params[0];
+                JavaDLTermServices services = (JavaDLTermServices) params[0];
                 Token desc = (Token) params[1];
                 LocationVariable selfVar = (LocationVariable) params[2];
                 LocationVariable resultVar = (LocationVariable) params[3];
@@ -1491,7 +1492,7 @@ public final class JMLTranslator {
                 checkParameters(params, Services.class, SLExpression.class,
                                 String.class, Token.class, SLExpression.class,
                                 SLExpression.class);
-                TermServices services = (TermServices) params[0];
+                JavaDLTermServices services = (JavaDLTermServices) params[0];
                 SLExpression receiver = (SLExpression) params[1];
                 String fullyQualifiedName = (String) params[2];
                 Token lbrack = (Token) params[3];
@@ -1541,7 +1542,7 @@ public final class JMLTranslator {
                 }
             }
 
-            private SLExpression translateArrayReference(TermServices services,
+            private SLExpression translateArrayReference(JavaDLTermServices services,
                                                          SLExpression receiver,
                                                          SLExpression rangeFrom,
                                                          SLExpression rangeTo) {
@@ -1571,7 +1572,7 @@ public final class JMLTranslator {
             }
 
 
-            private SLExpression translateSequenceReference(TermServices services,
+            private SLExpression translateSequenceReference(JavaDLTermServices services,
                                                             SLExpression receiver,
                                                             SLExpression rangeFrom,
                                                             SLExpression rangeTo)
@@ -1684,7 +1685,7 @@ public final class JMLTranslator {
                 ImmutableList<JavaDLTerm> list =
                         (ImmutableList<JavaDLTerm>) params[0];
                 @SuppressWarnings("unused")// please keep it for documentation purposes
-                TermServices services = (TermServices) params[1];
+                JavaDLTermServices services = (JavaDLTermServices) params[1];
 
                 ImmutableList<JavaDLTerm> disTerms = ImmutableSLList.<JavaDLTerm>nil();
                 while (!list.isEmpty()) {
@@ -1940,7 +1941,7 @@ public final class JMLTranslator {
         return skolemExprHelper(jmlKeyWord,kjt,services);
     }
 
-    private SLExpression skolemExprHelper(Token jmlKeyWord, KeYJavaType type, TermServices services) {
+    private SLExpression skolemExprHelper(Token jmlKeyWord, KeYJavaType type, JavaDLTermServices services) {
         addUnderspecifiedWarning(jmlKeyWord);
         assert services != null;
         final Namespace fns = services.getNamespaces().functions();

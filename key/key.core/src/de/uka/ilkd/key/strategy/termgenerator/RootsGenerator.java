@@ -17,13 +17,13 @@ import java.math.BigInteger;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -51,7 +51,7 @@ public class RootsGenerator implements TermGenerator {
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf ( 2 );
 
-    public static TermGenerator create(ProjectionToTerm powerRelation, TermServices services) {
+    public static TermGenerator create(ProjectionToTerm powerRelation, JavaDLTermServices services) {
         return new RootsGenerator ( powerRelation, services.getTermBuilder() );
     }
     
@@ -105,7 +105,7 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private JavaDLTerm breakDownEq(JavaDLTerm var, BigInteger lit, int pow,
-                             TermServices services) {
+                             JavaDLTermServices services) {
         final JavaDLTerm zero = tb.zero();
 
         if ( ( pow % 2 == 0 ) ) {
@@ -151,7 +151,7 @@ public class RootsGenerator implements TermGenerator {
         return null;
     }
 
-    private JavaDLTerm breakDownGeq(JavaDLTerm var, BigInteger lit, int pow, TermServices services) {
+    private JavaDLTerm breakDownGeq(JavaDLTerm var, BigInteger lit, int pow, JavaDLTermServices services) {
         if ( ( pow % 2 == 0 ) ) {
             // the even case
             
@@ -178,7 +178,7 @@ public class RootsGenerator implements TermGenerator {
         return null;
     }
 
-    private JavaDLTerm breakDownLeq(JavaDLTerm var, BigInteger lit, int pow, TermServices services) {
+    private JavaDLTerm breakDownLeq(JavaDLTerm var, BigInteger lit, int pow, JavaDLTermServices services) {
         if ( ( pow % 2 == 0 ) ) {
             // the even case
             

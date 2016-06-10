@@ -24,14 +24,13 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.GenericNameAbstractionTable;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
@@ -160,7 +159,7 @@ public class EqualityConstraint implements Constraint {
      * @return the term by which p_mv is instantiated by the most
      * general substitution satisfying the constraint
      */
-    public synchronized JavaDLTerm getInstantiation (Metavariable p_mv, TermServices services) {
+    public synchronized JavaDLTerm getInstantiation (Metavariable p_mv, JavaDLTermServices services) {
         JavaDLTerm t = null;
         if ( instantiationCache == null )
             instantiationCache = new LinkedHashMap<Metavariable, JavaDLTerm> ();
@@ -216,7 +215,7 @@ public class EqualityConstraint implements Constraint {
      * @return TOP if not possible, else a new constraint with after
      * unification of t1 and t2
      */
-    public Constraint unify ( JavaDLTerm t1, JavaDLTerm t2, TermServices services  ) {
+    public Constraint unify ( JavaDLTerm t1, JavaDLTerm t2, JavaDLTermServices services  ) {
 	return unify(t1, t2, services, CONSTRAINTBOOLEANCONTAINER);
     }
 
@@ -232,7 +231,7 @@ public class EqualityConstraint implements Constraint {
      */
     public Constraint unify ( JavaDLTerm             t1,
 			      JavaDLTerm             t2,
-                              TermServices        services,
+                              JavaDLTermServices        services,
 			      BooleanContainer unchanged ) {
 	final Constraint newConstraint = unifyHelp ( t1, t2, false, services );
 
@@ -325,9 +324,9 @@ public class EqualityConstraint implements Constraint {
                                    JavaDLTerm                       t1,
                                    ImmutableList<QuantifiableVariable> ownBoundVars, 
                                    ImmutableList<QuantifiableVariable> cmpBoundVars,
-                                   GenericNameAbstractionTable       nat,
+                                   NameAbstractionTable       nat,
                                    boolean                    modifyThis, 
-                                   TermServices services ) {
+                                   JavaDLTermServices services ) {
 
 	if ( t0 == t1 && ownBoundVars.equals ( cmpBoundVars ) )
                 return this;
@@ -398,7 +397,7 @@ public class EqualityConstraint implements Constraint {
     private Constraint introduceNewMV (JavaDLTerm t0,
                                        JavaDLTerm t1,
                                        boolean modifyThis,
-                                       TermServices services) {
+                                       JavaDLTermServices services) {
 /*        if (services == null) return Constraint.TOP;
         
         final ImmutableSet<Sort> set = 
@@ -435,11 +434,11 @@ public class EqualityConstraint implements Constraint {
      * used to encode that <tt>handleJava</tt> results in an unsatisfiable constraint
      * (faster than using exceptions)
      */
-    private static GenericNameAbstractionTable FAILED = new NameAbstractionTable();
+    private static NameAbstractionTable FAILED = new NameAbstractionTable();
     
-    private static GenericNameAbstractionTable handleJava (JavaDLTerm t0,
+    private static NameAbstractionTable handleJava (JavaDLTerm t0,
                                                     JavaDLTerm t1,
-                                                    GenericNameAbstractionTable nat) {
+                                                    NameAbstractionTable nat) {
 
 
         if ( !t0.modalContent ().isEmpty()
@@ -470,9 +469,9 @@ public class EqualityConstraint implements Constraint {
                        JavaDLTerm t1,
                        ImmutableList<QuantifiableVariable> ownBoundVars,
                        ImmutableList<QuantifiableVariable> cmpBoundVars,
-                       GenericNameAbstractionTable nat,
+                       NameAbstractionTable nat,
                        boolean modifyThis,
-                       TermServices services) {
+                       JavaDLTermServices services) {
         Constraint newConstraint = this;
 
         for ( int i = 0; i < t0.arity (); i++ ) {
@@ -504,7 +503,7 @@ public class EqualityConstraint implements Constraint {
         return newConstraint;
     }
 
-    private static GenericNameAbstractionTable checkNat (GenericNameAbstractionTable nat) {
+    private static NameAbstractionTable checkNat (NameAbstractionTable nat) {
         if ( nat == null ) return new NameAbstractionTable ();
         return nat;
     }
@@ -512,7 +511,7 @@ public class EqualityConstraint implements Constraint {
     private Constraint handleTwoMetavariables (JavaDLTerm t0,
                                                JavaDLTerm t1,
                                                boolean modifyThis,
-                                               TermServices services) {
+                                               JavaDLTermServices services) {
         final Metavariable mv0 = (Metavariable)t0.op ();
         final Metavariable mv1 = (Metavariable)t1.op ();
         final Sort mv0S = mv0.sort ();
@@ -564,7 +563,7 @@ public class EqualityConstraint implements Constraint {
      *         <code>Constraint.TOP</code> is always returned for ununifiable
      *         terms
      */
-    private Constraint unifyHelp (JavaDLTerm t1, JavaDLTerm t2, boolean modifyThis, TermServices services) {
+    private Constraint unifyHelp (JavaDLTerm t1, JavaDLTerm t2, boolean modifyThis, JavaDLTermServices services) {
 	return unifyHelp ( t1, t2,
 			   ImmutableSLList.<QuantifiableVariable>nil(), 
 			   ImmutableSLList.<QuantifiableVariable>nil(),
@@ -589,7 +588,7 @@ public class EqualityConstraint implements Constraint {
      */ 
     private Constraint normalize(Metavariable mv, JavaDLTerm t,
                                  boolean modifyThis, 
-                                 TermServices services) {
+                                 JavaDLTermServices services) {
 	// MV cycles are impossible if the orders of MV pairs are
 	// correct
 
@@ -671,7 +670,7 @@ public class EqualityConstraint implements Constraint {
      * @param co Constraint to be joined with this one
      * @return the joined constraint 
      */	
-    public Constraint join(Constraint co, TermServices services) { 
+    public Constraint join(Constraint co, JavaDLTermServices services) { 
 	return join(co, services, CONSTRAINTBOOLEANCONTAINER); 
     }
     
@@ -687,7 +686,7 @@ public class EqualityConstraint implements Constraint {
      * @return the joined constraint     
      */
     public synchronized Constraint join (Constraint co, 
-            TermServices services, 
+            JavaDLTermServices services, 
             BooleanContainer unchanged) {
         if ( co.isBottom () || co == this ) {
             unchanged.setVal ( true );
@@ -739,7 +738,7 @@ public class EqualityConstraint implements Constraint {
     }
 
         
-    private Constraint joinHelp (EqualityConstraint co, TermServices services) {
+    private Constraint joinHelp (EqualityConstraint co, JavaDLTermServices services) {
         Constraint newConstraint = this;
         boolean newCIsNew = false;
         for (Map.Entry<Metavariable, JavaDLTerm> entry : co.map.entrySet ()) {

@@ -183,7 +183,7 @@ public interface BlockContract extends SpecificationElement {
     public OriginalVariables getOrigVars();
 
     public static class Variables {
-        private final TermServices services;
+        private final JavaDLTermServices services;
 
         public static Variables create(final StatementBlock block,
                                        final List<Label> labels,
@@ -209,7 +209,7 @@ public interface BlockContract extends SpecificationElement {
                          final ProgramVariable exception,
                          final Map<LocationVariable, LocationVariable> remembranceHeaps,
                          final Map<LocationVariable, LocationVariable> remembranceLocalVariables,
-                         final TermServices services)
+                         final JavaDLTermServices services)
         {
             this.services = services;
             this.self = self;

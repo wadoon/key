@@ -28,7 +28,6 @@ import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -37,6 +36,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -46,13 +46,13 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -453,7 +453,7 @@ public abstract class TacletApp implements RuleApp {
     /*
      * checks if application conditions are satisfied and returns <code>true</code> if this is the case
      */
-    public boolean isExecutable(TermServices services) {
+    public boolean isExecutable(JavaDLTermServices services) {
         // bugfix #1336, see bugtracker
         if (taclet instanceof RewriteTaclet) {
             ImmutableList<UpdateLabelPair> oldUpdCtx = 
@@ -690,7 +690,8 @@ public abstract class TacletApp implements RuleApp {
      * @return a fresh created collection of strings in which a freshly created
      *         variable name should not fall.
      */
-    private Collection<String> collectClashNames(SchemaVariable sv, TermServices services) {
+    @SuppressWarnings("deprecation")
+    private Collection<String> collectClashNames(SchemaVariable sv, JavaDLTermServices services) {
         Collection<String> result = new LinkedHashSet<String>();
         VariableCollectVisitor vcv = new VariableCollectVisitor();
         for (final NotFreeIn nv: taclet().varsNotFreeIn()) {
@@ -772,7 +773,7 @@ public abstract class TacletApp implements RuleApp {
      * @throws GenericSortException
      *             iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(SchemaVariable p_sv, TermServices services) {
+    public Sort getRealSort(SchemaVariable p_sv, JavaDLTermServices services) {
 	return instantiations().getGenericSortInstantiations().getRealSort(
 		p_sv, services);
     }
@@ -807,14 +808,15 @@ public abstract class TacletApp implements RuleApp {
     }
     
     
-    public void registerSkolemConstants(TermServices services) {
+    public void registerSkolemConstants(JavaDLTermServices services) {
 	final SVInstantiations insts = instantiations();
 	final Iterator<SchemaVariable> svIt = insts.svIterator();
 	while(svIt.hasNext()) {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
 		final JavaDLTerm inst = (JavaDLTerm) insts.getInstantiation(sv);
-		final Namespace functions =
+		@SuppressWarnings("deprecation")
+        final Namespace functions =
                         services.getNamespaces().functions();
 
                 // skolem constant might already be registered in

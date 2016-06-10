@@ -28,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -556,7 +557,7 @@ public abstract class WellDefinednessCheck implements Contract {
     private JavaDLTerm appendFreePre(JavaDLTerm pre,
                                ParsableVariable self,
                                ParsableVariable heap,
-                               TermServices services) {
+                               JavaDLTermServices services) {
         final IObserverFunction target = getTarget();
         final KeYJavaType selfKJT = target.getContainerType();
         final JavaDLTerm notNull = target.isStatic() ?
@@ -707,7 +708,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                             JavaDLTerm find2,
                                             JavaDLTerm goal1,
                                             JavaDLTerm goal2,
-                                            TermServices services) {
+                                            JavaDLTermServices services) {
         assert find1.op().name().equals(TermBuilder.WD_ANY.name());
         assert find2.op().name().equals(TermBuilder.WD_ANY.name());
         assert find1.sub(0).op().name().equals(find2.sub(0).op().name());
@@ -747,7 +748,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                             JavaDLTerm callTerm,
                                             JavaDLTerm pre,
                                             boolean isStatic,
-                                            TermServices services) {
+                                            JavaDLTermServices services) {
         final TermBuilder TB = services.getTermBuilder();
         final RewriteTacletBuilder<RewriteTaclet> tb =
                 new RewriteTacletBuilder<RewriteTaclet>();
@@ -770,7 +771,7 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     final static RewriteTaclet createExcTaclet(String name,
                                                JavaDLTerm callTerm,
-                                               TermServices services) {
+                                               JavaDLTermServices services) {
         final TermBuilder TB = services.getTermBuilder();
         final RewriteTacletBuilder<RewriteTaclet> tb =
                 new RewriteTacletBuilder<RewriteTaclet>();
@@ -814,7 +815,7 @@ public abstract class WellDefinednessCheck implements Contract {
         this.requires = split(req);
     }
 
-    final void setAssignable(JavaDLTerm ass, TermServices services) {
+    final void setAssignable(JavaDLTerm ass, JavaDLTermServices services) {
         this.assignable = ass;
         if (TB.strictlyNothing().equals(ass) || TB.FALSE().equals(ass)
                 || ass == null || ass.op() == BooleanLiteral.FALSE) {
@@ -825,7 +826,7 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
-    final void combineAssignable(JavaDLTerm ass1, JavaDLTerm ass2, TermServices services) {
+    final void combineAssignable(JavaDLTerm ass1, JavaDLTerm ass2, JavaDLTermServices services) {
         if (ass1 == null || TB.strictlyNothing().equals(ass1)) {
             setAssignable(ass2, services);
         } else if(ass2 == null || TB.strictlyNothing().equals(ass2)) {
@@ -839,7 +840,7 @@ public abstract class WellDefinednessCheck implements Contract {
         this.accessible = acc;
     }
 
-    final void combineAccessible(JavaDLTerm acc, JavaDLTerm accPre, TermServices services) {
+    final void combineAccessible(JavaDLTerm acc, JavaDLTerm accPre, JavaDLTermServices services) {
         if (acc == null && accPre == null) {
             setAccessible(null);
         } else if (accPre == null || accPre.equals(acc)) {
@@ -929,7 +930,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param services
      * @return the combined well-definedness contract
      */
-    public WellDefinednessCheck combine(WellDefinednessCheck wdc, TermServices services) {
+    public WellDefinednessCheck combine(WellDefinednessCheck wdc, JavaDLTermServices services) {
         assert this.getName().equals(wdc.getName());
         assert this.id() == wdc.id();
         assert this.getTarget().equals(wdc.getTarget());
@@ -1056,7 +1057,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return the full valid post-condition
      */
     public final JavaDLTerm getPost(final Condition post, ParsableVariable result,
-                              TermServices services) {
+            JavaDLTermServices services) {
         final JavaDLTerm reachable;
         if (result != null) {
             reachable = TB.reachableValue(TB.var(result), origVars.result.getKeYJavaType());
@@ -1078,7 +1079,7 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     public final JavaDLTerm getUpdates(JavaDLTerm mod, LocationVariable heap,
                                  ProgramVariable heapAtPre,
-                                 JavaDLTerm anonHeap, TermServices services) {
+                                 JavaDLTerm anonHeap, JavaDLTermServices services) {
         assert mod != null;
         assert anonHeap != null || TB.strictlyNothing().equals(mod);
         final JavaDLTerm havocUpd = TB.strictlyNothing().equals(mod) ?

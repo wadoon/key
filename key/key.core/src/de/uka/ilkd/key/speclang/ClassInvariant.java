@@ -14,8 +14,8 @@
 package de.uka.ilkd.key.speclang;
 
 import org.key_project.common.core.logic.op.ParsableVariable;
-import org.key_project.common.core.services.TermServices;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
@@ -35,7 +35,7 @@ public interface ClassInvariant extends SpecificationElement {
      * Returns the invariant formula without implicit all-quantification over
      * the receiver object.
      */
-    public JavaDLTerm getInv(ParsableVariable selfVar, TermServices services);
+    public JavaDLTerm getInv(ParsableVariable selfVar, JavaDLTermServices services);
 
 
     /**

@@ -13,8 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import org.key_project.common.core.services.TermServices;
-
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -36,5 +35,5 @@ public interface BuiltInRule extends Rule {
     
     boolean isApplicableOnSubTerms();
 
-    IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
+    IBuiltInRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services);
 }
