@@ -225,7 +225,7 @@ options {
     /**
      * Extracts a term's subterms as an array.
      */
-    private Term[] getSubTerms(JavaDLTerm term) {
+    private JavaDLTerm[] getSubTerms(JavaDLTerm term) {
 	JavaDLTerm[] result = new JavaDLTerm[term.arity()];
 	for(int i = 0; i < term.arity(); i++) {
 	    result[i] = term.sub(i);
@@ -264,7 +264,7 @@ options {
     // TODO: remove when all clients have been moved to JMLTranslator
     private JavaDLTerm convertToOld(final JavaDLTerm term) {
 	    assert atPres != null && atPres.get(getBaseHeap()) != null;
-	    Map<Term, JavaDLTerm> map = new LinkedHashMap<Term, JavaDLTerm>();
+	    Map<JavaDLTerm, JavaDLTerm> map = new LinkedHashMap<JavaDLTerm, JavaDLTerm>();
         for (LocationVariable var : atPres.keySet()) {
             // caution: That may now also be other variables than only heaps.
             JavaDLTerm varAtPre = atPres.get(var);
@@ -1064,7 +1064,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 			    final JavaDLTerm upperBound = tb.func(intLDT.getLessThan(),right.getTerm(),right2.getTerm());
 			    result = new SLExpression(tb.and(result.getTerm(),upperBound));
 			}
-		} catch (JavaDLTermCreationException e) {
+		} catch (TermCreationException e) {
 		    raiseError("Error in relational expression: " + e.getMessage());
 		} catch (IllegalArgumentException e) {
 		    raiseError("Internal error.");
