@@ -24,6 +24,7 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -171,7 +172,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+   public IBuiltInRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services) {
       return new DefaultBuiltInRuleApp(this, pos);
    }
    

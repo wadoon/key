@@ -37,6 +37,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -50,11 +51,11 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -258,7 +259,7 @@ public class QueryExpand implements BuiltInRule {
 
 
     private ImmutableArray<ProgramVariable> getRegisteredArgumentVariables(
-            ImmutableArray<ParameterDeclaration> paramDecls, TermServices services) {
+            ImmutableArray<ParameterDeclaration> paramDecls, JavaDLTermServices services) {
 
         final Namespace progvarsNS = services.getNamespaces().programVariables();
         final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];

@@ -31,12 +31,13 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Immutables;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -714,7 +715,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     @Override
-    public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services) {
         return new OneStepSimplifierRuleApp(this, pos);
     }
 

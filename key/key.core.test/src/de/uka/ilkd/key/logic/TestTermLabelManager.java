@@ -20,18 +20,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
+import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -63,6 +62,7 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 /**
  * Tests {@link TermLabelManager}
@@ -716,7 +716,8 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public void updateLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence, JavaDLTerm applicationTerm, JavaDLTerm modalityTerm, Rule rule, RuleApp ruleApp, Goal goal, Object hint, JavaDLTerm tacletTerm, Operator newTermOp, ImmutableArray<JavaDLTerm> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, ModalContent newTermJavaBlock, Set<TermLabel> labels) {
+      public void updateLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence, JavaDLTerm applicationTerm, JavaDLTerm modalityTerm, Rule rule, RuleApp ruleApp, Goal goal, Object hint, JavaDLTerm tacletTerm, Operator newTermOp, ImmutableArray<JavaDLTerm> newTermSubs, 
+              ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
          if (!labels.contains(toAdd)) {
             labels.add(toAdd);
          }
@@ -740,12 +741,16 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public boolean isRuleApplicationSupported(TermServices services, PosInOccurrence applicationPosInOccurrence, JavaDLTerm applicationTerm, Rule rule, Goal goal, Object hint, JavaDLTerm tacletTerm, Operator newTermOp, ImmutableArray<JavaDLTerm> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, ModalContent newTermJavaBlock) {
+      public boolean isRuleApplicationSupported(JavaDLTermServices services, PosInOccurrence applicationPosInOccurrence, JavaDLTerm applicationTerm, Rule rule, 
+              Goal goal, Object hint, JavaDLTerm tacletTerm, Operator newTermOp, ImmutableArray<JavaDLTerm> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, 
+              JavaBlock newTermJavaBlock) {
          return true;
       }
 
       @Override
-      public boolean addLabel(TermServices services, PosInOccurrence applicationPosInOccurrence, JavaDLTerm applicationTerm, Rule rule, Goal goal, Object hint, JavaDLTerm tacletTerm, Operator newTermOp, ImmutableArray<JavaDLTerm> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, ModalContent newTermJavaBlock, JavaDLTerm childTerm, TermLabel label) {
+      public boolean addLabel(JavaDLTermServices services, PosInOccurrence applicationPosInOccurrence, JavaDLTerm applicationTerm, Rule rule, Goal goal, Object hint, 
+              JavaDLTerm tacletTerm, Operator newTermOp, ImmutableArray<JavaDLTerm> newTermSubs, 
+              ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, JavaDLTerm childTerm, TermLabel label) {
          log.add(label);
          return true;
       }

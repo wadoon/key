@@ -15,4 +15,5 @@ Export-Package:
  org.key_project.common.core.logic.label,
  org.key_project.common.core.logic.op,
  org.key_project.common.core.logic.sort,
+ org.key_project.common.core.program,
  org.key_project.common.core.services

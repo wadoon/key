@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Junctor;
@@ -1004,7 +1005,7 @@ public final class TruthValueTracingUtil {
       /**
        * The condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        */
-      private final JavaDLTerm condition;
+      private final GenericTerm<?,?,?,?> condition;
       
       /**
        * The human readable condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
@@ -1026,7 +1027,7 @@ public final class TruthValueTracingUtil {
        */
       public BranchResult(Node leafNode, 
                           Map<String, MultiEvaluationResult> results,
-                          JavaDLTerm condition,
+                          GenericTerm<?,?,?,?> condition,
                           String conditionString,
                           Name termLabelName) {
          assert leafNode != null;
@@ -1073,7 +1074,7 @@ public final class TruthValueTracingUtil {
        * Returns the condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        * @return The condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        */
-      public JavaDLTerm getCondition() {
+      public GenericTerm<?,?,?,?> getCondition() {
          return condition;
       }
 
@@ -1098,7 +1099,7 @@ public final class TruthValueTracingUtil {
        * @param term The {@link JavaDLTerm} to check.
        * @return {@code true} has {@link TermLabel}, {@code false} do not has {@link TermLabel}.
        */
-      public boolean hasPredicateLabel(JavaDLTerm term) {
+      public boolean hasPredicateLabel(GenericTerm<?,?,?,?> term) {
          return getPredicateLabel(term) != null;
       }
 
@@ -1107,7 +1108,7 @@ public final class TruthValueTracingUtil {
        * @param term The {@link JavaDLTerm}.
        * @return The found {@link FormulaTermLabel} or {@code null} otherwise.
        */
-      public FormulaTermLabel getPredicateLabel(JavaDLTerm term) {
+      public FormulaTermLabel getPredicateLabel(GenericTerm<?,?,?,?> term) {
          TermLabel label = term.getLabel(termLabelName);
          return label instanceof FormulaTermLabel ? (FormulaTermLabel) label : null;
       }

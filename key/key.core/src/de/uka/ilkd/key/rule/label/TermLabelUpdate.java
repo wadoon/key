@@ -15,7 +15,6 @@ package de.uka.ilkd.key.rule.label;
 
 import java.util.Set;
 
-import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -23,9 +22,9 @@ import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -81,6 +80,6 @@ public interface TermLabelUpdate extends RuleSpecificTask {
                             Operator newTermOp,
                             ImmutableArray<JavaDLTerm> newTermSubs,
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                            ModalContent newTermJavaBlock,
+                            JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels);
 }
