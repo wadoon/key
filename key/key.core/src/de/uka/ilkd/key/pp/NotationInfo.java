@@ -22,6 +22,7 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;

@@ -14,13 +14,13 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.Quantifier;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;

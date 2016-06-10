@@ -17,13 +17,13 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.op.Quantifier;
 
 /**
  * This class is used to create metavariables for every universal variables in 

@@ -14,12 +14,12 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.Quantifier;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Quantifier;
 
 
 /**

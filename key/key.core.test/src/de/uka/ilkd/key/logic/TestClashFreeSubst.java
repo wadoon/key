@@ -25,6 +25,7 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -33,7 +34,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
