@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Visitor;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
@@ -25,6 +24,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.JavaDLVisitor;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -121,7 +121,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    class QuantifiableVariableVisitor implements Visitor {
+    class QuantifiableVariableVisitor implements JavaDLVisitor {
 
         private LinkedList<QuantifiableVariable> vars = new LinkedList<QuantifiableVariable>();
 

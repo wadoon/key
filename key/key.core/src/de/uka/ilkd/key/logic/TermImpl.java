@@ -15,7 +15,6 @@ package de.uka.ilkd.key.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
@@ -237,7 +236,7 @@ class TermImpl implements JavaDLTerm {
     
 
     @Override
-    public <T extends GenericTerm<JavaDLVisitor>> boolean equalsModRenaming(T o) {
+    public boolean equalsModRenaming(JavaDLTerm o) {
         if (o == this) {
             return true;
         }
@@ -311,7 +310,7 @@ class TermImpl implements JavaDLTerm {
      * @return <code>true</code> is returned iff the terms are equal modulo
      *         bound renaming
      */
-    private boolean unifyHelp(GenericTerm<JavaDLVisitor> t0, GenericTerm<JavaDLVisitor> t1,
+    private boolean unifyHelp(JavaDLTerm t0, JavaDLTerm t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
             NameAbstractionTable nat) {
@@ -345,7 +344,7 @@ class TermImpl implements JavaDLTerm {
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
     }
 
-    private boolean handleQuantifiableVariable(GenericTerm<JavaDLVisitor> t0, GenericTerm<JavaDLVisitor> t1,
+    private boolean handleQuantifiableVariable(JavaDLTerm t0, JavaDLTerm t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars) {
         if (!((t1.op() instanceof QuantifiableVariable) && compareBoundVariables(
@@ -362,7 +361,7 @@ class TermImpl implements JavaDLTerm {
      */
     private static NameAbstractionTable FAILED = new NameAbstractionTable();
 
-    private static NameAbstractionTable handleJava(GenericTerm<JavaDLVisitor> t0, GenericTerm<JavaDLVisitor> t1,
+    private static NameAbstractionTable handleJava(JavaDLTerm t0, JavaDLTerm t1,
             NameAbstractionTable nat) {
 
         if (!t0.modalContent().isEmpty() || !t1.modalContent().isEmpty()) {
@@ -387,7 +386,7 @@ class TermImpl implements JavaDLTerm {
         return nat;
     }
 
-    private boolean descendRecursively(GenericTerm<JavaDLVisitor> t0, GenericTerm<JavaDLVisitor> t1,
+    private boolean descendRecursively(JavaDLTerm t0, JavaDLTerm t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
             NameAbstractionTable nat) {

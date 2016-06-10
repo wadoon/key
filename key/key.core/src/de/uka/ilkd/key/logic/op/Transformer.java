@@ -21,9 +21,9 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level

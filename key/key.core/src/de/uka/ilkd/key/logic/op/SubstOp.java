@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.AbstractOperator;
 import org.key_project.common.core.services.TermServices;
+
+import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
  * Standard first-order substitution operator, resolving clashes but not
@@ -24,7 +25,7 @@ import org.key_project.common.core.services.TermServices;
  * operators. Currently, only the subclass <code>WarySubstOp</code> is used and
  * accessible through the key parser.
  */
-public abstract class SubstOp <T extends GenericTerm<?>> extends AbstractOperator {
+public abstract class SubstOp extends AbstractOperator {
 
     protected SubstOp(Name name) {
         super(name, 2, new Boolean[] { false, true }, true);
@@ -37,7 +38,7 @@ public abstract class SubstOp <T extends GenericTerm<?>> extends AbstractOperato
      * @param services
      *            TODO
      */
-    public abstract T apply(T term, TermServices services);// {
+    public abstract JavaDLTerm apply(JavaDLTerm term, TermServices services);// {
     // QuantifiableVariable v =
     // term.varsBoundHere(1).getQuantifiableVariable(0);
     // ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));

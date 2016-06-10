@@ -19,12 +19,12 @@ import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.AbstractSV;
 import org.key_project.common.core.logic.op.UpdateableOperator;
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.LoopInitializer;
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -45,9 +45,9 @@ import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.ProgramConstruct;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.ProgramList;
@@ -92,7 +92,7 @@ public final class ProgramSV extends AbstractSV
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, 
-				     GenericNameAbstractionTable nat) {
+            NameAbstractionTable nat) {
 	return se == this;
     }    
         

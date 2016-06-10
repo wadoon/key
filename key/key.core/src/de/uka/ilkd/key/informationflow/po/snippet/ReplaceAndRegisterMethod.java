@@ -10,7 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Namespace;
-import org.key_project.common.core.logic.Visitor;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -22,6 +21,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.JavaDLVisitor;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -191,7 +191,7 @@ abstract class ReplaceAndRegisterMethod {
         return qvVisitor.getResult();
     }
 
-    final private static class QuantifiableVariableVisitor implements Visitor {
+    final private static class QuantifiableVariableVisitor implements JavaDLVisitor {
         private HashSet<QuantifiableVariable> vars = new LinkedHashSet<QuantifiableVariable>();
 
         @Override

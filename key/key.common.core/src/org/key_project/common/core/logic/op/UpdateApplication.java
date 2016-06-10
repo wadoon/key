@@ -42,7 +42,7 @@ public final class UpdateApplication extends AbstractOperator {
      *            term with this operator as top level operator
      */
     @SuppressWarnings("unchecked")
-    public static <T extends GenericTerm<?>> T getUpdate(T t) {
+    public static <T extends GenericTerm<?,?,?,?>> T getUpdate(T t) {
         assert t.op() == UPDATE_APPLICATION;
         return (T) t.sub(updatePos());
     }
@@ -62,7 +62,7 @@ public final class UpdateApplication extends AbstractOperator {
      *            term with this operator as top level operator
      */
     @SuppressWarnings("unchecked")
-    public static <T extends GenericTerm<?>> T getTarget(T t) {
+    public static <T extends GenericTerm<?,?,?,?>> T getTarget(T t) {
         assert t.op() == UPDATE_APPLICATION;
         return (T) t.sub(targetPos());
     }

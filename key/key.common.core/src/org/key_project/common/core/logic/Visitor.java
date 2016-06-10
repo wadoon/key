@@ -13,8 +13,9 @@
 
 package org.key_project.common.core.logic;
 
+import org.key_project.common.core.program.GenericNameAbstractionTable;
 
-public interface Visitor<T extends GenericTerm<? extends Visitor<T>>> {
+public interface Visitor<S, V extends Visitor<S,V,T,N>, T extends GenericTerm<S,T,V,N>, N extends GenericNameAbstractionTable<S>> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      * @param visited The currently visited {@link Term}.

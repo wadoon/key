@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.java;
 
-import org.key_project.common.core.program.GenericNameAbstractionTable;
-
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 public class Comment extends JavaSourceElement {
@@ -61,7 +59,7 @@ public class Comment extends JavaSourceElement {
     /** comments can be ignored
      */
      public boolean equalsModRenaming(SourceElement se, 
-				      GenericNameAbstractionTable nat) {
+             NameAbstractionTable nat) {
      	return true;
      }
      

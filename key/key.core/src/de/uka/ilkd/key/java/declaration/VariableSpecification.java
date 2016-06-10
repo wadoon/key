@@ -13,12 +13,12 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.NamedProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -268,7 +268,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      * NameAbstractionTable.
      */
      public boolean equalsModRenaming(SourceElement se, 
-				     GenericNameAbstractionTable nat) {
+             NameAbstractionTable nat) {
 	if (!(se instanceof VariableSpecification)) {
 	    return false;
 	}		 

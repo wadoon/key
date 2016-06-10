@@ -15,14 +15,13 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
-import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -41,6 +40,7 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -298,7 +298,7 @@ public final class ProgramMethod extends ObserverFunction
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, 
-	    GenericNameAbstractionTable nat) {
+	    NameAbstractionTable nat) {
 	if (se == null || !(se instanceof IProgramMethod)) {
 	    return false;
 	}
@@ -320,9 +320,9 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public Expression convertToProgram(GenericTerm t, ExtList l) {
-	ProgramElement called;
-	if (isStatic()) {
+    public Expression convertToProgram(JavaDLTerm t, ExtList l) {
+        ProgramElement called;
+    if (isStatic()) {
 	    called = new TypeRef(getContainerType());
 	} else {
 	    called=(ProgramElement)l.get(0);

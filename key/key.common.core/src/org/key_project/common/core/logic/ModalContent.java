@@ -2,7 +2,7 @@ package org.key_project.common.core.logic;
 
 import org.key_project.common.core.program.GenericNameAbstractionTable;
 
-public interface ModalContent<S> {
+public interface ModalContent<S/* program AST */, N extends GenericNameAbstractionTable<S>> {
 
     /**
      * returns true if the program is empty
@@ -10,6 +10,6 @@ public interface ModalContent<S> {
      */
     boolean isEmpty();
 
-    boolean equalsModRenaming(Object modalContent, GenericNameAbstractionTable<S> nat);
+    boolean equalsModRenaming(Object modalContent, N nat);
 
 }

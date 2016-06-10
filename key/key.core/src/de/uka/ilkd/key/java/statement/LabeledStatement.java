@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.NamedProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -304,7 +304,7 @@ public class LabeledStatement extends JavaStatement
      * mapped to the same abstract name. This is done here.
      */
     public boolean equalsModRenaming(SourceElement se, 
-				     GenericNameAbstractionTable nat) {
+            NameAbstractionTable nat) {
 	if (se == null || this.getClass() != se.getClass()) {
 	    return false;
 	}

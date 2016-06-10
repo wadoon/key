@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -24,6 +23,6 @@ import de.uka.ilkd.key.java.Expression;
  */
 public interface ProgramInLogic {
 
-    Expression convertToProgram(GenericTerm t, ExtList list);
+    Expression convertToProgram(JavaDLTerm t, ExtList list);
 
 }

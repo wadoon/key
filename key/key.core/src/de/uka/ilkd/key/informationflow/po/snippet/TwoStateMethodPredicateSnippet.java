@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
@@ -58,7 +57,6 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             ImmutableList<JavaDLTerm> termList, IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
-        ImmutableArray<Sort> pmSorts = pm.argSorts();
 
         int i = 0;
         for (final JavaDLTerm arg : termList) {

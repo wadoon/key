@@ -15,7 +15,6 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -129,7 +128,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
      */
     @Override    
     public boolean equalsModRenaming(SourceElement se, 
-				     GenericNameAbstractionTable<SourceElement> nat) {
+            NameAbstractionTable nat) {
     	return (this.getClass() == se.getClass());
     }
     

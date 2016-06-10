@@ -17,14 +17,14 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import org.key_project.common.core.logic.ModalContent;
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 
-public class JavaBlock implements ModalContent<SourceElement> {
+public class JavaBlock implements ModalContent<SourceElement, NameAbstractionTable> {
     
     /**
      * Attention using the JavaBlock below means no program not the empty program.
@@ -105,8 +105,7 @@ public class JavaBlock implements ModalContent<SourceElement> {
      * one of the JavaBlock modulo renaming (see comment in SourceElement)
      */ 
     @Override
-    public boolean equalsModRenaming(Object o, 
-				     GenericNameAbstractionTable<SourceElement> nat) {
+    public boolean equalsModRenaming(Object o, NameAbstractionTable nat) {
         if (!(o instanceof JavaBlock)) {
             return false;
         }       
@@ -118,7 +117,7 @@ public class JavaBlock implements ModalContent<SourceElement> {
      * one of the JavaBlock modulo renaming (see comment in SourceElement)
      */ 
     private boolean equalsModRenaming(JavaProgramElement pe,
-				     GenericNameAbstractionTable<SourceElement> nat) {
+            NameAbstractionTable nat) {
 	if (pe == null && program() == null) {
 	    return true;
 	} else if (pe != null && program() != null) {	    

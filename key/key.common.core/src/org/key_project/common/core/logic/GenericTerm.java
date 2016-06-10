@@ -18,6 +18,7 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -56,7 +57,7 @@ import org.key_project.util.collection.ImmutableSet;
  * "JavaTerm" or the like; from this class here, the java specific methods
  * have been removed.
  */
-public interface GenericTerm<V extends Visitor<? extends GenericTerm<V>>> extends SVSubstitute, Sorted {
+public interface GenericTerm<S, T extends GenericTerm<S,T,V,N>, V extends Visitor<S, V, T, N>, N extends GenericNameAbstractionTable<S>> extends SVSubstitute, Sorted {
 
     /** 
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
@@ -67,13 +68,13 @@ public interface GenericTerm<V extends Visitor<? extends GenericTerm<V>>> extend
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f")
      * casted to the passed type.
      */
-    <T> T op(Class<T> opClass) throws IllegalArgumentException;
+    <O> O op(Class<O> opClass) throws IllegalArgumentException;
 
     
     /**
      * The modal content 
      */
-    public ModalContent<?> modalContent();
+    public ModalContent<S,N> modalContent();
 
     /**
      * Checks if the {@link ModalContent} or one of its direct or indirect children
@@ -89,12 +90,12 @@ public interface GenericTerm<V extends Visitor<? extends GenericTerm<V>>> extend
     /**
      * The subterms.
      */
-    ImmutableArray<? extends GenericTerm<V>> subs();
+    ImmutableArray<T> subs();
 
     /** 
      * The <code>n</code>-th direct subterm.
      */
-    GenericTerm<V> sub(int n);
+    T sub(int n);
 
     /**
      * The logical variables bound by the top level operator.
@@ -153,7 +154,7 @@ public interface GenericTerm<V extends Visitor<? extends GenericTerm<V>>> extend
      * operator, sort, arity, varsBoundHere and javaBlock as this object
      * modulo bound renaming
      */
-    <T extends GenericTerm<V>> boolean equalsModRenaming(T o);
+    boolean equalsModRenaming(T o);
 
     /**
      * returns true if the term is labeled
