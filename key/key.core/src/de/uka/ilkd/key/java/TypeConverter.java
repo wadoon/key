@@ -15,7 +15,7 @@ package de.uka.ilkd.key.java;
 
 
 import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.GenericSortDependingFunction;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -74,7 +74,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.util.Debug;
 import recoder.service.ConstantEvaluator;
 
@@ -289,7 +288,7 @@ public final class TypeConverter {
 	    getKeYJavaType();
 	final JavaDLTerm obj = convertToLogicElement(io.getChildAt(0), ec);
 	final Sort s = type.getSort();
-	final GenericSortDependingFunction instanceOfSymbol = s.getInstanceofSymbol(services);
+	final SortDependingFunction instanceOfSymbol = s.getInstanceofSymbol(services);
 
 	// in JavaDL S::instance(o) is also true if o (for reference types S)
 	// is null in opposite to Java

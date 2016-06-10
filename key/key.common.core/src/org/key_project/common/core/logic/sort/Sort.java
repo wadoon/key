@@ -15,7 +15,7 @@ package org.key_project.common.core.logic.sort;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
-import org.key_project.common.core.logic.op.GenericSortDependingFunction;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.services.GenericProofServices;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -58,18 +58,18 @@ public interface Sort extends Named {
         }
 
         @Override
-        public GenericSortDependingFunction getCastSymbol(TermServices services) {
+        public SortDependingFunction getCastSymbol(TermServices services) {
             throw new UnsupportedOperationException("Cannot cast to " + name);
         }
 
         @Override
-        public GenericSortDependingFunction getInstanceofSymbol(
+        public SortDependingFunction getInstanceofSymbol(
                 TermServices services) {
             throw new UnsupportedOperationException("Cannot check instanceof for " + name);
         }
 
         @Override
-        public GenericSortDependingFunction getExactInstanceofSymbol(
+        public SortDependingFunction getExactInstanceofSymbol(
                 TermServices services) {
             throw new UnsupportedOperationException("Cannot check exactInstanceof for " + name);
         }
@@ -95,6 +95,13 @@ public interface Sort extends Named {
      * Term labels are represented as "terms" of this sort.
      */
     final Sort TERMLABEL = new SpecialSort(new Name("TermLabel"));
+    
+    // TODO: Hacked this in again, there is another one in SortImpl. Only
+    //       did this to get SortDependingFunction compile again.
+    /**
+     * Any is a supersort of all sorts.
+     */
+    final Sort ANY = new SpecialSort(new Name("any"));
 
     public final Name CAST_NAME = new Name("cast");
     final Name INSTANCE_NAME = new Name("instance");
@@ -125,17 +132,17 @@ public interface Sort extends Named {
     /**
      * returns the cast symbol of this Sort
      */
-    GenericSortDependingFunction getCastSymbol(TermServices services);
+    SortDependingFunction getCastSymbol(TermServices services);
     
     /**
      * returns the instanceof symbol of this Sort
      */
-    GenericSortDependingFunction getInstanceofSymbol(TermServices services);
+    SortDependingFunction getInstanceofSymbol(TermServices services);
     
     /**
      * returns the exactinstanceof symbol of this Sort
      */
-    GenericSortDependingFunction getExactInstanceofSymbol(TermServices services);
+    SortDependingFunction getExactInstanceofSymbol(TermServices services);
 
     String declarationString();
 }

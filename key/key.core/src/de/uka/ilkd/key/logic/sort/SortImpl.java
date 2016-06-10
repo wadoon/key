@@ -22,11 +22,6 @@ import org.key_project.util.collection.ImmutableSet;
  * Standard implementation of the Sort interface.
  */
 public final class SortImpl extends AbstractSort {
-    
-    /**
-     * Any is a supersort of all sorts.
-     */
-    public final static Sort ANY = new SortImpl(new Name("any"));
 
     public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         super(name, ext, isAbstract);

@@ -11,17 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.GenericSortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 
 /**
  * The objects of this class represent families of function symbols, where each
@@ -30,7 +25,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
  * and f2 then from f1.isSimilar(f2) and f1.getSortDependingOn() ==
  * f2.getSortDependingOn() follows f1 == f2
  */
-public final class SortDependingFunction extends Function implements GenericSortDependingFunction {
+public final class SortDependingFunction extends Function {
 
     private final SortDependingFunctionTemplate template;
     private final Sort sortDependingOn;
@@ -84,13 +79,13 @@ public final class SortDependingFunction extends Function implements GenericSort
         SortDependingFunctionTemplate template =
                 new SortDependingFunctionTemplate(sortDependingOn, kind, sort,
                         new ImmutableArray<Sort>(argSorts), unique);
-        return new SortDependingFunction(template, SortImpl.ANY);
+        return new SortDependingFunction(template, Sort.ANY);
     }
 
     public static SortDependingFunction getFirstInstance(Name kind,
             TermServices services) {
         return (SortDependingFunction) services.getNamespaces().getNamespace("functions")
-                .lookup(instantiateName(kind, SortImpl.ANY));
+                .lookup(instantiateName(kind, Sort.ANY));
     }
 
     public SortDependingFunction getInstanceFor(Sort sort, TermServices services) {
@@ -98,8 +93,10 @@ public final class SortDependingFunction extends Function implements GenericSort
             return this;
         }
 
-        assert !(sort instanceof ProgramSVSort);
-        assert sort != AbstractTermTransformer.METASORT;
+        //TODO: (DS) Commented out those assertion statements in course of the
+        //      refactoring. Maybe we have to replace / re-insert them later.
+//        assert !(sort instanceof ProgramSVSort);
+//        assert sort != AbstractTermTransformer.METASORT;
 
         SortDependingFunction result =
                 (SortDependingFunction) services.getNamespaces().lookup(
