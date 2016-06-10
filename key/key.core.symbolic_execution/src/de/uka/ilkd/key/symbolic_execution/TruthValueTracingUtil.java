@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.common.core.logic.sort.Sort;
@@ -27,7 +28,6 @@ import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;

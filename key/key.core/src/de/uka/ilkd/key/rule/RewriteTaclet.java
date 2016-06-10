@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;

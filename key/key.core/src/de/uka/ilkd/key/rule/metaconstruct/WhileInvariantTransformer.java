@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
@@ -47,7 +48,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;

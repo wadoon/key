@@ -14,12 +14,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.StrategyProperties;

@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.LRUCache;
@@ -39,7 +40,6 @@ import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.Transformer;
