@@ -42,8 +42,8 @@ import recoder.java.reference.*;
 import recoder.java.statement.*;
 import recoder.io.*;
 
-import org.key_project.common.core.services.recoderext.*;
-import org.key_project.common.core.services.recoderext.adt.*;
+import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.java.recoderext.adt.*;
 import recoder.abstraction.TypeArgument.WildcardMode;
 
 
