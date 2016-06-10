@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java;
 
+import org.key_project.common.core.services.ProgramServices;
+
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.InnerVariableNamer;

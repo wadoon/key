@@ -45,4 +45,14 @@ public interface GenericNamespaceSet {
      *             other logics than JavaDL.
      */
     Namespace functions();
+
+    /**
+     * TODO: Document.
+     *
+     * @return The sorts set.
+     * @deprecated Is here for backwards compatibility; you should use
+     *             {@link #getNamespace(String)} instead to be compatible with
+     *             other logics than JavaDL.
+     */
+    Namespace sorts();
 }

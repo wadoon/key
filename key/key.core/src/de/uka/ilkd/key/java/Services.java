@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.services.ProgramServices;
 import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
@@ -344,5 +345,18 @@ public class Services implements TermServices, ProofServices {
     public JavaServices getProgramServices() {
        return javaServices;
    }
+
+    /* (non-Javadoc)
+     * @see org.key_project.common.core.services.GenericProofServices#getProgramServices(java.lang.Class)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public <S extends ProgramServices> S getProgramServices(Class<S> clazz) {
+        if (JavaServices.class.equals(clazz)) {
+            return (S) getProgramServices();
+        } else {
+            throw new UnsupportedOperationException("Can only return program services of type JavaServices");
+        }
+    }
 
 }

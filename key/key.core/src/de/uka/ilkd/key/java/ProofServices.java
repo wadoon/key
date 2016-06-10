@@ -40,12 +40,6 @@ public interface ProofServices extends GenericProofServices {
     Counter getCounter(String name);
 
     /**
-     * returns the namespaces for functions, predicates etc.
-     * @return the proof specific namespaces
-     */
-    NamespaceSet getNamespaces();
-
-    /**
      * sets the namespaces of known predicates, functions, variables
      * @param namespaces the NamespaceSet with the proof specific namespaces
      */
@@ -62,7 +56,5 @@ public interface ProofServices extends GenericProofServices {
      * @return The used {@link Profile}.
      */
     Profile getProfile();
-
-    ProgramServices getProgramServices();
 
 }

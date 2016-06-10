@@ -18,10 +18,12 @@ import java.lang.ref.WeakReference;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.services.GenericProofServices;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
@@ -41,7 +43,7 @@ public final class NullSort implements Sort  {
     
     private final Sort objectSort;
     
-    private WeakReference<Services> lastServices 
+    private WeakReference<? extends GenericProofServices> lastServices 
     	= new WeakReference<Services>(null);
     private WeakReference<ImmutableSet<Sort>> extCache
         = new WeakReference<ImmutableSet<Sort>>(null);
@@ -66,27 +68,53 @@ public final class NullSort implements Sort  {
     }
     
     
-    @Override
-    public ImmutableSet<Sort> extendsSorts(Services services) {
-	assert services != null;
-	assert objectSort == services.getProgramServices().getJavaInfo().objectSort();
-	
-	ImmutableSet<Sort> result = extCache.get();
-	if(result == null || lastServices.get() != services) {
-	    result = DefaultImmutableSet.<Sort>nil();
+//    @Override
+//    public ImmutableSet<Sort> extendsSorts(Services services) {
+//        assert services != null;
+//        assert objectSort == services.getProgramServices().getJavaInfo()
+//                .objectSort();
+//
+//        ImmutableSet<Sort> result = extCache.get();
+//        if (result == null || lastServices.get() != services) {
+//            result = DefaultImmutableSet.<Sort> nil();
+//
+//            for (Named n : services.getNamespaces().sorts().allElements()) {
+//                Sort s = (Sort) n;
+//                if (s != this && s.extendsTrans(objectSort)) {
+//                    result = result.add(s);
+//                }
+//            }
+//
+//            lastServices = new WeakReference<Services>(services);
+//            extCache = new WeakReference<ImmutableSet<Sort>>(result);
+//        }
+//
+//        return result;
+//    }
 
-	    for(Named n : services.getNamespaces().sorts().allElements()) {
-		Sort s = (Sort)n;
-		if(s != this && s.extendsTrans(objectSort)) {
-		    result = result.add(s);
-		}
-	    }
-	    
-	    lastServices = new WeakReference<Services>(services);
-	    extCache = new WeakReference<ImmutableSet<Sort>>(result);
-	}
-	
-	return result;
+    @Override
+    public <T extends GenericProofServices> ImmutableSet<Sort> extendsSorts(
+            T services) {
+        assert services != null;
+        assert objectSort == services.getProgramServices(JavaServices.class)
+                .getJavaInfo().objectSort();
+
+        ImmutableSet<Sort> result = extCache.get();
+        if (result == null || lastServices.get() != services) {
+            result = DefaultImmutableSet.<Sort> nil();
+
+            for (Named n : services.getNamespaces().sorts().allElements()) {
+                Sort s = (Sort) n;
+                if (s != this && s.extendsTrans(objectSort)) {
+                    result = result.add(s);
+                }
+            }
+
+            lastServices = new WeakReference<T>(services);
+            extCache = new WeakReference<ImmutableSet<Sort>>(result);
+        }
+
+        return result;
     }
     
     
