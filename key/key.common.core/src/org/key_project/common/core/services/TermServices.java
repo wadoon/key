@@ -45,7 +45,7 @@ public interface TermServices<S, T extends GenericTerm<S, T, V, N>, V extends Vi
      * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
      * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
-    public abstract GenericTermBuilder getTermBuilder();
+    public abstract GenericTermBuilder<S, T, V, N, P> getTermBuilder();
 
     /**
      * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
