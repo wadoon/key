@@ -65,6 +65,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.XMLUtil;
@@ -96,10 +97,9 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.util.KeYTypeUtil;
-import de.uka.ilkd.key.util.Pair;
 
 /**
- * @author Stefan K�sdorf
+ * @author Stefan Kaesdorf
  */
 public class KeYResourcesUtil {
    

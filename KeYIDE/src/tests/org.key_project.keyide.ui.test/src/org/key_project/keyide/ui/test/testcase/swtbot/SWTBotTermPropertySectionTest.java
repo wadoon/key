@@ -26,7 +26,7 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 
@@ -97,13 +97,13 @@ public class SWTBotTermPropertySectionTest extends AbstractSWTBotKeYEditorProper
          assertEquals(StringUtil.EMPTY_STRING, propertiesView.bot().text(0).getText());
       }
       if (pis != null && pis.getPosInOccurrence() != null) {
-         Term term = pis.getPosInOccurrence().subTerm();
+         JavaDLTerm term = pis.getPosInOccurrence().subTerm();
          assertEquals(validate(ObjectUtil.toString(term.sort())), propertiesView.bot().text(1).getText());
          assertEquals(validate(TermPropertySection.operatorToString(term.op())), propertiesView.bot().text(2).getText());
          assertList(term.subs(), propertiesView.bot().list(0));
          assertList(term.freeVars(), propertiesView.bot().list(1));
          assertList(term.boundVars(), propertiesView.bot().list(2));
-         assertEquals(validate(ObjectUtil.toString(term.javaBlock())), propertiesView.bot().text(3).getText());
+         assertEquals(validate(ObjectUtil.toString(term.modalContent())), propertiesView.bot().text(3).getText());
          assertList(term.getLabels(), propertiesView.bot().list(3));
          assertEquals(validate(term.hashCode() + StringUtil.EMPTY_STRING), propertiesView.bot().text(4).getText());
       }

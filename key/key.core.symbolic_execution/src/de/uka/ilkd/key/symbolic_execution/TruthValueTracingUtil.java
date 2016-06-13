@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.GenericTermBuilder;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Junctor;
@@ -20,10 +21,10 @@ import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -1005,7 +1006,7 @@ public final class TruthValueTracingUtil {
       /**
        * The condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        */
-      private final GenericTerm<?,?,?,?> condition;
+      private final JavaDLTerm condition;
       
       /**
        * The human readable condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
@@ -1027,7 +1028,7 @@ public final class TruthValueTracingUtil {
        */
       public BranchResult(Node leafNode, 
                           Map<String, MultiEvaluationResult> results,
-                          GenericTerm<?,?,?,?> condition,
+                          JavaDLTerm condition,
                           String conditionString,
                           Name termLabelName) {
          assert leafNode != null;
@@ -1074,7 +1075,7 @@ public final class TruthValueTracingUtil {
        * Returns the condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        * @return The condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        */
-      public GenericTerm<?,?,?,?> getCondition() {
+      public JavaDLTerm getCondition() {
          return condition;
       }
 

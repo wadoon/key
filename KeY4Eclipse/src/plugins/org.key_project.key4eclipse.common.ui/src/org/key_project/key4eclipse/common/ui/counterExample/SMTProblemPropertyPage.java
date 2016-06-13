@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.gui.smt.CETree;
@@ -40,7 +41,6 @@ import de.uka.ilkd.key.smt.model.LocationSet;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.smt.model.Sequence;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * A {@link PropertyPage} which shows the result of an {@link InternSMTProblem}.

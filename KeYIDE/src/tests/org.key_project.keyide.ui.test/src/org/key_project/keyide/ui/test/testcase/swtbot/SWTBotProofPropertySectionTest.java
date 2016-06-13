@@ -21,10 +21,10 @@ import org.junit.Test;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.property.ProofPropertySection;
 import org.key_project.ui.test.util.TestKeYUIUtil;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * SWTBot tests for {@link ProofPropertySection}.

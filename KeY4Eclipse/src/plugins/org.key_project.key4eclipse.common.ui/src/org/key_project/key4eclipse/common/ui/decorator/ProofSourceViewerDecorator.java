@@ -28,6 +28,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.services.IDisposable;
+import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.ObjectUtil;
@@ -35,10 +36,9 @@ import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -57,7 +57,7 @@ import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 /**
  * The Decorator for the KeYEditor.
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
  */
 public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
@@ -96,12 +96,12 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    private TextPresentation textPresentation;
    
    /**
-    * The first range used to highlight the selected {@link Term}.
+    * The first range used to highlight the selected {@link JavaDLTerm}.
     */
    private StyleRange marked1;
    
    /**
-    * The second range used to highlight the selected {@link Term}.
+    * The second range used to highlight the selected {@link JavaDLTerm}.
     */
    private StyleRange marked2;
    /**
@@ -259,7 +259,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    
    
    /**
-    * Shows the given {@link Term} with help of the given {@link KeYMediator}
+    * Shows the given {@link JavaDLTerm} with help of the given {@link KeYMediator}
     * in the decorated {@link ISourceViewer}.
     * @param sequent The {@link Sequent} to be displayed.
     * @param services The {@link Services} to use.

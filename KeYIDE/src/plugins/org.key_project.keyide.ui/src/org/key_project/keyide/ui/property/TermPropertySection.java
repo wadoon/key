@@ -24,15 +24,15 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
+import org.key_project.common.core.logic.op.Operator;
 import org.key_project.keyide.ui.editor.IPosInSequentProvider;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 
@@ -165,14 +165,14 @@ public class TermPropertySection extends AbstractNodePropertySection {
       PosInSequent pis = pisProvider != null ? pisProvider.getSelectedPosInSequent() : null;
       pioText.setText(posInSequentToString(pis));
       // Show term information
-      Term term = pis != null && pis.getPosInOccurrence() != null ? pis.getPosInOccurrence().subTerm() : null;
+      JavaDLTerm term = pis != null && pis.getPosInOccurrence() != null ? pis.getPosInOccurrence().subTerm() : null;
       if (term != null) {
          SWTUtil.setText(sortText, ObjectUtil.toString(term.sort()));
          SWTUtil.setText(opText, operatorToString(term.op()));
          setListValues(subsList, term.subs());
          setListValues(freeVarsList, term.freeVars());
          setListValues(boundVarsList, term.boundVars());
-         SWTUtil.setText(javaBlockText, ObjectUtil.toString(term.javaBlock()));
+         SWTUtil.setText(javaBlockText, ObjectUtil.toString(term.modalContent()));
          setListValues(labelList, term.getLabels());
          SWTUtil.setText(hashCodeText, term.hashCode() + StringUtil.EMPTY_STRING);
       }

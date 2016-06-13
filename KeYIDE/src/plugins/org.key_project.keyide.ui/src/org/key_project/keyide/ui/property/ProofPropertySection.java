@@ -15,10 +15,11 @@ package org.key_project.keyide.ui.property;
 
 import java.util.List;
 
+import org.key_project.util.collection.Pair;
+
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Shows the {@link Proof} {@link Statistics}.

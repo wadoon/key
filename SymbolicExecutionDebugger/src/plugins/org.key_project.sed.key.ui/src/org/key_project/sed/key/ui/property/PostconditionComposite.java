@@ -20,8 +20,8 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
@@ -49,28 +49,28 @@ public class PostconditionComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Triple<Term, PosInTerm, Term> computeTermToShow(IKeYSENode<?> node,
+   protected Triple<JavaDLTerm, PosInTerm, JavaDLTerm> computeTermToShow(IKeYSENode<?> node,
                                                              IExecutionNode<?> executionNode, 
                                                              Node keyNode) {
-      Term term = keyNode.getAppliedRuleApp().posInOccurrence().subTerm();
+      JavaDLTerm term = keyNode.getAppliedRuleApp().posInOccurrence().subTerm();
       if (term.op() instanceof Modality) {
          term = term.sub(0);
       }
-      Term uninterpretedPredicate = AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof());
-      Term sfTerm = keyNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
-      ImmutableList<Term> updates = TermBuilder.goBelowUpdates2(sfTerm).first;
+      JavaDLTerm uninterpretedPredicate = AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof());
+      JavaDLTerm sfTerm = keyNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
+      ImmutableList<JavaDLTerm> updates = TermBuilder.goBelowUpdates2(sfTerm).first;
       if (uninterpretedPredicate != null) {
-         Set<Term> additionalPredicates = AbstractOperationPO.getAdditionalUninterpretedPredicates(executionNode.getProof());
+         Set<JavaDLTerm> additionalPredicates = AbstractOperationPO.getAdditionalUninterpretedPredicates(executionNode.getProof());
          PosInTerm predicatePosition = findUninterpretedPredicateTerm(node, term, uninterpretedPredicate, additionalPredicates);
-         Term termWithoutPredicate = predicatePosition != null ? 
+         JavaDLTerm termWithoutPredicate = predicatePosition != null ? 
                                      removeUninterpretedPredicate(keyNode, term, predicatePosition.getSubTerm(term)) :
                                      term;
-         return new Triple<Term, PosInTerm, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, termWithoutPredicate) : termWithoutPredicate, 
+         return new Triple<JavaDLTerm, PosInTerm, JavaDLTerm>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, termWithoutPredicate) : termWithoutPredicate, 
                                                   predicatePosition,
                                                   term);
       }
       else {
-         return new Triple<Term, PosInTerm, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, term) : term, 
+         return new Triple<JavaDLTerm, PosInTerm, JavaDLTerm>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, term) : term, 
                                                   null,
                                                   null);
       }

@@ -21,8 +21,8 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEMethodContract;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.core.model.impl.AbstractSEMethodContract;
 import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
@@ -34,7 +34,7 @@ import org.key_project.util.jdt.JDTUtil;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -234,9 +234,9 @@ public class KeYMethodContract extends AbstractSEMethodContract implements IKeYS
     * @return The current {@link PositionInfo}.
     */
    protected PositionInfo computePositionInfo() {
-      Term term = executionNode.getProofNode().getAppliedRuleApp().posInOccurrence().subTerm();
+      JavaDLTerm term = executionNode.getProofNode().getAppliedRuleApp().posInOccurrence().subTerm();
       term = TermBuilder.goBelowUpdates(term);
-      SourceElement firstElement = term.javaBlock().program().getFirstElement();
+      SourceElement firstElement = term.modalContent().program().getFirstElement();
       if (firstElement != null) {
          firstElement = NodeInfo.computeActiveStatement(firstElement);
          if (firstElement instanceof CopyAssignment) {

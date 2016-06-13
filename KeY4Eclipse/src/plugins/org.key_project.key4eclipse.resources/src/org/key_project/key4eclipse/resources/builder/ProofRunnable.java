@@ -22,6 +22,7 @@ import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.StringUtil;
 
@@ -48,13 +49,12 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
  * Runnable to perform the actual proof execution.
  * 
- * @author Stefan Käsdorf
+ * @author Stefan Kï¿½sdorf
  */
 public class ProofRunnable implements Runnable {
 

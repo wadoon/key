@@ -17,8 +17,8 @@ import java.io.File;
 import java.util.HashMap;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Sort;
 import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;

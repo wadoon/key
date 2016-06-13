@@ -15,7 +15,6 @@ package de.uka.ilkd.key.rule.label;
 
 import java.util.Set;
 
-import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
@@ -28,8 +27,9 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -69,7 +69,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                             Operator newTermOp,
                             ImmutableArray<JavaDLTerm> newTermSubs,
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                            ModalContent newTermJavaBlock,
+                            JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
       if (rule instanceof BlockContractRule &&
           StringUtil.startsWith(hint, "ValidityModality: exceptionVar=") &&

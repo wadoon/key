@@ -32,19 +32,21 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -286,7 +288,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
          LoopInvariant loopInv = loopApp.getInvariant();
 
-         Map<LocationVariable, Term> atPres = loopInv.getInternalAtPres();
+         Map<LocationVariable, JavaDLTerm> atPres = loopInv.getInternalAtPres();
          int heapCnt = services.getTheories().getHeapLDT().getAllHeaps().size();
          heaps = new LocationVariable[heapCnt];
          String[] invariantStrings = new String[heapCnt];
@@ -295,8 +297,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          int iter = 0; //iterator so we know where we're at.
          for (LocationVariable heap : services.getTheories().getHeapLDT().getAllHeaps()) {
             heaps[iter] = heap;
-            Term invTerm = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
-            Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
+            JavaDLTerm invTerm = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
+            JavaDLTerm modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
             if (invTerm != null) {
                invariantStrings[iter] = ProofSaver.printTerm(invTerm, services, true).toString();
             }
@@ -307,7 +309,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             iter++;
          }
          
-         Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
+         JavaDLTerm variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
          if (variant != null) {
             variantString = ProofSaver.printTerm(variant, services, true).toString();
          }
@@ -459,10 +461,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          int i = 0;
          for (LocationVariable heap : heaps) {
             Text wdgt = getTextField(-1, i, 0);
-            Term invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, null);
+            JavaDLTerm invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, null);
             wdgt = getTextField(-1, i, 1);
             Sort modSort = services.getTheories().getLocSetLDT().targetSort();
-            Term modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
+            JavaDLTerm modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
             if (invariantTerm == null) {
                setErrorMessage("Error in current specification: " + heap.toString() + " / invariant");
             }
@@ -471,7 +473,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             }
             i++;
          }
-         Term variantTerm = resetVariantsState();
+         JavaDLTerm variantTerm = resetVariantsState();
          if (variantTerm == null) {
             setErrorMessage("Error in current specification: variant");
          }
@@ -494,7 +496,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @author Viktor Pfanschilling
        * @return the invariant term
        */
-      private Term resetInvariantState() {
+      private JavaDLTerm resetInvariantState() {
          Text wdgt = getTextField(-1, -1, 0);
          return parseInputText(wdgt.getText(), Sort.FORMULA, invariantStatus);
       }
@@ -504,7 +506,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @author Viktor Pfanschilling
        * @return the modifies term
        */
-      private Term resetModifiesState() {
+      private JavaDLTerm resetModifiesState() {
          Text wdgt = getTextField(-1, -1, 1);
          Sort modSort = services.getTheories().getLocSetLDT().targetSort();
          return parseInputText(wdgt.getText(), modSort, modifiesStatus);
@@ -515,7 +517,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @author Viktor Pfanschilling
        * @return the variant term
        */
-      private Term resetVariantsState() {
+      private JavaDLTerm resetVariantsState() {
          Text wdgt = getTextField(-1, -1, 2);
          Sort varSort = services.getTheories().getIntegerLDT().targetSort();
          return parseInputText(wdgt.getText(), varSort, variantStatus);
@@ -527,10 +529,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @param input - text to be parsed
        * @param sortType - Sort of input text
        * @param status - status label to be updated, or null for none
-       * @return the Term parsed from the input, given the specification
+       * @return the JavaDLTerm parsed from the input, given the specification
        */
-      private Term parseInputText(String input, Sort sortType, Label status) {
-         Term result = null;
+      private JavaDLTerm parseInputText(String input, Sort sortType, Label status) {
+         JavaDLTerm result = null;
          try {
             DefaultTermParser parser = new DefaultTermParser();
             result = parser .parse(
@@ -589,20 +591,20 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       @Override
       public IBuiltInRuleApp finish() {
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
-         Map<LocationVariable, Term> invMap = new LinkedHashMap<LocationVariable, Term>();
-         Map<LocationVariable, Term> modMap = new LinkedHashMap<LocationVariable, Term>();
+         Map<LocationVariable, JavaDLTerm> invMap = new LinkedHashMap<LocationVariable, JavaDLTerm>();
+         Map<LocationVariable, JavaDLTerm> modMap = new LinkedHashMap<LocationVariable, JavaDLTerm>();
          int i = 0;
          //for every heap:
          for (LocationVariable heap : heaps) {
             //get the invariant and modify terms
             Text wdgt = getTextField(-1, i, 0);
-            Term invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, null);
+            JavaDLTerm invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, null);
             if (invariantTerm == null) {
                return null;
             }
             wdgt = getTextField(-1, i, 1);
             Sort modSort = services.getTheories().getLocSetLDT().targetSort();
-            Term modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
+            JavaDLTerm modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
             if (modifiesTerm == null) {
                return null;
             }
@@ -611,7 +613,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             i++;
          }
          //get the variant
-         Term variantTerm = resetVariantsState();
+         JavaDLTerm variantTerm = resetVariantsState();
          if (variantTerm == null) {
             return null;
          }

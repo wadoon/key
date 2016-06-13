@@ -4,7 +4,6 @@ import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -14,8 +13,9 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -46,7 +46,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                               Operator newTermOp, 
                               ImmutableArray<JavaDLTerm> newTermSubs, 
                               ImmutableArray<QuantifiableVariable> newTermBoundVars, 
-                              ModalContent newTermJavaBlock, 
+                              JavaBlock newTermJavaBlock, 
                               ImmutableArray<TermLabel> newTermOriginalLabels,
                               TermLabel label) {
       // Maintain label if new JavaDLTerm is a predicate

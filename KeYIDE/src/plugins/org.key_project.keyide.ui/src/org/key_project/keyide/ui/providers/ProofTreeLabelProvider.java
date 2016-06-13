@@ -29,7 +29,7 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -251,7 +251,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
 
 				} else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
                if (SymbolicExecutionUtil.isBlockContractValidityBranch(node.getAppliedRuleApp())) {
-                  Term modalityTerm = TermBuilder.goBelowUpdates(node.getAppliedRuleApp().posInOccurrence().subTerm());
+                  JavaDLTerm modalityTerm = TermBuilder.goBelowUpdates(node.getAppliedRuleApp().posInOccurrence().subTerm());
                   BlockContractValidityTermLabel bcLabel = (BlockContractValidityTermLabel) modalityTerm.getLabel(BlockContractValidityTermLabel.NAME);
                   if (SymbolicExecutionUtil.lazyComputeIsExceptionalTermination(node, (IProgramVariable) proof.getServices().getNamespaces().programVariables().lookup(bcLabel.getExceptionVariableName()))) {
                      if (SymbolicExecutionUtil.lazyComputeIsAdditionalBranchVerified(node)) {

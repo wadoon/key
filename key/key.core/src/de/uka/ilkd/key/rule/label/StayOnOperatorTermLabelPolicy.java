@@ -13,15 +13,15 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
@@ -48,7 +48,7 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
                               Operator newTermOp,
                               ImmutableArray<JavaDLTerm> newTermSubs,
                               ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                              ModalContent newTermJavaBlock,
+                              JavaBlock newTermJavaBlock,
                               ImmutableArray<TermLabel> newTermOriginalLabels,
                               TermLabel label) {
       return applicationTerm != null && newTermOp == applicationTerm.op() ? label : null;

@@ -20,7 +20,7 @@ import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
@@ -49,7 +49,7 @@ public abstract class AbstractKeYSlicer implements ISESlicer {
                KeYDebugTarget keyDebugTarget = keySeedNode.getDebugTarget();
                // Get needed proof elements
                Node proofSeedNode = keySeedNode.getExecutionNode().getProofNode();
-               Term seedLocation = ((KeYVariable) seedVariable).getExecutionVariable().createSelectTerm();
+               JavaDLTerm seedLocation = ((KeYVariable) seedVariable).getExecutionVariable().createSelectTerm();
                // Perform slicing
                AbstractSlicer slicer = createSlicer();
                @SuppressWarnings("unchecked")

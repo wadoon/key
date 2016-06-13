@@ -3,13 +3,14 @@ package org.key_project.key4eclipse.resources.counterexamples;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.key_project.util.collection.Pair;
+
 import de.uka.ilkd.key.gui.smt.CETree;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.LocationSet;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.smt.model.Sequence;
-import de.uka.ilkd.key.util.Pair;
 
 public class KeYProjectCounterExampleModel {
 

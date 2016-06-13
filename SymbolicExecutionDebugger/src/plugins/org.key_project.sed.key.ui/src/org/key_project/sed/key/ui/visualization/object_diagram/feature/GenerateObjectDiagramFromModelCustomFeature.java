@@ -36,6 +36,7 @@ import org.key_project.sed.ui.visualization.object_diagram.feature.AbstractGener
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
 
@@ -43,7 +44,6 @@ import de.uka.ilkd.key.gui.smt.CETree;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * An {@link ICustomFeature} that generates an object diagram based

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -22,11 +23,10 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Creates the representation of all references used by a particular {@link ProofElement}
- * @author Stefan Käsdorf
+ * @author Stefan Kï¿½sdorf
  */
 public class ProofMetaReferences {
 

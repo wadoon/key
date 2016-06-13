@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
@@ -775,7 +774,7 @@ public class TestTermLabelManager extends TestCase {
                                  Operator newTermOp,
                                  ImmutableArray<JavaDLTerm> newTermSubs,
                                  ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                 ModalContent newTermJavaBlock,
+                                 JavaBlock newTermJavaBlock,
                                  ImmutableArray<TermLabel> newTermOriginalLabels,
                                  TermLabel label) {
          log.add(label);
