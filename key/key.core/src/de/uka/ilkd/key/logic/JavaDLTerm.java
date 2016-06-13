@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.SourceElement;
  *
  * @author Dominic Scheurer
  */
-public interface JavaDLTerm extends GenericTerm<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable> {
+public interface JavaDLTerm extends GenericTerm<SourceElement, NameAbstractionTable, JavaDLVisitor, JavaDLTerm> {
 
     @Override
     public ImmutableArray<JavaDLTerm> subs();

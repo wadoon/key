@@ -15,7 +15,6 @@ package de.uka.ilkd.key.ldt;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;

@@ -15,8 +15,8 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.AbstractOperator;
-import org.key_project.common.core.services.TermServices;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
@@ -38,7 +38,7 @@ public abstract class SubstOp extends AbstractOperator {
      * @param services
      *            TODO
      */
-    public abstract JavaDLTerm apply(JavaDLTerm term, TermServices services);// {
+    public abstract JavaDLTerm apply(JavaDLTerm term, JavaDLTermServices services);// {
     // QuantifiableVariable v =
     // term.varsBoundHere(1).getQuantifiableVariable(0);
     // ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));

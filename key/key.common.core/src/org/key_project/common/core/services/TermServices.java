@@ -33,7 +33,7 @@ import org.key_project.common.core.program.GenericNameAbstractionTable;
  * @param <N> Name abstraction table type
  * @param <P> Program type
  */
-public interface TermServices<S, T extends GenericTerm<S, T, V, N>, V extends Visitor<S, V, T, N>, N extends GenericNameAbstractionTable<S>, P extends ModalContent<S, N>> {
+public interface TermServices<S, N extends GenericNameAbstractionTable<S>, P extends ModalContent<S, N>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>> {
 
     /**
      * returns the namespaces for functions, predicates etc.
@@ -45,12 +45,12 @@ public interface TermServices<S, T extends GenericTerm<S, T, V, N>, V extends Vi
      * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
      * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
-    public abstract <TB extends GenericTermBuilder<S, T, V, N, P>> TB getTermBuilder();
+    public abstract <TB extends GenericTermBuilder<S, N, P, V, T>> TB getTermBuilder();
 
     /**
      * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
      * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
-    public abstract <TF extends GenericTermFactory<S,T,V,N,P>> TF getTermFactory();
+    public abstract <TF extends GenericTermFactory<S, N, P, V, T>> TF getTermFactory();
 
 }

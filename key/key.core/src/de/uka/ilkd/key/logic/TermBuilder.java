@@ -87,7 +87,7 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
  * want to be sure that the term looks exactly as you built it, you
  * will have to use the GenericTermFactory.</p>
  */
-public class TermBuilder implements GenericTermBuilder<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> {
+public class TermBuilder implements GenericTermBuilder<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> {
 
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
@@ -658,7 +658,7 @@ public class TermBuilder implements GenericTermBuilder<SourceElement, JavaDLTerm
                      JavaDLTerm a,
                      JavaDLTerm b,
                      JavaDLTerm t,
-                     TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services) {
+                     TermServices<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> services) {
         Function bprod = theories.getIntegerLDT().getBprod();
         return func(bprod,
                     new JavaDLTerm[]{a, b, t},
@@ -672,7 +672,7 @@ public class TermBuilder implements GenericTermBuilder<SourceElement, JavaDLTerm
             ImmutableList<QuantifiableVariable> qvs,
             JavaDLTerm range,
             JavaDLTerm t,
-            TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services) {
+            TermServices<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> services) {
         @SuppressWarnings("deprecation")
         final Function prod =
                 (Function) services.getNamespaces().functions().lookup("prod");
@@ -695,7 +695,7 @@ public class TermBuilder implements GenericTermBuilder<SourceElement, JavaDLTerm
             ImmutableList<QuantifiableVariable> qvs,
             JavaDLTerm range,
             JavaDLTerm t,
-            TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services) {
+            TermServices<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> services) {
         @SuppressWarnings("deprecation")
         final Function min =
                 (Function) services.getNamespaces().functions().lookup("min");
@@ -718,7 +718,7 @@ public class TermBuilder implements GenericTermBuilder<SourceElement, JavaDLTerm
             ImmutableList<QuantifiableVariable> qvs,
             JavaDLTerm range,
             JavaDLTerm t,
-            TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services) {
+            TermServices<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> services) {
         @SuppressWarnings("deprecation")
         final Function max =
                 (Function) services.getNamespaces().functions().lookup("max");
@@ -2104,7 +2104,7 @@ public class TermBuilder implements GenericTermBuilder<SourceElement, JavaDLTerm
 
     @Override
     public JavaDLTerm fieldStore(
-            TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services,
+            TermServices<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> services,
             JavaDLTerm o, Function f, JavaDLTerm v) {
         return store(getBaseHeap(), o, func(f), v);
     }
@@ -2248,7 +2248,7 @@ public class TermBuilder implements GenericTermBuilder<SourceElement, JavaDLTerm
 
 
     @Override
-    public JavaDLTerm forallHeaps(TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services, JavaDLTerm t) {
+    public JavaDLTerm forallHeaps(TermServices<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> services, JavaDLTerm t) {
         final HeapLDT heapLDT = theories.getHeapLDT();
         final LogicVariable heapLV
         = new LogicVariable(new Name("h"), heapLDT.targetSort());
@@ -2570,7 +2570,7 @@ public JavaDLTerm orPreserveLabels(JavaDLTerm t1, JavaDLTerm t2) {
 
     @SuppressWarnings("deprecation")
     @Override
-    public JavaDLTerm eqAtLocs(TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services,
+    public JavaDLTerm eqAtLocs(TermServices<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> services,
                          JavaDLTerm heap1,
                          JavaDLTerm locset1,
                          JavaDLTerm heap2,
@@ -2586,7 +2586,7 @@ public JavaDLTerm orPreserveLabels(JavaDLTerm t1, JavaDLTerm t2) {
 
     @SuppressWarnings("deprecation")
     @Override
-    public JavaDLTerm eqAtLocsPost(TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> services,
+    public JavaDLTerm eqAtLocsPost(TermServices<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> services,
                              JavaDLTerm heap1_pre,
                              JavaDLTerm heap1_post,
                              JavaDLTerm locset1,

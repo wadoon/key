@@ -325,6 +325,7 @@ public class Services implements JavaDLTermServices, ProofServices {
      * Returns the {@link GenericTermBuilder} used to create {@link JavaDLTerm}s.
      * @return The {@link GenericTermBuilder} used to create {@link JavaDLTerm}s.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public TermBuilder getTermBuilder() {
        return termBuilder;
@@ -334,6 +335,7 @@ public class Services implements JavaDLTermServices, ProofServices {
      * Returns the {@link GenericTermFactory} used to create {@link JavaDLTerm}s.
      * @return The {@link GenericTermFactory} used to create {@link JavaDLTerm}s.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public TermFactory getTermFactory() {
         return termBuilder.tf();

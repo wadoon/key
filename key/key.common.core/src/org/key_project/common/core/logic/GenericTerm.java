@@ -57,7 +57,7 @@ import org.key_project.util.collection.ImmutableSet;
  * "JavaTerm" or the like; from this class here, the java specific methods
  * have been removed.
  */
-public interface GenericTerm<S, T extends GenericTerm<S, T, V, N>, V extends Visitor<S, V, T, N>, N extends GenericNameAbstractionTable<S>>
+public interface GenericTerm<S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>>
         extends SVSubstitute, Sorted {
 
     /** 

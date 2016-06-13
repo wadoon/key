@@ -16,10 +16,10 @@ package de.uka.ilkd.key.ldt;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -523,7 +523,7 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	                         JavaDLTerm sub, 
-	                         TermServices services, 
+	                         JavaDLTermServices services, 
 	                         ExecutionContext ec) {
         if(sub != null && sub.sort().extendsTrans(targetSort())) {
             if(op instanceof Negative) {

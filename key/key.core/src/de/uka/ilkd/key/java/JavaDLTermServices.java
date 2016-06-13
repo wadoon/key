@@ -13,11 +13,14 @@
 
 package de.uka.ilkd.key.java;
 
+import org.key_project.common.core.logic.GenericTermBuilder;
 import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.JavaDLVisitor;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 
 /**
  * TODO: Document.
@@ -27,6 +30,20 @@ import de.uka.ilkd.key.logic.JavaDLVisitor;
  */
 public interface JavaDLTermServices
         extends
-        TermServices<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> {
+        TermServices<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> {
 
+    /**
+     * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
+     * @return The {@link GenericTermBuilder} used to create {@link Term}s.
+     */
+    @SuppressWarnings("unchecked")
+    public abstract TermBuilder getTermBuilder();
+
+    /**
+     * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
+     * @return The {@link GenericTermBuilder} used to create {@link Term}s.
+     */
+    @SuppressWarnings("unchecked")
+    public abstract TermFactory getTermFactory();
+    
 }

@@ -38,7 +38,7 @@ import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
  * See {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to 
  * create terms. 
  */
-public final class TermFactory implements GenericTermFactory<SourceElement, JavaDLTerm, JavaDLVisitor, NameAbstractionTable, JavaBlock> {
+public final class TermFactory implements GenericTermFactory<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> {
     
 
     private static final ImmutableArray<JavaDLTerm> NO_SUBTERMS = new ImmutableArray<JavaDLTerm>();

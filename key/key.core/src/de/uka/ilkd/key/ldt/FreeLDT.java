@@ -15,10 +15,10 @@ package de.uka.ilkd.key.ldt;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -40,7 +40,7 @@ public final class FreeLDT extends LDT {
     // neutral element, the only pre-defined function
     private Function atom;
 
-    public FreeLDT(TermServices services) {
+    public FreeLDT(JavaDLTermServices services) {
         super(NAME, services);
         atom      = addFunction(services, "atom");
     }
@@ -60,7 +60,7 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, JavaDLTerm sub, TermServices services,
+    public boolean isResponsible(Operator op, JavaDLTerm sub, JavaDLTermServices services,
             ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;

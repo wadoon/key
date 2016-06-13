@@ -28,12 +28,12 @@ import org.key_project.util.collection.ImmutableSet;
  * @param <N>
  * @param <P>
  */
-public interface GenericTermBuilder<S, T extends GenericTerm<S, T, V, N>, V extends Visitor<S, V, T, N>, N extends GenericNameAbstractionTable<S>, P extends ModalContent<S, N>> {
+public interface GenericTermBuilder<S, N extends GenericNameAbstractionTable<S>, P extends ModalContent<S, N>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>> {
 
-    public abstract T eqAtLocsPost(TermServices<S, T,V, N, P> services, T heap1_pre, T heap1_post,
+    public abstract T eqAtLocsPost(TermServices<S, N, P, V, T> services, T heap1_pre, T heap1_post,
             T locset1, T heap2_pre, T heap2_post, T locset2);
 
-    public abstract T eqAtLocs(TermServices<S, T,V, N, P> services, T heap1, T locset1,
+    public abstract T eqAtLocs(TermServices<S, N, P, V, T> services, T heap1, T locset1,
             T heap2, T locset2);
 
     public abstract T orPreserveLabels(T t1, T t2);
@@ -87,7 +87,7 @@ public interface GenericTermBuilder<S, T extends GenericTerm<S, T, V, N>, V exte
     public abstract T acc(T h, T s, T o1,
             T o2);
 
-    public abstract T forallHeaps(TermServices<S, T,V, N, P> services, T t);
+    public abstract T forallHeaps(TermServices<S, N, P, V, T> services, T t);
 
 //    public abstract T anonUpd(LocationVariable heap, T mod, T anonHeap);
 
@@ -105,7 +105,7 @@ public interface GenericTermBuilder<S, T extends GenericTerm<S, T, V, N>, V exte
 
     public abstract T staticFieldStore(Function f, T v);
 
-    public abstract T fieldStore(TermServices<S, T,V, N, P> services, T o, Function f,
+    public abstract T fieldStore(TermServices<S, N, P, V, T> services, T o, Function f,
             T v);
 
     public abstract T anon(T h1, T s, T h2);
@@ -383,16 +383,16 @@ public interface GenericTermBuilder<S, T extends GenericTerm<S, T, V, N>, V exte
     public abstract T not(T t);
 
     public abstract T max(ImmutableList<QuantifiableVariable> qvs, T range, T t,
-            TermServices<S, T,V, N, P> services);
+            TermServices<S, N, P, V, T> services);
 
     public abstract T min(ImmutableList<QuantifiableVariable> qvs, T range, T t,
-            TermServices<S, T,V, N, P> services);
+            TermServices<S, N, P, V, T> services);
 
     public abstract T prod(ImmutableList<QuantifiableVariable> qvs, T range, T t,
-            TermServices<S, T,V, N, P> services);
+            TermServices<S, N, P, V, T> services);
 
     public abstract T bprod(QuantifiableVariable qv, T a, T b,
-            T t, TermServices<S, T,V, N, P> services);
+            T t, TermServices<S, N, P, V, T> services);
 
     public abstract T sum(ImmutableList<QuantifiableVariable> qvs, T range, T t);
 
@@ -494,6 +494,6 @@ public interface GenericTermBuilder<S, T extends GenericTerm<S, T, V, N>, V exte
 
 //    public abstract T parseTerm(String s) throws ParserException;
 
-    public abstract GenericTermFactory<S, T, V, N, P> tf();
+    public abstract GenericTermFactory<S, N, P, V, T> tf();
 
 }

@@ -14,10 +14,10 @@ package de.uka.ilkd.key.ldt;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -37,7 +37,7 @@ public final class MapLDT extends LDT {
 
     public final Function mapEmpty;
 
-    public MapLDT(TermServices services) {
+    public MapLDT(JavaDLTermServices services) {
         super(NAME, services);
         mapEmpty = addFunction(services, "mapEmpty");
     }
@@ -62,7 +62,7 @@ public final class MapLDT extends LDT {
     @Override
     public boolean isResponsible(Operator op,
             JavaDLTerm sub,
-            TermServices services,
+            JavaDLTermServices services,
             ExecutionContext ec) {
         return false;
     }

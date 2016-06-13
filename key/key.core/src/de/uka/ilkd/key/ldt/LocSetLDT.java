@@ -15,10 +15,10 @@ package de.uka.ilkd.key.ldt;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -53,7 +53,7 @@ public final class LocSetLDT extends LDT {
     private final Function createdInHeap;    
     
     
-    public LocSetLDT(TermServices services) {
+    public LocSetLDT(JavaDLTermServices services) {
 	super(NAME, services);
         empty	         = addFunction(services, "empty");
         allLocs          = addFunction(services, "allLocs");
@@ -170,7 +170,7 @@ public final class LocSetLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 JavaDLTerm sub, 
-	    			 TermServices services, 
+	    			 JavaDLTermServices services, 
 	    			 ExecutionContext ec) {
 	return op instanceof Singleton
 	       || op instanceof SetUnion

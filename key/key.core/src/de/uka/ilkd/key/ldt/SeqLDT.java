@@ -17,10 +17,10 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -55,7 +55,7 @@ public final class SeqLDT extends LDT {
     private final Function seqDef;
     private final Function values;
     
-    public SeqLDT(TermServices services) {
+    public SeqLDT(JavaDLTermServices services) {
 	super(NAME, services);
         seqGet        = addSortDependingFunction(services, "seqGet");
         seqLen        = addFunction(services, "seqLen");
@@ -70,7 +70,7 @@ public final class SeqLDT extends LDT {
     }
     
     
-    public Function getSeqGet(Sort instanceSort, TermServices services) {
+    public Function getSeqGet(Sort instanceSort, JavaDLTermServices services) {
 	return seqGet.getInstanceFor(instanceSort, services);
     }
     
@@ -140,7 +140,7 @@ public final class SeqLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 JavaDLTerm sub, 
-	    			 TermServices services, 
+	    			 JavaDLTermServices services, 
 	    			 ExecutionContext ec) {
 	return op instanceof SeqSingleton
 	       || op instanceof SeqConcat

@@ -18,6 +18,7 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -51,7 +52,7 @@ public class PermissionLDT extends LDT {
     }
 
 
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JavaDLTerm sub, org.key_project.common.core.services.TermServices services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JavaDLTerm sub, JavaDLTermServices services, ExecutionContext ec) {
         return false;
     }
 
