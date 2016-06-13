@@ -78,7 +78,12 @@ public interface Sort extends Named {
         public String declarationString() {
             return name.toString();
         }
-        
+
+        @Override
+        public String toString() {
+            return name.toString();
+        }
+
     }
     
     /**
