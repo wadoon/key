@@ -25,10 +25,10 @@ public class ModelArrayInstance extends ModelInstance {
      *
      * @return the length of this array.
      */
-    public int length() {
+    public long length() {
         for (ModelVariable field : getFields()) {
             if (field.isArrayLength()) {
-                return field.getValue();
+                return Long.valueOf(field.getValue().toString()).longValue();
             }
         }
         return getFields().size();
