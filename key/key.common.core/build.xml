@@ -21,7 +21,7 @@
 			<fileset file="${ext.dir}/recoderKey.jar"/>
 			<fileset file="${ext.dir}/LGPL.txt"/>
 		</copy>
-		<jar destfile="${dist.dir}/components/key.javadl.core.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
+		<jar destfile="${dist.dir}/components/key.common.core.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
 	</target>
 
 	<target name="compile" depends="copyAndGenerate" description="Compile all source files into the build directory.">
