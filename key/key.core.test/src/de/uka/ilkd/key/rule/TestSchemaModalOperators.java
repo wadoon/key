@@ -65,11 +65,11 @@ public class TestSchemaModalOperators extends TestCase {
    
     private static Semisequent parseTermForSemisequent(String t) {
 	if ("".equals(t)) { 
-	    return Semisequent.EMPTY_SEMISEQUENT;
+	    return Semisequent.nil();
 	}
 	SequentFormula cf0
 	    = new SequentFormula(TacletForTests.parseTerm(t));
-	return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
+	return Semisequent.nil().insert(0, cf0).semisequent();
     }
 
     public void setUp() {

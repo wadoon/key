@@ -49,7 +49,7 @@ public class Sequent implements Iterable<SequentFormula> {
 	if (ante.isEmpty()) {
 	    return EMPTY_SEQUENT;
         }
-        return new Sequent(ante,Semisequent.EMPTY_SEMISEQUENT);
+        return new Sequent(ante,Semisequent.nil());
     }
     /**
      * creates a new Sequent 
@@ -75,7 +75,7 @@ public class Sequent implements Iterable<SequentFormula> {
         if (succ.isEmpty()) {
             return EMPTY_SEQUENT;
         }
-	return new Sequent(Semisequent.EMPTY_SEMISEQUENT,succ);
+	return new Sequent(Semisequent.nil(),succ);
     }    
 
     private final Semisequent antecedent;
@@ -87,8 +87,8 @@ public class Sequent implements Iterable<SequentFormula> {
      *
      */
     private Sequent() {
-        antecedent = Semisequent.EMPTY_SEMISEQUENT;
-        succedent  = Semisequent.EMPTY_SEMISEQUENT;
+        antecedent = Semisequent.nil();
+        succedent  = Semisequent.nil();
     }
     
     /** creates new Sequent with antecedence and succedence */

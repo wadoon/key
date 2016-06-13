@@ -106,7 +106,7 @@ public class TestVariableNamer extends TestCase {
 
 
     private Goal constructGoal(SequentFormula containedFormula) {
-    	Semisequent empty = Semisequent.EMPTY_SEMISEQUENT;
+    	Semisequent empty = Semisequent.nil();
     	Semisequent ante = empty.insert(0, containedFormula).semisequent();
 	Semisequent succ = empty;
 

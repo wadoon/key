@@ -232,7 +232,7 @@ public final class QueryAxiom extends ClassAxiom {
 	    final JavaDLTerm ifFormula = TB.exactInstance(kjt.getSort(), TB.var(selfSV));
 	    final SequentFormula ifCf = new SequentFormula(ifFormula);
 	    final Semisequent ifSemiSeq
-	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
+	    	= Semisequent.nil().insertFirst(ifCf).semisequent();
 	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
 	}
 
@@ -257,7 +257,7 @@ public final class QueryAxiom extends ClassAxiom {
 	final JavaDLTerm addedFormula 
 		= TB.apply(update, TB.prog(Modality.BOX, jb, post), null);
 	final SequentFormula addedCf = new SequentFormula(addedFormula);
-	final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT
+	final Semisequent addedSemiSeq = Semisequent.nil()
 	                                            .insertFirst(addedCf)
 	                                            .semisequent();
 	final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);

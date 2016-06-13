@@ -167,12 +167,12 @@ public class TestTacletParser extends TestCase {
     }
     
     public Semisequent sseq(String s) {
-	return Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf(s)).semisequent();
+	return Semisequent.nil().insertFirst(cf(s)).semisequent();
     }
     
     public Sequent sequent(String a,String s) {
-	Semisequent ass = Semisequent.EMPTY_SEMISEQUENT;
-	Semisequent sss = Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent ass = Semisequent.nil();
+	Semisequent sss = Semisequent.nil();
 	if ( a != null ) {
 	    ass = sseq(a);
 	}

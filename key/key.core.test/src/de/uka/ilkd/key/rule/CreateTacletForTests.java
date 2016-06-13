@@ -309,14 +309,14 @@ public class CreateTacletForTests extends TestCase {
 	}	
 	SequentFormula cf=new SequentFormula(t_test1);
 	SequentFormula cf2=new SequentFormula(t_test1);
-	seq_test1 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
-		    Semisequent.EMPTY_SEMISEQUENT.insert(0,cf).semisequent()); 
-	seq_test2 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT
+	seq_test1 = Sequent.createSequent(Semisequent.nil(),
+		    Semisequent.nil().insert(0,cf).semisequent()); 
+	seq_test2 = Sequent.createSequent(Semisequent.nil()
 					  .insert(0,cf).semisequent(), 
-					  Semisequent.EMPTY_SEMISEQUENT); 
+					  Semisequent.nil()); 
 	seq_test3 =
-	    Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0,cf).semisequent(),
-			       Semisequent.EMPTY_SEMISEQUENT.insert(0,cf2).semisequent()); 
+	    Sequent.createSequent(Semisequent.nil().insert(0,cf).semisequent(),
+			       Semisequent.nil().insert(0,cf2).semisequent()); 
 	
 	
 	func_p=new Function(new Name("P"),Sort.FORMULA,
@@ -353,8 +353,8 @@ public class CreateTacletForTests extends TestCase {
 
 	// => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
 	seq_testNat=Sequent.createSequent
-	    (Semisequent.EMPTY_SEMISEQUENT,
-	     Semisequent.EMPTY_SEMISEQUENT.insert
+	    (Semisequent.nil(),
+	     Semisequent.nil().insert
 	     (0, new SequentFormula(tnat)).semisequent());
 
 
@@ -362,8 +362,8 @@ public class CreateTacletForTests extends TestCase {
        	JavaDLTerm t_z=tf.createTerm(z,new JavaDLTerm[0]);
 	JavaDLTerm t_allzpz=services.getTermBuilder().all(z, tf.createTerm(func_p,new JavaDLTerm[]{t_z}));
  	SequentFormula cf3=new SequentFormula(t_allzpz);
- 	seq_testAll=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
- 					  Semisequent.EMPTY_SEMISEQUENT
+ 	seq_testAll=Sequent.createSequent(Semisequent.nil(), 
+ 					  Semisequent.nil()
 					  .insert(0,cf3).semisequent()); 
 	
 

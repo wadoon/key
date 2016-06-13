@@ -1392,7 +1392,7 @@ public class JoinRuleUtils {
             Services services, boolean doSplit, String sideProofName, int timeout) {
         return tryToProve(Sequent.createSequent(
                                     // Sequent to prove
-                                    Semisequent.EMPTY_SEMISEQUENT,
+                                    Semisequent.nil(),
                                     new Semisequent(new SequentFormula(toProve))),
                           services, doSplit, sideProofName, timeout);
     }

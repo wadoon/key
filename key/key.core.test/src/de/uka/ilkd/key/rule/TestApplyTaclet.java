@@ -112,11 +112,11 @@ public class TestApplyTaclet extends TestCase{
 
     private static Semisequent parseTermForSemisequent(String t) {
 	if ("".equals(t)) { 
-	    return Semisequent.EMPTY_SEMISEQUENT;
+	    return Semisequent.nil();
 	}
 	SequentFormula cf0
 	    = new SequentFormula(TacletForTests.parseTerm(t));
-	return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
+	return Semisequent.nil().insert(0, cf0).semisequent();
     }
 
     public void setUp() {
@@ -237,7 +237,7 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("Too many or zero goals for all-right.",goals.size()==1);	
 	Sequent seq=goals.head().sequent();
 	assertEquals("Wrong antecedent after all-right",seq.antecedent(),
-		     Semisequent.EMPTY_SEMISEQUENT);  
+		     Semisequent.nil());  
        	assertEquals("Wrong succedent after all-right (op mismatch)",
 		     seq.succedent().getFirst().formula().op(),
 		     TacletForTests.getFunctions().lookup(new Name("p")));  	

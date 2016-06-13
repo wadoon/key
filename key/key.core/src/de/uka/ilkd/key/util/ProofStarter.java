@@ -71,7 +71,7 @@ public class ProofStarter {
         }
 
         public UserProvidedInput(JavaDLTerm formula, ProofEnvironment env) {
-            this(Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT.insertFirst(
+            this(Sequent.createSuccSequent(Semisequent.nil().insertFirst(
                     new SequentFormula(formula)).semisequent()), env);
         }
 

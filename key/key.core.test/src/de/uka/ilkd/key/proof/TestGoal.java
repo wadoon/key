@@ -49,7 +49,7 @@ public class TestGoal extends TestCase {
 
         public void testSetBack0() {
                 Sequent seq = Sequent
-                                .createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
+                                .createSuccSequent(Semisequent.nil()
                                                 .insert(0,
                                                                 new SequentFormula(
                                                                                 TacletForTests.parseTerm("A")))
@@ -105,7 +105,7 @@ public class TestGoal extends TestCase {
 
         public void testSetBack1() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
                 Sequent seq = Sequent
-                                .createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
+                                .createSuccSequent(Semisequent.nil()
                                                 .insert(0,
                                                                 new SequentFormula(
                                                                                 TacletForTests.parseTerm("A")))

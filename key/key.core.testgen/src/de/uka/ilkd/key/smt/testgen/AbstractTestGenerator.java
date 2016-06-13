@@ -299,7 +299,7 @@ public abstract class AbstractTestGenerator {
       final Proof oldProof = node.proof();
       final Sequent oldSequent = node.sequent();
       Sequent newSequent = Sequent.createSequent(
-            Semisequent.EMPTY_SEMISEQUENT, Semisequent.EMPTY_SEMISEQUENT);
+            Semisequent.nil(), Semisequent.nil());
       Iterator<SequentFormula> it = oldSequent.antecedent().iterator();
       while (it.hasNext()) {
          final SequentFormula sf = it.next();

@@ -223,7 +223,7 @@ public final class SpecificationRepository {
         final SequentFormula cf = new SequentFormula(tb.equals(limitedTerm,
                 unlimitedTerm));
         final Sequent addedSeq = Sequent
-                .createAnteSequent(Semisequent.EMPTY_SEMISEQUENT
+                .createAnteSequent(Semisequent.nil()
                         .insertFirst(cf).semisequent());
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(
                 addedSeq, ImmutableSLList.<Taclet> nil(), tb.func(unlimited,

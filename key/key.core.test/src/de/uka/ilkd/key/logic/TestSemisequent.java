@@ -78,7 +78,7 @@ public class TestSemisequent extends TestCase {
     }
 
     public void testContains() {
-	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq=Semisequent.nil();
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.insert(1,con[1]));
 	SequentFormula eq2con0 = new SequentFormula(con[0].formula());
@@ -86,7 +86,7 @@ public class TestSemisequent extends TestCase {
     }
 
     public void testContainsEquals() {
-	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq=Semisequent.nil();
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.insert(1,con[1]));
 	SequentFormula eq2con0 = new SequentFormula(con[0].formula());
@@ -94,7 +94,7 @@ public class TestSemisequent extends TestCase {
     }
 
     public void testGet() {
-	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq=Semisequent.nil();
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.insert(1,con[1]));
 	assertSame(seq.get(0), con[0]);
@@ -110,7 +110,7 @@ public class TestSemisequent extends TestCase {
 
 
     public void testindexOf() {
-	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq=Semisequent.nil();
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.insert(1,con[1]));
 	seq=extract(seq.insert(2,con[2]));
@@ -125,7 +125,7 @@ public class TestSemisequent extends TestCase {
 
     public void testRemove() {
 
-	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq=Semisequent.nil();
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.insert(1,con[1]));
 	seq=extract(seq.insert(2,con[2]));
@@ -139,7 +139,7 @@ public class TestSemisequent extends TestCase {
     }
 
     public void testReplace() {
-	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq=Semisequent.nil();
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.insert(1,con[1]));	
 	seq=extract(seq.replace(1,con[2]));
@@ -153,7 +153,7 @@ public class TestSemisequent extends TestCase {
     }
 
     public void testNoDuplicates() {
-	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq=Semisequent.nil();
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.insert(1,con[1]));
 	seq=extract(seq.insert(2,con[1]));
@@ -163,8 +163,8 @@ public class TestSemisequent extends TestCase {
 
 
     public void testImmutable() {
-	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
-	Semisequent old=Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq=Semisequent.nil();
+	Semisequent old=Semisequent.nil();
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.insert(1,con[1]));
 	old=seq;
@@ -174,27 +174,27 @@ public class TestSemisequent extends TestCase {
     }
 
     public void testUniqueEmpty() {
-	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq=Semisequent.nil();
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.remove(0));	
-	assertSame("Semisequent is empty but not the EMPTY_SEMISEQUENT.",seq, Semisequent.EMPTY_SEMISEQUENT);
+	assertSame("Semisequent is empty but not the EMPTY_SEMISEQUENT.",seq, Semisequent.nil());
 
     }
 
     public void testEquals() {
-	Semisequent seq1 = Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq1 = Semisequent.nil();
 	seq1 = extract(seq1.insert(0,con[0]));
 	seq1 = extract(seq1.insert(0,con[1]));
 	seq1 = extract(seq1.insert(0,con[2]));
-	Semisequent seq2 = Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq2 = Semisequent.nil();
 	seq2 = extract(seq2.insert(0,con[0]));
 	seq2 = extract(seq2.insert(0,con[1]));
 	seq2 = extract(seq2.insert(0,con[2]));
-	Semisequent seq3 = Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq3 = Semisequent.nil();
 	seq3 = extract(seq3.insert(0,con[0]));
 	seq3 = extract(seq3.insert(0,con[1]));
 	seq3 = extract(seq3.insert(0,con[3]));
-	Semisequent seq4 = Semisequent.EMPTY_SEMISEQUENT;
+	Semisequent seq4 = Semisequent.nil();
 	seq4 = extract(seq4.insert(0,con[0]));
 	seq4 = extract(seq4.insert(0,con[2]));
 	seq4 = extract(seq4.insert(0,con[1]));
@@ -206,7 +206,7 @@ public class TestSemisequent extends TestCase {
     }
 
     public void testListInsert() {
-	Semisequent origin   = extract(extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).
+	Semisequent origin   = extract(extract(extract(Semisequent.nil().insertLast(con[0])).
 	    insertLast(con[1])).insertLast(con[2]));
 
 	Semisequent expected = extract(extract(extract(origin.insertLast(con[4])).insertLast(con[5])).
@@ -219,7 +219,7 @@ public class TestSemisequent extends TestCase {
     }
 
     public void testListInsertInMid() {
-	Semisequent origin = extract(extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).
+	Semisequent origin = extract(extract(extract(Semisequent.nil().insertLast(con[0])).
 				     insertLast(con[1])).insertLast(con[2]));
  	Semisequent expected = extract(extract(extract(origin.insert(2, con[4])).insert(3, con[5])).insert(4, con[6]));
 	ImmutableList<SequentFormula> insertionList = 
@@ -231,7 +231,7 @@ public class TestSemisequent extends TestCase {
 
     public void testListReplace() {
 	// [p,q,r]
-	Semisequent origin = extract(extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).
+	Semisequent origin = extract(extract(extract(Semisequent.nil().insertLast(con[0])).
 	    insertLast(con[1])).insertLast(con[2]));
 	// [p,q,a,b,c]
 	Semisequent expected = 
@@ -255,7 +255,7 @@ public class TestSemisequent extends TestCase {
 
     public void testListReplaceAddRedundantList() {
 	//[p,q]
- 	Semisequent origin = extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).
+ 	Semisequent origin = extract(extract(Semisequent.nil().insertLast(con[0])).
 				     insertLast(con[1]));
 	//[exp.: p,q,a,b,c,r]
  	Semisequent expected = extract(extract

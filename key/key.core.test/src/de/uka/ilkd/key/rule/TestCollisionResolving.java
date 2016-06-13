@@ -68,7 +68,7 @@ public class TestCollisionResolving extends TestCase {
 
 	//build a goal (needed for creating TacletInstantiationsTableModel)
     	Proof proof = new Proof("TestCollisionResolving", TacletForTests.initConfig());
-       	Semisequent empty = Semisequent.EMPTY_SEMISEQUENT;
+       	Semisequent empty = Semisequent.nil();
     	Sequent seq = Sequent.createSequent(empty, empty);
 	
 	Node node = new Node(proof, seq);
@@ -280,7 +280,7 @@ public class TestCollisionResolving extends TestCase {
 	FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict").taclet();
 	Semisequent semiseq
-	    = Semisequent.EMPTY_SEMISEQUENT
+	    = Semisequent.nil()
 	    .insert(0, new SequentFormula(TacletForTests.parseTerm
 					      ("\\forall s x; p(x)"))).semisequent()
 	    .insert(1, new SequentFormula(TacletForTests.parseTerm

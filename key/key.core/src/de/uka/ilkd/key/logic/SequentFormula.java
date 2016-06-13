@@ -13,8 +13,10 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.logic.calculus.GenericSequentFormula;
 
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.SourceElement;
 
 /** 
  * A sequent formula is a wrapper around a formula that occurs 
@@ -26,46 +28,12 @@ import org.key_project.common.core.logic.sort.Sort;
  * by providing a way to add additional annotations or to cache local information 
  * about the formula.
  */
-public class SequentFormula {
+public class SequentFormula extends GenericSequentFormula<SourceElement, NameAbstractionTable, JavaDLVisitor, JavaDLTerm> {
 
-    private final JavaDLTerm term;
-   
-    private final int hashCode;
-    
     /** creates a new SequentFormula 
      * @param term a JavaDLTerm of sort Sort.FORMULA
      */ 
     public SequentFormula(JavaDLTerm term) {
-	if (term.sort() != Sort.FORMULA) {
-	    throw new RuntimeException("A JavaDLTerm instead of a formula: " + term);
-	}
-	this.term = term;	
-	this.hashCode = term.hashCode () * 13;
-    }
-
-    /** @return the stored JavaDLTerm */
-    public JavaDLTerm formula() {
-	return term;
-    }
-
-    /** equal if terms and constraints are equal */
-    public boolean equals(Object obj) {
-        if (this == obj) { return true; }
-	if (obj instanceof SequentFormula) {
-	    SequentFormula cmp=(SequentFormula)obj;
-	    if (term.equals(cmp.formula())) {
-		return true;
-	    }
-	}
-	return false;
-    }
-
-    /** String representation */
-    public String toString() {
-	return term.toString();
-    }
-    
-    public int hashCode () {
-        return hashCode;
+        super(term);
     }
 }

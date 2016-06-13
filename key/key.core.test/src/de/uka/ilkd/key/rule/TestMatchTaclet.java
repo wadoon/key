@@ -158,9 +158,9 @@ public class TestMatchTaclet extends TestCase {
 	// therefore no match should be found
 
 	Sequent seq = Sequent.createSequent
-	    (Semisequent.EMPTY_SEMISEQUENT.insert
+	    (Semisequent.nil().insert
 	     (0, new SequentFormula(match.sub(0))).semisequent(), 
-	     Semisequent.EMPTY_SEMISEQUENT);
+	     Semisequent.nil());
 
 	assertTrue("An area conflict should happen because there is a free"+
 		   " variable and the matching part is in the if and addrule", 
@@ -169,9 +169,9 @@ public class TestMatchTaclet extends TestCase {
 	       
  	// we bind the free variable now a match should be found
 	seq = Sequent.createSequent
-	    (Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula
+	    (Semisequent.nil().insert(0, new SequentFormula
 		(match)).semisequent(), 
-	     Semisequent.EMPTY_SEMISEQUENT );
+	     Semisequent.nil() );
 
 	assertTrue("No area conflict should happen because all variables are bound.", 
 		   NoPosTacletApp.createNoPosTacletApp ( if_addrule_conflict )
@@ -277,9 +277,9 @@ public class TestMatchTaclet extends TestCase {
 	JavaDLTerm closeable_one = TacletForTests.parseTerm("\\forall testSort z; p(z)");
 	JavaDLTerm closeable_two = TacletForTests.parseTerm("\\forall testSort y; p(y)");
 	Sequent seq = Sequent.createSequent
-	    (Semisequent.EMPTY_SEMISEQUENT.insert
+	    (Semisequent.nil().insert
 	     (0, new SequentFormula(closeable_one)).semisequent(), 
-	     Semisequent.EMPTY_SEMISEQUENT.insert
+	     Semisequent.nil().insert
 	     (0, new SequentFormula(closeable_two)).semisequent()); 	
 	TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
 	index.add(close_rule.taclet());
