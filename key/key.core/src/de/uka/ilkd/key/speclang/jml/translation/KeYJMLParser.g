@@ -10,6 +10,8 @@ options {
 
    import java.io.StringReader;
    
+   import org.key_project.util.collection.Pair;
+   
    import org.key_project.common.core.logic.*;
    import org.key_project.common.core.logic.op.*;
    import org.key_project.common.core.logic.sort.*;
@@ -30,7 +32,6 @@ options {
    import de.uka.ilkd.key.speclang.HeapContext;
    import de.uka.ilkd.key.speclang.PositionedString;
    import de.uka.ilkd.key.speclang.translation.*;
-   import de.uka.ilkd.key.util.Pair;
    import de.uka.ilkd.key.util.Triple;
    import de.uka.ilkd.key.util.InfFlowSpec;
    

@@ -16,11 +16,11 @@ package de.uka.ilkd.key.rule.conditions;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -52,7 +52,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     
     private static JavaDLTerm dropEffectlessStoresHelper(
 	    		JavaDLTerm heapTerm, 
-	    		TermServices services,
+	    		JavaDLTermServices services,
 	    		ImmutableSet<Pair<JavaDLTerm,JavaDLTerm>> overwrittenLocs,
 	    		Function store) {
 	if(heapTerm.op() == store) {

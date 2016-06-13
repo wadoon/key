@@ -21,7 +21,6 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -29,10 +28,11 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
@@ -128,7 +128,7 @@ class Instantiation {
    }
 
    private JavaDLTerm createArbitraryInstantiation(QuantifiableVariable var,
-         TermServices services) {
+         JavaDLTermServices services) {
       return services.getTermBuilder().func (var.sort().getCastSymbol (services),
             services.getTermBuilder().zero());
    }
@@ -161,7 +161,7 @@ class Instantiation {
     * @return all literals in antesequent, and all negation of literal in
     *         succedent
     */
-   private ImmutableSet<JavaDLTerm> initAssertLiterals(Sequent seq, TermServices services) {
+   private ImmutableSet<JavaDLTerm> initAssertLiterals(Sequent seq, JavaDLTermServices services) {
       ImmutableSet<JavaDLTerm> assertLits = DefaultImmutableSet.<JavaDLTerm> nil();
       for (final SequentFormula cf : seq.antecedent()) {
          final JavaDLTerm atom = cf.formula();

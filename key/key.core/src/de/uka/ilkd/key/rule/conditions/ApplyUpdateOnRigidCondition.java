@@ -15,7 +15,6 @@ package de.uka.ilkd.key.rule.conditions;
 
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;

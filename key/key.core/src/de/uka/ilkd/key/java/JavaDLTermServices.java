@@ -19,6 +19,7 @@ import org.key_project.common.core.services.TermServices;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.JavaDLVisitor;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 
@@ -37,6 +38,7 @@ public interface JavaDLTermServices
      * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
     @SuppressWarnings("unchecked")
+    @Override
     public abstract TermBuilder getTermBuilder();
 
     /**
@@ -44,6 +46,15 @@ public interface JavaDLTermServices
      * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
     @SuppressWarnings("unchecked")
+    @Override
     public abstract TermFactory getTermFactory();
+ 
     
+    /**
+     * returns the namespaces for functions, predicates etc.
+     * @return the proof specific namespaces
+     */
+    @Override
+    public abstract NamespaceSet getNamespaces();
+
 }

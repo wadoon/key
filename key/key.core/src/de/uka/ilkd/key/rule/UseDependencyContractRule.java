@@ -21,21 +21,21 @@ import java.util.Map;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -343,7 +343,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public static PosInOccurrence findStepInIfInsts(
 	    		List<PosInOccurrence> steps,
 	    		UseDependencyContractApp app,
-	    		TermServices services) {
+	    		JavaDLTermServices services) {
     	for(PosInOccurrence pio : app.ifInsts()) {
     		if(steps.contains(pio)) {
     			return pio;
@@ -636,7 +636,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
     
     @Override
-    public UseDependencyContractApp createApp(PosInOccurrence pos, TermServices services) {
+    public UseDependencyContractApp createApp(PosInOccurrence pos, JavaDLTermServices services) {
 		return new UseDependencyContractApp(this, pos);
     }
 

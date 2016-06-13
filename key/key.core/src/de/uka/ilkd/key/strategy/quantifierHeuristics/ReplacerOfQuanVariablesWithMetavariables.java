@@ -19,10 +19,10 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**
@@ -36,7 +36,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
 
     private ReplacerOfQuanVariablesWithMetavariables () {}
     
-    public static Substitution createSubstitutionForVars(JavaDLTerm allTerm, TermServices services) {
+    public static Substitution createSubstitutionForVars(JavaDLTerm allTerm, JavaDLTermServices services) {
         ImmutableMap<QuantifiableVariable,JavaDLTerm> res =
             DefaultImmutableMap.<QuantifiableVariable,JavaDLTerm>nilMap();
         JavaDLTerm t = allTerm;

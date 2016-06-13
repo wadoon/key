@@ -18,12 +18,12 @@ import java.util.Map;
 
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.ParsableVariable;
-import org.key_project.common.core.services.TermServices;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
@@ -85,7 +85,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     
     private Map<Operator, Operator> getReplaceMap(
                 ParsableVariable selfVar, 
-                TermServices services) {
+                JavaDLTermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
         
         if(selfVar != null && originalSelfVar != null) {
@@ -121,7 +121,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     
     
     @Override
-    public JavaDLTerm getClause(ParsableVariable selfVar, TermServices services) {
+    public JavaDLTerm getClause(ParsableVariable selfVar, JavaDLTermServices services) {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());

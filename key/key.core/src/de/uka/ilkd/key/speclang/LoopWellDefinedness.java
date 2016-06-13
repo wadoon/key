@@ -13,14 +13,14 @@
 
 package de.uka.ilkd.key.speclang;
 
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -59,7 +59,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    SequentFormula generateSequent(SequentTerms seq, TermServices services) {
+    SequentFormula generateSequent(SequentTerms seq, JavaDLTermServices services) {
         // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
         final JavaDLTerm imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
                                 TB.and(seq.wdMod, seq.wdRest, seq.anonWdPost));
@@ -110,7 +110,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    public LoopWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
+    public LoopWellDefinedness combine(WellDefinednessCheck wdc, JavaDLTermServices services) {
         assert wdc instanceof LoopWellDefinedness;
         final LoopWellDefinedness lwd = (LoopWellDefinedness)wdc;
         assert this.getStatement().getName().equals(lwd.getStatement().getName());

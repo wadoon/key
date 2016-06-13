@@ -13,10 +13,9 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import org.key_project.common.core.logic.Visitor;
-
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.JavaDLVisitor;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -80,7 +79,7 @@ public class ContainsTermFeature implements Feature {
     }
 
 
-    private class ContainsTermVisitor implements Visitor {
+    private class ContainsTermVisitor implements JavaDLVisitor {
         boolean found = false;
         JavaDLTerm term;
 

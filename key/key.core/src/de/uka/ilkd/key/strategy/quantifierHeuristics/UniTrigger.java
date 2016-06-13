@@ -17,7 +17,6 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.Quantifier;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -25,6 +24,7 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 
 
@@ -51,13 +51,13 @@ class UniTrigger implements Trigger {
     }
         
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<JavaDLTerm> targetTerm, 
-            TermServices services) {
+            JavaDLTermServices services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         for (JavaDLTerm aTargetTerm : targetTerm) allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
         return allsubs;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTerm(JavaDLTerm t, TermServices services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTerm(JavaDLTerm t, JavaDLTermServices services) {
         ImmutableSet<Substitution> res = matchResults.get ( t );
         if ( res == null ) {
             res = getSubstitutionsFromTermHelp ( t, services );
@@ -66,7 +66,7 @@ class UniTrigger implements Trigger {
         return res;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(JavaDLTerm t, TermServices services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(JavaDLTerm t, JavaDLTermServices services) {
         ImmutableSet<Substitution> newSubs = DefaultImmutableSet.<Substitution>nil();
         if ( t.freeVars ().size () > 0 || t.op () instanceof Quantifier )
             newSubs = Matching.twoSidedMatching ( this, t, services );

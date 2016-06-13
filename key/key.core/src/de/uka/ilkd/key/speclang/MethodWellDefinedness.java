@@ -21,10 +21,10 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.ParsableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -337,7 +337,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return the combined taclet
      */
-    public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, TermServices services) {
+    public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, JavaDLTermServices services) {
         assert t1.goalTemplates().size() == 1;
         assert t2.goalTemplates().size() == 1;
         final JavaDLTerm rw1 = ((RewriteTacletGoalTemplate)t1.goalTemplates().head()).replaceWith();
@@ -379,7 +379,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * is a model field/method and can thus not throw any exception.
      * @return true for either normal behaviour or model fields
      */
-    public boolean isNormal(TermServices services) {
+    public boolean isNormal(JavaDLTermServices services) {
         if (modelField() || isModel()) {
             return true;
         }
@@ -423,7 +423,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public MethodWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
+    public MethodWellDefinedness combine(WellDefinednessCheck wdc, JavaDLTermServices services) {
         assert wdc instanceof MethodWellDefinedness;
         final MethodWellDefinedness mwd = (MethodWellDefinedness)wdc;
         assert getMethodContract() instanceof FunctionalOperationContract ?

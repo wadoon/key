@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
 /**
@@ -46,7 +46,7 @@ public final class SLParameters {
     }
     
     
-    public ImmutableList<KeYJavaType> getSignature(TermServices services) {           
+    public ImmutableList<KeYJavaType> getSignature(JavaDLTermServices services) {           
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
         for(SLExpression expr : parameters) {
             result = result.append(expr.getType());

@@ -18,10 +18,10 @@ import java.util.Iterator;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
@@ -56,11 +56,11 @@ public class HeuristicInstantiation implements TermGenerator {
         private final Function             quantifiedVarSortCast;
 
         private JavaDLTerm                       nextInst = null;
-        private final TermServices services;
+        private final JavaDLTermServices services;
 
         private HIIterator(Iterator<JavaDLTerm> it, 
 					 QuantifiableVariable var, 
-        	         TermServices services) {
+        	         JavaDLTermServices services) {
             this.instances = it;
             this.quantifiedVar = var;
             this.services = services;

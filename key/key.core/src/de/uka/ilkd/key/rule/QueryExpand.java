@@ -31,7 +31,6 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -550,7 +549,7 @@ public class QueryExpand implements BuiltInRule {
      * @return Resulting term after replacement.
      * @note Was originally implemented in QueryExpand.java.
      */
-    protected JavaDLTerm replace(JavaDLTerm term, JavaDLTerm with, Iterator<Integer> it, TermServices services) {
+    protected JavaDLTerm replace(JavaDLTerm term, JavaDLTerm with, Iterator<Integer> it, JavaDLTermServices services) {
         if ( !it.hasNext() ) {
             return with;
         }
@@ -664,7 +663,7 @@ public class QueryExpand implements BuiltInRule {
     }
 
 	@Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services) {
 	    return new DefaultBuiltInRuleApp(this, pos);
     }
 

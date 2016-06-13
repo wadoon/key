@@ -25,11 +25,11 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.op.UpdateApplication;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -244,7 +244,7 @@ public class TriggersSet {
             return foundSubtriggers;
         }
 
-        private Set<JavaDLTerm> expandIfThenElse(JavaDLTerm t, TermServices services) {
+        private Set<JavaDLTerm> expandIfThenElse(JavaDLTerm t, JavaDLTermServices services) {
             final Set<JavaDLTerm>[] possibleSubs = new Set[t.arity()];
             boolean changed = false;
             for (int i = 0; i != t.arity(); ++i) {
@@ -274,7 +274,7 @@ public class TriggersSet {
                 Set<JavaDLTerm>[] possibleSubs,
                 JavaDLTerm[] chosenSubs,
                 ImmutableArray<QuantifiableVariable> boundVars,
-                int i, TermServices services) {
+                int i, JavaDLTermServices services) {
             final HashSet<JavaDLTerm> set = new LinkedHashSet<JavaDLTerm>();
             if (i >= possibleSubs.length) {
                 final JavaDLTerm res =

@@ -22,20 +22,20 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -169,7 +169,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
     private void collectAxiomsAndCandidateTerms(final Set<JavaDLTerm> terms,
             final Set<JavaDLTerm> axioms, final IntegerLDT integerLDT,
-            Semisequent antecedent, boolean inAntecedent, TermServices services) {
+            Semisequent antecedent, boolean inAntecedent, JavaDLTermServices services) {
         
         for (SequentFormula sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);

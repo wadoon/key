@@ -16,10 +16,10 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -298,7 +298,7 @@ public class TacletAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos, 
                                                  TacletFilter    filter,
-                                                 TermServices        services) { 
+                                                 JavaDLTermServices        services) { 
 
         final Iterator<NoPosTacletApp> it =
             getFindTaclet ( pos, filter, services ).iterator();
@@ -327,7 +327,7 @@ public class TacletAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos,
                                               TacletFilter    filter,
-                                              TermServices        services) { 
+                                              JavaDLTermServices        services) { 
         return getIndex ( pos ).getTacletAppAt ( pos, filter );
     }
 

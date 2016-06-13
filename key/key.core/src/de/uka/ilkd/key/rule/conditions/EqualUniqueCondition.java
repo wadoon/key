@@ -17,8 +17,8 @@ package de.uka.ilkd.key.rule.conditions;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.services.TermServices;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -41,7 +41,7 @@ public final class EqualUniqueCondition implements VariableCondition {
     }
     
     
-    private static JavaDLTerm equalUnique(JavaDLTerm t1, JavaDLTerm t2, TermServices services) {
+    private static JavaDLTerm equalUnique(JavaDLTerm t1, JavaDLTerm t2, JavaDLTermServices services) {
 	if(!(t1.op() instanceof Function 
 	     && t2.op() instanceof Function
 	     && ((Function)t1.op()).isUnique()

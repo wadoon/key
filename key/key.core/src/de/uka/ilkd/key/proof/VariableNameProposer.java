@@ -18,16 +18,16 @@ import java.util.regex.Pattern;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -205,7 +205,7 @@ public class VariableNameProposer implements InstantiationProposer {
      */
     private String getNameProposalForVariableSV(TacletApp app,
 						SchemaVariable var,
-						TermServices services,
+						JavaDLTermServices services,
 						ImmutableList<String> previousProposals) {
 
         String baseName = var.name().toString();

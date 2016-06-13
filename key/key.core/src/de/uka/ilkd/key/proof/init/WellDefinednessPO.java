@@ -20,17 +20,17 @@ import java.util.Properties;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -95,7 +95,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     private static LocationVariable createSelf(IProgramMethod pm,
                                                KeYJavaType selfKJT,
-                                               TermServices services) {
+                                               JavaDLTermServices services) {
         if (pm == null) {
             return services.getTermBuilder().selfVar(selfKJT, false);
         } else {
@@ -104,7 +104,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static ProgramVariable createResult(IProgramMethod pm,
-                                                TermServices services) {
+                                                JavaDLTermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -113,7 +113,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static ProgramVariable createException(IProgramMethod pm,
-                                                   TermServices services) {
+                                                   JavaDLTermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -122,7 +122,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static Map<LocationVariable, ProgramVariable> createAtPres(LocationVariable heap,
-                                                                       TermServices services) {
+                                                                       JavaDLTermServices services) {
         final Map<LocationVariable, ProgramVariable> res =
                 new LinkedHashMap<LocationVariable, ProgramVariable>();
         final ProgramVariable atPre =
@@ -148,7 +148,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static ImmutableList<ProgramVariable> createParams(IObserverFunction target,
                                                                ImmutableList<ProgramVariable>
                                                                           origParams,
-                                                               TermServices services) {
+                                                               JavaDLTermServices services) {
         final ImmutableList<ProgramVariable> params = services.getTermBuilder().paramVars(target, true);
         return addGhostParams(params, origParams);
     }
@@ -381,7 +381,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                           final Map<LocationVariable, ProgramVariable> atPres,
                           final ImmutableList<ProgramVariable> params,
                           final LocationVariable heap,
-                          final Function anonHeap, TermServices services) {
+                          final Function anonHeap, JavaDLTermServices services) {
             this(self, result, exception, atPres, params, heap,
                   services.getTermBuilder().label(services.getTermBuilder().func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
         }

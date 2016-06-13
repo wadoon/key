@@ -16,9 +16,8 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.common.core.services.TermServices;
-
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleKey;
@@ -50,7 +49,7 @@ public class RuleJustificationInfo {
         return rule2justif.get(new RuleKey(r));
     }
 
-    public RuleJustification getJustification(RuleApp r, TermServices services) {
+    public RuleJustification getJustification(RuleApp r, JavaDLTermServices services) {
         RuleJustification just = getJustification(r.rule());
         if (just instanceof ComplexRuleJustification) {
             return ((ComplexRuleJustification) just).getSpecificJustification(r, services);

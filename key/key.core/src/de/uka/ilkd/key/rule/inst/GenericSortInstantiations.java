@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -28,6 +27,7 @@ import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -200,11 +200,11 @@ public final class GenericSortInstantiations {
      * @throws GenericSortException iff p_s is a generic sort which is
      * not yet instantiated
      */
-    public Sort getRealSort ( SchemaVariable p_sv, TermServices services ) {
+    public Sort getRealSort ( SchemaVariable p_sv, JavaDLTermServices services ) {
 	return getRealSort ( p_sv.sort (), services );
     }
 
-    public Sort getRealSort ( Sort p_s, TermServices services ) {
+    public Sort getRealSort ( Sort p_s, JavaDLTermServices services ) {
 	if ( p_s instanceof GenericSort ) {
 	    p_s = getInstantiation ( (GenericSort)p_s );
 	    if ( p_s == null ) {

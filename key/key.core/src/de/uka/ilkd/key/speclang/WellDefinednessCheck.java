@@ -23,7 +23,6 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.ParsableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;

@@ -21,7 +21,6 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
@@ -58,11 +58,11 @@ import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -1060,12 +1060,12 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     @Override
-    public ContractRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public ContractRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services) {
 		return new ContractRuleApp(this, pos);
     }
 
    public static Map<LocationVariable, LocationVariable> computeAtPreVars(List<LocationVariable> heapContext, 
-                                                                          TermServices services, 
+                                                                          JavaDLTermServices services, 
                                                                           Instantiation inst) {
       return HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
    }
@@ -1088,7 +1088,7 @@ public final class UseOperationContractRule implements BuiltInRule {
       return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap), inst.actualParams, tf);
    }
 
-   public static ProgramVariable computeResultVar(Instantiation inst, TermServices services) {
+   public static ProgramVariable computeResultVar(Instantiation inst, JavaDLTermServices services) {
       final TermBuilder TB = services.getTermBuilder();
       return inst.pm.isConstructor() ? 
              TB.selfVar(inst.staticType, true) : 

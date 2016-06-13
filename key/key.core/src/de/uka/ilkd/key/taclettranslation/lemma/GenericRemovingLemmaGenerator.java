@@ -23,6 +23,7 @@ import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 
@@ -49,7 +50,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * if their sort argument is a generic sort.
      */
     @Override
-    protected Operator replaceOp(Operator op, TermServices services) {
+    protected Operator replaceOp(Operator op, JavaDLTermServices services) {
 
         if (op instanceof SortDependingFunction) {
             SortDependingFunction sdf = (SortDependingFunction) op;
@@ -71,7 +72,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * named proxy sorts.
      */
     @Override
-    protected Sort replaceSort(Sort sort, TermServices services) {
+    protected Sort replaceSort(Sort sort, JavaDLTermServices services) {
         if(sort instanceof GenericSort) {
 
             Sort cached = sortMap.get(sort);
@@ -98,7 +99,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      *            the services
      * @return the immutable set
      */
-    private ImmutableSet<Sort> replaceSorts(ImmutableSet<Sort> extendsSorts, TermServices services) {
+    private ImmutableSet<Sort> replaceSorts(ImmutableSet<Sort> extendsSorts, JavaDLTermServices services) {
         ImmutableSet<Sort> result = DefaultImmutableSet.nil();
         for (Sort sort : extendsSorts) {
             result = result.add(replaceSort(sort, services));

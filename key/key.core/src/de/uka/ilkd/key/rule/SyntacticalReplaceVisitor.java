@@ -23,7 +23,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Stack;
 
-import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Operator;
@@ -44,8 +43,8 @@ import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -347,7 +346,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             ImmutableArray<JavaDLTerm> newTermSubs,
             ImmutableArray<QuantifiableVariable>
     newTermBoundVars,
-    ModalContent newTermJavaBlock,
+    JavaBlock newTermJavaBlock,
     ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPosInOccurrence, rule, ruleApp, goal,
                 labelHint, tacletTerm, newTermOp, newTermSubs,

@@ -24,7 +24,6 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.UpdateApplication;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -721,7 +720,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     /**
      * Instances of this class are used in the {@link Map} of
-     * {@link OneStepSimplifier#replaceKnown(TermServices, SequentFormula, Map, List, Protocol)}
+     * {@link OneStepSimplifier#replaceKnown(JavaDLTermServices, SequentFormula, Map, List, Protocol)}
      * to forece the same behavior as in Taclet rules where
      * names of logical variables and {@link TermLabel}s are ignored.
      * @author Martin Hentschel

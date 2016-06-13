@@ -32,12 +32,12 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -70,7 +70,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 public class FunctionalOperationContractImpl implements FunctionalOperationContract {
 
     protected final TermBuilder TB; // TODO: Rename into tb
-    private final TermServices services;
+    private final JavaDLTermServices services;
 
     final String baseName;
     final String name;
@@ -151,7 +151,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     JavaDLTerm globalDefs,
                                     int id,
                                     boolean toBeSaved,
-                                    boolean transaction, TermServices services) {
+                                    boolean transaction, JavaDLTermServices services) {
         assert !(name == null && baseName == null);
         assert kjt != null;
         assert pm != null;

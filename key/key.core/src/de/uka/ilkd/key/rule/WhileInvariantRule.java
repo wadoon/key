@@ -25,7 +25,6 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
+import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -53,11 +53,11 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -555,7 +555,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         return invTerm;
     }
 
-    private Pair<JavaDLTerm,JavaDLTerm> prepareVariant (Instantiation inst, JavaDLTerm variant, TermServices services) {
+    private Pair<JavaDLTerm,JavaDLTerm> prepareVariant (Instantiation inst, JavaDLTerm variant, JavaDLTermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName variantName 
             = new ProgramElementName(tb.newName("variant"));
@@ -630,7 +630,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Triple<JavaBlock, JavaDLTerm, JavaDLTerm> prepareGuard(final Instantiation inst,
                                                        final KeYJavaType booleanKJT,
                                                        LoopInvariantBuiltInRuleApp loopRuleApp,
-                                                       final TermServices services) {
+                                                       final JavaDLTermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName guardVarName = new ProgramElementName(tb.newName("b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, booleanKJT);
@@ -747,7 +747,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         return true;
     }
 
-    static Pair<JavaDLTerm, JavaDLTerm> applyUpdates(JavaDLTerm focusTerm, TermServices services) {
+    static Pair<JavaDLTerm, JavaDLTerm> applyUpdates(JavaDLTerm focusTerm, JavaDLTermServices services) {
         if (focusTerm.op() instanceof UpdateApplication) {
             return new Pair<JavaDLTerm, JavaDLTerm>(UpdateApplication.getUpdate(focusTerm),
                     UpdateApplication.getTarget(focusTerm));
@@ -1017,7 +1017,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     @Override
-    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services) {
         return new LoopInvariantBuiltInRuleApp(this, pos, services);
     }
 

@@ -7,12 +7,12 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.common.core.logic.Visitor;
 import org.key_project.common.core.logic.op.SchemaVariable;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.JavaDLVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -54,7 +54,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
     private Set<SchemaVariable> collectSchemaVariables(JavaDLTerm t) {
         final Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 
-        t.execPreOrder(new Visitor() {
+        t.execPreOrder(new JavaDLVisitor() {
             @Override
             public boolean visitSubtree(JavaDLTerm visited) {
                 return true;
