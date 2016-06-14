@@ -122,7 +122,7 @@ respect this knowledge Mac OS will cause deadlocks!
   "JUnit Plug-in Test". 
    
 - Start SWTBot tests:
-  Run class org.key_project.key4eclipse.all.test.suite.swtbot.SWTBotAllTests
+  Run classss org.key_project.key4eclipse.all.test.suite.swtbot.SWTBotAllTests
   as "SWTBot Test". Use the JVM settings defined in the JavaDoc comment of 
   this class.
 
