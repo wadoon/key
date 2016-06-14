@@ -8,126 +8,149 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>, 
-                                SeqFor extends SequentFormula<T>> {
+public abstract class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>> {
 
     /** the empty semisequent (using singleton pattern) */
-    private static final GenericSemisequent<?,?> EMPTY_SEMISEQUENT = new Empty<>();
+    private static final GenericSemisequent<?, ?> EMPTY_SEMISEQUENT =
+            new Empty<>();
 
     @SuppressWarnings("unchecked")
-    public static <T extends GenericTerm<?, ?, ?, T>, 
-                      SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<T,SeqFor>> SemiSeq nil() {
+    public static <T extends GenericTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<T, SeqFor>> SemiSeq nil() {
         return (SemiSeq) EMPTY_SEMISEQUENT;
     }
 
-
-    
     /** list with the {@link SeqFor}s of the Semisequent */
     protected final ImmutableList<SeqFor> seqList;
 
-    // inner class used to represent an empty semisequent 
-   static class Empty<T extends GenericTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>> extends GenericSemisequent<T,SeqFor> {
+    protected abstract GenericSemisequentChangeInfo<T, SeqFor, GenericSemisequent<T, SeqFor>> createSemisequentChangeInfo(
+            ImmutableList<SeqFor> formulas);
+    
+    // inner class used to represent an empty semisequent
+    static class Empty<T extends GenericTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>>
+            extends GenericSemisequent<T, SeqFor> {
 
         private Empty() {
             super();
         }
 
-        /** inserts the element always at index 0 ignores the first
-         * argument 
-         * @param idx int encoding the place the element has to be put	
-         * @param sequentFormula {@link SeqFor} to be inserted
+        /**
+         * inserts the element always at index 0 ignores the first argument
+         * 
+         * @param idx
+         *            int encoding the place the element has to be put
+         * @param sequentFormula
+         *            {@link SeqFor} to be inserted
          * @return semisequent change information object with new semisequent
-         * with sequentFormula at place idx 
+         *         with sequentFormula at place idx
          */
-        public SemisequentChangeInfo insert(int idx, SeqFor sequentFormula) {	
+        public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insert(int idx, SeqFor sequentFormula) {
             return insertFirst(sequentFormula);
         }
 
-        /** inserts the element at index 0
-         * @param sequentFormula {@link SeqFor} to be inserted
+        /**
+         * inserts the element at index 0
+         * 
+         * @param sequentFormula
+         *            {@link SeqFor} to be inserted
          * @return semisequent change information object with new semisequent
-         * with sequentFormula at place idx 
+         *         with sequentFormula at place idx
          */
-        public SemisequentChangeInfo insertFirst(SeqFor sequentFormula) {
-            final SemisequentChangeInfo sci = new SemisequentChangeInfo
-                    (ImmutableSLList.<SeqFor>nil().prepend(sequentFormula));
+        public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insertFirst(SeqFor sequentFormula) {
+            final GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> sci =
+                    createSemisequentChangeInfo(ImmutableSLList.<SeqFor> nil()
+                            .prepend(sequentFormula));
             sci.addedFormula(0, sequentFormula);
             return sci;
         }
 
-        /** inserts the element at the end of the semisequent
-         * @param sequentFormula {@link SeqFor} to be inserted
+        /**
+         * inserts the element at the end of the semisequent
+         * 
+         * @param sequentFormula
+         *            {@link SeqFor} to be inserted
          * @return semisequent change information object with new semisequent
-         * with sequentFormula at place idx 
-         */	
-        public SemisequentChangeInfo insertLast(SeqFor sequentFormula) {
+         *         with sequentFormula at place idx
+         */
+        public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insertLast(SeqFor sequentFormula) {
             return insertFirst(sequentFormula);
         }
 
-
         /**
          * is this a semisequent that contains no formulas
+         * 
          * @return true if the semisequent contains no formulas
          */
         public boolean isEmpty() {
             return true;
         }
 
-        /** replaces the element at place idx with sequentFormula
-         * @param idx an int specifying the index of the element that
-         * has to be replaced 
-         * @param sequentFormula the {@link SeqFor} replacing the old
-         * element at index idx
+        /**
+         * replaces the element at place idx with sequentFormula
+         * 
+         * @param idx
+         *            an int specifying the index of the element that has to be
+         *            replaced
+         * @param sequentFormula
+         *            the {@link SeqFor} replacing the old element at index idx
          * @return semisequent change information object with new semisequent
-         * with sequentFormula at place idx 
+         *         with sequentFormula at place idx
          */
-        public SemisequentChangeInfo replace(int idx, SeqFor sequentFormula) {
+        public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> replace(int idx, SeqFor sequentFormula) {
             return insertFirst(sequentFormula);
         }
 
-        /** @return int counting the elements of this semisequent */ 
-        public int size() { 
-            return 0; 
+        /** @return int counting the elements of this semisequent */
+        public int size() {
+            return 0;
         }
 
-        /** removes an element 
-         * @param idx int being the index of the element that has to
-         * be removed
+        /**
+         * removes an element
+         * 
+         * @param idx
+         *            int being the index of the element that has to be removed
          * @return semisequent change information object with an empty
-         * semisequent as result
+         *         semisequent as result
          */
-        public SemisequentChangeInfo remove(int idx) {
-            return new SemisequentChangeInfo(ImmutableSLList.<SeqFor>nil());
+        public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> remove(int idx) {
+            return createSemisequentChangeInfo(ImmutableSLList.<SeqFor> nil());
         }
 
-        /** returns index of a {@link SeqFor} 
-         * @param sequentFormula the {@link SeqFor} the index want to be
-         * determined 
+        /**
+         * returns index of a {@link SeqFor}
+         * 
+         * @param sequentFormula
+         *            the {@link SeqFor} the index want to be determined
          * @return index of sequentFormula
          */
         public int indexOf(SeqFor sequentFormula) {
             return -1;
         }
 
-        /** gets the element at a specific index
-         * @param idx int representing the index of the element we
-         * want to have
+        /**
+         * gets the element at a specific index
+         * 
+         * @param idx
+         *            int representing the index of the element we want to have
          * @return {@link SeqFor} found at index idx
          */
         public SeqFor get(int idx) {
             return null;
         }
 
-        /** @return the first SeqFor of this Semisequent 
+        /**
+         * @return the first SeqFor of this Semisequent
          */
         public SeqFor getFirst() {
             return null;
         }
 
-        /** checks if a {@link SeqFor} is in this Semisequent
-         * @param sequentFormula the {@link SeqFor} to look for
-         * @return true iff. sequentFormula has been found in this
-         * Semisequent 
+        /**
+         * checks if a {@link SeqFor} is in this Semisequent
+         * 
+         * @param sequentFormula
+         *            the {@link SeqFor} to look for
+         * @return true iff. sequentFormula has been found in this Semisequent
          */
         public boolean contains(SeqFor sequentFormula) {
             return false;
@@ -137,7 +160,7 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
             return o == this;
         }
 
-        public int hashCode () {
+        public int hashCode() {
             return 34567;
         }
 
@@ -145,106 +168,138 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
         public String toString() {
             return "[]";
         }
+
+        /* (non-Javadoc)
+         * @see de.uka.ilkd.key.logic.GenericSemisequent#createSemisequentChangeInfo(org.key_project.util.collection.ImmutableList)
+         */
+        @Override
+        protected GenericSemisequentChangeInfo<T, SeqFor, GenericSemisequent<T, SeqFor>> createSemisequentChangeInfo(
+                ImmutableList<SeqFor> formulas) {
+            return new GenericSemisequentChangeInfo<T, SeqFor, GenericSemisequent<T, SeqFor>>(ImmutableSLList.<SeqFor>nil()) {
+
+                @Override
+                protected GenericSemisequent<T, SeqFor> createSemisequent(
+                        ImmutableList<SeqFor> modifiedFormulas) {
+                    return GenericSemisequent.<T,SeqFor,GenericSemisequent<T, SeqFor>>nil();
+                }
+                
+            };
+        }
     }
 
-
-    /** used by inner class Empty*/
+    /** used by inner class Empty */
     private GenericSemisequent() {
-        seqList = ImmutableSLList.<SeqFor>nil(); 
+        seqList = ImmutableSLList.<SeqFor> nil();
     }
 
-    /** 
-     * creates a new Semisequent with the Semisequent elements in
-     * seqList; the provided list must be redundance free, i.e.,
-     * the created sequent must be exactly the same as when creating the sequent
-     * by subsequently inserting all formulas
-     */ 
+    /**
+     * creates a new Semisequent with the Semisequent elements in seqList; the
+     * provided list must be redundance free, i.e., the created sequent must be
+     * exactly the same as when creating the sequent by subsequently inserting
+     * all formulas
+     */
     GenericSemisequent(ImmutableList<SeqFor> seqList) {
         assert !seqList.isEmpty();
         this.seqList = seqList;
     }
 
-
-    /** creates a new Semisequent with the Semisequent elements in
-     * seqList */ 
+    /**
+     * creates a new Semisequent with the Semisequent elements in seqList
+     */
     public GenericSemisequent(SeqFor seqFormula) {
         assert seqFormula != null;
-        this.seqList = ImmutableSLList.<SeqFor>nil().append(seqFormula);
-    }    
+        this.seqList = ImmutableSLList.<SeqFor> nil().append(seqFormula);
+    }
 
-
-    /** inserts an element at a specified index performing redundancy
-     * checks, this may result in returning same semisequent if
-     * inserting would create redundancies 
-     * @param idx int encoding the place the element has to be put	
-     * @param sequentFormula {@link SeqFor} to be inserted
+    /**
+     * inserts an element at a specified index performing redundancy checks,
+     * this may result in returning same semisequent if inserting would create
+     * redundancies
+     * 
+     * @param idx
+     *            int encoding the place the element has to be put
+     * @param sequentFormula
+     *            {@link SeqFor} to be inserted
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo insert(int idx, SeqFor sequentFormula) {	
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insert(int idx, SeqFor sequentFormula) {
         return removeRedundance(idx, sequentFormula);
     }
 
-    /** inserts the elements of the list at the specified index
-     * performing redundancy checks
-     * @param idx int encoding the place where the insertion starts
-     * @param insertionList IList<SeqFor> to be inserted
-     * starting at idx
+    /**
+     * inserts the elements of the list at the specified index performing
+     * redundancy checks
+     * 
+     * @param idx
+     *            int encoding the place where the insertion starts
+     * @param insertionList
+     *            IList<SeqFor> to be inserted starting at idx
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo insert(int idx, ImmutableList<SeqFor> insertionList) {	
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insert(int idx,
+            ImmutableList<SeqFor> insertionList) {
         return removeRedundance(idx, insertionList);
     }
 
-    /** inserts element at index 0 performing redundancy
-     * checks, this may result in returning same semisequent if
-     * inserting would create redundancies 
-     * @param sequentFormula SeqFor to be inserted
+    /**
+     * inserts element at index 0 performing redundancy checks, this may result
+     * in returning same semisequent if inserting would create redundancies
+     * 
+     * @param sequentFormula
+     *            SeqFor to be inserted
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo insertFirst(SeqFor sequentFormula) {
-        return insert(0,sequentFormula);
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insertFirst(SeqFor sequentFormula) {
+        return insert(0, sequentFormula);
     }
 
-    /** 
-     * inserts element at index 0 performing redundancy
-     * checks, this may result in returning same semisequent if
-     * inserting would create redundancies 
-     * @param insertions IList<SeqFor> to be inserted
+    /**
+     * inserts element at index 0 performing redundancy checks, this may result
+     * in returning same semisequent if inserting would create redundancies
+     * 
+     * @param insertions
+     *            IList<SeqFor> to be inserted
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo insertFirst(ImmutableList<SeqFor> insertions) {
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insertFirst(ImmutableList<SeqFor> insertions) {
         return insert(0, insertions);
     }
 
-    /** inserts element at the end of the semisequent performing
-     * redundancy checks, this may result in returning same
-     * semisequent if inserting would create redundancies 
-     * @param sequentFormula {@link SeqFor} to be inserted
+    /**
+     * inserts element at the end of the semisequent performing redundancy
+     * checks, this may result in returning same semisequent if inserting would
+     * create redundancies
+     * 
+     * @param sequentFormula
+     *            {@link SeqFor} to be inserted
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo insertLast(SeqFor sequentFormula) {
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insertLast(SeqFor sequentFormula) {
         return insert(size(), sequentFormula);
     }
 
-    /** 
-     * inserts the formulas of the list at the end of the semisequent
-     * performing redundancy checks, this may result in returning same 
-     * semisequent if inserting would create redundancies 
-     * @param insertions the IList<SeqFor> to be inserted
+    /**
+     * inserts the formulas of the list at the end of the semisequent performing
+     * redundancy checks, this may result in returning same semisequent if
+     * inserting would create redundancies
+     * 
+     * @param insertions
+     *            the IList<SeqFor> to be inserted
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo insertLast(ImmutableList<SeqFor> insertions) {
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insertLast(ImmutableList<SeqFor> insertions) {
         return insert(size(), insertions);
     }
 
     /**
      * is this a semisequent that contains no formulas
+     * 
      * @return true if the semisequent contains no formulas
      */
     public boolean isEmpty() {
@@ -252,84 +307,94 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
     }
 
     /**
-     * inserts new SeqFor at index idx and removes
-     * duplicates, perform simplifications etc.
-     * @param fci null if the formula to be added is new, otherwise an
-     * object telling which formula is replaced with the new formula
-     * <code>sequentFormula</code>, and what are the differences between the
-     * two formulas
+     * inserts new SeqFor at index idx and removes duplicates, perform
+     * simplifications etc.
+     * 
+     * @param fci
+     *            null if the formula to be added is new, otherwise an object
+     *            telling which formula is replaced with the new formula
+     *            <code>sequentFormula</code>, and what are the differences
+     *            between the two formulas
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    private SemisequentChangeInfo insertAndRemoveRedundancyHelper(int idx, SeqFor sequentFormula,
-            SemisequentChangeInfo semiCI, FormulaChangeInfo fci) {
+    private GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insertAndRemoveRedundancyHelper(int idx,
+            SeqFor sequentFormula, GenericSemisequentChangeInfo<T, SeqFor, GenericSemisequent<T, SeqFor>> semiCI,
+            FormulaChangeInfo<T, SeqFor> fci) {
 
         // Search for equivalent formulas and weakest constraint
         ImmutableList<SeqFor> searchList = semiCI.getFormulaList();
-        ImmutableList<SeqFor> newSeqList = ImmutableSLList.<SeqFor>nil();
-        SeqFor       cf;
-        int                      pos        = -1;
+        ImmutableList<SeqFor> newSeqList = ImmutableSLList.<SeqFor> nil();
+        SeqFor cf;
+        int pos = -1;
 
-        while ( !searchList.isEmpty() ) {
+        while (!searchList.isEmpty()) {
             ++pos;
-            cf         = searchList.head ();
+            cf = searchList.head();
             searchList = searchList.tail();
 
-            if (sequentFormula != null && cf.formula().equalsModRenaming(sequentFormula.formula())) {
+            if (sequentFormula != null
+                    && cf.formula().equalsModRenaming(sequentFormula.formula())) {
 
-                semiCI.rejectedFormula( sequentFormula );
+                semiCI.rejectedFormula(sequentFormula);
                 return semiCI; // semisequent already contains formula
 
             }
-            newSeqList = newSeqList.prepend ( cf );
+            newSeqList = newSeqList.prepend(cf);
         }
 
-
         // compose resulting formula list
-        if ( fci == null )
+        if (fci == null)
             semiCI.addedFormula(idx, sequentFormula);
         else
             semiCI.modifiedFormula(idx, fci);
 
-        if ( idx > pos ) {
-            searchList = searchList.prepend ( sequentFormula );
+        if (idx > pos) {
+            searchList = searchList.prepend(sequentFormula);
         }
 
-        while ( !newSeqList.isEmpty() ) {
-            searchList = searchList.prepend ( newSeqList.head () );
-            newSeqList = newSeqList.tail ();
-            if ( idx == pos ) {
-                searchList = searchList.prepend ( sequentFormula );
+        while (!newSeqList.isEmpty()) {
+            searchList = searchList.prepend(newSeqList.head());
+            newSeqList = newSeqList.tail();
+            if (idx == pos) {
+                searchList = searchList.prepend(sequentFormula);
             }
             --pos;
-        }      
+        }
 
         // add new formula list to result object
-        semiCI.setFormulaList ( searchList );
+        semiCI.setFormulaList(searchList);
 
         return semiCI;
     }
 
-    /** .
-     * inserts new ConstrainedFormulas starting at index idx and removes
+    /**
+     * . inserts new ConstrainedFormulas starting at index idx and removes
      * duplicates, perform simplifications etc.
-     * @param sequentFormulasToBeInserted the {@link ImmutableList<SeqFor>} to be inserted at position idx
-     * @param idx an int that means insert sequentFormula at the idx-th
-     * position in the semisequent 
+     * 
+     * @param sequentFormulasToBeInserted
+     *            the {@link ImmutableList<SeqFor>} to be inserted at position
+     *            idx
+     * @param idx
+     *            an int that means insert sequentFormula at the idx-th position
+     *            in the semisequent
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    private SemisequentChangeInfo insertAndRemoveRedundancy(int idx, ImmutableList<SeqFor> sequentFormulasToBeInserted,
-            SemisequentChangeInfo sci) {
+    private GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> insertAndRemoveRedundancy(int idx,
+            ImmutableList<SeqFor> sequentFormulasToBeInserted,
+            GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> sci) {
 
-        int pos = idx;	
+        int pos = idx;
         ImmutableList<SeqFor> oldFormulas = sci.getFormulaList();
 
         while (!sequentFormulasToBeInserted.isEmpty()) {
             final SeqFor aSequentFormula = sequentFormulasToBeInserted.head();
             sequentFormulasToBeInserted = sequentFormulasToBeInserted.tail();
 
-            sci = insertAndRemoveRedundancyHelper ( pos, aSequentFormula, sci, null );
+            sci =
+                    insertAndRemoveRedundancyHelper(pos, aSequentFormula, sci,
+                            null);
 
             if (sci.getFormulaList() != oldFormulas) {
                 pos = sci.getIndex() + 1;
@@ -339,30 +404,40 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
         return sci;
     }
 
-    /** .
-     * inserts new ConstrainedFormulas starting at index idx and removes
+    /**
+     * . inserts new ConstrainedFormulas starting at index idx and removes
      * duplicates, perform simplifications etc.
-     * @param sequentFormula the IList<SeqFor> to be inserted at position idx
-     * @param idx an int that means insert sequentFormula at the idx-th
-     * position in the semisequent 
+     * 
+     * @param sequentFormula
+     *            the IList<SeqFor> to be inserted at position idx
+     * @param idx
+     *            an int that means insert sequentFormula at the idx-th position
+     *            in the semisequent
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    private SemisequentChangeInfo removeRedundance(int idx, ImmutableList<SeqFor> sequentFormula) {
-        return insertAndRemoveRedundancy(idx, sequentFormula, new SemisequentChangeInfo(seqList));
+    private GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> removeRedundance(int idx,
+            ImmutableList<SeqFor> sequentFormula) {
+        return insertAndRemoveRedundancy(idx, sequentFormula,
+                createSemisequentChangeInfo(seqList));
     }
 
-    /** .
-     * inserts new SeqFor at index idx and removes
-     * duplicates, perform simplifications etc.
-     * @param sequentFormula the SeqFor to be inserted at position idx
-     * @param idx an int that means insert sequentFormula at the idx-th
-     * position in the semisequent 
+    /**
+     * . inserts new SeqFor at index idx and removes duplicates, perform
+     * simplifications etc.
+     * 
+     * @param sequentFormula
+     *            the SeqFor to be inserted at position idx
+     * @param idx
+     *            an int that means insert sequentFormula at the idx-th position
+     *            in the semisequent
      * @return new Semisequent with sequentFormula at index idx and removed
-     * redundancies 
+     *         redundancies
      */
-    private SemisequentChangeInfo removeRedundance(int idx, SeqFor sequentFormula) {
-        return insertAndRemoveRedundancyHelper ( idx, sequentFormula, new SemisequentChangeInfo(seqList), null );
+    private GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> removeRedundance(int idx,
+            SeqFor sequentFormula) {
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula,
+                createSemisequentChangeInfo(seqList), null);
     }
 
     /**
@@ -377,40 +452,51 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo replace(PosInOccurrence<T, SeqFor> pos, SeqFor sequentFormula) {	
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> replace(PosInOccurrence<T, SeqFor> pos,
+            SeqFor sequentFormula) {
         final int idx = indexOf(pos.sequentFormula());
-        final FormulaChangeInfo<T, SeqFor> fci = new FormulaChangeInfo<T, SeqFor> ( pos, sequentFormula );
-        return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci);
+        final FormulaChangeInfo<T, SeqFor> fci =
+                new FormulaChangeInfo<T, SeqFor>(pos, sequentFormula);
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula,
+                remove(idx), fci);
     }
 
     /**
      * replaces the <tt>idx</tt>-th formula by <tt>sequentFormula</tt>
-     * @param idx the int with the position of the formula to be replaced
-     * @param sequentFormula the SeqFor replacing the formula at the given position
-     * @return a SemisequentChangeInfo containing the new sequent and a diff to the old
-     *  one
+     * 
+     * @param idx
+     *            the int with the position of the formula to be replaced
+     * @param sequentFormula
+     *            the SeqFor replacing the formula at the given position
+     * @return a SemisequentChangeInfo containing the new sequent and a diff to
+     *         the old one
      */
-    public SemisequentChangeInfo replace(int idx, SeqFor sequentFormula) {	
-        return insertAndRemoveRedundancyHelper ( idx, sequentFormula, remove(idx), null );
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> replace(int idx, SeqFor sequentFormula) {
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula,
+                remove(idx), null);
     }
 
-    /** 
-     * replaces the element at place idx with the first element of the
-     * given list and adds the rest of the list to the semisequent
-     * behind the replaced formula
-     * @param pos the formula to be replaced
-     * @param replacements the IList<SeqFor> whose head
-     * replaces the element at index idx and the tail is added to the
-     * semisequent 
+    /**
+     * replaces the element at place idx with the first element of the given
+     * list and adds the rest of the list to the semisequent behind the replaced
+     * formula
+     * 
+     * @param pos
+     *            the formula to be replaced
+     * @param replacements
+     *            the IList<SeqFor> whose head replaces the element at index idx
+     *            and the tail is added to the semisequent
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo replace(PosInOccurrence<T, SeqFor> pos, ImmutableList<SeqFor> replacements) {	
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> replace(PosInOccurrence<T, SeqFor> pos,
+            ImmutableList<SeqFor> replacements) {
         final int idx = indexOf(pos.sequentFormula());
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
 
-    public SemisequentChangeInfo replace(int idx, ImmutableList<SeqFor> replacements) {	
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> replace(int idx,
+            ImmutableList<SeqFor> replacements) {
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
 
@@ -419,80 +505,82 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
         return seqList.size();
     }
 
-    /** 
-     * removes an element 
-     * @param idx int being the index of the element that has to
-     * be removed
+    /**
+     * removes an element
+     * 
+     * @param idx
+     *            int being the index of the element that has to be removed
      * @return a semi sequent change information object with the new semisequent
-     * and information which formulas have been added or removed
+     *         and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo remove(int idx) {	       
+    public GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> remove(int idx) {
 
-        ImmutableList<SeqFor> newList = seqList;  
-        ImmutableList<SeqFor> queue =
-                ImmutableSLList.<SeqFor>nil();  
+        ImmutableList<SeqFor> newList = seqList;
+        ImmutableList<SeqFor> queue = ImmutableSLList.<SeqFor> nil();
 
-        if (idx<0 || idx>=size()) {
-            return new SemisequentChangeInfo(seqList);
+        if (idx < 0 || idx >= size()) {
+            return createSemisequentChangeInfo(seqList);
         }
-
 
         final ArrayList<SeqFor> temp = new ArrayList<>();
 
-        for (int i = 0; i<idx; i++) {// go to idx 
+        for (int i = 0; i < idx; i++) {// go to idx
             temp.add(newList.head());
-            newList=newList.tail();
+            newList = newList.tail();
         }
 
-        for (int k = temp.size() - 1; k>=0; k--) queue=queue.prepend(temp.get(k));
+        for (int k = temp.size() - 1; k >= 0; k--)
+            queue = queue.prepend(temp.get(k));
 
-
-        // remove the element that is at head of newList	
+        // remove the element that is at head of newList
         final SeqFor removedFormula = newList.head();
-        newList=newList.tail();
-        newList=newList.prepend(queue);
+        newList = newList.tail();
+        newList = newList.prepend(queue);
 
         // create change info object
-        final SemisequentChangeInfo sci = new SemisequentChangeInfo(newList);
+        final GenericSemisequentChangeInfo<T,SeqFor,GenericSemisequent<T,SeqFor>> sci = createSemisequentChangeInfo(newList);
         sci.removedFormula(idx, removedFormula);
 
         return sci;
     }
 
     /**
-     * returns the index of the given {@link SeqFor} or {@code -1} 
-     * if the sequent formula is not found. Equality of sequent formulas
-     * is checked sing the identy check (i.e.,{@link ==})
+     * returns the index of the given {@link SeqFor} or {@code -1} if the
+     * sequent formula is not found. Equality of sequent formulas is checked
+     * sing the identy check (i.e.,{@link ==})
      * 
-     * @param sequentFormula the {@link SeqFor} to look for
+     * @param sequentFormula
+     *            the {@link SeqFor} to look for
      * @return index of sequentFormula (-1 if not found)
      */
     public int indexOf(SeqFor sequentFormula) {
-        ImmutableList<SeqFor> searchList = seqList;  
+        ImmutableList<SeqFor> searchList = seqList;
         int index = 0;
-        while (!searchList.isEmpty())
-        { 
+        while (!searchList.isEmpty()) {
             if (searchList.head() == sequentFormula) {
                 return index;
-            }            
+            }
             searchList = searchList.tail();
             index++;
-        } 
+        }
         return -1;
     }
 
-    /** gets the element at a specific index
-     * @param idx int representing the index of the element we
-     * want to have
+    /**
+     * gets the element at a specific index
+     * 
+     * @param idx
+     *            int representing the index of the element we want to have
      * @return {@link SeqFor} found at index idx
-     * @throws IndexOutOfBoundsException if idx is negative or 
-     * greater or equal to {@link Sequent#size()}
+     * @throws IndexOutOfBoundsException
+     *             if idx is negative or greater or equal to
+     *             {@link Sequent#size()}
      */
-    public SeqFor get(int idx) {        
+    public SeqFor get(int idx) {
         if (idx < 0 || idx >= seqList.size()) {
             throw new IndexOutOfBoundsException();
         }
-        return seqList.take(idx).head();	
+        return seqList.take(idx).head();
     }
 
     /** @return the first {@link SeqFor} of this Semisequent */
@@ -500,28 +588,31 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
         return seqList.head();
     }
 
-    /** checks if the {@link SeqFor} occurs in this 
-     * Semisequent (identity check)
-     * @param sequentFormula the {@link SeqFor} to look for
-     * @return true iff. sequentFormula has been found in this
-     * Semisequent 
+    /**
+     * checks if the {@link SeqFor} occurs in this Semisequent (identity check)
+     * 
+     * @param sequentFormula
+     *            the {@link SeqFor} to look for
+     * @return true iff. sequentFormula has been found in this Semisequent
      */
     public boolean contains(SeqFor sequentFormula) {
-        return indexOf(sequentFormula)!=-1;
+        return indexOf(sequentFormula) != -1;
     }
 
-    /** checks if a {@link SeqFor} is in this Semisequent
-     * (equality check)
-     * @param sequentFormula the {@link SeqFor} to look for
-     * @return true iff. sequentFormula has been found in this
-     * Semisequent 
+    /**
+     * checks if a {@link SeqFor} is in this Semisequent (equality check)
+     * 
+     * @param sequentFormula
+     *            the {@link SeqFor} to look for
+     * @return true iff. sequentFormula has been found in this Semisequent
      */
     public boolean containsEqual(SeqFor sequentFormula) {
-        return seqList.contains(sequentFormula);        
+        return seqList.contains(sequentFormula);
     }
 
-    /** 
-     * returns iterator about the elements of the sequent     
+    /**
+     * returns iterator about the elements of the sequent
+     * 
      * @return Iterator<SeqFor>
      */
     public Iterator<SeqFor> iterator() {
@@ -533,13 +624,13 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
     }
 
     public boolean equals(Object o) {
-        if ( ! ( o instanceof Semisequent ) ) 
+        if (!(o instanceof Semisequent))
             return false;
         return seqList.equals(((Semisequent) o).seqList);
     }
 
     public int hashCode() {
-        return seqList.hashCode ();
+        return seqList.hashCode();
     }
 
     /** @return String representation of this Semisequent */
