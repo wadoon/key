@@ -377,9 +377,9 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo replace(PosInOccurrence pos, SeqFor sequentFormula) {	
+    public SemisequentChangeInfo replace(PosInOccurrence<T, SeqFor> pos, SeqFor sequentFormula) {	
         final int idx = indexOf(pos.sequentFormula());
-        final FormulaChangeInfo fci = new FormulaChangeInfo ( pos, sequentFormula );
+        final FormulaChangeInfo<T, SeqFor> fci = new FormulaChangeInfo<T, SeqFor> ( pos, sequentFormula );
         return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci);
     }
 
@@ -405,7 +405,7 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo replace(PosInOccurrence pos, ImmutableList<SeqFor> replacements) {	
+    public SemisequentChangeInfo replace(PosInOccurrence<T, SeqFor> pos, ImmutableList<SeqFor> replacements) {	
         final int idx = indexOf(pos.sequentFormula());
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
