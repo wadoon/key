@@ -23,11 +23,13 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
  */
 public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<T>> {
 
-    public static <T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<T>> PosInOccurrence<T, SeqFor> findInSequent(Sequent seq, 
-                                                int formulaNumber, 
-                                                PosInTerm<JavaDLTerm> pos) {
-       return new PosInOccurrence<>(seq.getFormulabyNr(formulaNumber),  
-                                  pos, seq.numberInAntec(formulaNumber));
+    public static <T      extends GenericTerm<?, ?, ?, T>,
+                   SeqFor extends SequentFormula<T>>
+            PosInOccurrence<T, SeqFor> findInSequent(
+                    Sequent seq, int formulaNumber, PosInTerm<T> pos) {
+        return new PosInOccurrence<T, SeqFor>(
+                seq.getFormulabyNr(formulaNumber), pos,
+                seq.numberInAntec(formulaNumber));
     }
     
     /**
