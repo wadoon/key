@@ -13,14 +13,34 @@
 
 package de.uka.ilkd.key.logic;
 
-/** 
- * This class represents the succedent or antecendent part of a
- * sequent. It is more or less a list without duplicates and subsumed
- * formulas. This is ensured using method removeRedundancy. In future
- * versions it can be enhanced to do other simplifications. A sequent
- * and so a semisequent has to be immutable. 
- */
-public class Semisequent extends GenericSemisequent implements Iterable<SequentFormula> {
+import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.util.collection.ImmutableList;
 
-    
+/**
+ * This class represents the succedent or antecendent part of a sequent. It is
+ * more or less a list without duplicates and subsumed formulas. This is ensured
+ * using method removeRedundancy. In future versions it can be enhanced to do
+ * other simplifications. A sequent and so a semisequent has to be immutable.
+ */
+public class Semisequent extends
+        GenericSemisequent<JavaDLTerm, SequentFormula<JavaDLTerm>> implements
+        Iterable<SequentFormula<JavaDLTerm>> {
+
+    /**
+     * TODO: Document.
+     *
+     * @param seqList
+     */
+    Semisequent(ImmutableList<SequentFormula<JavaDLTerm>> seqList) {
+        super(seqList);
+    }
+
+    /**
+     * TODO: Document.
+     *
+     * @param seqList
+     */
+    Semisequent(SequentFormula<JavaDLTerm> seqList) {
+        super(seqList);
+    }
 }
