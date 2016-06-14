@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableList;
  * other simplifications. A sequent and so a semisequent has to be immutable.
  */
 public class Semisequent extends
-        GenericSemisequent<JavaDLTerm, SequentFormula<JavaDLTerm>> implements
+        GenericSemisequent<SequentFormula<JavaDLTerm>> implements
         Iterable<SequentFormula<JavaDLTerm>> {
 
     /**
@@ -48,7 +48,7 @@ public class Semisequent extends
      * @see de.uka.ilkd.key.logic.GenericSemisequent#createSemisequentChangeInfo(org.key_project.util.collection.ImmutableList)
      */
     @Override
-    protected GenericSemisequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, ? extends GenericSemisequent<JavaDLTerm, SequentFormula<JavaDLTerm>>> createSemisequentChangeInfo(
+    protected GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, ? extends GenericSemisequent<SequentFormula<JavaDLTerm>>> createSemisequentChangeInfo(
             ImmutableList<SequentFormula<JavaDLTerm>> formulas) {
         return new SemisequentChangeInfo(formulas);
     }

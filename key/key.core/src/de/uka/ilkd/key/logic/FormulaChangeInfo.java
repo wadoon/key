@@ -8,14 +8,14 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
  * @see GenericSemisequentChangeInfo
  * @see GenericSequentChangeInfo
  */
-public class FormulaChangeInfo<T extends GenericTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>> {
+public class FormulaChangeInfo<SeqFor extends SequentFormula<?>> {
 
     /** position within the original formula */
-    protected final PosInOccurrence<T, SeqFor> positionOfModification;
+    protected final PosInOccurrence<?, SeqFor> positionOfModification;
     /** modified formula */
     protected final SeqFor newFormula;
 
-    public FormulaChangeInfo(PosInOccurrence<T, SeqFor> positionOfModification,
+    public FormulaChangeInfo(PosInOccurrence<?, SeqFor> positionOfModification,
             SeqFor newFormula) {
         this.newFormula = newFormula;
         this.positionOfModification = positionOfModification;
@@ -33,7 +33,7 @@ public class FormulaChangeInfo<T extends GenericTerm<?, ?, ?, T>, SeqFor extends
     /**
      * @return position within the original formula
      */
-    public PosInOccurrence<T, SeqFor> getPositionOfModification() {
+    public PosInOccurrence<?, SeqFor> getPositionOfModification() {
         return positionOfModification;
     }
 

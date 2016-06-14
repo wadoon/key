@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableList;
  * Records the changes made to a semisequent. Keeps track of added and
  * removed formula to the semisequents. 
  */
-public class SemisequentChangeInfo extends GenericSemisequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent> {
+public class SemisequentChangeInfo extends GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> {
    
     public SemisequentChangeInfo(ImmutableList<SequentFormula<JavaDLTerm>> formulas) {
         super(formulas);
@@ -30,7 +30,7 @@ public class SemisequentChangeInfo extends GenericSemisequentChangeInfo<JavaDLTe
      * @see de.uka.ilkd.key.logic.GenericSemisequentChangeInfo#createSemisequent(org.key_project.util.collection.ImmutableList)
      */
     @Override
-    protected GenericSemisequent<JavaDLTerm, SequentFormula<JavaDLTerm>> createSemisequent(
+    protected GenericSemisequent<SequentFormula<JavaDLTerm>> createSemisequent(
             ImmutableList<SequentFormula<JavaDLTerm>> modifiedFormulas) {
         return new Semisequent(modifiedFormulas);
     }

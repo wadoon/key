@@ -5,8 +5,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public abstract class GenericSemisequentChangeInfo<T extends GenericTerm<?, ?, ?, T>, 
-                                                  SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<T,SeqFor>> {
+public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor>> {
 
     /** contains the added formulas to the semisequent */
     private ImmutableList<SeqFor> added = ImmutableSLList.<SeqFor>nil();

@@ -16,16 +16,17 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
 
 
@@ -67,8 +68,8 @@ public class NodeReplacement {
     }
 
     private void addNodeChange ( SequentChangeInfo p_sci ) {
-        Iterator<SequentFormula> it;
-        Iterator<FormulaChangeInfo>  it2;
+        Iterator<SequentFormula<JavaDLTerm>> it;
+        Iterator<FormulaChangeInfo<SequentFormula<JavaDLTerm>>>  it2;
      
         //---
         it = p_sci.removedFormulas ( true ).iterator ();
@@ -165,7 +166,7 @@ public class NodeReplacement {
     
     
 
-    private void addRemovedChange ( SequentFormula p_cf,
+    private void addRemovedChange ( SequentFormula<JavaDLTerm> p_cf,
 				    boolean            p_inAntec ) {
 	Sequent     oldS  = parent.sequent ();
 	Semisequent oldSS = ( p_inAntec          ?

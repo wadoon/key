@@ -36,7 +36,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Sequent#createSuccSequent} 
  * or by inserting formulas directly into {@link Sequent#EMPTY_SEQUENT}.
  */ 
-public class Sequent implements Iterable<SequentFormula> {
+public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTerm>> implements Iterable<SequentFormula> {
 
     public static final Sequent EMPTY_SEQUENT = new NILSequent();
 
