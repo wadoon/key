@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -60,7 +61,7 @@ public class SequentChangeInfo {
    * result.  
    */
   public static SequentChangeInfo createSequentChangeInfo
-  (PosInOccurrence pos, SemisequentChangeInfo semiCI, Sequent result, Sequent original) {
+  (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, SemisequentChangeInfo semiCI, Sequent result, Sequent original) {
     return createSequentChangeInfo(pos.isInAntec(), semiCI, result, original);
   }
 
@@ -158,11 +159,11 @@ public class SequentChangeInfo {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas added to the selected semisequent 
    */
-  public ImmutableList<SequentFormula> addedFormulas(boolean antec) {
+  public ImmutableList<SequentFormula<JavaDLTerm>> addedFormulas(boolean antec) {
     return antec ? (antecedent != null ? antecedent.addedFormulas()
-		    : ImmutableSLList.<SequentFormula>nil()) :
+		    : ImmutableSLList.<SequentFormula<JavaDLTerm>>nil()) :
       (succedent != null ? succedent.addedFormulas() : 
-       ImmutableSLList.<SequentFormula>nil());
+       ImmutableSLList.<SequentFormula<JavaDLTerm>>nil());
   }
 
   /** 
@@ -170,7 +171,7 @@ public class SequentChangeInfo {
    * the formulas added to each semisequent.
    * @return list of formulas added to sequent 
    */
-  public ImmutableList<SequentFormula> addedFormulas() {
+  public ImmutableList<SequentFormula<JavaDLTerm>> addedFormulas() {
     return addedFormulas(true).size() > addedFormulas(false).size() ?
 	addedFormulas(false).prepend(addedFormulas(true)) : 
 	addedFormulas(true).prepend(addedFormulas(false));
@@ -185,11 +186,11 @@ public class SequentChangeInfo {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas removed from the selected semisequent 
    */
-  public ImmutableList<SequentFormula> removedFormulas(boolean antec) {
+  public ImmutableList<SequentFormula<JavaDLTerm>> removedFormulas(boolean antec) {
     return antec ? (antecedent != null ? antecedent.removedFormulas()
-		    : ImmutableSLList.<SequentFormula>nil()) :
+		    : ImmutableSLList.<SequentFormula<JavaDLTerm>>nil()) :
       (succedent != null ? succedent.removedFormulas() : 
-       ImmutableSLList.<SequentFormula>nil());
+       ImmutableSLList.<SequentFormula<JavaDLTerm>>nil());
   }
 
   /** 
@@ -197,7 +198,7 @@ public class SequentChangeInfo {
    * concatenated list of the formulas removed from each semisequent.
    * @return list of formulas removed from the sequent 
    */
-  public ImmutableList<SequentFormula> removedFormulas() {
+  public ImmutableList<SequentFormula<JavaDLTerm>> removedFormulas() {
     return removedFormulas(true).size() > removedFormulas(false).size() ?
 	removedFormulas(false).prepend(removedFormulas(true)) : 
 	removedFormulas(true).prepend(removedFormulas(false));
@@ -213,11 +214,11 @@ public class SequentChangeInfo {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas modified within the selected semisequent 
    */
-  public ImmutableList<FormulaChangeInfo> modifiedFormulas(boolean antec) {
+  public ImmutableList<FormulaChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>>> modifiedFormulas(boolean antec) {
       return antec ? (antecedent != null ? antecedent.modifiedFormulas()
-		      : ImmutableSLList.<FormulaChangeInfo>nil()) :
+		      : ImmutableSLList.<FormulaChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>>>nil()) :
 	  (succedent != null ? succedent.modifiedFormulas() : 
-	   ImmutableSLList.<FormulaChangeInfo>nil());
+	   ImmutableSLList.<FormulaChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>>>nil());
   }
 
   /** 
@@ -226,7 +227,7 @@ public class SequentChangeInfo {
    * semisequent.
    * @return list of formulas modified to sequent 
    */
-  public ImmutableList<FormulaChangeInfo> modifiedFormulas() {
+  public ImmutableList<FormulaChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>>> modifiedFormulas() {
     return modifiedFormulas(true).size() > modifiedFormulas(false).size() ?
 	modifiedFormulas(false).prepend(modifiedFormulas(true)) : 
 	modifiedFormulas(true).prepend(modifiedFormulas(false));
@@ -238,18 +239,18 @@ public class SequentChangeInfo {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas rejected when trying to add to the selected semisequent
    */
-  public ImmutableList<SequentFormula> rejectedFormulas(boolean antec) {
+  public ImmutableList<SequentFormula<JavaDLTerm>> rejectedFormulas(boolean antec) {
       return antec ? (antecedent != null ? antecedent.rejectedFormulas()
-                      : ImmutableSLList.<SequentFormula>nil()) :
+                      : ImmutableSLList.<SequentFormula<JavaDLTerm>>nil()) :
           (succedent != null ? succedent.rejectedFormulas() : 
-           ImmutableSLList.<SequentFormula>nil());
+           ImmutableSLList.<SequentFormula<JavaDLTerm>>nil());
   }
 
   /** 
    * Returns the formulas that have been rejected when trying to add as being redundant.
    * @return list of rejected formulas 
    */
-  public ImmutableList<SequentFormula> rejectedFormulas() {
+  public ImmutableList<SequentFormula<JavaDLTerm>> rejectedFormulas() {
     return rejectedFormulas(true).size() > rejectedFormulas(false).size() ?
         rejectedFormulas(false).prepend(rejectedFormulas(true)) : 
         rejectedFormulas(true).prepend(rejectedFormulas(false));
