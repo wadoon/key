@@ -1,21 +1,19 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.GenericTerm;
-import org.key_project.common.core.logic.Visitor;
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public abstract class GenericSemisequentChangeInfo<S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>, 
-                                          SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<S,N,V,T,SeqFor>> {
+public abstract class GenericSemisequentChangeInfo<T extends GenericTerm<?, ?, ?, T>, 
+                                                  SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<T,SeqFor>> {
 
     /** contains the added formulas to the semisequent */
     private ImmutableList<SeqFor> added = ImmutableSLList.<SeqFor>nil();
     /** contains the removed formulas from the semisequent */
     private ImmutableList<SeqFor> removed = ImmutableSLList.<SeqFor>nil();
     /** contains the modified formulas from the semisequent */
-    private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.<FormulaChangeInfo>nil();
+    private ImmutableList<FormulaChangeInfo<T, SeqFor>> modified = ImmutableSLList.<FormulaChangeInfo<T, SeqFor>>nil();
     /** stores the redundance free formula list of the semisequent */
     protected ImmutableList<SeqFor> modifiedSemisequent = ImmutableSLList.<SeqFor>nil();
     /**
@@ -26,7 +24,7 @@ public abstract class GenericSemisequentChangeInfo<S, N extends GenericNameAbstr
     /** */
     private int lastFormulaIndex = -1;
 
-    public GenericSemisequentChangeInfo(ImmutableList<SeqFor> formulas) {
+    protected GenericSemisequentChangeInfo(ImmutableList<SeqFor> formulas) {
         this.modifiedSemisequent = formulas;
     }
 
@@ -65,7 +63,7 @@ public abstract class GenericSemisequentChangeInfo<S, N extends GenericNameAbstr
     /** 
      * logs a modified formula at position idx
      */
-    public void modifiedFormula(int idx, FormulaChangeInfo fci) {
+    public void modifiedFormula(int idx, FormulaChangeInfo<T, SeqFor> fci) {
     // This information can overwrite older records about removed
     // formulas
     removed  = removed.removeAll
@@ -114,7 +112,7 @@ public abstract class GenericSemisequentChangeInfo<S, N extends GenericNameAbstr
      * @return IList<SeqFor> modified within the
      * semisequent
      */
-    public ImmutableList<FormulaChangeInfo> modifiedFormulas() {
+    public ImmutableList<FormulaChangeInfo<T, SeqFor>> modifiedFormulas() {
     return modified;
     }
 
@@ -138,8 +136,8 @@ public abstract class GenericSemisequentChangeInfo<S, N extends GenericNameAbstr
      * ATTENTION: it takes over ownership over {@link succ} and does not release it. This means
      * when invoking the method it must be snsured that succ is never used afterwards.
      */
-    public void combine(GenericSemisequentChangeInfo<S,N,V,T,SeqFor,SemiSeq> succ) {
-       final GenericSemisequentChangeInfo<S,N,V,T,SeqFor,SemiSeq> predecessor = this;
+    public void combine(GenericSemisequentChangeInfo<T,SeqFor,SemiSeq> succ) {
+       final GenericSemisequentChangeInfo<T,SeqFor,SemiSeq> predecessor = this;
        if (succ == predecessor) {
           return ;
        }
@@ -148,7 +146,7 @@ public abstract class GenericSemisequentChangeInfo<S, N extends GenericNameAbstr
           predecessor.added = predecessor.added.removeAll(sf);
     
           boolean skip = false; 
-          for (FormulaChangeInfo fci : predecessor.modified) {
+          for (FormulaChangeInfo<T, SeqFor> fci : predecessor.modified) {
              if (fci.getNewFormula() == sf) {
                 predecessor.modified = predecessor.modified.removeAll(fci);
                 if (!predecessor.removed.contains(fci.getOriginalFormula())) {
@@ -163,7 +161,7 @@ public abstract class GenericSemisequentChangeInfo<S, N extends GenericNameAbstr
           }
        }
     
-       for (FormulaChangeInfo fci : succ.modified) {
+       for (FormulaChangeInfo<T, SeqFor> fci : succ.modified) {
           if (predecessor.addedFormulas().contains(fci.getOriginalFormula())) {
              predecessor.added = predecessor.added.removeAll(fci.getOriginalFormula());
              predecessor.addedFormula(succ.lastFormulaIndex, fci.getNewFormula());
@@ -196,17 +194,21 @@ public abstract class GenericSemisequentChangeInfo<S, N extends GenericNameAbstr
     return lastFormulaIndex;
     }
 
-    
-    protected abstract GenericSemisequent<S,N,V,T,SeqFor> createSemisequent(ImmutableList<SeqFor> modifiedFormulas);
+    /**
+     * creates a new semisequent containing the modified formulas
+     * @param modifiedFormulas
+     * @return
+     */
+    protected abstract GenericSemisequent<T,SeqFor> createSemisequent(ImmutableList<SeqFor> modifiedFormulas);
     
     /** 
      * returns the semisequent that is the result of the change
      * operation
      */
-    public GenericSemisequent<S,N,V,T,SeqFor> semisequent() {        
-        final GenericSemisequent<S,N,V,T,SeqFor> semisequent;
+    public GenericSemisequent<T,SeqFor> semisequent() {        
+        final GenericSemisequent<T,SeqFor> semisequent;
         if (modifiedSemisequent.isEmpty()) {
-            semisequent = GenericSemisequent.<S,N,V,T,SeqFor,SemiSeq>nil();
+            semisequent = GenericSemisequent.<T,SeqFor,SemiSeq>nil();
         } else {
             semisequent = createSemisequent(modifiedSemisequent);
         }

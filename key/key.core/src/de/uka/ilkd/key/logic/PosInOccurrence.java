@@ -21,9 +21,9 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
  * SequentFormula and a PosInTerm<JavaDLTerm> determine an object of this 
  * class exactly. 
  */
-public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<?, ?, ?, T>> {
+public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<T>> {
 
-    public static <T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<?, ?, ?, T>> PosInOccurrence<T, SeqFor> findInSequent(Sequent seq, 
+    public static <T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<T>> PosInOccurrence<T, SeqFor> findInSequent(Sequent seq, 
                                                 int formulaNumber, 
                                                 PosInTerm<JavaDLTerm> pos) {
        return new PosInOccurrence<>(seq.getFormulabyNr(formulaNumber),  

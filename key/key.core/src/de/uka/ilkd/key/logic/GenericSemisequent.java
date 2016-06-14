@@ -1,11 +1,10 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.GenericTerm;
-import org.key_project.common.core.logic.Visitor;
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -16,8 +15,8 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
     private static final GenericSemisequent<?,?> EMPTY_SEMISEQUENT = new Empty<>();
 
     @SuppressWarnings("unchecked")
-    public static <S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>, 
-                      SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<S,N,V,T,SeqFor>> SemiSeq nil() {
+    public static <T extends GenericTerm<?, ?, ?, T>, 
+                      SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<T,SeqFor>> SemiSeq nil() {
         return (SemiSeq) EMPTY_SEMISEQUENT;
     }
 
@@ -27,8 +26,7 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
     protected final ImmutableList<SeqFor> seqList;
 
     // inner class used to represent an empty semisequent 
-   static class Empty<S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>, 
-       SeqFor extends SequentFormula<T>> extends GenericSemisequent<S,N,V,T,SeqFor> {
+   static class Empty<T extends GenericTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>> extends GenericSemisequent<T,SeqFor> {
 
         private Empty() {
             super();
@@ -338,7 +336,7 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
                 oldFormulas = sci.getFormulaList();
             }
         }
-        return complete(sci);
+        return sci;
     }
 
     /** .
@@ -364,8 +362,7 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
      * redundancies 
      */
     private SemisequentChangeInfo removeRedundance(int idx, SeqFor sequentFormula) {
-        return complete
-                (insertAndRemoveRedundancyHelper ( idx, sequentFormula, new SemisequentChangeInfo(seqList), null ));
+        return insertAndRemoveRedundancyHelper ( idx, sequentFormula, new SemisequentChangeInfo(seqList), null );
     }
 
     /**
@@ -383,7 +380,7 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
     public SemisequentChangeInfo replace(PosInOccurrence pos, SeqFor sequentFormula) {	
         final int idx = indexOf(pos.sequentFormula());
         final FormulaChangeInfo fci = new FormulaChangeInfo ( pos, sequentFormula );
-        return complete(insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci));
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci);
     }
 
     /**
@@ -394,7 +391,7 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
      *  one
      */
     public SemisequentChangeInfo replace(int idx, SeqFor sequentFormula) {	
-        return complete(insertAndRemoveRedundancyHelper ( idx, sequentFormula, remove(idx), null ));
+        return insertAndRemoveRedundancyHelper ( idx, sequentFormula, remove(idx), null );
     }
 
     /** 
@@ -423,15 +420,6 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
     }
 
     /** 
-     * creates a semisequent out of the semisequent change info (semiCI)
-     * object and hands it over to semiCI 
-     * @deprecated Use {@link de.uka.ilkd.key.logic.SemisequentChangeInfo#complete(de.uka.ilkd.key.logic.Semisequent)} instead
-     */
-    private SemisequentChangeInfo complete(SemisequentChangeInfo semiCI) {
-        return semiCI;
-    }
-
-    /** 
      * removes an element 
      * @param idx int being the index of the element that has to
      * be removed
@@ -443,22 +431,20 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
         ImmutableList<SeqFor> newList = seqList;  
         ImmutableList<SeqFor> queue =
                 ImmutableSLList.<SeqFor>nil();  
-        int index = 0;
 
         if (idx<0 || idx>=size()) {
-            return complete(new SemisequentChangeInfo(seqList));
+            return new SemisequentChangeInfo(seqList);
         }
 
 
-        final SeqFor[] temp = new SeqFor[idx];
+        final ArrayList<SeqFor> temp = new ArrayList<>();
 
-        while (index<idx) {// go to idx 
-            temp[index] = newList.head();
+        for (int i = 0; i<idx; i++) {// go to idx 
+            temp.add(newList.head());
             newList=newList.tail();
-            index++;
         }
 
-        for (int k=index-1; k>=0; k--) queue=queue.prepend(temp[k]);
+        for (int k = temp.size() - 1; k>=0; k--) queue=queue.prepend(temp.get(k));
 
 
         // remove the element that is at head of newList	
@@ -470,7 +456,7 @@ public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>,
         final SemisequentChangeInfo sci = new SemisequentChangeInfo(newList);
         sci.removedFormula(idx, removedFormula);
 
-        return complete(sci);
+        return sci;
     }
 
     /**
