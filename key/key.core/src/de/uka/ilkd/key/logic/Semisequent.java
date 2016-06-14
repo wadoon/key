@@ -43,4 +43,13 @@ public class Semisequent extends
     Semisequent(SequentFormula<JavaDLTerm> seqList) {
         super(seqList);
     }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.GenericSemisequent#createSemisequentChangeInfo(org.key_project.util.collection.ImmutableList)
+     */
+    @Override
+    protected GenericSemisequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, ? extends GenericSemisequent<JavaDLTerm, SequentFormula<JavaDLTerm>>> createSemisequentChangeInfo(
+            ImmutableList<SequentFormula<JavaDLTerm>> formulas) {
+        return new SemisequentChangeInfo(formulas);
+    }
 }
