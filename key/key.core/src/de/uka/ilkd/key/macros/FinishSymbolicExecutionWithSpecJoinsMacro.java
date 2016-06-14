@@ -31,7 +31,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -511,7 +511,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                 if (activeStmt != null
                         && ((Statement) activeStmt).equals(breakpoint)) {
                     return new PosInOccurrence(formula,
-                            PosInTerm.getTopLevel(), false);
+                            PosInTerm.<JavaDLTerm>getTopLevel(), false);
                 }
             }
 

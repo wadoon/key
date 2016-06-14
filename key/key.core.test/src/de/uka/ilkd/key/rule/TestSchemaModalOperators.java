@@ -30,7 +30,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -183,7 +183,7 @@ public class TestSchemaModalOperators extends TestCase {
 	         mc.getInstantiations().isInstantiated(osv));
 	 assertTrue(mc.getInstantiations().getInstantiation(osv) == Modality.DIA);
 
-	 PosInOccurrence pos = new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
+	 PosInOccurrence pos = new PosInOccurrence(new SequentFormula(goal), PosInTerm.<JavaDLTerm>getTopLevel(), true);
 	 PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
 	 JavaDLTerm instReplace = 
 	         t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();
@@ -199,7 +199,7 @@ public class TestSchemaModalOperators extends TestCase {
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
-					PosInTerm.getTopLevel(),
+					PosInTerm.<JavaDLTerm>getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
@@ -233,7 +233,7 @@ public class TestSchemaModalOperators extends TestCase {
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
-					PosInTerm.getTopLevel(),
+					PosInTerm.<JavaDLTerm>getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
@@ -263,7 +263,7 @@ public class TestSchemaModalOperators extends TestCase {
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
-					PosInTerm.getTopLevel(),
+					PosInTerm.<JavaDLTerm>getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	

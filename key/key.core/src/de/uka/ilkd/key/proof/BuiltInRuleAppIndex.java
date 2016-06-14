@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -121,7 +121,7 @@ public class BuiltInRuleAppIndex {
                                           boolean antec, 
                                           SequentFormula cfma, 
                                           NewRuleListener listener ) {
-        final PosInOccurrence pos = new PosInOccurrence( cfma, PosInTerm.getTopLevel(), antec );
+        final PosInOccurrence pos = new PosInOccurrence( cfma, PosInTerm.<JavaDLTerm>getTopLevel(), antec );
         if(rule.isApplicableOnSubTerms()) {
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {

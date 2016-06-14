@@ -1,17 +1,27 @@
 package org.key_project.common.core.logic.calculus;
 
 import org.key_project.common.core.logic.GenericTerm;
-import org.key_project.common.core.logic.Visitor;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 
-
-public class GenericSequentFormula<S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S,N,V,T>, T extends GenericTerm<S,N,V,T>> {
+/** 
+ * A sequent formula is a wrapper around a formula that occurs 
+ * as top level formula in a sequent. SequentFormula instances have
+ * to be unique in the sequent as they are used by PosInOccurrence 
+ * to determine the exact position. In earlier KeY versions this class 
+ * was called ConstrainedFormula as it was equipped with an additional 
+ * constraints. It would be interesting to add more value to this class 
+ * by providing a way to add additional annotations or to cache local information 
+ * about the formula.
+ */
+public class SequentFormula<T extends GenericTerm<?, ?, ?, T>> {
 
     protected final T term;
     protected final int hashCode;
 
-    public GenericSequentFormula(T term) {
+    /** creates a new SequentFormula 
+     * @param term of sort {@link Sort#FORMULA}
+     */ 
+    public SequentFormula(T term) {
         if (term.sort() != Sort.FORMULA) {
             throw new RuntimeException("A term instead of a formula: " + term);
         }
@@ -28,8 +38,8 @@ public class GenericSequentFormula<S, N extends GenericNameAbstractionTable<S>, 
     @SuppressWarnings("unchecked")
     public boolean equals(Object obj) {
         if (this == obj) { return true; }
-    if (obj instanceof GenericSequentFormula/*<S,N,V,T>*/) {
-        GenericSequentFormula<S,N,V,T> cmp=(GenericSequentFormula<S,N,V,T>)obj;
+    if (obj instanceof SequentFormula/*<S,N,V,T>*/) {
+        SequentFormula<T> cmp=(SequentFormula<T>)obj;
         if (term.equals(cmp.formula())) {
     	return true;
         }

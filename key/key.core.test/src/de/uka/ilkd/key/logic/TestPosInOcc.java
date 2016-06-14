@@ -51,7 +51,7 @@ public class TestPosInOcc extends TestCase {
 
 	PosInOccurrence pio = new PosInOccurrence
 	    ( new SequentFormula ( terms[2] ),
-	      PosInTerm.getTopLevel(),
+	      PosInTerm.<JavaDLTerm>getTopLevel(),
 	    true);
 
 	PIOPathIterator it = pio.iterator ();
@@ -116,7 +116,7 @@ public class TestPosInOcc extends TestCase {
         SequentFormula cfma2 = new SequentFormula ( terms2[3] );
 
         final PosInOccurrence topPIO = new PosInOccurrence ( cfma,
-                                                             PosInTerm.getTopLevel(),
+                                                             PosInTerm.<JavaDLTerm>getTopLevel(),
                                                              true );
 
 

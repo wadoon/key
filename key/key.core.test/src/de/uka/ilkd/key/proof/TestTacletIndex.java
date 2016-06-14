@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -124,7 +124,7 @@ public class TestTacletIndex extends TestCase{
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
         listofHeuristic=listofHeuristic.prepend(h3);
         PosInOccurrence pos = new PosInOccurrence(new SequentFormula(term_p1),
-                PosInTerm.getTopLevel(), true);
+                PosInTerm.<JavaDLTerm>getTopLevel(), true);
   	assertTrue("Noninteractive antecrule is not in list, but none of its"+
 		   "heuristics is active.",
 		   isRuleIn(variante_one.getAntecedentTaclet(pos,
@@ -158,7 +158,7 @@ public class TestTacletIndex extends TestCase{
 
         SequentFormula cfma = new SequentFormula(term_p1);
         
-        PosInOccurrence posSucc  = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
+        PosInOccurrence posSucc  = new PosInOccurrence(cfma, PosInTerm.<JavaDLTerm>getTopLevel(), false);
         
   	assertTrue("ruleSucc has no heuristics, but is"+
 		   " not in succ list.",
@@ -191,9 +191,9 @@ public class TestTacletIndex extends TestCase{
 	JavaDLTerm term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 	
         PosInOccurrence posAntec = new PosInOccurrence(new SequentFormula(term_p2),
-                PosInTerm.getTopLevel(), true);
+                PosInTerm.<JavaDLTerm>getTopLevel(), true);
         PosInOccurrence posSucc = new PosInOccurrence(new SequentFormula(term_p2),
-                PosInTerm.getTopLevel(), true);
+                PosInTerm.<JavaDLTerm>getTopLevel(), true);
 
         
  	assertTrue("rule matched, but no match possible",
@@ -224,7 +224,7 @@ public class TestTacletIndex extends TestCase{
 
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
         PosInOccurrence posAntec = new PosInOccurrence(new SequentFormula(term_p4),
-                PosInTerm.getTopLevel(), true);
+                PosInTerm.<JavaDLTerm>getTopLevel(), true);
 	
  	assertTrue("rule matched, but no match possible",
 		   !isRuleIn(ruleIdx.getAntecedentTaclet(posAntec,
@@ -242,7 +242,7 @@ public class TestTacletIndex extends TestCase{
 	Sequent seq_p5 = Sequent.createAnteSequent
 	    (Semisequent.nil().insertFirst(cfma_p5).semisequent());
 	PosInOccurrence pio_p5 = new PosInOccurrence
-	    (cfma_p5, PosInTerm.getTopLevel(), true);
+	    (cfma_p5, PosInTerm.<JavaDLTerm>getTopLevel(), true);
         RuleAppIndex appIdx = createGoalFor(seq_p5, ruleIdx);
 		  
 	assertTrue("No rule should match",
@@ -258,7 +258,7 @@ public class TestTacletIndex extends TestCase{
 	Sequent seq_p6 = Sequent.createAnteSequent
 	    (Semisequent.nil().insertFirst(cfma_p6).semisequent());
 	PosInOccurrence pio_p6 = new PosInOccurrence
-	    (cfma_p6, PosInTerm.getTopLevel(), true);
+	    (cfma_p6, PosInTerm.<JavaDLTerm>getTopLevel(), true);
 	appIdx = createGoalFor(seq_p6, ruleIdx);
 
 	assertTrue("One rule should match", isRuleIn

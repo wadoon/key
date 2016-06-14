@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
@@ -120,7 +120,7 @@ public class FormulaTagManager {
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.addedFormulas(p_antec)) {
             final PosInOccurrence pio = new PosInOccurrence
-                    (constrainedFormula, PosInTerm.getTopLevel(), p_antec);
+                    (constrainedFormula, PosInTerm.<JavaDLTerm>getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }
@@ -128,7 +128,7 @@ public class FormulaTagManager {
     private void removeTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence pio = new PosInOccurrence
-                    (constrainedFormula, PosInTerm.getTopLevel(), p_antec);
+                    (constrainedFormula, PosInTerm.<JavaDLTerm>getTopLevel(), p_antec);
             removeTag(pio);
         }	
     }
@@ -165,7 +165,7 @@ public class FormulaTagManager {
 
         for (Object s : ss) {
             final PosInOccurrence pio = new PosInOccurrence((SequentFormula) s,
-                    PosInTerm.getTopLevel(),
+                    PosInTerm.<JavaDLTerm>getTopLevel(),
                     p_antec);
             createNewTag(pio, p_goal);
         }
@@ -279,7 +279,7 @@ public class FormulaTagManager {
                                              long              p_age) {
 	    final PosInOccurrence newPIO =
 		new PosInOccurrence ( p_info.getNewFormula(),
-				      PosInTerm.getTopLevel(),
+				      PosInTerm.<JavaDLTerm>getTopLevel(),
 				      pio.isInAntec() );
 	    
 	    return new FormulaInfo ( newPIO,

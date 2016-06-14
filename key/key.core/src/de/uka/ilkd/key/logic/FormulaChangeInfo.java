@@ -1,26 +1,46 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.logic;
+
+import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 
 /**
  * This class is used to hold information about modified formulas.
- * @see SequentChangeInfo
+ * @see GenericSemisequentChangeInfo
+ * @see GenericSequentChangeInfo
  */
-public class FormulaChangeInfo extends GenericFormulaChangeInfo {
-    
-    public FormulaChangeInfo(PosInOccurrence positionOfModification,
-			     SequentFormula newFormula) {
-        super(positionOfModification, newFormula);
+public class FormulaChangeInfo<T extends GenericTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>> {
+
+    /** position within the original formula */
+    protected final PosInOccurrence<T, SeqFor> positionOfModification;
+    /** modified formula */
+    protected final SeqFor newFormula;
+
+    public FormulaChangeInfo(PosInOccurrence<T, SeqFor> positionOfModification,
+            SeqFor newFormula) {
+        this.newFormula = newFormula;
+        this.positionOfModification = positionOfModification;
     }
+
+
+    public SeqFor getNewFormula() {
+        return newFormula;
+    }
+
+    public SeqFor getOriginalFormula() {
+        return getPositionOfModification ().sequentFormula ();
+    }
+
+    /**
+     * @return position within the original formula
+     */
+    public PosInOccurrence<T, SeqFor> getPositionOfModification() {
+        return positionOfModification;
+    }
+
+    public String toString() {
+        return
+                "Replaced " + positionOfModification +
+                " with " + newFormula;
+    }
+
 }

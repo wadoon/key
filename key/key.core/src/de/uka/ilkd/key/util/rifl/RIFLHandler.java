@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.util.rifl;
 
+import static de.uka.ilkd.key.util.MiscTools.apply;
+
 import java.util.AbstractMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -26,8 +28,10 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.uka.ilkd.key.util.LinkedHashMap;
-import static de.uka.ilkd.key.util.rifl.SpecificationEntity.*;
-import static de.uka.ilkd.key.util.MiscTools.apply;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.Field;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.Parameter;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.ReturnValue;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
 
 /**
  * XML content handler for the RIFL language. Produces a RIFL

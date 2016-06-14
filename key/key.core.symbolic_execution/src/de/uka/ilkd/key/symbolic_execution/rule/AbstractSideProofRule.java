@@ -26,7 +26,7 @@ import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -119,7 +119,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
       // Iterate along the PosInOccurrence and collect the parents and indices
       Deque<Pair<Integer, JavaDLTerm>> indexAndParents = new LinkedList<Pair<Integer, JavaDLTerm>>();
       JavaDLTerm root = pio.sequentFormula().formula();
-      final PosInTerm pit = pio.posInTerm();
+      final PosInTerm<JavaDLTerm> pit = pio.posInTerm();
       for (int i = 0, sz=pit.depth(); i<sz; i++) { 
          int next = pit.getIndexAt(i);
          indexAndParents.addFirst(new Pair<Integer, JavaDLTerm>(Integer.valueOf(next), root));

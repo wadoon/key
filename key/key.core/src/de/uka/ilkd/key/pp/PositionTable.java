@@ -17,7 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.SequentFormula;
 
 /**
@@ -272,7 +272,7 @@ public class PositionTable {
 	SequentFormula cfma = filterEntry.getOriginalFormula();
 
 	PosInOccurrence currentPos = 
-	    new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
+	    new PosInOccurrence ( cfma, PosInTerm.<JavaDLTerm>getTopLevel(),
 				  filter.getSequent ().antecedent().contains(cfma) );
 	
 	return child[cfmaNo].getTermPIS(filterEntry,tail,

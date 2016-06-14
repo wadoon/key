@@ -50,7 +50,7 @@ import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -878,7 +878,7 @@ public class JoinRuleUtils {
                 .sequent().succedent();
         for (final SequentFormula f : semiseq) {
             final PosInOccurrence gPio = new PosInOccurrence(f,
-                    PosInTerm.getTopLevel(), antec);
+                    PosInTerm.<JavaDLTerm>getTopLevel(), antec);
             goal.removeFormula(gPio);
         }
     }

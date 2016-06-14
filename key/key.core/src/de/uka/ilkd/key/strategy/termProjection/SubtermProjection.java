@@ -14,26 +14,26 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * Projection for computing a subterm of a given term. The position of the
- * subterm within the complete term is described using a <code>PosInTerm</code>.
+ * subterm within the complete term is described using a <code>PosInTerm<JavaDLTerm></code>.
  */
 public class SubtermProjection implements ProjectionToTerm {
 
-    private final PosInTerm pit;
+    private final PosInTerm<JavaDLTerm> pit;
     private final ProjectionToTerm completeTerm;
 
     public static ProjectionToTerm create(ProjectionToTerm completeTerm,
-                                          PosInTerm pit) {
+                                          PosInTerm<JavaDLTerm> pit) {
         return new SubtermProjection ( completeTerm, pit );
     }
 
-    private SubtermProjection(ProjectionToTerm completeTerm, PosInTerm pit) {
+    private SubtermProjection(ProjectionToTerm completeTerm, PosInTerm<JavaDLTerm> pit) {
         this.completeTerm = completeTerm;
         this.pit = pit;
     }

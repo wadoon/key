@@ -45,7 +45,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -261,7 +261,7 @@ public class JoinRule implements BuiltInRule {
         final SequentFormula newSuccedent =
                 new SequentFormula(succedentFormula);
         newGoal.addFormula(newSuccedent, new PosInOccurrence(newSuccedent,
-                PosInTerm.getTopLevel(), false));
+                PosInTerm.<JavaDLTerm>getTopLevel(), false));
         
         // The following line has the only effect of emptying the
         // name recorder -- the name recorder for currentNode will
@@ -737,7 +737,7 @@ public class JoinRule implements BuiltInRule {
                 for (int i = 0; i < succedent.size(); i++) {
                     SequentFormula f = succedent.get(i);
 
-                    PosInTerm pit = PosInTerm.getTopLevel();
+                    PosInTerm<JavaDLTerm> pit = PosInTerm.<JavaDLTerm>getTopLevel();
 
                     PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
                     if (isOfAdmissibleForm(g, gPio, false)) {

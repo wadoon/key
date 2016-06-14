@@ -11,7 +11,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
@@ -151,7 +151,7 @@ public class RuleCommand extends AbstractCommand {
             }
             allApps = allApps.append(
                     index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                            new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(), true),
                             services));
         }
 
@@ -161,7 +161,7 @@ public class RuleCommand extends AbstractCommand {
             }
             allApps = allApps.append(
                     index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
+                            new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(), false),
                             services));
         }
 

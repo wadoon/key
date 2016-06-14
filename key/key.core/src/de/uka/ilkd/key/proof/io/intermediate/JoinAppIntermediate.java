@@ -7,7 +7,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 
 /**
  * Encapsulates intermediate information for constructing a join rule
@@ -44,7 +44,7 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
      * @param distinguishingFormula
      *            The user-supplied distinguishing formula for the join.
      */
-    public JoinAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
+    public JoinAppIntermediate(String ruleName, Pair<Integer, PosInTerm<JavaDLTerm>> pos,
             int id, String joinProc, int nrPartners,
             ImmutableList<Name> newNames, String distinguishingFormula) {
         super(ruleName, pos, null, null, newNames);

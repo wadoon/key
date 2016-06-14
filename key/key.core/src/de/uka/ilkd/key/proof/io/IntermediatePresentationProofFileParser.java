@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
@@ -143,7 +143,7 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case TERM: // term
-            final PosInTerm pos = PosInTerm.parseReverseString(str);
+            final PosInTerm<JavaDLTerm> pos = PosInTerm.<JavaDLTerm>parseReverseString(str);
             if (insideBuiltinIfInsts()) {
                 ((BuiltinRuleInformation) ruleInfo).currIfInstPosInTerm = pos;
             }
@@ -218,10 +218,10 @@ public class IntermediatePresentationProofFileParser implements
 
             if (builtinInfo.builtinIfInsts == null) {
                 builtinInfo.builtinIfInsts = ImmutableSLList
-                        .<Pair<Integer, PosInTerm>> nil();
+                        .<Pair<Integer, PosInTerm<JavaDLTerm>>> nil();
             }
             builtinInfo.currIfInstFormula = 0;
-            builtinInfo.currIfInstPosInTerm = PosInTerm.getTopLevel();
+            builtinInfo.currIfInstPosInTerm = PosInTerm.<JavaDLTerm>getTopLevel();
             break;
 
         case NEW_NAMES: // newnames
@@ -302,7 +302,7 @@ public class IntermediatePresentationProofFileParser implements
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
             builtinInfo.builtinIfInsts = builtinInfo.builtinIfInsts
-                    .append(new Pair<Integer, PosInTerm>(
+                    .append(new Pair<Integer, PosInTerm<JavaDLTerm>>(
                             builtinInfo.currIfInstFormula,
                             builtinInfo.currIfInstPosInTerm));
             break;
@@ -344,7 +344,7 @@ public class IntermediatePresentationProofFileParser implements
     private TacletAppIntermediate constructTacletApp() {
         TacletInformation tacletInfo = (TacletInformation) ruleInfo;
         return new TacletAppIntermediate(tacletInfo.currRuleName,
-                new Pair<Integer, PosInTerm>(tacletInfo.currFormula,
+                new Pair<Integer, PosInTerm<JavaDLTerm>>(tacletInfo.currFormula,
                         tacletInfo.currPosInTerm), tacletInfo.loadedInsts,
                 tacletInfo.ifSeqFormulaList, tacletInfo.ifDirectFormulaList,
                 tacletInfo.currNewNames);
@@ -360,7 +360,7 @@ public class IntermediatePresentationProofFileParser implements
 
         if (builtinInfo.currRuleName.equals("JoinRule")) {
             result = new JoinAppIntermediate(builtinInfo.currRuleName,
-                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
+                    new Pair<Integer, PosInTerm<JavaDLTerm>>(builtinInfo.currFormula,
                             builtinInfo.currPosInTerm),
                     builtinInfo.currJoinNodeId, builtinInfo.currJoinProc,
                     builtinInfo.currNrPartners, builtinInfo.currNewNames,
@@ -368,14 +368,14 @@ public class IntermediatePresentationProofFileParser implements
         }
         else if (builtinInfo.currRuleName.equals("CloseAfterJoin")) {
             result = new JoinPartnerAppIntermediate(builtinInfo.currRuleName,
-                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
+                    new Pair<Integer, PosInTerm<JavaDLTerm>>(builtinInfo.currFormula,
                             builtinInfo.currPosInTerm),
                     builtinInfo.currCorrespondingJoinNodeId,
                     builtinInfo.currNewNames);
         }
         else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
-                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
+                    new Pair<Integer, PosInTerm<JavaDLTerm>>(builtinInfo.currFormula,
                             builtinInfo.currPosInTerm),
                     builtinInfo.currContract, builtinInfo.builtinIfInsts,
                     builtinInfo.currNewNames);
@@ -413,7 +413,7 @@ public class IntermediatePresentationProofFileParser implements
         /* + General Information */
         protected String currRuleName = null;
         protected int currFormula = 0;
-        protected PosInTerm currPosInTerm = PosInTerm.getTopLevel();
+        protected PosInTerm<JavaDLTerm> currPosInTerm = PosInTerm.<JavaDLTerm>getTopLevel();
         protected ImmutableList<Name> currNewNames = null;
 
         public RuleInformation(String ruleName) {
@@ -450,9 +450,9 @@ public class IntermediatePresentationProofFileParser implements
      */
     private static class BuiltinRuleInformation extends RuleInformation {
         /* + Built-In Formula Information */
-        protected ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
+        protected ImmutableList<Pair<Integer, PosInTerm<JavaDLTerm>>> builtinIfInsts;
         protected int currIfInstFormula;
-        protected PosInTerm currIfInstPosInTerm;
+        protected PosInTerm<JavaDLTerm> currIfInstPosInTerm;
         /* > Method Contract */
         protected String currContract = null;
         /* > Join Rule */

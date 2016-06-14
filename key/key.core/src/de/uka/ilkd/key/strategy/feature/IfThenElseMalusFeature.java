@@ -16,9 +16,9 @@ package de.uka.ilkd.key.strategy.feature;
 import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.java.ServiceCaches;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;

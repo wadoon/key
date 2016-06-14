@@ -4,20 +4,20 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Visitor;
-import org.key_project.common.core.logic.calculus.GenericSequentFormula;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public class GenericSemisequent<S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>, 
-                                SeqFor extends GenericSequentFormula<S, N, V, T>> {
+public class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>, 
+                                SeqFor extends SequentFormula<T>> {
 
     /** the empty semisequent (using singleton pattern) */
-    private static final GenericSemisequent<?,?,?,?,?> EMPTY_SEMISEQUENT = new Empty<>();
+    private static final GenericSemisequent<?,?> EMPTY_SEMISEQUENT = new Empty<>();
 
     @SuppressWarnings("unchecked")
     public static <S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>, 
-                      SeqFor extends GenericSequentFormula<S, N, V, T>, SemiSeq extends GenericSemisequent<S,N,V,T,SeqFor>> SemiSeq nil() {
+                      SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<S,N,V,T,SeqFor>> SemiSeq nil() {
         return (SemiSeq) EMPTY_SEMISEQUENT;
     }
 
@@ -28,7 +28,7 @@ public class GenericSemisequent<S, N extends GenericNameAbstractionTable<S>, V e
 
     // inner class used to represent an empty semisequent 
    static class Empty<S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>, 
-       SeqFor extends GenericSequentFormula<S, N, V, T>> extends GenericSemisequent<S,N,V,T,SeqFor> {
+       SeqFor extends SequentFormula<T>> extends GenericSemisequent<S,N,V,T,SeqFor> {
 
         private Empty() {
             super();

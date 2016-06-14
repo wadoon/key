@@ -16,6 +16,8 @@ package de.uka.ilkd.key.logic;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
+import org.key_project.common.core.logic.GenericTerm;
+
 /**
  * Describes the position within a term by a sequence of integers.
  * 
@@ -29,9 +31,9 @@ import java.util.StringTokenizer;
  * </ul>
  * 
  */
-public final class PosInTerm {
+public final class PosInTerm<T extends GenericTerm<?, ?, ?, T>> {
 
-    private static final PosInTerm TOP_LEVEL = new PosInTerm();
+    private static final PosInTerm<?> TOP_LEVEL = new PosInTerm<>();
 
     // to save memory, we use 16bit integers (unsigned) instead of 32bit
     private final char[] positions;
@@ -51,7 +53,7 @@ public final class PosInTerm {
      * reverse order
      * @return the PosInTerm encapsulating the integer list in reverse order
      */
-    public static PosInTerm parseReverseString(String s) {
+    public static <T extends GenericTerm<?, ?, ?, T>> PosInTerm<T> parseReverseString(String s) {
         if ("".equals(s)) {
             return getTopLevel();
         }
@@ -71,15 +73,16 @@ public final class PosInTerm {
             ++i;
         }
                
-        return positions.length == 0 ? getTopLevel() : new PosInTerm(positions, (char) positions.length, true);
+        return positions.length == 0 ? getTopLevel() : new PosInTerm<>(positions, (char) positions.length, true);
     }
 
     /**
      * returns the instance representing the top level position
      * @return the top level position
      */
-    public static PosInTerm getTopLevel() {
-        return TOP_LEVEL;
+    @SuppressWarnings("unchecked")
+    public static <T extends GenericTerm<?, ?, ?, T>> PosInTerm<T> getTopLevel() {
+        return (PosInTerm<T>) TOP_LEVEL;
     }
     
     /**
@@ -104,6 +107,7 @@ public final class PosInTerm {
         this.size = size;
         this.copy = (copy || (size == positions.length));
     }
+    
 
     /**
      * the depth of the sub term described by this position
@@ -125,11 +129,11 @@ public final class PosInTerm {
      * returns the position of the enclosing term
      * @return the position of the parent
      */
-    public PosInTerm up() {
+    public PosInTerm<T> up() {
         if (size == 0) {
             return null;
         }
-        return size == 1 ? getTopLevel() : new PosInTerm(positions, (char)(size - 1), true);
+        return size == 1 ? getTopLevel() : new PosInTerm<>(positions, (char)(size - 1), true);
     }
 
     /**
@@ -138,7 +142,7 @@ public final class PosInTerm {
      * @return the prefix of this position of length <code>n</code>
      * @throws IndexOutOfBoundsException if <code>n</code> is greater than the depth of this position
      */
-    public PosInTerm firstN(int n) {
+    public PosInTerm<T> firstN(int n) {
         if (n > size) {
             throw new IndexOutOfBoundsException("Position is shorter than " + n);
         } else if (n == 0) {
@@ -146,7 +150,7 @@ public final class PosInTerm {
         } else if (n == size) {
             return this;
         }
-        return new PosInTerm(positions, (char)n, true);
+        return new PosInTerm<>(positions, (char)n, true);
     }
     
     /**
@@ -154,7 +158,7 @@ public final class PosInTerm {
      * @param i the index of the subterm
      * @return the position of the i-th subterm
      */
-    public PosInTerm down(int i) {
+    public PosInTerm<T> down(int i) {
         if (i > Character.MAX_VALUE) throw new ArithmeticException("Position "+i+" out of bounds");
         
         boolean localCopy = true;
@@ -166,17 +170,17 @@ public final class PosInTerm {
                 }
             }
         }
-        final PosInTerm result;        
+        final PosInTerm<T> result;        
         if (localCopy) {        
             final char[] newPositions = 
                     new char[positions.length <= size ? size + 4 : positions.length];
             System.arraycopy(positions, 0, newPositions, 0, size);
             newPositions[size] = (char)i;
-            result = new PosInTerm(newPositions, (char)(size + 1), false);
+            result = new PosInTerm<>(newPositions, (char)(size + 1), false);
         } else {
             copy   = true;
             positions[size] = (char)i;
-            result = new PosInTerm(positions, (char)(size + 1), size >= positions.length - 1);            
+            result = new PosInTerm<>(positions, (char)(size + 1), size >= positions.length - 1);            
         }
         return result;
     }
@@ -206,12 +210,12 @@ public final class PosInTerm {
      * navigate to the subterm described by this position and return it
      * if the described position does not exist in the term an {@link IndexOutOfBoundsException}
      * is thrown
-     * @param t the {@link JavaDLTerm} 
+     * @param t the term  ({@link GenericTerm})
      * @return the sub term of term {@code t} at this position   
      * @throws an {@link IndexOutOfBoundsException} if no subterm exists at this position
      */
-    public JavaDLTerm getSubTerm(JavaDLTerm t) {
-        JavaDLTerm sub = t;
+    public T getSubTerm(T t) {
+        T sub = t;
         for (int i = 0; i<size; i++) {  
             sub = sub.sub(positions[i]);
         }
@@ -238,7 +242,8 @@ public final class PosInTerm {
             return true;
 
         if (o != null && o.getClass() == this.getClass()) {
-            final PosInTerm p = (PosInTerm) o;
+            @SuppressWarnings("unchecked")
+            final PosInTerm<T> p = (PosInTerm<T>) o;
 
             if (size == p.size) {
                 if (positions != p.positions) {
@@ -298,11 +303,11 @@ public final class PosInTerm {
     }
 
     public static final class PiTIterator implements IntIterator {
-        private final PosInTerm pit;
+        private final PosInTerm<?> pit;
         private int pos;
         private final boolean order;
 
-        public PiTIterator(PosInTerm p, boolean order) {
+        public PiTIterator(PosInTerm<?> p, boolean order) {
             this.pit = p;
             this.order = order;
             this.pos = order ? 0 : p.size - 1;

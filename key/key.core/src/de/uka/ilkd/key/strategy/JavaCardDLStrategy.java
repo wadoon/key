@@ -35,7 +35,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -1805,7 +1805,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature biggerLeftSide =
                 MonomialsSmallerThanFeature
                         .create(instOf("newSymLeft"),
-                                subAt(antecFor, PosInTerm.getTopLevel().down(0)
+                                subAt(antecFor, PosInTerm.<JavaDLTerm>getTopLevel().down(0)
                                         .down(0)), numbers);
         bindRuleSet(
                 d,

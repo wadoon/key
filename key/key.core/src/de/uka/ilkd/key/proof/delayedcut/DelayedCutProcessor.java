@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
@@ -217,7 +217,7 @@ public class DelayedCutProcessor implements Runnable {
         SequentFormula sf = getSequentFormula(goal,
                 cut.isDecisionPredicateInAntecendet());
 
-        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(),
+        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(),
                 cut.isDecisionPredicateInAntecendet());
 
         ImmutableList<Goal> result = apply(getHideTacletName(cut), goal, pio);

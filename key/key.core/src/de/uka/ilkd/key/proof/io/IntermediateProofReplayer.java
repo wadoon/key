@@ -37,7 +37,7 @@ import org.key_project.util.collection.Pair;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -460,7 +460,7 @@ public class IntermediateProofReplayer {
 
         final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
-        final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
+        final PosInTerm<JavaDLTerm> currPosInTerm = currInterm.getPosInfo().second;
         final Sequent seq = currGoal.sequent();
         
         TacletApp ourApp = null;
@@ -536,7 +536,7 @@ public class IntermediateProofReplayer {
 
         final String ruleName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
-        final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
+        final PosInTerm<JavaDLTerm> currPosInTerm = currInterm.getPosInfo().second;
 
         Contract currContract = null;
         ImmutableList<PosInOccurrence> builtinIfInsts = null;
@@ -558,9 +558,9 @@ public class IntermediateProofReplayer {
         // Load ifInsts, if applicable
         if (currInterm.getBuiltInIfInsts() != null) {
             builtinIfInsts = ImmutableSLList.nil();
-            for (final Pair<Integer, PosInTerm> ifInstP : currInterm.getBuiltInIfInsts()) {
+            for (final Pair<Integer, PosInTerm<JavaDLTerm>> ifInstP : currInterm.getBuiltInIfInsts()) {
                 final int currIfInstFormula         = ifInstP.first;
-                final PosInTerm currIfInstPosInTerm = ifInstP.second;
+                final PosInTerm<JavaDLTerm> currIfInstPosInTerm = ifInstP.second;
 
                 try {
                     final PosInOccurrence ifInst = PosInOccurrence

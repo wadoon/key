@@ -33,7 +33,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -95,7 +95,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    if(formula.op() instanceof Equality
 	       && formula.sub(1).equals(term)) {
 		final PosInOccurrence pos
-			= new PosInOccurrence(cf, PosInTerm.getTopLevel(), true);
+			= new PosInOccurrence(cf, PosInTerm.<JavaDLTerm>getTopLevel(), true);
 		result.add(new Pair<JavaDLTerm,PosInOccurrence>(formula.sub(0), pos));
 	    }
 	}
@@ -279,12 +279,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
 		= new LinkedHashMap<JavaDLTerm, PosInOccurrence>();
 	for(SequentFormula cf : seq.antecedent()) {
 	    final PosInOccurrence pos
-	    	= new PosInOccurrence(cf, PosInTerm.getTopLevel(), true);
+	    	= new PosInOccurrence(cf, PosInTerm.<JavaDLTerm>getTopLevel(), true);
 	    collectBaseOccsHelper(focus, pos, result);
 	}
 	for(SequentFormula cf : seq.succedent()) {
 	    final PosInOccurrence pos
-	    	= new PosInOccurrence(cf, PosInTerm.getTopLevel(), false);
+	    	= new PosInOccurrence(cf, PosInTerm.<JavaDLTerm>getTopLevel(), false);
 	    collectBaseOccsHelper(focus, pos, result);
 	}
 	return result;

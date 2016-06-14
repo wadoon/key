@@ -15,8 +15,6 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Collection;
 
-import org.key_project.common.core.services.TermServices;
-
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.rule.Taclet;

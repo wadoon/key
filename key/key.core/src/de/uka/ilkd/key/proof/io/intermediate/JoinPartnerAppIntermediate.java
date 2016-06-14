@@ -7,7 +7,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 
 /**
  * Encapsulates intermediate information for constructing a close-join-partner rule application.
@@ -27,7 +27,7 @@ public class JoinPartnerAppIntermediate extends BuiltInAppIntermediate {
      * @param newNames New names registered in the course of partner goal closing.
      */
     public JoinPartnerAppIntermediate(String ruleName,
-            Pair<Integer, PosInTerm> pos,
+            Pair<Integer, PosInTerm<JavaDLTerm>> pos,
             int joinNodeId, ImmutableList<Name> newNames) {
         super(ruleName, pos, null, null, newNames);
         

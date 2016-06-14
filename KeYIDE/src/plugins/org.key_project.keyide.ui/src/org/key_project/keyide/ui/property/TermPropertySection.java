@@ -32,7 +32,7 @@ import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 
@@ -222,7 +222,7 @@ public class TermPropertySection extends AbstractNodePropertySection {
                      sb.append("Top Level");
                   }
                   else {
-                     PosInTerm pit = pio.posInTerm();
+                     PosInTerm<JavaDLTerm> pit = pio.posInTerm();
                      if (pit != null) {
                         sb.append(pit.integerList(pit.iterator()));
                         ;

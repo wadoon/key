@@ -34,7 +34,7 @@ import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -432,7 +432,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         svi.add(sv, pio.sequentFormula().formula(), lastProof.getServices());
 
         PosInOccurrence applicatinPIO = new PosInOccurrence(new SequentFormula(formula),
-                                                            PosInTerm.getTopLevel(), // TODO: This should be the precise sub term
+                                                            PosInTerm.<JavaDLTerm>getTopLevel(), // TODO: This should be the precise sub term
                                                             inAntecedent); // It is required to create a new PosInOccurrence because formula and pio.constrainedFormula().formula() are only equals module renamings and term labels
         ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
         ifInst = ifInst.append(new IfFormulaInstDirect(pio.sequentFormula()));
@@ -461,7 +461,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         for(int i = 0; i < indices.length; i++) {
             PosInOccurrence pos = new PosInOccurrence(cf,
-                            PosInTerm.getTopLevel(),
+                            PosInTerm.<JavaDLTerm>getTopLevel(),
                             inAntecedent);
             result = simplifyPosOrSub(goal, services, pos, i, protocol);
             if(result != null) {
@@ -492,14 +492,14 @@ public final class OneStepSimplifier implements BuiltInRule {
             if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
                 context.put(
                                 new TermReplacementKey(ante.formula()),
-                                new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
+                                new PosInOccurrence(ante, PosInTerm.<JavaDLTerm>getTopLevel(), true));
             }
         }
         for(SequentFormula succ : seq.succedent()) {
             if(!succ.equals(cf) && succ.formula().op() != Junctor.FALSE) {
                 context.put(
                                 new TermReplacementKey(succ.formula()),
-                                new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
+                                new PosInOccurrence(succ, PosInTerm.<JavaDLTerm>getTopLevel(), false));
             }
         }
         final List<PosInOccurrence> ifInsts = new ArrayList<PosInOccurrence>(seq.size());

@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 
 /**
  * Encapsulates intermediate information for constructing a taclet application.
@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 public class TacletAppIntermediate extends AppIntermediate {
 
     private String tacletName = null;
-    private Pair<Integer, PosInTerm> posInfo = null;
+    private Pair<Integer, PosInTerm<JavaDLTerm>> posInfo = null;
     private LinkedList<String> insts = null;
     private ImmutableList<String> ifSeqFormulaList = null;
     private ImmutableList<String> ifDirectFormulaList = null;
@@ -40,14 +40,14 @@ public class TacletAppIntermediate extends AppIntermediate {
      *
      * @param tacletName Name of the taclet.
      * @param posInfo Position information (Integer representing position
-     *   of the target formula, PosInTerm for relevant term inside the formula).
+     *   of the target formula, PosInTerm<JavaDLTerm> for relevant term inside the formula).
      * @param insts Schema variable instantiations.
      * @param ifSeqFormulaList
      * @param ifDirectFormulaList
      * @param newNames New names registered during taclet application.
      */
     public TacletAppIntermediate(String tacletName,
-            Pair<Integer, PosInTerm> posInfo, LinkedList<String> insts,
+            Pair<Integer, PosInTerm<JavaDLTerm>> posInfo, LinkedList<String> insts,
             ImmutableList<String> ifSeqFormulaList, ImmutableList<String> ifDirectFormulaList,
             ImmutableList<Name> newNames) {
         // Taclet names are internalized later, so we don't waste memory
@@ -63,7 +63,7 @@ public class TacletAppIntermediate extends AppIntermediate {
         return tacletName;
     }
 
-    public Pair<Integer, PosInTerm> getPosInfo() {
+    public Pair<Integer, PosInTerm<JavaDLTerm>> getPosInfo() {
         return posInfo;
     }
 

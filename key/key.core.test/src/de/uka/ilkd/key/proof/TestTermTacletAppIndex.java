@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
@@ -123,7 +123,7 @@ public class TestTermTacletAppIndex extends TestCase{
         JavaDLTerm term = TacletForTests.parseTerm ( "f(f(f(zero)))=one" );
         SequentFormula cfma = new SequentFormula ( term );
 
-        PosInOccurrence pio = new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
+        PosInOccurrence pio = new PosInOccurrence ( cfma, PosInTerm.<JavaDLTerm>getTopLevel(),
                                                     false );
 
         TermTacletAppIndex termIdx =
@@ -144,7 +144,7 @@ public class TestTermTacletAppIndex extends TestCase{
         JavaDLTerm term2 = TacletForTests.parseTerm ( "f(f(zero))=one" );
         SequentFormula cfma2 = new SequentFormula ( term2 );
         PosInOccurrence pio2 = new PosInOccurrence ( cfma2,
-                                                     PosInTerm.getTopLevel(), false );
+                                                     PosInTerm.<JavaDLTerm>getTopLevel(), false );
 
         termIdx = termIdx.update ( pio2.down ( 0 ).down ( 0 ).down ( 0 ), serv,
                                    ruleIdx, NullNewRuleListener.INSTANCE,

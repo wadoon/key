@@ -27,9 +27,9 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.NewDependingOn;

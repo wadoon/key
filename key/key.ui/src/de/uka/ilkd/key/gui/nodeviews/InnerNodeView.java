@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -289,7 +289,7 @@ public class InnerNodeView extends SequentView {
             final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
             final PosInOccurrence pos
                     = new PosInOccurrence(inst.getConstrainedFormula(),
-                    PosInTerm.getTopLevel(),
+                    PosInTerm.<JavaDLTerm>getTopLevel(),
                     inst.inAntec());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
         }

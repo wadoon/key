@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java.recoderext;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.java.CompilationUnit;
@@ -51,7 +52,6 @@ import recoder.java.statement.Try;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Each class is prepared before it is initialised. The preparation of

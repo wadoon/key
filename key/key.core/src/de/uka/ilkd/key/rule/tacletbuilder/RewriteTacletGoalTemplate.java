@@ -21,8 +21,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.rule.Taclet;
 
 /** this class inherits from TacletGoalTemplate. It is used if there is a

@@ -22,6 +22,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
+import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
+import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
+import de.uka.ilkd.key.java.recoderext.expression.literal.BigintLiteral;
+import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
+import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ArrayType;
 import recoder.abstraction.ClassType;
@@ -54,12 +60,6 @@ import recoder.java.reference.TypeReference;
 import recoder.java.reference.VariableReference;
 import recoder.kit.TwoPassTransformation;
 import recoder.service.DefaultCrossReferenceSourceInfo;
-import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
-import de.uka.ilkd.key.java.recoderext.expression.literal.BigintLiteral;
-import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * The Java DL requires some implicit fields, that are available in each

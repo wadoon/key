@@ -21,7 +21,7 @@ import org.key_project.sed.key.core.model.KeYMethodContract;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -70,7 +70,7 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Triple<JavaDLTerm, PosInTerm, JavaDLTerm> computeTermToShow(IKeYSENode<?> node,
+   protected Triple<JavaDLTerm, PosInTerm<JavaDLTerm>, JavaDLTerm> computeTermToShow(IKeYSENode<?> node,
                                                              IExecutionNode<?> executionNode, 
                                                              Node keyNode) {
       if (node instanceof KeYMethodContract || node instanceof KeYBlockContract) {
@@ -87,7 +87,7 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
          if (!INCLUDE_UPDATES) {
             term = TermBuilder.goBelowUpdates(term);
          }
-         return new Triple<JavaDLTerm, PosInTerm, JavaDLTerm>(term, null, null);
+         return new Triple<JavaDLTerm, PosInTerm<JavaDLTerm>, JavaDLTerm>(term, null, null);
       }
       else {
          throw new IllegalArgumentException("Unsupported node.");

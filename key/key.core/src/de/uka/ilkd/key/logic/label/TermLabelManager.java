@@ -39,7 +39,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
@@ -916,7 +916,7 @@ public class TermLabelManager {
                                       Object hint,
                                       Rule rule,
                                       JavaDLTerm tacletTerm) {
-      final PosInTerm pos = applicationPosInOccurrence.posInTerm();
+      final PosInTerm<JavaDLTerm> pos = applicationPosInOccurrence.posInTerm();
       final JavaDLTerm oldTerm = pos.getSubTerm(sequentFormula);
       // Compute active refactorings
       RefactoringsContainer refactorings = computeRefactorings(state, services, applicationPosInOccurrence, oldTerm, rule, goal, hint, tacletTerm);
@@ -1468,7 +1468,7 @@ public class TermLabelManager {
       for (SequentFormula sfa : semisequent) {
          JavaDLTerm updatedTerm = refactorLabelsRecursive(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(), activeRefactorings);
          goal.changeFormula(new SequentFormula(updatedTerm),
-                            new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
+                            new PosInOccurrence(sfa, PosInTerm.<JavaDLTerm>getTopLevel(), inAntec));
       }
    }
 
@@ -1797,7 +1797,7 @@ public class TermLabelManager {
             // Replace sequent formula
             if (labelsChanged) {
                JavaDLTerm newTerm = services.getTermFactory().createTerm(existingTerm.op(), existingTerm.subs(), existingTerm.boundVars(), existingTerm.modalContent(), new ImmutableArray<TermLabel>(mergedLabels));
-               SequentChangeInfo sci = currentSequent.sequent().changeFormula(new SequentFormula(newTerm), new PosInOccurrence(existingSF, PosInTerm.getTopLevel(), inAntecedent));
+               SequentChangeInfo sci = currentSequent.sequent().changeFormula(new SequentFormula(newTerm), new PosInOccurrence(existingSF, PosInTerm.<JavaDLTerm>getTopLevel(), inAntecedent));
                currentSequent.combine(sci);
             }
          }

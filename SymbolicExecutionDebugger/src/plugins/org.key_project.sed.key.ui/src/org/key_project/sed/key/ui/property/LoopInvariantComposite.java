@@ -24,7 +24,7 @@ import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -71,7 +71,7 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Triple<JavaDLTerm, PosInTerm, JavaDLTerm> computeTermToShow(IKeYSENode<?> node, 
+   protected Triple<JavaDLTerm, PosInTerm<JavaDLTerm>, JavaDLTerm> computeTermToShow(IKeYSENode<?> node, 
                                                              IExecutionNode<?> executionNode, 
                                                              final Node keyNode) {
       if (node instanceof KeYLoopBodyTermination) {
@@ -92,14 +92,14 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
          if (term.op() == Junctor.IMP) {
             term = term.sub(1);
          }
-         PosInTerm predicatePosition = findUninterpretedPredicateTerm(node, term, AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof()), null);
+         PosInTerm<JavaDLTerm> predicatePosition = findUninterpretedPredicateTerm(node, term, AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof()), null);
          JavaDLTerm termWithoutPredicate = predicatePosition != null ?
                                      removeUninterpretedPredicate(keyNode, term, predicatePosition.getSubTerm(term)) :
                                      term;
          if (!INCLUDE_UPDATES) {
             termWithoutPredicate = TermBuilder.goBelowUpdates(termWithoutPredicate);
          }
-         return new Triple<JavaDLTerm, PosInTerm, JavaDLTerm>(termWithoutPredicate, predicatePosition, term);
+         return new Triple<JavaDLTerm, PosInTerm<JavaDLTerm>, JavaDLTerm>(termWithoutPredicate, predicatePosition, term);
       }
       else if (node instanceof KeYLoopInvariant) {
          PosInOccurrence pio = executionNode.getModalityPIO();
@@ -115,7 +115,7 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
          if (!INCLUDE_UPDATES) {
             term = TermBuilder.goBelowUpdates(term);
          }
-         return new Triple<JavaDLTerm, PosInTerm, JavaDLTerm>(term, null, null);
+         return new Triple<JavaDLTerm, PosInTerm<JavaDLTerm>, JavaDLTerm>(term, null, null);
       }
       else {
          throw new IllegalArgumentException("Unsupported node.");

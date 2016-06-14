@@ -13,24 +13,27 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
 /**
  * This class describes a position in an occurrence of a term. A
- * SequentFormula and a PosInTerm determine an object of this 
+ * SequentFormula and a PosInTerm<JavaDLTerm> determine an object of this 
  * class exactly. 
  */
-public final class PosInOccurrence {
+public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<?, ?, ?, T>> {
 
-    public static PosInOccurrence findInSequent(Sequent seq, 
+    public static <T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<?, ?, ?, T>> PosInOccurrence<T, SeqFor> findInSequent(Sequent seq, 
                                                 int formulaNumber, 
-                                                PosInTerm pos) {
-       return new PosInOccurrence(seq.getFormulabyNr(formulaNumber),  
+                                                PosInTerm<JavaDLTerm> pos) {
+       return new PosInOccurrence<>(seq.getFormulabyNr(formulaNumber),  
                                   pos, seq.numberInAntec(formulaNumber));
     }
     
     /**
      * the constrained formula the pos in occurrence describes
      */
-    private final SequentFormula sequentFormula;
+    private final SeqFor sequentFormula;
 
     // saves 8 bytes (due to alignment issues) per instance if we use a
     // short here instead of an int
@@ -42,15 +45,15 @@ public final class PosInOccurrence {
     private final boolean inAntec;
 
     /** the position in sequentFormula.formula() */
-    private final PosInTerm posInTerm;
+    private final PosInTerm<T> posInTerm;
 
     /**
      * The subterm this object points to, or <code>null</code>
      */
-    private JavaDLTerm subTermCache = null;
+    private T subTermCache = null;
 
-    public PosInOccurrence(SequentFormula sequentFormula,
-                           PosInTerm posInTerm,
+    public PosInOccurrence(SeqFor sequentFormula,
+                           PosInTerm<T> posInTerm,
                            boolean inAntec) {
         assert posInTerm != null;
     assert sequentFormula != null;
@@ -64,7 +67,7 @@ public final class PosInOccurrence {
      * returns the SequentFormula that determines the occurrence of
      * this PosInOccurrence 
      */
-    public SequentFormula sequentFormula() {
+    public SeqFor sequentFormula() {
 	return sequentFormula;
     }
 
@@ -78,12 +81,12 @@ public final class PosInOccurrence {
 
     /**
      * creates a new PosInOccurrence that has exactly the same state as this
-     * object except the PosInTerm is new and walked down the specified
+     * object except the PosInTerm<JavaDLTerm> is new and walked down the specified
      * subterm, as specified in method down of 
-     * {@link de.uka.ilkd.key.logic.PosInTerm}.
+     * {@link de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>}.
      */
-    public PosInOccurrence down(int i) {
-	return new PosInOccurrence(sequentFormula, posInTerm.down(i), inAntec);
+    public PosInOccurrence<T, SeqFor> down(int i) {
+	return new PosInOccurrence<>(sequentFormula, posInTerm.down(i), inAntec);
     }
     
     /** 
@@ -94,7 +97,8 @@ public final class PosInOccurrence {
 	if (!(obj instanceof PosInOccurrence)) {
 	    return false;
 	}
-	final PosInOccurrence cmp = (PosInOccurrence)obj;
+	@SuppressWarnings("unchecked")
+    final PosInOccurrence<T, SeqFor> cmp = (PosInOccurrence<T, SeqFor>)obj;
 
 	if ( !sequentFormula.equals ( cmp.sequentFormula ) ) {
 	    return false;
@@ -113,7 +117,8 @@ public final class PosInOccurrence {
 	if (!(obj instanceof PosInOccurrence)) {
 	    return false;
 	}
-	final PosInOccurrence cmp = (PosInOccurrence)obj;
+    @SuppressWarnings("unchecked")
+    final PosInOccurrence<T, SeqFor> cmp = (PosInOccurrence<T, SeqFor>)obj;
 
 	// NB: the class <code>NonDuplicateAppFeature</code> depends on the usage
 	// of <code>!=</code> in this condition
@@ -124,7 +129,7 @@ public final class PosInOccurrence {
 	return equalsHelp ( cmp );
     }
 
-    private boolean equalsHelp (final PosInOccurrence cmp) {
+    private boolean equalsHelp (final PosInOccurrence<T, SeqFor> cmp) {
 	if ( inAntec == cmp.inAntec ) {
 	    return posInTerm .equals ( cmp.posInTerm );
 	}
@@ -153,7 +158,7 @@ public final class PosInOccurrence {
     }
 
     public boolean isTopLevel () {
-	return posInTerm == PosInTerm.getTopLevel();
+	return posInTerm == PosInTerm.<JavaDLTerm>getTopLevel();
     }
 
     /**
@@ -164,7 +169,7 @@ public final class PosInOccurrence {
      * @return an iterator that walks from the root of the term to the
      * position this <code>PosInOccurrence</code>-object points to
      */
-    public PIOPathIterator iterator () {
+    public PIOPathIterator<T,SeqFor> iterator () {
 	return new PIOPathIteratorImpl ();
     }
 
@@ -176,7 +181,7 @@ public final class PosInOccurrence {
      * @returns the position in the formula of the SequentFormula of
      * this PosInOccurrence. 
      */
-    public PosInTerm posInTerm() {
+    public PosInTerm<T> posInTerm() {
 	return posInTerm;
     }
 
@@ -190,11 +195,11 @@ public final class PosInOccurrence {
      *         object does within the formula <code>constrainedFormula()</code>.
      *         It is not tested whether this position exists within <code>p_newFormula</code>
      */
-    public PosInOccurrence replaceConstrainedFormula (SequentFormula p_newFormula) {
+    public PosInOccurrence<T, SeqFor> replaceConstrainedFormula (SeqFor p_newFormula) {
         assert p_newFormula != null;
-        final PIOPathIterator it = iterator ();
-        JavaDLTerm newTerm = p_newFormula.formula ();
-        PosInTerm newPosInTerm = PosInTerm.getTopLevel();
+        final PIOPathIterator<T, SeqFor> it = iterator ();
+        T newTerm = p_newFormula.formula ();
+        PosInTerm<T> newPosInTerm = PosInTerm.<T>getTopLevel();
 
         while ( true ) {
             final int subNr = it.next ();
@@ -205,7 +210,7 @@ public final class PosInOccurrence {
             newTerm = newTerm.sub ( subNr );
         }
 
-        return new PosInOccurrence ( p_newFormula,
+        return new PosInOccurrence<> ( p_newFormula,
                                      newPosInTerm,
                                      inAntec);
     }
@@ -216,7 +221,7 @@ public final class PosInOccurrence {
     /**
      * returns the subterm this object points to
      */
-    public JavaDLTerm subTerm () {
+    public T subTerm () {
 	if ( subTermCache == null ) {
 	    subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
 	}
@@ -226,18 +231,18 @@ public final class PosInOccurrence {
     /**
      * Ascend to the top node of the formula this object points to 
      */
-    public PosInOccurrence topLevel () {
+    public PosInOccurrence<T, SeqFor> topLevel () {
         if (isTopLevel()) {
             return this;
         }
-	return new PosInOccurrence(sequentFormula, PosInTerm.getTopLevel(), 
+	return new PosInOccurrence<>(sequentFormula, PosInTerm.<T>getTopLevel(), 
 				   inAntec);    	
     }
 
 
     /** toString */
     public String toString() {
-	String res = "JavaDLTerm "+
+	String res = "Term "+
 	    posInTerm()+" of "+ sequentFormula();
 	
 	return res;
@@ -249,20 +254,19 @@ public final class PosInOccurrence {
     /**
      * Ascend to the parent node
      */
-    public PosInOccurrence up() {
+    public PosInOccurrence<T, SeqFor> up() {
 	assert !isTopLevel() : "not possible to go up from top level position";
 
-	return new PosInOccurrence(sequentFormula, posInTerm.up(), 
-		inAntec);
+	return new PosInOccurrence<>(sequentFormula, posInTerm.up(), inAntec);
 
     }
 
     
-    private final class PIOPathIteratorImpl implements PIOPathIterator {	
+    private final class PIOPathIteratorImpl implements PIOPathIterator<T,SeqFor> {	
 	int               child;
 	int               count             = 0;
 	IntIterator       currentPathIt;
-	JavaDLTerm              currentSubTerm    = null;
+	T                 currentSubTerm    = null;
 	
 	private PIOPathIteratorImpl               () {
 	    currentPathIt = posInTerm ().iterator ();
@@ -281,12 +285,12 @@ public final class PosInOccurrence {
 	 * @return the current position within the term
 	 * (i.e. corresponding to the latest <code>next()</code>-call)
 	 */
-	public PosInOccurrence getPosInOccurrence () {
+	public PosInOccurrence<T, SeqFor> getPosInOccurrence () {
 	    // the object is created only now to make the method
 	    // <code>next()</code> faster
 
-	    final PosInOccurrence pio;	   
-	    pio = new PosInOccurrence ( sequentFormula,
+	    final PosInOccurrence<T, SeqFor> pio;	   
+	    pio = new PosInOccurrence<> ( sequentFormula,
 		    posInTerm.firstN(count - 1),
 		    inAntec );            
 
@@ -300,7 +304,7 @@ public final class PosInOccurrence {
 	 * this method satisfies
 	 * <code>getPosInOccurrence().subTerm()==getSubTerm()</code>
 	 */
-	public JavaDLTerm            getSubTerm         () {
+	public T            getSubTerm         () {
 	    return currentSubTerm;
 	}
 

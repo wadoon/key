@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -134,7 +134,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     public PosInOccurrence toPosInOccurrence () {
         if (pioCache == null)
             pioCache = new PosInOccurrence ( getConstrainedFormula (),
-                                             PosInTerm.getTopLevel(),
+                                             PosInTerm.<JavaDLTerm>getTopLevel(),
                                              inAntec () );
         return pioCache;
     }

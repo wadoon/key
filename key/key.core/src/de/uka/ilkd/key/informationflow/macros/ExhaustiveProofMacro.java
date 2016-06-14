@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
@@ -101,7 +101,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                     for (int i = 1; i <= seq.size() &&
                             applicableOnNodeAtPos.get(goal.node()) == null; i++) {
                         PosInOccurrence searchPos =
-                                PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
+                                PosInOccurrence.findInSequent(seq, i, PosInTerm.<JavaDLTerm>getTopLevel());
                         PosInOccurrence applicableAt =
                                 getApplicablePosInOcc(proof, goal, searchPos, macro);
                         applicableOnNodeAtPos.put(goal.node(), applicableAt);

@@ -19,11 +19,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.key_project.common.core.logic.sort.Sort;
-
 import java.util.Set;
 import java.util.Stack;
+
+import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.smt.ProblemTypeInformation;
 import de.uka.ilkd.key.smt.SMTObjTranslator;

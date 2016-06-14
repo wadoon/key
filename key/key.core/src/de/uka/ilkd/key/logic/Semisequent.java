@@ -13,10 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-
 /** 
  * This class represents the succedent or antecendent part of a
  * sequent. It is more or less a list without duplicates and subsumed

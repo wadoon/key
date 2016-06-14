@@ -84,7 +84,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -1342,7 +1342,7 @@ public final class SymbolicExecutionUtil {
          int maxId = Integer.MIN_VALUE;
          PosInOccurrence maxPio = null;
          for (SequentFormula sf : semisequent) {
-            PosInTerm current = findModalityWithMaxSymbolicExecutionLabelId(sf.formula());
+            PosInTerm<JavaDLTerm> current = findModalityWithMaxSymbolicExecutionLabelId(sf.formula());
             if (current != null) {
                PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
                SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
@@ -1360,12 +1360,12 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Searches the modality {@link PosInTerm} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link PosInTerm<JavaDLTerm>} with the maximal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link JavaDLTerm}.
     * @param term The {@link JavaDLTerm} to search in.
-    * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null} otherwise.
+    * @return The modality {@link PosInTerm<JavaDLTerm>} with the maximal ID if available or {@code null} otherwise.
     */
-   public static PosInTerm findModalityWithMaxSymbolicExecutionLabelId(JavaDLTerm term) {
+   public static PosInTerm<JavaDLTerm> findModalityWithMaxSymbolicExecutionLabelId(JavaDLTerm term) {
       if (term != null) {
          FindModalityWithSymbolicExecutionLabelId visitor = new FindModalityWithSymbolicExecutionLabelId(true);
          term.execPreOrder(visitor);
@@ -1417,7 +1417,7 @@ public final class SymbolicExecutionUtil {
          int maxId = Integer.MIN_VALUE;
          PosInOccurrence minPio = null;
          for (SequentFormula sf : semisequent) {
-            PosInTerm current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
+            PosInTerm<JavaDLTerm> current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
             if (current != null) {
                PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
                SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
@@ -1435,12 +1435,12 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Searches the modality {@link PosInTerm} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link PosInTerm<JavaDLTerm>} with the minimal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link JavaDLTerm}.
     * @param term The {@link JavaDLTerm} to search in.
-    * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null} otherwise.
+    * @return The modality {@link PosInTerm<JavaDLTerm>} with the maximal ID if available or {@code null} otherwise.
     */
-   public static PosInTerm findModalityWithMinSymbolicExecutionLabelId(JavaDLTerm term) {
+   public static PosInTerm<JavaDLTerm> findModalityWithMinSymbolicExecutionLabelId(JavaDLTerm term) {
       if (term != null) {
          FindModalityWithSymbolicExecutionLabelId visitor = new FindModalityWithSymbolicExecutionLabelId(false);
          term.execPreOrder(visitor);
@@ -1458,9 +1458,9 @@ public final class SymbolicExecutionUtil {
     */
    private static final class FindModalityWithSymbolicExecutionLabelId extends DefaultVisitor {
       /**
-       * The modality {@link PosInTerm} with the maximal ID.
+       * The modality {@link PosInTerm<JavaDLTerm>} with the maximal ID.
        */
-      private PosInTerm posInTerm;
+      private PosInTerm<JavaDLTerm> posInTerm;
       
       /**
        * The maximal ID.
@@ -1473,9 +1473,9 @@ public final class SymbolicExecutionUtil {
       private boolean maximum;
       
       /**
-       * The current {@link PosInTerm}.
+       * The current {@link PosInTerm<JavaDLTerm>}.
        */
-      private PosInTerm currentPosInTerm = null;
+      private PosInTerm<JavaDLTerm> currentPosInTerm = null;
       
       private Deque<Integer> indexStack = new LinkedList<Integer>();
       
@@ -1507,7 +1507,7 @@ public final class SymbolicExecutionUtil {
       @Override
       public void subtreeEntered(JavaDLTerm subtreeRoot) {
          if (currentPosInTerm == null) {
-            currentPosInTerm = PosInTerm.getTopLevel();
+            currentPosInTerm = PosInTerm.<JavaDLTerm>getTopLevel();
          }
          else {
             int index = indexStack.getFirst();
@@ -1530,10 +1530,10 @@ public final class SymbolicExecutionUtil {
       }
 
       /**
-       * Returns the modality {@link PosInTerm} with the maximal ID.
-       * @return The modality {@link PosInTerm} with the maximal ID.
+       * Returns the modality {@link PosInTerm<JavaDLTerm>} with the maximal ID.
+       * @return The modality {@link PosInTerm<JavaDLTerm>} with the maximal ID.
        */
-      public PosInTerm getPosInTerm() {
+      public PosInTerm<JavaDLTerm> getPosInTerm() {
          return posInTerm;
       }
    }
@@ -2972,7 +2972,7 @@ public final class SymbolicExecutionUtil {
                newSubs.add(definition);
                newSubs.add(skolem);
                JavaDLTerm newEquality = factory.createTerm(equality.op(), new ImmutableArray<JavaDLTerm>(newSubs), equality.boundVars(), equality.modalContent(), equality.getLabels());
-               sequent = sequent.changeFormula(new SequentFormula(newEquality), new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
+               sequent = sequent.changeFormula(new SequentFormula(newEquality), new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(), true)).sequent();
             }
          }
          else if (skolemEquality == 1) {
@@ -2984,7 +2984,7 @@ public final class SymbolicExecutionUtil {
                newSubs.add(definition);
                newSubs.add(skolem);
                JavaDLTerm newEquality = factory.createTerm(equality.op(), new ImmutableArray<JavaDLTerm>(newSubs), equality.boundVars(), equality.modalContent(), equality.getLabels());
-               sequent = sequent.changeFormula(new SequentFormula(newEquality), new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
+               sequent = sequent.changeFormula(new SequentFormula(newEquality), new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(), true)).sequent();
             }
          }
       }
@@ -3149,7 +3149,7 @@ public final class SymbolicExecutionUtil {
       }
       if (remove) {
          return sequent.removeFormula(
-                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), antecedent)).sequent();
+                 new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(), antecedent)).sequent();
       }
       else {
          return sequent;

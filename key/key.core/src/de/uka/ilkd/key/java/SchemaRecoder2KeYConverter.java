@@ -19,7 +19,6 @@ import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -75,6 +74,7 @@ import de.uka.ilkd.key.rule.metaconstruct.SwitchToIf;
 import de.uka.ilkd.key.rule.metaconstruct.TypeOf;
 import de.uka.ilkd.key.rule.metaconstruct.Unpack;
 import de.uka.ilkd.key.rule.metaconstruct.UnwindLoop;
+import recoder.list.generic.ASTList;
 
 /**
  * This is an extension of the usual {@link Recoder2KeYConverter} that supports

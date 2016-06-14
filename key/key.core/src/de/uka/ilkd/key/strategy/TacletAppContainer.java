@@ -27,7 +27,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -501,7 +501,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
             final SequentFormula cfma = p_ifInstantiation.getConstrainedFormula ();
             final PosInOccurrence pio = new PosInOccurrence ( cfma,
-                                                              PosInTerm.getTopLevel(),
+                                                              PosInTerm.<JavaDLTerm>getTopLevel(),
                                                               antec );
 
             final FormulaTagManager tagManager = goal.getFormulaTagManager ();

@@ -2,13 +2,13 @@ package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Visitor;
-import org.key_project.common.core.logic.calculus.GenericSequentFormula;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 public abstract class GenericSemisequentChangeInfo<S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>, 
-                                          SeqFor extends GenericSequentFormula<S, N, V, T>, SemiSeq extends GenericSemisequent<S,N,V,T,SeqFor>> {
+                                          SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<S,N,V,T,SeqFor>> {
 
     /** contains the added formulas to the semisequent */
     private ImmutableList<SeqFor> added = ImmutableSLList.<SeqFor>nil();

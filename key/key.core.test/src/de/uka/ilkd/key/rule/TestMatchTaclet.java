@@ -36,7 +36,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -191,7 +191,7 @@ public class TestMatchTaclet extends TestCase {
 	        find_addrule_conflict.getMatcher().matchFind(match.sub(0), 
 	                MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
                     new PosInOccurrence(new SequentFormula(match),
-                            PosInTerm.getTopLevel().down(0), true), services);
+                            PosInTerm.<JavaDLTerm>getTopLevel().down(0), true), services);
         
     
 	assertTrue("A match has been found but there is a free variable in"+
@@ -205,7 +205,7 @@ public class TestMatchTaclet extends TestCase {
             find_addrule_conflict.getMatcher().matchFind(match, 
                     MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
                     new PosInOccurrence(new SequentFormula(match),
-                            PosInTerm.getTopLevel(), true), services);
+                            PosInTerm.<JavaDLTerm>getTopLevel(), true), services);
 	assertTrue("A match should have been found,"+
 		   " because here there formerly free variable is bound.",
 		   app != null);	           
@@ -226,7 +226,7 @@ public class TestMatchTaclet extends TestCase {
                MatchConditions.EMPTY_MATCHCONDITIONS, 
                services).getInstantiations(),
                new PosInOccurrence(new SequentFormula(match.sub(0)),
-                       PosInTerm.getTopLevel().down(0), true), services);
+                       PosInTerm.<JavaDLTerm>getTopLevel().down(0), true), services);
         
 	assertTrue("Match found but match term contains free var and"+
 		   "matching var occurs in two instantiation areas"+
@@ -284,7 +284,7 @@ public class TestMatchTaclet extends TestCase {
 	TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
 	index.add(close_rule.taclet());
         PosInOccurrence pio = new PosInOccurrence(new SequentFormula(closeable_two),
-                PosInTerm.getTopLevel(), false);
+                PosInTerm.<JavaDLTerm>getTopLevel(), false);
 
 	TacletApp tacletApp = index.getSuccedentTaclet(pio,
 	                                               new IHTacletFilter (true, ImmutableSLList.<RuleSet>nil()),

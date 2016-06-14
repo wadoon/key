@@ -16,6 +16,8 @@ package de.uka.ilkd.key.java.recoderext;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.util.Debug;
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.abstraction.TypeParameter;
@@ -48,8 +50,6 @@ import recoder.java.reference.TypeReference;
 import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.java.ConvertException;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Make a ClassDeclaration out of a class file.

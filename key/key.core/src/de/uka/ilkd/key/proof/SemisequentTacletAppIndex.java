@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -77,7 +77,7 @@ public class SemisequentTacletAppIndex {
                                 TacletIndex        tacletIndex,
                                 NewRuleListener    listener ) {
         final PosInOccurrence pos =
-            new PosInOccurrence ( cfma, PosInTerm.getTopLevel(), antec );
+            new PosInOccurrence ( cfma, PosInTerm.<JavaDLTerm>getTopLevel(), antec );
         termIndices =
             termIndices.put ( cfma, TermTacletAppIndex.create ( pos,
                                                                 services,
@@ -105,7 +105,7 @@ public class SemisequentTacletAppIndex {
             "does not exist";
     
         final PosInOccurrence pos =
-            new PosInOccurrence ( cfma, PosInTerm.getTopLevel(), antec );
+            new PosInOccurrence ( cfma, PosInTerm.<JavaDLTerm>getTopLevel(), antec );
 
         termIndices = termIndices.put ( cfma,
                                         oldIndex.addTaclets ( filter,
@@ -319,7 +319,7 @@ public class SemisequentTacletAppIndex {
             final SequentFormula cfma = entry.key (); 
             final TermTacletAppIndex index = entry.value ();
             final PosInOccurrence pio = 
-                new PosInOccurrence ( cfma, PosInTerm.getTopLevel(), antec );
+                new PosInOccurrence ( cfma, PosInTerm.<JavaDLTerm>getTopLevel(), antec );
             
             index.reportTacletApps( pio, l );
         }

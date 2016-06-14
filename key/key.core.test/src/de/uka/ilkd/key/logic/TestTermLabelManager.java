@@ -444,7 +444,7 @@ public class TestTermLabelManager extends TestCase {
       LocationVariable heap = services.getTheories().getHeapLDT().getSavedHeap();
       JavaDLTerm update = TB.label(TB.elementary(TB.var(heap), TB.var(heap)), new ParameterlessTermLabel(new Name("UPDATE")));
       JavaDLTerm updateApp = TB.apply(update, modality, new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
-      PosInOccurrence pos = new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.getTopLevel(), true);
+      PosInOccurrence pos = new PosInOccurrence(new SequentFormula(updateApp), PosInTerm.<JavaDLTerm>getTopLevel(), true);
       JavaDLTerm taclet = TB.tt();
       Rule rule = new DummyRule("rule");
       // Create labels
@@ -512,7 +512,7 @@ public class TestTermLabelManager extends TestCase {
    protected PosInOccurrence createTestPosInOccurrence(Services services) {
       JavaDLTerm testTerm = createTestTerm(services);
       JavaDLTerm inInt = services.getTermBuilder().inInt(testTerm);
-      return new PosInOccurrence(new SequentFormula(inInt), PosInTerm.parseReverseString("0"), true);
+      return new PosInOccurrence(new SequentFormula(inInt), PosInTerm.<JavaDLTerm>parseReverseString("0"), true);
    }
 
    protected JavaDLTerm createTestTerm(Services services) {

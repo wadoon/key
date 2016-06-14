@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -138,7 +138,7 @@ public class JoinProcessor implements Runnable {
 
     private void orRight(Goal goal) {
         SequentFormula sf = goal.sequent().succedent().get(0);
-        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(),
+        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(),
                 false);
         apply(new String[] { OR_RIGHT_TACLET }, goal, pio);
 
@@ -159,7 +159,7 @@ public class JoinProcessor implements Runnable {
 
         SequentFormula sf = findFormula(goal.sequent(), cut.getFormula(), false);
 
-        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel()
+        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel()
                 .down(0), false);
         Goal result = apply(SIMPLIFY_UPDATE, goal, pio).head();
 
@@ -206,7 +206,7 @@ public class JoinProcessor implements Runnable {
         int index = goal.sequent().formulaNumberInSequent(false,
                 partner.getFormulaForHiding());
         PosInOccurrence pio = PosInOccurrence.findInSequent(goal.sequent(),
-                index, PosInTerm.getTopLevel());
+                index, PosInTerm.<JavaDLTerm>getTopLevel());
         return apply(new String[] { HIDE_RIGHT_TACLET }, goal, pio).head();
 
     }

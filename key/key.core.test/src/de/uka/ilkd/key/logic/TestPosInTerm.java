@@ -19,14 +19,14 @@ public class TestPosInTerm extends TestCase {
     
     
     public void testUpDownWithoutCopyExceptForTopLevelChange() {
-        PosInTerm pit = PosInTerm.getTopLevel();
+        PosInTerm<JavaDLTerm> pit = PosInTerm.<JavaDLTerm>getTopLevel();
                 
         pit = pit.down(8);
         assertTrue(pit.getIndex() == 8);
         assertTrue(pit.depth() == 1);
         
         
-        PosInTerm copy = pit;
+        PosInTerm<JavaDLTerm> copy = pit;
         
         pit = pit.down(20);
         assertTrue(pit.depth() == 2);
@@ -47,10 +47,10 @@ public class TestPosInTerm extends TestCase {
     }
 
     public void testCopyFlag() {
-        PosInTerm pit = PosInTerm.getTopLevel();        
+        PosInTerm<JavaDLTerm> pit = PosInTerm.<JavaDLTerm>getTopLevel();        
         pit = pit.down(10);
         
-        PosInTerm copy = pit;        
+        PosInTerm<JavaDLTerm> copy = pit;        
         pit = pit.down(20);
         copy = copy.down(30);
         
@@ -61,9 +61,9 @@ public class TestPosInTerm extends TestCase {
     public void testUpDownWithCopy() {
         int[] pos = new int[]{10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1};
 
-        PosInTerm pit = toPosInTerm(pos);
+        PosInTerm<JavaDLTerm> pit = toPosInTerm(pos);
                 
-        PosInTerm copy = pit;
+        PosInTerm<JavaDLTerm> copy = pit;
         
         assertEquals(pos.length, pit.depth());
         
@@ -84,8 +84,8 @@ public class TestPosInTerm extends TestCase {
         assertEquals(10000, pit.up().getIndex());        
     }
 
-    private PosInTerm toPosInTerm(int[] pos) {
-        PosInTerm pit = PosInTerm.getTopLevel();
+    private PosInTerm<JavaDLTerm> toPosInTerm(int[] pos) {
+        PosInTerm<JavaDLTerm> pit = PosInTerm.<JavaDLTerm>getTopLevel();
 
         for (int i : pos) {
             pit = pit.down(i);
@@ -100,8 +100,8 @@ public class TestPosInTerm extends TestCase {
         int[] pos4 = new int[]{10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1, 67, 68, 69};
 
 
-        PosInTerm pit1 = toPosInTerm(pos);
-        PosInTerm pit2 = toPosInTerm(pos);
+        PosInTerm<JavaDLTerm> pit1 = toPosInTerm(pos);
+        PosInTerm<JavaDLTerm> pit2 = toPosInTerm(pos);
         assertEquals(pit1, pit2);
         assertEquals(pit1.hashCode(), pit2.hashCode());
             
@@ -115,11 +115,11 @@ public class TestPosInTerm extends TestCase {
         int[] posN4 = new int[]{10, 2, 5, 20};
         int[] posN7 = new int[]{10, 2, 5, 20, 4, 100, 25};
         
-        PosInTerm pit = toPosInTerm(pos);
+        PosInTerm<JavaDLTerm> pit = toPosInTerm(pos);
 
-        PosInTerm pitN1 = PosInTerm.getTopLevel().down(10);
-        PosInTerm pitN4 = toPosInTerm(posN4);
-        PosInTerm pitN7 = toPosInTerm(posN7);
+        PosInTerm<JavaDLTerm> pitN1 = PosInTerm.<JavaDLTerm>getTopLevel().down(10);
+        PosInTerm<JavaDLTerm> pitN4 = toPosInTerm(posN4);
+        PosInTerm<JavaDLTerm> pitN7 = toPosInTerm(posN7);
 
         assertTrue(pit.firstN(0).isTopLevel());
         assertEquals(pitN1, pit.firstN(1));
@@ -131,7 +131,7 @@ public class TestPosInTerm extends TestCase {
     public void testIntegerList() {
         int[] pos = new int[]{10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1};
         
-        PosInTerm pit = toPosInTerm(pos);
+        PosInTerm<JavaDLTerm> pit = toPosInTerm(pos);
         
         assertEquals("[10,2,5,20,4,100,25,65,23,40,2,0,1,0,1]", pit.integerList(pit.iterator()));
         assertEquals("[1,0,1,0,2,40,23,65,25,100,4,20,5,2,10]", pit.integerList(pit.reverseIterator()));
@@ -140,10 +140,10 @@ public class TestPosInTerm extends TestCase {
     public void testParseReverseString() {
         int[] pos = new int[]{10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1};
         
-        PosInTerm pit = toPosInTerm(pos);
+        PosInTerm<JavaDLTerm> pit = toPosInTerm(pos);
         
         assertEquals(pit, 
-                PosInTerm.parseReverseString("1,0,1,0,2,40,23,65,25,100,4,20,5,2,10"));
+                PosInTerm.<JavaDLTerm>parseReverseString("1,0,1,0,2,40,23,65,25,100,4,20,5,2,10"));
         
     }
     

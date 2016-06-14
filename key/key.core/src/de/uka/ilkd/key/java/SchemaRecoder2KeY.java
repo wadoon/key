@@ -22,15 +22,15 @@ import java.util.LinkedHashMap;
 
 import org.key_project.common.core.logic.Namespace;
 
-import recoder.java.declaration.TypeDeclaration;
-import recoder.list.generic.ASTArrayList;
-import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 
 public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
 

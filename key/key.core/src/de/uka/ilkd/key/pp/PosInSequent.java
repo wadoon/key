@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 /**
  * describes a position in a sequent including the bounds within a string
  * representation of the sequent. In contrast to PosInOccurrence and
- * PosInTerm of package de.uka.ilkd.key.logic, this class is mutable,
+ * PosInTerm<JavaDLTerm> of package de.uka.ilkd.key.logic, this class is mutable,
  * i.e the bounds may be set later in an already existing PosInSequent
  * instance. Apart from the bounds, PosInSequent has the following kind
  * of states: It marks the whole sequent, the whole antecedent, the whole

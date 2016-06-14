@@ -28,7 +28,7 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -72,7 +72,7 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
             KeYSelectionModel selectionModel = keyEditor.getSelectionModel();
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, selectionModel.getSelectedNode());
             // Apply rule interactively
-            applyTaclet(keyEditor.getUI(), selectionModel.getSelectedGoal(), selectionModel.getSelectedNode().sequent(), false, 0, PosInTerm.getTopLevel(), "impRight");
+            applyTaclet(keyEditor.getUI(), selectionModel.getSelectedGoal(), selectionModel.getSelectedNode().sequent(), false, 0, PosInTerm.<JavaDLTerm>getTopLevel(), "impRight");
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, selectionModel.getSelectedNode());
             // Select root
             selectionModel.setSelectedNode(proof.root());

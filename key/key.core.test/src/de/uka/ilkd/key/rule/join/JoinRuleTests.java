@@ -12,7 +12,7 @@ import org.junit.Test;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilJoinPointMacro;
@@ -197,7 +197,7 @@ public class JoinRuleTests extends TestCase {
      */
     private PosInOccurrence getPioFirstFormula(Sequent sequent) {
         return new PosInOccurrence(sequent.succedent().getFirst(),
-                PosInTerm.getTopLevel(), false);
+                PosInTerm.<JavaDLTerm>getTopLevel(), false);
     }
 
     /**

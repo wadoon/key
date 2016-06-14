@@ -26,6 +26,10 @@ import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.op.SchemaVariable;
 
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.parser.schemajava.ParseException;
+import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import recoder.ParserException;
 import recoder.convenience.TreeWalker;
 import recoder.java.Comment;
@@ -50,10 +54,6 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.parser.schemajava.ParseException;
-import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 
 public class SchemaJavaProgramFactory extends JavaProgramFactory {
 

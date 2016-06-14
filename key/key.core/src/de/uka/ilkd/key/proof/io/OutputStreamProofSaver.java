@@ -32,7 +32,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -441,8 +441,8 @@ public class OutputStreamProofSaver {
     }
 
 
-   public static String posInTerm2Proof(PosInTerm pos) {
-      if (pos == PosInTerm.getTopLevel()) return "";
+   public static String posInTerm2Proof(PosInTerm<JavaDLTerm> pos) {
+      if (pos == PosInTerm.<JavaDLTerm>getTopLevel()) return "";
       String s = " (term \"";
       String list = pos.integerList(pos.reverseIterator()); // cheaper to read in
       s = s + list.substring(1,list.length()-1); // chop off "[" and "]"

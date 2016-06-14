@@ -13,12 +13,15 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
 /**
  * This interface represents an iterator, iterating the nodes on the
  * path between the root of a term and a position within the term,
  * given by a <code>PosInOccurrence</code>-object
  */
-public interface PIOPathIterator extends IntIterator {
+public interface PIOPathIterator<T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<?, ?, ?, T>> extends IntIterator {
 
     /**
      * @return the number of the next child on the path, or
@@ -33,7 +36,7 @@ public interface PIOPathIterator extends IntIterator {
      * @return the current position within the term
      * (i.e. corresponding to the latest <code>next()</code>-call)
      */
-    PosInOccurrence getPosInOccurrence ();
+    PosInOccurrence<T,SeqFor> getPosInOccurrence ();
 
     /**
      * @return the current subterm this object points to
@@ -41,7 +44,7 @@ public interface PIOPathIterator extends IntIterator {
      * this method satisfies
      * <code>getPosInOccurrence().subTerm()==getSubTerm()</code>
      */
-    JavaDLTerm            getSubTerm         ();
+    T            getSubTerm         ();
 
     /**
      * @return the number of the next child on the path, or
