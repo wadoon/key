@@ -16,9 +16,6 @@ package de.uka.ilkd.key.java;
 import org.key_project.common.core.logic.GenericTermBuilder;
 import org.key_project.common.core.services.TermServices;
 
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.JavaDLVisitor;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -29,9 +26,7 @@ import de.uka.ilkd.key.logic.TermFactory;
  * @author Dominic Scheurer
  *
  */
-public interface JavaDLTermServices
-        extends
-        TermServices<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> {
+public interface JavaDLTermServices extends TermServices {
 
     /**
      * Returns the {@link GenericTermBuilder} used to create {@link Term}s.

@@ -83,12 +83,12 @@ public final class SortDependingFunction extends Function {
     }
 
     public static SortDependingFunction getFirstInstance(Name kind,
-            TermServices<?,?,?,?,?> services) {
+            TermServices services) {
         return (SortDependingFunction) services.getNamespaces().getNamespace("functions")
                 .lookup(instantiateName(kind, Sort.ANY));
     }
 
-    public SortDependingFunction getInstanceFor(Sort sort, TermServices<?,?,?,?,?> services) {
+    public SortDependingFunction getInstanceFor(Sort sort, TermServices services) {
         if (sort == this.sortDependingOn) {
             return this;
         }

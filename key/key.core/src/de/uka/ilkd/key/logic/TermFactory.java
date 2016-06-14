@@ -22,8 +22,6 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
 
 /** 
@@ -38,7 +36,7 @@ import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
  * See {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to 
  * create terms. 
  */
-public final class TermFactory implements GenericTermFactory<SourceElement, NameAbstractionTable, JavaBlock, JavaDLVisitor, JavaDLTerm> {
+public final class TermFactory implements GenericTermFactory<JavaBlock, JavaDLTerm> {
     
 
     private static final ImmutableArray<JavaDLTerm> NO_SUBTERMS = new ImmutableArray<JavaDLTerm>();

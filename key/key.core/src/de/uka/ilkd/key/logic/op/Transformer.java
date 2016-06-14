@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.sort.Sort;
@@ -89,13 +90,13 @@ public class Transformer extends Function {
      * @param pio A position in an occurrence of a term
      * @return true if inside a term transformer, false otherwise
      */
-    public static boolean inTransformer(PosInOccurrence pio) {
+    public static boolean inTransformer(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         boolean trans = false;
         if (pio == null) {
             return false;
         }
         if ( pio.posInTerm () != null ) {
-            PIOPathIterator it = pio.iterator ();
+            PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pio.iterator ();
             Operator        op;
 
             while ( it.next () != -1 && !trans) {
@@ -113,9 +114,9 @@ public class Transformer extends Function {
      * @param pio A position in an occurrence of a term
      * @return the term transformer the position is in, null otherwise
      */
-    public static Transformer getTransformer(PosInOccurrence pio) {
+    public static Transformer getTransformer(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         if ( pio.posInTerm () != null ) {
-            PIOPathIterator it = pio.iterator ();
+            PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pio.iterator ();
             Operator        op;
 
             while ( it.next () != -1) {

@@ -14,12 +14,8 @@
 package org.key_project.common.core.services;
 
 import org.key_project.common.core.logic.GenericNamespaceSet;
-import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.GenericTermBuilder;
 import org.key_project.common.core.logic.GenericTermFactory;
-import org.key_project.common.core.logic.ModalContent;
-import org.key_project.common.core.logic.Visitor;
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 
 /**
  * This interface defines the basic functionalities of services
@@ -33,7 +29,7 @@ import org.key_project.common.core.program.GenericNameAbstractionTable;
  * @param <N> Name abstraction table type
  * @param <P> Program type
  */
-public interface TermServices<S, N extends GenericNameAbstractionTable<S>, P extends ModalContent<S, N>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>> {
+public interface TermServices {
 
     /**
      * returns the namespaces for functions, predicates etc.
@@ -45,12 +41,12 @@ public interface TermServices<S, N extends GenericNameAbstractionTable<S>, P ext
      * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
      * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
-    public abstract <TB extends GenericTermBuilder<S, N, P, V, T>> TB getTermBuilder();
+    public abstract <TB extends GenericTermBuilder<?, ?>> TB getTermBuilder();
 
     /**
      * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
      * @return The {@link GenericTermBuilder} used to create {@link Term}s.
      */
-    public abstract <TF extends GenericTermFactory<S, N, P, V, T>> TF getTermFactory();
+    public abstract <TF extends GenericTermFactory<?, ?>> TF getTermFactory();
 
 }

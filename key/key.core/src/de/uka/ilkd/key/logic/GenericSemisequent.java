@@ -513,7 +513,7 @@ public abstract class GenericSemisequent<T extends GenericTerm<?, ?, ?, T>, SeqF
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<T, SeqFor, ? extends GenericSemisequent<T,SeqFor>> remove(int idx) {
+    public GenericSemisequentChangeInfo<T, SeqFor, ?> remove(int idx) {
 
         ImmutableList<SeqFor> newList = seqList;
         ImmutableList<SeqFor> queue = ImmutableSLList.<SeqFor> nil();

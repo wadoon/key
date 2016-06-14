@@ -3,10 +3,9 @@ package org.key_project.common.core.logic;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.program.GenericNameAbstractionTable;
 import org.key_project.util.collection.ImmutableArray;
 
-public interface GenericTermFactory<S,  N extends GenericNameAbstractionTable<S>, P extends ModalContent<S, N>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>> {
+public interface GenericTermFactory<P extends ModalContent<?, ?>, T extends GenericTerm<?, ?, ?, T>> {
     
     /**
      * Master method for term creation. Should be the only place where terms are
