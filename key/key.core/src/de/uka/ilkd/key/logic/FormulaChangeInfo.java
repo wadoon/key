@@ -29,8 +29,8 @@ public class FormulaChangeInfo<SeqFor extends SequentFormula<?>> {
         return getPositionOfModification().sequentFormula();
     }
 
-    // FIXME: We might have to include the Term type as generic argument for
-    // callers of the method below...
+    // FIXME (DS): We might have to include the Term type as generic argument
+    // for callers of the method below...
 
     /**
      * @return position within the original formula

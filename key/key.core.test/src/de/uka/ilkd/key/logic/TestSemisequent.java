@@ -73,7 +73,7 @@ public class TestSemisequent extends TestCase {
         con = null;
     }
 
-    private Semisequent extract(SemisequentChangeInfo semiCI) {
+    private Semisequent extract(GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> semiCI) {
         return semiCI.semisequent();
     }
 
@@ -278,7 +278,7 @@ public class TestSemisequent extends TestCase {
                         .prepend(con.get(6)).prepend(con.get(5))
                         .prepend(con.get(4));
 
-        SemisequentChangeInfo result =
+        GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> result =
                 origin.replace(origin.size() - 1, insertionList);
 
         assertEquals(
@@ -316,7 +316,7 @@ public class TestSemisequent extends TestCase {
                         .prepend(con.get(6)).prepend(con.get(5))
                         .prepend(con.get(4));
 
-        SemisequentChangeInfo sci =
+        GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> sci =
                 origin.replace(origin.size(), insertionList);
         assertEquals(
                 "SemisequentChangeInfo is corrupt due to wrong added formula list:",
