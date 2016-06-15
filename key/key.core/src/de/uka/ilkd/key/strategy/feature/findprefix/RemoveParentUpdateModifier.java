@@ -13,8 +13,10 @@
 
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
 

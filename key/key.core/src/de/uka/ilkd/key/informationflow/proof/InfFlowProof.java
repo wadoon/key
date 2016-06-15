@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.informationflow.proof;
 
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;

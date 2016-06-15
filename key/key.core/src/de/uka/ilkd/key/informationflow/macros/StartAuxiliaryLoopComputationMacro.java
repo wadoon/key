@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.informationflow.macros;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;

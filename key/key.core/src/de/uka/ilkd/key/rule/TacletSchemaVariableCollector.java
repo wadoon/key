@@ -26,7 +26,11 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.TermLabelSV;

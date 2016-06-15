@@ -4,15 +4,35 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.common.core.logic.op.*;
-import org.key_project.util.collection.*;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SVSubstitute;
+import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.UpdateApplication;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.JavaDLTermServices;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.IfMatchResult;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.NotFreeIn;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletMatcher;
+import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 
 /** 

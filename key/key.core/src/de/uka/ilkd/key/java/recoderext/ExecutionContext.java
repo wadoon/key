@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
 import recoder.java.Expression;
 import recoder.java.ExpressionContainer;
 import recoder.java.JavaNonTerminalProgramElement;
@@ -25,6 +24,7 @@ import recoder.java.SourceVisitor;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
+import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
 
 public class ExecutionContext
     extends JavaNonTerminalProgramElement 

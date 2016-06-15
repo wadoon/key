@@ -16,6 +16,7 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.common.core.logic.sort.Sort;

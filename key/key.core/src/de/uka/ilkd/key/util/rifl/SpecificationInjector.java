@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
 import recoder.abstraction.ClassType;
 import recoder.java.Comment;
 import recoder.java.CompilationUnit;
@@ -36,6 +35,7 @@ import recoder.java.declaration.ParameterDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.SourceInfo;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
 
 /**
  * Writes JML* translation of RIFL specifications to Java files. This is a

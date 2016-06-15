@@ -25,6 +25,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import recoder.abstraction.ClassType;
+import recoder.abstraction.Constructor;
+import recoder.java.CompilationUnit;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -44,9 +47,6 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Constructor;
-import recoder.java.CompilationUnit;
 
 public class KeYProgModelInfo{
 

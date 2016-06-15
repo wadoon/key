@@ -13,9 +13,20 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.key_project.common.core.logic.op.*;
+import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.Quantifier;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -31,7 +42,18 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
-import de.uka.ilkd.key.smt.lang.*;
+import de.uka.ilkd.key.smt.lang.SMTFile;
+import de.uka.ilkd.key.smt.lang.SMTFunction;
+import de.uka.ilkd.key.smt.lang.SMTFunctionDef;
+import de.uka.ilkd.key.smt.lang.SMTSort;
+import de.uka.ilkd.key.smt.lang.SMTTerm;
+import de.uka.ilkd.key.smt.lang.SMTTermCall;
+import de.uka.ilkd.key.smt.lang.SMTTermITE;
+import de.uka.ilkd.key.smt.lang.SMTTermMultOp;
+import de.uka.ilkd.key.smt.lang.SMTTermNumber;
+import de.uka.ilkd.key.smt.lang.SMTTermUnaryOp;
+import de.uka.ilkd.key.smt.lang.SMTTermVariable;
+import de.uka.ilkd.key.smt.lang.Util;
 import de.uka.ilkd.key.util.Debug;
 
 public class SMTObjTranslator implements SMTTranslator {

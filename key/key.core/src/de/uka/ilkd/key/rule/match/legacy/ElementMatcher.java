@@ -1,18 +1,37 @@
 package de.uka.ilkd.key.rule.match.legacy;
 
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.common.core.logic.op.*;
+import org.key_project.common.core.logic.op.AbstractSV;
+import org.key_project.common.core.logic.op.ElementaryUpdate;
+import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SVSubstitute;
+import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.TermLabelSV;
+import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.rule.inst.GenericSortCondition;
+import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.SortException;
+import de.uka.ilkd.key.rule.inst.TermLabelInstantiationEntry;
 import de.uka.ilkd.key.util.Debug;
 
 

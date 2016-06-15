@@ -40,7 +40,7 @@ public class Semisequent extends
      *
      * @param seqList
      */
-    Semisequent(SequentFormula<JavaDLTerm> seqList) {
+    public Semisequent(SequentFormula<JavaDLTerm> seqList) {
         super(seqList);
     }
 

@@ -13,8 +13,12 @@
 
 package de.uka.ilkd.key.logic.label;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.key_project.common.core.logic.GenericTermFactory;
 import org.key_project.common.core.logic.Name;
@@ -31,14 +35,27 @@ import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.label.*;
+import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.TermLabelMerger;
+import de.uka.ilkd.key.rule.label.TermLabelPolicy;
+import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
+import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**

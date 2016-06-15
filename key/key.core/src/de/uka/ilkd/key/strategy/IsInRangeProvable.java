@@ -3,6 +3,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -13,7 +14,6 @@ import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;

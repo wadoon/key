@@ -3,11 +3,13 @@ package de.uka.ilkd.key.informationflow.macros;
 import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
 import de.uka.ilkd.key.proof.Goal;

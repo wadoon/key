@@ -31,8 +31,16 @@ import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCostCollector;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 

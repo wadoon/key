@@ -25,7 +25,12 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ScopeDefiningElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;

@@ -24,7 +24,11 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.JavaReduxFileCollection;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;

@@ -16,7 +16,11 @@ package de.uka.ilkd.key.speclang;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

@@ -23,6 +23,7 @@
 
 package de.uka.ilkd.key.taclettranslation;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.Taclet;
 

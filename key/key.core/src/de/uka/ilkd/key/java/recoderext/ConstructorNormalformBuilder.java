@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
@@ -59,6 +58,7 @@ import recoder.java.reference.VariableReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * Transforms the constructors of the given class to their

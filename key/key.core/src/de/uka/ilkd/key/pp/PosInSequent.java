@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.pp;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
 /**

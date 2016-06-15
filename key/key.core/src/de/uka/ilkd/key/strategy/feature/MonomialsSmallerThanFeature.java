@@ -27,7 +27,11 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termfeature.*;
+import de.uka.ilkd.key.strategy.termfeature.BinarySumTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.ConstTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
+import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 
 /**

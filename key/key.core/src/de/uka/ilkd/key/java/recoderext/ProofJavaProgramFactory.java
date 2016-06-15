@@ -21,9 +21,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
-import de.uka.ilkd.key.parser.proofjava.ParseException;
-import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.convenience.TreeWalker;
@@ -52,6 +49,9 @@ import recoder.java.reference.VariableReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
+import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
+import de.uka.ilkd.key.parser.proofjava.ParseException;
+import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 
 public class ProofJavaProgramFactory extends JavaProgramFactory {
     

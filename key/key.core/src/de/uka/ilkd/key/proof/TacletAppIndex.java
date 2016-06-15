@@ -31,7 +31,14 @@ import de.uka.ilkd.key.proof.rulefilter.AndRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.NoFindTaclet;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
 

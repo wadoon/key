@@ -25,14 +25,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLFieldDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
@@ -60,6 +52,14 @@ import recoder.java.statement.EmptyStatement;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLFieldDecl;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
 /**

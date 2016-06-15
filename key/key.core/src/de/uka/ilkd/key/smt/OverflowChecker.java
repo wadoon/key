@@ -18,7 +18,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import de.uka.ilkd.key.smt.lang.*;
+import de.uka.ilkd.key.smt.lang.SMTSort;
+import de.uka.ilkd.key.smt.lang.SMTTerm;
+import de.uka.ilkd.key.smt.lang.SMTTermCall;
+import de.uka.ilkd.key.smt.lang.SMTTermITE;
+import de.uka.ilkd.key.smt.lang.SMTTermMultOp;
+import de.uka.ilkd.key.smt.lang.SMTTermNumber;
+import de.uka.ilkd.key.smt.lang.SMTTermQuant;
+import de.uka.ilkd.key.smt.lang.SMTTermUnaryOp;
+import de.uka.ilkd.key.smt.lang.SMTTermVariable;
 
 public class OverflowChecker {
 

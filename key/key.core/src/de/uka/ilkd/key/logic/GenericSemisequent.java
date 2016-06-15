@@ -187,6 +187,7 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>, SemiS
             return new GenericSemisequentChangeInfo<SeqFor, SemiSeq>(
                     ImmutableSLList.<SeqFor> nil()) {
 
+                @SuppressWarnings("unchecked")
                 @Override
                 protected SemiSeq createSemisequent(
                         ImmutableList<SeqFor> modifiedFormulas) {

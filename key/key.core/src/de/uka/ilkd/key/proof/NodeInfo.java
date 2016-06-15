@@ -21,12 +21,23 @@ import java.util.regex.Pattern;
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.JavaSourceElement;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 
 
 /**

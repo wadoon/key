@@ -13,14 +13,23 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.smt.lang.SMTFunction;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.Util;
-import de.uka.ilkd.key.smt.model.*;
+import de.uka.ilkd.key.smt.model.Heap;
+import de.uka.ilkd.key.smt.model.Location;
+import de.uka.ilkd.key.smt.model.LocationSet;
+import de.uka.ilkd.key.smt.model.Model;
+import de.uka.ilkd.key.smt.model.ObjectVal;
+import de.uka.ilkd.key.smt.model.Sequence;
 /**
  * Represents a query directed to towards the z3 solver.
  * @author mihai

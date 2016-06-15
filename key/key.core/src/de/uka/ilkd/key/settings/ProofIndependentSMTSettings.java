@@ -13,8 +13,14 @@
 
 package de.uka.ilkd.key.settings;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.EventObject;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.SolverTypeCollection;

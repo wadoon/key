@@ -7,7 +7,8 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
+import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInTerm;
 
 /**
  * Encapsulates intermediate information for constructing a close-join-partner rule application.

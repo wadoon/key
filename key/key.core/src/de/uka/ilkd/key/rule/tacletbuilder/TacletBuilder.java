@@ -32,7 +32,15 @@ import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.NewDependingOn;
+import de.uka.ilkd.key.rule.NewVarcond;
+import de.uka.ilkd.key.rule.NotFreeIn;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletAnnotation;
+import de.uka.ilkd.key.rule.TacletAttributes;
+import de.uka.ilkd.key.rule.Trigger;
+import de.uka.ilkd.key.rule.VariableCondition;
 
 /** 
  * abstract taclet builder class to be inherited from taclet builders

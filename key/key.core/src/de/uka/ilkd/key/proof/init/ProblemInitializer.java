@@ -23,6 +23,7 @@ import java.util.Vector;
 
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SortDependingFunction;
@@ -30,6 +31,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import recoder.io.PathList;
+import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -43,7 +46,6 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -66,8 +68,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import recoder.io.PathList;
-import recoder.io.ProjectSettings;
 
 
 public final class ProblemInitializer {

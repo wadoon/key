@@ -31,7 +31,11 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.BoundVarsVisitor;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;

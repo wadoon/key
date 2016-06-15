@@ -18,7 +18,12 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SortCollector;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -30,7 +35,11 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCostCollector;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 

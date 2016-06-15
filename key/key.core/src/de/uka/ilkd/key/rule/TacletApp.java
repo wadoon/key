@@ -13,7 +13,12 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
@@ -24,19 +29,45 @@ import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaDLTermServices;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PIOPathIterator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.RenameTable;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
-import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.rule.inst.GenericSortCondition;
+import de.uka.ilkd.key.rule.inst.GenericSortException;
+import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 

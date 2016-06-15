@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.IfThenElse;

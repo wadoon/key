@@ -27,7 +27,11 @@ import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
-import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCostCollector;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
  * This macro resolves the well-definedness transformer, i.e. it applies exactly

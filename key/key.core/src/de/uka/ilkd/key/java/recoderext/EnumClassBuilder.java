@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.convenience.TreeWalker;
 import recoder.java.CompilationUnit;
@@ -35,6 +34,7 @@ import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.statement.Case;
 import recoder.kit.ProblemReport;
 import recoder.kit.TypeKit;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * 

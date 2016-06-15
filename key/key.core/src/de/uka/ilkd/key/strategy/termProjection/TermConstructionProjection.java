@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.termProjection;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;

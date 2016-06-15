@@ -28,15 +28,15 @@ import org.key_project.util.collection.Pair;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import de.uka.ilkd.key.util.DirectoryFileCollection;
-import de.uka.ilkd.key.util.FileCollection.Walker;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import de.uka.ilkd.key.util.LinkedHashMap;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
+import de.uka.ilkd.key.util.DirectoryFileCollection;
+import de.uka.ilkd.key.util.FileCollection.Walker;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * Facet class for interpreting RIFL specifications. The Requirements for

@@ -24,6 +24,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import recoder.ServiceConfiguration;
+import recoder.service.NameInfo;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -50,8 +52,6 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
-import recoder.ServiceConfiguration;
-import recoder.service.NameInfo;
 
 /**
  * provide means to convert recoder types to the corresponding KeY type
