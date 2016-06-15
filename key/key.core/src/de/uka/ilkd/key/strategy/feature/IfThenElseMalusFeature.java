@@ -55,7 +55,7 @@ public class IfThenElseMalusFeature implements Feature {
 
         int res = 0;
 
-        final PIOPathIterator it = pos.iterator ();
+        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator ();
         while ( true ) {
             final int ind = it.next ();
             if ( ind == -1 ) break;

@@ -83,11 +83,11 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * preceding update has changed
      */
     private boolean subformulaOrPreceedingUpdateHasChanged ( Goal p_goal ) {
-    	ImmutableList<FormulaChangeInfo> infoList =
+    	ImmutableList<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> infoList =
     	    p_goal.getFormulaTagManager().getModifications(positionTag);
 
 	while ( !infoList.isEmpty () ) {
-	    final FormulaChangeInfo info = infoList.head ();
+	    final FormulaChangeInfo<SequentFormula<JavaDLTerm>> info = infoList.head ();
 	    infoList = infoList.tail ();
 	    
 	    final SequentFormula<JavaDLTerm> newFormula = info.getNewFormula();
@@ -118,8 +118,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
      */
     private boolean independentSubformulas(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> changePos,
                                            SequentFormula<JavaDLTerm> newFormula) {
-        final PIOPathIterator changePIO = changePos.iterator ();
-        final PIOPathIterator appPIO = applicationPosition.iterator ();
+        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> changePIO = changePos.iterator ();
+        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> appPIO = applicationPosition.iterator ();
 
         while ( true ) {
             final int changeIndex = changePIO.next ();

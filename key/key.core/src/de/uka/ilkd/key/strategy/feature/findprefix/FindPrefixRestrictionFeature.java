@@ -59,7 +59,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
 
         public void checkOperator(Operator op,
-                                  PIOPathIterator it) {
+                                  PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it) {
             checker.checkOperator(op, it);
         }
 
@@ -167,7 +167,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
         // iterate through the prefix and let the prefix checkers do their work
         if (pos.posInTerm() != null) {
-            PIOPathIterator it = pos.iterator();
+            PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator();
             Operator op;
 
             while (it.next() != -1) {
