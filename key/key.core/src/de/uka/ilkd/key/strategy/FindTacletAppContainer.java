@@ -82,6 +82,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * this object has been altered since the creation of this object or if a 
      * preceding update has changed
      */
+    @SuppressWarnings("unchecked")
     private boolean subformulaOrPreceedingUpdateHasChanged ( Goal p_goal ) {
     	ImmutableList<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> infoList =
     	    p_goal.getFormulaTagManager().getModifications(positionTag);
@@ -96,7 +97,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
             // of the rule app object
             return false;
 
-	    if ( !independentSubformulas ( info.getPositionOfModification(),
+	    if ( !independentSubformulas ( (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>) info.getPositionOfModification(),
 	                                   newFormula ) )
 	        return true;
 	}

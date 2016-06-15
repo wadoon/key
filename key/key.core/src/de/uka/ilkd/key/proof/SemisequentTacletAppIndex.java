@@ -183,7 +183,8 @@ public class SemisequentTacletAppIndex {
                 addTermIndex ( newFor, newSeq, services, tacletIndex,
                                listener );
             else {
-                final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPos = info.getPositionOfModification ();
+                @SuppressWarnings("unchecked")
+                final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPos = (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>) info.getPositionOfModification ();
                 final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos = oldPos.replaceConstrainedFormula ( newFor );
                 termIndices = termIndices.put ( newFor,
                                                 oldIndex.update ( newPos,

@@ -201,8 +201,9 @@ public class FormulaTagManager {
                              Goal              p_goal ) {
      
  
-	final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPIO  =
-	    p_info.getPositionOfModification().topLevel();
+	@SuppressWarnings("unchecked")
+    final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPIO  =
+	    (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>) p_info.getPositionOfModification().topLevel();
         final FormulaTag      tag     = getTagForPos ( oldPIO );
         final FormulaInfo     oldInfo = getFormulaInfo(tag);
         final FormulaInfo     newInfo =
