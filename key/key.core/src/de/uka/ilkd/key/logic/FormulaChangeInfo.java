@@ -4,6 +4,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 
 /**
  * This class is used to hold information about modified formulas.
+ * 
  * @see GenericSemisequentChangeInfo
  * @see GenericSequentChangeInfo
  */
@@ -20,14 +21,16 @@ public class FormulaChangeInfo<SeqFor extends SequentFormula<?>> {
         this.positionOfModification = positionOfModification;
     }
 
-
     public SeqFor getNewFormula() {
         return newFormula;
     }
 
     public SeqFor getOriginalFormula() {
-        return getPositionOfModification ().sequentFormula ();
+        return getPositionOfModification().sequentFormula();
     }
+
+    // FIXME: We might have to include the Term type as generic argument for
+    // callers of the method below...
 
     /**
      * @return position within the original formula
@@ -37,8 +40,7 @@ public class FormulaChangeInfo<SeqFor extends SequentFormula<?>> {
     }
 
     public String toString() {
-        return
-                "Replaced " + positionOfModification +
+        return "Replaced " + positionOfModification +
                 " with " + newFormula;
     }
 
