@@ -23,10 +23,10 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
 
     protected abstract GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> createSemisequentChangeInfo(
             ImmutableList<SeqFor> formulas);
-    
+
     // inner class used to represent an empty semisequent
-    static class Empty<SeqFor extends SequentFormula<?>>
-            extends GenericSemisequent<SeqFor> {
+    static class Empty<SeqFor extends SequentFormula<?>> extends
+            GenericSemisequent<SeqFor> {
 
         private Empty() {
             super();
@@ -42,7 +42,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
          * @return semisequent change information object with new semisequent
          *         with sequentFormula at place idx
          */
-        public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insert(int idx, SeqFor sequentFormula) {
+        public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insert(
+                int idx, SeqFor sequentFormula) {
             return insertFirst(sequentFormula);
         }
 
@@ -54,7 +55,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
          * @return semisequent change information object with new semisequent
          *         with sequentFormula at place idx
          */
-        public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertFirst(SeqFor sequentFormula) {
+        public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertFirst(
+                SeqFor sequentFormula) {
             final GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> sci =
                     createSemisequentChangeInfo(ImmutableSLList.<SeqFor> nil()
                             .prepend(sequentFormula));
@@ -70,7 +72,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
          * @return semisequent change information object with new semisequent
          *         with sequentFormula at place idx
          */
-        public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertLast(SeqFor sequentFormula) {
+        public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertLast(
+                SeqFor sequentFormula) {
             return insertFirst(sequentFormula);
         }
 
@@ -94,7 +97,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
          * @return semisequent change information object with new semisequent
          *         with sequentFormula at place idx
          */
-        public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(int idx, SeqFor sequentFormula) {
+        public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(
+                int idx, SeqFor sequentFormula) {
             return insertFirst(sequentFormula);
         }
 
@@ -111,7 +115,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
          * @return semisequent change information object with an empty
          *         semisequent as result
          */
-        public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> remove(int idx) {
+        public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> remove(
+                int idx) {
             return createSemisequentChangeInfo(ImmutableSLList.<SeqFor> nil());
         }
 
@@ -168,20 +173,26 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
             return "[]";
         }
 
-        /* (non-Javadoc)
-         * @see de.uka.ilkd.key.logic.GenericSemisequent#createSemisequentChangeInfo(org.key_project.util.collection.ImmutableList)
+        /*
+         * (non-Javadoc)
+         * 
+         * @see
+         * de.uka.ilkd.key.logic.GenericSemisequent#createSemisequentChangeInfo
+         * (org.key_project.util.collection.ImmutableList)
          */
         @Override
         protected GenericSemisequentChangeInfo<SeqFor, GenericSemisequent<SeqFor>> createSemisequentChangeInfo(
                 ImmutableList<SeqFor> formulas) {
-            return new GenericSemisequentChangeInfo<SeqFor, GenericSemisequent<SeqFor>>(ImmutableSLList.<SeqFor>nil()) {
+            return new GenericSemisequentChangeInfo<SeqFor, GenericSemisequent<SeqFor>>(
+                    ImmutableSLList.<SeqFor> nil()) {
 
                 @Override
                 protected GenericSemisequent<SeqFor> createSemisequent(
                         ImmutableList<SeqFor> modifiedFormulas) {
-                    return GenericSemisequent.<SeqFor,GenericSemisequent<SeqFor>>nil();
+                    return GenericSemisequent
+                            .<SeqFor, GenericSemisequent<SeqFor>> nil();
                 }
-                
+
             };
         }
     }
@@ -222,7 +233,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insert(int idx, SeqFor sequentFormula) {
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insert(
+            int idx, SeqFor sequentFormula) {
         return removeRedundance(idx, sequentFormula);
     }
 
@@ -237,8 +249,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insert(int idx,
-            ImmutableList<SeqFor> insertionList) {
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insert(
+            int idx, ImmutableList<SeqFor> insertionList) {
         return removeRedundance(idx, insertionList);
     }
 
@@ -251,7 +263,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertFirst(SeqFor sequentFormula) {
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertFirst(
+            SeqFor sequentFormula) {
         return insert(0, sequentFormula);
     }
 
@@ -264,7 +277,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertFirst(ImmutableList<SeqFor> insertions) {
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertFirst(
+            ImmutableList<SeqFor> insertions) {
         return insert(0, insertions);
     }
 
@@ -278,7 +292,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertLast(SeqFor sequentFormula) {
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertLast(
+            SeqFor sequentFormula) {
         return insert(size(), sequentFormula);
     }
 
@@ -292,7 +307,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertLast(ImmutableList<SeqFor> insertions) {
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertLast(
+            ImmutableList<SeqFor> insertions) {
         return insert(size(), insertions);
     }
 
@@ -317,8 +333,10 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    private GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertAndRemoveRedundancyHelper(int idx,
-            SeqFor sequentFormula, GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> semiCI,
+    private GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertAndRemoveRedundancyHelper(
+            int idx,
+            SeqFor sequentFormula,
+            GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> semiCI,
             FormulaChangeInfo<SeqFor> fci) {
 
         // Search for equivalent formulas and weakest constraint
@@ -332,6 +350,10 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
             cf = searchList.head();
             searchList = searchList.tail();
 
+            // FIXME (DS):
+            // the lines below compile if we set the generic type argument of
+            // GenericSemisequent to "<T extends GenericTerm<?, ?, ?, T>, SeqFor
+            // extends SequentFormula<T>".
             if (sequentFormula != null
                     && cf.formula().equalsModRenaming(sequentFormula.formula())) {
 
@@ -380,7 +402,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    private GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertAndRemoveRedundancy(int idx,
+    private GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertAndRemoveRedundancy(
+            int idx,
             ImmutableList<SeqFor> sequentFormulasToBeInserted,
             GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> sci) {
 
@@ -415,8 +438,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    private GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> removeRedundance(int idx,
-            ImmutableList<SeqFor> sequentFormula) {
+    private GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> removeRedundance(
+            int idx, ImmutableList<SeqFor> sequentFormula) {
         return insertAndRemoveRedundancy(idx, sequentFormula,
                 createSemisequentChangeInfo(seqList));
     }
@@ -433,8 +456,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return new Semisequent with sequentFormula at index idx and removed
      *         redundancies
      */
-    private GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> removeRedundance(int idx,
-            SeqFor sequentFormula) {
+    private GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> removeRedundance(
+            int idx, SeqFor sequentFormula) {
         return insertAndRemoveRedundancyHelper(idx, sequentFormula,
                 createSemisequentChangeInfo(seqList), null);
     }
@@ -451,8 +474,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(PosInOccurrence<?, SeqFor> pos,
-            SeqFor sequentFormula) {
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(
+            PosInOccurrence<?, SeqFor> pos, SeqFor sequentFormula) {
         final int idx = indexOf(pos.sequentFormula());
         final FormulaChangeInfo<SeqFor> fci =
                 new FormulaChangeInfo<SeqFor>(pos, sequentFormula);
@@ -470,7 +493,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a SemisequentChangeInfo containing the new sequent and a diff to
      *         the old one
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(int idx, SeqFor sequentFormula) {
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(
+            int idx, SeqFor sequentFormula) {
         return insertAndRemoveRedundancyHelper(idx, sequentFormula,
                 remove(idx), null);
     }
@@ -488,14 +512,14 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(PosInOccurrence<?, SeqFor> pos,
-            ImmutableList<SeqFor> replacements) {
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(
+            PosInOccurrence<?, SeqFor> pos, ImmutableList<SeqFor> replacements) {
         final int idx = indexOf(pos.sequentFormula());
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
 
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(int idx,
-            ImmutableList<SeqFor> replacements) {
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(
+            int idx, ImmutableList<SeqFor> replacements) {
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
 
@@ -537,7 +561,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
         newList = newList.prepend(queue);
 
         // create change info object
-        final GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> sci = createSemisequentChangeInfo(newList);
+        final GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> sci =
+                createSemisequentChangeInfo(newList);
         sci.removedFormula(idx, removedFormula);
 
         return sci;
