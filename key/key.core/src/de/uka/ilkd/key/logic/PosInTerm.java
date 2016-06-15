@@ -72,8 +72,11 @@ public final class PosInTerm<T extends GenericTerm<?, ?, ?, T>> {
             positions[i] = (char)j;
             ++i;
         }
-               
-        return positions.length == 0 ? getTopLevel() : new PosInTerm<>(positions, (char) positions.length, true);
+        
+        @SuppressWarnings("unchecked")
+        final PosInTerm<T> result = positions.length == 0 ? (PosInTerm<T>) TOP_LEVEL : new PosInTerm<T>(positions, (char) positions.length, true);
+        
+        return result;
     }
 
     /**
@@ -133,7 +136,11 @@ public final class PosInTerm<T extends GenericTerm<?, ?, ?, T>> {
         if (size == 0) {
             return null;
         }
-        return size == 1 ? getTopLevel() : new PosInTerm<>(positions, (char)(size - 1), true);
+        
+        @SuppressWarnings("unchecked")
+        final PosInTerm<T> result = size == 1 ? (PosInTerm<T>) TOP_LEVEL : new PosInTerm<T>(positions, (char)(size - 1), true);
+        
+        return result;
     }
 
     /**

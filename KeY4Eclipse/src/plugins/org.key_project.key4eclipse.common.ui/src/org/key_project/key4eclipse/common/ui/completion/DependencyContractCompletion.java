@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
 import org.key_project.util.eclipse.swt.viewer.AbstractSimpleHTMLLabelProvider;
 import org.key_project.util.java.ObjectUtil;
