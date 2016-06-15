@@ -31,12 +31,14 @@ import org.key_project.util.collection.ImmutableSLList;
  * @author Dominic Scheurer
  *
  */
-public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor>, Seq extends GenericSequent<SeqFor, SemiSeq, Seq>>
+public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>, Seq extends GenericSequent<SeqFor, SemiSeq, Seq>>
         implements Iterable<SeqFor> {
 
-    private final GenericSemisequent<SeqFor> antecedent;
+    private final SemiSeq antecedent;
 
-    private final GenericSemisequent<SeqFor> succedent;
+    private final SemiSeq succedent;
+    
+    protected abstract AbstractSequentFactory<SemiSeq, Seq> getSequentFactory();
 
     // FIXME (DS):
     // A lot of compilation errors in this class like "seq.insertXXX" can be
@@ -49,20 +51,17 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      */
     protected GenericSequent() {
         antecedent =
-                GenericSemisequent.<SeqFor, GenericSemisequent<SeqFor>> nil();
+                GenericSemisequent.<SeqFor, SemiSeq> nil();
         succedent =
-                GenericSemisequent.<SeqFor, GenericSemisequent<SeqFor>> nil();
+                GenericSemisequent.<SeqFor, SemiSeq> nil();
     }
 
     /** creates new GenericSequent<T, SeqFor> with antecedence and succedence */
-    protected GenericSequent(GenericSemisequent<SeqFor> antecedent,
-            GenericSemisequent<SeqFor> succedent) {
+    protected GenericSequent(SemiSeq antecedent, SemiSeq succedent) {
         assert !antecedent.isEmpty() || !succedent.isEmpty();
         this.antecedent = antecedent;
         this.succedent = succedent;
     }
-    
-    protected abstract AbstractSequentFactory<?, ?> getSequentFactory();
 
     /**
      * adds a formula to the antecedent (or succedent) of the sequent. Depending
@@ -84,7 +83,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      */
     public SequentChangeInfo addFormula(SeqFor cf, boolean antec, boolean first) {
 
-        final GenericSemisequent<SeqFor> seq = antec ? antecedent : succedent;
+        final GenericSemisequent<SeqFor, SemiSeq> seq = antec ? antecedent : succedent;
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 first ? seq.insertFirst(cf) : seq.insertLast(cf);
@@ -106,7 +105,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      *         information which formulas have been added or removed
      */
     public SequentChangeInfo addFormula(SeqFor cf, PosInOccurrence<?, SeqFor> p) {
-        final GenericSemisequent<SeqFor> seq = getSemisequent(p);
+        final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 seq.insert(seq.indexOf(p.sequentFormula()), cf);
@@ -136,7 +135,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
     public SequentChangeInfo addFormula(ImmutableList<SeqFor> insertions,
             boolean antec, boolean first) {
 
-        final GenericSemisequent<SeqFor> seq = antec ? antecedent : succedent;
+        final GenericSemisequent<SeqFor, SemiSeq> seq = antec ? antecedent : succedent;
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 first ? seq.insertFirst(insertions) : seq
@@ -161,7 +160,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      */
     public SequentChangeInfo addFormula(ImmutableList<SeqFor> insertions,
             PosInOccurrence<?, SeqFor> p) {
-        final GenericSemisequent<SeqFor> seq = getSemisequent(p);
+        final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 seq.insert(seq.indexOf(p.sequentFormula()), insertions);
@@ -171,7 +170,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
     }
 
     /** returns semisequent of the antecedent to work with */
-    public GenericSemisequent<SeqFor> antecedent() {
+    public GenericSemisequent<SeqFor, SemiSeq> antecedent() {
         return antecedent;
     }
 
@@ -227,23 +226,23 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
 
     /**
      * replaces the antecedent ({@code antec} is true) of this sequent by the
-     * given {@link GenericSemisequent<SeqFor>} similar for the succedent if
+     * given {@link GenericSemisequent<SeqFor, SemiSeq>} similar for the succedent if
      * {@code antec} is false.
      * 
      * @param antec
      *            if the antecedent or succedent shall be replaced
      * @param semiSeq
-     *            the {@link GenericSemisequent<SeqFor>} to use
+     *            the {@link GenericSemisequent<SeqFor, SemiSeq>} to use
      * @return the resulting sequent
      */
     private GenericSequent<SeqFor, SemiSeq, Seq> composeSequent(boolean antec,
-            GenericSemisequent<SeqFor> semiSeq) {
+            SemiSeq semiSeq) {
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent.isEmpty()) {
-                return nil();
+                return getSequentFactory().nil();
             }
             else if (antec && succedent.isEmpty()) {
-                return nil();
+                return getSequentFactory().nil();
             }
         }
 
@@ -251,8 +250,8 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
                 || (!antec && semiSeq == succedent)) {
             return this;
         }
-
-        return new GenericSequent<SeqFor, SemiSeq, Seq>(antec ? semiSeq
+        
+        return getSequentFactory().createSequent(antec ? semiSeq
                 : antecedent, antec ? succedent : semiSeq);
     }
 
@@ -260,7 +259,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      * determines if the sequent is empty.
      * 
      * @return true iff the sequent consists of two instances of
-     *         GenericSemisequent<SeqFor>.EMPTY_SEMISEQUENT
+     *         GenericSemisequent<SeqFor, SemiSeq>.EMPTY_SEMISEQUENT
      */
     public boolean isEmpty() {
         return antecedent.isEmpty() && succedent.isEmpty();
@@ -303,7 +302,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      * returns the semisequent in which the SeqFor described by
      * PosInOccurrence<?, SeqFor> p lies
      */
-    private GenericSemisequent<SeqFor> getSemisequent(
+    private GenericSemisequent<SeqFor, SemiSeq> getSemisequent(
             PosInOccurrence<?, SeqFor> p) {
         return p.isInAntec() ? antecedent() : succedent();
     }
@@ -337,7 +336,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      *         information which formulas have been added or removed
      */
     public SequentChangeInfo removeFormula(PosInOccurrence<?, SeqFor> p) {
-        final GenericSemisequent<SeqFor> seq = getSemisequent(p);
+        final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 seq.remove(seq.indexOf(p.sequentFormula()));
@@ -370,7 +369,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
     }
 
     /** returns semisequent of the succedent to work with */
-    public GenericSemisequent<SeqFor> succedent() {
+    public GenericSemisequent<SeqFor, SemiSeq> succedent() {
         return succedent;
     }
 
@@ -402,31 +401,14 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
         return false;
     }
 
-    static class NILSequent<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor>, Seq extends GenericSequent<SeqFor, SemiSeq, Seq>>
-            extends GenericSequent<SeqFor, SemiSeq, Seq> {
-
-        public boolean isEmpty() {
-            return true;
-        }
-
-        public Iterator<SeqFor> iterator() {
-            return ImmutableSLList.<SeqFor> nil().iterator();
-        }
-
-        public boolean varIsBound(QuantifiableVariable v) {
-            return false;
-        }
-
-    }
-
-    static class SequentIterator<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor>, Seq extends GenericSequent<SeqFor, SemiSeq, Seq>>
+    static class SequentIterator<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>, Seq extends GenericSequent<SeqFor, SemiSeq, Seq>>
             implements Iterator<SeqFor> {
 
         private final Iterator<SeqFor> anteIt;
         private final Iterator<SeqFor> succIt;
 
-        SequentIterator(GenericSemisequent<SeqFor> ante,
-                GenericSemisequent<SeqFor> succ) {
+        SequentIterator(GenericSemisequent<SeqFor, SemiSeq> ante,
+                GenericSemisequent<SeqFor, SemiSeq> succ) {
             this.anteIt = ante.iterator();
             this.succIt = succ.iterator();
         }

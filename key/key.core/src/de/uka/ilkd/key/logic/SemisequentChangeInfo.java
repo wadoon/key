@@ -30,7 +30,7 @@ public class SemisequentChangeInfo extends GenericSemisequentChangeInfo<SequentF
      * @see de.uka.ilkd.key.logic.GenericSemisequentChangeInfo#createSemisequent(org.key_project.util.collection.ImmutableList)
      */
     @Override
-    protected GenericSemisequent<SequentFormula<JavaDLTerm>> createSemisequent(
+    protected Semisequent createSemisequent(
             ImmutableList<SequentFormula<JavaDLTerm>> modifiedFormulas) {
         return new Semisequent(modifiedFormulas);
     }

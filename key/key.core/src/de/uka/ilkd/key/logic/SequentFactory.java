@@ -45,7 +45,7 @@ public class SequentFactory extends AbstractSequentFactory<Semisequent, Sequent>
     @Override
     public Sequent createAnteSequent(Semisequent ante) {
         if (ante.isEmpty()) {
-            return EMPTY_SEQUENT;
+            return nil();
         }
         
         return createSequent(ante, GenericSemisequent.<SequentFormula<JavaDLTerm>, Semisequent>nil());
@@ -61,7 +61,7 @@ public class SequentFactory extends AbstractSequentFactory<Semisequent, Sequent>
     @Override
     public Sequent createSequent(Semisequent ante, Semisequent succ) {
         if (ante.isEmpty() && succ.isEmpty()) {
-            return EMPTY_SEQUENT;
+            return nil();
         }
         
         return Sequent.createSequent(ante, succ);
@@ -76,9 +76,17 @@ public class SequentFactory extends AbstractSequentFactory<Semisequent, Sequent>
     @Override
     public Sequent createSuccSequent(Semisequent succ) {
         if (succ.isEmpty()) {
-            return EMPTY_SEQUENT;
+            return nil();
         }
         
         return createSequent(GenericSemisequent.<SequentFormula<JavaDLTerm>, Semisequent>nil(), succ);
+    }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.AbstractSequentFactory#nil()
+     */
+    @Override
+    public Sequent nil() {
+        return EMPTY_SEQUENT;
     }
 }
