@@ -14,8 +14,11 @@ package de.uka.ilkd.key.gui;
 
 import javax.swing.SwingWorker;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;

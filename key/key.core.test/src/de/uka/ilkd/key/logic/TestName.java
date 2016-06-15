@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.Name;
-
 import junit.framework.TestCase;
+
+import org.key_project.common.core.logic.Name;
 
 public class TestName extends TestCase {
 

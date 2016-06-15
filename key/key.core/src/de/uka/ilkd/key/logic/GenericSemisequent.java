@@ -7,7 +7,21 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+/**
+ * TODO: Document.
+ *
+ * @author Dominic Scheurer
+ *
+ * @param <SeqFor>
+ * @param <SemiSeq>
+ */
 public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>> {
+
+    // FIXME (DS):
+    // Maybe we have to make this parametric in the change info, such that
+    // classes like de.uka.ilkd.key.logic.TestSemisequent in the key.core.test
+    // package compile. Or we have to use the Generic class there; then it might
+    // be an idea to drop subclasses of this class totally.
 
     /** the empty semisequent (using singleton pattern) */
     private static final GenericSemisequent<?, ?> EMPTY_SEMISEQUENT =
@@ -467,8 +481,9 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>, SemiS
      * replaces the element at place idx with sequentFormula
      * 
      * @param pos
-     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the position of and within the
-     *            formula below which the formula differs from the new formula
+     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
+     *            describing the position of and within the formula below which
+     *            the formula differs from the new formula
      *            <code>sequentFormula</code>
      * @param sequentFormula
      *            the SeqFor replacing the old element at index idx

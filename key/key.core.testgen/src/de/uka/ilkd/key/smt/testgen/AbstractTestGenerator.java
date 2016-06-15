@@ -7,16 +7,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-import org.key_project.common.core.logic.ModalContent;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.macros.TestGenMacro;
@@ -340,7 +340,7 @@ public abstract class AbstractTestGenerator {
    }
 
    private boolean hasModalities(JavaDLTerm t, boolean checkUpdates) {
-      final ModalContent jb = t.modalContent();
+      final JavaBlock jb = t.modalContent();
       if (jb != null && !jb.isEmpty()) {
          // System.out.println("Excluded javablock");
          return true;

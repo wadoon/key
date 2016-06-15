@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;

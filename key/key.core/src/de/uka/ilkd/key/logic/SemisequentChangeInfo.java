@@ -39,4 +39,5 @@ public class SemisequentChangeInfo extends GenericSemisequentChangeInfo<SequentF
             ImmutableList<SequentFormula<JavaDLTerm>> modifiedFormulas) {
         return new Semisequent(modifiedFormulas);
     }
+    
 }
