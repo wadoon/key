@@ -14,7 +14,7 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>, SemiS
             new Empty<>();
 
     @SuppressWarnings("unchecked")
-    public static <SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>> SemiSeq nil() {
+    protected static <SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>> SemiSeq nil() {
         return (SemiSeq) EMPTY_SEMISEQUENT;
     }
 
@@ -190,8 +190,7 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>, SemiS
                 @Override
                 protected SemiSeq createSemisequent(
                         ImmutableList<SeqFor> modifiedFormulas) {
-                    return GenericSemisequent
-                            .<SeqFor, SemiSeq> nil();
+                    return (SemiSeq) EMPTY_SEMISEQUENT;
                 }
 
             };

@@ -52,4 +52,9 @@ public class Semisequent extends
             ImmutableList<SequentFormula<JavaDLTerm>> formulas) {
         return new SemisequentChangeInfo(formulas);
     }
+
+    @SuppressWarnings("unchecked")
+    public static Semisequent nil() {
+        return GenericSemisequent.<SequentFormula<JavaDLTerm>, Semisequent>nil();
+    }
 }
