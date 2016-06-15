@@ -49,7 +49,7 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                     && !("".equals(sequentView.getHighlightedText(mousePos)))) {
 
                 JavaDLTerm t;
-                final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
+                final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc = mousePos.getPosInOccurrence();
                 if (posInOcc != null) {
                     t = posInOcc.subTerm();
                     String tOpClassString = t.op().getClass().toString();

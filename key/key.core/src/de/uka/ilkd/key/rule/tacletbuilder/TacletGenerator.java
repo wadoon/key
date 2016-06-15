@@ -17,55 +17,20 @@
  */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.LogicVariable;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.ParsableVariable;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -94,7 +59,7 @@ public class TacletGenerator {
 
     
     private TacletGoalTemplate createAxiomGoalTemplate(JavaDLTerm goalTerm) {
-        final SequentFormula axiomSf = new SequentFormula(goalTerm);
+        final SequentFormula<JavaDLTerm> axiomSf = new SequentFormula<>(goalTerm);
         final Semisequent axiomSemiSeq =
                 Semisequent.nil().insertFirst(axiomSf).semisequent();
         final Sequent axiomSeq = Sequent.createAnteSequent(axiomSemiSeq);
@@ -204,7 +169,7 @@ public class TacletGenerator {
         final TermAndBoundVarPair schemaAxiom = createSchemaTerm(originalAxiom, pvs, svs, services);
 
         // create goal template
-        SequentFormula guardedSchemaAxiom =
+        SequentFormula<JavaDLTerm> guardedSchemaAxiom =
                 generateGuard(kjt, target, services, selfSV, heapSVs, paramSVs,
                               schemaAxiom.term, tacletBuilder, satisfiabilityGuard);
         final Sequent addedSeq =
@@ -314,7 +279,7 @@ public class TacletGenerator {
         } else {
             final JavaDLTerm ifFormula = TB.exactInstance(kjt.getSort(), TB.var(
                     selfSV));
-            final SequentFormula ifCf = new SequentFormula(ifFormula);
+            final SequentFormula<JavaDLTerm> ifCf = new SequentFormula<>(ifFormula);
             final Semisequent ifSemiSeq = Semisequent.nil().insertFirst(
                     ifCf).semisequent();
             ifSeq = Sequent.createAnteSequent(ifSemiSeq);
@@ -357,7 +322,7 @@ public class TacletGenerator {
             final TermAndBoundVarPair schemaAdd = createSchemaTerm(addForumlaTerm, pvs, svs, services);
 
             final JavaDLTerm addedFormula = schemaAdd.term;
-            final SequentFormula addedCf = new SequentFormula(addedFormula);
+            final SequentFormula<JavaDLTerm> addedCf = new SequentFormula<>(addedFormula);
             final Semisequent addedSemiSeq = Semisequent.nil().insertFirst(addedCf).semisequent();
             addedSeq = Sequent.createSuccSequent(addedSemiSeq);
         } else {
@@ -420,7 +385,7 @@ public class TacletGenerator {
         final JavaDLTerm axiomSatisfiable = functionalRepresentsSatisfiability(
               target, services, heapSVs, selfSV, paramSVs, schemaRepresents,
               tacletBuilder);
-        SequentFormula addedCf = new SequentFormula(axiomSatisfiable);
+        SequentFormula<JavaDLTerm> addedCf = new SequentFormula<>(axiomSatisfiable);
         final Semisequent addedSemiSeq = Semisequent.nil().insertFirst(
                 addedCf).semisequent();
         final Sequent addedSeq = Sequent.createSuccSequent(addedSemiSeq);
@@ -604,7 +569,7 @@ public class TacletGenerator {
                        find, originalPost, services.getTermFactory())), pvs, svs, services);
 
         final JavaDLTerm addedFormula = schemaAdd.term;
-        final SequentFormula addedCf = new SequentFormula(addedFormula);
+        final SequentFormula<JavaDLTerm> addedCf = new SequentFormula<>(addedFormula);
         final Semisequent addedSemiSeq = Semisequent.nil().insertFirst(addedCf).semisequent();
         final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
 
@@ -729,7 +694,7 @@ public class TacletGenerator {
         result = result.union(limited.second);
 
         //create added sequent
-        final SequentFormula addedCf = new SequentFormula(limitedAxiom);
+        final SequentFormula<JavaDLTerm> addedCf = new SequentFormula<>(limitedAxiom);
         final Semisequent addedSemiSeq = Semisequent.nil().insertFirst(
                 addedCf).semisequent();
         final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
@@ -769,7 +734,7 @@ public class TacletGenerator {
         if (eqVersion) {
             assert !isStatic;
             final JavaDLTerm ifFormula = TB.equals(TB.var(selfSV), TB.var(eqSV));
-            final SequentFormula ifCf = new SequentFormula(ifFormula);
+            final SequentFormula<JavaDLTerm> ifCf = new SequentFormula<>(ifFormula);
             final Semisequent ifSemiSeq = Semisequent.nil().insertFirst(
                     ifCf).semisequent();
             final Sequent ifSeq = Sequent.createAnteSequent(ifSemiSeq);
@@ -1000,7 +965,7 @@ public class TacletGenerator {
     }
 
 
-    private SequentFormula generateGuard(KeYJavaType kjt,
+    private SequentFormula<JavaDLTerm> generateGuard(KeYJavaType kjt,
                                          IObserverFunction target,
                                          JavaDLTermServices services,
                                          final SchemaVariable selfSV,
@@ -1018,8 +983,8 @@ public class TacletGenerator {
                                            : TB.tt();
         //assemble formula
         final JavaDLTerm guardedAxiom = TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
-        final SequentFormula guardedAxiomCf =
-                new SequentFormula(guardedAxiom);
+        final SequentFormula<JavaDLTerm> guardedAxiomCf =
+                new SequentFormula<>(guardedAxiom);
         return guardedAxiomCf;
     }
 

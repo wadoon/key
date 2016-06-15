@@ -46,7 +46,7 @@ public class CutHeapObjectsFeature extends BinaryFeature {
     * {@inheritDoc}
     */
    @Override
-   protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+   protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
       JavaDLTerm cutFormula = SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal);
       if (cutFormula != null) {
          if (cutFormula.op() == Junctor.NOT) {
@@ -56,7 +56,7 @@ public class CutHeapObjectsFeature extends BinaryFeature {
             JavaDLTerm cutFormulaC0 = cutFormula.sub(0);
             JavaDLTerm cutFormulaC1 = cutFormula.sub(1);
             boolean contains = false;
-            Iterator<SequentFormula> iter = goal.sequent().iterator();
+            Iterator<SequentFormula<JavaDLTerm>> iter = goal.sequent().iterator();
             while (!contains && iter.hasNext()) {
                JavaDLTerm formula = iter.next().formula();
                if (formula.op() == Junctor.NOT) {

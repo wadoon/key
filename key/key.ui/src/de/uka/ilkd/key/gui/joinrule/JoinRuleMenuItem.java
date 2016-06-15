@@ -47,7 +47,7 @@ public class JoinRuleMenuItem extends JMenuItem {
      * @param mediator
      *            The KeY mediator.
      */
-    public JoinRuleMenuItem(final Goal goal, final PosInOccurrence pio,
+    public JoinRuleMenuItem(final Goal goal, final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
             final KeYMediator mediator) {
         final Services services = goal.proof().getServices();
 

@@ -42,7 +42,7 @@ public class InstantiationCostScalerFeature implements Feature {
         return new InstantiationCostScalerFeature ( costFeature, allowSplitting );
     }
 
-    public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost compute(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         
         final RuleAppCost cost = costFeature.compute ( app, pos, goal );
         

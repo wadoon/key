@@ -85,7 +85,7 @@ public abstract class AbstractSlicer {
     */
    public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation, ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
       // Solve this reference
-      PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = seedNode.getAppliedRuleApp().posInOccurrence();
       JavaDLTerm topLevel = pio.sequentFormula().formula();
       JavaDLTerm modalityTerm = TermBuilder.goBelowUpdates(topLevel);
       Services services = seedNode.proof().getServices();
@@ -107,7 +107,7 @@ public abstract class AbstractSlicer {
       if (seedNode.getAppliedRuleApp() == null) {
          throw new IllegalStateException("No rule applied on seed Node '" + seedNode.serialNr() + "'.");
       }
-      PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = seedNode.getAppliedRuleApp().posInOccurrence();
       JavaDLTerm applicationTerm = pio.subTerm();
       Pair<ImmutableList<JavaDLTerm>,JavaDLTerm> pair = TermBuilder.goBelowUpdates2(applicationTerm);
       JavaDLTerm modalityTerm = pair.second;
@@ -205,12 +205,12 @@ public abstract class AbstractSlicer {
    
    /**
     * Computes the aliases specified by the updates of the current {@link Node}
-    * at the application {@link PosInOccurrence} and computes the current {@code this} reference.
+    * at the application {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} and computes the current {@code this} reference.
     * @param node The {@link Node} to analyze.
     * @return The computed {@link SequentInfo} or {@code null} if the {@link Node} is not supported.
     */
    protected SequentInfo analyzeSequent(Node node, ImmutableList<ISymbolicEquivalenceClass> sec) {
-      PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = node.getAppliedRuleApp().posInOccurrence();
       JavaDLTerm topLevel = pio.sequentFormula().formula();
       Pair<ImmutableList<JavaDLTerm>,JavaDLTerm> pair = TermBuilder.goBelowUpdates2(topLevel);
       JavaDLTerm modalityTerm = pair.second;
@@ -277,13 +277,13 @@ public abstract class AbstractSlicer {
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
    protected void analyzeSequent(Services services, Sequent sequent, Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
-      for (SequentFormula sf : sequent.antecedent()) {
+      for (SequentFormula<JavaDLTerm> sf : sequent.antecedent()) {
          JavaDLTerm term = sf.formula();
          if (Equality.EQUALS == term.op()) {
             analyzeEquality(services, term, aliases, thisReference);
          }
       }
-      for (SequentFormula sf : sequent.succedent()) {
+      for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
          JavaDLTerm term = sf.formula();
          if (Junctor.NOT == term.op()) {
             JavaDLTerm negatedTerm = term.sub(0);

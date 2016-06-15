@@ -13,7 +13,10 @@
 
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
 import de.uka.ilkd.key.java.JavaDLTermServices;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -31,9 +34,9 @@ public interface BuiltInRule extends Rule {
      * will change the goal (this decision is made due to performance
      * reasons)
      */
-    boolean isApplicable(Goal goal, PosInOccurrence pio);
+    boolean isApplicable(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio);
     
     boolean isApplicableOnSubTerms();
 
-    IBuiltInRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services);
+    IBuiltInRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, JavaDLTermServices services);
 }

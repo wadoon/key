@@ -13,12 +13,14 @@
 
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
@@ -29,16 +31,16 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
     protected final Contract instantiation;
 
-    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio) {
+    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         this(rule, pio, null);
     }
 
-    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio, Contract contract) {
-        this(rule, pio, ImmutableSLList.<PosInOccurrence>nil(), contract);
+    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Contract contract) {
+        this(rule, pio, ImmutableSLList.<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>>nil(), contract);
     }
 
-    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
-                                      ImmutableList<PosInOccurrence> ifInsts,
+    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+                                      ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts,
                                       Contract contract) {
         super(rule, pio, ifInsts);
         this.instantiation = contract;

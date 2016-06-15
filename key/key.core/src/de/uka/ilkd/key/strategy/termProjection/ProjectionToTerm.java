@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.strategy.termProjection;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -25,5 +27,5 @@ import de.uka.ilkd.key.rule.RuleApp;
  * returning <code>null</code>
  */
 public interface ProjectionToTerm {
-    JavaDLTerm toTerm ( RuleApp app, PosInOccurrence pos, Goal goal );
+    JavaDLTerm toTerm ( RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal );
 }

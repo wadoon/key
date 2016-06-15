@@ -60,7 +60,7 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
    @Override
    public void updateLabels(TermLabelState state,
                             Services services,
-                            PosInOccurrence applicationPosInOccurrence,
+                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
                             JavaDLTerm applicationTerm,
                             JavaDLTerm modalityTerm,
                             Rule rule,

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.LRUCache;
@@ -91,7 +92,7 @@ public class ServiceCaches {
     */
    private final LRUCache<JavaDLTerm, TermInfo> betaCandidates = new LRUCache<JavaDLTerm, TermInfo> (1000);
 
-   private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache = new LRUCache<PosInOccurrence, RuleAppCost>(1000); 
+   private final LRUCache<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, RuleAppCost> ifThenElseMalusCache = new LRUCache<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, RuleAppCost>(1000); 
 
    private final LRUCache<Operator, Integer> introductionTimeCache = new LRUCache<Operator, Integer> ( 10000 );
    
@@ -131,7 +132,7 @@ public class ServiceCaches {
    private LRUCache<Pair<JavaDLTerm, JavaDLTerm>, JavaDLTerm> provedByArithSndCache = new LRUCache<Pair<JavaDLTerm, JavaDLTerm>, JavaDLTerm>(5000);
 
    /** Cache used by the exhaustive macro */
-   private Map<Node, PosInOccurrence> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence>();;
+   private Map<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>>();;
 
    
    /**
@@ -146,7 +147,7 @@ public class ServiceCaches {
       return betaCandidates;
    }
 
-   public final LRUCache<PosInOccurrence, RuleAppCost> getIfThenElseMalusCache() {
+   public final LRUCache<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, RuleAppCost> getIfThenElseMalusCache() {
       return ifThenElseMalusCache;
    }
 
@@ -190,7 +191,7 @@ public class ServiceCaches {
       return provedByArithSndCache;
    }
 
-   public final Map<Node, PosInOccurrence> getExhaustiveMacroCache() {
+   public final Map<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> getExhaustiveMacroCache() {
        return exhaustiveMacroCache;
    }
 

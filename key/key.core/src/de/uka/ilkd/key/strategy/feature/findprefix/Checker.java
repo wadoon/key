@@ -33,7 +33,7 @@ interface Checker {
      *
      * @param pos   the initial position of occurrence
      */
-    public void initPrefixCheck(PosInOccurrence pos);
+    public void initPrefixCheck(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos);
 
 
     /**

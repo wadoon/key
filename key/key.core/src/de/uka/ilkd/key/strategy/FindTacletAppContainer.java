@@ -41,10 +41,10 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * rule app was created
      */
     private final FormulaTag      positionTag;
-    private final PosInOccurrence applicationPosition;
+    private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosition;
 
     FindTacletAppContainer ( RuleApp         p_app,
-			     PosInOccurrence p_pio,
+			     PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pio,
 			     RuleAppCost     p_cost,
 			     Goal            p_goal,
                              long            p_age ) {
@@ -66,7 +66,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * considered)
      */
     protected boolean isStillApplicable ( Goal p_goal ) {
-    	final PosInOccurrence topPos =
+    	final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> topPos =
     	    p_goal.getFormulaTagManager().getPosForTag(positionTag);
 	if ( topPos == null )
 	    // the formula does not exist anymore, bail out
@@ -90,7 +90,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
 	    final FormulaChangeInfo info = infoList.head ();
 	    infoList = infoList.tail ();
 	    
-	    final SequentFormula newFormula = info.getNewFormula();
+	    final SequentFormula<JavaDLTerm> newFormula = info.getNewFormula();
         if ( newFormula == applicationPosition.sequentFormula() )
             // then there were no relevant modifications since the creation
             // of the rule app object
@@ -116,8 +116,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * positions within the formulas) and no indirect relationship exists which 
      * is established by a modification that occurred inside an update 
      */
-    private boolean independentSubformulas(PosInOccurrence changePos,
-                                           SequentFormula newFormula) {
+    private boolean independentSubformulas(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> changePos,
+                                           SequentFormula<JavaDLTerm> newFormula) {
         final PIOPathIterator changePIO = changePos.iterator ();
         final PIOPathIterator appPIO = applicationPosition.iterator ();
 
@@ -137,7 +137,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // during symbolic program execution; also consider
                 // <code>TermTacletAppIndex.updateCompleteRebuild</code>
                 if ( beforeChangeOp instanceof Modality ) {
-                    final PosInOccurrence afterChangePos =
+                    final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> afterChangePos =
                         changePos.replaceConstrainedFormula ( newFormula );
                     final JavaDLTerm afterChangeTerm = afterChangePos.subTerm ();
                     return beforeChangeOp == afterChangeTerm.op ()
@@ -174,8 +174,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
     /**
      * @return non-null for FindTaclets
      */
-    protected PosInOccurrence getPosInOccurrence ( Goal p_goal ) {
-    	final PosInOccurrence topPos =
+    protected PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getPosInOccurrence ( Goal p_goal ) {
+    	final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> topPos =
     	    p_goal.getFormulaTagManager().getPosForTag(positionTag);
 
 	assert topPos != null;

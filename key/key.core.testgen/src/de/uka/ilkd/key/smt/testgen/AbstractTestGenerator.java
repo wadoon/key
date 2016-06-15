@@ -300,9 +300,9 @@ public abstract class AbstractTestGenerator {
       final Sequent oldSequent = node.sequent();
       Sequent newSequent = Sequent.createSequent(
             Semisequent.nil(), Semisequent.nil());
-      Iterator<SequentFormula> it = oldSequent.antecedent().iterator();
+      Iterator<SequentFormula<JavaDLTerm>> it = oldSequent.antecedent().iterator();
       while (it.hasNext()) {
-         final SequentFormula sf = it.next();
+         final SequentFormula<JavaDLTerm> sf = it.next();
          // Allow updates modailities in the antecedent
          if (hasModalities(sf.formula(), false)) {
             continue;
@@ -311,7 +311,7 @@ public abstract class AbstractTestGenerator {
       }
       it = oldSequent.succedent().iterator();
       while (it.hasNext()) {
-         final SequentFormula sf = it.next();
+         final SequentFormula<JavaDLTerm> sf = it.next();
          if (hasModalities(sf.formula(), removePostCondition)) {
             continue;
          }

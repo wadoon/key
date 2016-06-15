@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -24,22 +25,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IfMismatchException;
-import de.uka.ilkd.key.proof.MissingInstantiationException;
-import de.uka.ilkd.key.proof.ModelChangeListener;
-import de.uka.ilkd.key.proof.ModelEvent;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.SVInstantiationException;
-import de.uka.ilkd.key.proof.SVInstantiationParserException;
-import de.uka.ilkd.key.proof.SortMismatchException;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SortException;
 
 public class TacletInstantiationModel {
@@ -143,7 +131,7 @@ public class TacletInstantiationModel {
 	    ImmutableList<IfFormulaInstantiation> succCand  =
 		IfFormulaInstSeq.createList ( seq, false );
 
-	    Iterator<SequentFormula> it        = ifseq.iterator();
+	    Iterator<SequentFormula<JavaDLTerm>> it        = ifseq.iterator();
 	    JavaDLTerm                         ifFma;
 	    MatchConditions              matchCond = app.matchConditions ();
 

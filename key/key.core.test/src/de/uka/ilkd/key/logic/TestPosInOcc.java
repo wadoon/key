@@ -49,8 +49,8 @@ public class TestPosInOcc extends TestCase {
 	terms[1]     = TB.func ( f, new JavaDLTerm[] { terms[0] } );
 	terms[2]     = TB.func ( p, new JavaDLTerm[] { terms[1] } );
 
-	PosInOccurrence pio = new PosInOccurrence
-	    ( new SequentFormula ( terms[2] ),
+	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
+	    ( new SequentFormula<JavaDLTerm> ( terms[2] ),
 	      PosInTerm.<JavaDLTerm>getTopLevel(),
 	    true);
 
@@ -106,24 +106,24 @@ public class TestPosInOcc extends TestCase {
         terms[0] = TB.var( x );
         terms[1] = TB.func ( f, new JavaDLTerm[] { terms[0] } );
         terms[2] = TB.func ( p, new JavaDLTerm[] { terms[1] } );
-        SequentFormula cfma = new SequentFormula ( terms[2] );
+        SequentFormula<JavaDLTerm> cfma = new SequentFormula<JavaDLTerm> ( terms[2] );
 
         JavaDLTerm terms2[] = new JavaDLTerm[4];
         terms2[0] = TB.func ( c );
         terms2[1] = TB.func ( f, new JavaDLTerm[] { terms2[0] } );
         terms2[2] = TB.func ( f, new JavaDLTerm[] { terms2[1] } );
         terms2[3] = TB.func ( p, new JavaDLTerm[] { terms2[2] } );
-        SequentFormula cfma2 = new SequentFormula ( terms2[3] );
+        SequentFormula<JavaDLTerm> cfma2 = new SequentFormula<JavaDLTerm> ( terms2[3] );
 
-        final PosInOccurrence topPIO = new PosInOccurrence ( cfma,
+        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> topPIO = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( cfma,
                                                              PosInTerm.<JavaDLTerm>getTopLevel(),
                                                              true );
 
 
         // Test without metavariables involved
-        PosInOccurrence pio = topPIO.down ( 0 );
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = topPIO.down ( 0 );
         assertTrue ( pio.subTerm () == terms[1] );
-        PosInOccurrence pio2 = pio.replaceConstrainedFormula ( cfma );
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio2 = pio.replaceConstrainedFormula ( cfma );
         assertEquals ( pio, pio2 );
         pio = pio.replaceConstrainedFormula ( cfma2 );
         assertTrue ( pio.subTerm () == terms2[2] );

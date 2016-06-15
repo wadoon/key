@@ -15,6 +15,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -43,7 +44,7 @@ public class PosTacletApp extends TacletApp {
     /** stores the information where the Taclet is to be applied. This means where
      * the find section of the taclet matches
      */
-    private final PosInOccurrence pos;
+    private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos;
 
     /** creates a PosTacletApp for the given taclet with some known instantiations
      * and a position information
@@ -54,14 +55,14 @@ public class PosTacletApp extends TacletApp {
      * use the method "setIfFormulaInstantiations".
      * @param taclet the FindTaclet
      * @param instantiations the SVInstantiations
-     * @param pos the PosInOccurrence storing the position where to apply the
+     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> storing the position where to apply the
      * Taclet
      * @return new PosTacletApp or null if conditions (assertions) have been hurted
      */
     public static PosTacletApp
 	createPosTacletApp(FindTaclet       taclet,
 			   SVInstantiations instantiations,
-			   PosInOccurrence  pos,
+			   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>  pos,
 			   Services services) {
 	return createPosTacletApp ( taclet,
 				    instantiations,
@@ -74,7 +75,7 @@ public class PosTacletApp extends TacletApp {
 	createPosTacletApp(FindTaclet                   taclet,
 			   SVInstantiations             instantiations,
 			   ImmutableList<IfFormulaInstantiation> ifInstantiations,
-			   PosInOccurrence              pos,
+			   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>              pos,
 			   Services                     services) {
 	Debug.assertTrue ( ifInstsCorrectSize ( taclet, ifInstantiations ),
 			   "If instantiations list has wrong size" );
@@ -96,7 +97,7 @@ public class PosTacletApp extends TacletApp {
 
     public static PosTacletApp createPosTacletApp(FindTaclet         taclet,
 						  MatchConditions    matchCond,
-						  PosInOccurrence    pos,
+						  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>    pos,
 						  Services           services) {
 	return createPosTacletApp ( taclet,
 				    matchCond.getInstantiations   (),
@@ -109,10 +110,10 @@ public class PosTacletApp extends TacletApp {
     /** creates a PosTacletApp for the given taclet
      * and a position information
      * @param taclet the FindTaclet
-     * @param pos the PosInOccurrence storing the position where to apply the
+     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> storing the position where to apply the
      * Taclet
      */
-    private PosTacletApp(FindTaclet taclet, PosInOccurrence pos) {
+    private PosTacletApp(FindTaclet taclet, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
 	super(taclet);
 	this.pos = pos;
     }
@@ -121,13 +122,13 @@ public class PosTacletApp extends TacletApp {
      * and a position information
      * @param taclet the FindTaclet
      * @param instantiations the SVInstantiations
-     * @param pos the PosInOccurrence storing the position where to apply the
+     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> storing the position where to apply the
      * Taclet
      */
     private PosTacletApp(FindTaclet                   taclet,
 			 SVInstantiations             instantiations,
 			 ImmutableList<IfFormulaInstantiation> ifInstantiations,
-			 PosInOccurrence              pos) {
+			 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>              pos) {
 	super(taclet,
 	      instantiations,
 	      ifInstantiations);
@@ -145,7 +146,7 @@ public class PosTacletApp extends TacletApp {
      * indicated application position of the TacletApp.
      */
     private static ImmutableSet<QuantifiableVariable> varsBoundAboveFindPos
-	(Taclet taclet, PosInOccurrence pos) {
+	(Taclet taclet, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
 
 	if (!(taclet instanceof RewriteTaclet)) {
 	    return DefaultImmutableSet.<QuantifiableVariable>nil();
@@ -179,7 +180,7 @@ public class PosTacletApp extends TacletApp {
     private static SVInstantiations resolveCollisionWithContext(
 	    Taclet taclet,
 	    SVInstantiations insts,
-	    PosInOccurrence pos,
+	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
 	    Services services){
 
 	if (taclet.isContextInPrefix()) {
@@ -351,11 +352,11 @@ public class PosTacletApp extends TacletApp {
     }
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula and
+     * returns the PositionInOccurrence (representing a SequentFormula<JavaDLTerm> and
      * a position in the corresponding formula)
-     * @return the PosInOccurrence
+     * @return the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
      */
-    public PosInOccurrence posInOccurrence() {
+    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence() {
 	return pos;
     }
 

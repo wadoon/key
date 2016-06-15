@@ -5,24 +5,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 
 public class RuleCommand extends AbstractCommand {
 
@@ -145,23 +141,23 @@ public class RuleCommand extends AbstractCommand {
         index.autoModeStopped ();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
-        for (SequentFormula sf : g.node().sequent().antecedent()) {
+        for (SequentFormula<JavaDLTerm> sf : g.node().sequent().antecedent()) {
             if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;
             }
             allApps = allApps.append(
                     index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(), true),
+                            new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(), true),
                             services));
         }
 
-        for (SequentFormula sf : g.node().sequent().succedent()) {
+        for (SequentFormula<JavaDLTerm> sf : g.node().sequent().succedent()) {
             if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;
             }
             allApps = allApps.append(
                     index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(), false),
+                            new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(), false),
                             services));
         }
 

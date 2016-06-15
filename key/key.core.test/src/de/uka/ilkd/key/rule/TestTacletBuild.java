@@ -102,7 +102,7 @@ public class TestTacletBuild extends TestCase {
 	JavaDLTerm t1=tb.all((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.nil().insert
-	     (0, new SequentFormula(t1)).semisequent());
+	     (0, new SequentFormula<>(t1)).semisequent());
 	JavaDLTerm t2=tb.ex((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setIfSequent(seq);
@@ -128,8 +128,8 @@ public class TestTacletBuild extends TestCase {
 	JavaDLTerm t2=tb.ex((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.nil()
-	     .insert(0, new SequentFormula(t1)).semisequent()
-	     .insert(1, new SequentFormula(t2)).semisequent());
+	     .insert(0, new SequentFormula<>(t1)).semisequent()
+	     .insert(1, new SequentFormula<>(t2)).semisequent());
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setIfSequent(seq);
 	sb.setFind(A);

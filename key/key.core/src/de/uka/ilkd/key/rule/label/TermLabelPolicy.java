@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule.label;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -32,7 +33,7 @@ import de.uka.ilkd.key.rule.Rule;
 /**
  * <p>
  * A {@link TermLabelPolicy} is used by
- * {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, JavaDLTerm, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
+ * {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, JavaDLTerm, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
  * to decide for each {@link TermLabel} of an old {@link JavaDLTerm} if it
  * should be re-added to the new {@link JavaDLTerm} or not.
  * </p>
@@ -51,8 +52,8 @@ public interface TermLabelPolicy {
     * provided by the application {@link JavaDLTerm}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
-    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
     * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
@@ -67,7 +68,7 @@ public interface TermLabelPolicy {
     */
    public TermLabel keepLabel(TermLabelState state,
                               Services services,
-                              PosInOccurrence applicationPosInOccurrence,
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
                               JavaDLTerm applicationTerm,
                               Rule rule,
                               Goal goal,

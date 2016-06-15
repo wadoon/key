@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.Taclet;
 public class TriggerVariableInstantiationProjection implements ProjectionToTerm  {
 
     @Override
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         assert app.rule() instanceof Taclet;
         final Taclet t = (Taclet) app.rule();
         

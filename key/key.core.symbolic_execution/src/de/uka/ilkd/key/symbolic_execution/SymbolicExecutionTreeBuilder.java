@@ -289,7 +289,7 @@ public class SymbolicExecutionTreeBuilder {
    protected void initMethodCallStack(final Node root, Services services) {
       // Find all modalities in the succedent
       final List<JavaDLTerm> modalityTerms = new LinkedList<JavaDLTerm>();
-      for (SequentFormula sequentFormula : root.sequent().succedent()) {
+      for (SequentFormula<JavaDLTerm> sequentFormula : root.sequent().succedent()) {
          sequentFormula.formula().execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(JavaDLTerm visited) {
@@ -1419,7 +1419,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param node The {@link Node} on which the loop invariant rule is applied.
     */
    protected void initNewLoopBodyMethodCallStack(Node node) {
-      PosInOccurrence childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
       initNewMethodCallStack(node, childPIO);
    }
    
@@ -1431,16 +1431,16 @@ public class SymbolicExecutionTreeBuilder {
     * @param node The {@link Node} on which the block contract rule is applied.
     */
    protected void initNewValidiityMethodCallStack(Node node) {
-      PosInOccurrence childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(0).sequent());
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(0).sequent());
       initNewMethodCallStack(node, childPIO);
    }
    
    /**
     * Initializes a new method call stack.
     * @param currentNode The current {@link Node}.
-    * @param childPIO The {@link PosInOccurrence} where the modality has a new symbolic execution label counter.
+    * @param childPIO The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} where the modality has a new symbolic execution label counter.
     */
-   protected void initNewMethodCallStack(Node currentNode, PosInOccurrence childPIO) {
+   protected void initNewMethodCallStack(Node currentNode, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> childPIO) {
       JavaDLTerm newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
       assert newModality != null;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);

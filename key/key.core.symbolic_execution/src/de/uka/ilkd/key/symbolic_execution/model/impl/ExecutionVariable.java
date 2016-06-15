@@ -72,7 +72,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
                             Node proofNode, 
-                            PosInOccurrence modalityPIO, 
+                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO, 
                             IProgramVariable programVariable,
                             JavaDLTerm additionalCondition) {
       this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
@@ -88,7 +88,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
                             Node proofNode, 
-                            PosInOccurrence modalityPIO, 
+                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO, 
                             ExecutionValue parentValue, 
                             IProgramVariable programVariable,
                             JavaDLTerm additionalCondition) {
@@ -115,7 +115,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
                             Node proofNode, 
-                            PosInOccurrence modalityPIO, 
+                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO, 
                             ExecutionValue parentValue, 
                             JavaDLTerm arrayIndex,
                             ExecutionValue lengthValue,

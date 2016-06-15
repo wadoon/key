@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -179,7 +182,7 @@ public abstract class ScaleFeature implements Feature {
             offset = p_offset;
         }
 
-        public RuleAppCost compute (RuleApp app, PosInOccurrence pos, Goal goal) {
+        public RuleAppCost compute (RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
             final RuleAppCost cost = getFeature ().compute ( app, pos, goal );
             long costVal;
             

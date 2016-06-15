@@ -98,10 +98,10 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
     private static JavaDLTerm buildFormulaFromGoal(Goal symbExecGoal) {
         final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
         JavaDLTerm result = tb.tt();
-        for (final SequentFormula f : symbExecGoal.sequent().antecedent()) {
+        for (final SequentFormula<JavaDLTerm> f : symbExecGoal.sequent().antecedent()) {
             result = tb.and(result, f.formula());
         }
-        for (final SequentFormula f : symbExecGoal.sequent().succedent()) {
+        for (final SequentFormula<JavaDLTerm> f : symbExecGoal.sequent().succedent()) {
             result = tb.and(result, tb.not(f.formula()));
         }
         return result;

@@ -71,7 +71,7 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     /**
      * This position may be null if no subterm selected
      */
-    private final PosInOccurrence posInOcc;
+    private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc;
 
     /**
      * Instantiates a new proof macro worker.
@@ -81,7 +81,7 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
      * @param mediator the mediator, not null
      * @param posInOcc the position, possibly null
      */
-    public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator, PosInOccurrence posInOcc) {
+    public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
         assert macro != null;
         assert mediator != null;
         this.node = node;

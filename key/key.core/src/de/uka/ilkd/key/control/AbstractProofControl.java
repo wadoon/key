@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -12,25 +13,12 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.util.Debug;
@@ -95,7 +83,7 @@ public abstract class AbstractProofControl implements ProofControl {
    }
    
    @Override
-   public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos) {
+   public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
         ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
 
         for (RuleApp ruleApp : focusedGoal.ruleAppIndex().getBuiltInRules(focusedGoal, pos)) {
@@ -117,7 +105,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-   public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos) {
+   public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
         if (pos != null && pos != null && focusedGoal != null) {
             Debug.out("NoPosTacletApp: Looking for applicables rule at node",
                     focusedGoal.node().serialNr());
@@ -130,7 +118,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-   public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence pos) {
+   public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
         if (pos != null) {
             return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex().
                     getRewriteTaclet(TacletFilter.TRUE,
@@ -145,7 +133,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * takes NoPosTacletApps as arguments and returns a duplicate free list of
      * the contained TacletApps
      */
-    private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal, ImmutableList<NoPosTacletApp> tacletInstances, PosInOccurrence pos) {
+    private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal, ImmutableList<NoPosTacletApp> tacletInstances, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         for (NoPosTacletApp app : tacletInstances) {
@@ -182,7 +170,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
     
     @Override
-    public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
+    public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
    final Services services = goal.proof().getServices();
    ImmutableSet<TacletApp> applics =
          getAppsForName(goal, taclet.name().toString(), pos);
@@ -253,12 +241,12 @@ public abstract class AbstractProofControl implements ProofControl {
      * @param goal the Goal for which the applications should be returned
      * @param name the String with the taclet names whose applications are
      * looked for
-     * @param pos the PosInOccurrence describing the position
+     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the position
      * @return a list of all found rule applications of the given rule at
      * position pos
      */
     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
-            PosInOccurrence pos) {
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
         return getAppsForName(goal, name, pos, TacletFilter.TRUE);
     }
 
@@ -269,13 +257,13 @@ public abstract class AbstractProofControl implements ProofControl {
      * @param goal the Goal for which the applications should be returned
      * @param name the String with the taclet names whose applications are
      * looked for
-     * @param pos the PosInOccurrence describing the position
+     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the position
      * @param filter the TacletFilter expressing restrictions
      * @return a list of all found rule applications of the given rule at
      * position <tt>pos</tt> passing the filter
      */
     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
-            PosInOccurrence pos,
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
             TacletFilter filter) {
         Services services = goal.proof().getServices();
         ImmutableSet<TacletApp> result = DefaultImmutableSet.<TacletApp>nil();
@@ -365,7 +353,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
     
     @Override
-    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
+    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, boolean forced) {
       assert goal != null;
 
       ImmutableSet<IBuiltInRuleApp> set = getBuiltInRuleApp(goal, rule, pos);
@@ -399,7 +387,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @return a SetOf<IBuiltInRuleApp> with all possible rule applications
      */
     public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApp(Goal focusedGoal, BuiltInRule rule,
-            PosInOccurrence pos) {
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
 
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
 
@@ -423,7 +411,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * applied
      * @return a SetOf<RuleApp> with all possible applications of the rule
      */
-    protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(Goal focusedGoal, String name, PosInOccurrence pos) {
+    protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(Goal focusedGoal, String name, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
         ImmutableList<BuiltInRule> match = ImmutableSLList.<BuiltInRule>nil();
 
@@ -592,7 +580,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * <code>focus!=null</code>) to a particular subterm or subformula of that
      * goal
      */
-    public void startFocussedAutoMode(PosInOccurrence focus, Goal goal) {
+    public void startFocussedAutoMode(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> focus, Goal goal) {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
 

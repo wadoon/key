@@ -87,7 +87,7 @@ class Instantiation {
 
    private static ImmutableSet<JavaDLTerm> sequentToTerms(Sequent seq) {
       ImmutableList<JavaDLTerm> res = ImmutableSLList.<JavaDLTerm> nil();
-      for (final SequentFormula cf : seq) {
+      for (final SequentFormula<JavaDLTerm> cf : seq) {
          res = res.prepend(cf.formula());
       }
       return DefaultImmutableSet.fromImmutableList(res);
@@ -163,13 +163,13 @@ class Instantiation {
     */
    private ImmutableSet<JavaDLTerm> initAssertLiterals(Sequent seq, JavaDLTermServices services) {
       ImmutableSet<JavaDLTerm> assertLits = DefaultImmutableSet.<JavaDLTerm> nil();
-      for (final SequentFormula cf : seq.antecedent()) {
+      for (final SequentFormula<JavaDLTerm> cf : seq.antecedent()) {
          final JavaDLTerm atom = cf.formula();
          final Operator op = atom.op();
          if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
             assertLits = assertLits.add(atom);
       }
-      for (final SequentFormula cf : seq.succedent()) {
+      for (final SequentFormula<JavaDLTerm> cf : seq.succedent()) {
          final JavaDLTerm atom = cf.formula();
          final Operator op = atom.op();
          if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )

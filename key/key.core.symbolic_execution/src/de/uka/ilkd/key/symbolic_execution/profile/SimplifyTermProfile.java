@@ -82,7 +82,7 @@ public class SimplifyTermProfile extends JavaProfile {
       ImmutableList<TermLabelPolicy> symExcPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new TermLabelPolicy() {
          @Override
          public TermLabel keepLabel(TermLabelState state, Services services,
-               PosInOccurrence applicationPosInOccurrence,
+               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
                JavaDLTerm applicationTerm, Rule rule, Goal goal, Object hint,
                JavaDLTerm tacletTerm, Operator newTermOp,
                ImmutableArray<JavaDLTerm> newTermSubs,

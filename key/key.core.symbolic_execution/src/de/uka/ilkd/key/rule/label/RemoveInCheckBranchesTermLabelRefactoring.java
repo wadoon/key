@@ -73,7 +73,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
    @Override
    public RefactoringScope defineRefactoringScope(TermLabelState state,
                                                   Services services,
-                                                  PosInOccurrence applicationPosInOccurrence,
+                                                  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
                                                   JavaDLTerm applicationTerm,
                                                   Rule rule,
                                                   Goal goal,
@@ -108,7 +108,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
    @Override
    public void refactoreLabels(TermLabelState state,
                                Services services,
-                               PosInOccurrence applicationPosInOccurrence,
+                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
                                JavaDLTerm applicationTerm,
                                Rule rule,
                                Goal goal,

@@ -51,7 +51,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro imp
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
         if (goals == null || goals.head() == null) {
             return false;
         }
@@ -81,7 +81,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro imp
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
+                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
                                           ProverTaskListener listener) throws Exception {
         final Services services = proof.getServices();
         final InfFlowContractPO po = (InfFlowContractPO) services.getSpecificationRepository().getProofOblInput(proof);

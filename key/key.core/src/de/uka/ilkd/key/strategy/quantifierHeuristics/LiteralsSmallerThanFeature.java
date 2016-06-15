@@ -41,7 +41,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     
     // ugly, but we need some services
     private Services               services = null;
-    private PosInOccurrence        focus = null;
+    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>        focus = null;
 
     private LiteralsSmallerThanFeature(ProjectionToTerm left,
                                        ProjectionToTerm right,
@@ -57,7 +57,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return new LiteralsSmallerThanFeature ( left, right, numbers );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         final JavaDLTerm leftTerm = left.toTerm ( app, pos, goal );
         final JavaDLTerm rightTerm = right.toTerm ( app, pos, goal );
 
@@ -65,7 +65,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     protected boolean compareTerms(JavaDLTerm leftTerm, JavaDLTerm rightTerm,
-                                   PosInOccurrence pos, Services p_services) {
+                                   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Services p_services) {
         services = p_services;
         focus = pos;
         

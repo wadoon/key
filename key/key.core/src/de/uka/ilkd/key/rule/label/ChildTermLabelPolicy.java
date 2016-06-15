@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule.label;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -32,7 +33,7 @@ import de.uka.ilkd.key.rule.Rule;
 /**
  * <p>
  * A {@link ChildTermLabelPolicy} is used by
- * {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, JavaDLTerm, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
+ * {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, JavaDLTerm, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
  * to decide for each {@link TermLabel} on a child or grandchild of the application {@link JavaDLTerm} if it
  * should be re-added to the new {@link JavaDLTerm} or not.
  * </p>
@@ -48,11 +49,11 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
    /**
     * Decides if the currently active {@link Rule} application is supported or not.
     * If it is not supported no iteration over children will be executed.
-    * Only if it returns {@code true} {@link #addLabel(Services, PosInOccurrence, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock, JavaDLTerm, TermLabel)}
+    * Only if it returns {@code true} {@link #addLabel(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock, JavaDLTerm, TermLabel)}
     * will be called if a child {@link JavaDLTerm} contains a managed label.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
-    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
     * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
@@ -65,7 +66,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
     * @return {@code true} keep {@link TermLabel} and add it to the new {@link JavaDLTerm}. {@code false} drop {@link TermLabel} and do not need it to the new {@link JavaDLTerm}.
     */
    public boolean isRuleApplicationSupported(JavaDLTermServices services,
-                                             PosInOccurrence applicationPosInOccurrence,
+                                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
                                              JavaDLTerm applicationTerm,
                                              Rule rule,
                                              Goal goal,
@@ -87,8 +88,8 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
     * To remove it from the child a refacotring has to be used instead.
     * </p>
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
-    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
     * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
@@ -102,7 +103,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
     * @return {@code true} add {@link TermLabel} to new {@link JavaDLTerm}. {@code false} do not add {@link TermLabel} to new {@link JavaDLTerm}.
     */
    public boolean addLabel(JavaDLTermServices services,
-                           PosInOccurrence applicationPosInOccurrence,
+                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
                            JavaDLTerm applicationTerm,
                            Rule rule,
                            Goal goal,

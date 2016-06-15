@@ -56,7 +56,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
       Feature superFeature = super.setupApprovalF();
       Feature labelFeature = new Feature() {
          @Override
-         public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+         public RuleAppCost compute(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
             boolean hasLabel = false;
             if (pos != null && app instanceof TacletApp) {
                JavaDLTerm findTerm = pos.subTerm();

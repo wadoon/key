@@ -29,5 +29,5 @@ interface Modifier {
      * @param pos the position to be modified
      * @return the (new) position
      */
-    PosInOccurrence modifyPosistion(PosInOccurrence pos);
+    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modifyPosistion(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos);
 }

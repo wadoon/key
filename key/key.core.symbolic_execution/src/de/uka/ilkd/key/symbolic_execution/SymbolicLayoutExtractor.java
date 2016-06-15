@@ -221,13 +221,13 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
-    * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
+    * @param modalityPio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality or its updates.
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     */
    public SymbolicLayoutExtractor(Node node, 
-                                  PosInOccurrence modalityPio,
+                                  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPio,
                                   boolean useUnicode,
                                   boolean usePrettyPrinting,
                                   boolean simplifyConditions) {
@@ -654,7 +654,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
    protected Set<JavaDLTerm> collectObjectsFromSequent(Sequent sequent,
                                                  Set<JavaDLTerm> objectsToIgnore) throws ProofInputException {
       Set<JavaDLTerm> result = new LinkedHashSet<JavaDLTerm>();
-      for (SequentFormula sf : sequent) {
+      for (SequentFormula<JavaDLTerm> sf : sequent) {
          if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
             result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
          }

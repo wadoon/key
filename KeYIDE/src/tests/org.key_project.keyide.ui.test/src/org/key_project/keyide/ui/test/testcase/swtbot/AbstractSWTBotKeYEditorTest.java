@@ -228,7 +228,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
                               int index, 
                               PosInTerm<JavaDLTerm> pit, 
                               final String tacletName) {
-      PosInOccurrence pio = new PosInOccurrence((inAntecedent ? sequent.antecedent() : sequent.succedent()).get(index), pit, inAntecedent);
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>((inAntecedent ? sequent.antecedent() : sequent.succedent()).get(index), pit, inAntecedent);
       ImmutableList<TacletApp> rules = KeYIDEUtil.findTaclets(ui, goal, PosInSequent.createCfmaPos(pio));
       TacletApp tacletApp = CollectionUtil.search(rules, new IFilter<TacletApp>() {
          @Override

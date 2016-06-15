@@ -38,7 +38,7 @@ public abstract class TacletVisitor extends DefaultVisitor {
         private String failureDescription = null;
 
         private void visit(Semisequent semiseq) {
-                for (SequentFormula aSemiseq : semiseq) {
+                for (SequentFormula<JavaDLTerm> aSemiseq : semiseq) {
                         aSemiseq.formula().execPostOrder(this);
                 }
         }

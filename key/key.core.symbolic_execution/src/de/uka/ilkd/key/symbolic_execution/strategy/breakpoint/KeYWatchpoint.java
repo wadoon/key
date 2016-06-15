@@ -94,7 +94,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
          try {
             JavaDLTerm negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
             //initialize values
-            PosInOccurrence pio = ruleApp.posInOccurrence();
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = ruleApp.posInOccurrence();
             JavaDLTerm term = pio.subTerm();
             term = TermBuilder.goBelowUpdates(term);
             IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.modalContent(), proof.getServices());

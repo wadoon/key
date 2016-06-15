@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
@@ -26,11 +27,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termfeature.BinarySumTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ConstTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
-import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+import de.uka.ilkd.key.strategy.termfeature.*;
 
 
 /**
@@ -71,7 +68,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         return new MonomialsSmallerThanFeature ( left, right, numbers );
     }
     
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         final MonomialCollector m1 = new MonomialCollector ();
         m1.collect ( left.toTerm ( app, pos, goal ), goal.proof().getServices() );
         final MonomialCollector m2 = new MonomialCollector ();

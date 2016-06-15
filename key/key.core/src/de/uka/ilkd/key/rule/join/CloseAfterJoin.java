@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.sort.Sort;
@@ -35,7 +36,6 @@ import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -152,7 +152,7 @@ public class CloseAfterJoin implements BuiltInRule {
             // Delete previous sequents
             clearSemisequent(ruleIsWeakeningGoal, true);
             clearSemisequent(ruleIsWeakeningGoal, false);
-            ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm),
+            ruleIsWeakeningGoal.addFormula(new SequentFormula<>(isWeakeningForm),
                     false, true);
         }
 
@@ -255,7 +255,7 @@ public class CloseAfterJoin implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         return true;
     }
 
@@ -265,7 +265,7 @@ public class CloseAfterJoin implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, JavaDLTermServices services) {
         return new CloseAfterJoinRuleBuiltInRuleApp(this, pos);
     }
 
@@ -291,7 +291,7 @@ public class CloseAfterJoin implements BuiltInRule {
      *            and PHI is a DL formula).
      * @return A complete {@link CloseAfterJoinRuleBuiltInRuleApp}.
      */
-    public CloseAfterJoinRuleBuiltInRuleApp createApp(PosInOccurrence pio,
+    public CloseAfterJoinRuleBuiltInRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
             Node thePartnerNode, Node correspondingJoinNode,
             SymbolicExecutionState joinNodeState,
             SymbolicExecutionState partnerState, JavaDLTerm pc) {

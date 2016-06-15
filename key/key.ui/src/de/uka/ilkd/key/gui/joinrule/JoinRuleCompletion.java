@@ -40,12 +40,12 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
             boolean forced) {
 
         final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) app;
-        final PosInOccurrence pio = joinApp.posInOccurrence();
+        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = joinApp.posInOccurrence();
 
-        final ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> candidates =
+        final ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> candidates =
                 JoinRule.findPotentialJoinPartners(goal, pio);
 
-        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> chosenCandidates =
+        ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> chosenCandidates =
                 null;
         final JoinProcedure chosenRule;
         JavaDLTerm chosenDistForm = null; // null is admissible standard ==> auto

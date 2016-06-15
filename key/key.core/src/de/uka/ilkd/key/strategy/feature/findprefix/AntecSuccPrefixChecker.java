@@ -54,7 +54,7 @@ class AntecSuccPrefixChecker implements Checker {
 
 
     @Override
-    public void initPrefixCheck(PosInOccurrence p_pos) {
+    public void initPrefixCheck(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos) {
         pol = p_pos.isInAntec() ? -1 : 1;  // init polarity
     }
 

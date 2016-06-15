@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 /**
  * This interface represents an iterator, iterating the nodes on the
  * path between the root of a term and a position within the term,
- * given by a <code>PosInOccurrence</code>-object
+ * given by a <code>PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>></code>-object
  */
 public interface PIOPathIterator<T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<T>> extends IntIterator {
 

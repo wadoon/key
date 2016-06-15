@@ -24,7 +24,7 @@ public class FocusFormulaProjection implements ProjectionToTerm {
     
     private FocusFormulaProjection () {}
 
-     public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+     public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
          assert pos != null : "Projection is only applicable to rules with find";
 
          return pos.sequentFormula ().formula ();

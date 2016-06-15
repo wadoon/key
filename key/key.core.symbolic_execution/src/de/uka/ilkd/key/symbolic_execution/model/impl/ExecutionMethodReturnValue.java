@@ -32,9 +32,9 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    private final JavaDLTerm returnValue;
    
    /**
-    * The {@link PosInOccurrence} of the modality of interest.
+    * The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
     */
-   private final PosInOccurrence modalityPIO;
+   private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO;
 
    /**
     * The return value as human readable {@link String}.
@@ -60,7 +60,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     */
    public ExecutionMethodReturnValue(ITreeSettings settings,
                                      Node proofNode, 
-                                     PosInOccurrence modalityPIO,
+                                     PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO,
                                      JavaDLTerm returnValue, 
                                      JavaDLTerm condition) {
       super(settings, proofNode);
@@ -165,7 +165,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence getModalityPIO() {
+   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
       return modalityPIO;
    }
 }

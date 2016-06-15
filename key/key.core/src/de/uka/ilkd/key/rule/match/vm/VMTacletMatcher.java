@@ -3,11 +3,8 @@ package de.uka.ilkd.key.rule.match.vm;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.SVSubstitute;
-import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.logic.op.UpdateApplication;
+import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -18,16 +15,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.IfMatchResult;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.NotFreeIn;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletMatcher;
-import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
@@ -92,7 +80,7 @@ public class VMTacletMatcher implements TacletMatcher {
             findMatchProgram = TacletMatchProgram.EMPTY_PROGRAM;
         }     
 
-        for (SequentFormula sf : assumesSequent) {
+        for (SequentFormula<JavaDLTerm> sf : assumesSequent) {
             assumesMatchPrograms.put(sf.formula(), TacletMatchProgram.createProgram(sf.formula()));
         }
     }
@@ -175,7 +163,7 @@ public class VMTacletMatcher implements TacletMatcher {
             MatchConditions                  p_matchCond,
             Services                         p_services ) {
 
-        final Iterator<SequentFormula>     itIfSequent   = assumesSequent .iterator ();
+        final Iterator<SequentFormula<JavaDLTerm>>     itIfSequent   = assumesSequent .iterator ();
 
         ImmutableList<MatchConditions>            newMC;   
 

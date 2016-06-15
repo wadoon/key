@@ -359,8 +359,8 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    protected Sequent createSequentToShow(JavaDLTerm antecedent,
                                          JavaDLTerm succedent) {
       Sequent sequent = Sequent.EMPTY_SEQUENT;
-      sequent = sequent.addFormula(new SequentFormula(antecedent), true, false).sequent();
-      sequent = sequent.addFormula(new SequentFormula(succedent), false, false).sequent();
+      sequent = sequent.addFormula(new SequentFormula<>(antecedent), true, false).sequent();
+      sequent = sequent.addFormula(new SequentFormula<>(succedent), false, false).sequent();
       return sequent;
    }
    

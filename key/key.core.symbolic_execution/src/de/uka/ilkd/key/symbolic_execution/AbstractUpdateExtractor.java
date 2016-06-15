@@ -59,9 +59,9 @@ public abstract class AbstractUpdateExtractor {
    protected final Node node;
    
    /**
-    * The {@link PosInOccurrence} of the modality or its updates.
+    * The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality or its updates.
     */
-   protected final PosInOccurrence modalityPio;
+   protected final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPio;
    
    /**
     * An incremented number used to give each pre value an unique name.
@@ -71,10 +71,10 @@ public abstract class AbstractUpdateExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
-    * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
+    * @param modalityPio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality or its updates.
     */
    public AbstractUpdateExtractor(Node node, 
-                                  PosInOccurrence modalityPio) {
+                                  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPio) {
       assert node != null;
       assert modalityPio != null;
       this.node = node;
@@ -161,7 +161,7 @@ public abstract class AbstractUpdateExtractor {
       if (ignoreOldStateVariables) {
          // Add initial updates which are used as backup of the heap and method arguments. They are not part of the source code and should be ignored.
          Sequent sequent = getRoot().sequent();
-         for (SequentFormula sf : sequent.succedent()) {
+         for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
             JavaDLTerm term = sf.formula();
             if (Junctor.IMP.equals(term.op())) {
                fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
@@ -221,7 +221,7 @@ public abstract class AbstractUpdateExtractor {
                                               Set<JavaDLTerm> updateValueObjectsToFill, 
                                               Set<JavaDLTerm> objectsToIgnore) throws ProofInputException {
       // Go up in parent hierarchy and collect updates on all update applications
-      PosInOccurrence pio = modalityPio;
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = modalityPio;
       while (pio != null) {
          JavaDLTerm updateApplication = pio.subTerm();
          if (updateApplication.op() == UpdateApplication.UPDATE_APPLICATION) {
@@ -432,7 +432,7 @@ public abstract class AbstractUpdateExtractor {
    protected Set<ExtractLocationParameter> extractLocationsFromSequent(Sequent sequent, 
                                                                        Set<JavaDLTerm> objectsToIgnore) throws ProofInputException {
       Set<ExtractLocationParameter> result = new LinkedHashSet<ExtractLocationParameter>();
-      for (SequentFormula sf : sequent) {
+      for (SequentFormula<JavaDLTerm> sf : sequent) {
          result.addAll(extractLocationsFromTerm(sf.formula(), objectsToIgnore));
       }
       return result;
@@ -1042,11 +1042,11 @@ public abstract class AbstractUpdateExtractor {
    
    /**
     * Computes the original updates.
-    * @param pio The {@link PosInOccurrence}.
+    * @param pio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}.
     * @param currentLayout Is current layout?
     * @return The original updates.
     */
-   protected ImmutableList<JavaDLTerm> computeOriginalUpdates(PosInOccurrence pio, boolean currentLayout) {
+   protected ImmutableList<JavaDLTerm> computeOriginalUpdates(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, boolean currentLayout) {
       ImmutableList<JavaDLTerm> originalUpdates;
       if (!currentLayout) {
          originalUpdates = ImmutableSLList.nil();

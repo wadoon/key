@@ -15,12 +15,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 
-import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.Junctor;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.Quantifier;
-import org.key_project.common.core.logic.op.UpdateApplication;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -50,7 +51,7 @@ public class BoundVarsVisitor extends DefaultVisitor {
      * visits a sequent
      */
     public void visit(Sequent visited) {
-        for (SequentFormula cf : visited) {
+        for (SequentFormula<JavaDLTerm> cf : visited) {
             visit(cf.formula());
         }
     }

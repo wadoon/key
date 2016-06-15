@@ -46,7 +46,7 @@ public class TermConstructionProjection implements ProjectionToTerm {
         return new TermConstructionProjection ( op, subTerms );
     }
 
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         final JavaDLTerm[] subs = new JavaDLTerm[subTerms.length];
         for ( int i = 0; i != subTerms.length; ++i ) {
             subs[i] = subTerms[i].toTerm ( app, pos, goal );           

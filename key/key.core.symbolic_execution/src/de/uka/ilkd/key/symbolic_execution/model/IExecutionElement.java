@@ -65,10 +65,10 @@ public interface IExecutionElement {
    public RuleApp getAppliedRuleApp();
    
    /**
-    * Returns the {@link PosInOccurrence} of the modality of interest including updates.
-    * @return The {@link PosInOccurrence} of the modality of interest including updates.
+    * Returns the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest including updates.
+    * @return The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest including updates.
     */
-   public PosInOccurrence getModalityPIO();
+   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO();
    
    /**
     * Returns the {@link NodeInfo} of {@link #getProofNode()}.

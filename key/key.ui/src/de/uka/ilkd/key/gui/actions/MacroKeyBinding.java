@@ -56,7 +56,7 @@ public class MacroKeyBinding extends AbstractAction {
             return;
         }
 
-        PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc = mousePos.getPosInOccurrence();
         mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
     }
 

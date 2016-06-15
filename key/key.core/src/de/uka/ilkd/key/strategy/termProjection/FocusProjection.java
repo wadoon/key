@@ -40,7 +40,7 @@ public class FocusProjection implements ProjectionToTerm {
     }
 
     @Override
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;

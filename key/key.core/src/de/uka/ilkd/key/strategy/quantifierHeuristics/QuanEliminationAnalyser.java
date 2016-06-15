@@ -31,13 +31,13 @@ public class QuanEliminationAnalyser {
      *         <code>Integer.MAX_VALUE</code> if the subformula is not an
      *         eliminable definition
      */
-    public int eliminableDefinition(JavaDLTerm definition, PosInOccurrence envPIO) {
-        final PosInOccurrence matrixPIO = walkUpMatrix ( envPIO );
+    public int eliminableDefinition(JavaDLTerm definition, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> envPIO) {
+        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> matrixPIO = walkUpMatrix ( envPIO );
         final JavaDLTerm matrix = matrixPIO.subTerm ();
 
         if ( matrixPIO.isTopLevel () ) return Integer.MAX_VALUE;
         
-        PosInOccurrence quantPIO = matrixPIO.up ();
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> quantPIO = matrixPIO.up ();
         JavaDLTerm quantTerm = quantPIO.subTerm ();
         final boolean ex;
         if ( quantTerm.op () == Quantifier.EX ) {
@@ -93,9 +93,9 @@ public class QuanEliminationAnalyser {
         return false;
     }
     
-    private PosInOccurrence walkUpMatrix(PosInOccurrence pio) {
+    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> walkUpMatrix(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         while ( !pio.isTopLevel () ) {
-            final PosInOccurrence parent = pio.up ();
+            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> parent = pio.up ();
             final Operator parentOp = parent.subTerm ().op ();
             if ( parentOp != Junctor.AND && parentOp != Junctor.OR ) return pio;
             pio = parent;

@@ -15,35 +15,19 @@ package de.uka.ilkd.key.proof;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EventObject;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.SwingUtilities;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -233,7 +217,7 @@ public class Proof implements Named {
     public Proof(String name, JavaDLTerm problem, String header, InitConfig initConfig ) {
         this ( name, Sequent.createSuccSequent
                         (Semisequent.nil().insert(0,
-                                        new SequentFormula(problem)).semisequent()),
+                                        new SequentFormula<>(problem)).semisequent()),
                                         initConfig.createTacletIndex(), 
                                         initConfig.createBuiltInRuleIndex(), 
                                         initConfig );
@@ -638,7 +622,7 @@ public class Proof implements Named {
                         final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) visitedNode
                                 .getAppliedRuleApp();
 
-                        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinApp
+                        for (Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinApp
                                 .getJoinPartners()) {
                             final Goal linkedGoal = joinPartner.first;
 

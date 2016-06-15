@@ -841,7 +841,7 @@ public class LogicPrinter {
      *
      * @param cfma the constrained formula to be printed
      */
-    public void printConstrainedFormula(SequentFormula cfma)
+    public void printConstrainedFormula(SequentFormula<JavaDLTerm> cfma)
         throws IOException {
 	printTerm(cfma.formula());
     }

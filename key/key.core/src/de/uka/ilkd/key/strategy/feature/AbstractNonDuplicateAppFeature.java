@@ -15,15 +15,16 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
@@ -42,21 +43,21 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     protected AbstractNonDuplicateAppFeature () {}
     
     /**
-     * Compare whether two <code>PosInOccurrence</code>s are equal. This can be
+     * Compare whether two <code>PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>></code>s are equal. This can be
      * done using <code>equals</code> or <code>eqEquals</code> (checking for
      * same or equal formulas), which has to be decided by the subclasses
      */
     protected abstract boolean comparePio(TacletApp newApp,
                                           TacletApp oldApp,
-                                          PosInOccurrence newPio,
-                                          PosInOccurrence oldPio);
+                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPio,
+                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPio);
 
     /**
      * Check whether a semisequent contains a formula. Again, one can either
      * search for the same or an equal formula
      */
     protected abstract boolean semiSequentContains(Semisequent semisequent,
-                                                   SequentFormula cfma);
+                                                   SequentFormula<JavaDLTerm> cfma);
 
 
     /**
@@ -66,7 +67,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      */
     protected boolean sameApplication(RuleApp ruleCmp,
                                       TacletApp newApp,
-                                      PosInOccurrence newPio) {
+                                      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPio) {
         // compare the rules
         if ( newApp.rule () != ruleCmp.rule () ) {
             return false;
@@ -77,7 +78,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         // compare the position of application
         if ( newPio != null ) {
             if ( ! ( cmp instanceof PosTacletApp ) ) return false;
-            final PosInOccurrence oldPio = cmp.posInOccurrence();
+            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPio = cmp.posInOccurrence();
             if ( !comparePio ( newApp, cmp, newPio, oldPio ) ) return false;
         }
 
@@ -152,9 +153,9 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * sequent
      */
     protected boolean noDuplicateFindTaclet(TacletApp app,
-                                            PosInOccurrence pos,
+                                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
                                             Goal goal) {
-        final SequentFormula focusFor = pos.sequentFormula ();
+        final SequentFormula<JavaDLTerm> focusFor = pos.sequentFormula ();
         final boolean antec = pos.isInAntec ();
     
         Node node = goal.node ();

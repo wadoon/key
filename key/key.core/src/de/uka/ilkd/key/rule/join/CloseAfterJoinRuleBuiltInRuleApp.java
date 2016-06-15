@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule.join;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -25,7 +26,7 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private JavaDLTerm pc = null;
 
     public CloseAfterJoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence pio, Node thePartnerNode,
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Node thePartnerNode,
             Node correspondingJoinNode, SymbolicExecutionState joinNodeState,
             SymbolicExecutionState partnerState, JavaDLTerm pc) {
         this(builtInRule, pio);
@@ -37,17 +38,17 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public CloseAfterJoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence pio) {
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         super(builtInRule, pio);
     }
 
     @Override
-    public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+    public AbstractBuiltInRuleApp replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos) {
         return null;
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
         setMutable(ifInsts);
         return this;
     }

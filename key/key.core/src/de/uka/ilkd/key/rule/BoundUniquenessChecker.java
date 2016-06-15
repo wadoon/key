@@ -16,13 +16,13 @@ package de.uka.ilkd.key.rule;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 
 /**
  * The bound uniqueness checker ensures that schemavariables can be bound
@@ -64,7 +64,7 @@ public class BoundUniquenessChecker {
      * @param seq the Sequent with the formulas to add
      */
     public void addAll(Sequent seq) {
-	for (final SequentFormula cf : seq) {
+	for (final SequentFormula<JavaDLTerm> cf : seq) {
 	    terms = terms.prepend(cf.formula());
 	}
     }

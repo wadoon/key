@@ -28,7 +28,7 @@ class SuccChecker implements Checker {
     private boolean isInAntec;
 
     @Override
-    public void initPrefixCheck(PosInOccurrence p_pos) {
+    public void initPrefixCheck(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos) {
         isInAntec = p_pos.isInAntec();
     }
 

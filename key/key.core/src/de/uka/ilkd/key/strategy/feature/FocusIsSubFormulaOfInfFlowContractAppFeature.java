@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
@@ -42,7 +43,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
     @Override
     public RuleAppCost compute(RuleApp ruleApp,
-                               PosInOccurrence pos,
+                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
                                Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " +

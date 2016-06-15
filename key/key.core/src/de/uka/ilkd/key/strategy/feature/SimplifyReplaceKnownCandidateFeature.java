@@ -13,8 +13,10 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -44,7 +46,7 @@ public class SimplifyReplaceKnownCandidateFeature
      * @param goal the goal on which <code>app</code> is to be applied
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost compute (RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost compute (RuleApp ruleApp, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
         
         if ( !isAllowedPosition ( pos ) ) return BinaryFeature.TOP_COST;
@@ -69,8 +71,8 @@ public class SimplifyReplaceKnownCandidateFeature
         return approved ? BinaryFeature.ZERO_COST : BinaryFeature.TOP_COST;
     }
 
-    private boolean isAllowedPosition ( PosInOccurrence pos ) {
-        final PIOPathIterator it = pos.iterator ();
+    private boolean isAllowedPosition ( PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos ) {
+        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator ();
         
         while ( it.next() != -1 ) {
             if ( !( it.getSubTerm().op() instanceof UpdateApplication ) )

@@ -31,7 +31,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     
     public static SequentFormulasGenerator antecedent() {
         return new SequentFormulasGenerator () {
-            protected Iterator<SequentFormula> generateForIt(Goal goal) {
+            protected Iterator<SequentFormula<JavaDLTerm>> generateForIt(Goal goal) {
                 return goal.sequent ().antecedent ().iterator ();
             }
         };
@@ -39,7 +39,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     
     public static SequentFormulasGenerator succedent() {
         return new SequentFormulasGenerator () {
-            protected Iterator<SequentFormula> generateForIt(Goal goal) {
+            protected Iterator<SequentFormula<JavaDLTerm>> generateForIt(Goal goal) {
                 return goal.sequent ().succedent ().iterator ();
             }
         };
@@ -47,20 +47,20 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     
     public static SequentFormulasGenerator sequent() {
         return new SequentFormulasGenerator () {
-            protected Iterator<SequentFormula> generateForIt(Goal goal) {
+            protected Iterator<SequentFormula<JavaDLTerm>> generateForIt(Goal goal) {
                 return goal.sequent ().iterator ();
             }
         };
     }
     
-    protected abstract Iterator<SequentFormula> generateForIt(Goal goal);
+    protected abstract Iterator<SequentFormula<JavaDLTerm>> generateForIt(Goal goal);
 
-    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         return new SFIterator ( generateForIt ( goal ) );
     }
 
     private static class SFIterator implements Iterator<JavaDLTerm> {
-        private final Iterator<SequentFormula> forIt;
+        private final Iterator<SequentFormula<JavaDLTerm>> forIt;
 
         public boolean hasNext() {
             return forIt.hasNext ();
@@ -70,7 +70,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
             return forIt.next ().formula ();
         }
 
-        public SFIterator(Iterator<SequentFormula> forIt) {
+        public SFIterator(Iterator<SequentFormula<JavaDLTerm>> forIt) {
             this.forIt = forIt;
         }
         

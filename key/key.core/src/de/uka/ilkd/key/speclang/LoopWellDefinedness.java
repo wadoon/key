@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
@@ -20,7 +21,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -59,12 +59,12 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    SequentFormula generateSequent(SequentTerms seq, JavaDLTermServices services) {
+    SequentFormula<JavaDLTerm> generateSequent(SequentTerms seq, JavaDLTermServices services) {
         // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
         final JavaDLTerm imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
                                 TB.and(seq.wdMod, seq.wdRest, seq.anonWdPost));
         final JavaDLTerm wdPre = TB.wd(seq.pre);
-        return new SequentFormula(TB.apply(seq.context,
+        return new SequentFormula<>(TB.apply(seq.context,
                                            TB.and(wdPre, imp)));
     }
 

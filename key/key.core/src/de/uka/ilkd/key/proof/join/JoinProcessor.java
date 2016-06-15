@@ -137,16 +137,16 @@ public class JoinProcessor implements Runnable {
     }
 
     private void orRight(Goal goal) {
-        SequentFormula sf = goal.sequent().succedent().get(0);
-        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(),
+        SequentFormula<JavaDLTerm> sf = goal.sequent().succedent().get(0);
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(),
                 false);
         apply(new String[] { OR_RIGHT_TACLET }, goal, pio);
 
     }
 
-    private SequentFormula findFormula(Sequent sequent, JavaDLTerm content,
+    private SequentFormula<JavaDLTerm> findFormula(Sequent sequent, JavaDLTerm content,
             boolean antecedent) {
-        for (SequentFormula sf : (antecedent ? sequent.antecedent() : sequent
+        for (SequentFormula<JavaDLTerm> sf : (antecedent ? sequent.antecedent() : sequent
                 .succedent())) {
             if (sf.formula().equals(content)) {
                 return sf;
@@ -157,9 +157,9 @@ public class JoinProcessor implements Runnable {
 
     private Goal simplifyUpdate(Goal goal, DelayedCut cut) {
 
-        SequentFormula sf = findFormula(goal.sequent(), cut.getFormula(), false);
+        SequentFormula<JavaDLTerm> sf = findFormula(goal.sequent(), cut.getFormula(), false);
 
-        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel()
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel()
                 .down(0), false);
         Goal result = apply(SIMPLIFY_UPDATE, goal, pio).head();
 
@@ -171,7 +171,7 @@ public class JoinProcessor implements Runnable {
      * is thrown.
      */
     private ImmutableList<Goal> apply(final String[] tacletNames, Goal goal,
-            PosInOccurrence pio) {
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
 
         TacletFilter filter = new TacletFilter() {
 
@@ -205,7 +205,7 @@ public class JoinProcessor implements Runnable {
         }
         int index = goal.sequent().formulaNumberInSequent(false,
                 partner.getFormulaForHiding());
-        PosInOccurrence pio = PosInOccurrence.findInSequent(goal.sequent(),
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>.findInSequent(goal.sequent(),
                 index, PosInTerm.<JavaDLTerm>getTopLevel());
         return apply(new String[] { HIDE_RIGHT_TACLET }, goal, pio).head();
 
@@ -301,7 +301,7 @@ public class JoinProcessor implements Runnable {
             Semisequent s2, JavaDLTerm exclude) {
         TreeSet<JavaDLTerm> formulas1 = createTree(s1, exclude);
         TreeSet<JavaDLTerm> result = createTree();
-        for (SequentFormula sf : s2) {
+        for (SequentFormula<JavaDLTerm> sf : s2) {
             if (formulas1.contains(sf.formula())) {
                 result.add(sf.formula());
             }
@@ -312,7 +312,7 @@ public class JoinProcessor implements Runnable {
     private Collection<JavaDLTerm> computeDifference(Semisequent s,
             Collection<JavaDLTerm> excludeSet, JavaDLTerm exclude) {
         LinkedList<JavaDLTerm> result = new LinkedList<JavaDLTerm>();
-        for (SequentFormula sf : s) {
+        for (SequentFormula<JavaDLTerm> sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {
                 result.add(sf.formula());
             }
@@ -322,7 +322,7 @@ public class JoinProcessor implements Runnable {
 
     private TreeSet<JavaDLTerm> createTree(Semisequent semisequent, JavaDLTerm exclude) {
         TreeSet<JavaDLTerm> set = createTree();
-        for (SequentFormula sf : semisequent) {
+        for (SequentFormula<JavaDLTerm> sf : semisequent) {
             if (sf.formula() != exclude) {
                 set.add(sf.formula());
             }

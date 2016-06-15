@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -30,7 +31,7 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature ();
 
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         if ( !app.ifInstsComplete () ) {
             return true;
         }
@@ -40,7 +41,7 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
     protected boolean comparePio(TacletApp newApp,
                                  TacletApp oldApp,
-                                 PosInOccurrence newPio, PosInOccurrence oldPio) {
+                                 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPio, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPio) {
         final JavaDLTerm newFocus = newPio.subTerm ();
         final JavaDLTerm oldFocus = oldPio.subTerm ();
         if ( !newFocus.equals ( oldFocus ) ) return false;

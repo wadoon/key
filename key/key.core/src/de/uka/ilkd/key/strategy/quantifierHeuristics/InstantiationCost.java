@@ -40,7 +40,7 @@ public class InstantiationCost implements Feature {
 	/**
 	 * Compute the cost of a RuleApp.
 	 */
-	public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+	public RuleAppCost compute(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         final JavaDLTerm formula = pos.sequentFormula ().formula ();

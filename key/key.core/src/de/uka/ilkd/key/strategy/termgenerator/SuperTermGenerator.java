@@ -41,7 +41,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator ( cond ) {
-            protected Iterator<JavaDLTerm> createIterator(PosInOccurrence focus) {
+            protected Iterator<JavaDLTerm> createIterator(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> focus) {
                 return new UpwardsIterator ( focus, services );
             }
         };
@@ -49,17 +49,17 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
         return new SuperTermWithIndexGenerator ( cond ) {
-            protected Iterator<JavaDLTerm> createIterator(PosInOccurrence focus) {
+            protected Iterator<JavaDLTerm> createIterator(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> focus) {
                 return new UpwardsIterator ( focus, services );
             }
         };
     }
     
-    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         return createIterator ( pos );
     }
 
-    protected abstract Iterator<JavaDLTerm> createIterator(PosInOccurrence focus);
+    protected abstract Iterator<JavaDLTerm> createIterator(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> focus);
     
     protected JavaDLTerm generateOneTerm(JavaDLTerm superterm, int child) {
         return superterm;
@@ -77,7 +77,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             super ( cond );
         }
 
-        public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+        public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
             if ( services == null ) {
                 services = goal.proof ().getServices ();
                 final IntegerLDT numbers = services.getTheories().getIntegerLDT();
@@ -143,11 +143,11 @@ public abstract class SuperTermGenerator implements TermGenerator {
     }
     
     class UpwardsIterator implements Iterator<JavaDLTerm> {
-        private PosInOccurrence currentPos;
+        private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> currentPos;
         
         private final Services services;
 
-        private UpwardsIterator(PosInOccurrence startPos, Services services) {
+        private UpwardsIterator(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> startPos, Services services) {
             this.currentPos = startPos;
             this.services = services;
         }

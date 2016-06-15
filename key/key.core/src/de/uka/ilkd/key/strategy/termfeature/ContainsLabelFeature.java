@@ -32,7 +32,7 @@ public class ContainsLabelFeature extends BinaryFeature {
   
 
    @Override
-   protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+   protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
       return pos != null && pos.subTerm().containsLabel(label);
    }
 

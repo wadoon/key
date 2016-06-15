@@ -47,7 +47,7 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     }
     
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
 	final Node root = goal.proof().root();
 	
 	Node n = goal.node();

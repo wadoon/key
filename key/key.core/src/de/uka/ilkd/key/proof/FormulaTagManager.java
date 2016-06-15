@@ -16,16 +16,11 @@ package de.uka.ilkd.key.proof;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -40,8 +35,8 @@ public class FormulaTagManager {
     /** Key: FormulaTag        Value: FormulaInfo */
     private final HashMap<FormulaTag, FormulaInfo> tagToFormulaInfo;
 
-    /** Key: PosInOccurrence   Value: FormulaTag */
-    private final HashMap<PosInOccurrence, FormulaTag> pioToTag;
+    /** Key: PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>   Value: FormulaTag */
+    private final HashMap<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, FormulaTag> pioToTag;
 
     /**
      * Create a new manager that is initialised with the formulas of the given
@@ -49,12 +44,12 @@ public class FormulaTagManager {
      */
     FormulaTagManager ( Goal p_goal ) {
 	tagToFormulaInfo = new LinkedHashMap<FormulaTag, FormulaInfo> ();
-	pioToTag = new LinkedHashMap<PosInOccurrence, FormulaTag> ();
+	pioToTag = new LinkedHashMap<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, FormulaTag> ();
 	createNewTags ( p_goal );
     }
 
     private FormulaTagManager ( HashMap<FormulaTag, FormulaInfo> p_tagToPIO, 
-            HashMap<PosInOccurrence, FormulaTag> p_pioToTag ) {
+            HashMap<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, FormulaTag> p_pioToTag ) {
     	tagToFormulaInfo = p_tagToPIO;
     	pioToTag = p_pioToTag;
     }
@@ -62,17 +57,17 @@ public class FormulaTagManager {
     /**
      * @return the tag of the formula at the given position
      */
-    public FormulaTag getTagForPos ( PosInOccurrence p_pio ) {
+    public FormulaTag getTagForPos ( PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pio ) {
 	return pioToTag.get(p_pio);
     }
 
     /**
      * @return The current position of the formula with the given tag; the
-     * sequent attribute of the returned <code>PosInOccurrence</code> can
+     * sequent attribute of the returned <code>PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>></code> can
      * be obsolete and refer to a previous node. If no formula is assigned to
      * the given tag, <code>null</code> is returned
      */
-    public PosInOccurrence getPosForTag ( FormulaTag p_tag ) {
+    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getPosForTag ( FormulaTag p_tag ) {
     	final FormulaInfo info = getFormulaInfo(p_tag); 
 	if ( info == null ) return null;
 	return info.pio;
@@ -95,7 +90,7 @@ public class FormulaTagManager {
      * with the given tag since the creation of the tag, starting with the
      * most recent one
      */
-    public ImmutableList<FormulaChangeInfo> getModifications ( FormulaTag p_tag ) {
+    public ImmutableList<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> getModifications ( FormulaTag p_tag ) {
 	return getFormulaInfo(p_tag).modifications;
     }
 
@@ -113,21 +108,21 @@ public class FormulaTagManager {
     }
 
     private void updateTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-        for (FormulaChangeInfo formulaChangeInfo : sci.modifiedFormulas(p_antec))
+        for (FormulaChangeInfo<SequentFormula<JavaDLTerm>> formulaChangeInfo : sci.modifiedFormulas(p_antec))
             updateTag(formulaChangeInfo, sci.sequent(), p_goal);
     }
 
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-        for (SequentFormula constrainedFormula : sci.addedFormulas(p_antec)) {
-            final PosInOccurrence pio = new PosInOccurrence
+        for (SequentFormula<JavaDLTerm> constrainedFormula : sci.addedFormulas(p_antec)) {
+            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
                     (constrainedFormula, PosInTerm.<JavaDLTerm>getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }
 
     private void removeTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-        for (SequentFormula constrainedFormula : sci.removedFormulas(p_antec)) {
-            final PosInOccurrence pio = new PosInOccurrence
+        for (SequentFormula<JavaDLTerm> constrainedFormula : sci.removedFormulas(p_antec)) {
+            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
                     (constrainedFormula, PosInTerm.<JavaDLTerm>getTopLevel(), p_antec);
             removeTag(pio);
         }	
@@ -137,7 +132,7 @@ public class FormulaTagManager {
     public Object clone () {
     	return new FormulaTagManager
     	    ( (HashMap<FormulaTag, FormulaInfo>)tagToFormulaInfo.clone(), 
-    	            (HashMap<PosInOccurrence, FormulaTag>)pioToTag.clone() );
+    	            (HashMap<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, FormulaTag>)pioToTag.clone() );
     }
 
     public FormulaTagManager copy () {
@@ -164,7 +159,7 @@ public class FormulaTagManager {
         final Semisequent ss = p_antec ? seq.antecedent () : seq.succedent ();
 
         for (Object s : ss) {
-            final PosInOccurrence pio = new PosInOccurrence((SequentFormula) s,
+            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>((SequentFormula<JavaDLTerm>) s,
                     PosInTerm.<JavaDLTerm>getTopLevel(),
                     p_antec);
             createNewTag(pio, p_goal);
@@ -175,7 +170,7 @@ public class FormulaTagManager {
      * Add a new tag to the maps
      * @param p_pio The formula for which a new tag is supposed to be created
      */
-    private void createNewTag ( PosInOccurrence p_pio, Goal p_goal ) {
+    private void createNewTag ( PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pio, Goal p_goal ) {
     	final FormulaTag tag = new FormulaTag ();
     	tagToFormulaInfo.put ( tag, new FormulaInfo ( p_pio, p_goal.getTime () ) );
     	pioToTag.put(p_pio, tag);
@@ -184,7 +179,7 @@ public class FormulaTagManager {
     /**
      * Remove the entries for the given formulas from the maps
      */
-    private void removeTag ( PosInOccurrence p_pio ) {
+    private void removeTag ( PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pio ) {
     	final FormulaTag tag = getTagForPos ( p_pio );
     	
     	Debug.assertFalse ( tag == null,
@@ -195,12 +190,12 @@ public class FormulaTagManager {
 	pioToTag.remove(p_pio);        
     }
 
-    private void updateTag ( FormulaChangeInfo p_info,
+    private void updateTag ( FormulaChangeInfo<SequentFormula<JavaDLTerm>> p_info,
                              Sequent           p_newSeq,
                              Goal              p_goal ) {
      
  
-	final PosInOccurrence oldPIO  =
+	final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPIO  =
 	    p_info.getPositionOfModification().topLevel();
         final FormulaTag      tag     = getTagForPos ( oldPIO );
         final FormulaInfo     oldInfo = getFormulaInfo(tag);
@@ -235,7 +230,7 @@ public class FormulaTagManager {
     
     /**
      * Class that holds information about a formula, namely the current position
-     * (<code>PosInOccurrence</code>) as well as a list of the modifications
+     * (<code>PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>></code>) as well as a list of the modifications
      * that have been applied to the formula so far. Instances of this class
      * are immutable
      */
@@ -249,11 +244,11 @@ public class FormulaTagManager {
                     + modifications + ", age=" + age + "]";
         }
 
-        public final PosInOccurrence         pio;
+        public final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>         pio;
 	/** All modifications that have been applied to the formula
 	 * since the creation of the tag. The most recent modification
 	 * is the first element of the list */
-    	public final ImmutableList<FormulaChangeInfo> modifications;
+    	public final ImmutableList<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> modifications;
     	
         /**
          * The age (as obtained by <code>Goal.getTime()</code>) of the formula,
@@ -262,23 +257,23 @@ public class FormulaTagManager {
          */
         public final long                    age;
         
-    	public FormulaInfo ( PosInOccurrence p_pio, long p_age ) {
-	    this ( p_pio, ImmutableSLList.<FormulaChangeInfo>nil(), p_age );
+    	public FormulaInfo ( PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pio, long p_age ) {
+	    this ( p_pio, ImmutableSLList.<FormulaChangeInfo<SequentFormula<JavaDLTerm>>>nil(), p_age );
 	}	
 
-    	private FormulaInfo ( PosInOccurrence         p_pio,
-    	                      ImmutableList<FormulaChangeInfo> p_modifications,
+    	private FormulaInfo ( PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>         p_pio,
+    	                      ImmutableList<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> p_modifications,
                               long                    p_age ) {
     	    pio           = p_pio;
     	    modifications = p_modifications;
             age           = p_age;
     	}
     	
-    	public FormulaInfo addModification ( FormulaChangeInfo p_info,
+    	public FormulaInfo addModification ( FormulaChangeInfo<SequentFormula<JavaDLTerm>> p_info,
     	                                     Sequent           p_newSeq,
                                              long              p_age) {
-	    final PosInOccurrence newPIO =
-		new PosInOccurrence ( p_info.getNewFormula(),
+	    final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPIO =
+		new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( p_info.getNewFormula(),
 				      PosInTerm.<JavaDLTerm>getTopLevel(),
 				      pio.isInAntec() );
 	    

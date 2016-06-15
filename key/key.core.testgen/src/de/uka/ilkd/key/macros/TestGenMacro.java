@@ -56,7 +56,7 @@ public class TestGenMacro extends StrategyProofMacro {
 		}
 
 		@Override
-		public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+		public RuleAppCost computeCost(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
 		        Goal goal) {
 			if (TestGenStrategy.isUnwindRule(app.rule())) {
 				return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);
@@ -81,7 +81,7 @@ public class TestGenMacro extends StrategyProofMacro {
 		}
 
 		@Override
-		public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+		public boolean isApprovedApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
 			if (!TestGenMacro.hasModality(goal.node())) {
 				return false;
 			}
@@ -114,7 +114,7 @@ public class TestGenMacro extends StrategyProofMacro {
 	 */
 	private static boolean hasModality(Node node) {
 		final Sequent sequent = node.sequent();
-		for (final SequentFormula sequentFormula : sequent) {
+		for (final SequentFormula<JavaDLTerm> sequentFormula : sequent) {
 			if (TestGenMacro.hasModality(sequentFormula.formula())) {
 				return true;
 			}
@@ -139,7 +139,7 @@ public class TestGenMacro extends StrategyProofMacro {
 
 	@Override
 	protected Strategy createStrategy(Proof proof,
-	        PosInOccurrence posInOcc) {
+	        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
 		return new TestGenStrategy(proof
 		        .getActiveStrategy());
 	}

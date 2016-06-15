@@ -220,7 +220,7 @@ public final class SpecificationRepository {
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         tacletBuilder.setFind(tb.func(unlimited, subs));
-        final SequentFormula cf = new SequentFormula(tb.equals(limitedTerm,
+        final SequentFormula<JavaDLTerm> cf = new SequentFormula<>(tb.equals(limitedTerm,
                 unlimitedTerm));
         final Sequent addedSeq = Sequent
                 .createAnteSequent(Semisequent.nil()

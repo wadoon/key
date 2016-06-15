@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -29,18 +30,9 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.NotFreeIn;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletAnnotation;
-import de.uka.ilkd.key.rule.TacletAttributes;
-import de.uka.ilkd.key.rule.Trigger;
-import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.*;
 
 /** 
  * abstract taclet builder class to be inherited from taclet builders
@@ -83,7 +75,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     private static boolean containsFreeVarSV(Sequent sequent) {
-	for (final SequentFormula cf : sequent) {
+	for (final SequentFormula<JavaDLTerm> cf : sequent) {
 	    if (containsFreeVarSV(cf.formula())) {
 		return true;
 	    }
@@ -353,7 +345,7 @@ public abstract class TacletBuilder<T extends Taclet> {
             this.errorMessage = errorMessage;
         }
         
-        public TacletBuilderException(TacletBuilder tb,  String errorMessage) {
+        public TacletBuilderException(TacletBuilder<?> tb,  String errorMessage) {
            this(tb.getName(), errorMessage);
         }
         

@@ -207,9 +207,9 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
             //create sequents
             Sequent assumesSeq = Sequent.createAnteSequent(
-                    new Semisequent(new SequentFormula(schemaAssumes)));
+                    new Semisequent(new SequentFormula<>(schemaAssumes)));
             Sequent replaceWithSeq = Sequent.createAnteSequent(
-                    new Semisequent(new SequentFormula(replaceWithTerm)));
+                    new Semisequent(new SequentFormula<>(replaceWithTerm)));
 
             //create taclet
             InfFlowContractAppRewriteTacletBuilder tacletBuilder =

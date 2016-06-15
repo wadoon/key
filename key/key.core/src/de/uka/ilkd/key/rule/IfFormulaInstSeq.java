@@ -15,15 +15,12 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 
@@ -39,9 +36,9 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      */ 
     private final Sequent            seq;
     private final boolean antec;	// formula is in antecedent?
-    private final SequentFormula cf;
+    private final SequentFormula<JavaDLTerm> cf;
 
-    public IfFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula p_cf ) {
+    public IfFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula<JavaDLTerm> p_cf ) {
 	seq = p_seq;	
         this.antec = antec;
 	cf  = p_cf;
@@ -57,7 +54,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     /**
      * @return the cf this is pointing to
      */
-    public SequentFormula getConstrainedFormula () {
+    public SequentFormula<JavaDLTerm> getConstrainedFormula () {
 	return cf;
     }    
 
@@ -68,7 +65,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 							       boolean antec ) {
 	
 	ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
-	Iterator<SequentFormula>  it;
+	Iterator<SequentFormula<JavaDLTerm>>  it;
         if (antec) it = p_s.antecedent().iterator ();
            else it = p_s.succedent().iterator ();
 	while ( it.hasNext () ) {
@@ -129,11 +126,11 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
        return antec;
     }
 
-    private PosInOccurrence pioCache = null;
+    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pioCache = null;
     
-    public PosInOccurrence toPosInOccurrence () {
+    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> toPosInOccurrence () {
         if (pioCache == null)
-            pioCache = new PosInOccurrence ( getConstrainedFormula (),
+            pioCache = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( getConstrainedFormula (),
                                              PosInTerm.<JavaDLTerm>getTopLevel(),
                                              inAntec () );
         return pioCache;

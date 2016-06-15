@@ -103,7 +103,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * Implementation of the method from <code>NewRuleListener</code>. The new
      * rule app is added to the heap
      */
-    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
+    public void ruleAdded(RuleApp rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
         //System.out.println ( "Rule added: " + rule + "\n");
         
         	//ensureQueueExists ();
@@ -125,7 +125,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * rule app is added to the heap
      */
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
         if ( queue == null )
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us

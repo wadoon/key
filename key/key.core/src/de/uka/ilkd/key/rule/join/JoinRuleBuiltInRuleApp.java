@@ -4,6 +4,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
 
 import java.util.HashMap;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -33,7 +34,7 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
 public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private Node joinNode = null;
-    private ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = null;
+    private ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = null;
     private JoinProcedure concreteRule = null;
     
     private SymbolicExecutionStateWithProgCnt thisSEState = null;
@@ -41,22 +42,22 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private JavaDLTerm distForm = null;
 
 	public JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence pio) {
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         super(builtInRule, pio);
     }
 
-    protected JoinRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts) {
+    protected JoinRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+            ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
         super(rule, pio, ifInsts);
     }
 
     @Override
-    public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+    public AbstractBuiltInRuleApp replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos) {
         return null;
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -112,15 +113,15 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     // GETTERS AND SETTERS //
 
-    public ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> getJoinPartners() {
+    public ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> getJoinPartners() {
         return joinPartners;
     }
     
-    public void setJoinPartners(ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners) {
+    public void setJoinPartners(ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners) {
         this.joinPartners = joinPartners;
         
         joinPartnerStates = ImmutableSLList.nil();
-        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
+        for (Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
             final Services services = joinPartner.first.proof().getServices();
             
             Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> partnerSEState =

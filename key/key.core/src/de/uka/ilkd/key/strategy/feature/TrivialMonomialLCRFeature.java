@@ -13,7 +13,10 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -39,7 +42,7 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
         return new TrivialMonomialLCRFeature ( a, b );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         final Services services = goal.proof().getServices();
         final Monomial aMon =
             Monomial.create ( a.toTerm ( app, pos, goal ), services );

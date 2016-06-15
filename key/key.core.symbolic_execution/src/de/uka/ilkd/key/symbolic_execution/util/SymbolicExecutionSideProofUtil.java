@@ -78,16 +78,16 @@ public final class SymbolicExecutionSideProofUtil {
     * @param currentSF The {@link SequentFormula} to ignore.
     * @return The general initial {@link Sequent}.
     */
-   public static Sequent computeGeneralSequentToProve(Sequent goalSequent, SequentFormula currentSF) {
+   public static Sequent computeGeneralSequentToProve(Sequent goalSequent, SequentFormula<JavaDLTerm> currentSF) {
       Sequent sequentToProve = Sequent.EMPTY_SEQUENT;
-      for (SequentFormula sf : goalSequent.antecedent()) {
+      for (SequentFormula<JavaDLTerm> sf : goalSequent.antecedent()) {
          if (sf != currentSF) {
             if (!containsModalityOrQuery(sf)) {
                sequentToProve = sequentToProve.addFormula(sf, true, false).sequent();
             }
          }
       }
-      for (SequentFormula sf : goalSequent.succedent()) {
+      for (SequentFormula<JavaDLTerm> sf : goalSequent.succedent()) {
          if (sf != currentSF) {
             if (!containsModalityOrQuery(sf)) {
                sequentToProve = sequentToProve.addFormula(sf, false, false).sequent();
@@ -137,14 +137,14 @@ public final class SymbolicExecutionSideProofUtil {
             }
             Sequent sequent = resultGoal.sequent();
             List<JavaDLTerm> results = new LinkedList<JavaDLTerm>();
-            for (SequentFormula sf : sequent.antecedent()) {
+            for (SequentFormula<JavaDLTerm> sf : sequent.antecedent()) {
                if (sf.formula().containsLabel(label)) {
                   JavaDLTerm result = sf.formula();
                   result = services.getTermBuilder().not(result);
                   results.add(result);
                }
             }
-            for (SequentFormula sf : sequent.succedent()) {
+            for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
                if (sf.formula().containsLabel(label)) {
                   JavaDLTerm result = sf.formula();
                   results.add(result);
@@ -210,7 +210,7 @@ public final class SymbolicExecutionSideProofUtil {
             boolean newPredicateIsSequentFormula = isOperatorASequentFormula(sequent, operator);
             Set<JavaDLTerm> resultConditions = new LinkedHashSet<JavaDLTerm>();
             JavaDLTerm result = null;
-            for (SequentFormula sf : sequent.antecedent()) {
+            for (SequentFormula<JavaDLTerm> sf : sequent.antecedent()) {
                if (newPredicateIsSequentFormula) {
                   if (sf.formula().op() == operator) {
                      throw new IllegalStateException("Result predicate found in antecedent.");
@@ -228,7 +228,7 @@ public final class SymbolicExecutionSideProofUtil {
                   }
                }
             }
-            for (SequentFormula sf : sequent.succedent()) {
+            for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
                if (newPredicateIsSequentFormula) {
                   if (sf.formula().op() == operator) {
                      if (result != null) {
@@ -266,7 +266,7 @@ public final class SymbolicExecutionSideProofUtil {
       }
    }
    
-   private static JavaDLTerm constructResultIfContained(Services services, SequentFormula sf, Operator operator) {
+   private static JavaDLTerm constructResultIfContained(Services services, SequentFormula<JavaDLTerm> sf, Operator operator) {
       return constructResultIfContained(services, sf.formula(), operator);
    }
    
@@ -298,9 +298,9 @@ public final class SymbolicExecutionSideProofUtil {
    }
 
    private static boolean isOperatorASequentFormula(Sequent sequent, final Operator operator) {
-      return CollectionUtil.search(sequent, new IFilter<SequentFormula>() {
+      return CollectionUtil.search(sequent, new IFilter<SequentFormula<JavaDLTerm>>() {
          @Override
-         public boolean select(SequentFormula element) {
+         public boolean select(SequentFormula<JavaDLTerm> element) {
             return element.formula().op() == operator;
          }
       }) != null;
@@ -334,7 +334,7 @@ public final class SymbolicExecutionSideProofUtil {
     * @param sf The {@link SequentFormula} to check.
     * @return {@code true} contains at least one modality or query, {@code false} contains no modalities and no queries.
     */
-   public static boolean containsModalityOrQuery(SequentFormula sf) {
+   public static boolean containsModalityOrQuery(SequentFormula<JavaDLTerm> sf) {
       return containsModalityOrQuery(sf.formula());
    }
 
@@ -391,7 +391,7 @@ public final class SymbolicExecutionSideProofUtil {
    public static Set<Operator> extractRelevantThings(final Services services, 
                                                      Sequent sequentToProve) {
       final Set<Operator> result = new HashSet<Operator>();
-      for (SequentFormula sf : sequentToProve) {
+      for (SequentFormula<JavaDLTerm> sf : sequentToProve) {
          sf.formula().execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(JavaDLTerm visited) {
@@ -446,7 +446,7 @@ public final class SymbolicExecutionSideProofUtil {
    public static boolean isIrrelevantCondition(Services services, 
                                                Sequent initialSequent, 
                                                Set<Operator> relevantThingsInSequentToProve, 
-                                               SequentFormula sf) {
+                                               SequentFormula<JavaDLTerm> sf) {
       return initialSequent.antecedent().contains(sf) || // Conditions which already exist in the initial sequent are irrelevant
              initialSequent.succedent().contains(sf) || // Conditions which already exist in the initial sequent are irrelevant
 //             isInOrOfAntecedent(initialSequent, sf) ||
@@ -454,12 +454,12 @@ public final class SymbolicExecutionSideProofUtil {
              containsIrrelevantThings(services, sf, relevantThingsInSequentToProve); // Conditions which contains not relevant things are irrelevant
    }
 
-//   public static boolean isInOrOfAntecedent(Sequent initialSequent, SequentFormula sf) {
+//   public static boolean isInOrOfAntecedent(Sequent initialSequent, SequentFormula<JavaDLTerm> sf) {
 //      JavaDLTerm term = sf.formula();
 //      boolean result = false;
-//      Iterator<SequentFormula> iter = initialSequent.antecedent().iterator();
+//      Iterator<SequentFormula<JavaDLTerm>> iter = initialSequent.antecedent().iterator();
 //      while (!result && iter.hasNext()) {
-//         SequentFormula next = iter.next();
+//         SequentFormula<JavaDLTerm> next = iter.next();
 //         if (isInOr(next.formula(), term)) {
 //            result = true;
 //         }
@@ -490,7 +490,7 @@ public final class SymbolicExecutionSideProofUtil {
     * @return {@code true} The {@link SequentFormula} contains irrelevant things, {@code false} the {@link SequentFormula} contains no irrelevant things.
     */
    public static boolean containsIrrelevantThings(Services services,
-                                              SequentFormula sf,
+                                              SequentFormula<JavaDLTerm> sf,
                                               Set<Operator> relevantThings) {
       ContainsIrrelevantThingsVisitor visitor = new ContainsIrrelevantThingsVisitor(services, relevantThings);
       sf.formula().execPostOrder(visitor);
@@ -699,9 +699,9 @@ public final class SymbolicExecutionSideProofUtil {
    public static JavaDLTerm extractOperatorTerm(Node node, final Operator operator) {
       assert node != null;
       // Search formula with the given operator in sequent (or in some cases below the updates)
-      SequentFormula sf = CollectionUtil.search(node.sequent(), new IFilter<SequentFormula>() {
+      SequentFormula<JavaDLTerm> sf = CollectionUtil.search(node.sequent(), new IFilter<SequentFormula<JavaDLTerm>>() {
          @Override
-         public boolean select(SequentFormula element) {
+         public boolean select(SequentFormula<JavaDLTerm> element) {
             JavaDLTerm term = element.formula();
             term = TermBuilder.goBelowUpdates(term);
             return ObjectUtil.equals(term.op(), operator);

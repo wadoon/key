@@ -16,35 +16,20 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SemisequentChangeInfo;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.OperatorInstantiation;
-import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
-import de.uka.ilkd.key.rule.inst.ProgramListInstantiation;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.rule.inst.*;
 
 
 /**
@@ -87,15 +72,15 @@ public final class ProgVarReplacer {
                               int idx) {
         assert next.modifiedFormulas().isEmpty();
 
-        Iterator<SequentFormula> remIt = next.removedFormulas().iterator();
+        Iterator<SequentFormula<JavaDLTerm>> remIt = next.removedFormulas().iterator();
         assert remIt.hasNext();
-        SequentFormula remCf = remIt.next();
+        SequentFormula<JavaDLTerm> remCf = remIt.next();
         assert !remIt.hasNext();
         base.removedFormula(idx, remCf);
 
-        Iterator<SequentFormula> addIt = next.addedFormulas().iterator();
+        Iterator<SequentFormula<JavaDLTerm>> addIt = next.addedFormulas().iterator();
         assert addIt.hasNext();
-        SequentFormula addCf = addIt.next();
+        SequentFormula<JavaDLTerm> addCf = addIt.next();
         assert !addIt.hasNext();
         base.addedFormula(idx, addCf);
 
@@ -247,11 +232,11 @@ public final class ProgVarReplacer {
     	  SemisequentChangeInfo result = new SemisequentChangeInfo();
         result.setFormulaList(s.asList());
 
-        final Iterator<SequentFormula> it = s.iterator();
+        final Iterator<SequentFormula<JavaDLTerm>> it = s.iterator();
         
         for (int formulaNumber = 0; it.hasNext(); formulaNumber++) {            
-            final SequentFormula oldcf = it.next();
-            final SequentFormula newcf = replace(oldcf);
+            final SequentFormula<JavaDLTerm> oldcf = it.next();
+            final SequentFormula<JavaDLTerm> newcf = replace(oldcf);
 
             if(newcf != oldcf) {
                 result.combine(result.semisequent().replace(formulaNumber, newcf));
@@ -265,13 +250,13 @@ public final class ProgVarReplacer {
     /**
      * replaces in a constrained formula
      */
-    public SequentFormula replace(SequentFormula cf) {
-        SequentFormula result = cf;
+    public SequentFormula<JavaDLTerm> replace(SequentFormula<JavaDLTerm> cf) {
+        SequentFormula<JavaDLTerm> result = cf;
 
 	final JavaDLTerm newFormula = replace(cf.formula());
 
 	if(newFormula != cf.formula()) {
-            result = new SequentFormula(newFormula);
+            result = new SequentFormula<>(newFormula);
 	}
         return result;
     }

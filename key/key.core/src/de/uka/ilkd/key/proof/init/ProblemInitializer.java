@@ -411,9 +411,9 @@ public final class ProblemInitializer {
     private void populateNamespaces(Proof proof) {
         final NamespaceSet namespaces = proof.getNamespaces();
         final Goal rootGoal = proof.openGoals().head();
-        Iterator<SequentFormula> it = proof.root().sequent().iterator();
+        Iterator<SequentFormula<JavaDLTerm>> it = proof.root().sequent().iterator();
         while(it.hasNext()) {
-            SequentFormula cf = it.next();
+            SequentFormula<JavaDLTerm> cf = it.next();
             populateNamespaces(cf.formula(), namespaces, rootGoal);
         }
     }

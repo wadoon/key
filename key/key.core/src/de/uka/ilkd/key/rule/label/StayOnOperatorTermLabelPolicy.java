@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule.label;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -30,7 +31,7 @@ import de.uka.ilkd.key.rule.Rule;
  * This {@link TermLabelPolicy} maintains a {@link TermLabel} as long
  * the new {@link JavaDLTerm} has the same {@link Operator} as the
  * previous best matching {@link JavaDLTerm} from which it was created.
- * @author Martin Hentschel
+ * @author Martin Hentschel 
  */
 public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
    /**
@@ -39,7 +40,7 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
    @Override
    public TermLabel keepLabel(TermLabelState state,
                               Services services,
-                              PosInOccurrence applicationPosInOccurrence,
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
                               JavaDLTerm applicationTerm,
                               Rule rule,
                               Goal goal,

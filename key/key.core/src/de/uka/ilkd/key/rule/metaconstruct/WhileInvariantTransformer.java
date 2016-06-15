@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
@@ -26,26 +27,13 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -127,7 +115,7 @@ public final class WhileInvariantTransformer {
     
     
     /** calculates the resulting term. */
-    public JavaDLTerm transform(TermLabelState termLabelState, Rule rule, RuleApp ruleApp, Goal goal, Sequent applicationSequent, PosInOccurrence applicationPos, JavaDLTerm initialPost, JavaDLTerm invariantFramingTermination, SVInstantiations svInst, Services services) {
+    public JavaDLTerm transform(TermLabelState termLabelState, Rule rule, RuleApp ruleApp, Goal goal, Sequent applicationSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, JavaDLTerm initialPost, JavaDLTerm invariantFramingTermination, SVInstantiations svInst, Services services) {
         
         // global initialisation
         init(initialPost, invariantFramingTermination, services);
@@ -286,7 +274,7 @@ public final class WhileInvariantTransformer {
      * loop body modality {@link JavaDLTerm}.
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services}.
-     * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
+     * @param applicationPos The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the {@link Sequent} to rewrite.
      * @param rule The {@link Rule} to apply.
      * @param goal The {@link Goal} to compute the result for. 
      * @param loopBodyModality The {@link Modality} of the loop body.
@@ -297,7 +285,7 @@ public final class WhileInvariantTransformer {
      */
     private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(TermLabelState termLabelState,
                                                                     Services services,
-                                                                    PosInOccurrence applicationPos, 
+                                                                    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, 
                                                                     Rule rule, 
                                                                     RuleApp ruleApp,
                                                                     Goal goal, 
@@ -404,7 +392,7 @@ public final class WhileInvariantTransformer {
                             Rule rule,
                             RuleApp ruleApp,
                             Goal goal,
-                            PosInOccurrence applicationPos, 
+                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, 
                             Services services) {
         JavaBlock returnJavaBlock = addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
         JavaDLTerm executeReturn = services.getTermBuilder().prog(modality, 
@@ -436,7 +424,7 @@ public final class WhileInvariantTransformer {
                            Rule rule,
                            RuleApp ruleApp,
                            Goal goal,
-                           PosInOccurrence applicationPos, 
+                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, 
                            Services services) {
         JavaBlock executeJavaBlock = addContext(root, new StatementBlock(breakIfCascade.toArray(new Statement[breakIfCascade.size()])));
         JavaDLTerm executeBreak = services.getTermBuilder().prog(modality, 
@@ -451,7 +439,7 @@ public final class WhileInvariantTransformer {
 
     private JavaDLTerm  normalCaseAndContinue(TermLabelState termLabelState,
                                         Services services,
-                                        PosInOccurrence applicationPos,
+                                        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos,
                                         Rule rule,
                                         RuleApp ruleApp,
                                         Goal goal,
@@ -498,7 +486,7 @@ public final class WhileInvariantTransformer {
      * of the normal termination branch of a loop body.
     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services}.
-     * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
+     * @param applicationPos The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the {@link Sequent} to rewrite.
      * @param rule The {@link Rule} to apply.
      * @param goal The {@link Goal} to compute the result for. 
      * @param operator The {@link Operator} of the new {@link JavaDLTerm}.
@@ -508,7 +496,7 @@ public final class WhileInvariantTransformer {
      */
     private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(TermLabelState termLabelState,
                                                                       Services services,
-                                                                      PosInOccurrence applicationPos, 
+                                                                      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, 
                                                                       Rule rule, 
                                                                       RuleApp ruleApp,
                                                                       Goal goal, 
@@ -526,7 +514,7 @@ public final class WhileInvariantTransformer {
                            Rule rule,
                            RuleApp ruleApp,
                            Goal goal,
-                           PosInOccurrence applicationPos, 
+                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, 
                            Services services) {
         final TermBuilder TB = services.getTermBuilder();
         JavaBlock throwJavaBlock = addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));

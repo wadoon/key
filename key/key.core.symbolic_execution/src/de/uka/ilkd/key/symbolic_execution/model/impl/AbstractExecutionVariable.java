@@ -37,9 +37,9 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
    private final JavaDLTerm additionalCondition;
    
    /**
-    * The {@link PosInOccurrence} of the modality of interest.
+    * The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
     */
-   private final PosInOccurrence modalityPIO;
+   private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO;
 
    /**
     * Constructor.
@@ -49,7 +49,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
     * @param arrayIndex The index in the parent array.
     * @param additionalCondition An optional additional condition to consider.
-    * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
+    * @param modalityPIO The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
     */
    public AbstractExecutionVariable(ITreeSettings settings, 
                                     Node proofNode, 
@@ -57,7 +57,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
                                     IExecutionValue parentValue, 
                                     JavaDLTerm arrayIndex, 
                                     JavaDLTerm additionalCondition,
-                                    PosInOccurrence modalityPIO) {
+                                    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO) {
       super(settings, proofNode);
       this.programVariable = programVariable;
       this.parentValue = parentValue;
@@ -140,7 +140,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence getModalityPIO() {
+   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
       return modalityPIO;
    }
 }

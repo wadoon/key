@@ -13,17 +13,13 @@
 
 package de.uka.ilkd.key.macros;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 
 /**
@@ -46,17 +42,17 @@ import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
  *
  * Whenever a situation arises where the user wants to apply macros, they are
  * asked whether they can be applied (
- * {@link #canApplyTo(KeYMediator, PosInOccurrence)}). A macro is offered to the
+ * {@link #canApplyTo(KeYMediator, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>)}). A macro is offered to the
  * user iff it returns <code>true</code>. No changes should be made there.
  *
- * A macro is then applied using {@link #applyTo(KeYMediator, PosInOccurrence)}.
+ * A macro is then applied using {@link #applyTo(KeYMediator, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>)}.
  * This may change the proof by applying rule applications. It is allowed to use
  * automatic runs, manual instantiations, ...
  *
  * A proof macro needs to extract all necessary information on the application
  * from the mediator passed to the
- * {@link #applyTo(KeYMediator, PosInOccurrence)} (or
- * {@link #canApplyTo(KeYMediator, PosInOccurrence)}) method. You will be able
+ * {@link #applyTo(KeYMediator, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>)} (or
+ * {@link #canApplyTo(KeYMediator, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>)}) method. You will be able
  * to access any interesting data from that starting point, especially
  * {@link KeYMediator#getInteractiveProver()}.
  *
@@ -132,7 +128,7 @@ public interface ProofMacro {
      */
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc);
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc);
 
     /**
      * Can this macro be applied on the given node?
@@ -144,7 +140,7 @@ public interface ProofMacro {
      * with that fact.
      *
      * This method must be implemented to have the same effect as calling
-     * {@link #canApplyTo(Proof, ImmutableList, PosInOccurrence)} with
+     * {@link #canApplyTo(Proof, ImmutableList, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>)} with
      * <code>node.proof()</code> as proof and all open goals below
      * <code>node</code>.
      *
@@ -156,7 +152,7 @@ public interface ProofMacro {
      * @return <code>true</code>, if the macro is allowed to be applied
      */
     public boolean canApplyTo(Node node,
-                              PosInOccurrence posInOcc);
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc);
 
     /**
      * Apply this macro on the given goals.
@@ -189,7 +185,7 @@ public interface ProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
+                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException, Exception;
 
     /**
@@ -220,7 +216,7 @@ public interface ProofMacro {
      */
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Node node,
-                                          PosInOccurrence posInOcc,
+                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException, Exception;
 
     /**

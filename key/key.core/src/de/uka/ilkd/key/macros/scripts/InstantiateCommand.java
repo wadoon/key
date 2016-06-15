@@ -3,6 +3,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
@@ -11,11 +12,10 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -108,23 +108,23 @@ public class InstantiateCommand extends AbstractCommand {
         index.autoModeStopped ();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
-        for (SequentFormula sf : g.node().sequent().antecedent()) {
+        for (SequentFormula<JavaDLTerm> sf : g.node().sequent().antecedent()) {
             if(p.formula != null && !sf.formula().equals(p.formula)) {
                 continue;
             }
             allApps = allApps.append(
                     index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(), true),
+                            new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(), true),
                             services));
         }
 
-        for (SequentFormula sf : g.node().sequent().succedent()) {
+        for (SequentFormula<JavaDLTerm> sf : g.node().sequent().succedent()) {
             if(p.formula != null && !sf.formula().equals(p.formula)) {
                 continue;
             }
             allApps = allApps.append(
                     index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(), false),
+                            new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(), false),
                             services));
         }
 
@@ -166,7 +166,7 @@ public class InstantiateCommand extends AbstractCommand {
         Node n = goal.node();
         Sequent seq = n.sequent();
         int occ = params.occ;
-        for(SequentFormula form : seq.antecedent().asList()) {
+        for(SequentFormula<JavaDLTerm> form : seq.antecedent().asList()) {
             JavaDLTerm term = form.formula();
             if(term.op() == Quantifier.ALL) {
                 String varName = term.boundVars().get(0).name().toString();
@@ -180,7 +180,7 @@ public class InstantiateCommand extends AbstractCommand {
             }
         }
 
-        for(SequentFormula form : seq.succedent().asList()) {
+        for(SequentFormula<JavaDLTerm> form : seq.succedent().asList()) {
             JavaDLTerm term = form.formula();
             if(term.op() == Quantifier.EX) {
                 String varName = term.boundVars().get(0).name().toString();

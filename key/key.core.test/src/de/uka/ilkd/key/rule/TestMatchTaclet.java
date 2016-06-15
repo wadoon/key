@@ -159,7 +159,7 @@ public class TestMatchTaclet extends TestCase {
 
 	Sequent seq = Sequent.createSequent
 	    (Semisequent.nil().insert
-	     (0, new SequentFormula(match.sub(0))).semisequent(), 
+	     (0, new SequentFormula<>(match.sub(0))).semisequent(), 
 	     Semisequent.nil());
 
 	assertTrue("An area conflict should happen because there is a free"+
@@ -190,7 +190,7 @@ public class TestMatchTaclet extends TestCase {
 	(find_addrule_conflict,
 	        find_addrule_conflict.getMatcher().matchFind(match.sub(0), 
 	                MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
-                    new PosInOccurrence(new SequentFormula(match),
+                    new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(match),
                             PosInTerm.<JavaDLTerm>getTopLevel().down(0), true), services);
         
     
@@ -204,7 +204,7 @@ public class TestMatchTaclet extends TestCase {
 	(find_addrule_conflict,
             find_addrule_conflict.getMatcher().matchFind(match, 
                     MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
-                    new PosInOccurrence(new SequentFormula(match),
+                    new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(match),
                             PosInTerm.<JavaDLTerm>getTopLevel(), true), services);
 	assertTrue("A match should have been found,"+
 		   " because here there formerly free variable is bound.",
@@ -225,7 +225,7 @@ public class TestMatchTaclet extends TestCase {
             if_find_clash.getMatcher().matchFind(match.sub(0),  
                MatchConditions.EMPTY_MATCHCONDITIONS, 
                services).getInstantiations(),
-               new PosInOccurrence(new SequentFormula(match.sub(0)),
+               new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(match.sub(0)),
                        PosInTerm.<JavaDLTerm>getTopLevel().down(0), true), services);
         
 	assertTrue("Match found but match term contains free var and"+
@@ -278,12 +278,12 @@ public class TestMatchTaclet extends TestCase {
 	JavaDLTerm closeable_two = TacletForTests.parseTerm("\\forall testSort y; p(y)");
 	Sequent seq = Sequent.createSequent
 	    (Semisequent.nil().insert
-	     (0, new SequentFormula(closeable_one)).semisequent(), 
+	     (0, new SequentFormula<>(closeable_one)).semisequent(), 
 	     Semisequent.nil().insert
-	     (0, new SequentFormula(closeable_two)).semisequent()); 	
+	     (0, new SequentFormula<>(closeable_two)).semisequent()); 	
 	TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
 	index.add(close_rule.taclet());
-        PosInOccurrence pio = new PosInOccurrence(new SequentFormula(closeable_two),
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(closeable_two),
                 PosInTerm.<JavaDLTerm>getTopLevel(), false);
 
 	TacletApp tacletApp = index.getSuccedentTaclet(pio,

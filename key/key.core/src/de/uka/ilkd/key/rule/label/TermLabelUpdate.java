@@ -15,6 +15,7 @@ package de.uka.ilkd.key.rule.label;
 
 import java.util.Set;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -35,7 +36,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 /**
  * <p>
  * A {@link TermLabelUpdate} is used by
- * {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, JavaDLTerm, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
+ * {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, JavaDLTerm, JavaDLTerm, Rule, Goal, Object, JavaDLTerm, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
  * to add or remove maintained {@link TermLabel}s which will be added to the new {@link JavaDLTerm}.
  * </p>
  * <p>
@@ -51,8 +52,8 @@ public interface TermLabelUpdate extends RuleSpecificTask {
     * This method can freely add, remove or sort the given {@link TermLabel}
     * which will be added to the new {@link JavaDLTerm}.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
-    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationTerm The {@link JavaDLTerm} defined by the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the previous {@link Sequent}.
     * @param modalityTerm The optional modality {@link JavaDLTerm}.
     * @param rule The {@link Rule} which is applied.
     * @param ruleApp The {@link RuleApp} which is currently performed.
@@ -69,7 +70,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
     */
    public void updateLabels(TermLabelState state,
                             Services services,
-                            PosInOccurrence applicationPosInOccurrence,
+                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
                             JavaDLTerm applicationTerm,
                             JavaDLTerm modalityTerm,
                             Rule rule,

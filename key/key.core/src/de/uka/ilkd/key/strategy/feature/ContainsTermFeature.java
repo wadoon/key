@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.JavaDLVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -65,7 +67,7 @@ public class ContainsTermFeature implements Feature {
 
     @Override
     public RuleAppCost compute(RuleApp app,
-                               PosInOccurrence pos,
+                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
                                Goal goal) {
         final JavaDLTerm t1 = proj1.toTerm(app, pos, goal);
         final JavaDLTerm t2 = proj2.toTerm(app, pos, goal);

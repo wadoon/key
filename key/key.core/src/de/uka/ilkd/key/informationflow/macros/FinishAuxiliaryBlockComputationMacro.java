@@ -35,7 +35,7 @@ public class FinishAuxiliaryBlockComputationMacro
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {        
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {        
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                     proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -56,7 +56,7 @@ public class FinishAuxiliaryBlockComputationMacro
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           final Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
+                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
                                           ProverTaskListener listener) {
         assert canApplyTo(proof, goals, posInOcc);
 

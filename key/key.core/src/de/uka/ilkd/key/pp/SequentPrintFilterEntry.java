@@ -25,11 +25,11 @@ public interface SequentPrintFilterEntry {
     /**
      * Formula to display
      */
-    SequentFormula getFilteredFormula   ();
+    SequentFormula<JavaDLTerm> getFilteredFormula   ();
 
     /**
      * Original formula from sequent
      */
-    SequentFormula getOriginalFormula   ();
+    SequentFormula<JavaDLTerm> getOriginalFormula   ();
 
 }

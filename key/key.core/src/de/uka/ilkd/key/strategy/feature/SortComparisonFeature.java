@@ -13,8 +13,10 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.sort.Sort;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -42,7 +44,7 @@ public class SortComparisonFeature extends BinaryFeature {
         this.comparator = comparator;
     }
     
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {        
+    protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {        
         final Sort sort1 = s1.toTerm(app, pos, goal).sort();
         final Sort sort2 = s2.toTerm(app, pos, goal).sort();
 

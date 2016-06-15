@@ -34,7 +34,7 @@ public class HeuristicInstantiation implements TermGenerator {
     private HeuristicInstantiation() {}
     
     public Iterator<JavaDLTerm> generate(RuleApp app,
-                                   PosInOccurrence pos,
+                                   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
                                    Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 

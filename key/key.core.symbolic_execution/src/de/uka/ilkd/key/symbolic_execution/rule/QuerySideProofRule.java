@@ -123,7 +123,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+   public boolean isApplicable(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
       boolean applicable = false;
       if (pio != null) {
           // abort if inside of transformer
@@ -143,13 +143,13 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
    
    /**
     * Checks if the query term is supported. The functionality is identical to
-    * {@link QueryExpand#isApplicable(Goal, PosInOccurrence)}.
+    * {@link QueryExpand#isApplicable(Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>)}.
     * @param goal The {@link Goal}.
     * @param pmTerm The {@link JavaDLTerm} to with the query to check.
-    * @param pio The {@link PosInOccurrence} in the {@link Goal}.
+    * @param pio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the {@link Goal}.
     * @return {@code true} is applicable, {@code false} is not applicable
     */
-   protected boolean isApplicableQuery(Goal goal, JavaDLTerm pmTerm, PosInOccurrence pio) {
+   protected boolean isApplicableQuery(Goal goal, JavaDLTerm pmTerm, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
       if (pmTerm.op() instanceof IProgramMethod && pmTerm.freeVars().isEmpty()) {
          IProgramMethod pm = (IProgramMethod) pmTerm.op();
          final Sort nullSort = goal.proof().getJavaInfo().nullSort();
@@ -172,7 +172,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public IBuiltInRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services) {
+   public IBuiltInRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, JavaDLTermServices services) {
       return new DefaultBuiltInRuleApp(this, pos);
    }
    
@@ -183,9 +183,9 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
       try {
          // Extract required Terms from goal
-         PosInOccurrence pio = ruleApp.posInOccurrence();
+         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = ruleApp.posInOccurrence();
          Sequent goalSequent = goal.sequent();
-         SequentFormula equalitySF = pio.sequentFormula();
+         SequentFormula<JavaDLTerm> equalitySF = pio.sequentFormula();
          JavaDLTerm equalityTerm = pio.subTerm();
          JavaDLTerm queryTerm;
          JavaDLTerm varTerm;
@@ -210,7 +210,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          Sequent sequentToProve = SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(goalSequent, equalitySF);
          Function newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
          JavaDLTerm newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
-         sequentToProve = sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
+         sequentToProve = sequentToProve.addFormula(new SequentFormula<>(newTerm), false, false).sequent();
          // Compute results and their conditions
          List<Triple<JavaDLTerm, Set<JavaDLTerm>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve, newPredicate);
          // Create new single goal in which the query is replaced by the possible results
@@ -230,7 +230,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                if (queryConditionTerm != null) {
                   resultTerm = tb.imp(queryConditionTerm, resultTerm);
                }
-               resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
+               resultGoal.addFormula(new SequentFormula<>(resultTerm), pio.isInAntec(), false);
             }
          }
          else {
@@ -244,7 +244,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             for (Triple<JavaDLTerm, Set<JavaDLTerm>, Node> conditionsAndResult : conditionsAndResultsMap) {
                JavaDLTerm conditionTerm = tb.and(conditionsAndResult.second);
                JavaDLTerm resultTerm = tb.imp(conditionTerm, varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.first) : tb.equals(conditionsAndResult.first, resultFunctionTerm));
-               resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
+               resultGoal.addFormula(new SequentFormula<>(resultTerm), true, false);
             }
          }
          return goals;

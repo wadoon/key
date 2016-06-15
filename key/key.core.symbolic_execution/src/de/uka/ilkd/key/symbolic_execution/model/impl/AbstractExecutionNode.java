@@ -82,9 +82,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    private ExecutionNodeSymbolicLayoutExtractor layoutExtractor;
    
    /**
-    * The {@link PosInOccurrence} of the modality or its updates.
+    * The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality or its updates.
     */
-   private PosInOccurrence modalityPIO;
+   private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO;
    
    /**
     * The up to know discovered completed {@link IExecutionBlockStartNode}s.
@@ -362,7 +362,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence getModalityPIO() {
+   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
       if (modalityPIO == null) {
          modalityPIO = lazyComputeModalityPIO();
       }
@@ -370,14 +370,14 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    }
 
    /**
-    * Computes the {@link PosInOccurrence} lazily when {@link #getModalityPIO()} is 
+    * Computes the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} lazily when {@link #getModalityPIO()} is 
     * called the first time.
-    * @return The {@link PosInOccurrence}s of the modality or its updates.
+    * @return The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}s of the modality or its updates.
     */
-   protected PosInOccurrence lazyComputeModalityPIO() {
-      PosInOccurrence originalPio = getProofNode().getAppliedRuleApp().posInOccurrence();
+   protected PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> lazyComputeModalityPIO() {
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> originalPio = getProofNode().getAppliedRuleApp().posInOccurrence();
       // Try to go back to the parent which provides the updates
-      PosInOccurrence pio = originalPio;
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = originalPio;
       JavaDLTerm term = pio.subTerm();
       if (!pio.isTopLevel() && term.op() != UpdateApplication.UPDATE_APPLICATION) {
          pio = pio.up();

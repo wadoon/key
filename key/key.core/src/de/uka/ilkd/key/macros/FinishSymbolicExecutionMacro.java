@@ -14,11 +14,11 @@
 package de.uka.ilkd.key.macros;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
@@ -63,7 +63,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
      */
     private static boolean hasModality(Node node) {
         Sequent sequent = node.sequent();
-        for (SequentFormula sequentFormula : sequent) {
+        for (SequentFormula<JavaDLTerm> sequentFormula : sequent) {
             if(hasModality(sequentFormula.formula())) {
                 return true;
             }
@@ -95,7 +95,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
         return new FilterSymbexStrategy(
                 proof.getActiveStrategy());
     }
@@ -118,7 +118,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
             if(!hasModality(goal.node())) {
                 return false;
             }

@@ -42,7 +42,7 @@ public class FIFOStrategy implements Strategy {
      * (it is discarded by the strategy).
      */
     public RuleAppCost computeCost ( RuleApp         app,
-	                             PosInOccurrence pio,
+	                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
 	                             Goal            goal ) {
 	return NumberRuleAppCost.create ( goal.getTime () );
     }
@@ -53,13 +53,13 @@ public class FIFOStrategy implements Strategy {
      * @return true iff the rule should be applied, false otherwise
      */
     public boolean isApprovedApp (  RuleApp         app,
-	                            PosInOccurrence pio,
+	                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
 	                            Goal            goal ) {
 	return true;
     }
 
     public void instantiateApp(RuleApp app,
-                               PosInOccurrence pio,
+                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
                                Goal goal,
                                RuleAppCostCollector collector) {}
 

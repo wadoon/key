@@ -45,7 +45,7 @@ public class MediatorProofControl extends AbstractProofControl {
     * {@inheritDoc}
     */
    @Override
-   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
+   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
       boolean result = super.selectedTaclet(taclet, goal, pos);
       if (!result) {
          ui.notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));
@@ -204,7 +204,7 @@ public class MediatorProofControl extends AbstractProofControl {
     * {@inheritDoc}
     */
    @Override
-   public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
+   public void runMacro(Node node, ProofMacro macro, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
       KeYMediator mediator = ui.getMediator();
       final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
       mediator.stopInterface(true);

@@ -37,7 +37,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
    @Override
    public TermLabel keepLabel(TermLabelState state,
                               Services services,
-                              PosInOccurrence applicationPosInOccurrence, 
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, 
                               JavaDLTerm applicationTerm, 
                               Rule rule, 
                               Goal goal, 

@@ -13,42 +13,23 @@
 
 package de.uka.ilkd.key.rule.join;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.clearSemisequent;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.closeJoinPartnerGoal;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.createSimplifiedDisjunctivePathCondition;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getConjunctiveElementsFor;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getLocationVariables;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateLeftSideLocations;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateRightSideFor;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isProvableWithSplitting;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isUpdateNormalForm;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSEPair;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -59,11 +40,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
-import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithSignLattice;
+import de.uka.ilkd.key.rule.join.procedures.*;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.ProgramVariablesMatchVisitor;
@@ -167,7 +144,7 @@ public class JoinRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final JoinProcedure joinRule = joinRuleApp.getConcreteRule();
         final Node currentNode = newGoal.node();
-        final ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
+        final ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
                 joinRuleApp.getJoinPartners();
 
         final SymbolicExecutionStateWithProgCnt thisSEState =
@@ -178,7 +155,7 @@ public class JoinRule implements BuiltInRule {
 
         // Unify names in join partner symbolic state and path condition
         {
-            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> tmpJoinPartners =
+            ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> tmpJoinPartners =
                     joinPartners;
             for (final SymbolicExecutionState joinPartnerState : joinRuleApp
                     .getJoinPartnerStates()) {
@@ -250,17 +227,17 @@ public class JoinRule implements BuiltInRule {
 
         // Add new antecedent (path condition)
         for (JavaDLTerm antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
-            final SequentFormula newAntecedent =
-                    new SequentFormula(antecedentFormula);
+            final SequentFormula<JavaDLTerm> newAntecedent =
+                    new SequentFormula<>(antecedentFormula);
             newGoal.addFormula(newAntecedent, true, false);
         }
 
         // Add new succedent (symbolic state & program counter)
         final JavaDLTerm succedentFormula =
                 tb.apply(joinedState.first, thisSEState.third);
-        final SequentFormula newSuccedent =
-                new SequentFormula(succedentFormula);
-        newGoal.addFormula(newSuccedent, new PosInOccurrence(newSuccedent,
+        final SequentFormula<JavaDLTerm> newSuccedent =
+                new SequentFormula<>(succedentFormula);
+        newGoal.addFormula(newSuccedent, new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(newSuccedent,
                 PosInTerm.<JavaDLTerm>getTopLevel(), false));
         
         // The following line has the only effect of emptying the
@@ -271,7 +248,7 @@ public class JoinRule implements BuiltInRule {
         services.saveNameRecorder(currentNode);
 
         // Close partner goals
-        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
+        for (Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
             closeJoinPartnerGoal(
                     newGoal.node(),
                     joinPartner.first,
@@ -602,7 +579,7 @@ public class JoinRule implements BuiltInRule {
      * @return true iff a suitable top level formula for joining.
      */
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         // Note: We do not check for join partner existence
         // to save time during automatic execution.
         // As a result, the rule is applicable for any
@@ -628,7 +605,7 @@ public class JoinRule implements BuiltInRule {
      *            true.
      * @return true iff a suitable top level formula for joining.
      */
-    public static boolean isOfAdmissibleForm(Goal goal, PosInOccurrence pio,
+    public static boolean isOfAdmissibleForm(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
             boolean doJoinPartnerCheck) {
         // We admit top level formulas of the form \<{ ... }\> phi
         // and U \<{ ... }\> phi, where U must be an update
@@ -686,7 +663,7 @@ public class JoinRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pio, JavaDLTermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, JavaDLTermServices services) {
         return new JoinRuleBuiltInRuleApp(this, pio);
     }
 
@@ -701,8 +678,8 @@ public class JoinRule implements BuiltInRule {
      *            The services object.
      * @return A list of suitable join partners. May be empty if none exist.
      */
-    public static ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
-            Goal goal, PosInOccurrence pio) {
+    public static ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
+            Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         return findPotentialJoinPartners(goal, pio, goal.proof().root());
     }
 
@@ -719,8 +696,8 @@ public class JoinRule implements BuiltInRule {
      *            The services object.
      * @return A list of suitable join partners. May be empty if none exist.
      */
-    public static ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
-            Goal goal, PosInOccurrence pio, Node start) {
+    public static ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
+            Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Node start) {
 
         Services services = goal.proof().getServices();
 
@@ -729,17 +706,17 @@ public class JoinRule implements BuiltInRule {
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
-        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> potentialPartners =
+        ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> potentialPartners =
                 ImmutableSLList.nil();
         for (Goal g : allGoals) {
             if (!g.equals(goal) && !g.isLinked()) {
                 Semisequent succedent = g.sequent().succedent();
                 for (int i = 0; i < succedent.size(); i++) {
-                    SequentFormula f = succedent.get(i);
+                    SequentFormula<JavaDLTerm> f = succedent.get(i);
 
                     PosInTerm<JavaDLTerm> pit = PosInTerm.<JavaDLTerm>getTopLevel();
 
-                    PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
+                    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> gPio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(f, pit, false);
                     if (isOfAdmissibleForm(g, gPio, false)) {
                         Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> ownSEState =
                                 sequentToSETriple(goal.node(), pio, services);
@@ -788,7 +765,7 @@ public class JoinRule implements BuiltInRule {
 
                             potentialPartners =
                                     potentialPartners
-                                            .prepend(new Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>(
+                                            .prepend(new Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>(
                                                     g, gPio, matchVisitor
                                                             .getMatches()
                                                             .getValue()));

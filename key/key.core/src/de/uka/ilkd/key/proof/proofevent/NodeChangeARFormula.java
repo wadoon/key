@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.proof.proofevent;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
 
@@ -20,16 +23,16 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
  * node */
 public abstract class NodeChangeARFormula implements NodeChange {
     
-    PosInOccurrence pos;
+    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos;
 
-    public NodeChangeARFormula ( PosInOccurrence p_pos ) {
+    public NodeChangeARFormula ( PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos ) {
 	pos = p_pos;
     }
 
     /**
      * @return the position of the formula
      */
-    public PosInOccurrence getPos () {
+    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getPos () {
 	return pos;
     }
 

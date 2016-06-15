@@ -96,12 +96,12 @@ public class InitialPositionTable extends PositionTable{
     }
 
 
-    /** Returns the path for a given PosInOccurrence.  This is 
+    /** Returns the path for a given PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>.  This is 
      * built up from the initial 0, the number of the 
-     * SequentFormula in the sequent, the position in the 
+     * SequentFormula<JavaDLTerm> in the sequent, the position in the 
      * constrained formula, and possibly inside a Metavariable
      * instantiation. */
-    public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
+    public ImmutableList<Integer> pathForPosition(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
 					 SequentPrintFilter filter) {
 	ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
 
@@ -113,7 +113,7 @@ public class InitialPositionTable extends PositionTable{
     }
 
     private ImmutableList<Integer> prependPathInFormula(ImmutableList<Integer> p,
-					       PosInOccurrence pio) {
+					       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
 	IntIterator pit = pio.posInTerm().reverseIterator();
 	while (pit.hasNext()) {
 	    p = p.prepend(Integer.valueOf(pit.next()));
@@ -124,7 +124,7 @@ public class InitialPositionTable extends PositionTable{
 
     /** Returns the index of the constrained formula in the sequent
      * as printed. */
-    private int indexOfCfma(SequentFormula cfma,
+    private int indexOfCfma(SequentFormula<JavaDLTerm> cfma,
 			    SequentPrintFilter filter) {
 	ImmutableList<SequentPrintFilterEntry> list =
 	    filter.getAntec().append(filter.getSucc());

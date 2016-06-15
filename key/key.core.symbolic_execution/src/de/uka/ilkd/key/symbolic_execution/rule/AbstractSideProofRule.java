@@ -109,14 +109,14 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
    }
    
    /**
-    * Replaces the {@link JavaDLTerm} defined by the given {@link PosInOccurrence}
+    * Replaces the {@link JavaDLTerm} defined by the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}
     * with the given new {@link JavaDLTerm}.
-    * @param pio The {@link PosInOccurrence} which defines the {@link JavaDLTerm} to replace.
+    * @param pio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} which defines the {@link JavaDLTerm} to replace.
     * @param newTerm The new {@link JavaDLTerm}.
     * @return The created {@link SequentFormula} in which the {@link JavaDLTerm} is replaced.
     */
-   protected static SequentFormula replace(PosInOccurrence pio, JavaDLTerm newTerm, Services services) {
-      // Iterate along the PosInOccurrence and collect the parents and indices
+   protected static SequentFormula<JavaDLTerm> replace(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, JavaDLTerm newTerm, Services services) {
+      // Iterate along the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> and collect the parents and indices
       Deque<Pair<Integer, JavaDLTerm>> indexAndParents = new LinkedList<Pair<Integer, JavaDLTerm>>();
       JavaDLTerm root = pio.sequentFormula().formula();
       final PosInTerm<JavaDLTerm> pit = pio.posInTerm();
@@ -133,7 +133,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
          newSubs[pair.first] = root;
          root =  services.getTermFactory().createTerm(parent.op(), newSubs, parent.boundVars(), parent.modalContent(), parent.getLabels());
       }
-      return new SequentFormula(root);
+      return new SequentFormula<>(root);
    }
 
    /**

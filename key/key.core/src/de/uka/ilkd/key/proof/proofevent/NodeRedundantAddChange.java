@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.proof.proofevent;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
 /** 
@@ -21,22 +24,22 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
  */
 public class NodeRedundantAddChange implements NodeChange {
 
-    /** the PosInOccurrence of the formula that has been tried to add */
-    private final PosInOccurrence pio;
+    /** the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the formula that has been tried to add */
+    private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio;
     
     /**
      *  creates an instance 
-     *  @param pio the PosInOccurrence of the formula that has been tried to add
+     *  @param pio the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the formula that has been tried to add
      */
-    public NodeRedundantAddChange(PosInOccurrence pio) {
+    public NodeRedundantAddChange(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         this.pio = pio;
     }         
 
     /**
-     * returns the PosInOccurrence of the formula that has been tried to add
+     * returns the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the formula that has been tried to add
      * @return the PosInOccurrrence 
      */
-    public PosInOccurrence getPos() {
+    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getPos() {
         return pio;
     }
     

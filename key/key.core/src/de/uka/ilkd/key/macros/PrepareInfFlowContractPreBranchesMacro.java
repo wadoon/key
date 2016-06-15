@@ -1,17 +1,15 @@
 package de.uka.ilkd.key.macros;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsPostConditionTermFeature;
 
@@ -54,7 +52,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof,
-                                      PosInOccurrence posInOcc) {
+                                      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
         return new RemovePostStrategy(proof);
     }
 
@@ -81,7 +79,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp,
-                                       PosInOccurrence pio,
+                                       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
                                        Goal goal) {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
@@ -98,7 +96,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app,
-                                     PosInOccurrence pio,
+                                     PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
                                      Goal goal) {
             String name = app.rule().name().toString();
             if (!name.equals("hide_right")) {
@@ -135,7 +133,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
         @Override
         protected RuleAppCost instantiateApp(RuleApp app,
-                                             PosInOccurrence pio,
+                                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
                                              Goal goal) {
             return computeCost(app, pio, goal);
         }

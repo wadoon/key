@@ -39,7 +39,7 @@ import de.uka.ilkd.key.proof.Node;
  * <p>
  * It provides a menu with all macros which are applicable in a given context.
  * The check of of applicability is done using
- * {@link ProofMacro#canApplyTo(KeYMediator, PosInOccurrence)}.
+ * {@link ProofMacro#canApplyTo(KeYMediator, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>)}.
  *
  * <p>
  * The menu items bear the name returned by {@link ProofMacro#getName()} and the
@@ -86,7 +86,7 @@ public class ProofMacroMenu extends JMenu {
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not
      * available.
      */
-    public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
+    public ProofMacroMenu(KeYMediator mediator, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
         super("Strategy macros");
 
         // Macros are group according to their category.
@@ -142,7 +142,7 @@ public class ProofMacroMenu extends JMenu {
      * Instantiates a new proof macro menu.
      * Only to be used in the {@link MainWindow}.
      *
-     * Only macros applicable at any PosInOccurrence are added as menu items.
+     * Only macros applicable at any PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> are added as menu items.
      *
      * @param mediator the mediator of the current proof.
      */
@@ -152,7 +152,7 @@ public class ProofMacroMenu extends JMenu {
 
     private JMenuItem createMenuItem(final ProofMacro macro,
             final KeYMediator mediator,
-            final PosInOccurrence posInOcc) {
+            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
 
         JMenuItem menuItem = new JMenuItem(macro.getName());
         menuItem.setToolTipText(macro.getDescription());

@@ -363,14 +363,14 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      *            the IList<TacletApp> with taclet applications to be enriched by
      *            position information
      * @param findPos
-     *            the PosInOccurrence against which the find part has been
+     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> against which the find part has been
      *            matched
      * @return the taclet apps as given in <tt>tacletApps</tt> but with
      *         position information
      */
     private ImmutableList<PosTacletApp>  addPositionInformation(
             ImmutableList<TacletApp>  tacletApps, 
-            PosInOccurrence findPos,
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> findPos,
             Services services) {
 
         ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
@@ -400,13 +400,13 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @param seq
      *            the Sequent to which the position information in <tt>ifPIO<tt>
      * is relative to
-     * @param ifPIO the PosInOccurrence describing the position of the term to 
+     * @param ifPIO the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the position of the term to 
      * be matched against the if sequent of the taclets
      * @param services the Services 
      * @return the IList<PosTacletApp> that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeIfInstantiations(ImmutableList<PosTacletApp> apps,
-            Sequent seq, PosInOccurrence ifPIO, Services services) {
+            Sequent seq, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ifPIO, Services services) {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
 
@@ -465,13 +465,13 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      *            be matched against the formula specified by the pair
      *            <tt>seq</tt> and <tt>ifPIO</tt>
      * is relative to
-     * @param missingSVPIO the PosInOccurrence describing the position of the term an 
+     * @param missingSVPIO the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the position of the term an 
      * uninstantiated SV will be matched against 
      * @param services the Services 
      * @return the IList<PosTacletApp> that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeInstantiations(ImmutableList<PosTacletApp> apps,
-             PosInOccurrence missingSVPIO, Services services) {
+             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> missingSVPIO, Services services) {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
         if (missingSVPIO == null) {        

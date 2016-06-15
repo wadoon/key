@@ -13,61 +13,30 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.ClashFreeSubst;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
-import de.uka.ilkd.key.rule.inst.GenericSortCondition;
-import de.uka.ilkd.key.rule.inst.GenericSortException;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
@@ -173,7 +142,7 @@ public abstract class TacletApp implements RuleApp {
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(
 	    TacletPrefix prefix, 
 	    SVInstantiations instantiations,
-	    PosInOccurrence pos) {
+	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
 
 	ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix,
 		instantiations);
@@ -319,7 +288,7 @@ public abstract class TacletApp implements RuleApp {
      */
     private static JavaDLTerm getTermBelowQuantifier(Taclet taclet,
 	    				       SchemaVariable varSV) {
-	Iterator<SequentFormula> it = taclet.ifSequent().iterator();
+	Iterator<SequentFormula<JavaDLTerm>> it = taclet.ifSequent().iterator();
 	while (it.hasNext()) {
 	    JavaDLTerm result = getTermBelowQuantifier(varSV, it.next().formula());
 	    if (result != null) {
@@ -690,7 +659,6 @@ public abstract class TacletApp implements RuleApp {
      * @return a fresh created collection of strings in which a freshly created
      *         variable name should not fall.
      */
-    @SuppressWarnings("deprecation")
     private Collection<String> collectClashNames(SchemaVariable sv, JavaDLTermServices services) {
         Collection<String> result = new LinkedHashSet<String>();
         VariableCollectVisitor vcv = new VariableCollectVisitor();
@@ -815,8 +783,7 @@ public abstract class TacletApp implements RuleApp {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
 		final JavaDLTerm inst = (JavaDLTerm) insts.getInstantiation(sv);
-		@SuppressWarnings("deprecation")
-        final Namespace functions =
+		final Namespace functions =
                         services.getNamespaces().functions();
 
                 // skolem constant might already be registered in
@@ -1034,8 +1001,8 @@ public abstract class TacletApp implements RuleApp {
      *            formulas of the if sequent
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
-	    ImmutableList<SequentFormula> p_ifSeqTail,
-	    ImmutableList<SequentFormula> p_ifSeqTail2nd,
+	    ImmutableList<SequentFormula<JavaDLTerm>> p_ifSeqTail,
+	    ImmutableList<SequentFormula<JavaDLTerm>> p_ifSeqTail2nd,
 	    ImmutableList<IfFormulaInstantiation> p_toMatch,
 	    ImmutableList<IfFormulaInstantiation> p_toMatch2nd,
 	    ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
@@ -1076,28 +1043,31 @@ public abstract class TacletApp implements RuleApp {
 	return res;
     }
 
-    private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
-	ImmutableList<SequentFormula> res = ImmutableSLList.<SequentFormula>nil();
+    @SuppressWarnings("unchecked")
+    private ImmutableList<SequentFormula<JavaDLTerm>> createSemisequentList(Semisequent p_ss) {
+	ImmutableList<SequentFormula<JavaDLTerm>> res = ImmutableSLList.<SequentFormula<JavaDLTerm>>nil();
 
-        for (Object p_s : p_ss) res = res.prepend((SequentFormula) p_s);
+        for (Object p_s : p_ss) { 
+            res = res.prepend((SequentFormula<JavaDLTerm>) p_s);
+        }
 
 	return res;
     }
 
     /**
      * returns a new PosTacletApp that is equal to this TacletApp except that
-     * the position is set to the given PosInOccurrence.
+     * the position is set to the given PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>.
      * 
      * <p><b>CAUTION:</b> If you call this method, consider to call 
-     * {@link NoPosTacletApp#matchFind(PosInOccurrence, Services)} first (if
+     * {@link NoPosTacletApp#matchFind(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Services)} first (if
      * applicable) as otherwise the TacletApp may become invalid. 
      * (This happened sometimes during interactive proofs).
      * 
      * @param pos
-     *            the PosInOccurrence of the newl created PosTacletApp
+     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the newl created PosTacletApp
      * @return the new TacletApp
      */
-    public PosTacletApp setPosInOccurrence(PosInOccurrence pos, 
+    public PosTacletApp setPosInOccurrence(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, 
 	    			           Services services) {
 	if (taclet() instanceof NoFindTaclet) {
 	    throw new IllegalStateException("Cannot add position to an taclet"
@@ -1130,12 +1100,12 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula and a
+     * returns the PositionInOccurrence (representing a SequentFormula<JavaDLTerm> and a
      * position in the corresponding formula)
      * 
-     * @return the PosInOccurrence
+     * @return the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
      */
-    public abstract PosInOccurrence posInOccurrence();
+    public abstract PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence();
 
     /**
      * compares the given Object with this one and returns true iff both are
@@ -1353,11 +1323,11 @@ public abstract class TacletApp implements RuleApp {
      * @param instantiations
      *            the SVInstantiations so that the find(if) expression matches
      * @param pos
-     *            the PosInOccurrence where the Taclet is applied
+     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> where the Taclet is applied
      * @return true iff all variable conditions x not free in y are hold
      */
     public static boolean checkVarCondNotFreeIn(Taclet taclet,
-	    SVInstantiations instantiations, PosInOccurrence pos) {
+	    SVInstantiations instantiations, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
 
 	Iterator<SchemaVariable> it = instantiations.svIterator();
 	while (it.hasNext()) {
@@ -1380,15 +1350,15 @@ public abstract class TacletApp implements RuleApp {
      * given term position information
      * 
      * @param pos
-     *            the PosInOccurrence describing a subterm in JavaDLTerm
+     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing a subterm in JavaDLTerm
      * @return a set of logic variables that are bound above the specified
      *         subterm
      */
     protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(
-	    PosInOccurrence pos) {
+	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
 	ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.<QuantifiableVariable>nil();
 
-	PIOPathIterator it = pos.iterator();
+	PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator();
 	int i;
 	ImmutableArray<QuantifiableVariable> vars;
 

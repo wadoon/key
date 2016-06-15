@@ -2,12 +2,12 @@ package de.uka.ilkd.key.rule.label;
 
 import java.util.List;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 
 /**
@@ -37,10 +37,10 @@ public interface TermLabelMerger {
     * @param mergedLabels The {@link List} with new {@link TermLabel}s which will be visible in the resulting {@link Sequent}.
     * @return {@code true} if the {@link List} of {@link TermLabel} was modified and {@code false} otherwise.
     */
-   public boolean mergeLabels(SequentFormula existingSF, 
+   public boolean mergeLabels(SequentFormula<JavaDLTerm> existingSF, 
                               JavaDLTerm existingTerm, 
                               TermLabel existingLabel, 
-                              SequentFormula rejectedSF, 
+                              SequentFormula<JavaDLTerm> rejectedSF, 
                               JavaDLTerm rejectedTerm, 
                               TermLabel rejectedLabel,
                               List<TermLabel> mergedLabels);

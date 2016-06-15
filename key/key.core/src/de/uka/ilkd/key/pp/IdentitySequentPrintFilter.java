@@ -40,7 +40,7 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
 	if ( antec != null )
 	    return;
 
-	Iterator<SequentFormula> it;
+	Iterator<SequentFormula<JavaDLTerm>> it;
 
 	antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
 	it    = originalSequent.antecedent ().iterator ();
@@ -53,7 +53,7 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
 	    succ  = succ .append ( filterFormula ( it.next () ) );
     }
 
-    protected SequentPrintFilterEntry filterFormula ( SequentFormula p_cfma ) {
+    protected SequentPrintFilterEntry filterFormula ( SequentFormula<JavaDLTerm> p_cfma ) {
 	return new IdentityFilterEntry ( p_cfma );
     }
 
@@ -81,24 +81,24 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
 
 
     private static class IdentityFilterEntry implements SequentPrintFilterEntry {
-	final SequentFormula originalFormula;
+	final SequentFormula<JavaDLTerm> originalFormula;
 
 
-	public IdentityFilterEntry ( SequentFormula p_originalFormula) {
+	public IdentityFilterEntry ( SequentFormula<JavaDLTerm> p_originalFormula) {
 	    originalFormula   = p_originalFormula;
 	}
 
 	/**
 	 * Formula to display
 	 */
-	public SequentFormula getFilteredFormula   () {
+	public SequentFormula<JavaDLTerm> getFilteredFormula   () {
 	    return originalFormula;
 	}
 
 	/**
 	 * Original formula from sequent
 	 */
-	public SequentFormula getOriginalFormula   () {
+	public SequentFormula<JavaDLTerm> getOriginalFormula   () {
 	    return originalFormula;
 	}
 

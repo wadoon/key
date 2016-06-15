@@ -38,7 +38,7 @@ public class ExistentiallyConnectedFormulasFeature extends
         return new ExistentiallyConnectedFormulasFeature ( for0, for1 );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final ClausesGraph graph =

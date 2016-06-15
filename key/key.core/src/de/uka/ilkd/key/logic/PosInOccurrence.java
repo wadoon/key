@@ -18,15 +18,14 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 
 /**
  * This class describes a position in an occurrence of a term. A
- * SequentFormula and a PosInTerm<JavaDLTerm> determine an object of this 
+ * SequentFormula<JavaDLTerm> and a PosInTerm<JavaDLTerm> determine an object of this 
  * class exactly. 
  */
 public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<T>> {
 
     public static <T      extends GenericTerm<?, ?, ?, T>,
                    SeqFor extends SequentFormula<T>>
-            PosInOccurrence<T, SeqFor> findInSequent(
-                    Sequent seq, int formulaNumber, PosInTerm<T> pos) {
+            PosInOccurrence<T, SeqFor> findInSequent(GenericSequent<SeqFor, ?, ?> seq, int formulaNumber, PosInTerm<T> pos) {
         return new PosInOccurrence<T, SeqFor>(
                 seq.getFormulabyNr(formulaNumber), pos,
                 seq.numberInAntec(formulaNumber));
@@ -66,7 +65,7 @@ public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extend
     }
            
     /**
-     * returns the SequentFormula that determines the occurrence of
+     * returns the SequentFormula<JavaDLTerm> that determines the occurrence of
      * this PosInOccurrence 
      */
     public SeqFor sequentFormula() {
@@ -180,7 +179,7 @@ public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extend
      * {@link PosInOccurrence#iterator} instead.     
      * describes the exact occurrence of the referred term inside
      * {@link SequentFormula#formula()} 
-     * @returns the position in the formula of the SequentFormula of
+     * @returns the position in the formula of the SequentFormula<JavaDLTerm> of
      * this PosInOccurrence. 
      */
     public PosInTerm<T> posInTerm() {
@@ -291,13 +290,9 @@ public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extend
 	    // the object is created only now to make the method
 	    // <code>next()</code> faster
 
-	    final PosInOccurrence<T, SeqFor> pio;	   
-	    pio = new PosInOccurrence<> ( sequentFormula,
+	    return new PosInOccurrence<>( sequentFormula,
 		    posInTerm.firstN(count - 1),
 		    inAntec );            
-
-        
-	    return pio;
 	}
 
 	/**

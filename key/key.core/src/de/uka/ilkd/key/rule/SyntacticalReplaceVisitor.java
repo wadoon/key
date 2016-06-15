@@ -23,22 +23,13 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Stack;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.common.core.logic.op.ElementaryUpdate;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.logic.op.SortDependingFunction;
-import org.key_project.common.core.logic.op.UpdateableOperator;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -63,7 +54,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     protected final SVInstantiations svInst;
     protected final Services services;
     private JavaDLTerm computedResult = null;
-    protected final PosInOccurrence applicationPosInOccurrence;
+    protected final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
     protected final RuleApp ruleApp;
@@ -86,7 +77,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
             SVInstantiations svInst,
             Goal goal,                                     
             Rule rule,
@@ -108,7 +99,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
             Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
             Rule rule,
             RuleApp ruleApp,
             TacletLabelHint labelHint, 

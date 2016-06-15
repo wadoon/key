@@ -1,14 +1,10 @@
 package de.uka.ilkd.key.rule.executor.javadl;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IntIterator;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.util.TermHelper;
@@ -36,7 +32,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
             JavaDLTerm with,
             TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            PosInOccurrence posOfFind,
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
             IntIterator it,
             MatchConditions mc,
             Sort maxSort,
@@ -78,10 +74,10 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     }
 
 
-    private SequentFormula applyReplacewithHelper(Goal goal,
+    private SequentFormula<JavaDLTerm> applyReplacewithHelper(Goal goal,
                TermLabelState termLabelState, 
                     RewriteTacletGoalTemplate gt, 
-                    PosInOccurrence    posOfFind,
+                    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>    posOfFind,
                     Services           services,
                     MatchConditions    matchCond,
                     RuleApp ruleApp) {
@@ -104,12 +100,12 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     if(term == formula) {
         return posOfFind.sequentFormula();
     } else {
-        return new SequentFormula(formula);
+        return new SequentFormula<JavaDLTerm>(formula);
     }
     }
     
     
-    public SequentFormula getRewriteResult(Goal goal, TermLabelState termLabelState, Services services, TacletApp app) {
+    public SequentFormula<JavaDLTerm> getRewriteResult(Goal goal, TermLabelState termLabelState, Services services, TacletApp app) {
         assert taclet.goalTemplates().size() == 1;
         assert taclet.goalTemplates().head().sequent().isEmpty();  
         assert taclet.getApplicationRestriction() != RewriteTaclet.IN_SEQUENT_STATE;
@@ -130,13 +126,13 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
      */
    @Override
    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-           SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
+           SequentChangeInfo currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
            MatchConditions matchCond,
            Goal goal,
            RuleApp ruleApp,
            Services services) {
       if (gt instanceof RewriteTacletGoalTemplate) {
-         SequentFormula cf = applyReplacewithHelper(goal, termLabelState,
+         SequentFormula<JavaDLTerm> cf = applyReplacewithHelper(goal, termLabelState,
                (RewriteTacletGoalTemplate) gt, posOfFind, services, matchCond, ruleApp);
 
          currentSequent.combine(currentSequent.sequent().changeFormula(cf, posOfFind));
@@ -149,7 +145,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
          JavaDLTerm newFormula = TermLabelManager.refactorSequentFormula(termLabelState, services, oldFormula, 
                  posOfFind, taclet, goal, null, null);
          if (oldFormula != newFormula) {
-            currentSequent.combine(currentSequent.sequent().changeFormula(new SequentFormula(newFormula), posOfFind));
+            currentSequent.combine(currentSequent.sequent().changeFormula(new SequentFormula<JavaDLTerm>(newFormula), posOfFind));
          }
       }
    }
@@ -163,7 +159,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     *           the Sequent which is the current (intermediate) result of
     *           applying the taclet
  * @param posOfFind
-    *           the PosInOccurrence describes the place where to add the
+    *           the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describes the place where to add the
     *           semisequent
  * @param matchCond
     *           the MatchConditions with all required instantiations
@@ -172,7 +168,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     */
    @Override
    protected void applyAdd(Sequent add, TermLabelState termLabelState,
-         SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
+         SequentChangeInfo currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
          MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
       if (posOfFind.isInAntec()) {
          addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, posOfFind, posOfFind, matchCond, goal, ruleApp, services);

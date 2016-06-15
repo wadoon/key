@@ -301,7 +301,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     * {@inheritDoc}
     */
    @Override
-   protected PosInOccurrence lazyComputeModalityPIO() {
+   protected PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> lazyComputeModalityPIO() {
       return SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(getProofNode().sequent());
    }
 

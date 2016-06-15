@@ -50,7 +50,7 @@ public abstract class SubtermGenerator implements TermGenerator {
     public static TermGenerator leftTraverse(ProjectionToTerm cTerm,
                                              TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
-            public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+            public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
                 return new LeftIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
             }
         };
@@ -63,13 +63,13 @@ public abstract class SubtermGenerator implements TermGenerator {
     public static TermGenerator rightTraverse(ProjectionToTerm cTerm,
                                               TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
-            public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+            public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
                 return new RightIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
             }
         };
     }
 
-    protected JavaDLTerm getTermInst(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected JavaDLTerm getTermInst(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         return completeTerm.toTerm ( app, pos, goal );
     }
     

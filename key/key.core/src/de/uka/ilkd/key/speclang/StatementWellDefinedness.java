@@ -16,6 +16,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -24,7 +25,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -68,7 +68,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return
      */
-    abstract SequentFormula generateSequent(SequentTerms seqTerms, JavaDLTermServices services);
+    abstract SequentFormula<JavaDLTerm> generateSequent(SequentTerms seqTerms, JavaDLTermServices services);
 
     public abstract SpecificationElement getStatement();
 
@@ -127,7 +127,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services The current services reference
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(ProgramVariable self, ProgramVariable exception,
+    public SequentFormula<JavaDLTerm> generateSequent(ProgramVariable self, ProgramVariable exception,
                                           ProgramVariable result, LocationVariable heap,
                                           ProgramVariable heapAtPre, JavaDLTerm anonHeap,
                                           ImmutableSet<ProgramVariable> ps,
@@ -156,7 +156,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return The proof seuqne t for the well-definedness check
      */
-    public SequentFormula generateSequent(ProgramVariable self, LocationVariable heap,
+    public SequentFormula<JavaDLTerm> generateSequent(ProgramVariable self, LocationVariable heap,
                                           JavaDLTerm anonHeap, ImmutableSet<ProgramVariable> ps,
                                           JavaDLTerm leadingUpdate, Services services) {
         return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate, services);

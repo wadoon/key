@@ -64,7 +64,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                   SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp()) ||
                   SymbolicExecutionUtil.isBlockContract(node, node.getAppliedRuleApp())) {
             // Compute this reference
-            PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = node.getAppliedRuleApp().posInOccurrence();
             // Compute modified locations
             List<Location> modifiedLocations = new LinkedList<Location>();
             JavaDLTerm loopConditionModalityTerm = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);

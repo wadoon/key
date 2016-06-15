@@ -162,8 +162,8 @@ public class TestTacletParser extends TestCase {
 	}
     }
 
-    public SequentFormula cf(String s) {
-	return new SequentFormula(parseFma(s));
+    public SequentFormula<JavaDLTerm> cf(String s) {
+	return new SequentFormula<>(parseFma(s));
     }
     
     public Semisequent sseq(String s) {

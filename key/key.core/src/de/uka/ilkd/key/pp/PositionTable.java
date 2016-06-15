@@ -57,7 +57,7 @@ public class PositionTable {
 
     /**
      * creates a new PositionTable with the number of subterms (or number of
-     * SequentFormula in a Semisequent, or the number of Semisequents in a
+     * SequentFormula<JavaDLTerm> in a Semisequent, or the number of Semisequents in a
      * Sequent, etc.)
      *
      * @param rows
@@ -269,10 +269,10 @@ public class PositionTable {
 	SequentPrintFilterEntry filterEntry = 
 	    getFilterEntry(cfmaNo, filter);
 
-	SequentFormula cfma = filterEntry.getOriginalFormula();
+	SequentFormula<JavaDLTerm> cfma = filterEntry.getOriginalFormula();
 
-	PosInOccurrence currentPos = 
-	    new PosInOccurrence ( cfma, PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> currentPos = 
+	    new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( cfma, PosInTerm.<JavaDLTerm>getTopLevel(),
 				  filter.getSequent ().antecedent().contains(cfma) );
 	
 	return child[cfmaNo].getTermPIS(filterEntry,tail,
@@ -291,16 +291,16 @@ public class PositionTable {
      * @param posList
      *            the position list that navigates through the position tables.
      * @param pio
-     *            the PosInOccurrence leading to the current term
+     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> leading to the current term
      */
     private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry,
 				    ImmutableList<Integer> posList,
-				    PosInOccurrence pio) {
+				    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
 	if(posList.isEmpty()) {
 	    return PosInSequent.createCfmaPos(pio);
 	} else {
 	    int subNo  =  posList.head().intValue();
-	    PosInOccurrence subpio = pio.down ( subNo );	   
+	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> subpio = pio.down ( subNo );	   
 
 	    return child[subNo].getTermPIS(filterEntry,
 					   posList.tail(),

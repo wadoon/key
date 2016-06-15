@@ -20,16 +20,13 @@ import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
@@ -38,12 +35,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
-import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -52,21 +44,11 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -464,7 +446,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                  tb.apply(infData.updates.second,
                                          tb.and(afterAssumptions, infData.applPredTerm))));
 
-        goal.addFormula(new SequentFormula(infFlowAssumptions),
+        goal.addFormula(new SequentFormula<>(infFlowAssumptions),
                         true,
                         false);
         goal.addTaclet(infData.infFlowApp,
@@ -530,7 +512,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 tb.imp(tb.label(selfComposedExec, ParameterlessTermLabel.SELF_COMPOSITION_LABEL),
                        post);
         ((InfFlowProof)infFlowGoal.proof()).addLabeledIFSymbol(selfComposedExec);
-        infFlowGoal.addFormula(new SequentFormula(finalTerm), false, true);
+        infFlowGoal.addFormula(new SequentFormula<>(finalTerm), false, true);
 
         return infFlowData;
     }
@@ -599,7 +581,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private SequentFormula initFormula(TermLabelState termLabelState,
+    private SequentFormula<JavaDLTerm> initFormula(TermLabelState termLabelState,
                                        Instantiation inst, 
                                        final JavaDLTerm invTerm,
                                        JavaDLTerm reachableState, 
@@ -608,7 +590,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         JavaDLTerm sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null, sfTerm, this, initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
-        return new SequentFormula(sfTerm);
+        return new SequentFormula<>(sfTerm);
     }
 
     private JavaDLTerm useCaseFormula(TermLabelState termLabelState, Services services, RuleApp ruleApp,
@@ -681,11 +663,11 @@ public final class WhileInvariantRule implements BuiltInRule {
                                             final JavaDLTerm uAnonInv) {
         final TermBuilder tb = services.getTermBuilder();
         bodyGoal.setBranchLabel(BODY_PRESERVES_INVARIANT_LABEL);
-        bodyGoal.addFormula(new SequentFormula(wellFormedAnon), 
+        bodyGoal.addFormula(new SequentFormula<>(wellFormedAnon), 
                 true, 
                 false);         
 
-        bodyGoal.addFormula(new SequentFormula(uAnonInv), 
+        bodyGoal.addFormula(new SequentFormula<>(uAnonInv), 
                 true, 
                 false);
 
@@ -693,7 +675,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                       inst, invTerm, frameCondition, variantPO,
                                       bodyGoal, guardJb, guardTrueTerm); 
 
-        bodyGoal.changeFormula(new SequentFormula(tb.applySequential(uBeforeLoopDefAnonVariant, 
+        bodyGoal.changeFormula(new SequentFormula<>(tb.applySequential(uBeforeLoopDefAnonVariant, 
                                                                      guardTrueBody)), 
                                                   ruleApp.posInOccurrence());
     }
@@ -706,12 +688,12 @@ public final class WhileInvariantRule implements BuiltInRule {
                                       final JavaDLTerm guardFalseTerm,
                                       final JavaDLTerm[] uAnon, final JavaDLTerm uAnonInv) {
         useGoal.setBranchLabel("Use Case");
-        useGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
-        useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+        useGoal.addFormula(new SequentFormula<>(wellFormedAnon), true, false);
+        useGoal.addFormula(new SequentFormula<>(uAnonInv), true, false);
         final TermBuilder tb = services.getTermBuilder();
 
         JavaDLTerm guardFalseRestPsi = useCaseFormula(termLabelState, services, ruleApp, inst, useGoal, guardJb, guardFalseTerm);
-        useGoal.changeFormula(new SequentFormula(tb.applySequential(uAnon, guardFalseRestPsi)),
+        useGoal.changeFormula(new SequentFormula<>(tb.applySequential(uAnon, guardFalseRestPsi)),
                               ruleApp.posInOccurrence());
     }
     
@@ -720,13 +702,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     //-------------------------------------------------------------------------
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         return checkApplicability(goal,pio);
     }
 
 
     //focus must be top level succedent
-    static boolean checkApplicability (Goal g, PosInOccurrence pio) {
+    static boolean checkApplicability (Goal g, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
         }
@@ -760,7 +742,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                              final JavaDLTerm update, final JavaDLTerm selfTerm,
                              final LocationVariable heap, final JavaDLTerm anonHeap,
                              final ImmutableSet<ProgramVariable> localIns,
-                             PosInOccurrence pio, Services services) {
+                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Services services) {
         if (goal == null) {
             return;
         }
@@ -773,7 +755,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             self = null;
         }
         services.getSpecificationRepository().addWdStatement(lwd);
-        final SequentFormula wdInv = lwd.generateSequent(self, heap, anonHeap, localIns,
+        final SequentFormula<JavaDLTerm> wdInv = lwd.generateSequent(self, heap, anonHeap, localIns,
                                                          update, services);
         goal.changeFormula(wdInv, pio);
     }
@@ -1017,7 +999,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     @Override
-    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services) {
+    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, JavaDLTermServices services) {
         return new LoopInvariantBuiltInRuleApp(this, pos, services);
     }
 

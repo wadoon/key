@@ -44,13 +44,13 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
             TermLabelState termLabelState,
             TacletLabelHint labelHint,
             SequentChangeInfo currentSequent,
-            PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence,
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
             MatchConditions matchCond,
             Goal goal,
             RuleApp tacletApp,
             Services services) {
-        final ImmutableList<SequentFormula> replacements =
+        final ImmutableList<SequentFormula<JavaDLTerm>> replacements =
                 instantiateSemisequent(semi, termLabelState, labelHint, pos, matchCond, goal, tacletApp, services);
         assert replacements.size() == 1 : "information flow taclets must have " +
                 "exactly one add!";

@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.control;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -37,7 +35,7 @@ public interface ProofControl {
     *
     * @return a list of Taclets with all applicable RewriteTaclets
     */
-   public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence pos);
+   public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos);
 
    /**
     * collects all applicable FindTaclets of the current goal (called by the
@@ -45,7 +43,7 @@ public interface ProofControl {
     *
     * @return a list of Taclets with all applicable FindTaclets
     */
-   public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos);
+   public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos);
 
    /**
     * collects all applicable NoFindTaclets of the current goal (called by the
@@ -62,9 +60,9 @@ public interface ProofControl {
     * @param pos
     *           the PosInSequent where to look for applicable rules
     */
-   public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
+   public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos);
    
-   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos);
+   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos);
    
    /**
     * Apply a RuleApp and continue with update simplification or strategy
@@ -82,7 +80,7 @@ public interface ProofControl {
     * automatically then the rule should be applied automatically without asking the user at all
     * (e.g. if a loop invariant is available do not ask the user to provide one)
     */
-   public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced);
+   public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, boolean forced);
    
    /**
     * Returns the default {@link ProverTaskListener} which will be added to all started {@link ApplyStrategy} instances.
@@ -153,13 +151,13 @@ public interface ProofControl {
     */
    void startAndWaitForAutoMode(Proof proof);
    
-   public void startFocussedAutoMode(PosInOccurrence focus, Goal goal);
+   public void startFocussedAutoMode(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> focus, Goal goal);
    
    /**
-    * Runs the given {@link ProofMacro} at the given {@link PosInOccurrence} on the given {@link Node}.
+    * Runs the given {@link ProofMacro} at the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} on the given {@link Node}.
     * @param node The {@link Node} to start macro at.
     * @param macro The {@link ProofMacro} to execute.
-    * @param posInOcc The exact {@link PosInOccurrence} at which the {@link ProofMacro} is started at.
+    * @param posInOcc The exact {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} at which the {@link ProofMacro} is started at.
     */
-   public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc);
+   public void runMacro(Node node, ProofMacro macro, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc);
 }

@@ -19,9 +19,9 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
    private final JavaDLTerm term;
    
    /**
-    * The {@link PosInOccurrence} of the modality of interest.
+    * The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
     */
-   private final PosInOccurrence modalityPIO;
+   private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO;
 
    /**
     * Constructor.
@@ -29,7 +29,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param term The {@link JavaDLTerm} representing the constraint.
     */
-   public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO, JavaDLTerm term) {
+   public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO, JavaDLTerm term) {
       super(settings, proofNode);
       assert term != null;
       assert modalityPIO != null;
@@ -65,7 +65,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence getModalityPIO() {
+   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
       return modalityPIO;
    }
 }

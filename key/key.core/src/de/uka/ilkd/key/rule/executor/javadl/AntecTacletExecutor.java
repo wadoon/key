@@ -27,7 +27,7 @@ extends FindTacletExecutor<TacletKind> {
      * {@inheritDoc}
      */
     @Override
-    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
+    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, SequentChangeInfo currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
             MatchConditions matchCond,
             Goal goal, 
             RuleApp ruleApp,
@@ -53,7 +53,7 @@ extends FindTacletExecutor<TacletKind> {
      * @param add the Sequent to be added
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the PosInOccurrence describes the place where to add
+     * @param posOfFind the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describes the place where to add
      * the semisequent 
      * @param matchCond the MatchConditions with all required instantiations 
      * @param services the Services encapsulating all java information
@@ -61,7 +61,7 @@ extends FindTacletExecutor<TacletKind> {
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState, 
             SequentChangeInfo currentSequent,
-            PosInOccurrence posOfFind,
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
             MatchConditions matchCond,
             Goal goal,
             RuleApp ruleApp,

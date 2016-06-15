@@ -52,7 +52,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.checker = checker;
         }
 
-        public void initPrefixCheck(PosInOccurrence p_pos) {
+        public void initPrefixCheck(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos) {
             checker.initPrefixCheck(p_pos);
         }
 
@@ -83,7 +83,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.modifier = modifier;
         }
 
-        PosInOccurrence modifyPosistion(PosInOccurrence pos) {
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modifyPosistion(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
             return modifier.modifyPosistion(pos);
         }
     }
@@ -137,12 +137,12 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
     @Override
     protected boolean filter(TacletApp app,
-                             PosInOccurrence pos,
+                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
                              Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         // apply the position modifiers
-        PosInOccurrence newPos = pos;
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos = pos;
         for (PositionModifier positionModifier : positionModifiers) {
             newPos = positionModifier.modifyPosistion(pos);
         }
@@ -155,10 +155,10 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     /**
      * Applies the PrefixCheckers.
      *
-     * @param pos the PosInOccurrence to be checked.
+     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> to be checked.
      * @return true, if all PrefixCheckers return true
      */
-    private boolean checkPrefix(PosInOccurrence pos) {
+    private boolean checkPrefix(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
         // init prefix checkers
         for (PrefixChecker prefixChecker : prefixCheckers) {
             prefixChecker.initPrefixCheck(pos);

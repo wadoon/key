@@ -13,15 +13,11 @@
 
 package de.uka.ilkd.key.proof;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
@@ -49,7 +45,7 @@ public class BuiltInRuleAppIndex {
      * for the given goal and position
      */
     public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal            goal, 
-						 PosInOccurrence pos) {
+						 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
 
 	ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.<IBuiltInRuleApp>nil();
 
@@ -111,7 +107,8 @@ public class BuiltInRuleAppIndex {
 	final Sequent                seq  = node.sequent ();
 
         for (Object o : (antec ? seq.antecedent() : seq.succedent())) {
-            final SequentFormula cfma = (SequentFormula) o;
+            @SuppressWarnings("unchecked")
+            final SequentFormula<JavaDLTerm> cfma = (SequentFormula<JavaDLTerm>) o;
             scanSimplificationRule(rule, goal, antec, cfma, listener);
         }
     }
@@ -119,9 +116,9 @@ public class BuiltInRuleAppIndex {
     private void scanSimplificationRule ( BuiltInRule rule, 
                                           Goal goal, 
                                           boolean antec, 
-                                          SequentFormula cfma, 
+                                          SequentFormula<JavaDLTerm> cfma, 
                                           NewRuleListener listener ) {
-        final PosInOccurrence pos = new PosInOccurrence( cfma, PosInTerm.<JavaDLTerm>getTopLevel(), antec );
+        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>( cfma, PosInTerm.<JavaDLTerm>getTopLevel(), antec );
         if(rule.isApplicableOnSubTerms()) {
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
@@ -133,7 +130,7 @@ public class BuiltInRuleAppIndex {
     //TODO: optimise?
     private void scanSimplificationRule ( BuiltInRule rule,
 	    				  Goal goal,
-                                          PosInOccurrence pos,
+                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
                                           NewRuleListener listener ) {
         if (rule.isApplicable ( goal, pos ) ) {
             IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );                            
@@ -162,10 +159,10 @@ public class BuiltInRuleAppIndex {
     }
     
     private void scanAddedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci ) {
-        ImmutableList<SequentFormula> cfmas = sci.addedFormulas( antec );
+        ImmutableList<SequentFormula<JavaDLTerm>> cfmas = sci.addedFormulas( antec );
         final NewRuleListener listener = getNewRulePropagator();
         while ( !cfmas.isEmpty() ) {
-            final SequentFormula cfma = cfmas.head();
+            final SequentFormula<JavaDLTerm> cfma = cfmas.head();
             for (BuiltInRule builtInRule : index.rules()) {
                 final BuiltInRule rule = builtInRule;
                 scanSimplificationRule(rule, goal, antec,
@@ -179,11 +176,11 @@ public class BuiltInRuleAppIndex {
     private void scanModifiedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci ) {
         
         final NewRuleListener listener = getNewRulePropagator();
-        ImmutableList<FormulaChangeInfo> fcis = sci.modifiedFormulas( antec );
+        ImmutableList<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> fcis = sci.modifiedFormulas( antec );
 
         while ( !fcis.isEmpty() ) {
-            final FormulaChangeInfo fci = fcis.head();               
-            final SequentFormula cfma = fci.getNewFormula();
+            final FormulaChangeInfo<SequentFormula<JavaDLTerm>> fci = fcis.head();               
+            final SequentFormula<JavaDLTerm> cfma = fci.getNewFormula();
             for (BuiltInRule builtInRule : index.rules()) {
                 final BuiltInRule rule = builtInRule;
                 scanSimplificationRule(rule, goal, antec, cfma, listener);

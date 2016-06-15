@@ -36,7 +36,7 @@ public class AssumptionProjection implements ProjectionToTerm {
         return new AssumptionProjection ( no );
     }
 
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         assert app instanceof TacletApp :
             "Projection is only applicable to taclet apps," +
             " but got " + app;

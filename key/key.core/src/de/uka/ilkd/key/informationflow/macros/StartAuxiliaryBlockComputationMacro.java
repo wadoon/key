@@ -54,7 +54,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
         if (goals == null || goals.head() == null
                 || goals.head().node() == null
                 || goals.head().node().parent() == null) {
@@ -96,7 +96,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
+                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
                                           ProverTaskListener listener) throws Exception {
         final BlockContractBuiltInRuleApp blockRuleApp = 
                 (BlockContractBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();

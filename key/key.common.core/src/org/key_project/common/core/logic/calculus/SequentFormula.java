@@ -5,8 +5,8 @@ import org.key_project.common.core.logic.sort.Sort;
 
 /** 
  * A sequent formula is a wrapper around a formula that occurs 
- * as top level formula in a sequent. SequentFormula instances have
- * to be unique in the sequent as they are used by PosInOccurrence 
+ * as top level formula in a sequent. SequentFormula<JavaDLTerm> instances have
+ * to be unique in the sequent as they are used by PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> 
  * to determine the exact position. In earlier KeY versions this class 
  * was called ConstrainedFormula as it was equipped with an additional 
  * constraints. It would be interesting to add more value to this class 
@@ -18,7 +18,7 @@ public class SequentFormula<T extends GenericTerm<?, ?, ?, T>> {
     protected final T term;
     protected final int hashCode;
 
-    /** creates a new SequentFormula 
+    /** creates a new SequentFormula<JavaDLTerm> 
      * @param term of sort {@link Sort#FORMULA}
      */ 
     public SequentFormula(T term) {

@@ -34,10 +34,10 @@ public class HeapGenerator implements TermGenerator {
     }
     
     @Override
-    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         LinkedHashSet<JavaDLTerm> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();
-        for (SequentFormula sf : seq) {
+        for (SequentFormula<JavaDLTerm> sf : seq) {
             collectHeaps(sf.formula(), heaps, goal.proof().getServices());
         }
         return heaps.iterator();

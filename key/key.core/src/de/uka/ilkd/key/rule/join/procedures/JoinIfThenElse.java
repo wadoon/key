@@ -13,6 +13,11 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.countAtoms;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getDistinguishingFormula;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateRightSideFor;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.trySimplify;
+
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -26,8 +31,8 @@ import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils.Option;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
  * Rule that joins two sequents based on the if-then-else construction: If two

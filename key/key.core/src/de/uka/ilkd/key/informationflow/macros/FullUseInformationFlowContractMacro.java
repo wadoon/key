@@ -65,7 +65,7 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
         if (proof == null) {
             return false;
         }

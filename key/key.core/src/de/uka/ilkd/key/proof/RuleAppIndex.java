@@ -17,11 +17,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
@@ -103,13 +105,13 @@ public final class RuleAppIndex  {
     private void setNewRuleListeners() {
 	NewRuleListener newRuleListener = new NewRuleListener () {
             public void ruleAdded( RuleApp         taclet,
-        			   PosInOccurrence pos ) {
+        			   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos ) {
         	informNewRuleListener(taclet, pos);			   	
             }
 
             @Override
             public void rulesAdded(ImmutableList<? extends RuleApp> rules,
-                    PosInOccurrence pos) {
+                    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
                 informNewRuleListener(rules, pos);
             }
         };
@@ -175,12 +177,12 @@ public final class RuleAppIndex  {
      * the given heuristics 
      * at the given position of the given sequent.
      * @param filter the TacletFiler filtering the taclets of interest
-     * @param pos the PosInOccurrence to focus
+     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> to focus
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
      */
     public ImmutableList<TacletApp> getTacletAppAt(TacletFilter    filter,
-					  PosInOccurrence pos,
+					  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
 					  Services        services) { 
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 	if ( !autoMode ) {
@@ -200,7 +202,7 @@ public final class RuleAppIndex  {
     
 
     /**
-     * returns the rule applications at the given PosInOccurrence and at all
+     * returns the rule applications at the given PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> and at all
      * Positions below this. The method calls getTacletAppAt for all the
      * Positions below.
      * @param filter the TacletFiler filtering the taclets of interest
@@ -210,7 +212,7 @@ public final class RuleAppIndex  {
      * @return the possible rule applications 
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter    filter,
-						  PosInOccurrence pos,
+						  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
 						  Services        services) {
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 	if ( !autoMode ) {
@@ -233,13 +235,13 @@ public final class RuleAppIndex  {
      * collects all FindTacletInstantiations for the given
      * heuristics and position
      * @param filter the TacletFiler filtering the taclets of interest
-     * @param pos the PosInOccurrence to focus
+     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> to focus
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter    filter,
-					      PosInOccurrence pos,
+					      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
 					      JavaDLTermServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
@@ -285,15 +287,15 @@ public final class RuleAppIndex  {
     /** 
      * collects all RewriteTacletInstantiations for the given
      * heuristics in a subterm of the constraintformula described by a
-     * PosInOccurrence
+     * PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
      * @param filter the TacletFiler filtering the taclets of interest
-     * @param pos the PosInOccurrence to focus
+     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> to focus
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet (TacletFilter    filter,
-						  PosInOccurrence pos,
+						  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
 						  JavaDLTermServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
@@ -317,7 +319,7 @@ public final class RuleAppIndex  {
      * for the given goal, user defined constraint and position
      */
     public ImmutableList<IBuiltInRuleApp> getBuiltInRules(Goal g,
-	    PosInOccurrence pos) {
+	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
 	 	 	
 	 return builtInRuleAppIndex().getBuiltInRule(g, pos);
      }
@@ -435,7 +437,7 @@ public final class RuleAppIndex  {
      * removed
      */ 
     private void informNewRuleListener(RuleApp         p_app,
-                                       PosInOccurrence p_pos) {
+                                       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos) {
 	for (final NewRuleListener listener : listenerList) {
 	    listener.ruleAdded(p_app, p_pos);
 	}
@@ -446,7 +448,7 @@ public final class RuleAppIndex  {
      * removed
      */ 
     private void informNewRuleListener(ImmutableList<? extends RuleApp> p_apps,
-                                       PosInOccurrence p_pos) {
+                                       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos) {
         for (final NewRuleListener listener : listenerList) {
             listener.rulesAdded(p_apps, p_pos);
         }

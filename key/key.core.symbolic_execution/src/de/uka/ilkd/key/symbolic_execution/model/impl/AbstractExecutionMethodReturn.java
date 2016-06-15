@@ -169,16 +169,16 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
       // Get relevant information in current node
       Node proofNode = methodCall.getProofNode();
       assert proofNode.childrenCount() == 1;
-      PosInOccurrence originalPIO = methodCall.getModalityPIO();
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> originalPIO = methodCall.getModalityPIO();
       int index = originalPIO.isInAntec() ?
                   proofNode.sequent().antecedent().indexOf(originalPIO.sequentFormula()) :
                   proofNode.sequent().succedent().indexOf(originalPIO.sequentFormula());
       // Search relevant position in child node
       Node childNode = proofNode.child(0);
-      SequentFormula nodeSF = originalPIO.isInAntec() ?
+      SequentFormula<JavaDLTerm> nodeSF = originalPIO.isInAntec() ?
                               childNode.sequent().antecedent().get(index) :
                               childNode.sequent().succedent().get(index);
-      PosInOccurrence modalityPIO = new PosInOccurrence(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
       JavaDLTerm modalityTerm = modalityPIO.subTerm();
       while (modalityTerm.op() instanceof UpdateApplication) {
          modalityPIO = modalityPIO.down(1);

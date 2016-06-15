@@ -66,7 +66,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
          Assignment assignment = (Assignment) activeStatement;
          SourceElement firstElement = assignment.getChildAt(0);
          if(firstElement instanceof FieldReference){
-            PosInOccurrence pio = ruleApp.posInOccurrence();
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = ruleApp.posInOccurrence();
             JavaDLTerm term = pio.subTerm();
             getProof().getServices().getTermBuilder();
             term = TermBuilder.goBelowUpdates(term);

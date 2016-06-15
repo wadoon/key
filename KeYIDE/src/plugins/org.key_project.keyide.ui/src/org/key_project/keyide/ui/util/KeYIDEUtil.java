@@ -238,14 +238,14 @@ public final class KeYIDEUtil {
 
    /**
     * <p>
-    * Collects all applicable {@link TacletApp}s for a given {@link PosInOccurrence} and {@link UserInterfaceControl}.
+    * Collects all applicable {@link TacletApp}s for a given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} and {@link UserInterfaceControl}.
     * </p>
     * <p>
     * The code behaves like the {@link TacletMenu}.
     * </p>
     * @param ui - the {@link UserInterfaceControl} of the current {@link Proof}.
     * @param goal - the current {@link Goal}
-    * @param pos - the {@link PosInOccurrence} to find the {@link TacletApp}s for.
+    * @param pos - the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} to find the {@link TacletApp}s for.
     * @return {@link ImmutableList} - the {@link ImmutableList} with all applicable {@link TacletApp}s.
     */
    public static ImmutableList<TacletApp> findTaclets(UserInterfaceControl ui, Goal goal, PosInSequent pos) {

@@ -147,7 +147,7 @@ public class ModelGenerator implements SolverLauncherListener{
 		if(!tmodel.equals(tb.tt())){
 			//System.out.println(tmodel);
 			JavaDLTerm notTerm = tb.not(tmodel);
-			SequentFormula sf = new SequentFormula(notTerm);			
+			SequentFormula<JavaDLTerm> sf = new SequentFormula<>(notTerm);			
 			goal.addFormula(sf, true, true);		
 			return true;
 		}
@@ -178,13 +178,13 @@ public class ModelGenerator implements SolverLauncherListener{
 
 		final TermBuilder tb = services.getTermBuilder();
 		ante = ante.append(tb.tt());
-		for (SequentFormula f : s.antecedent()) {
+		for (SequentFormula<JavaDLTerm> f : s.antecedent()) {
 			ante = ante.append(f.formula());
 		}
 
 		ImmutableList<JavaDLTerm> succ = ImmutableSLList.nil();
 		succ = succ.append(tb.ff());
-		for (SequentFormula f : s.succedent()) {
+		for (SequentFormula<JavaDLTerm> f : s.succedent()) {
 			succ = succ.append(f.formula());
 		}
 

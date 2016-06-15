@@ -48,7 +48,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * to indicate that a refactoring below an update 
     * ({@link RefactoringScope#APPLICATION_BELOW_UPDATES})
     * is required performed by
-    * {@link #refactorBewlowUpdates(PosInOccurrence, JavaDLTerm, List)}.
+    * {@link #refactorBewlowUpdates(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, JavaDLTerm, List)}.
     * <p>
     * This is for instance required for the following rules:
     * <ul>
@@ -121,7 +121,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    @Override
    public RefactoringScope defineRefactoringScope(TermLabelState state,
                                                   Services services, 
-                                                  PosInOccurrence applicationPosInOccurrence, 
+                                                  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, 
                                                   JavaDLTerm applicationTerm, 
                                                   Rule rule, 
                                                   Goal goal, 
@@ -185,7 +185,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    @Override
    public void refactoreLabels(TermLabelState state,
                                Services services, 
-                               PosInOccurrence applicationPosInOccurrence, 
+                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, 
                                JavaDLTerm applicationTerm, 
                                Rule rule, 
                                Goal goal, 
@@ -259,11 +259,11 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    
    /**
     * Refactors the {@link JavaDLTerm} below its update.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
     * @param term The {@link JavaDLTerm} which is now refactored.
     * @param labels The new labels the {@link JavaDLTerm} will have after the refactoring.
     */
-   protected void refactorBewlowUpdates(PosInOccurrence applicationPosInOccurrence, 
+   protected void refactorBewlowUpdates(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, 
                                         JavaDLTerm term, 
                                         List<TermLabel> labels) {
       FormulaTermLabel applicationLabel = (FormulaTermLabel)applicationPosInOccurrence.subTerm().getLabel(FormulaTermLabel.NAME);
@@ -293,10 +293,10 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                                           Services services, 
                                           final JavaDLTerm term, 
                                           List<TermLabel> labels) {
-      Set<SequentFormula> sequentFormulas = getSequentFormulasToRefactor(state);
-      if (CollectionUtil.search(sequentFormulas, new IFilter<SequentFormula>() {
+      Set<SequentFormula<JavaDLTerm>> sequentFormulas = getSequentFormulasToRefactor(state);
+      if (CollectionUtil.search(sequentFormulas, new IFilter<SequentFormula<JavaDLTerm>>() {
          @Override
-         public boolean select(SequentFormula element) {
+         public boolean select(SequentFormula<JavaDLTerm> element) {
             return element.formula() == term;
          }
       }) != null) {
@@ -420,7 +420,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    public static boolean containsSequentFormulasToRefactor(TermLabelState state) {
       Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       @SuppressWarnings("unchecked")
-      Set<SequentFormula> sfSet = (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+      Set<SequentFormula<JavaDLTerm>> sfSet = (Set<SequentFormula<JavaDLTerm>>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
       return !CollectionUtil.isEmpty(sfSet);
    }
    
@@ -429,10 +429,10 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * @param state The {@link TermLabelState} to read from.
     * @return The {@link SequentFormula}s to refactor.
     */
-   public static Set<SequentFormula> getSequentFormulasToRefactor(TermLabelState state) {
+   public static Set<SequentFormula<JavaDLTerm>> getSequentFormulasToRefactor(TermLabelState state) {
       Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       @SuppressWarnings("unchecked")
-      Set<SequentFormula> sfSet = (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+      Set<SequentFormula<JavaDLTerm>> sfSet = (Set<SequentFormula<JavaDLTerm>>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
       return sfSet;
    }
    
@@ -441,12 +441,12 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * @param state The {@link TermLabelState} to modify.
     * @param sf The {@link SequentFormula} to add.
     */
-   public static void addSequentFormulaToRefactor(TermLabelState state, SequentFormula sf) {
+   public static void addSequentFormulaToRefactor(TermLabelState state, SequentFormula<JavaDLTerm> sf) {
       Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       @SuppressWarnings("unchecked")
-      Set<SequentFormula> sfSet = (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+      Set<SequentFormula<JavaDLTerm>> sfSet = (Set<SequentFormula<JavaDLTerm>>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
       if (sfSet == null) {
-         sfSet = new LinkedHashSet<SequentFormula>();
+         sfSet = new LinkedHashSet<SequentFormula<JavaDLTerm>>();
          labelState.put(SEQUENT_FORMULA_REFACTORING_REQUIRED, sfSet);
       }
       sfSet.add(sf);

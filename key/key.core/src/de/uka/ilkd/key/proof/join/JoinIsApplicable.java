@@ -47,7 +47,7 @@ public class JoinIsApplicable {
      * @return The list of possible join partner objects -- may be empty (then,
      *         the join is not applicable).
      */
-    public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence pio) {
+    public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return new LinkedList<ProspectivePartner>();
         }
@@ -65,7 +65,7 @@ public class JoinIsApplicable {
      * @return The list of possible join partners.
      */
     public List<ProspectivePartner> computeProspecitvePartner(Goal goal,
-            PosInOccurrence pio) {
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         assert !pio.isInAntec();
         List<ProspectivePartner> partners = new LinkedList<ProspectivePartner>();
 
@@ -97,7 +97,7 @@ public class JoinIsApplicable {
      *         null otherwise.
      */
     private ProspectivePartner areProspectivePartners(Goal g1,
-            PosInOccurrence pio, Goal g2) {
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal g2) {
         JavaDLTerm referenceFormula = pio.subTerm();
 
         assert g1.proof().getServices() == g2.proof().getServices();
@@ -109,7 +109,7 @@ public class JoinIsApplicable {
         referenceFormula = referenceFormula.op() instanceof UpdateApplication ? referenceFormula
                 .sub(1) : referenceFormula;
 
-        for (SequentFormula sf : g2.sequent().succedent()) {
+        for (SequentFormula<JavaDLTerm> sf : g2.sequent().succedent()) {
             JavaDLTerm formula = sf.formula();
             JavaDLTerm update2 = tb.skip();
             if (formula.op() instanceof UpdateApplication

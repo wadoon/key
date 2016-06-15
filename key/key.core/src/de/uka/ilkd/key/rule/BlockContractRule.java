@@ -13,25 +13,16 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
@@ -42,40 +33,16 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowBlockContractTacletBuilder;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.NotEquals;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.TransactionStatement;
-import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -284,7 +251,7 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public boolean isApplicable(final Goal goal, final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occurrence) {
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -448,7 +415,7 @@ public class BlockContractRule implements BuiltInRule {
             POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2,
                                                instantiation.context, services);
 
-        final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
+        final SequentFormula<JavaDLTerm> poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
 
         // add proof obligation to goal
         infFlowGoal.addFormula(poFormula, false, true);
@@ -462,7 +429,7 @@ public class BlockContractRule implements BuiltInRule {
                                        informationFlowContractApp);
     }
 
-    private static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence) {
+    private static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occurrence) {
         return occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec();
     }
 
@@ -591,7 +558,7 @@ public class BlockContractRule implements BuiltInRule {
                                             anonymisationUpdate, tb);
             } else {
                 // nothing to prove -> set up trivial goal
-                validityGoal.addFormula(new SequentFormula(tb.tt()), false, true);
+                validityGoal.addFormula(new SequentFormula<>(tb.tt()), false, true);
             }
         }
 
@@ -618,7 +585,7 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     @Override
-    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence occurrence, JavaDLTermServices services)
+    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occurrence, JavaDLTermServices services)
     {
         return new BlockContractBuiltInRuleApp(this, occurrence);
     }
@@ -649,7 +616,7 @@ public class BlockContractRule implements BuiltInRule {
         return NAME.toString();
     }
 
-    static SequentFormula buildBodyPreservesSequent(InfFlowPOSnippetFactory f, InfFlowProof proof) {
+    static SequentFormula<JavaDLTerm> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, InfFlowProof proof) {
         JavaDLTerm selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         JavaDLTerm post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
@@ -661,7 +628,7 @@ public class BlockContractRule implements BuiltInRule {
                        post);
         proof.addLabeledIFSymbol(selfComposedExec);
 
-        return new SequentFormula(finalTerm);
+        return new SequentFormula<>(finalTerm);
     }
 
 
@@ -677,7 +644,7 @@ public class BlockContractRule implements BuiltInRule {
                     tb.applySequential(new JavaDLTerm[] {contextUpdate, remembranceUpdate},
                                     tb.and(infFlowValitidyData.preAssumption,
                                            tb.apply(anonymisationUpdate, infFlowValitidyData.postAssumption)));
-        usageGoal.addFormula(new SequentFormula(uAssumptions), true, false);
+        usageGoal.addFormula(new SequentFormula<>(uAssumptions), true, false);
     }
 
 
@@ -1134,7 +1101,7 @@ public class BlockContractRule implements BuiltInRule {
         private final Instantiation instantiation;
         private final List<Label> labels;
         private final BlockContract.Variables variables;
-        private final PosInOccurrence occurrence;
+        private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occurrence;
         private final Services services;
         private final BlockContractRule rule;
 
@@ -1143,7 +1110,7 @@ public class BlockContractRule implements BuiltInRule {
                                  final Instantiation instantiation,
                                  final List<Label> labels,
                                  final BlockContract.Variables variables,
-                                 final PosInOccurrence occurrence,
+                                 final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occurrence,
                                  final Services services,
                                  final BlockContractRule rule)
         {
@@ -1169,7 +1136,7 @@ public class BlockContractRule implements BuiltInRule {
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
             final JavaDLTerm anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
-            final SequentFormula wdBlock = bwd.generateSequent(variables.self, variables.exception,
+            final SequentFormula<JavaDLTerm> wdBlock = bwd.generateSequent(variables.self, variables.exception,
                     variables.result, heap, heapAtPre,
                     anon, localIns, update, services);
             goal.changeFormula(wdBlock, occurrence);
@@ -1182,7 +1149,7 @@ public class BlockContractRule implements BuiltInRule {
                                       final Terms terms) {
             goal.setBranchLabel("Validity");
             final TermBuilder tb = services.getTermBuilder();
-            goal.addFormula(new SequentFormula(
+            goal.addFormula(new SequentFormula<>(
                     tb.applySequential(updates, tb.and(assumptions))), true, false);
             final StatementBlock block =
                     new ValidityProgramConstructor(labels, instantiation.block,
@@ -1194,7 +1161,7 @@ public class BlockContractRule implements BuiltInRule {
             JavaDLTerm newPost = tb.and(postconditions);
             newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, newPost, ImmutableSLList.<LocationVariable>nil().prepend(terms.remembranceLocalVariables.keySet()), terms.exception);
             newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule, goal, BlockContractRule.NEW_POSTCONDITION_TERM_HINT, null);
-            goal.changeFormula(new SequentFormula(
+            goal.changeFormula(new SequentFormula<>(
                   tb.applySequential(
                     updates,
                     tb.prog(instantiation.modality,
@@ -1259,7 +1226,7 @@ public class BlockContractRule implements BuiltInRule {
             goal.setBranchLabel("Precondition");
             JavaDLTerm fullPrecondition = tb.apply(update, tb.and(preconditions), null);
             fullPrecondition = TermLabelManager.refactorTerm(termLabelState, services, null, fullPrecondition, rule, goal, BlockContractRule.FULL_PRECONDITION_TERM_HINT, null);
-            goal.changeFormula(new SequentFormula(fullPrecondition),
+            goal.changeFormula(new SequentFormula<>(fullPrecondition),
                                occurrence);
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
         }
@@ -1269,8 +1236,8 @@ public class BlockContractRule implements BuiltInRule {
             final TermBuilder tb = services.getTermBuilder();
             goal.setBranchLabel("Usage");
             JavaDLTerm uAssumptions = tb.applySequential(updates, tb.and(assumptions));
-            goal.addFormula(new SequentFormula(uAssumptions), true, false);
-            goal.changeFormula(new SequentFormula(tb.applySequential(updates, buildUsageFormula(goal))),
+            goal.addFormula(new SequentFormula<>(uAssumptions), true, false);
+            goal.changeFormula(new SequentFormula<>(tb.applySequential(updates, buildUsageFormula(goal))),
                                                   occurrence);
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
         }

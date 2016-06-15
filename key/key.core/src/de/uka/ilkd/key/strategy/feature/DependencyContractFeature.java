@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.List;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -29,12 +30,12 @@ import de.uka.ilkd.key.speclang.HeapContext;
 public final class DependencyContractFeature extends BinaryFeature {
 
    private void removePreviouslyUsedSteps(JavaDLTerm focus, Goal goal,
-         List<PosInOccurrence> steps) {
+         List<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> steps) {
       for (RuleApp app : goal.appliedRuleApps()) {
          if (app.rule() instanceof UseDependencyContractRule
                && app.posInOccurrence().subTerm().equalsModRenaming(focus)) {
             final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-            for (PosInOccurrence ifInst : bapp.ifInsts()) {
+            for (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ifInst : bapp.ifInsts()) {
                steps.remove(ifInst);
             }
          }
@@ -42,7 +43,7 @@ public final class DependencyContractFeature extends BinaryFeature {
    }
 
    @Override
-   protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+   protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
       IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
       final JavaDLTerm focus = pos.subTerm();
 
@@ -52,7 +53,7 @@ public final class DependencyContractFeature extends BinaryFeature {
             .getHeapContext() : HeapContext.getModHeaps(goal.proof()
             .getServices(), false);
 
-      final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(
+      final List<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> steps = UseDependencyContractRule.getSteps(
             heapContext, pos, goal.sequent(), goal.proof().getServices());
       if (steps.isEmpty()) {
          return false;
@@ -65,7 +66,7 @@ public final class DependencyContractFeature extends BinaryFeature {
       }
 
       // instantiate with arbitrary remaining step
-      bapp = bapp.setIfInsts(ImmutableSLList.<PosInOccurrence> nil().prepend(
+      bapp = bapp.setIfInsts(ImmutableSLList.<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> nil().prepend(
             steps.get(0)));
       return true;
    }

@@ -13,15 +13,13 @@
 
 package de.uka.ilkd.key.macros;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -31,7 +29,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  * which use their own strategy.
  *
  * In order to implement a {@link StrategyProofMacro}, override
- * {@link #createStrategy(KeYMediator, PosInOccurrence)}.
+ * {@link #createStrategy(KeYMediator, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>)}.
  *
  * This class is aware of Position in occurrences and can also be applied to
  * inner nodes. Both {@link AutomatedRuleApplicationManager} and
@@ -43,7 +41,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  */
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
-    protected abstract Strategy createStrategy(Proof proof, PosInOccurrence posInOcc);
+    protected abstract Strategy createStrategy(Proof proof, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc);
 
     /**
      * {@inheritDoc}
@@ -56,7 +54,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
@@ -79,7 +77,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
+                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         if (goals == null || goals.isEmpty()) {
             // should not happen, because in this case canApplyTo returns

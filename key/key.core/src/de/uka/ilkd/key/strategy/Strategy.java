@@ -14,7 +14,9 @@
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -39,7 +41,7 @@ public interface Strategy extends Named {
      * (it is discarded by the strategy).
      */
     RuleAppCost computeCost ( RuleApp         app,
-                              PosInOccurrence pio,
+                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
                               Goal            goal );
 
     /**
@@ -48,7 +50,7 @@ public interface Strategy extends Named {
      * @return true iff the rule should be applied, false otherwise
      */
     boolean isApprovedApp ( RuleApp         app,
-                            PosInOccurrence pio,
+                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
                             Goal            goal );
     
     /**
@@ -62,7 +64,7 @@ public interface Strategy extends Named {
      * <code>RuleAppCostCollector</code>.
      */
     void instantiateApp ( RuleApp              app,
-                          PosInOccurrence      pio,
+                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>      pio,
                           Goal                 goal,
                           RuleAppCostCollector collector );
 }

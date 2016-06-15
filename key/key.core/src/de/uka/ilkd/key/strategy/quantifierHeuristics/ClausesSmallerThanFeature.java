@@ -40,7 +40,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         new QuanEliminationAnalyser ();
     
     // ugly
-    private PosInOccurrence        focus = null;
+    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>        focus = null;
     private Services               services = null;
 
     private final LiteralsSmallerThanFeature litComparator;
@@ -59,7 +59,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         return new ClausesSmallerThanFeature ( left, right, numbers );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         final JavaDLTerm leftTerm = left.toTerm ( app, pos, goal );
         final JavaDLTerm rightTerm = right.toTerm ( app, pos, goal );
 

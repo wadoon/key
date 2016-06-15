@@ -19,17 +19,13 @@ import java.util.LinkedHashMap;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.ScopeDefiningElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -160,9 +156,9 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     /**
-     * returns the program contained in a PosInOccurrence
+     * returns the program contained in a PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
      */
-    protected ProgramElement getProgramFromPIO(PosInOccurrence pio) {
+    protected ProgramElement getProgramFromPIO(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
     	JavaDLTerm progTerm;
     	if(pio != null
     	   && (progTerm = findProgramInTerm(pio.subTerm())) != null) {
@@ -334,12 +330,12 @@ public abstract class VariableNamer implements InstantiationProposer {
      * variables by renaming the new variable and / or other variables
      * @param var the new program variable
      * @param goal the goal
-     * @param posOfFind the PosInOccurrence of the currently executed program
+     * @param posOfFind the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the currently executed program
      * @return the renamed version of the var parameter
      */
     public abstract ProgramVariable rename(ProgramVariable var,
                                            Goal goal,
-                                           PosInOccurrence posOfFind);
+                                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind);
 
     
     
@@ -376,7 +372,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * (like getProposal(), but somewhat less nicely)
      * @param basename desired base name, or null to use default
      * @param sv the schema variable
-     * @param posOfFind the PosInOccurrence containing the name's target program
+     * @param posOfFind the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> containing the name's target program
      * @param posOfDeclaration the PosInProgram where the name will be declared
      *                         (or null to just be pessimistic about the scope)
      * @param previousProposals list of names which should be considered taken,
@@ -386,7 +382,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected ProgramElementName getNameProposalForSchemaVariable(
                            String basename,
                            SchemaVariable sv,
-                           PosInOccurrence posOfFind,
+                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
                            PosInProgram posOfDeclaration,
                            ImmutableList<String> previousProposals) {
         ProgramElementName result = null;
@@ -520,14 +516,14 @@ public abstract class VariableNamer implements InstantiationProposer {
      * within its scope
      * @param name the name to be checked
      * @param sv the schema variable
-     * @param posOfFind the PosInOccurrence of the name's target program
+     * @param posOfFind the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the name's target program
      * @param posOfDeclaration the PosInProgram where the name will be declared
      * @return true if the name is unique or if its uniqueness cannot be
      *         checked, else false
      */
     public boolean isUniqueNameForSchemaVariable(String name,
     					       SchemaVariable sv,
-					       PosInOccurrence posOfFind,
+					       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
 					       PosInProgram posOfDeclaration) {
 	boolean result = true;
 

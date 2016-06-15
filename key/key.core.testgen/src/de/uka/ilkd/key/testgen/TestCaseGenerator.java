@@ -682,7 +682,7 @@ public class TestCaseGenerator {
 
     protected Map<String, Sort>  generateTypeInferenceMap(Node n){
         HashMap<String,Sort> typeInfMap = new HashMap<String,Sort>();
-        Iterator<SequentFormula> formIter = n.sequent().iterator();
+        Iterator<SequentFormula<JavaDLTerm>> formIter = n.sequent().iterator();
         //System.out.println("\n---------------------------------------");
         while(formIter.hasNext()){
             JavaDLTerm t = formIter.next().formula();

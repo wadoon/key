@@ -38,7 +38,7 @@ public class SubtermProjection implements ProjectionToTerm {
         this.pit = pit;
     }
 
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         return pit.getSubTerm( completeTerm.toTerm ( app, pos, goal ) ) ;
     }
 }

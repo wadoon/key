@@ -2,13 +2,14 @@ package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -31,14 +32,14 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param gt the {@link TacletGoalTemplate} used to get the taclet's {@code replacewith}-expression 
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the {@link PosInOccurrence} belonging to the find expression
+     * @param posOfFind the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} belonging to the find expression
      * @param matchCond the {@link MatchConditions} with all required instantiations 
      * @param goal the {@link Goal} on which the taclet is applied 
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-                         SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
+                         SequentChangeInfo currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
                          MatchConditions matchCond,
                          Goal goal,
                          RuleApp ruleApp,
@@ -50,14 +51,14 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param add the {@link Sequent} with the uninstantiated {@link SequentFormula}'s to be added to the goal's sequent
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the {@link PosInOccurrence} providing the position information where the match took place 
+     * @param posOfFind the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} providing the position information where the match took place 
      * (it will be tried to add the new formulas close to that position)
      * @param matchCond the {@link MatchConditions} with all required instantiations 
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyAdd(Sequent add, TermLabelState termLabelState, SequentChangeInfo currentSequent,
-                     PosInOccurrence posOfFind,
+                     PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
                      MatchConditions matchCond,
                      Goal goal,
                      RuleApp ruleApp,
@@ -125,11 +126,11 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
 
         
         applyAddProgVars( gt.addedProgVars(),
-                currentSequent,
-                  currentGoal,
-               tacletApp.posInOccurrence(),
-               services,
-                  mc);
+                    currentSequent,
+                    currentGoal,
+                    tacletApp.posInOccurrence(),
+                    services,
+                    mc);
        
        TermLabelManager.mergeLabels(currentSequent, services);
        

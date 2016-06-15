@@ -62,7 +62,7 @@ public final class TruthValueTracingUtil {
     * @param sequentFormula The {@link SequentFormula} to check.
     * @return {@code true} is predicate, {@code false} is something else.
     */
-   public static boolean isPredicate(SequentFormula sequentFormula) {
+   public static boolean isPredicate(SequentFormula<JavaDLTerm> sequentFormula) {
       return sequentFormula != null ? 
              isPredicate(sequentFormula.formula()) : 
              false;
@@ -244,7 +244,7 @@ public final class TruthValueTracingUtil {
       }
       else if (node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
          OneStepSimplifierRuleApp app = (OneStepSimplifierRuleApp) node.getAppliedRuleApp();
-         PosInOccurrence parentPio = null;
+         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> parentPio = null;
          for (RuleApp protocolApp : app.getProtocol()) {
             if (parentPio != null) {
                updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(), parentPio, termLabelName, services.getTermBuilder(), currentResults);
@@ -262,7 +262,7 @@ public final class TruthValueTracingUtil {
          // Compare last PIO with PIO in child sequent (Attention: Child PIO is computed with help of the PIO of the OSS)
          if (parentPio != null) {
             assert 1 == node.childrenCount() : "Implementaton of the OneStepSimplifierRule has changed.";
-            PosInOccurrence childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(node, node.getAppliedRuleApp().posInOccurrence(), node.child(0));
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(node, node.getAppliedRuleApp().posInOccurrence(), node.child(0));
             updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName, services.getTermBuilder(), currentResults);
          }
       }
@@ -307,7 +307,7 @@ public final class TruthValueTracingUtil {
                                                              Name termLabelName) {
       List<LabelOccurrence> result = new LinkedList<LabelOccurrence>();
       // Search for labels in find part
-      PosInOccurrence pio = tacletApp.posInOccurrence();
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = tacletApp.posInOccurrence();
       if (pio != null) {
          JavaDLTerm term = pio.subTerm();
          if (term != null) {
@@ -425,8 +425,8 @@ public final class TruthValueTracingUtil {
     * @param tb The {@link GenericTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
-   protected static void updatePredicateResultBasedOnNewMinorIdsOSS(final PosInOccurrence childPio,
-                                                                    final PosInOccurrence parentPio,
+   protected static void updatePredicateResultBasedOnNewMinorIdsOSS(final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> childPio,
+                                                                    final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> parentPio,
                                                                     final Name termLabelName,
                                                                     final TermBuilder tb,
                                                                     final Map<String, MultiEvaluationResult> results) {
@@ -439,7 +439,7 @@ public final class TruthValueTracingUtil {
             }
          });
          // Check application term parents
-         PosInOccurrence currentPio = parentPio;
+         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> currentPio = parentPio;
          while (!currentPio.isTopLevel()) {
             currentPio = currentPio.up();
             checkForNewMinorIdsOSS(childPio.sequentFormula(), currentPio.subTerm(), termLabelName, parentPio, tb, results);
@@ -452,14 +452,14 @@ public final class TruthValueTracingUtil {
     * @param onlyChangedChildSF The only changed {@link SequentFormula} in the child {@link Node}.
     * @param term The {@link JavaDLTerm} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-    * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
+    * @param parentPio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the applied rule of the parent {@link Node}.
     * @param tb The {@link GenericTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
-   protected static void checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
+   protected static void checkForNewMinorIdsOSS(SequentFormula<JavaDLTerm> onlyChangedChildSF, 
                                                 JavaDLTerm term, 
                                                 Name termLabelName, 
-                                                PosInOccurrence parentPio, 
+                                                PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> parentPio, 
                                                 TermBuilder tb, 
                                                 Map<String, MultiEvaluationResult> results) {
       TermLabel label = term.getLabel(termLabelName);
@@ -479,7 +479,7 @@ public final class TruthValueTracingUtil {
     * @param tb The {@link GenericTermBuilder} to use.
     * @return The computed instruction {@link JavaDLTerm} or {@code null} if not available.
     */
-   protected static JavaDLTerm checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
+   protected static JavaDLTerm checkForNewMinorIdsOSS(SequentFormula<JavaDLTerm> onlyChangedChildSF, 
                                                 FormulaTermLabel label,
                                                 boolean antecedentRuleApplication,
                                                 TermBuilder tb) {
@@ -510,7 +510,7 @@ public final class TruthValueTracingUtil {
       final Node parentNode = childNode.parent();
       if (parentNode != null) {
          final RuleApp parentRuleApp = parentNode.getAppliedRuleApp();
-         final PosInOccurrence parentPio = parentRuleApp.posInOccurrence();
+         final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> parentPio = parentRuleApp.posInOccurrence();
          if (parentPio != null) {
             // Check application term and all of its children and grand children
             parentPio.subTerm().execPreOrder(new DefaultVisitor() {
@@ -520,7 +520,7 @@ public final class TruthValueTracingUtil {
                }
             });
             // Check application term parents
-            PosInOccurrence currentPio = parentPio;
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> currentPio = parentPio;
             while (!currentPio.isTopLevel()) {
                currentPio = currentPio.up();
                checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, parentPio, tb, results);
@@ -543,14 +543,14 @@ public final class TruthValueTracingUtil {
     * @param childNode The child {@link Node}.
     * @param term The {@link JavaDLTerm} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-    * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
+    * @param parentPio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the applied rule of the parent {@link Node}.
     * @param tb The {@link GenericTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIds(Node childNode, 
                                              JavaDLTerm term, 
                                              Name termLabelName, 
-                                             PosInOccurrence parentPio, 
+                                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> parentPio, 
                                              TermBuilder tb, 
                                              Map<String, MultiEvaluationResult> results) {
       TermLabel label = term.getLabel(termLabelName);
@@ -577,10 +577,10 @@ public final class TruthValueTracingUtil {
       // Search replacements
       List<JavaDLTerm> antecedentReplacements = new LinkedList<JavaDLTerm>();
       List<JavaDLTerm> succedentReplacements = new LinkedList<JavaDLTerm>();
-      for (SequentFormula sf : childNode.sequent().antecedent()) {
+      for (SequentFormula<JavaDLTerm> sf : childNode.sequent().antecedent()) {
          listLabelReplacements(sf, label.name(), label.getId(), antecedentReplacements);
       }
-      for (SequentFormula sf : childNode.sequent().succedent()) {
+      for (SequentFormula<JavaDLTerm> sf : childNode.sequent().succedent()) {
          listLabelReplacements(sf, label.name(), label.getId(), succedentReplacements);
       }
       // Compute term
@@ -594,7 +594,7 @@ public final class TruthValueTracingUtil {
     * @param labelId The label ID of interest.
     * @param resultToFill The result {@link List} to fill.
     */
-   protected static void listLabelReplacements(final SequentFormula sf, 
+   protected static void listLabelReplacements(final SequentFormula<JavaDLTerm> sf, 
                                                final Name labelName,
                                                final String labelId, 
                                                final List<JavaDLTerm> resultToFill) {

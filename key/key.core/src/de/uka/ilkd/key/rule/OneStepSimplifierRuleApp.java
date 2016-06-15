@@ -13,13 +13,16 @@
 
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
 public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
     
     private OneStepSimplifier.Protocol protocol;
 
-    protected OneStepSimplifierRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {
+    protected OneStepSimplifierRuleApp(BuiltInRule builtInRule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         super(builtInRule, pio);
     }
 

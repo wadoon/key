@@ -75,7 +75,7 @@ public class TriggeredInstantiations implements TermGenerator {
     /**
      * Generates all instances 
      */
-    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         if (app instanceof TacletApp) {
 
             final Services services = goal.proof().getServices();
@@ -171,7 +171,7 @@ public class TriggeredInstantiations implements TermGenerator {
             final Set<JavaDLTerm> axioms, final IntegerLDT integerLDT,
             Semisequent antecedent, boolean inAntecedent, JavaDLTermServices services) {
         
-        for (SequentFormula sf : antecedent) {
+        for (SequentFormula<JavaDLTerm> sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);
             if (sf.formula().op() instanceof Function || 
                     sf.formula().op() == Equality.EQUALS) {

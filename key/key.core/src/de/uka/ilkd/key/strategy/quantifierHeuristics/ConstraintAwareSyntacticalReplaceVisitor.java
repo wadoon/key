@@ -26,7 +26,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
     public ConstraintAwareSyntacticalReplaceVisitor(
             TermLabelState termLabelState, Services services,
             Constraint metavariableInst,
-            PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal) {
         super(termLabelState, services,
                 applicationPosInOccurrence, rule, ruleApp, labelHint, goal);

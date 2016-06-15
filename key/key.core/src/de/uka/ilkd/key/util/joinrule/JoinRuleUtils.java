@@ -14,49 +14,18 @@
 package de.uka.ilkd.key.util.joinrule;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.ElementaryUpdate;
-import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.Junctor;
-import org.key_project.common.core.logic.op.LogicVariable;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.UpdateApplication;
+import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -242,7 +211,7 @@ public class JoinRuleUtils {
             Sequent sequent, Services services) {
         HashSet<LocationVariable> result = new HashSet<LocationVariable>();
 
-        for (SequentFormula f : sequent) {
+        for (SequentFormula<JavaDLTerm> f : sequent) {
             result.addAll(getLocationVariablesHashSet(f.formula(), services));
         }
 
@@ -876,8 +845,8 @@ public class JoinRuleUtils {
     public static void clearSemisequent(Goal goal, boolean antec) {
         final Semisequent semiseq = antec ? goal.sequent().antecedent() : goal
                 .sequent().succedent();
-        for (final SequentFormula f : semiseq) {
-            final PosInOccurrence gPio = new PosInOccurrence(f,
+        for (final SequentFormula<JavaDLTerm> f : semiseq) {
+            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> gPio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(f,
                     PosInTerm.<JavaDLTerm>getTopLevel(), antec);
             goal.removeFormula(gPio);
         }
@@ -1130,7 +1099,7 @@ public class JoinRuleUtils {
      *            Partner goal to close.
      */
     public static void closeJoinPartnerGoal(Node joinNodeParent,
-            Goal joinPartner, PosInOccurrence pio,
+            Goal joinPartner, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
             SymbolicExecutionState joinState,
             SymbolicExecutionState joinPartnerState, JavaDLTerm pc) {
 
@@ -1165,10 +1134,10 @@ public class JoinRuleUtils {
      * @param services
      *            The services object.
      * @return An SE state (U,C).
-     * @see #sequentToSETriple(Goal, PosInOccurrence, Services)
+     * @see #sequentToSETriple(Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Services)
      */
     public static SymbolicExecutionState sequentToSEPair(Node node,
-            PosInOccurrence pio, Services services) {
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Services services) {
 
         SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio,
                 services);
@@ -1201,17 +1170,17 @@ public class JoinRuleUtils {
      * @return An SE state (U,C,p).
      */
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(
-            Node node, PosInOccurrence pio, Services services) {
+            Node node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Services services) {
 
-        ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
+        ImmutableList<SequentFormula<JavaDLTerm>> pathConditionSet = ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent()
                 .asList());
 
         JavaDLTerm selected = pio.subTerm();
 
-        for (SequentFormula sf : node.sequent().succedent()) {
+        for (SequentFormula<JavaDLTerm> sf : node.sequent().succedent()) {
             if (!sf.formula().equals(selected)) {
-                pathConditionSet = pathConditionSet.prepend(new SequentFormula(
+                pathConditionSet = pathConditionSet.prepend(new SequentFormula<>(
                         services.getTermBuilder().not(sf.formula())));
             }
         }
@@ -1282,7 +1251,7 @@ public class JoinRuleUtils {
      * @return And-formula connecting the given terms.
      */
     private static JavaDLTerm joinListToAndTerm(
-            ImmutableList<SequentFormula> formulae, Services services) {
+            ImmutableList<SequentFormula<JavaDLTerm>> formulae, Services services) {
         if (formulae.size() == 0) {
             return services.getTermBuilder().tt();
         }
@@ -1393,7 +1362,7 @@ public class JoinRuleUtils {
         return tryToProve(Sequent.createSequent(
                                     // Sequent to prove
                                     Semisequent.nil(),
-                                    new Semisequent(new SequentFormula(toProve))),
+                                    new Semisequent(new SequentFormula<>(toProve))),
                           services, doSplit, sideProofName, timeout);
     }
 
@@ -1549,12 +1518,12 @@ public class JoinRuleUtils {
         ImmutableList<JavaDLTerm> succedentForms = ImmutableSLList.nil();
 
         // Shift antecedent formulae to the succedent by negation
-        for (SequentFormula sf : sequent.antecedent().asList()) {
+        for (SequentFormula<JavaDLTerm> sf : sequent.antecedent().asList()) {
             negAntecedentForms = negAntecedentForms
                     .prepend(tb.not(sf.formula()));
         }
 
-        for (SequentFormula sf : sequent.succedent().asList()) {
+        for (SequentFormula<JavaDLTerm> sf : sequent.succedent().asList()) {
             succedentForms = succedentForms.prepend(sf.formula());
         }
 

@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -30,13 +31,7 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
@@ -709,7 +704,7 @@ public abstract class Taclet implements Rule, Named {
 
 
     private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-	for(SequentFormula cf : s) {
+	for(SequentFormula<JavaDLTerm> cf : s) {
 	    cf.formula().execPostOrder(oc);
 	}
     }
@@ -732,7 +727,7 @@ public abstract class Taclet implements Rule, Named {
        /**
         * The optional {@link SequentFormula} contained in {@link #getSequent()}.
         */
-       private final SequentFormula sequentFormula;
+       private final SequentFormula<JavaDLTerm> sequentFormula;
 
        /**
         * The optional replace {@link JavaDLTerm} of the taclet.
@@ -777,7 +772,7 @@ public abstract class Taclet implements Rule, Named {
         * @param labelHint The previous {@link TacletLabelHint} which is now specialised.
         * @param sequentFormula The optional {@link SequentFormula} contained in {@link #getSequent()}.
         */
-       public TacletLabelHint(TacletLabelHint labelHint, SequentFormula sequentFormula) {
+       public TacletLabelHint(TacletLabelHint labelHint, SequentFormula<JavaDLTerm> sequentFormula) {
           assert labelHint != null;
           assert !TacletOperation.REPLACE_TERM.equals(labelHint.getTacletOperation());
           assert sequentFormula != null;
@@ -807,7 +802,7 @@ public abstract class Taclet implements Rule, Named {
         * Returns the optional {@link SequentFormula} contained in {@link #getSequent()}.
         * @return The optional {@link SequentFormula} contained in {@link #getSequent()}.
         */
-       public SequentFormula getSequentFormula() {
+       public SequentFormula<JavaDLTerm> getSequentFormula() {
           return sequentFormula;
        }
 
@@ -867,13 +862,13 @@ public abstract class Taclet implements Rule, Named {
           REPLACE_TO_ANTECEDENT, 
           
           /**
-           * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently the current {@link PosInOccurrence} on the succedent is modified.
+           * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently the current {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} on the succedent is modified.
            * Available information are {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSequentFormula()}.
            */
           REPLACE_AT_SUCCEDENT, 
           
           /**
-           * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently the current {@link PosInOccurrence} on the antecedent is modified.
+           * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently the current {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} on the antecedent is modified.
            * Available information are {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSequentFormula()}.
            */
           REPLACE_AT_ANTECEDENT, 
@@ -885,7 +880,7 @@ public abstract class Taclet implements Rule, Named {
           REPLACE_TO_SUCCEDENT, 
 
           /**
-           * Replace clause of a {@link Taclet} provides a {@link JavaDLTerm} which is currently used to modify the {@link PosInOccurrence}.
+           * Replace clause of a {@link Taclet} provides a {@link JavaDLTerm} which is currently used to modify the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}.
            * Available information are {@link TacletLabelHint#getTerm()}.
            */
           REPLACE_TERM;

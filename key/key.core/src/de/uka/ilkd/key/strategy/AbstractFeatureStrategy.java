@@ -16,6 +16,7 @@ package de.uka.ilkd.key.strategy;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
@@ -31,40 +32,13 @@ import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
-import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
-import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.ConstFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
-import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
-import de.uka.ilkd.key.strategy.feature.LetFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.feature.ShannonFeature;
-import de.uka.ilkd.key.strategy.feature.SortComparisonFeature;
-import de.uka.ilkd.key.strategy.feature.SumFeature;
-import de.uka.ilkd.key.strategy.feature.TriggerVarInstantiatedFeature;
+import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.instantiator.BackTrackingManager;
 import de.uka.ilkd.key.strategy.feature.instantiator.ForEachCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.SVInstantiationCP;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
-import de.uka.ilkd.key.strategy.termProjection.SubtermProjection;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
-import de.uka.ilkd.key.strategy.termProjection.TermConstructionProjection;
-import de.uka.ilkd.key.strategy.termProjection.TriggerVariableInstantiationProjection;
-import de.uka.ilkd.key.strategy.termfeature.BinarySumTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ConstTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
-import de.uka.ilkd.key.strategy.termfeature.PrintTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.RecSubTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ShannonTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.SortExtendsTransTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+import de.uka.ilkd.key.strategy.termProjection.*;
+import de.uka.ilkd.key.strategy.termfeature.*;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 
@@ -441,7 +415,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     }
 
     public final void instantiateApp ( RuleApp              app,
-                                       PosInOccurrence      pio,
+                                       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>      pio,
                                        Goal                 goal,
                                        RuleAppCostCollector collector ) {
         getBtManager ().setup ( app );
@@ -455,7 +429,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     }
  
     protected abstract RuleAppCost instantiateApp (RuleApp              app,
-                                                   PosInOccurrence      pio,
+                                                   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>      pio,
                                                    Goal                 goal);
     
     protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {

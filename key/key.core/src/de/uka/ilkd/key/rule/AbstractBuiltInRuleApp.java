@@ -15,10 +15,12 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -27,24 +29,24 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
 	protected final BuiltInRule builtInRule;
 
-	protected final PosInOccurrence pio;
-	protected ImmutableList<PosInOccurrence> ifInsts;
+	protected final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio;
+	protected ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts;
 
-	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-	                                 ImmutableList<PosInOccurrence> ifInsts) {
+	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+	                                 ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
         this.builtInRule = rule;
 	    this.pio     = pio;
-	    this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence>nil() : ifInsts);
+	    this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>>nil() : ifInsts);
 	}
 
-	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
+	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
 	    this(rule, pio, null);
 	}
 
 	/** HACK: but strategies do not work otherwise in the moment; I need to have a closer look on what is going on there
 	 * This restores the behaviour as it was before my previous commit for the moment
 	 */
-    public void setMutable(ImmutableList<PosInOccurrence> ifInsts) {
+    public void setMutable(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
         this.ifInsts = ifInsts;
     }
 
@@ -57,11 +59,11 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     }
 
 	/**
-     * returns the PositionInOccurrence (representing a SequentFormula and
+     * returns the PositionInOccurrence (representing a SequentFormula<JavaDLTerm> and
      * a position in the corresponding formula) of this rule application
      */
     @Override
-    public PosInOccurrence posInOccurrence() {
+    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence() {
     return pio;
     }
 
@@ -86,13 +88,13 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     return result;
     }
 
-    public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);
+    public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos);
 
     @Override
-    public abstract IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
+    public abstract IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts);
 
     @Override
-    public ImmutableList<PosInOccurrence> ifInsts() {
+    public ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts() {
 	return ifInsts;
     }
 

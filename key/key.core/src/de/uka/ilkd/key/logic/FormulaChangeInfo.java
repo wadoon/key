@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 /**

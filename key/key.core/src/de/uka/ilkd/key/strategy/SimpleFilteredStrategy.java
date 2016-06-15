@@ -58,7 +58,7 @@ public class SimpleFilteredStrategy implements Strategy {
      * (it is discarded by the strategy).
      */
     public RuleAppCost computeCost ( RuleApp         app,
-	                             PosInOccurrence pio,
+	                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
 	                             Goal            goal ) {
 	if ( app instanceof TacletApp &&
 	     !ruleFilter.filter ( app.rule () ) )
@@ -82,7 +82,7 @@ public class SimpleFilteredStrategy implements Strategy {
      * @return true iff the rule should be applied, false otherwise
      */
     public boolean isApprovedApp ( RuleApp         app,
-	                           PosInOccurrence pio,
+	                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
 	                           Goal            goal ) {
     	// do not apply a rule twice
     	if ( app instanceof TacletApp &&
@@ -93,7 +93,7 @@ public class SimpleFilteredStrategy implements Strategy {
     }
 
     public void instantiateApp(RuleApp app,
-                               PosInOccurrence pio,
+                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
                                Goal goal,
                                RuleAppCostCollector collector) {}
 

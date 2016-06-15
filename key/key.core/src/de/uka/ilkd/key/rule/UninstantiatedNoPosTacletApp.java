@@ -13,7 +13,10 @@
 
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
 import de.uka.ilkd.key.java.JavaDLTermServices;
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
 
@@ -33,10 +36,10 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
     }
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.NoPosTacletApp#setupMatchConditions(de.uka.ilkd.key.logic.PosInOccurrence, org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.Constraint)
+     * @see de.uka.ilkd.key.rule.NoPosTacletApp#setupMatchConditions(de.uka.ilkd.key.logic.PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.Constraint)
      */
     @Override
-    protected MatchConditions setupMatchConditions (PosInOccurrence pos,
+    protected MatchConditions setupMatchConditions (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
                                                     JavaDLTermServices services) {
         if ( taclet() instanceof RewriteTaclet )
             return ((RewriteTaclet)taclet ()).checkPrefix

@@ -30,7 +30,7 @@ public class SequentChangeInfo extends GenericSequentChangeInfo<SequentFormula<J
      * sequent is given by result
      * 
      * @param pos
-     *            the PosInOccurrence describing the semisequent where the
+     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the semisequent where the
      *            changes took place
      * @param semiCI
      *            the SemisequentChangeInfo describing the changes in detail

@@ -35,7 +35,7 @@ public class TermBuffer implements ProjectionToTerm {
         this.t = t;
     }
 
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         return t;
     }
 

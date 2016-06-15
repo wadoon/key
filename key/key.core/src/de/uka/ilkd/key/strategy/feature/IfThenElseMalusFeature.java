@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -37,13 +38,13 @@ public class IfThenElseMalusFeature implements Feature {
     
     private IfThenElseMalusFeature () {}
     
-    public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost compute(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         if ( pos == null ) return NumberRuleAppCost.getZeroCost();
 
         final ServiceCaches caches = goal.proof().getServices().getCaches();
         
         RuleAppCost resInt;
-        final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache = caches.getIfThenElseMalusCache();
+        final LRUCache<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, RuleAppCost> ifThenElseMalusCache = caches.getIfThenElseMalusCache();
         synchronized(ifThenElseMalusCache) {
             resInt = ifThenElseMalusCache.get ( pos );
         }

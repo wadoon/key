@@ -17,14 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -34,19 +30,8 @@ import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -230,7 +215,7 @@ public final class QueryAxiom extends ClassAxiom {
 	    ifSeq = null;
 	} else {
 	    final JavaDLTerm ifFormula = TB.exactInstance(kjt.getSort(), TB.var(selfSV));
-	    final SequentFormula ifCf = new SequentFormula(ifFormula);
+	    final SequentFormula<JavaDLTerm> ifCf = new SequentFormula<>(ifFormula);
 	    final Semisequent ifSemiSeq
 	    	= Semisequent.nil().insertFirst(ifCf).semisequent();
 	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
@@ -256,7 +241,7 @@ public final class QueryAxiom extends ClassAxiom {
 	//create added sequent
 	final JavaDLTerm addedFormula 
 		= TB.apply(update, TB.prog(Modality.BOX, jb, post), null);
-	final SequentFormula addedCf = new SequentFormula(addedFormula);
+	final SequentFormula<JavaDLTerm> addedCf = new SequentFormula<>(addedFormula);
 	final Semisequent addedSemiSeq = Semisequent.nil()
 	                                            .insertFirst(addedCf)
 	                                            .semisequent();

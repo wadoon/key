@@ -18,61 +18,30 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MethodOrConstructorReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -523,7 +492,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
 
         // add term and taclet to post goal
-        goal.addFormula(new SequentFormula(contractApplPredTerm),
+        goal.addFormula(new SequentFormula<>(contractApplPredTerm),
                 true,
                 false);
         goal.addTaclet(informationFlowContractApp,
@@ -532,7 +501,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         // information flow proofs might get easier if we add the (proved)
         // method contract precondition as an assumption to the post goal
         // (in case the precondition cannot be proved easily)
-        goal.addFormula(new SequentFormula(finalPreTerm), true, false);
+        goal.addFormula(new SequentFormula<>(finalPreTerm), true, false);
         final InfFlowProof proof = (InfFlowProof) goal.proof();
         proof.addIFSymbol(contractApplPredTerm);
         proof.addIFSymbol(informationFlowContractApp);
@@ -617,7 +586,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal,
-                                PosInOccurrence pio) {
+                                PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
 	//focus must be top level succedent
 	if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
 	    return false;
@@ -900,7 +869,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
 
         finalPreTerm = TermLabelManager.refactorTerm(termLabelState, services, null, finalPreTerm, this, preGoal, FINAL_PRE_TERM_HINT, null);
-        preGoal.changeFormula(new SequentFormula(finalPreTerm),
+        preGoal.changeFormula(new SequentFormula<>(finalPreTerm),
                               ruleApp.posInOccurrence());
 
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, preGoal, null, null);
@@ -928,12 +897,12 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                          null, postJavaBlock, inst.progPost.getLabels())
                                                  ),
                                          null);
-        postGoal.addFormula(new SequentFormula(wellFormedAnon),
+        postGoal.addFormula(new SequentFormula<>(wellFormedAnon),
         	            true,
         	            false);
-        postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
+        postGoal.changeFormula(new SequentFormula<>(tb.apply(inst.u, normalPost, null)),
         	               ruleApp.posInOccurrence());
-        postGoal.addFormula(new SequentFormula(postAssumption),
+        postGoal.addFormula(new SequentFormula<>(postAssumption),
         	            true,
         	            false);
 
@@ -954,12 +923,12 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                                       inst.progPost.sub(0)),
                                                               null, excJavaBlock, inst.progPost.getLabels())), null);
         final JavaDLTerm excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
-        excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
+        excPostGoal.addFormula(new SequentFormula<>(wellFormedAnon),
                 	       true,
                 	       false);
-        excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
+        excPostGoal.changeFormula(new SequentFormula<>(tb.apply(inst.u, excPost, null)),
         	                  ruleApp.posInOccurrence());
-        excPostGoal.addFormula(new SequentFormula(excPostAssumption),
+        excPostGoal.addFormula(new SequentFormula<>(excPostAssumption),
         	               true,
         	               false);
 
@@ -968,7 +937,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(nullGoal != null) {
             final JavaDLTerm actualSelfNotNull
             	= tb.not(tb.equals(inst.actualSelf, tb.NULL()));
-            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, 
+            nullGoal.changeFormula(new SequentFormula<>(tb.apply(inst.u, 
         					               actualSelfNotNull,
         					               null)),
         	                   ruleApp.posInOccurrence());
@@ -1055,12 +1024,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
     }
 
-    public ContractRuleApp createApp(PosInOccurrence pos) {
+    public ContractRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
        return createApp(pos, null);
     }
 
     @Override
-    public ContractRuleApp createApp(PosInOccurrence pos, JavaDLTermServices services) {
+    public ContractRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, JavaDLTermServices services) {
 		return new ContractRuleApp(this, pos);
     }
 

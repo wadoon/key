@@ -42,17 +42,17 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
     * {@inheritDoc}
     */
    @Override
-   public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+   public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
       // Compute collect terms of sequent formulas
       Sequent sequent = goal.sequent();
       Set<JavaDLTerm> topTerms = new LinkedHashSet<JavaDLTerm>();
-      for (SequentFormula sf : sequent) {
+      for (SequentFormula<JavaDLTerm> sf : sequent) {
          topTerms.add(sf.formula());
       }
       // Compute equality terms
       HeapLDT heapLDT = goal.node().proof().getServices().getTheories().getHeapLDT();
       Set<JavaDLTerm> equalityTerms = new LinkedHashSet<JavaDLTerm>();
-      for (SequentFormula sf : sequent) {
+      for (SequentFormula<JavaDLTerm> sf : sequent) {
          collectEqualityTerms(sf, equalityTerms, topTerms, heapLDT, goal.node().proof().getServices());
       }
       return equalityTerms.iterator();
@@ -66,7 +66,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
     * @param heapLDT The {@link HeapLDT} to use.
     * @param services TODO
     */
-   protected void collectEqualityTerms(SequentFormula sf, Set<JavaDLTerm> equalityTerms, Set<JavaDLTerm> topTerms, HeapLDT heapLDT, Services services) {
+   protected void collectEqualityTerms(SequentFormula<JavaDLTerm> sf, Set<JavaDLTerm> equalityTerms, Set<JavaDLTerm> topTerms, HeapLDT heapLDT, Services services) {
       // Collect objects (target of store operations on heap)
       Set<JavaDLTerm> storeLocations = new LinkedHashSet<JavaDLTerm>();
       collectStoreLocations(sf.formula(), storeLocations, heapLDT);

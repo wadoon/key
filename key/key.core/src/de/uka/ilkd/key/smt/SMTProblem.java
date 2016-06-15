@@ -16,13 +16,13 @@ package de.uka.ilkd.key.smt;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -153,13 +153,13 @@ public class SMTProblem {
 
             final TermBuilder tb = services.getTermBuilder();
             ante = ante.append(tb.tt());
-            for (SequentFormula f : s.antecedent()) {
+            for (SequentFormula<JavaDLTerm> f : s.antecedent()) {
                     ante = ante.append(f.formula());
             }
 
             ImmutableList<JavaDLTerm> succ = ImmutableSLList.nil();
             succ = succ.append(tb.ff());
-            for (SequentFormula f : s.succedent()) {
+            for (SequentFormula<JavaDLTerm> f : s.succedent()) {
                     succ = succ.append(f.formula());
             }
 
@@ -174,13 +174,13 @@ public class SMTProblem {
 
                 final TermBuilder tb = goal.proof().getServices().getTermBuilder();
                 ante = ante.append(tb.tt());
-                for (SequentFormula f : s.antecedent()) {
+                for (SequentFormula<JavaDLTerm> f : s.antecedent()) {
                         ante = ante.append(f.formula());
                 }
 
                 ImmutableList<JavaDLTerm> succ = ImmutableSLList.nil();
                 succ = succ.append(tb.ff());
-                for (SequentFormula f : s.succedent()) {
+                for (SequentFormula<JavaDLTerm> f : s.succedent()) {
                         succ = succ.append(f.formula());
                 }
 

@@ -21,9 +21,7 @@ import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * TODO: Document.
@@ -120,8 +118,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      *         removed
      */
     @SuppressWarnings("unchecked")
-    public GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> addFormula(SeqFor cf,
-            PosInOccurrence<?, SeqFor> p) {
+    public GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> addFormula(SeqFor cf, PosInOccurrence<?, SeqFor> p) {
         final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
@@ -181,7 +178,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      *         removed
      */
     @SuppressWarnings("unchecked")
-    public GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> addFormula(
+    public  GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> addFormula(
             ImmutableList<SeqFor> insertions,
             PosInOccurrence<?, SeqFor> p) {
         final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
@@ -300,7 +297,6 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
     public boolean equals(Object o) {
         if (!(o instanceof GenericSequent<?, ?, ?>))
             return false;
-        @SuppressWarnings("unchecked")
         final GenericSequent<?, ?, ?> o1 = (GenericSequent<?, ?, ?>) o;
         return antecedent.equals(o1.antecedent)
                 && succedent.equals(o1.succedent);
@@ -400,29 +396,6 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      */
     public String toString() {
         return antecedent().toString() + "==>" + succedent().toString();
-    }
-
-    /**
-     * returns true iff the given variable is bound in a formula of a SeqFor in
-     * this sequent.
-     * 
-     * @param v
-     *            the bound variable to search for
-     */
-    public boolean varIsBound(QuantifiableVariable v) {
-        final Iterator<SeqFor> it = iterator();
-        while (it.hasNext()) {
-            
-            // FIXME (DS):
-            // BoundVarsVisitor is NOT generic, but JavaDL-dependent
-            
-            final BoundVarsVisitor bvv = new BoundVarsVisitor();
-            it.next().formula().execPostOrder(bvv);
-            if (bvv.getBoundVariables().contains(v)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     static class SequentIterator<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>, Seq extends GenericSequent<SeqFor, SemiSeq, Seq>>

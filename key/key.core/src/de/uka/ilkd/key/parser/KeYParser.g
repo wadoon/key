@@ -3649,7 +3649,7 @@ triggers[TacletBuilder b]
 
 taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r] 
 @init{ 
-    ifSeq = Sequent.EMPTY_SEQUENT;
+    ifSeq = Sequent.nil();
     TacletBuilder b = null;
     int applicationRestriction = RewriteTaclet.NONE;
     choices_ = choices;
@@ -4297,7 +4297,7 @@ RPAREN
 
 goalspec[TacletBuilder b, ImmutableSet<Choice> soc, boolean ruleWithFind] 
 @init{
-    addSeq = Sequent.EMPTY_SEQUENT;
+    addSeq = Sequent.nil();
     addRList = ImmutableSLList.<Taclet>nil();
     addpv = DefaultImmutableSet.<SchemaVariable>nil();
 }

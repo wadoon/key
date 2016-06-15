@@ -191,7 +191,7 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     private ImmutableList<Goal> apply(final String tacletName, Goal goal,
-            PosInOccurrence pio) {
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
         TacletFilter filter = new TacletFilter() {
             @Override
             protected boolean filter(Taclet taclet) {
@@ -214,10 +214,10 @@ public class DelayedCutProcessor implements Runnable {
      */
     private ImmutableList<Goal> hide(DelayedCut cut, Goal goal) {
 
-        SequentFormula sf = getSequentFormula(goal,
+        SequentFormula<JavaDLTerm> sf = getSequentFormula(goal,
                 cut.isDecisionPredicateInAntecendet());
 
-        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.<JavaDLTerm>getTopLevel(),
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(),
                 cut.isDecisionPredicateInAntecendet());
 
         ImmutableList<Goal> result = apply(getHideTacletName(cut), goal, pio);
@@ -239,7 +239,7 @@ public class DelayedCutProcessor implements Runnable {
                     : "FALSE";
 
             if (goal[i].node().getNodeInfo().getBranchLabel().endsWith(side)) {
-                SequentFormula formula = getSequentFormula(goal[i],
+                SequentFormula<JavaDLTerm> formula = getSequentFormula(goal[i],
                         cut.isDecisionPredicateInAntecendet());
                 if (formula.formula() == cut.getFormula()) {
                     return i;
@@ -255,7 +255,7 @@ public class DelayedCutProcessor implements Runnable {
                 : HIDE_RIGHT_TACLET;
     }
 
-    private SequentFormula getSequentFormula(Goal goal, boolean decPredInAnte) {
+    private SequentFormula<JavaDLTerm> getSequentFormula(Goal goal, boolean decPredInAnte) {
         return decPredInAnte ? goal.sequent().antecedent().get(DEC_PRED_INDEX)
                 : goal.sequent().succedent().get(DEC_PRED_INDEX);
 
@@ -357,7 +357,7 @@ public class DelayedCutProcessor implements Runnable {
     private RuleApp createNewRuleApp(NodeGoalPair pair, Services services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
 
-        PosInOccurrence newPos = translate(pair, services);
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos = translate(pair, services);
         try {
             check(pair.goal, oldRuleApp, newPos, services);
         }
@@ -382,7 +382,7 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private void check(Goal goal, final RuleApp app, PosInOccurrence newPos,
+    private void check(Goal goal, final RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos,
             Services services) {
         if (newPos == null) {
             return;
@@ -433,7 +433,7 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private PosInOccurrence translate(NodeGoalPair pair, JavaDLTermServices services) {
+    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> translate(NodeGoalPair pair, JavaDLTermServices services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if (oldRuleApp == null || oldRuleApp.posInOccurrence() == null) {
             return null;
@@ -441,7 +441,7 @@ public class DelayedCutProcessor implements Runnable {
         int formulaNumber = pair.node.sequent().formulaNumberInSequent(
                 oldRuleApp.posInOccurrence().isInAntec(),
                 oldRuleApp.posInOccurrence().sequentFormula());
-        return PosInOccurrence.findInSequent(pair.goal.sequent(),
+        return PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>.findInSequent(pair.goal.sequent(),
                 formulaNumber, oldRuleApp.posInOccurrence().posInTerm());
     }
 

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Quantifier;
 
@@ -350,7 +351,7 @@ public abstract class AbstractBetaFeature implements Feature {
      * @param goal the goal on which <code>app</code> is to be applied
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost compute (RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost compute (RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
     
         final JavaDLTerm findTerm = pos.sequentFormula ().formula ();
@@ -358,7 +359,7 @@ public abstract class AbstractBetaFeature implements Feature {
         return doComputation ( pos, findTerm, goal.proof().getServices().getCaches() );
     }
 
-    protected abstract RuleAppCost doComputation (PosInOccurrence pos,
+    protected abstract RuleAppCost doComputation (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
                                                   JavaDLTerm findTerm, 
                                                   ServiceCaches caches);
 }

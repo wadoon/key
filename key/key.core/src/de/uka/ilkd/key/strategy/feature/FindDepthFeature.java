@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -32,7 +35,7 @@ public class FindDepthFeature implements Feature {
 
     private FindDepthFeature () {}
     
-    public RuleAppCost compute ( RuleApp app, PosInOccurrence pos, Goal goal ) {
+    public RuleAppCost compute ( RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal ) {
         //assert pos != null : "Feature is only applicable to rules with find";
 
         return NumberRuleAppCost.create ( pos == null ? 0 : pos.depth () );

@@ -38,7 +38,7 @@ public class ReduceMonomialsProjection implements ProjectionToTerm {
         return new ReduceMonomialsProjection ( dividend, divisor );
     }
     
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         final JavaDLTerm dividendT = dividend.toTerm ( app, pos, goal );
         final JavaDLTerm divisorT = divisor.toTerm ( app, pos, goal );
 

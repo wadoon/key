@@ -16,6 +16,7 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
@@ -78,7 +79,7 @@ public class QueryExpandCost implements Feature {
 	}
     
 	@Override
-	public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+	public RuleAppCost compute(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
 		final Services services = goal.proof().getServices();
 		final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
 		final JavaDLTerm t = pos.subTerm();
@@ -174,14 +175,14 @@ public class QueryExpandCost implements Feature {
 	 *  at the same position in the sequent. This method detects repetitive rule
 	 *  applications and is used to prevent loops in the proof tree.
 	 */
-	protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal){
+	protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal){
 		 int count=0;
 		 ImmutableList<RuleApp> appliedRuleApps =goal.appliedRuleApps();
 	        if(appliedRuleApps!=null && !appliedRuleApps.isEmpty()){
 	        	Iterator<RuleApp> appliedRuleAppIter=appliedRuleApps.iterator();
 	        	while(appliedRuleAppIter.hasNext()){
 	        		RuleApp appliedRuleApp = appliedRuleAppIter.next();
-	        		final PosInOccurrence pio = appliedRuleApp.posInOccurrence();
+	        		final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = appliedRuleApp.posInOccurrence();
 	        		if(pio!=null){
 		        		final JavaDLTerm oldterm = pio.subTerm();
 		        		final JavaDLTerm curterm = pos.subTerm();

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Quantifier;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
@@ -32,10 +33,10 @@ public class OnlyInScopeOfQuantifiersFeature extends BinaryTacletAppFeature {
 
     private OnlyInScopeOfQuantifiersFeature() {}
     
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final PIOPathIterator it = pos.iterator ();
+        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator ();
         while ( it.next () != -1 ) {
             final JavaDLTerm subterm = it.getSubTerm ();
             if ( ! ( subterm.op () instanceof Quantifier ) ) return false;

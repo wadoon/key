@@ -467,7 +467,7 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>, SemiS
      * replaces the element at place idx with sequentFormula
      * 
      * @param pos
-     *            the PosInOccurrence describing the position of and within the
+     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the position of and within the
      *            formula below which the formula differs from the new formula
      *            <code>sequentFormula</code>
      * @param sequentFormula

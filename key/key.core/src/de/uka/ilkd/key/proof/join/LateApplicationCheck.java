@@ -39,8 +39,8 @@ public enum LateApplicationCheck {
     private List<String> check(ApplicationCheck check, Sequent sequent,
             Node cutNode) {
         List<String> conflicts = new LinkedList<String>();
-        for (Iterator<SequentFormula> it = sequent.iterator(); it.hasNext();) {
-            SequentFormula sf = it.next();
+        for (Iterator<SequentFormula<JavaDLTerm>> it = sequent.iterator(); it.hasNext();) {
+            SequentFormula<JavaDLTerm> sf = it.next();
             String result = check.check(cutNode, sf.formula());
             if (result != null) {
                 conflicts.add(result);

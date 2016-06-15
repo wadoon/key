@@ -51,7 +51,7 @@ public class TestGoal extends TestCase {
                 Sequent seq = Sequent
                                 .createSuccSequent(Semisequent.nil()
                                                 .insert(0,
-                                                                new SequentFormula(
+                                                                new SequentFormula<>(
                                                                                 TacletForTests.parseTerm("A")))
                                                 .semisequent());
 
@@ -107,7 +107,7 @@ public class TestGoal extends TestCase {
                 Sequent seq = Sequent
                                 .createSuccSequent(Semisequent.nil()
                                                 .insert(0,
-                                                                new SequentFormula(
+                                                                new SequentFormula<>(
                                                                                 TacletForTests.parseTerm("A")))
                                                 .semisequent());
                 Node root = new Node(proof, seq);

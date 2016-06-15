@@ -20,15 +20,16 @@ import java.util.List;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
@@ -364,10 +365,10 @@ public final class Goal  {
 
     /** adds a formula to the sequent before the given position
      * and informs the rule application index about this change
-     * @param cf the SequentFormula to be added
-     * @param p PosInOccurrence encodes the position
+     * @param cf the SequentFormula<JavaDLTerm> to be added
+     * @param p PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> encodes the position
      */
-    public void addFormula(SequentFormula cf, PosInOccurrence p) {
+    public void addFormula(SequentFormula<JavaDLTerm> cf, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
        setSequent(sequent().addFormula(cf, p));
     }
 
@@ -375,13 +376,13 @@ public final class Goal  {
     /** adds a formula to the antecedent or succedent of a
      * sequent. Either at its front or back
      * and informs the rule application index about this change
-     * @param cf the SequentFormula to be added
-     * @param inAntec boolean true(false) if SequentFormula has to be
+     * @param cf the SequentFormula<JavaDLTerm> to be added
+     * @param inAntec boolean true(false) if SequentFormula<JavaDLTerm> has to be
      * added to antecedent (succedent)
      * @param first boolean true if at the front, if false then cf is
      * added at the back
      */
-    public void addFormula ( SequentFormula cf, boolean inAntec,
+    public void addFormula ( SequentFormula<JavaDLTerm> cf, boolean inAntec,
           boolean first ) {
        setSequent(sequent().addFormula(cf, inAntec, first));
     }
@@ -389,19 +390,19 @@ public final class Goal  {
     /**
      * replaces a formula at the given position
      * and informs the rule application index about this change
-     * @param cf the SequentFormula replacing the old one
-     * @param p the PosInOccurrence encoding the position
+     * @param cf the SequentFormula<JavaDLTerm> replacing the old one
+     * @param p the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> encoding the position
      */
-    public void changeFormula(SequentFormula cf, PosInOccurrence p) {
+    public void changeFormula(SequentFormula<JavaDLTerm> cf, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
        setSequent(sequent().changeFormula(cf, p));
     }
 
 
     /** removes a formula at the given position from the sequent
      * and informs the rule appliccation index about this change
-     * @param p PosInOccurrence encodes the position
+     * @param p PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> encodes the position
      */
-    public void removeFormula(PosInOccurrence p) {
+    public void removeFormula(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
        setSequent(sequent().removeFormula(p));
     }
 

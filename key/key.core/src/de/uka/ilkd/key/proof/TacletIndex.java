@@ -13,14 +13,10 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.SortDependingFunction;
@@ -30,11 +26,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.SynchronizedBlock;
@@ -42,20 +34,10 @@ import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
-import de.uka.ilkd.key.rule.AntecTaclet;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.SuccTaclet;
-import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -323,7 +305,7 @@ public abstract class TacletIndex  {
      */
     private ImmutableList<NoPosTacletApp> getFindTaclet(ImmutableList<NoPosTacletApp> taclets,
 					       RuleFilter           filter,
-					       PosInOccurrence      pos,
+					       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>      pos,
 					       Services             services) { 
 	return matchTaclets ( taclets,
 			      filter,
@@ -337,7 +319,7 @@ public abstract class TacletIndex  {
      */
     protected abstract ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
             final RuleFilter           p_filter,
-            final PosInOccurrence      pos,
+            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>      pos,
             final Services             services);   
     
     /**
@@ -465,7 +447,7 @@ public abstract class TacletIndex  {
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
-    public ImmutableList<NoPosTacletApp> getAntecedentTaclet(PosInOccurrence pos,						    
+    public ImmutableList<NoPosTacletApp> getAntecedentTaclet(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,						    
 						    RuleFilter filter,
 						    Services   services) {                        
         return getTopLevelTaclets(antecList,
@@ -483,7 +465,7 @@ public abstract class TacletIndex  {
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
-    public ImmutableList<NoPosTacletApp> getSuccedentTaclet(PosInOccurrence pos,						  
+    public ImmutableList<NoPosTacletApp> getSuccedentTaclet(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,						  
 						   RuleFilter filter,
 						   Services   services) {       
            
@@ -496,7 +478,7 @@ public abstract class TacletIndex  {
     private ImmutableList<NoPosTacletApp>
 	getTopLevelTaclets(HashMap<Object, ImmutableList<NoPosTacletApp>> findTaclets,
 			   RuleFilter filter,
-			   PosInOccurrence pos,			   
+			   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,			   
 			   Services services) {
       
         assert pos.isTopLevel();
@@ -520,7 +502,7 @@ public abstract class TacletIndex  {
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
-    public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos,
+    public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
 						 RuleFilter      filter,
 						 Services        services) { 
 	ImmutableList<NoPosTacletApp> result = matchTaclets(getList(rwList, pos.subTerm(), false),

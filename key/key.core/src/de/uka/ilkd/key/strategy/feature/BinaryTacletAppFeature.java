@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
+
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -39,7 +42,7 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature {
         nonTacletValue = p_nonTacletValue;
     }
 
-    final protected boolean filter ( RuleApp app, PosInOccurrence pos, Goal goal ) {
+    final protected boolean filter ( RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal ) {
         if ( app instanceof TacletApp )
             return filter ( (TacletApp)app, pos, goal );
         return nonTacletValue;
@@ -58,6 +61,6 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature {
      * @return true iff the the result of the feature is supposed to be zero.
      */
     protected abstract boolean filter ( TacletApp app,
-                                        PosInOccurrence pos,
+                                        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
                                         Goal goal );
 }

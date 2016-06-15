@@ -19,10 +19,10 @@ public class FormulaTermLabelMerger implements TermLabelMerger {
     * {@inheritDoc}
     */
    @Override
-   public boolean mergeLabels(SequentFormula existingSF, 
+   public boolean mergeLabels(SequentFormula<JavaDLTerm> existingSF, 
                               JavaDLTerm existingTerm, 
                               TermLabel existingLabel, 
-                              SequentFormula rejectedSF, 
+                              SequentFormula<JavaDLTerm> rejectedSF, 
                               JavaDLTerm rejectedTerm, 
                               TermLabel rejectedLabel, 
                               List<TermLabel> mergedLabels) {

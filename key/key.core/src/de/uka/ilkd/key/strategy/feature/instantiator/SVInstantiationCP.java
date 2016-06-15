@@ -66,7 +66,7 @@ public class SVInstantiationCP implements Feature {
         this.manager = manager;
     }
 
-    public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost compute(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         manager.passChoicePoint ( new CP (app, pos, goal), this );
         return NumberRuleAppCost.getZeroCost();
     }
@@ -94,11 +94,11 @@ public class SVInstantiationCP implements Feature {
     
     private class CP implements ChoicePoint {
         
-        private final PosInOccurrence pos;
+        private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos;
         private final RuleApp         app;
         private final Goal            goal;
     
-        private CP(RuleApp app, PosInOccurrence pos, Goal goal) {
+        private CP(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;

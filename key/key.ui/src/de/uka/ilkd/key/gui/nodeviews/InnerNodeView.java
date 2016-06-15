@@ -287,8 +287,8 @@ public class InnerNodeView extends SequentView {
                 continue;
             }
             final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
-            final PosInOccurrence pos
-                    = new PosInOccurrence(inst.getConstrainedFormula(),
+            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
+                    = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(inst.getConstrainedFormula(),
                     PosInTerm.<JavaDLTerm>getTopLevel(),
                     inst.inAntec());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
@@ -297,19 +297,19 @@ public class InnerNodeView extends SequentView {
 
     private void highlightIfInsts(IBuiltInRuleApp bapp)
             throws BadLocationException {
-        final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
-        for (PosInOccurrence pio : ifs) {
+        final ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifs = bapp.ifInsts();
+        for (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio : ifs) {
             highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
         }
     }
 
     /**
-     * @param pos the PosInOccurrence that should be highlighted.
+     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> that should be highlighted.
      * @param light the painter for the highlight.
      * @return the range of characters that was highlighted.
      * @throws BadLocationException
      */
-    private Range highlightPos(PosInOccurrence pos,
+    private Range highlightPos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
             HighlightPainter light)
             throws BadLocationException {
         ImmutableList<Integer> path = posTable.pathForPosition(pos, filter);

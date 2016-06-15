@@ -98,7 +98,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
     */
    protected ExecutionContext extractContext(Node node, Services services) {
       RuleApp app = node.getAppliedRuleApp();
-      PosInOccurrence pio = app.posInOccurrence();
+      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = app.posInOccurrence();
       JavaBlock jb = TermBuilder.goBelowUpdates(pio.subTerm()).modalContent();
       return JavaTools.getInnermostExecutionContext(jb, services);
    }

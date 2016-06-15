@@ -18,13 +18,13 @@ import java.util.Iterator;
 import javax.swing.DefaultComboBoxModel;
 
 import org.antlr.runtime.RecognitionException;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -52,7 +52,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         }
         
         @Override
-        public SequentFormula getConstrainedFormula() {
+        public SequentFormula<JavaDLTerm> getConstrainedFormula() {
             return null;
         }
     };
@@ -145,7 +145,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
                         + ProofSaver.printAnything(ifFma, services), pos, -1, true);
             }
 
-            return new IfFormulaInstDirect(new SequentFormula(parseFormula(manualInput)));
+            return new IfFormulaInstDirect(new SequentFormula<>(parseFormula(manualInput)));
         } catch (RecognitionException e) {
             throw new SVInstantiationParserException(manualInput, pos, e.charPositionInLine,
                     "Problem occured parsing a manual input"

@@ -62,7 +62,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
                 node.sequent().antecedent() : node.sequent().succedent();
         String position = cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? "antecedent":"succedent";   
         
-        for(SequentFormula sf : semisequent){
+        for(SequentFormula<JavaDLTerm> sf : semisequent){
             if(sf.formula() == term){
                 return "Formula already exists in "+position+".";
             }

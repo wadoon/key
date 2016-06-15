@@ -133,7 +133,7 @@ public class OutputStreamProofSaver {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
-              for (SequentFormula s: proof.root().sequent().succedent().asList()) {
+              for (SequentFormula<JavaDLTerm> s: proof.root().sequent().succedent().asList()) {
                   ((InfFlowProof)proof).addLabeledTotalTerm(s.formula());
               }
           } else {
@@ -433,7 +433,7 @@ public class OutputStreamProofSaver {
    }
 
 
-    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
+    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
         if (pos == null) return "";
         return " (formula \""+seq.formulaNumberInSequent(pos.isInAntec(),
                 pos.sequentFormula())+"\")"+
@@ -481,7 +481,7 @@ public class OutputStreamProofSaver {
        for (IfFormulaInstantiation aL : l) {
            IfFormulaInstantiation iff = aL;
            if (iff instanceof IfFormulaInstSeq) {
-               SequentFormula f = iff.getConstrainedFormula();
+               SequentFormula<JavaDLTerm> f = iff.getConstrainedFormula();
                s += " (ifseqformula \"" +
                        node.sequent().formulaNumberInSequent(
                                ((IfFormulaInstSeq) iff).inAntec(), f) +
@@ -500,9 +500,9 @@ public class OutputStreamProofSaver {
 
 
    public String builtinRuleIfInsts(Node node, 
-	   			    ImmutableList<PosInOccurrence> ifInsts) {
+	   			    ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
        String s = "";
-       for(PosInOccurrence ifInst : ifInsts) {
+       for(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ifInst : ifInsts) {
 	   s += " (ifInst \"\" ";
 	   s += posInOccurrence2Proof(node.sequent(), ifInst);
 	   s += ")";

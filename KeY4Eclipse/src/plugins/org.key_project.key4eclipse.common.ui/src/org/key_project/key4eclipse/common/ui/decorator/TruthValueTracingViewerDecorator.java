@@ -169,14 +169,14 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
       // Evaluate antecedent
       int i = 0;
       TruthValue antecedentValue = TruthValue.TRUE;
-      for (SequentFormula sf : sequent.antecedent()) {
+      for (SequentFormula<JavaDLTerm> sf : sequent.antecedent()) {
          TruthValue truthValue = fillTermRanges(sf.formula(), positionTable, branchResult, textLength, termValueMap, path.append(i), styleRanges);
          antecedentValue = TruthValue.and(antecedentValue, truthValue);
          i++;
       }
       // Evaluate succedent
       TruthValue succedentValue = TruthValue.FALSE;
-      for (SequentFormula sf : sequent.succedent()) {
+      for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
          TruthValue truthValue = fillTermRanges(sf.formula(), positionTable, branchResult, textLength, termValueMap, path.append(i), styleRanges);
          succedentValue = TruthValue.or(succedentValue, truthValue);
          i++;

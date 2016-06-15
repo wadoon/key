@@ -168,7 +168,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence getModalityPIO() {
+   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
       return getVariable().getModalityPIO();
    }
 

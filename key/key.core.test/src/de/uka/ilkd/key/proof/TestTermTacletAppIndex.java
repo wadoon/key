@@ -121,9 +121,9 @@ public class TestTermTacletAppIndex extends TestCase{
         ruleIdx.add ( remove_zero );
 
         JavaDLTerm term = TacletForTests.parseTerm ( "f(f(f(zero)))=one" );
-        SequentFormula cfma = new SequentFormula ( term );
+        SequentFormula<JavaDLTerm> cfma = new SequentFormula<JavaDLTerm> ( term );
 
-        PosInOccurrence pio = new PosInOccurrence ( cfma, PosInTerm.<JavaDLTerm>getTopLevel(),
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( cfma, PosInTerm.<JavaDLTerm>getTopLevel(),
                                                     false );
 
         TermTacletAppIndex termIdx =
@@ -142,8 +142,8 @@ public class TestTermTacletAppIndex extends TestCase{
 
         // now a real change
         JavaDLTerm term2 = TacletForTests.parseTerm ( "f(f(zero))=one" );
-        SequentFormula cfma2 = new SequentFormula ( term2 );
-        PosInOccurrence pio2 = new PosInOccurrence ( cfma2,
+        SequentFormula<JavaDLTerm> cfma2 = new SequentFormula<JavaDLTerm> ( term2 );
+        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio2 = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( cfma2,
                                                      PosInTerm.<JavaDLTerm>getTopLevel(), false );
 
         termIdx = termIdx.update ( pio2.down ( 0 ).down ( 0 ).down ( 0 ), serv,
@@ -160,7 +160,7 @@ public class TestTermTacletAppIndex extends TestCase{
         checkTermIndex3 ( pio2, termIdx );
     }
 
-    private void checkAtPos(PosInOccurrence pio,
+    private void checkAtPos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
 			    TermTacletAppIndex termIdx,
 			    ImmutableList<Taclet> list) {
         checkTacletList(termIdx.getTacletAppAt(pio,
@@ -168,11 +168,11 @@ public class TestTermTacletAppIndex extends TestCase{
                         list);
     }
 
-    private PosInOccurrence down ( PosInOccurrence pio, int i ) {
+    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> down ( PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, int i ) {
 	return pio.down(i);
     }
 
-    private void checkTermIndex(PosInOccurrence pio,
+    private void checkTermIndex(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
                                 TermTacletAppIndex termIdx) {
         ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
@@ -186,7 +186,7 @@ public class TestTermTacletAppIndex extends TestCase{
         checkAtPos(down(pio, 1), termIdx, listA);
     }
 
-    private void checkTermIndex2(PosInOccurrence pio,
+    private void checkTermIndex2(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
 				 TermTacletAppIndex termIdx) {
 	ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
 	ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
@@ -199,7 +199,7 @@ public class TestTermTacletAppIndex extends TestCase{
 	checkAtPos(down(pio, 1), termIdx, listA);
     }
 
-    private void checkTermIndex3(PosInOccurrence pio,
+    private void checkTermIndex3(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
 				 TermTacletAppIndex termIdx) {
 	ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
 	ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());

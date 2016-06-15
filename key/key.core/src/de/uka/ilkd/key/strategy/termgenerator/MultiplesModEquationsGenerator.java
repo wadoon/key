@@ -65,7 +65,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return new MultiplesModEquationsGenerator ( source, target );
     }
     
-    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
         
         final Monomial sourceM =
@@ -163,7 +163,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
 
         final List<CofactorPolynomial> res = new ArrayList<CofactorPolynomial> ();
      
-        for (final SequentFormula cfm : goal.sequent ().antecedent ()) {
+        for (final SequentFormula<JavaDLTerm> cfm : goal.sequent ().antecedent ()) {
 
             final JavaDLTerm t = cfm.formula();
             if ( t.op () != Equality.EQUALS

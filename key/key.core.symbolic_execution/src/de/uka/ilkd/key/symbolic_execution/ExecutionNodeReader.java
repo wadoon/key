@@ -1340,7 +1340,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence getModalityPIO() {
+      public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
          return null;
       }
       
@@ -2203,7 +2203,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence getModalityPIO() {
+      public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
          return null;
       }
    }
@@ -2582,7 +2582,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence getModalityPIO() {
+      public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
          return null;
       }
    }
@@ -2706,7 +2706,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence getModalityPIO() {
+      public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
          return null;
       }
 
@@ -2899,7 +2899,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence getModalityPIO() {
+      public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
          return null;
       }
    }

@@ -307,8 +307,8 @@ public class CreateTacletForTests extends TestCase {
 	    System.err.println("Parser Error or Input Error");
 	    fail("Parser Error");
 	}	
-	SequentFormula cf=new SequentFormula(t_test1);
-	SequentFormula cf2=new SequentFormula(t_test1);
+	SequentFormula<JavaDLTerm> cf=new SequentFormula<>(t_test1);
+	SequentFormula<JavaDLTerm> cf2=new SequentFormula<>(t_test1);
 	seq_test1 = Sequent.createSequent(Semisequent.nil(),
 		    Semisequent.nil().insert(0,cf).semisequent()); 
 	seq_test2 = Sequent.createSequent(Semisequent.nil()
@@ -355,13 +355,13 @@ public class CreateTacletForTests extends TestCase {
 	seq_testNat=Sequent.createSequent
 	    (Semisequent.nil(),
 	     Semisequent.nil().insert
-	     (0, new SequentFormula(tnat)).semisequent());
+	     (0, new SequentFormula<>(tnat)).semisequent());
 
 
 	z = new LogicVariable(new Name("z"),sort1);
        	JavaDLTerm t_z=tf.createTerm(z,new JavaDLTerm[0]);
 	JavaDLTerm t_allzpz=services.getTermBuilder().all(z, tf.createTerm(func_p,new JavaDLTerm[]{t_z}));
- 	SequentFormula cf3=new SequentFormula(t_allzpz);
+ 	SequentFormula<JavaDLTerm> cf3=new SequentFormula<>(t_allzpz);
  	seq_testAll=Sequent.createSequent(Semisequent.nil(), 
  					  Semisequent.nil()
 					  .insert(0,cf3).semisequent()); 

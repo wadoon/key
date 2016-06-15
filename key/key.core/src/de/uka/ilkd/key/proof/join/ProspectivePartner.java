@@ -30,7 +30,7 @@ public class ProspectivePartner {
     private final Node[] nodes = new Node[2];
     private JavaDLTerm commonPredicate = null;
     private Node commonParent = null;
-    private SequentFormula formulaForHiding = null;
+    private SequentFormula<JavaDLTerm> formulaForHiding = null;
 
     /**
      * Constructs a new prospective partner object, i.e. a
@@ -47,8 +47,8 @@ public class ProspectivePartner {
      * @param update2 The second symbolic state.
      */
     public ProspectivePartner(JavaDLTerm commonFormula, Node node1,
-            SequentFormula formula1, JavaDLTerm update1, Node node2,
-            SequentFormula formula2, JavaDLTerm update2) {
+            SequentFormula<JavaDLTerm> formula1, JavaDLTerm update1, Node node2,
+            SequentFormula<JavaDLTerm> formula2, JavaDLTerm update2) {
         super();
         this.commonFormula = commonFormula;
         formula[0] = formula1;
@@ -88,11 +88,11 @@ public class ProspectivePartner {
         }
     }
 
-    private void setFormulaForHiding(SequentFormula formulaForHiding) {
+    private void setFormulaForHiding(SequentFormula<JavaDLTerm> formulaForHiding) {
         this.formulaForHiding = formulaForHiding;
     }
 
-    public SequentFormula getFormulaForHiding() {
+    public SequentFormula<JavaDLTerm> getFormulaForHiding() {
         return formulaForHiding;
     }
 
@@ -104,7 +104,7 @@ public class ProspectivePartner {
         return getNode(index).sequent();
     }
 
-    public SequentFormula getFormula(int i) {
+    public SequentFormula<JavaDLTerm> getFormula(int i) {
         return formula[i];
     }
 

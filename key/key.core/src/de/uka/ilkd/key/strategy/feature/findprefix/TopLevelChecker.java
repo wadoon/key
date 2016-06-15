@@ -28,7 +28,7 @@ class TopLevelChecker implements Checker {
     private boolean topLevel;
 
     @Override
-    public void initPrefixCheck(PosInOccurrence p_pos) {
+    public void initPrefixCheck(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos) {
         topLevel = p_pos.isTopLevel();
     }
 
