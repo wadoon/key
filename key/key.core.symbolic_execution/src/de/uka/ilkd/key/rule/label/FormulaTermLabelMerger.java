@@ -3,10 +3,10 @@ package de.uka.ilkd.key.rule.label;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.java.CollectionUtil;
 
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 
