@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -12,7 +11,7 @@ public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula
     /** contains the removed formulas from the semisequent */
     private ImmutableList<SeqFor> removed = ImmutableSLList.<SeqFor>nil();
     /** contains the modified formulas from the semisequent */
-    private ImmutableList<FormulaChangeInfo<T, SeqFor>> modified = ImmutableSLList.<FormulaChangeInfo<T, SeqFor>>nil();
+    private ImmutableList<FormulaChangeInfo<SeqFor>> modified = ImmutableSLList.<FormulaChangeInfo<SeqFor>>nil();
     /** stores the redundance free formula list of the semisequent */
     protected ImmutableList<SeqFor> modifiedSemisequent = ImmutableSLList.<SeqFor>nil();
     /**
@@ -62,7 +61,7 @@ public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula
     /** 
      * logs a modified formula at position idx
      */
-    public void modifiedFormula(int idx, FormulaChangeInfo<T, SeqFor> fci) {
+    public void modifiedFormula(int idx, FormulaChangeInfo<SeqFor> fci) {
     // This information can overwrite older records about removed
     // formulas
     removed  = removed.removeAll
@@ -111,7 +110,7 @@ public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula
      * @return IList<SeqFor> modified within the
      * semisequent
      */
-    public ImmutableList<FormulaChangeInfo<T, SeqFor>> modifiedFormulas() {
+    public ImmutableList<FormulaChangeInfo<SeqFor>> modifiedFormulas() {
     return modified;
     }
 
@@ -135,8 +134,8 @@ public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula
      * ATTENTION: it takes over ownership over {@link succ} and does not release it. This means
      * when invoking the method it must be snsured that succ is never used afterwards.
      */
-    public void combine(GenericSemisequentChangeInfo<T,SeqFor,SemiSeq> succ) {
-       final GenericSemisequentChangeInfo<T,SeqFor,SemiSeq> predecessor = this;
+    public void combine(GenericSemisequentChangeInfo<SeqFor,SemiSeq> succ) {
+       final GenericSemisequentChangeInfo<SeqFor,SemiSeq> predecessor = this;
        if (succ == predecessor) {
           return ;
        }
@@ -145,7 +144,7 @@ public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula
           predecessor.added = predecessor.added.removeAll(sf);
     
           boolean skip = false; 
-          for (FormulaChangeInfo<T, SeqFor> fci : predecessor.modified) {
+          for (FormulaChangeInfo<SeqFor> fci : predecessor.modified) {
              if (fci.getNewFormula() == sf) {
                 predecessor.modified = predecessor.modified.removeAll(fci);
                 if (!predecessor.removed.contains(fci.getOriginalFormula())) {
@@ -160,7 +159,7 @@ public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula
           }
        }
     
-       for (FormulaChangeInfo<T, SeqFor> fci : succ.modified) {
+       for (FormulaChangeInfo<SeqFor> fci : succ.modified) {
           if (predecessor.addedFormulas().contains(fci.getOriginalFormula())) {
              predecessor.added = predecessor.added.removeAll(fci.getOriginalFormula());
              predecessor.addedFormula(succ.lastFormulaIndex, fci.getNewFormula());
@@ -198,16 +197,16 @@ public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula
      * @param modifiedFormulas
      * @return
      */
-    protected abstract GenericSemisequent<T,SeqFor> createSemisequent(ImmutableList<SeqFor> modifiedFormulas);
+    protected abstract GenericSemisequent<SeqFor> createSemisequent(ImmutableList<SeqFor> modifiedFormulas);
     
     /** 
      * returns the semisequent that is the result of the change
      * operation
      */
-    public GenericSemisequent<T,SeqFor> semisequent() {        
-        final GenericSemisequent<T,SeqFor> semisequent;
+    public GenericSemisequent<SeqFor> semisequent() {        
+        final GenericSemisequent<SeqFor> semisequent;
         if (modifiedSemisequent.isEmpty()) {
-            semisequent = GenericSemisequent.<T,SeqFor,SemiSeq>nil();
+            semisequent = GenericSemisequent.<SeqFor,SemiSeq>nil();
         } else {
             semisequent = createSemisequent(modifiedSemisequent);
         }

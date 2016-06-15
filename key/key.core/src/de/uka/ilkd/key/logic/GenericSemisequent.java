@@ -3,7 +3,6 @@ package de.uka.ilkd.key.logic;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -320,7 +319,7 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      */
     private GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> insertAndRemoveRedundancyHelper(int idx,
             SeqFor sequentFormula, GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> semiCI,
-            FormulaChangeInfo<T, SeqFor> fci) {
+            FormulaChangeInfo<SeqFor> fci) {
 
         // Search for equivalent formulas and weakest constraint
         ImmutableList<SeqFor> searchList = semiCI.getFormulaList();
@@ -452,11 +451,11 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(PosInOccurrence<T, SeqFor> pos,
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(PosInOccurrence<?, SeqFor> pos,
             SeqFor sequentFormula) {
         final int idx = indexOf(pos.sequentFormula());
-        final FormulaChangeInfo<T, SeqFor> fci =
-                new FormulaChangeInfo<T, SeqFor>(pos, sequentFormula);
+        final FormulaChangeInfo<SeqFor> fci =
+                new FormulaChangeInfo<SeqFor>(pos, sequentFormula);
         return insertAndRemoveRedundancyHelper(idx, sequentFormula,
                 remove(idx), fci);
     }
@@ -489,7 +488,7 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>> {
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(PosInOccurrence<T, SeqFor> pos,
+    public GenericSemisequentChangeInfo<SeqFor, ? extends GenericSemisequent<SeqFor>> replace(PosInOccurrence<?, SeqFor> pos,
             ImmutableList<SeqFor> replacements) {
         final int idx = indexOf(pos.sequentFormula());
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
