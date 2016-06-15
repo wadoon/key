@@ -236,11 +236,15 @@ class TermImpl implements JavaDLTerm {
     
 
     @Override
-    public boolean equalsModRenaming(JavaDLTerm o) {
+    public boolean equalsModRenaming(Object o) {
+        if (!(o instanceof JavaDLTerm)) {
+            return false;
+        }
+        
         if (o == this) {
             return true;
         }
-        return unifyHelp(this, o, ImmutableSLList.<QuantifiableVariable> nil(),
+        return unifyHelp(this, (JavaDLTerm) o, ImmutableSLList.<QuantifiableVariable> nil(),
                 ImmutableSLList.<QuantifiableVariable> nil(), null);
     }
 

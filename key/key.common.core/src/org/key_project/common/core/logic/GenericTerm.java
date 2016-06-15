@@ -151,11 +151,12 @@ public interface GenericTerm<S, N extends GenericNameAbstractionTable<S>, V exte
 
     /**
      * Compares if two terms are equal modulo bound renaming
-     * @return true iff the given Term has the same values in
-     * operator, sort, arity, varsBoundHere and javaBlock as this object
-     * modulo bound renaming
+     * 
+     * @return true iff (1) o is of the same Term type, and (2) the given Term
+     *         has the same values in operator, sort, arity, varsBoundHere and
+     *         javaBlock as this object modulo bound renaming
      */
-    boolean equalsModRenaming(T o);
+    boolean equalsModRenaming(Object o);
 
     /**
      * returns true if the term is labeled

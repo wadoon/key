@@ -37,13 +37,23 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
     private final SemiSeq antecedent;
 
     private final SemiSeq succedent;
-    
+
     protected abstract AbstractSequentFactory<SemiSeq, Seq> getSequentFactory();
 
-    // FIXME (DS):
-    // A lot of compilation errors in this class like "seq.insertXXX" can be
-    // solved by adding "T extends GenericTerm<?, ?, ?, T>" as a type argument
-    // to GenericSequent as well as GenericSemisequent.
+    /**
+     * TODO: Document.
+     *
+     * @param inAntec
+     * @param semiCI
+     * @param composeSequent
+     * @param genericSequent
+     * @return
+     */
+    protected abstract GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> createSequentChangeInfo(
+            boolean inAntec,
+            GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI,
+            Seq composeSequent,
+            Seq genericSequent);
 
     /**
      * must only be called by NILSequent
@@ -78,18 +88,22 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      * @param first
      *            boolean if true the formula is added at the beginning of the
      *            ante-/succedent, otherwise to the end
-     * @return a SequentChangeInfo which contains the new sequent and
-     *         information which formulas have been added or removed
+     * @return a GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> which contains
+     *         the new sequent and information which formulas have been added or
+     *         removed
      */
-    public SequentChangeInfo addFormula(SeqFor cf, boolean antec, boolean first) {
+    @SuppressWarnings("unchecked")
+    public GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> addFormula(SeqFor cf,
+            boolean antec, boolean first) {
 
-        final GenericSemisequent<SeqFor, SemiSeq> seq = antec ? antecedent : succedent;
+        final GenericSemisequent<SeqFor, SemiSeq> seq =
+                antec ? antecedent : succedent;
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 first ? seq.insertFirst(cf) : seq.insertLast(cf);
 
-        return SequentChangeInfo.createSequentChangeInfo(antec, semiCI,
-                composeSequent(antec, semiCI.semisequent()), this);
+        return createSequentChangeInfo(antec, semiCI,
+                composeSequent(antec, semiCI.semisequent()), (Seq) this);
     }
 
     /**
@@ -101,17 +115,20 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      *            a SeqFor to be added
      * @param p
      *            a PosInOccurrence<?, SeqFor> describes position in the sequent
-     * @return a SequentChangeInfo which contains the new sequent and
-     *         information which formulas have been added or removed
+     * @return a GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> which contains
+     *         the new sequent and information which formulas have been added or
+     *         removed
      */
-    public SequentChangeInfo addFormula(SeqFor cf, PosInOccurrence<?, SeqFor> p) {
+    @SuppressWarnings("unchecked")
+    public GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> addFormula(SeqFor cf,
+            PosInOccurrence<?, SeqFor> p) {
         final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 seq.insert(seq.indexOf(p.sequentFormula()), cf);
 
-        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-                composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+        return createSequentChangeInfo(p.isInAntec(), semiCI,
+                composeSequent(p.isInAntec(), semiCI.semisequent()), (Seq) this);
     }
 
     /**
@@ -129,20 +146,24 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      * @param first
      *            boolean if true the formulas are added at the beginning of the
      *            ante-/succedent, otherwise to the end
-     * @return a SequentChangeInfo which contains the new sequent and
-     *         information which formulas have been added or removed
+     * @return a GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> which contains
+     *         the new sequent and information which formulas have been added or
+     *         removed
      */
-    public SequentChangeInfo addFormula(ImmutableList<SeqFor> insertions,
+    @SuppressWarnings("unchecked")
+    public GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> addFormula(
+            ImmutableList<SeqFor> insertions,
             boolean antec, boolean first) {
 
-        final GenericSemisequent<SeqFor, SemiSeq> seq = antec ? antecedent : succedent;
+        final GenericSemisequent<SeqFor, SemiSeq> seq =
+                antec ? antecedent : succedent;
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 first ? seq.insertFirst(insertions) : seq
                         .insertLast(insertions);
 
-        return SequentChangeInfo.createSequentChangeInfo(antec, semiCI,
-                composeSequent(antec, semiCI.semisequent()), this);
+        return createSequentChangeInfo(antec, semiCI,
+                composeSequent(antec, semiCI.semisequent()), (Seq) this);
     }
 
     /**
@@ -155,22 +176,25 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      * @param p
      *            the PosInOccurrence<?, SeqFor> describing the position where
      *            to insert the formulas
-     * @return a SequentChangeInfo which contains the new sequent and
-     *         information which formulas have been added or removed
+     * @return a GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> which contains
+     *         the new sequent and information which formulas have been added or
+     *         removed
      */
-    public SequentChangeInfo addFormula(ImmutableList<SeqFor> insertions,
+    @SuppressWarnings("unchecked")
+    public GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> addFormula(
+            ImmutableList<SeqFor> insertions,
             PosInOccurrence<?, SeqFor> p) {
         final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 seq.insert(seq.indexOf(p.sequentFormula()), insertions);
 
-        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-                composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+        return createSequentChangeInfo(p.isInAntec(), semiCI,
+                composeSequent(p.isInAntec(), semiCI.semisequent()), (Seq) this);
     }
 
     /** returns semisequent of the antecedent to work with */
-    public GenericSemisequent<SeqFor, SemiSeq> antecedent() {
+    public SemiSeq antecedent() {
         return antecedent;
     }
 
@@ -183,16 +207,19 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      *            the SeqFor replacing the old one
      * @param p
      *            a PosInOccurrence<?, SeqFor> describes position in the sequent
-     * @return a SequentChangeInfo which contains the new sequent and
-     *         information which formulas have been added or removed
+     * @return a GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> which contains
+     *         the new sequent and information which formulas have been added or
+     *         removed
      */
-    public SequentChangeInfo changeFormula(SeqFor newCF,
+    @SuppressWarnings("unchecked")
+    public GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> changeFormula(
+            SeqFor newCF,
             PosInOccurrence<?, SeqFor> p) {
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 getSemisequent(p).replace(p, newCF);
 
-        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-                composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+        return createSequentChangeInfo(p.isInAntec(), semiCI,
+                composeSequent(p.isInAntec(), semiCI.semisequent()), (Seq) this);
     }
 
     /**
@@ -206,28 +233,31 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      * @param p
      *            a PosInOccurrence<?, SeqFor> describing the position of the
      *            formula to be replaced
-     * @return a SequentChangeInfo which contains the new sequent and
-     *         information which formulas have been added or removed
+     * @return a GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> which contains
+     *         the new sequent and information which formulas have been added or
+     *         removed
      */
-    public SequentChangeInfo changeFormula(ImmutableList<SeqFor> replacements,
+    public GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> changeFormula(
+            ImmutableList<SeqFor> replacements,
             PosInOccurrence<?, SeqFor> p) {
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 getSemisequent(p).replace(p, replacements);
 
-        final SequentChangeInfo sci =
-                SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
+        @SuppressWarnings("unchecked")
+        final GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> sci =
+                createSequentChangeInfo(p.isInAntec(),
                         semiCI,
                         composeSequent(p.isInAntec(), semiCI.semisequent()),
-                        this);
+                        (Seq) this);
 
         return sci;
     }
 
     /**
      * replaces the antecedent ({@code antec} is true) of this sequent by the
-     * given {@link GenericSemisequent<SeqFor, SemiSeq>} similar for the succedent if
-     * {@code antec} is false.
+     * given {@link GenericSemisequent<SeqFor, SemiSeq>} similar for the
+     * succedent if {@code antec} is false.
      * 
      * @param antec
      *            if the antecedent or succedent shall be replaced
@@ -235,7 +265,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      *            the {@link GenericSemisequent<SeqFor, SemiSeq>} to use
      * @return the resulting sequent
      */
-    private GenericSequent<SeqFor, SemiSeq, Seq> composeSequent(boolean antec,
+    private Seq composeSequent(boolean antec,
             SemiSeq semiSeq) {
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent.isEmpty()) {
@@ -248,9 +278,11 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
 
         if ((antec && semiSeq == antecedent)
                 || (!antec && semiSeq == succedent)) {
-            return this;
+            @SuppressWarnings("unchecked")
+            final Seq result = (Seq) this;
+            return result;
         }
-        
+
         return getSequentFactory().createSequent(antec ? semiSeq
                 : antecedent, antec ? succedent : semiSeq);
     }
@@ -302,7 +334,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      * returns the semisequent in which the SeqFor described by
      * PosInOccurrence<?, SeqFor> p lies
      */
-    private GenericSemisequent<SeqFor, SemiSeq> getSemisequent(
+    protected SemiSeq getSemisequent(
             PosInOccurrence<?, SeqFor> p) {
         return p.isInAntec() ? antecedent() : succedent();
     }
@@ -332,44 +364,32 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      * @param p
      *            a PosInOccurrence<?, SeqFor> that describes position in the
      *            sequent
-     * @return a SequentChangeInfo which contains the new sequent and
-     *         information which formulas have been added or removed
+     * @return a GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> which contains
+     *         the new sequent and information which formulas have been added or
+     *         removed
      */
-    public SequentChangeInfo removeFormula(PosInOccurrence<?, SeqFor> p) {
+    public GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> removeFormula(
+            PosInOccurrence<?, SeqFor> p) {
         final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
         final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 seq.remove(seq.indexOf(p.sequentFormula()));
 
-        final SequentChangeInfo sci =
+        @SuppressWarnings("unchecked")
+        final GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> sci =
                 createSequentChangeInfo(p.isInAntec(), semiCI,
                         composeSequent(p.isInAntec(), semiCI.semisequent()),
-                        this);
+                        (Seq) this);
 
         return sci;
     }
-
-    /**
-     * TODO: Document.
-     *
-     * @param inAntec
-     * @param semiCI
-     * @param composeSequent
-     * @param genericSequent
-     * @return
-     */
-    protected abstract SequentChangeInfo createSequentChangeInfo(
-            boolean inAntec,
-            GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI,
-            GenericSequent<SeqFor, SemiSeq, Seq> composeSequent,
-            GenericSequent<SeqFor, SemiSeq, Seq> genericSequent);
 
     public int size() {
         return antecedent().size() + succedent().size();
     }
 
     /** returns semisequent of the succedent to work with */
-    public GenericSemisequent<SeqFor, SemiSeq> succedent() {
+    public SemiSeq succedent() {
         return succedent;
     }
 
@@ -392,6 +412,10 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
     public boolean varIsBound(QuantifiableVariable v) {
         final Iterator<SeqFor> it = iterator();
         while (it.hasNext()) {
+            
+            // FIXME (DS):
+            // BoundVarsVisitor is NOT generic, but JavaDL-dependent
+            
             final BoundVarsVisitor bvv = new BoundVarsVisitor();
             it.next().formula().execPostOrder(bvv);
             if (bvv.getBoundVariables().contains(v)) {

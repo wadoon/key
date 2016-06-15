@@ -14,8 +14,6 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Records the changes made to a sequent. Keeps track of added and removed
@@ -25,30 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * situation where this can happen is that a list of formulas had to be added to
  * the sequent and the list has not been redundance free.
  */
-public class SequentChangeInfo {
-
-    /**
-     * change information related to the antecedent, this means the there added
-     * and removed formulas
-     */
-    private SemisequentChangeInfo antecedent;
-
-    /**
-     * change information related to the antecedent, this means the there added
-     * and removed formulas
-     */
-    private SemisequentChangeInfo succedent;
-
-    /**
-     * the sequent before the changes
-     */
-    private Sequent originalSequent;
-
-    /**
-     * the sequent after the changes
-     */
-    private Sequent resultingSequent;
-
+public class SequentChangeInfo extends GenericSequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent, Sequent> {
     /**
      * creates a new sequent change info whose semisequent described by position
      * pos has changed. The made changes are stored in semiCI and the resulting
@@ -65,7 +40,8 @@ public class SequentChangeInfo {
      */
     public static SequentChangeInfo createSequentChangeInfo(
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
-            SemisequentChangeInfo semiCI, Sequent result, Sequent original) {
+            SemisequentChangeInfo semiCI,
+            Sequent result, Sequent original) {
         return createSequentChangeInfo(pos.isInAntec(), semiCI, result,
                 original);
     }
@@ -91,7 +67,8 @@ public class SequentChangeInfo {
      *         changes made to the sequent together with the operations result.
      */
     public static SequentChangeInfo createSequentChangeInfo(boolean antec,
-            SemisequentChangeInfo semiCI, Sequent result, Sequent original) {
+            SemisequentChangeInfo semiCI,
+            Sequent result, Sequent original) {
         if (antec) {
             return new SequentChangeInfo(semiCI, null, result, original);
         }
@@ -138,232 +115,7 @@ public class SequentChangeInfo {
     private SequentChangeInfo(SemisequentChangeInfo antecedent,
             SemisequentChangeInfo succedent, Sequent resultingSequent,
             Sequent originalSequent) {
-        this.antecedent = antecedent;
-        this.succedent = succedent;
-        this.resultingSequent = resultingSequent;
-        this.originalSequent = originalSequent;
-    }
-
-    /**
-     * returns true iff the sequent has been changed by the operation
-     * 
-     * @return true iff the sequent has been changed by the operation
-     */
-    public boolean hasChanged() {
-        return (antecedent == null || antecedent.hasChanged())
-                || (succedent == null || succedent.hasChanged());
-    }
-
-    /**
-     * returns true if the selected part of sequent has changed. Thereby the
-     * flag 'antec' specifies the selection: true selects the antecedent and
-     * false the succedent of the sequent.
-     *
-     * @return true iff the sequent has been changed by the operation
-     */
-    public boolean hasChanged(boolean antec) {
-        return antec ? (antecedent != null && antecedent.hasChanged())
-                : (succedent != null && succedent.hasChanged());
-    }
-
-    public SemisequentChangeInfo getSemisequentChangeInfo(boolean antec) {
-        return antec ? antecedent : succedent;
-    }
-
-    /**
-     * The formulas added to one of the semisequents are returned. The selected
-     * semisequent depends on the value of selector 'antec' which is the
-     * antecedent if 'antec' is true and the succedent otherwise.
-     *
-     * @param antec
-     *            a boolean used to select one of the two semisequents of a
-     *            sequent (true means antecedent; false means succedent)
-     * @return list of formulas added to the selected semisequent
-     */
-    public ImmutableList<SequentFormula<JavaDLTerm>> addedFormulas(boolean antec) {
-        return antec ? (antecedent != null ? antecedent.addedFormulas()
-                : ImmutableSLList.<SequentFormula<JavaDLTerm>> nil())
-                : (succedent != null ? succedent.addedFormulas()
-                        : ImmutableSLList.<SequentFormula<JavaDLTerm>> nil());
-    }
-
-    /**
-     * The formulas added to the sequent are returned as a concatenated list of
-     * the formulas added to each semisequent.
-     * 
-     * @return list of formulas added to sequent
-     */
-    public ImmutableList<SequentFormula<JavaDLTerm>> addedFormulas() {
-        return addedFormulas(true).size() > addedFormulas(false).size() ? addedFormulas(
-                false).prepend(addedFormulas(true))
-                : addedFormulas(true).prepend(addedFormulas(false));
-    }
-
-    /**
-     * The formulas removed from one of the semisequents are returned. The
-     * selected semisequent depends on the value of selector 'antec' which is
-     * the antecedent if 'antec' is true and the succedent otherwise.
-     *
-     * @param antec
-     *            a boolean used to select one of the two semisequents of a
-     *            sequent (true means antecedent; false means succedent)
-     * @return list of formulas removed from the selected semisequent
-     */
-    public ImmutableList<SequentFormula<JavaDLTerm>> removedFormulas(
-            boolean antec) {
-        return antec ? (antecedent != null ? antecedent.removedFormulas()
-                : ImmutableSLList.<SequentFormula<JavaDLTerm>> nil())
-                : (succedent != null ? succedent.removedFormulas()
-                        : ImmutableSLList.<SequentFormula<JavaDLTerm>> nil());
-    }
-
-    /**
-     * The formulas removed from the sequent are returned as a concatenated list
-     * of the formulas removed from each semisequent.
-     * 
-     * @return list of formulas removed from the sequent
-     */
-    public ImmutableList<SequentFormula<JavaDLTerm>> removedFormulas() {
-        return removedFormulas(true).size() > removedFormulas(false).size() ? removedFormulas(
-                false).prepend(removedFormulas(true))
-                : removedFormulas(true).prepend(removedFormulas(false));
-    }
-
-    /**
-     * The formulas modified within one of the semisequents are returned. The
-     * selected semisequent depends on the value of selector 'antec' which is
-     * the antecedent if 'antec' is true and the succedent otherwise.
-     *
-     * @param antec
-     *            a boolean used to select one of the two semisequents of a
-     *            sequent (true means antecedent; false means succedent)
-     * @return list of formulas modified within the selected semisequent
-     */
-    public ImmutableList<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> modifiedFormulas(
-            boolean antec) {
-        return antec ? (antecedent != null ? antecedent.modifiedFormulas()
-                : ImmutableSLList
-                        .<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> nil())
-                : (succedent != null ? succedent.modifiedFormulas()
-                        : ImmutableSLList
-                                .<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> nil());
-    }
-
-    /**
-     * The formulas modified within the sequent are returned as a concatenated
-     * list of the formulas modified within each each semisequent.
-     * 
-     * @return list of formulas modified to sequent
-     */
-    public ImmutableList<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> modifiedFormulas() {
-        return modifiedFormulas(true).size() > modifiedFormulas(false).size() ? modifiedFormulas(
-                false).prepend(modifiedFormulas(true))
-                : modifiedFormulas(true).prepend(modifiedFormulas(false));
-    }
-
-    /**
-     * Returns the formulas that have been rejected when trying to add as being
-     * redundant.
-     * 
-     * @param antec
-     *            a boolean used to select one of the two semisequents of a
-     *            sequent (true means antecedent; false means succedent)
-     * @return list of formulas rejected when trying to add to the selected
-     *         semisequent
-     */
-    public ImmutableList<SequentFormula<JavaDLTerm>> rejectedFormulas(
-            boolean antec) {
-        return antec ? (antecedent != null ? antecedent.rejectedFormulas()
-                : ImmutableSLList.<SequentFormula<JavaDLTerm>> nil())
-                : (succedent != null ? succedent.rejectedFormulas()
-                        : ImmutableSLList.<SequentFormula<JavaDLTerm>> nil());
-    }
-
-    /**
-     * Returns the formulas that have been rejected when trying to add as being
-     * redundant.
-     * 
-     * @return list of rejected formulas
-     */
-    public ImmutableList<SequentFormula<JavaDLTerm>> rejectedFormulas() {
-        return rejectedFormulas(true).size() > rejectedFormulas(false).size() ? rejectedFormulas(
-                false).prepend(rejectedFormulas(true))
-                : rejectedFormulas(true).prepend(rejectedFormulas(false));
-    }
-
-    /**
-     * This method combines the change information from this info and its
-     * successor. ATTENTION: it takes over ownership over {@code succ} and does
-     * not release it. This means when invoking the method it must be ensured
-     * that {@code succ} is never used afterwards.
-     */
-    public void combine(SequentChangeInfo succ) {
-        final SequentChangeInfo antec = this;
-        if (antec == succ) {
-            return;
-        }
-
-        antec.resultingSequent = succ.resultingSequent;
-
-        if (antec.antecedent != succ.antecedent) {
-            if (antec.antecedent == null) {
-                antec.antecedent = succ.antecedent;
-            }
-            else if (succ.antecedent != null) {
-                antec.antecedent.combine(succ.antecedent);
-            }
-        }
-
-        if (antec.succedent != succ.succedent) {
-            if (antec.succedent == null) {
-                antec.succedent = succ.succedent;
-            }
-            else if (succ.succedent != null) {
-                antec.succedent.combine(succ.succedent);
-            }
-        }
-    }
-
-    /**
-     * @return the original sequent
-     */
-    public Sequent getOriginalSequent() {
-        return originalSequent;
-    }
-
-    /**
-     * returns the resulting sequent
-     * 
-     * @return the resulting sequent
-     */
-    public Sequent sequent() {
-        return resultingSequent;
-    }
-
-    /**
-     * toString helper
-     */
-    private String toStringHelp(boolean antec) {
-        String result = "";
-        if (hasChanged(antec)) {
-            result += "\t added:" + addedFormulas(antec);
-            result += "\t removed:" + removedFormulas(antec);
-            result += "\t modified:" + modifiedFormulas(antec);
-        }
-        return result;
-    }
-
-    /**
-     * toString
-     */
-    public String toString() {
-        String result = "antecedent: " + hasChanged(true);
-        result += toStringHelp(true);
-
-        result += "\n succedent: " + hasChanged(false);
-        result += toStringHelp(false);
-
-        return result;
+        super(antecedent, succedent, resultingSequent, originalSequent);
     }
 
 }

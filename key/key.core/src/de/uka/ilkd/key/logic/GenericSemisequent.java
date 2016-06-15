@@ -25,7 +25,8 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>, SemiS
             ImmutableList<SeqFor> formulas);
 
     // inner class used to represent an empty semisequent
-    static class Empty<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>> extends
+    static class Empty<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>>
+            extends
             GenericSemisequent<SeqFor, SemiSeq> {
 
         private Empty() {
@@ -187,7 +188,7 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>, SemiS
                     ImmutableSLList.<SeqFor> nil()) {
 
                 @Override
-                protected GenericSemisequent<SeqFor, SemiSeq> createSemisequent(
+                protected SemiSeq createSemisequent(
                         ImmutableList<SeqFor> modifiedFormulas) {
                     return GenericSemisequent
                             .<SeqFor, SemiSeq> nil();

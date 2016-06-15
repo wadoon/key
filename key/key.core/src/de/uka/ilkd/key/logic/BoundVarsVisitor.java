@@ -17,20 +17,19 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-/** 
- * Visitor traversing a term and collecting all variables that occur bound.
- * The visitor implements also a continuation on sequents, traversing all of
- * the formulas occuring in the sequent.
+/**
+ * Visitor traversing a term and collecting all variables that occur bound. The
+ * visitor implements also a continuation on sequents, traversing all of the
+ * formulas occuring in the sequent.
  */
-public class BoundVarsVisitor extends DefaultVisitor{
-  
-    private ImmutableSet<QuantifiableVariable> bdVars =
-	DefaultImmutableSet.<QuantifiableVariable>nil();  
+public class BoundVarsVisitor extends DefaultVisitor {
 
- 
+    private ImmutableSet<QuantifiableVariable> bdVars =
+            DefaultImmutableSet.<QuantifiableVariable> nil();
+
     /**
-     * creates a Visitor that collects all bound variables for the subterms
-     * of the term it is called from.
+     * creates a Visitor that collects all bound variables for the subterms of
+     * the term it is called from.
      */
     public BoundVarsVisitor() {
     }
@@ -38,15 +37,15 @@ public class BoundVarsVisitor extends DefaultVisitor{
     /**
      * only called by execPostOrder in JavaDLTerm.
      */
-    public void visit(JavaDLTerm visited) {        
-        for (int i = 0, ar = visited.arity(); i<ar; i++) {
-            for (int j = 0, boundVarsSize = 
-                visited.varsBoundHere(i).size(); j<boundVarsSize; j++) {
-                bdVars=bdVars.add(visited.varsBoundHere(i).get(j));	    
-            }	  
+    public void visit(JavaDLTerm visited) {
+        for (int i = 0, ar = visited.arity(); i < ar; i++) {
+            for (int j = 0, boundVarsSize =
+                    visited.varsBoundHere(i).size(); j < boundVarsSize; j++) {
+                bdVars = bdVars.add(visited.varsBoundHere(i).get(j));
+            }
         }
     }
-    
+
     /**
      * visits a sequent
      */
@@ -55,12 +54,12 @@ public class BoundVarsVisitor extends DefaultVisitor{
             visit(cf.formula());
         }
     }
-    
+
     /**
      * returns all the bound variables that have been stored
      */
-    public ImmutableSet<QuantifiableVariable> getBoundVariables(){
-	return bdVars;
+    public ImmutableSet<QuantifiableVariable> getBoundVariables() {
+        return bdVars;
     }
 
 }
