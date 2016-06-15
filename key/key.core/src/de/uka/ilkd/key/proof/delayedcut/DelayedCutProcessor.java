@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -25,8 +26,7 @@ import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -310,7 +310,6 @@ public class DelayedCutProcessor implements Runnable {
      * @param app
      * @return
      */
-    @SuppressWarnings("deprecation")
     private LinkedList<Goal> apply(Goal goal, RuleApp app, JavaDLTermServices services) {
         if (app instanceof TacletApp) {
             TacletApp tapp = (TacletApp) app;
@@ -441,7 +440,7 @@ public class DelayedCutProcessor implements Runnable {
         int formulaNumber = pair.node.sequent().formulaNumberInSequent(
                 oldRuleApp.posInOccurrence().isInAntec(),
                 oldRuleApp.posInOccurrence().sequentFormula());
-        return PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>.findInSequent(pair.goal.sequent(),
+        return PosInOccurrence.findInSequent(pair.goal.sequent(),
                 formulaNumber, oldRuleApp.posInOccurrence().posInTerm());
     }
 

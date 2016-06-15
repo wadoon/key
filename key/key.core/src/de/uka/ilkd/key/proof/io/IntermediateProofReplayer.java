@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -36,11 +37,10 @@ import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
@@ -75,9 +75,9 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Triple;
@@ -334,7 +334,7 @@ public class IntermediateProofReplayer {
                             partnerNodeInfo
                                     .add(new Triple<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, NodeIntermediate>(
                                             currNode,
-                                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>.findInSequent(
+                                            PosInOccurrence.findInSequent(
                                                     currGoal.sequent(),
                                                     appInterm.getPosInfo().first,
                                                     appInterm.getPosInfo().second),
@@ -478,7 +478,7 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>.findInSequent(currGoal.sequent(),
+                pos = PosInOccurrence.findInSequent(currGoal.sequent(),
                         currFormula, currPosInTerm);
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
@@ -563,8 +563,7 @@ public class IntermediateProofReplayer {
                 final PosInTerm<JavaDLTerm> currIfInstPosInTerm = ifInstP.second;
 
                 try {
-                    final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ifInst = PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
-                            .findInSequent(currGoal.sequent(),
+                    final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
                                     currIfInstFormula, currIfInstPosInTerm);
                     builtinIfInsts = builtinIfInsts.append(ifInst);
                 }
@@ -620,7 +619,7 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>.findInSequent(currGoal.sequent(),
+                pos = PosInOccurrence.findInSequent(currGoal.sequent(),
                         currFormula, currPosInTerm);
             }
             catch (RuntimeException e) {
