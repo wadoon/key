@@ -1,11 +1,6 @@
 package org.key_project.key4eclipse.common.ui.decorator;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -13,6 +8,7 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.UpdateApplication;
@@ -25,16 +21,10 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.PositionTable;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
