@@ -47,7 +47,7 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
      * must only be called by NILSequent
      *
      */
-    private GenericSequent() {
+    protected GenericSequent() {
         antecedent =
                 GenericSemisequent.<SeqFor, GenericSemisequent<SeqFor>> nil();
         succedent =
@@ -55,16 +55,14 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
     }
 
     /** creates new GenericSequent<T, SeqFor> with antecedence and succedence */
-    private GenericSequent(GenericSemisequent<SeqFor> antecedent,
+    protected GenericSequent(GenericSemisequent<SeqFor> antecedent,
             GenericSemisequent<SeqFor> succedent) {
         assert !antecedent.isEmpty() || !succedent.isEmpty();
         this.antecedent = antecedent;
         this.succedent = succedent;
     }
-
+    
     protected abstract AbstractSequentFactory<?, ?> getSequentFactory();
-
-    protected abstract GenericSequent<SeqFor, SemiSeq, Seq> nil();
 
     /**
      * adds a formula to the antecedent (or succedent) of the sequent. Depending

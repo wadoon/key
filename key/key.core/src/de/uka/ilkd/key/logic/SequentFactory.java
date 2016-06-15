@@ -22,7 +22,20 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
  * @author Dominic Scheurer
  *
  */
-public class SequentFactory extends AbstractSequentFactory<Semisequent, Sequent> {    
+public class SequentFactory extends AbstractSequentFactory<Semisequent, Sequent> {
+    
+    private static final SequentFactory INSTANCE = new SequentFactory();
+    private static final Sequent EMPTY_SEQUENT = Sequent.EMPTY_SEQUENT; // new Sequent();
+    
+    /**
+     * Singleton constructor.
+     */
+    private SequentFactory() {}
+    
+    public static SequentFactory instance() {
+        return INSTANCE;
+    }
+    
     /**
      * creates a new GenericSequent<T, SeqFor> with empty succedent 
      * @param ante the GenericSemisequent<T, SeqFor> that plays the antecedent part
@@ -32,9 +45,10 @@ public class SequentFactory extends AbstractSequentFactory<Semisequent, Sequent>
     @Override
     public Sequent createAnteSequent(Semisequent ante) {
         if (ante.isEmpty()) {
-            return (Sequent) GenericSequent.EMPTY_SEQUENT;
+            return EMPTY_SEQUENT;
         }
-        return createSequent(ante, GenericSemisequent.<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent>nil());
+        
+        return createSequent(ante, GenericSemisequent.<SequentFormula<JavaDLTerm>, Semisequent>nil());
     }
 
     /**
@@ -47,8 +61,9 @@ public class SequentFactory extends AbstractSequentFactory<Semisequent, Sequent>
     @Override
     public Sequent createSequent(Semisequent ante, Semisequent succ) {
         if (ante.isEmpty() && succ.isEmpty()) {
-            return (Sequent) GenericSequent.EMPTY_SEQUENT;
+            return EMPTY_SEQUENT;
         }
+        
         return Sequent.createSequent(ante, succ);
     }
 
@@ -61,11 +76,9 @@ public class SequentFactory extends AbstractSequentFactory<Semisequent, Sequent>
     @Override
     public Sequent createSuccSequent(Semisequent succ) {
         if (succ.isEmpty()) {
-            return (Sequent) GenericSequent.EMPTY_SEQUENT;
+            return EMPTY_SEQUENT;
         }
-        return createSequent(GenericSemisequent.<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent>nil(), succ);
+        
+        return createSequent(GenericSemisequent.<SequentFormula<JavaDLTerm>, Semisequent>nil(), succ);
     }
-
-
-
 }

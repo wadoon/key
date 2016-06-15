@@ -36,7 +36,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Sequent#createSuccSequent} 
  * or by inserting formulas directly into {@link Sequent#EMPTY_SEQUENT}.
  */ 
-public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTerm>> implements Iterable<SequentFormula> {
+public class Sequent extends GenericSequent<SequentFormula<JavaDLTerm>, Semisequent, Sequent> implements Iterable<SequentFormula<JavaDLTerm>> {
 
     public static final Sequent EMPTY_SEQUENT = new NILSequent();
 
@@ -87,16 +87,16 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
      * must only be called by NILSequent
      *
      */
-    private Sequent() {
+    Sequent() {
         antecedent = Semisequent.nil();
         succedent  = Semisequent.nil();
     }
     
     /** creates new Sequent with antecedence and succedence */
-    private Sequent(Semisequent antecedent, Semisequent succedent) {
-	assert !antecedent.isEmpty() || !succedent.isEmpty();
+    Sequent(Semisequent antecedent, Semisequent succedent) {
+        assert !antecedent.isEmpty() || !succedent.isEmpty();
         this.antecedent = antecedent;
-	this.succedent  = succedent;	
+        this.succedent  = succedent;	
     }
 
     /** 
@@ -105,7 +105,7 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
      * inserted at the beginning or end of the ante-/succedent.
      *  (NOTICE:Sequent determines 
      * index using identy (==) not equality.)
-     * @param cf the SequentFormula to be added
+     * @param cf the SequentFormula<JavaDLTerm> to be added
      * @param antec boolean selecting the correct semisequent where to
      * insert the formulas. If set to true, the antecedent is taken
      * otherwise the succedent.
@@ -114,7 +114,7 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
      * @return a SequentChangeInfo which contains the new sequent and
      * information which formulas have been added or removed 
      */
-    public SequentChangeInfo addFormula(SequentFormula cf, 
+    public SequentChangeInfo addFormula(SequentFormula<JavaDLTerm> cf, 
 					boolean antec, boolean first) {
 
 	final Semisequent seq = antec ? antecedent : succedent;
@@ -130,13 +130,13 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
      * adds a formula to the sequent at the given
      * position. (NOTICE:Sequent determines 
      * index using identy (==) not equality.)
-     * @param cf a SequentFormula to be added
-     * @param p a PosInOccurrence describes position in the sequent 
+     * @param cf a SequentFormula<JavaDLTerm> to be added
+     * @param p a PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describes position in the sequent 
      * @return a SequentChangeInfo which contains the new sequent and
      * information which formulas have been added or removed 
      */
-    public SequentChangeInfo addFormula(SequentFormula cf, 
-            PosInOccurrence p) {
+    public SequentChangeInfo addFormula(SequentFormula<JavaDLTerm> cf, 
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
 	final Semisequent seq = getSemisequent(p);
 
 	final SemisequentChangeInfo semiCI = seq.insert(seq.indexOf(p.sequentFormula()),cf);
@@ -151,7 +151,7 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
      * inserted at the beginning or end of the ante-/succedent.
      *  (NOTICE:Sequent determines 
      * index using identity (==) not equality.)
-     * @param insertions the IList<SequentFormula> to be added
+     * @param insertions the IList<SequentFormula<JavaDLTerm>> to be added
      * @param antec boolean selecting the correct semisequent where to
      * insert the formulas. If set to true, the antecedent is taken
      * otherwise the succedent.
@@ -160,7 +160,7 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
      * @return a SequentChangeInfo which contains the new sequent and
      * information which formulas have been added or removed 
      */
-    public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions,
+    public SequentChangeInfo addFormula(ImmutableList<SequentFormula<JavaDLTerm>> insertions,
 					boolean antec, boolean first) {
 
         final Semisequent seq = antec ? antecedent : succedent;
@@ -174,14 +174,14 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
     /** adds the formulas of list insertions to the sequent starting at
      * position p. (NOTICE:Sequent determines 
      * index using identy (==) not equality.)
-     * @param insertions a IList<SequentFormula> with the formulas to be added
-     * @param p the PosInOccurrence describing the position where to
+     * @param insertions a IList<SequentFormula<JavaDLTerm>> with the formulas to be added
+     * @param p the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the position where to
      * insert the formulas 
      * @return a SequentChangeInfo which contains the new sequent and
      * information which formulas have been added or removed 
      */
-    public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions, 
-					PosInOccurrence p) {
+    public SequentChangeInfo addFormula(ImmutableList<SequentFormula<JavaDLTerm>> insertions, 
+					PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
 	final Semisequent seq = getSemisequent(p);
 
 	final SemisequentChangeInfo semiCI = 
@@ -200,13 +200,13 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
      * replaces the formula at the given position with another one
      * (NOTICE:Sequent determines 
      * index using identity (==) not equality.)  
-     * @param newCF the SequentFormula replacing the old one
-     * @param p a PosInOccurrence describes position in the sequent 
+     * @param newCF the SequentFormula<JavaDLTerm> replacing the old one
+     * @param p a PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describes position in the sequent 
      * @return a SequentChangeInfo which contains the new sequent and
      * information which formulas have been added or removed 
      */
-    public SequentChangeInfo changeFormula(SequentFormula newCF,
-					   PosInOccurrence p) { 	
+    public SequentChangeInfo changeFormula(SequentFormula<JavaDLTerm> newCF,
+					   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) { 	
 	final SemisequentChangeInfo semiCI = 
             getSemisequent(p).replace(p, newCF);
 
@@ -219,16 +219,16 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
      * list and adds the remaining list elements to the sequent
      * (NOTICE:Sequent determines 
      * index using identity (==) not equality.)  
-     * @param replacements the IList<SequentFormula> whose head
+     * @param replacements the IList<SequentFormula<JavaDLTerm>> whose head
      * replaces the formula at position p and adds the rest of the list
      * behind the changed formula
-     * @param p a PosInOccurrence describing the position of the formula
+     * @param p a PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the position of the formula
      * to be replaced
      * @return a SequentChangeInfo which contains the new sequent and
      * information which formulas have been added or removed 
      */
-    public SequentChangeInfo changeFormula(ImmutableList<SequentFormula> replacements,
-					   PosInOccurrence p) {
+    public SequentChangeInfo changeFormula(ImmutableList<SequentFormula<JavaDLTerm>> replacements,
+					   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
 
 	final SemisequentChangeInfo semiCI = 
             getSemisequent(p).replace(p, replacements);
@@ -282,9 +282,9 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
     }
 
     public int formulaNumberInSequent(boolean inAntec,
-                                      SequentFormula cfma) {
+                                      SequentFormula<JavaDLTerm> cfma) {
         int n = inAntec ? 0 : antecedent.size();
-        final Iterator<SequentFormula> formIter =
+        final Iterator<SequentFormula<JavaDLTerm>> formIter =
             inAntec ? antecedent.iterator() : succedent.iterator();
         while (formIter.hasNext()) {
             n++;
@@ -294,7 +294,7 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
                 this+" [antec="+inAntec+"]");
     }
 
-    public SequentFormula getFormulabyNr(int formulaNumber) {
+    public SequentFormula<JavaDLTerm> getFormulabyNr(int formulaNumber) {
         if (formulaNumber <= 0 || formulaNumber>size()) {
             throw new RuntimeException("No formula nr. "+
                     formulaNumber+" in seq. "+this);
@@ -305,10 +305,10 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
         return succedent.get((formulaNumber-1)-antecedent.size());
     }
 
-    /** returns the semisequent in which the SequentFormula described
-     * by PosInOccurrence p lies
+    /** returns the semisequent in which the SequentFormula<JavaDLTerm> described
+     * by PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p lies
      */
-    private Semisequent getSemisequent(PosInOccurrence p) {
+    private Semisequent getSemisequent(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
 	return p.isInAntec() ? antecedent() : succedent();
     }
 
@@ -320,7 +320,7 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
     /** returns iterator about all ConstrainedFormulae of the sequent
      * @return iterator about all ConstrainedFormulae of the sequent
      */
-    public Iterator<SequentFormula> iterator() {
+    public Iterator<SequentFormula<JavaDLTerm>> iterator() {
 	return new SequentIterator( antecedent(), succedent() );
     }
 
@@ -332,11 +332,11 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
 
     /** removes the formula at position p (NOTICE:Sequent determines
      * index using identity (==) not equality.)
-     * @param p a PosInOccurrence that describes position in the sequent
+     * @param p a PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> that describes position in the sequent
      * @return a SequentChangeInfo which contains the new sequent and
      * information which formulas have been added or removed
      */
-    public SequentChangeInfo removeFormula(PosInOccurrence p) {
+    public SequentChangeInfo removeFormula(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
 	final Semisequent seq = getSemisequent(p);
 
 	final SemisequentChangeInfo semiCI =
@@ -365,11 +365,11 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
 
     /**
      * returns true iff the given variable is bound in a formula of a
-     * SequentFormula in this sequent.
+     * SequentFormula<JavaDLTerm> in this sequent.
      * @param v the bound variable to search for
      */
     public boolean varIsBound(QuantifiableVariable v) {
-	final Iterator<SequentFormula> it = iterator();	
+	final Iterator<SequentFormula<JavaDLTerm>> it = iterator();	
 	while (it.hasNext()) {
 	    final BoundVarsVisitor bvv=new BoundVarsVisitor();
 	    it.next().formula().execPostOrder(bvv);
@@ -386,8 +386,8 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
             return true;
         }
                 
-        public Iterator<SequentFormula> iterator() {
-            return ImmutableSLList.<SequentFormula>nil().iterator();
+        public Iterator<SequentFormula<JavaDLTerm>> iterator() {
+            return ImmutableSLList.<SequentFormula<JavaDLTerm>>nil().iterator();
         }
         
         public boolean varIsBound(QuantifiableVariable v) {
@@ -396,10 +396,10 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
         
     } 
     
-    static class SequentIterator implements Iterator<SequentFormula> {
+    static class SequentIterator implements Iterator<SequentFormula<JavaDLTerm>> {
 
-	private final Iterator<SequentFormula> anteIt;
-	private final Iterator<SequentFormula> succIt;      
+	private final Iterator<SequentFormula<JavaDLTerm>> anteIt;
+	private final Iterator<SequentFormula<JavaDLTerm>> succIt;      
 
 	SequentIterator(Semisequent ante, 
 			Semisequent succ) {
@@ -411,7 +411,7 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
 	    return anteIt.hasNext() || succIt.hasNext();
 	}
 
-	public SequentFormula next() {
+	public SequentFormula<JavaDLTerm> next() {
 	    if (anteIt.hasNext()) {
 		return anteIt.next();
 	    } 	              
@@ -450,9 +450,30 @@ public class Sequent extends GenericSequent<JavaDLTerm, SequentFormula<JavaDLTer
      */
     public Set<Name> getOccuringTermLabels() {
         final Set<Name> result = new HashSet<Name>();
-        for (final SequentFormula sf : this) {
+        for (final SequentFormula<JavaDLTerm> sf : this) {
             result.addAll(getLabelsForTermRecursively(sf.formula()));
         }
         return result;
+    }
+    
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.GenericSequent#getSequentFactory()
+     */
+    @Override
+    protected AbstractSequentFactory<?, ?> getSequentFactory() {
+        return SequentFactory.instance();
+    }
+    
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.GenericSequent#createSequentChangeInfo(boolean, de.uka.ilkd.key.logic.GenericSemisequentChangeInfo, de.uka.ilkd.key.logic.GenericSequent, de.uka.ilkd.key.logic.GenericSequent)
+     */
+    @Override
+    protected SequentChangeInfo createSequentChangeInfo(
+            boolean inAntec,
+            GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> semiCI,
+            GenericSequent<SequentFormula<JavaDLTerm>, Semisequent, Sequent> composeSequent,
+            GenericSequent<SequentFormula<JavaDLTerm>, Semisequent, Sequent> genericSequent) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
