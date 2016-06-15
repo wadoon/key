@@ -46,64 +46,51 @@ options {
   import antlr.TokenStreamException;
   import antlr.TokenStreamSelector;
   import org.antlr.runtime.*;
+  import org.antlr.runtime.BitSet;
 
-  import java.io.*;
-  import java.util.HashSet;
-  import java.util.Iterator;
-  import java.util.LinkedHashMap;
-  import java.util.LinkedHashSet;
-  import java.util.LinkedList;
-  import java.util.Set;
-  import java.util.Vector;
+  import java.io.File;
+  import java.io.PrintWriter;
+  import java.io.StringWriter;
   import java.math.BigInteger;
-  
-  import org.key_project.common.core.logic.*;
-  import org.key_project.common.core.logic.label.*;
-  import org.key_project.common.core.logic.op.*;
-  import org.key_project.common.core.logic.sort.*;
+  import java.util.*;
 
-  import org.key_project.util.collection.Pair;
-  import org.key_project.util.collection.DefaultImmutableSet;
-  import org.key_project.util.collection.ImmutableArray;
-  import org.key_project.util.collection.ImmutableList;
-  import org.key_project.util.collection.ImmutableSLList;
-  import org.key_project.util.collection.ImmutableSet;
+  import org.key_project.common.core.logic.Name;
+  import org.key_project.common.core.logic.Named;
+  import org.key_project.common.core.logic.Namespace;
+  import org.key_project.common.core.logic.calculus.SequentFormula;
+  import org.key_project.common.core.logic.label.TermLabel;
+  import org.key_project.common.core.logic.op.*;
+  import org.key_project.common.core.logic.sort.Sort;
+  import org.key_project.util.collection.*;
+
+  import de.uka.ilkd.key.java.*;
+  import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+  import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+  import de.uka.ilkd.key.java.abstraction.Type;
+  import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+  import de.uka.ilkd.key.java.visitor.DeclarationProgramVariableCollector;
+  import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+  import de.uka.ilkd.key.ldt.IntegerLDT;
+  import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.logic.*;
+  import de.uka.ilkd.key.logic.label.TermLabelException;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
-  import de.uka.ilkd.key.logic.label.*;
-
-  import de.uka.ilkd.key.proof.init.*;
-  import de.uka.ilkd.key.proof.io.*;
-  import static de.uka.ilkd.key.proof.io.IProofFileParser.*;
-  
-  import de.uka.ilkd.key.rule.*;
-  import de.uka.ilkd.key.rule.tacletbuilder.*;
-  import de.uka.ilkd.key.rule.conditions.*;
-  import de.uka.ilkd.key.rule.label.*;
- 
-  import de.uka.ilkd.key.speclang.*;
-
-  import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
-
-  import de.uka.ilkd.key.util.*;
-
-  import de.uka.ilkd.key.java.JavaInfo;
-  import de.uka.ilkd.key.java.Services;
-  import de.uka.ilkd.key.java.JavaReader;
-  import de.uka.ilkd.key.java.SchemaJavaReader;
-  import de.uka.ilkd.key.java.abstraction.*;
-  import de.uka.ilkd.key.java.visitor.*;
-  import de.uka.ilkd.key.java.Recoder2KeY;
-  import de.uka.ilkd.key.java.SchemaRecoder2KeY;
-  import de.uka.ilkd.key.java.StatementBlock;
-  import de.uka.ilkd.key.java.declaration.VariableDeclaration;
-  import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
-  import de.uka.ilkd.key.pp.LogicPrinter;
-  
-  import de.uka.ilkd.key.ldt.SeqLDT;
-  import de.uka.ilkd.key.ldt.IntegerLDT;
+  import de.uka.ilkd.key.proof.init.Includes;
+  import de.uka.ilkd.key.proof.init.ProofInputException;
+  import de.uka.ilkd.key.proof.io.IProofFileParser;
+  import de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
+  import de.uka.ilkd.key.proof.io.RuleSource;
+  import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+  import de.uka.ilkd.key.rule.*;
+  import de.uka.ilkd.key.rule.conditions.*;
+  import de.uka.ilkd.key.rule.tacletbuilder.*;
+  import de.uka.ilkd.key.speclang.ClassInvariant;
+  import de.uka.ilkd.key.speclang.Contract;
+  import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
+  import de.uka.ilkd.key.util.Debug;
+  import de.uka.ilkd.key.util.Triple;
   
   
 }
@@ -3649,7 +3636,7 @@ triggers[TacletBuilder b]
 
 taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r] 
 @init{ 
-    ifSeq = Sequent.nil();
+    ifSeq = SequentFactory.instance().nil();
     TacletBuilder b = null;
     int applicationRestriction = RewriteTaclet.NONE;
     choices_ = choices;
@@ -3747,7 +3734,7 @@ termorseq returns [Object o]
                     o = head;
                 } else {
                     // A sequent with only head in the antecedent.
-                    Semisequent ant = Semisequent.EMPTY_SEMISEQUENT;
+                    Semisequent ant = Semisequent.nil();
                     ant = ant.insertFirst(
                                           new SequentFormula(head)).semisequent();
                     o = Sequent.createSequent(ant,ss);
@@ -3763,13 +3750,13 @@ termorseq returns [Object o]
     |
         SEQARROW ss=semisequent
         {
-            o = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,ss);
+            o = Sequent.createSequent(Semisequent.nil(),ss);
         }
     ;
 
 semisequent returns [Semisequent _semi_sequent]
 @init{ 
-    ss = Semisequent.EMPTY_SEMISEQUENT; 
+    ss = Semisequent.nil(); 
 }
 @after{ _semi_sequent = ss; }
     :
@@ -4297,7 +4284,7 @@ RPAREN
 
 goalspec[TacletBuilder b, ImmutableSet<Choice> soc, boolean ruleWithFind] 
 @init{
-    addSeq = Sequent.nil();
+    addSeq = SequentFactory.instance().nil();
     addRList = ImmutableSLList.<Taclet>nil();
     addpv = DefaultImmutableSet.<SchemaVariable>nil();
 }
