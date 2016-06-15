@@ -38,6 +38,11 @@ public abstract class GenericSequent<SeqFor extends SequentFormula<?>, SemiSeq e
 
     private final GenericSemisequent<SeqFor> succedent;
 
+    // FIXME (DS):
+    // A lot of compilation errors in this class like "seq.insertXXX" can be
+    // solved by adding "T extends GenericTerm<?, ?, ?, T>" as a type argument
+    // to GenericSequent as well as GenericSemisequent.
+
     /**
      * must only be called by NILSequent
      *
