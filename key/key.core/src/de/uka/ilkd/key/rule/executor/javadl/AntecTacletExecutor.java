@@ -3,10 +3,7 @@ package de.uka.ilkd.key.rule.executor.javadl;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AntecTaclet;
@@ -30,7 +27,7 @@ extends FindTacletExecutor<TacletKind> {
      * {@inheritDoc}
      */
     @Override
-    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, SequentChangeInfo currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
             MatchConditions matchCond,
             Goal goal, 
             RuleApp ruleApp,
@@ -63,7 +60,7 @@ extends FindTacletExecutor<TacletKind> {
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState, 
-            SequentChangeInfo currentSequent,
+            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
             MatchConditions matchCond,
             Goal goal,

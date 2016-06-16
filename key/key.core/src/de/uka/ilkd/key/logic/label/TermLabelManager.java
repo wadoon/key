@@ -35,16 +35,7 @@ import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -1734,7 +1725,7 @@ public class TermLabelManager {
     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
     * @param services The {@link Services} to use.
     */
-   public static void mergeLabels(SequentChangeInfo currentSequent, Services services) {
+   public static void mergeLabels(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, Services services) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
          manager.mergeLabels(services, currentSequent);
@@ -1746,7 +1737,7 @@ public class TermLabelManager {
     * @param services The {@link Services} to use.
     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
     */
-   public void mergeLabels(Services services, SequentChangeInfo currentSequent) {
+   public void mergeLabels(Services services, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent) {
       for (SequentFormula<JavaDLTerm> rejectedSF : currentSequent.getSemisequentChangeInfo(true).rejectedFormulas()) {
          mergeLabels(currentSequent, services, rejectedSF, true);
       }
@@ -1762,7 +1753,7 @@ public class TermLabelManager {
     * @param rejectedSF The rejected {@link SequentFormula} to work with.
     * @param inAntecedent {@code true} rejected {@link SequentFormula} is in antecedent, {@code false} it is in succedent.
     */
-   protected void mergeLabels(SequentChangeInfo currentSequent, 
+   protected void mergeLabels(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, 
                               Services services, 
                               SequentFormula<JavaDLTerm> rejectedSF, 
                               boolean inAntecedent) {
@@ -1796,7 +1787,7 @@ public class TermLabelManager {
             // Replace sequent formula
             if (labelsChanged) {
                JavaDLTerm newTerm = services.getTermFactory().createTerm(existingTerm.op(), existingTerm.subs(), existingTerm.boundVars(), existingTerm.modalContent(), new ImmutableArray<TermLabel>(mergedLabels));
-               SequentChangeInfo sci = currentSequent.sequent().changeFormula(new SequentFormula<>(newTerm), new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(existingSF, PosInTerm.<JavaDLTerm>getTopLevel(), inAntecedent));
+               GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci = currentSequent.sequent().changeFormula(new SequentFormula<>(newTerm), new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(existingSF, PosInTerm.<JavaDLTerm>getTopLevel(), inAntecedent));
                currentSequent.combine(sci);
             }
          }

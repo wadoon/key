@@ -4,11 +4,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IntIterator;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.util.TermHelper;
@@ -130,7 +126,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
      */
    @Override
    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-           SequentChangeInfo currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+           GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
            MatchConditions matchCond,
            Goal goal,
            RuleApp ruleApp,
@@ -172,7 +168,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     */
    @Override
    protected void applyAdd(Sequent add, TermLabelState termLabelState,
-         SequentChangeInfo currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+         GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
          MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
       if (posOfFind.isInAntec()) {
          addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, posOfFind, posOfFind, matchCond, goal, ruleApp, services);

@@ -13,9 +13,13 @@
 
 package de.uka.ilkd.key.proof;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.GenericSequentChangeInfo;
+import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
 
 /** interface to be implemented by a goal listener */
 public interface GoalListener {
@@ -23,7 +27,7 @@ public interface GoalListener {
     /** 
      * informs the listener about a change that occured to the sequent of goal
      */
-    void sequentChanged(Goal source, SequentChangeInfo sci);
+    void sequentChanged(Goal source, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci);
 
 
     /**

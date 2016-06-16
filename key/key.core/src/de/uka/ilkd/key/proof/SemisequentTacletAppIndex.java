@@ -23,12 +23,7 @@ import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -271,7 +266,7 @@ public class SemisequentTacletAppIndex {
      * called if a formula has been replaced
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public SemisequentTacletAppIndex sequentChanged ( SequentChangeInfo sci,
+    public SemisequentTacletAppIndex sequentChanged ( GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci,
                                                       Services          services,
                                                       TacletIndex       tacletIndex,
                                                       NewRuleListener   listener) {

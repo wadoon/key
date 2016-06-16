@@ -20,13 +20,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -101,7 +95,7 @@ public class FormulaTagManager {
     }
 
 
-    public void sequentChanged (Goal source, SequentChangeInfo sci) {
+    public void sequentChanged (Goal source, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci) {
 	assert source != null;
         removeTags ( sci, true, source  );
 	removeTags ( sci, false, source );
@@ -113,12 +107,12 @@ public class FormulaTagManager {
         addTags    ( sci, false, source );
     }
 
-    private void updateTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
+    private void updateTags(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
         for (FormulaChangeInfo<SequentFormula<JavaDLTerm>> formulaChangeInfo : sci.modifiedFormulas(p_antec))
             updateTag(formulaChangeInfo, sci.sequent(), p_goal);
     }
 
-    private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
+    private void addTags(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula<JavaDLTerm> constrainedFormula : sci.addedFormulas(p_antec)) {
             final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
                     (constrainedFormula, PosInTerm.<JavaDLTerm>getTopLevel(), p_antec);
@@ -126,7 +120,7 @@ public class FormulaTagManager {
         }
     }
 
-    private void removeTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
+    private void removeTags(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula<JavaDLTerm> constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
                     (constrainedFormula, PosInTerm.<JavaDLTerm>getTopLevel(), p_antec);

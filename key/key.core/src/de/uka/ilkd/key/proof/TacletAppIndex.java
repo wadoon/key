@@ -22,10 +22,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.rulefilter.AndRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
@@ -356,7 +353,7 @@ public class TacletAppIndex  {
      * called if a formula has been replaced
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal goal, SequentChangeInfo sci ) {
+    public void sequentChanged ( Goal goal, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
     	if ( sci.getOriginalSequent() != getSequent() )
     	    // we are not up to date and have to rebuild everything (lazy)
     	    clearIndexes();
@@ -364,7 +361,7 @@ public class TacletAppIndex  {
     	    updateIndices ( sci );
     }
 
-    private void updateIndices(SequentChangeInfo sci) {
+    private void updateIndices(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci) {
         seq = sci.sequent ();
 
         antecIndex = antecIndex.sequentChanged ( sci, getServices (),

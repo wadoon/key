@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.GenericTerm;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -27,7 +28,7 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  * @author Dominic Scheurer
  */
-public class GenericSequentChangeInfo<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>, Seq extends GenericSequent<SeqFor, SemiSeq, Seq>> {
+public class GenericSequentChangeInfo<T extends GenericTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>, Seq extends GenericSequent<T, SeqFor, SemiSeq, Seq>> {
 
     /**
      * change information related to the antecedent, this means the there added
@@ -230,8 +231,8 @@ public class GenericSequentChangeInfo<SeqFor extends SequentFormula<?>, SemiSeq 
      * not release it. This means when invoking the method it must be ensured
      * that {@code succ} is never used afterwards.
      */
-    public void combine(GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> succ) {
-        final GenericSequentChangeInfo<SeqFor, SemiSeq, Seq> antec = this;
+    public void combine(GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> succ) {
+        final GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> antec = this;
         if (antec == succ) {
             return;
         }

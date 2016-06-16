@@ -6,10 +6,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -31,7 +28,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * applies the {@code replacewith}-expression of taclet goal descriptions
      * @param gt the {@link TacletGoalTemplate} used to get the taclet's {@code replacewith}-expression 
      * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate) result of applying the taclet
+     * @param currentSequent the {@link GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>} which is the current (intermediate) result of applying the taclet
      * @param posOfFind the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} belonging to the find expression
      * @param matchCond the {@link MatchConditions} with all required instantiations 
      * @param goal the {@link Goal} on which the taclet is applied 
@@ -39,7 +36,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-                         SequentChangeInfo currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+                         GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
                          MatchConditions matchCond,
                          Goal goal,
                          RuleApp ruleApp,
@@ -50,14 +47,14 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * applies the {@code add}-expressions of taclet goal descriptions
      * @param add the {@link Sequent} with the uninstantiated {@link SequentFormula}'s to be added to the goal's sequent
      * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate) result of applying the taclet
+     * @param currentSequent the {@link GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>} which is the current (intermediate) result of applying the taclet
      * @param posOfFind the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} providing the position information where the match took place 
      * (it will be tried to add the new formulas close to that position)
      * @param matchCond the {@link MatchConditions} with all required instantiations 
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Java model information
      */
-    protected abstract void applyAdd(Sequent add, TermLabelState termLabelState, SequentChangeInfo currentSequent,
+    protected abstract void applyAdd(Sequent add, TermLabelState termLabelState, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
                      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
                      MatchConditions matchCond,
                      Goal goal,
@@ -83,7 +80,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
     TacletApp                    tacletApp        = (TacletApp) ruleApp;
     MatchConditions              mc               = tacletApp.matchConditions ();
 
-    ImmutableList<SequentChangeInfo>                   newSequentsForGoals         =
+    ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>>                   newSequentsForGoals         =
         checkIfGoals ( goal,
                tacletApp.ifFormulaInstantiations (),
                mc,
@@ -93,12 +90,12 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
     
     Iterator<TacletGoalTemplate> it               = taclet.goalTemplates().iterator(); 
     Iterator<Goal>               goalIt           = newGoals.iterator();
-   Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
+   Iterator<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> newSequentsIt = newSequentsForGoals.iterator();
 
     while (it.hasNext()) {
         TacletGoalTemplate gt          = it    .next();
         Goal               currentGoal = goalIt.next();
-       SequentChangeInfo  currentSequent = newSequentsIt.next();
+       GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>  currentSequent = newSequentsIt.next();
 
         // add first because we want to use pos information that
         // is lost applying replacewith

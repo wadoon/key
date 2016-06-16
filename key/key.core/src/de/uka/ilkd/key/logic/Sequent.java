@@ -34,7 +34,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Sequent#EMPTY_SEQUENT}.
  */
 public class Sequent extends
-        GenericSequent<SequentFormula<JavaDLTerm>, Semisequent, Sequent>
+        GenericSequent<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>
         implements Iterable<SequentFormula<JavaDLTerm>> {
 
     public static final Sequent EMPTY_SEQUENT = new NILSequent();
@@ -125,7 +125,7 @@ public class Sequent extends
      *         information which formulas have been added or removed
      */
     @Override
-    public SequentChangeInfo addFormula(
+    public GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> addFormula(
             SequentFormula<JavaDLTerm> cf, boolean antec, boolean first) {
         final Semisequent seq = antec ? antecedent : succedent;
 
@@ -153,7 +153,7 @@ public class Sequent extends
     @Override
     public SequentChangeInfo addFormula(
             SequentFormula<JavaDLTerm> cf,
-            PosInOccurrence<?, SequentFormula<JavaDLTerm>> p) {
+            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
         final Semisequent seq = getSemisequent(p);
 
         final GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> semiCI =
@@ -188,7 +188,7 @@ public class Sequent extends
      * @see de.uka.ilkd.key.logic.GenericSequent#addFormula(org.key_project.util.collection.ImmutableList, boolean, boolean)
      */
     @Override
-    public SequentChangeInfo addFormula(
+    public GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> addFormula(
             ImmutableList<SequentFormula<JavaDLTerm>> insertions,
             boolean antec, boolean first) {
         final Semisequent seq = antec ? antecedent : succedent;
@@ -216,7 +216,7 @@ public class Sequent extends
      *         information which formulas have been added or removed
      */
     @Override
-    public SequentChangeInfo addFormula(
+    public GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> addFormula(
             ImmutableList<SequentFormula<JavaDLTerm>> insertions,
             PosInOccurrence<?, SequentFormula<JavaDLTerm>> p) {
         final Semisequent seq = getSemisequent(p);
@@ -270,13 +270,13 @@ public class Sequent extends
      *         information which formulas have been added or removed
      */
     @Override
-    public SequentChangeInfo changeFormula(
+    public GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> changeFormula(
             ImmutableList<SequentFormula<JavaDLTerm>> replacements,
             PosInOccurrence<?, SequentFormula<JavaDLTerm>> p) {
         final GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> semiCI =
                 getSemisequent(p).replace(p, replacements);
 
-        final SequentChangeInfo sci =
+        final GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci =
                 createSequentChangeInfo
                 (p.isInAntec(),
                         semiCI,

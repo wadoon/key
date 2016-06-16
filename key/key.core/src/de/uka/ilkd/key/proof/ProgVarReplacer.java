@@ -30,12 +30,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SemisequentChangeInfo;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
@@ -224,7 +219,7 @@ public final class ProgVarReplacer {
     /**
      * replaces in a sequent
      */
-    public SequentChangeInfo replace(Sequent s) {
+    public GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> replace(Sequent s) {
         SemisequentChangeInfo anteCI = replace(s.antecedent());
         SemisequentChangeInfo succCI = replace(s.succedent());
 
@@ -234,7 +229,7 @@ public final class ProgVarReplacer {
         Sequent newSequent = Sequent.createSequent(newAntecedent,
                                                    newSuccedent);
 
-        SequentChangeInfo result = SequentChangeInfo.createSequentChangeInfo
+        GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> result = SequentChangeInfo.createSequentChangeInfo
                                               (anteCI, succCI, newSequent, s);
         return result;
     }

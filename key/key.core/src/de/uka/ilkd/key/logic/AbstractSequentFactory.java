@@ -20,7 +20,7 @@ package de.uka.ilkd.key.logic;
  * @author Dominic Scheurer
  *
  */
-public abstract class AbstractSequentFactory<SemiSeq extends GenericSemisequent<?, ?>, Seq extends GenericSequent<?, ?, ?>> {
+public abstract class AbstractSequentFactory<SemiSeq extends GenericSemisequent<?, ?>, Seq extends GenericSequent<?, ?, ?, ?>> {
 
     /**
      * TODO: Document.

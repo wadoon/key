@@ -26,10 +26,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
@@ -214,7 +211,7 @@ public final class Goal  {
      * to reduce unnecessary object creation the necessary information is passed
      * to the listener as parameters and not through an event object.
      */
-    protected void fireSequentChanged(SequentChangeInfo sci) {
+    protected void fireSequentChanged(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci) {
 	getFormulaTagManager().sequentChanged(this, sci);
 	ruleAppIndex()        .sequentChanged(this, sci);
 	for (GoalListener listener : listeners) {
@@ -356,7 +353,7 @@ public final class Goal  {
      * @param sci SequentChangeInfo containing the sequent to be set and
      * desribing the applied changes to the sequent of the parent node
      */
-    public void setSequent(SequentChangeInfo sci) {
+    public void setSequent(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci) {
         node().setSequent(sci.sequent());
 //VK reminder: now update the index
        	fireSequentChanged(sci);

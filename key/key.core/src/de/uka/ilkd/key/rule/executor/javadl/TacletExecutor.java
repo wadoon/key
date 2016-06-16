@@ -13,13 +13,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SemisequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -101,13 +95,13 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * position information or the boolean antec 
      * contrary to "addToPos" frm will not be modified
      * @param frm the {@link SequentFormula} that should be added
-     * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate) result of applying the taclet
+     * @param currentSequent the {@link GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>} which is the current (intermediate) result of applying the taclet
      * @param pos the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} describing the place in the sequent
      * @param antec boolean true(false) if elements have to be added to the
      * antecedent(succedent) (only looked at if pos == null)
      */
     private void addToPosWithoutInst(SequentFormula<JavaDLTerm>frm,
-            SequentChangeInfo currentSequent,            
+            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,            
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
             boolean antec) {
         if (pos != null) {
@@ -197,7 +191,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      */   
     protected void replaceAtPos(Semisequent semi, 
             TermLabelState termLabelState,
-            SequentChangeInfo currentSequent,
+            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
             MatchConditions matchCond, 
             TacletLabelHint labelHint,
@@ -227,7 +221,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param services the Services encapsulating all java information
      */
     private void addToPos (Semisequent semi, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent,         
+            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,         
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
             boolean antec, 
@@ -267,7 +261,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     protected void addToAntec(Semisequent semi,
             TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            SequentChangeInfo currentSequent,
+            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, 
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
             MatchConditions matchCond,
@@ -298,7 +292,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     protected void addToSucc(Semisequent semi,
             TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            SequentChangeInfo currentSequent,
+            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, 
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
             MatchConditions matchCond,
@@ -371,7 +365,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
 
     protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs, 
-            SequentChangeInfo currentSequent,
+            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
             Goal goal,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
             Services services, 
@@ -430,12 +424,12 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * the list has two entries: one for the original sequent and one with the sequent 
      * encoding the proof obligation for the to be proven formulas of the assumes goal
      */
-    protected ImmutableList<SequentChangeInfo> checkIfGoals ( Goal p_goal,
+    protected ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> checkIfGoals ( Goal p_goal,
             ImmutableList<IfFormulaInstantiation> p_list,
             MatchConditions              p_matchCond,
             int                          p_numberOfNewGoals ) {
-        ImmutableList<SequentChangeInfo>     res    = null;
-        Iterator<SequentChangeInfo> itNewGoalSequents;
+        ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>>     res    = null;
+        Iterator<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> itNewGoalSequents;
 
         // proof obligation for the if formulas
         JavaDLTerm           ifObl  = null;
@@ -459,7 +453,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                         ifPart = services.getTermBuilder().not(ifPart);          
 
                     if ( res == null ) {
-                        res = ImmutableSLList.<SequentChangeInfo>nil();
+                        res = ImmutableSLList.<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>>nil();
                         for (int j = 0; j< p_numberOfNewGoals + 1; j++) {
                             res = res.prepend(SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo)null, 
                                     (SemisequentChangeInfo)null, p_goal.sequent(), p_goal.sequent()));
@@ -474,7 +468,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                     // goals, thus the if formulas have to be added to
                     // every new goal
                     itNewGoalSequents = res.iterator ();
-                    SequentChangeInfo seq = itNewGoalSequents.next ();
+                    GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> seq = itNewGoalSequents.next ();
                     while ( itNewGoalSequents.hasNext () ) {
                         addToPosWithoutInst ( inst.getConstrainedFormula (),
                                 seq,
@@ -490,7 +484,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         }
 
         if ( res == null ) {
-            res = ImmutableSLList.<SequentChangeInfo>nil();
+            res = ImmutableSLList.<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>>nil();
             for (int j = 0; j< p_numberOfNewGoals; j++) {
                 res = res.prepend(SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo)null, 
                         (SemisequentChangeInfo)null, p_goal.sequent(), p_goal.sequent()));
@@ -498,7 +492,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         } else {
             // find the sequent the if obligation has to be added to
             itNewGoalSequents = res.iterator ();
-            SequentChangeInfo seq = itNewGoalSequents.next ();
+            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> seq = itNewGoalSequents.next ();
             while ( itNewGoalSequents.hasNext () ) {
                 seq = itNewGoalSequents.next ();
             }

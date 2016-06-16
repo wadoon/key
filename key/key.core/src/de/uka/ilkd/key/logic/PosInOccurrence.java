@@ -25,7 +25,7 @@ public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extend
 
     public static <T      extends GenericTerm<?, ?, ?, T>,
                    SeqFor extends SequentFormula<T>>
-            PosInOccurrence<T, SeqFor> findInSequent(GenericSequent<SeqFor, ?, ?> seq, int formulaNumber, PosInTerm<T> pos) {
+            PosInOccurrence<T, SeqFor> findInSequent(GenericSequent<T, SeqFor, ?, ?> seq, int formulaNumber, PosInTerm<T> pos) {
         return new PosInOccurrence<T, SeqFor>(
                 seq.getFormulabyNr(formulaNumber), pos,
                 seq.numberInAntec(formulaNumber));

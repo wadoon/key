@@ -13,24 +13,25 @@
 
 package de.uka.ilkd.key.proof.proofevent;
 
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 
 
 public class NodeChangesHolder {
-    public ImmutableList<SequentChangeInfo> scis;
+    public ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> scis;
 
     NodeChangesHolder () {
-	this ( ImmutableSLList.<SequentChangeInfo>nil() );
+	this ( ImmutableSLList.<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>>nil() );
     }
 
-    NodeChangesHolder ( ImmutableList<SequentChangeInfo> p_scis ) {
+    NodeChangesHolder ( ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> p_scis ) {
 	scis = p_scis;
     }
 
-    public void addSCI ( SequentChangeInfo p_sci ) {
+    public void addSCI ( GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> p_sci ) {
 	scis = scis.prepend ( p_sci );
     }
 

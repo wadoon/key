@@ -6,10 +6,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
@@ -43,7 +40,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
     protected void addToAntec(Semisequent semi,
             TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            SequentChangeInfo currentSequent,
+            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
             MatchConditions matchCond,

@@ -23,9 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.NotRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -375,7 +373,7 @@ public final class RuleAppIndex  {
      * @param g the Goal which sequent has been changed
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal g, SequentChangeInfo sci ) {
+    public void sequentChanged ( Goal g, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
 	if ( !autoMode )
             // the TacletAppIndex is able to detect modification of the
             // sequent itself, it is not necessary to clear the index

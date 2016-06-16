@@ -17,12 +17,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
@@ -155,7 +150,7 @@ public class BuiltInRuleAppIndex {
      * called if a formula has been replaced
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal goal, SequentChangeInfo sci ) {        
+    public void sequentChanged ( Goal goal, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {        
         scanAddedFormulas ( goal, true, sci );
         scanAddedFormulas ( goal, false, sci );
         
@@ -163,7 +158,7 @@ public class BuiltInRuleAppIndex {
         scanModifiedFormulas ( goal, false, sci );
     }
     
-    private void scanAddedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci ) {
+    private void scanAddedFormulas ( Goal goal, boolean antec, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
         ImmutableList<SequentFormula<JavaDLTerm>> cfmas = sci.addedFormulas( antec );
         final NewRuleListener listener = getNewRulePropagator();
         while ( !cfmas.isEmpty() ) {
@@ -178,7 +173,7 @@ public class BuiltInRuleAppIndex {
     }
 
 
-    private void scanModifiedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci ) {
+    private void scanModifiedFormulas ( Goal goal, boolean antec, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
         
         final NewRuleListener listener = getNewRulePropagator();
         ImmutableList<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> fcis = sci.modifiedFormulas( antec );

@@ -20,13 +20,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Node;
 
 
@@ -37,7 +31,7 @@ public class NodeReplacement {
 
     Node                    node;
     Node                    parent;
-    ImmutableList<SequentChangeInfo> rawChanges;
+    ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> rawChanges;
     ImmutableList<NodeChange>        changes    = null;
 
     /**
@@ -49,7 +43,7 @@ public class NodeReplacement {
      */
     public NodeReplacement ( Node                    p_node,
 			     Node                    p_parent,
-			     ImmutableList<SequentChangeInfo> p_changes ) {
+			     ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> p_changes ) {
 	node       = p_node;
 	parent     = p_parent;
 	rawChanges = p_changes;
@@ -57,7 +51,7 @@ public class NodeReplacement {
 
     private void addNodeChanges () {
 	if ( !rawChanges.isEmpty() ) {
-	    SequentChangeInfo sci = rawChanges.head ();
+	    GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci = rawChanges.head ();
 	    rawChanges            = rawChanges.tail ();
 
 	    addNodeChanges ();
@@ -67,7 +61,7 @@ public class NodeReplacement {
 	}
     }
 
-    private void addNodeChange ( SequentChangeInfo p_sci ) {
+    private void addNodeChange ( GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> p_sci ) {
         Iterator<SequentFormula<JavaDLTerm>> it;
         Iterator<FormulaChangeInfo<SequentFormula<JavaDLTerm>>>  it2;
      
