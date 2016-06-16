@@ -40,7 +40,7 @@ public final class PosInTerm<T extends CCTerm<?, ?, T>> {
     private final char[] positions;
     private final char size;
     private volatile char hash = (char)-1;
-    private boolean copy;
+    private volatile boolean copy;
 
     
     /** 

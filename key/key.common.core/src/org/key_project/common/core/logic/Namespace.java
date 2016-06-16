@@ -29,12 +29,7 @@ import org.key_project.util.collection.ImmutableSet;
  * and protocoled mode, where the protocoled mode keeps track of all new added
  * names since the last call of {@link Namespace#startProtocol}.
  */
-public class Namespace implements java.io.Serializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 3094844691883883929L;
+public class Namespace {
 
     /**
      * The fall-back namespace for symbols not present in this Namespace.
