@@ -13,9 +13,9 @@
 
 package org.key_project.common.core.logic;
 
-import org.key_project.common.core.program.GenericNameAbstractionTable;
+import org.key_project.common.core.program.CCNameAbstractionTable;
 
-public interface Visitor<S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S,N,V,T>, T extends GenericTerm<S,N,V,T>> {
+public interface CCVisitor<S, N extends CCNameAbstractionTable<S>, V extends CCVisitor<S,N,V,T>, T extends CCTerm<S,N,V,T>> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      * @param visited The currently visited {@link Term}.

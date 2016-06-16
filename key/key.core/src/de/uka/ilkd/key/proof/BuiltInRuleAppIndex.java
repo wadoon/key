@@ -150,7 +150,7 @@ public class BuiltInRuleAppIndex {
      * called if a formula has been replaced
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal goal, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {        
+    public void sequentChanged ( Goal goal, CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {        
         scanAddedFormulas ( goal, true, sci );
         scanAddedFormulas ( goal, false, sci );
         
@@ -158,7 +158,7 @@ public class BuiltInRuleAppIndex {
         scanModifiedFormulas ( goal, false, sci );
     }
     
-    private void scanAddedFormulas ( Goal goal, boolean antec, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
+    private void scanAddedFormulas ( Goal goal, boolean antec, CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
         ImmutableList<SequentFormula<JavaDLTerm>> cfmas = sci.addedFormulas( antec );
         final NewRuleListener listener = getNewRulePropagator();
         while ( !cfmas.isEmpty() ) {
@@ -173,7 +173,7 @@ public class BuiltInRuleAppIndex {
     }
 
 
-    private void scanModifiedFormulas ( Goal goal, boolean antec, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
+    private void scanModifiedFormulas ( Goal goal, boolean antec, CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
         
         final NewRuleListener listener = getNewRulePropagator();
         ImmutableList<FormulaChangeInfo<SequentFormula<JavaDLTerm>>> fcis = sci.modifiedFormulas( antec );

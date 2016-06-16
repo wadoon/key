@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.java;
 
-import org.key_project.common.core.logic.GenericTermBuilder;
+import org.key_project.common.core.logic.CCTermBuilder;
 import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -29,16 +29,16 @@ import de.uka.ilkd.key.logic.TermFactory;
 public interface JavaDLTermServices extends TermServices {
 
     /**
-     * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
-     * @return The {@link GenericTermBuilder} used to create {@link Term}s.
+     * Returns the {@link CCTermBuilder} used to create {@link Term}s.
+     * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
     @SuppressWarnings("unchecked")
     @Override
     public abstract TermBuilder getTermBuilder();
 
     /**
-     * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
-     * @return The {@link GenericTermBuilder} used to create {@link Term}s.
+     * Returns the {@link CCTermBuilder} used to create {@link Term}s.
+     * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
     @SuppressWarnings("unchecked")
     @Override

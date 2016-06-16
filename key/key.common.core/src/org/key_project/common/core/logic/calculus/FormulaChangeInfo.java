@@ -4,8 +4,8 @@ package org.key_project.common.core.logic.calculus;
 /**
  * This class is used to hold information about modified formulas.
  * 
- * @see GenericSemisequentChangeInfo
- * @see GenericSequentChangeInfo
+ * @see CCSemisequentChangeInfo
+ * @see CCSequentChangeInfo
  */
 public class FormulaChangeInfo<SeqFor extends SequentFormula<?>> {
 

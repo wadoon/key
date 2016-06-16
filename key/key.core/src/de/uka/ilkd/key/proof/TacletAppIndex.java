@@ -16,7 +16,7 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.key_project.common.core.logic.calculus.GenericSequentChangeInfo;
+import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -355,7 +355,7 @@ public class TacletAppIndex  {
      * called if a formula has been replaced
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal goal, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
+    public void sequentChanged ( Goal goal, CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
     	if ( sci.getOriginalSequent() != getSequent() )
     	    // we are not up to date and have to rebuild everything (lazy)
     	    clearIndexes();
@@ -363,7 +363,7 @@ public class TacletAppIndex  {
     	    updateIndices ( sci );
     }
 
-    private void updateIndices(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci) {
+    private void updateIndices(CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci) {
         seq = sci.sequent ();
 
         antecIndex = antecIndex.sequentChanged ( sci, getServices (),

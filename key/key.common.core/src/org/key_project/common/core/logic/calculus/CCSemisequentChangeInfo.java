@@ -3,7 +3,7 @@ package org.key_project.common.core.logic.calculus;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>> {
+public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>> {
 
     /** contains the added formulas to the semisequent */
     private ImmutableList<SeqFor> added = ImmutableSLList.<SeqFor> nil();
@@ -24,7 +24,7 @@ public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula
     /** */
     private int lastFormulaIndex = -1;
 
-    protected GenericSemisequentChangeInfo(ImmutableList<SeqFor> formulas) {
+    protected CCSemisequentChangeInfo(ImmutableList<SeqFor> formulas) {
         this.modifiedSemisequent = formulas;
     }
 
@@ -144,8 +144,8 @@ public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula
      * not release it. This means when invoking the method it must be snsured
      * that succ is never used afterwards.
      */
-    public void combine(GenericSemisequentChangeInfo<SeqFor, SemiSeq> succ) {
-        final GenericSemisequentChangeInfo<SeqFor, SemiSeq> predecessor = this;
+    public void combine(CCSemisequentChangeInfo<SeqFor, SemiSeq> succ) {
+        final CCSemisequentChangeInfo<SeqFor, SemiSeq> predecessor = this;
         if (succ == predecessor) {
             return;
         }

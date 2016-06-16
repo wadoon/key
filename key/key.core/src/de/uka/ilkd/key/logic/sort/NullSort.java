@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.GenericProofServices;
+import org.key_project.common.core.services.CCProofServices;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -43,7 +43,7 @@ public final class NullSort implements Sort  {
     
     private final Sort objectSort;
     
-    private WeakReference<? extends GenericProofServices> lastServices 
+    private WeakReference<? extends CCProofServices> lastServices 
     	= new WeakReference<Services>(null);
     private WeakReference<ImmutableSet<Sort>> extCache
         = new WeakReference<ImmutableSet<Sort>>(null);
@@ -93,7 +93,7 @@ public final class NullSort implements Sort  {
 //    }
 
     @Override
-    public <T extends GenericProofServices> ImmutableSet<Sort> extendsSorts(
+    public <T extends CCProofServices> ImmutableSet<Sort> extendsSorts(
             T services) {
         assert services != null;
         assert objectSort == services.getProgramServices(JavaServices.class)

@@ -16,7 +16,7 @@ package de.uka.ilkd.key.logic.op;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.AbstractSortedOperator;
 import org.key_project.common.core.logic.op.Operator;
@@ -147,7 +147,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     /** @return String representing a logical integer literal 
      *  in decimal representation
      */
-    public static String convertToDecimalString(GenericTerm term, Services services) {
+    public static String convertToDecimalString(CCTerm term, Services services) {
       	StringBuilder result = new StringBuilder();
 	boolean neg = false;
 	

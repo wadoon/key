@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.calculus.GenericSemisequentChangeInfo;
+import org.key_project.common.core.logic.calculus.CCSemisequentChangeInfo;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * Records the changes made to a semisequent. Keeps track of added and
  * removed formula to the semisequents. 
  */
-public class SemisequentChangeInfo extends GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> {
+public class SemisequentChangeInfo extends CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> {
    
     public SemisequentChangeInfo() {
         super(ImmutableSLList.<SequentFormula<JavaDLTerm>> nil());

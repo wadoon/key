@@ -16,7 +16,7 @@ package de.uka.ilkd.key.logic.sort;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.GenericProofServices;
+import org.key_project.common.core.services.CCProofServices;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -49,7 +49,7 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override
-    public final ImmutableSet<Sort> extendsSorts(GenericProofServices services) {
+    public final ImmutableSet<Sort> extendsSorts(CCProofServices services) {
 	return extendsSorts();
     }
 

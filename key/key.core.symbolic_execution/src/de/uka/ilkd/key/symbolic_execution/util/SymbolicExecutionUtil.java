@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.key_project.common.core.logic.GenericTermFactory;
+import org.key_project.common.core.logic.CCTermFactory;
 import org.key_project.common.core.logic.IntIterator;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
@@ -2956,7 +2956,7 @@ public final class SymbolicExecutionUtil {
     * Labels all specified skolem equalities with the {@link SymbolicExecutionUtil#RESULT_LABEL}.
     * @param sequent The {@link Sequent} to modify.
     * @param constantsToLabel The skolem constants to label.
-    * @param factory The {@link GenericTermFactory} to use.
+    * @param factory The {@link CCTermFactory} to use.
     * @return The modified {@link Sequent}.
     */
    protected static Sequent labelSkolemConstants(Sequent sequent, 
@@ -2994,7 +2994,7 @@ public final class SymbolicExecutionUtil {
 
    /**
     * Adds the given {@link TermLabel} to the given {@link JavaDLTerm} and to all of its children.
-    * @param tf The {@link GenericTermFactory} to use.
+    * @param tf The {@link CCTermFactory} to use.
     * @param term The {@link JavaDLTerm} to add label to.
     * @param label The {@link TermLabel} to add.
     * @return A new {@link JavaDLTerm} with the given {@link TermLabel}.
@@ -3021,7 +3021,7 @@ public final class SymbolicExecutionUtil {
    
    /**
     * Removes the given {@link TermLabel} from the given {@link JavaDLTerm} and from all of its children.
-    * @param tf The {@link GenericTermFactory} to use.
+    * @param tf The {@link CCTermFactory} to use.
     * @param term The {@link JavaDLTerm} to remove label from.
     * @param label The {@link TermLabel} to remove.
     * @return A new {@link JavaDLTerm} without the given {@link TermLabel}.

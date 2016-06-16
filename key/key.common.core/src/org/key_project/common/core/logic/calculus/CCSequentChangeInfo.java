@@ -13,7 +13,7 @@
 
 package org.key_project.common.core.logic.calculus;
 
-import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -27,18 +27,18 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  * @author Dominic Scheurer
  */
-public class GenericSequentChangeInfo<T extends GenericTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>, Seq extends GenericSequent<T, SeqFor, SemiSeq, Seq>> {
+public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<T, SeqFor, SemiSeq, Seq>> {
 
     /**
      * change information related to the antecedent, this means the there added
      * and removed formulas
      */
-    protected GenericSemisequentChangeInfo<SeqFor, SemiSeq> antecedent;
+    protected CCSemisequentChangeInfo<SeqFor, SemiSeq> antecedent;
     /**
      * change information related to the antecedent, this means the there added
      * and removed formulas
      */
-    protected GenericSemisequentChangeInfo<SeqFor, SemiSeq> succedent;
+    protected CCSemisequentChangeInfo<SeqFor, SemiSeq> succedent;
     
     /**
      * the sequent before the changes
@@ -65,9 +65,9 @@ public class GenericSequentChangeInfo<T extends GenericTerm<?, ?, ?, T>, SeqFor 
      * @param originalSequent
      *            the Sequent that has been transformed
      */
-    protected GenericSequentChangeInfo(
-            GenericSemisequentChangeInfo<SeqFor, SemiSeq> antecedent,
-            GenericSemisequentChangeInfo<SeqFor, SemiSeq> succedent,
+    protected CCSequentChangeInfo(
+            CCSemisequentChangeInfo<SeqFor, SemiSeq> antecedent,
+            CCSemisequentChangeInfo<SeqFor, SemiSeq> succedent,
             Seq resultingSequent,
             Seq originalSequent) {
         this.antecedent = antecedent;
@@ -98,7 +98,7 @@ public class GenericSequentChangeInfo<T extends GenericTerm<?, ?, ?, T>, SeqFor 
                 : (succedent != null && succedent.hasChanged());
     }
 
-    public GenericSemisequentChangeInfo<SeqFor, SemiSeq> getSemisequentChangeInfo(
+    public CCSemisequentChangeInfo<SeqFor, SemiSeq> getSemisequentChangeInfo(
             boolean antec) {
         return antec ? antecedent : succedent;
     }
@@ -230,8 +230,8 @@ public class GenericSequentChangeInfo<T extends GenericTerm<?, ?, ?, T>, SeqFor 
      * not release it. This means when invoking the method it must be ensured
      * that {@code succ} is never used afterwards.
      */
-    public void combine(GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> succ) {
-        final GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> antec = this;
+    public void combine(CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> succ) {
+        final CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> antec = this;
         if (antec == succ) {
             return;
         }

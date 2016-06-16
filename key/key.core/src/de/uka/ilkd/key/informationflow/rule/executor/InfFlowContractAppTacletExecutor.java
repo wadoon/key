@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.informationflow.rule.executor;
 
-import org.key_project.common.core.logic.calculus.GenericSequentChangeInfo;
+import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -42,7 +42,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
     protected void addToAntec(Semisequent semi,
             TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
+            CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
             MatchConditions matchCond,

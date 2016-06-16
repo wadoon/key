@@ -1,6 +1,6 @@
 package org.key_project.common.core.program;
 
-public interface GenericNameAbstractionTable<S> {
+public interface CCNameAbstractionTable<S> {
 
     /** 
      * adds the given two elements   to the table

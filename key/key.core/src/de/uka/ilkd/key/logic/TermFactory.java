@@ -15,7 +15,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Map;
 
-import org.key_project.common.core.logic.GenericTermFactory;
+import org.key_project.common.core.logic.CCTermFactory;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -36,7 +36,7 @@ import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
  * See {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to 
  * create terms. 
  */
-public final class TermFactory implements GenericTermFactory<JavaBlock, JavaDLTerm> {
+public final class TermFactory implements CCTermFactory<JavaBlock, JavaDLTerm> {
     
 
     private static final ImmutableArray<JavaDLTerm> NO_SUBTERMS = new ImmutableArray<JavaDLTerm>();

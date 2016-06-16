@@ -95,7 +95,7 @@ public class FormulaTagManager {
     }
 
 
-    public void sequentChanged (Goal source, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci) {
+    public void sequentChanged (Goal source, CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci) {
 	assert source != null;
         removeTags ( sci, true, source  );
 	removeTags ( sci, false, source );
@@ -107,12 +107,12 @@ public class FormulaTagManager {
         addTags    ( sci, false, source );
     }
 
-    private void updateTags(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
+    private void updateTags(CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
         for (FormulaChangeInfo<SequentFormula<JavaDLTerm>> formulaChangeInfo : sci.modifiedFormulas(p_antec))
             updateTag(formulaChangeInfo, sci.sequent(), p_goal);
     }
 
-    private void addTags(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
+    private void addTags(CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula<JavaDLTerm> constrainedFormula : sci.addedFormulas(p_antec)) {
             final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
                     (constrainedFormula, PosInTerm.<JavaDLTerm>getTopLevel(), p_antec);
@@ -120,7 +120,7 @@ public class FormulaTagManager {
         }
     }
 
-    private void removeTags(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
+    private void removeTags(CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula<JavaDLTerm> constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
                     (constrainedFormula, PosInTerm.<JavaDLTerm>getTopLevel(), p_antec);

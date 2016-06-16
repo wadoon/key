@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.key_project.common.core.logic.GenericTermFactory;
+import org.key_project.common.core.logic.CCTermFactory;
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.calculus.GenericSequentChangeInfo;
+import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.common.core.logic.calculus.SequentFormula;
@@ -1140,7 +1140,7 @@ public class TermLabelManager {
     * @param state The {@link TermLabelState} of the current rule application.
     * @param pio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} to replace {@link JavaDLTerm} at.
     * @param newTerm The new {@link JavaDLTerm} to set.
-    * @param tf The {@link GenericTermFactory} to use.
+    * @param tf The {@link CCTermFactory} to use.
     * @param refactorings The {@link RefactoringsContainer} to consider.
     * @return The root of the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} containing the new {@link JavaDLTerm} at the specified {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}.
     */
@@ -1728,7 +1728,7 @@ public class TermLabelManager {
     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
     * @param services The {@link Services} to use.
     */
-   public static void mergeLabels(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, Services services) {
+   public static void mergeLabels(CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, Services services) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
          manager.mergeLabels(services, currentSequent);
@@ -1740,7 +1740,7 @@ public class TermLabelManager {
     * @param services The {@link Services} to use.
     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
     */
-   public void mergeLabels(Services services, GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent) {
+   public void mergeLabels(Services services, CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent) {
       for (SequentFormula<JavaDLTerm> rejectedSF : currentSequent.getSemisequentChangeInfo(true).rejectedFormulas()) {
          mergeLabels(currentSequent, services, rejectedSF, true);
       }
@@ -1756,7 +1756,7 @@ public class TermLabelManager {
     * @param rejectedSF The rejected {@link SequentFormula} to work with.
     * @param inAntecedent {@code true} rejected {@link SequentFormula} is in antecedent, {@code false} it is in succedent.
     */
-   protected void mergeLabels(GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, 
+   protected void mergeLabels(CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, 
                               Services services, 
                               SequentFormula<JavaDLTerm> rejectedSF, 
                               boolean inAntecedent) {
@@ -1790,7 +1790,7 @@ public class TermLabelManager {
             // Replace sequent formula
             if (labelsChanged) {
                JavaDLTerm newTerm = services.getTermFactory().createTerm(existingTerm.op(), existingTerm.subs(), existingTerm.boundVars(), existingTerm.modalContent(), new ImmutableArray<TermLabel>(mergedLabels));
-               GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci = currentSequent.sequent().changeFormula(new SequentFormula<>(newTerm), new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(existingSF, PosInTerm.<JavaDLTerm>getTopLevel(), inAntecedent));
+               CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci = currentSequent.sequent().changeFormula(new SequentFormula<>(newTerm), new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(existingSF, PosInTerm.<JavaDLTerm>getTopLevel(), inAntecedent));
                currentSequent.combine(sci);
             }
          }

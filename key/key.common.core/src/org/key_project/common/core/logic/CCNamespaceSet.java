@@ -5,7 +5,7 @@ package org.key_project.common.core.logic;
  * TODO: Document.
  *
  */
-public interface GenericNamespaceSet {
+public interface CCNamespaceSet {
 
     /**
      * Returns the {@link Namespace} with the given name (e.g., "functions") or

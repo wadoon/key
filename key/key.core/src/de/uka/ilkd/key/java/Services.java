@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-import org.key_project.common.core.logic.GenericTermBuilder;
-import org.key_project.common.core.logic.GenericTermFactory;
+import org.key_project.common.core.logic.CCTermBuilder;
+import org.key_project.common.core.logic.CCTermFactory;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.services.ProgramServices;
 
@@ -322,8 +322,8 @@ public class Services implements JavaDLTermServices, ProofServices {
     }
     
     /**
-     * Returns the {@link GenericTermBuilder} used to create {@link JavaDLTerm}s.
-     * @return The {@link GenericTermBuilder} used to create {@link JavaDLTerm}s.
+     * Returns the {@link CCTermBuilder} used to create {@link JavaDLTerm}s.
+     * @return The {@link CCTermBuilder} used to create {@link JavaDLTerm}s.
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -332,8 +332,8 @@ public class Services implements JavaDLTermServices, ProofServices {
     }
 
     /**
-     * Returns the {@link GenericTermFactory} used to create {@link JavaDLTerm}s.
-     * @return The {@link GenericTermFactory} used to create {@link JavaDLTerm}s.
+     * Returns the {@link CCTermFactory} used to create {@link JavaDLTerm}s.
+     * @return The {@link CCTermFactory} used to create {@link JavaDLTerm}s.
      */
     @SuppressWarnings("unchecked")
     @Override

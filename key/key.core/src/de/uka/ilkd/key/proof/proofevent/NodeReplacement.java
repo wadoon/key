@@ -31,7 +31,7 @@ public class NodeReplacement {
 
     Node                    node;
     Node                    parent;
-    ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> rawChanges;
+    ImmutableList<CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> rawChanges;
     ImmutableList<NodeChange>        changes    = null;
 
     /**
@@ -43,7 +43,7 @@ public class NodeReplacement {
      */
     public NodeReplacement ( Node                    p_node,
 			     Node                    p_parent,
-			     ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> p_changes ) {
+			     ImmutableList<CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> p_changes ) {
 	node       = p_node;
 	parent     = p_parent;
 	rawChanges = p_changes;
@@ -51,7 +51,7 @@ public class NodeReplacement {
 
     private void addNodeChanges () {
 	if ( !rawChanges.isEmpty() ) {
-	    GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci = rawChanges.head ();
+	    CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci = rawChanges.head ();
 	    rawChanges            = rawChanges.tail ();
 
 	    addNodeChanges ();
@@ -61,7 +61,7 @@ public class NodeReplacement {
 	}
     }
 
-    private void addNodeChange ( GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> p_sci ) {
+    private void addNodeChange ( CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> p_sci ) {
         Iterator<SequentFormula<JavaDLTerm>> it;
         Iterator<FormulaChangeInfo<SequentFormula<JavaDLTerm>>>  it2;
      

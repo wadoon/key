@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.key_project.common.core.logic.GenericTerm;
-import org.key_project.common.core.logic.GenericTermBuilder;
+import org.key_project.common.core.logic.CCTerm;
+import org.key_project.common.core.logic.CCTermBuilder;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
@@ -422,7 +422,7 @@ public final class TruthValueTracingUtil {
     * available in case of {@link OneStepSimplifier} usage.
     * @param childNode The child {@link Node}.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-    * @param tb The {@link GenericTermBuilder} to use.
+    * @param tb The {@link CCTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void updatePredicateResultBasedOnNewMinorIdsOSS(final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> childPio,
@@ -453,7 +453,7 @@ public final class TruthValueTracingUtil {
     * @param term The {@link JavaDLTerm} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param parentPio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the applied rule of the parent {@link Node}.
-    * @param tb The {@link GenericTermBuilder} to use.
+    * @param tb The {@link CCTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIdsOSS(SequentFormula<JavaDLTerm> onlyChangedChildSF, 
@@ -476,7 +476,7 @@ public final class TruthValueTracingUtil {
     * @param onlyChangedChildSF The only changed {@link SequentFormula} in the child {@link Node}.
     * @param label The {@link FormulaTermLabel} of interest.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
-    * @param tb The {@link GenericTermBuilder} to use.
+    * @param tb The {@link CCTermBuilder} to use.
     * @return The computed instruction {@link JavaDLTerm} or {@code null} if not available.
     */
    protected static JavaDLTerm checkForNewMinorIdsOSS(SequentFormula<JavaDLTerm> onlyChangedChildSF, 
@@ -500,7 +500,7 @@ public final class TruthValueTracingUtil {
     * Updates the {@link PredicateResult}s based on minor ID changes if available.
     * @param childNode The child {@link Node}.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-    * @param tb The {@link GenericTermBuilder} to use.
+    * @param tb The {@link CCTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void updatePredicateResultBasedOnNewMinorIds(final Node childNode,
@@ -544,7 +544,7 @@ public final class TruthValueTracingUtil {
     * @param term The {@link JavaDLTerm} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param parentPio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the applied rule of the parent {@link Node}.
-    * @param tb The {@link GenericTermBuilder} to use.
+    * @param tb The {@link CCTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIds(Node childNode, 
@@ -567,7 +567,7 @@ public final class TruthValueTracingUtil {
     * @param childNode The child {@link Node}.
     * @param label The {@link FormulaTermLabel} of interest.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
-    * @param tb The {@link GenericTermBuilder} to use.
+    * @param tb The {@link CCTermBuilder} to use.
     * @return The computed instruction {@link JavaDLTerm} or {@code null} if not available.
     */
    protected static JavaDLTerm checkForNewMinorIds(Node childNode, 
@@ -631,7 +631,7 @@ public final class TruthValueTracingUtil {
     * @param antecedentReplacements The replacements found in the antecedent.
     * @param succedentReplacements The replacements found in the succedent.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
-    * @param tb The {@link GenericTermBuilder} to use.
+    * @param tb The {@link CCTermBuilder} to use.
     * @return The computed instruction {@link JavaDLTerm} or {@code null} if not available.
     */
    protected static JavaDLTerm computeInstructionTerm(List<JavaDLTerm> antecedentReplacements, 
@@ -1100,7 +1100,7 @@ public final class TruthValueTracingUtil {
        * @param term The {@link JavaDLTerm} to check.
        * @return {@code true} has {@link TermLabel}, {@code false} do not has {@link TermLabel}.
        */
-      public boolean hasPredicateLabel(GenericTerm<?,?,?,?> term) {
+      public boolean hasPredicateLabel(CCTerm<?,?,?,?> term) {
          return getPredicateLabel(term) != null;
       }
 
@@ -1109,7 +1109,7 @@ public final class TruthValueTracingUtil {
        * @param term The {@link JavaDLTerm}.
        * @return The found {@link FormulaTermLabel} or {@code null} otherwise.
        */
-      public FormulaTermLabel getPredicateLabel(GenericTerm<?,?,?,?> term) {
+      public FormulaTermLabel getPredicateLabel(CCTerm<?,?,?,?> term) {
          TermLabel label = term.getLabel(termLabelName);
          return label instanceof FormulaTermLabel ? (FormulaTermLabel) label : null;
       }

@@ -16,7 +16,7 @@ package org.key_project.common.core.logic.calculus;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
-import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.IntIterator;
 
 /**
@@ -32,7 +32,7 @@ import org.key_project.common.core.logic.IntIterator;
  * </ul>
  * 
  */
-public final class PosInTerm<T extends GenericTerm<?, ?, ?, T>> {
+public final class PosInTerm<T extends CCTerm<?, ?, ?, T>> {
 
     private static final PosInTerm<?> TOP_LEVEL = new PosInTerm<>();
 
@@ -54,7 +54,7 @@ public final class PosInTerm<T extends GenericTerm<?, ?, ?, T>> {
      * reverse order
      * @return the PosInTerm encapsulating the integer list in reverse order
      */
-    public static <T extends GenericTerm<?, ?, ?, T>> PosInTerm<T> parseReverseString(String s) {
+    public static <T extends CCTerm<?, ?, ?, T>> PosInTerm<T> parseReverseString(String s) {
         if ("".equals(s)) {
             return getTopLevel();
         }
@@ -85,7 +85,7 @@ public final class PosInTerm<T extends GenericTerm<?, ?, ?, T>> {
      * @return the top level position
      */
     @SuppressWarnings("unchecked")
-    public static <T extends GenericTerm<?, ?, ?, T>> PosInTerm<T> getTopLevel() {
+    public static <T extends CCTerm<?, ?, ?, T>> PosInTerm<T> getTopLevel() {
         return (PosInTerm<T>) TOP_LEVEL;
     }
     
@@ -218,7 +218,7 @@ public final class PosInTerm<T extends GenericTerm<?, ?, ?, T>> {
      * navigate to the subterm described by this position and return it
      * if the described position does not exist in the term an {@link IndexOutOfBoundsException}
      * is thrown
-     * @param t the term  ({@link GenericTerm})
+     * @param t the term  ({@link CCTerm})
      * @return the sub term of term {@code t} at this position   
      * @throws an {@link IndexOutOfBoundsException} if no subterm exists at this position
      */

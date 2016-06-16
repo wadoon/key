@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.GenericNameAbstractionTable;
+import org.key_project.common.core.program.CCNameAbstractionTable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -39,25 +39,25 @@ import org.key_project.util.collection.ImmutableSet;
  *  cannot be changed. The advantage is that we can use term sharing and
  *  saving a lot of memory space. 
  *  </li>
- *  <li> Term has to be created using the {@link GenericTermFactory} and
+ *  <li> Term has to be created using the {@link CCTermFactory} and
  *    <emph>not</emph> by using the constructors itself. 
  *  </li>
  *  <li> Term is subclassed, but all subclasses have to be package private, so
- *    that all other classes except {@link GenericTermFactory} know only the class
+ *    that all other classes except {@link CCTermFactory} know only the class
  *    Term and its interface. Even most classes of the logic package.
  *  </li>
  *  <li> as it is immutable, most (all) attributes should be declared final
  * </li>
  * </ol>
- * Term supports the {@link Visitor} pattern. Two different visit strategies are
- * currently supported: {@link Term#execPostOrder(Visitor)} and
- * {@link Term#execPreOrder(Visitor)}.<br/>
+ * Term supports the {@link CCVisitor} pattern. Two different visit strategies are
+ * currently supported: {@link Term#execPostOrder(CCVisitor)} and
+ * {@link Term#execPreOrder(CCVisitor)}.<br/>
  * 
  * <strong>TODO</strong>: Rename to "Term", and the previous {@link Term} to
  * "JavaTerm" or the like; from this class here, the java specific methods
  * have been removed.
  */
-public interface GenericTerm<S, N extends GenericNameAbstractionTable<S>, V extends Visitor<S, N, V, T>, T extends GenericTerm<S, N, V, T>>
+public interface CCTerm<S, N extends CCNameAbstractionTable<S>, V extends CCVisitor<S, N, V, T>, T extends CCTerm<S, N, V, T>>
         extends SVSubstitute, Sorted {
 
     /** 

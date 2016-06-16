@@ -27,7 +27,7 @@ import org.key_project.util.collection.ImmutableSet;
  * @param <N>
  * @param <P>
  */
-public interface GenericTermBuilder<P extends ModalContent<?, ?>, T extends GenericTerm<?, ?, ?, T>> {
+public interface CCTermBuilder<P extends ModalContent<?, ?>, T extends CCTerm<?, ?, ?, T>> {
 
     public abstract T eqAtLocsPost(TermServices services, T heap1_pre, T heap1_post,
             T locset1, T heap2_pre, T heap2_post, T locset2);
@@ -493,6 +493,6 @@ public interface GenericTermBuilder<P extends ModalContent<?, ?>, T extends Gene
 
 //    public abstract T parseTerm(String s) throws ParserException;
 
-    public abstract GenericTermFactory<?, T> tf();
+    public abstract CCTermFactory<?, T> tf();
 
 }

@@ -15,7 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
-import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.AbstractSV;
 import org.key_project.common.core.logic.op.UpdateableOperator;
@@ -296,7 +296,7 @@ public final class ProgramSV extends AbstractSV
 
 	if (foundInst != null) {
 	    final Object newInst;
-	    if (foundInst instanceof GenericTerm) {
+	    if (foundInst instanceof CCTerm) {
 		newInst = services.getProgramServices().getTypeConverter().
 		    convertToLogicElement(pe, insts.getExecutionContext());
 	    } else {

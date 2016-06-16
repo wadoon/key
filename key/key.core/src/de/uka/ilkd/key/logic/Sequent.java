@@ -16,8 +16,8 @@ package de.uka.ilkd.key.logic;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.AbstractSequentFactory;
-import org.key_project.common.core.logic.calculus.GenericSemisequentChangeInfo;
-import org.key_project.common.core.logic.calculus.GenericSequent;
+import org.key_project.common.core.logic.calculus.CCSemisequentChangeInfo;
+import org.key_project.common.core.logic.calculus.CCSequent;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableSLList;
@@ -33,7 +33,7 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public class Sequent
         extends
-        GenericSequent<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>
+        CCSequent<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>
         implements Iterable<SequentFormula<JavaDLTerm>> {
 
     public static final Sequent EMPTY_SEQUENT = new NILSequent();
@@ -139,7 +139,7 @@ public class Sequent
     @Override
     protected SequentChangeInfo createSequentChangeInfo(
             boolean inAntec,
-            GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> semiCI,
+            CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> semiCI,
             Sequent result, Sequent original) {
         assert semiCI instanceof SemisequentChangeInfo;
 

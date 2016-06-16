@@ -13,9 +13,9 @@
 
 package org.key_project.common.core.services;
 
-import org.key_project.common.core.logic.GenericNamespaceSet;
-import org.key_project.common.core.logic.GenericTermBuilder;
-import org.key_project.common.core.logic.GenericTermFactory;
+import org.key_project.common.core.logic.CCNamespaceSet;
+import org.key_project.common.core.logic.CCTermBuilder;
+import org.key_project.common.core.logic.CCTermFactory;
 
 /**
  * This interface defines the basic functionalities of services
@@ -35,18 +35,18 @@ public interface TermServices {
      * returns the namespaces for functions, predicates etc.
      * @return the proof specific namespaces
      */
-    public abstract GenericNamespaceSet getNamespaces();
+    public abstract CCNamespaceSet getNamespaces();
 
     /**
-     * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
-     * @return The {@link GenericTermBuilder} used to create {@link Term}s.
+     * Returns the {@link CCTermBuilder} used to create {@link Term}s.
+     * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
-    public abstract <TB extends GenericTermBuilder<?, ?>> TB getTermBuilder();
+    public abstract <TB extends CCTermBuilder<?, ?>> TB getTermBuilder();
 
     /**
-     * Returns the {@link GenericTermBuilder} used to create {@link Term}s.
-     * @return The {@link GenericTermBuilder} used to create {@link Term}s.
+     * Returns the {@link CCTermBuilder} used to create {@link Term}s.
+     * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
-    public abstract <TF extends GenericTermFactory<?, ?>> TF getTermFactory();
+    public abstract <TF extends CCTermFactory<?, ?>> TF getTermFactory();
 
 }

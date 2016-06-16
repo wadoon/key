@@ -23,7 +23,7 @@ import java.util.TreeMap;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
-import org.key_project.common.core.logic.GenericTermBuilder;
+import org.key_project.common.core.logic.CCTermBuilder;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
@@ -2499,7 +2499,7 @@ public final class JMLTranslator {
 
     /** Provide restriction terms for the declared KeYJavaType 
      *  Note that these restrictions only apply to the JML to DL translation.
-     *  See also {@link GenericTermBuilder#reachableValue(JavaDLTerm, KeYJavaType)}. 
+     *  See also {@link CCTermBuilder#reachableValue(JavaDLTerm, KeYJavaType)}. 
      */
     protected JavaDLTerm typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
         final Type type = kjt.getProgramType();

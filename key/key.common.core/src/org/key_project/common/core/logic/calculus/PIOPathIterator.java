@@ -13,7 +13,7 @@
 
 package org.key_project.common.core.logic.calculus;
 
-import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.IntIterator;
 
 /**
@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.IntIterator;
  * path between the root of a term and a position within the term,
  * given by a <code>PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>></code>-object
  */
-public interface PIOPathIterator<T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<T>> extends IntIterator {
+public interface PIOPathIterator<T extends CCTerm<?,?,?,T>, SeqFor extends SequentFormula<T>> extends IntIterator {
 
     /**
      * @return the number of the next child on the path, or

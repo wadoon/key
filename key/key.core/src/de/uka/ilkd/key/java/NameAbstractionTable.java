@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.common.core.program.GenericNameAbstractionTable;
+import org.key_project.common.core.program.CCNameAbstractionTable;
 
 /** 
  * This class is used for the equals modulo renaming method in
@@ -28,7 +28,7 @@ import org.key_project.common.core.program.GenericNameAbstractionTable;
  * o2 instead of their real name. For this comparision a method is
  * offered so that the assigned name is not given outside.
  */
-public class NameAbstractionTable implements GenericNameAbstractionTable<SourceElement> {
+public class NameAbstractionTable implements CCNameAbstractionTable<SourceElement> {
 
     /**
      * The order in which symbols are declared in the two terms or programs that

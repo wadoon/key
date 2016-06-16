@@ -13,7 +13,7 @@
 
 package org.key_project.common.core.logic.calculus;
 
-import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.IntIterator;
 
 /**
@@ -21,11 +21,11 @@ import org.key_project.common.core.logic.IntIterator;
  * SequentFormula<JavaDLTerm> and a PosInTerm<JavaDLTerm> determine an object of this 
  * class exactly. 
  */
-public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extends SequentFormula<T>> {
+public final class PosInOccurrence<T extends CCTerm<?,?,?,T>, SeqFor extends SequentFormula<T>> {
 
-    public static <T      extends GenericTerm<?, ?, ?, T>,
+    public static <T      extends CCTerm<?, ?, ?, T>,
                    SeqFor extends SequentFormula<T>>
-            PosInOccurrence<T, SeqFor> findInSequent(GenericSequent<T, SeqFor, ?, ?> seq, int formulaNumber, PosInTerm<T> pos) {
+            PosInOccurrence<T, SeqFor> findInSequent(CCSequent<T, SeqFor, ?, ?> seq, int formulaNumber, PosInTerm<T> pos) {
         return new PosInOccurrence<T, SeqFor>(
                 seq.getFormulabyNr(formulaNumber), pos,
                 seq.numberInAntec(formulaNumber));

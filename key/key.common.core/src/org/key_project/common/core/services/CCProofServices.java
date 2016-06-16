@@ -13,7 +13,7 @@
 
 package org.key_project.common.core.services;
 
-import org.key_project.common.core.logic.GenericNamespaceSet;
+import org.key_project.common.core.logic.CCNamespaceSet;
 
 /**
  * TODO: Document.
@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.GenericNamespaceSet;
  * @author Dominic Scheurer
  *
  */
-public interface GenericProofServices {
+public interface CCProofServices {
 
     ProgramServices getProgramServices();
 
@@ -31,6 +31,6 @@ public interface GenericProofServices {
      * returns the namespaces for functions, predicates etc.
      * @return the proof specific namespaces
      */
-    GenericNamespaceSet getNamespaces();
+    CCNamespaceSet getNamespaces();
 
 }

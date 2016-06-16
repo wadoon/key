@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.collection.ImmutableList;
@@ -28,7 +28,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author Dominic Scheurer
  *
  */
-public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>, Seq extends GenericSequent<T, SeqFor, SemiSeq, Seq>>
+public abstract class CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<T, SeqFor, SemiSeq, Seq>>
         implements Iterable<SeqFor> {
 
     private final SemiSeq antecedent;
@@ -46,14 +46,14 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
      * @param genericSequent
      * @return
      */
-    protected abstract GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> createSequentChangeInfo(
+    protected abstract CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> createSequentChangeInfo(
             boolean inAntec,
-            GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI,
+            CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI,
             Seq composeSequent,
             Seq genericSequent);
 
     /** creates new GenericSequent<T, SeqFor> with antecedence and succedence */
-    protected GenericSequent(SemiSeq antecedent, SemiSeq succedent) {
+    protected CCSequent(SemiSeq antecedent, SemiSeq succedent) {
         this.antecedent = antecedent;
         this.succedent = succedent;
     }
@@ -78,13 +78,13 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
      *         removed
      */
     @SuppressWarnings("unchecked")
-    public GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(SeqFor cf,
+    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(SeqFor cf,
                                                                         boolean antec, boolean first) {
 
-        final GenericSemisequent<SeqFor, SemiSeq> seq =
+        final CCSemisequent<SeqFor, SemiSeq> seq =
                 antec ? antecedent : succedent;
 
-        final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 first ? seq.insertFirst(cf) : seq.insertLast(cf);
 
         return createSequentChangeInfo(antec, semiCI,
@@ -105,10 +105,10 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
      *         removed
      */
     @SuppressWarnings("unchecked")
-    public GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(SeqFor cf, PosInOccurrence<T, SeqFor> p) {
-        final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
+    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(SeqFor cf, PosInOccurrence<T, SeqFor> p) {
+        final CCSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
-        final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 seq.insert(seq.indexOf(p.sequentFormula()), cf);
 
         return createSequentChangeInfo(p.isInAntec(), semiCI,
@@ -135,14 +135,14 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
      *         removed
      */
     @SuppressWarnings("unchecked")
-    public GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(
+    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(
             ImmutableList<SeqFor> insertions,
             boolean antec, boolean first) {
 
-        final GenericSemisequent<SeqFor, SemiSeq> seq =
+        final CCSemisequent<SeqFor, SemiSeq> seq =
                 antec ? antecedent : succedent;
 
-        final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 first ? seq.insertFirst(insertions) : seq
                         .insertLast(insertions);
 
@@ -165,12 +165,12 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
      *         removed
      */
     @SuppressWarnings("unchecked")
-    public  GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(
+    public  CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(
             ImmutableList<SeqFor> insertions,
             PosInOccurrence<?, SeqFor> p) {
-        final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
+        final CCSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
-        final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 seq.insert(seq.indexOf(p.sequentFormula()), insertions);
 
         return createSequentChangeInfo(p.isInAntec(), semiCI,
@@ -196,10 +196,10 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
      *         removed
      */
     @SuppressWarnings("unchecked")
-    public GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> changeFormula(
+    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> changeFormula(
             SeqFor newCF,
             PosInOccurrence<?, SeqFor> p) {
-        final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 getSemisequent(p).replace(p, newCF);
 
         return createSequentChangeInfo(p.isInAntec(), semiCI,
@@ -221,15 +221,15 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
      *         the new sequent and information which formulas have been added or
      *         removed
      */
-    public GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> changeFormula(
+    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> changeFormula(
             ImmutableList<SeqFor> replacements,
             PosInOccurrence<?, SeqFor> p) {
 
-        final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 getSemisequent(p).replace(p, replacements);
 
         @SuppressWarnings("unchecked")
-        final GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> sci =
+        final CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> sci =
                 createSequentChangeInfo(p.isInAntec(),
                         semiCI,
                         composeSequent(p.isInAntec(), semiCI.semisequent()),
@@ -282,9 +282,9 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof GenericSequent<?, ?, ?, ?>))
+        if (!(o instanceof CCSequent<?, ?, ?, ?>))
             return false;
-        final GenericSequent<?, ?, ?, ?> o1 = (GenericSequent<?, ?, ?, ?>) o;
+        final CCSequent<?, ?, ?, ?> o1 = (CCSequent<?, ?, ?, ?>) o;
         return antecedent.equals(o1.antecedent)
                 && succedent.equals(o1.succedent);
     }
@@ -351,15 +351,15 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
      *         the new sequent and information which formulas have been added or
      *         removed
      */
-    public GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> removeFormula(
+    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> removeFormula(
             PosInOccurrence<?, SeqFor> p) {
-        final GenericSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
+        final CCSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
-        final GenericSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
                 seq.remove(seq.indexOf(p.sequentFormula()));
 
         @SuppressWarnings("unchecked")
-        final GenericSequentChangeInfo<T, SeqFor, SemiSeq, Seq> sci =
+        final CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> sci =
                 createSequentChangeInfo(p.isInAntec(), semiCI,
                         composeSequent(p.isInAntec(), semiCI.semisequent()),
                         (Seq) this);
@@ -385,14 +385,14 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
         return antecedent().toString() + "==>" + succedent().toString();
     }
 
-    static class SequentIterator<SeqFor extends SequentFormula<?>, SemiSeq extends GenericSemisequent<SeqFor, SemiSeq>, Seq extends GenericSequent<?, SeqFor, SemiSeq, Seq>>
+    static class SequentIterator<SeqFor extends SequentFormula<?>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<?, SeqFor, SemiSeq, Seq>>
             implements Iterator<SeqFor> {
 
         private final Iterator<SeqFor> anteIt;
         private final Iterator<SeqFor> succIt;
 
-        SequentIterator(GenericSemisequent<SeqFor, SemiSeq> ante,
-                GenericSemisequent<SeqFor, SemiSeq> succ) {
+        SequentIterator(CCSemisequent<SeqFor, SemiSeq> ante,
+                CCSemisequent<SeqFor, SemiSeq> succ) {
             this.anteIt = ante.iterator();
             this.succIt = succ.iterator();
         }

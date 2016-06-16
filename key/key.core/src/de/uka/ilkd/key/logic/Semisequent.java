@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.calculus.GenericSemisequent;
-import org.key_project.common.core.logic.calculus.GenericSemisequentChangeInfo;
+import org.key_project.common.core.logic.calculus.CCSemisequent;
+import org.key_project.common.core.logic.calculus.CCSemisequentChangeInfo;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableList;
  * other simplifications. A sequent and so a semisequent has to be immutable.
  */
 public class Semisequent extends
-        GenericSemisequent<SequentFormula<JavaDLTerm>, Semisequent> implements
+        CCSemisequent<SequentFormula<JavaDLTerm>, Semisequent> implements
         Iterable<SequentFormula<JavaDLTerm>> {
     
     private static final Semisequent EMPTY = new Semisequent();
@@ -60,7 +60,7 @@ public class Semisequent extends
      * @see de.uka.ilkd.key.logic.GenericSemisequent#createSemisequentChangeInfo(org.key_project.util.collection.ImmutableList)
      */
     @Override
-    protected GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> createSemisequentChangeInfo(
+    protected CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> createSemisequentChangeInfo(
             ImmutableList<SequentFormula<JavaDLTerm>> formulas) {
         return new SemisequentChangeInfo(formulas);
     }

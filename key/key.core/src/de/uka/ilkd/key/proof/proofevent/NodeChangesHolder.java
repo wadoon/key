@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.proof.proofevent;
 
-import org.key_project.common.core.logic.calculus.GenericSequentChangeInfo;
+import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -22,17 +22,17 @@ import de.uka.ilkd.key.logic.*;
 
 
 public class NodeChangesHolder {
-    public ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> scis;
+    public ImmutableList<CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> scis;
 
     NodeChangesHolder () {
-	this ( ImmutableSLList.<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>>nil() );
+	this ( ImmutableSLList.<CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>>nil() );
     }
 
-    NodeChangesHolder ( ImmutableList<GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> p_scis ) {
+    NodeChangesHolder ( ImmutableList<CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> p_scis ) {
 	scis = p_scis;
     }
 
-    public void addSCI ( GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> p_sci ) {
+    public void addSCI ( CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> p_sci ) {
 	scis = scis.prepend ( p_sci );
     }
 

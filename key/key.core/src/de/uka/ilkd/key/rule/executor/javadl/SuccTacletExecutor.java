@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule.executor.javadl;
 
-import org.key_project.common.core.logic.calculus.GenericSequentChangeInfo;
+import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
@@ -27,7 +27,7 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacle
      */
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+            CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
             MatchConditions matchCond,
             Goal goal,
             RuleApp ruleApp,
@@ -50,7 +50,7 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacle
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState, 
-            GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
+            CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
             MatchConditions matchCond,
             Goal goal,

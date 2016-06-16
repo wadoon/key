@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.calculus.GenericSequentChangeInfo;
+import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
@@ -25,7 +25,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
  * situation where this can happen is that a list of formulas had to be added to
  * the sequent and the list has not been redundance free.
  */
-public class SequentChangeInfo extends GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> {
+public class SequentChangeInfo extends CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> {
     /**
      * creates a new sequent change info whose semisequent described by position
      * pos has changed. The made changes are stored in semiCI and the resulting
@@ -40,7 +40,7 @@ public class SequentChangeInfo extends GenericSequentChangeInfo<JavaDLTerm, Sequ
      * @return the sequent change information object describing the complete
      *         changes made to the sequent together with the operations result.
      */
-    public static GenericSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> createSequentChangeInfo(
+    public static CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> createSequentChangeInfo(
             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
             SemisequentChangeInfo semiCI,
             Sequent result, Sequent original) {

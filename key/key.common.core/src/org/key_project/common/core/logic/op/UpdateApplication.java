@@ -13,7 +13,7 @@
 
 package org.key_project.common.core.logic.op;
 
-import org.key_project.common.core.logic.GenericTerm;
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
 
 /**
@@ -42,7 +42,7 @@ public final class UpdateApplication extends AbstractOperator {
      *            term with this operator as top level operator
      */
     @SuppressWarnings("unchecked")
-    public static <T extends GenericTerm<?,?,?,?>> T getUpdate(T t) {
+    public static <T extends CCTerm<?,?,?,?>> T getUpdate(T t) {
         assert t.op() == UPDATE_APPLICATION;
         return (T) t.sub(updatePos());
     }
@@ -62,7 +62,7 @@ public final class UpdateApplication extends AbstractOperator {
      *            term with this operator as top level operator
      */
     @SuppressWarnings("unchecked")
-    public static <T extends GenericTerm<?,?,?,?>> T getTarget(T t) {
+    public static <T extends CCTerm<?,?,?,?>> T getTarget(T t) {
         assert t.op() == UPDATE_APPLICATION;
         return (T) t.sub(targetPos());
     }

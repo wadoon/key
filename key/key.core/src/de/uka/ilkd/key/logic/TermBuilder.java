@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.common.core.logic.GenericTermBuilder;
+import org.key_project.common.core.logic.CCTermBuilder;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.label.TermLabel;
@@ -85,7 +85,7 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
  * want to be sure that the term looks exactly as you built it, you
  * will have to use the GenericTermFactory.</p>
  */
-public class TermBuilder implements GenericTermBuilder<JavaBlock, JavaDLTerm> {
+public class TermBuilder implements CCTermBuilder<JavaBlock, JavaDLTerm> {
 
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
