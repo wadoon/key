@@ -17,7 +17,7 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.AbstractSequentFactory;
 import org.key_project.common.core.logic.calculus.CCSemisequentChangeInfo;
-import org.key_project.common.core.logic.calculus.CCSequent;
+import org.key_project.common.core.logic.calculus.CCSequentImpl;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableSLList;
@@ -32,9 +32,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Sequent#EMPTY_SEQUENT}.
  */
 public class Sequent
-        extends
-        CCSequent<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>
-        implements Iterable<SequentFormula<JavaDLTerm>> {
+        extends CCSequentImpl<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> {
 
     public static final Sequent EMPTY_SEQUENT = new NILSequent();
 
