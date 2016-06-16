@@ -37,6 +37,10 @@ public class SemisequentChangeInfo extends GenericSemisequentChangeInfo<SequentF
     @Override
     protected Semisequent createSemisequent(
             ImmutableList<SequentFormula<JavaDLTerm>> modifiedFormulas) {
+        if (modifiedFormulas.isEmpty()) {
+            return Semisequent.nil();
+        }
+        
         return new Semisequent(modifiedFormulas);
     }
     
