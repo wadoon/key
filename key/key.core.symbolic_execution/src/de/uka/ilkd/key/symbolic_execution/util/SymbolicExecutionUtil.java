@@ -2694,7 +2694,7 @@ public final class SymbolicExecutionUtil {
     * @return The choice value.
     */
    public static String getChoiceSetting(String key) {
-      Map<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      Map<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().getDefaultTacletOptions();
       return settings.get(key);
    }
    
@@ -2707,11 +2707,11 @@ public final class SymbolicExecutionUtil {
     * @param value The new choice value to set.
     */
    public static void setChoiceSetting(String key, String value) {
-      HashMap<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      HashMap<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().getDefaultTacletOptions();
       HashMap<String, String> clone = new LinkedHashMap<String, String>();
       clone.putAll(settings);
       clone.put(key, value);
-      ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+      ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().setDefaultTacletOptions(clone);
    }
 
    /**
@@ -3606,7 +3606,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} settings are initialized, {@code false} settings are not initialized.
     */
    public static boolean isChoiceSettingInitialised() {
-      return ProofSettings.isChoiceSettingInitialised();
+      return ProofSettings.isTacletOptionSettingInitialised();
    }
 
    /**

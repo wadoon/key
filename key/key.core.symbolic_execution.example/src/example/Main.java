@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.TacletOptionSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -47,16 +47,16 @@ public class Main {
       List<File> includes = null; // Optionally: Additional includes to consider
       try {
          // Ensure that Taclets are parsed
-         if (!ProofSettings.isChoiceSettingInitialised()) {
+         if (!ProofSettings.isTacletOptionSettingInitialised()) {
             KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath, includes);
             env.dispose();
          }
          // Set Taclet options
-         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-         HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
+         TacletOptionSettings tacletOptionSettings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings();
+         HashMap<String, String> oldSettings = tacletOptionSettings.getDefaultTacletOptions();
          HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
          newSettings.putAll(MiscTools.getDefaultTacletOptions());
-         choiceSettings.setDefaultChoices(newSettings);
+         tacletOptionSettings.setDefaultTacletOptions(newSettings);
          // Load source code
          KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, classPaths, bootClassPath, includes, true); // env.getLoadedProof() returns performed proof if a *.proof file is loaded
          try {

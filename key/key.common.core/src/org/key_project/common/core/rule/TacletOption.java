@@ -16,20 +16,25 @@ package org.key_project.common.core.rule;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 
-public class Choice implements Named {
+/** 
+ * Represents a taclet option. A taclet option consists of
+ * a category and an option name. For instance, <code>programRules:Java</code>
+ * is a taclet option with category <code>programRules</code> and option name <code>Java</code>
+ */
+public class TacletOption implements Named {
 
     private final Name name;
     private final String category;
 
     /** 
-     * creates a choice object with name <category>:<choice>.
+     * creates a taclet option with name {@code <category>:<name>}.
      */
-    public Choice(String choice, String category){
-	this(new Name(category + ":" + choice), category);
+    public TacletOption(String name, String category){
+	this(new Name(category + ":" + name), category);
     }
     
 
-    public Choice(Name name, String category){
+    public TacletOption(Name name, String category){
 	this.name = name;
 	// .intern() crucial for correct equals
 	this.category = category.intern();       
@@ -48,10 +53,10 @@ public class Choice implements Named {
     
     @Override
     public boolean equals(Object o) {
-	if (!(o instanceof Choice)) {
+	if (!(o instanceof TacletOption)) {
 	    return false;
 	}
-	final Choice c = (Choice)o;
+	final TacletOption c = (TacletOption)o;
 	return category == c.category && name.equals(c.name);
 	    
     }

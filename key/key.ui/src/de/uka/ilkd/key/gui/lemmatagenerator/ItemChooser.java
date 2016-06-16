@@ -187,7 +187,7 @@ class ItemChooser<T> extends JPanel {
 
         private SelectionPanel<T> getSuppliedList() {
                 if (suppliedList == null) {
-                        suppliedList = new SelectionPanel<T>("Choice",searchTitle,Side.LEFT,userFilter);
+                        suppliedList = new SelectionPanel<T>("TacletOption",searchTitle,Side.LEFT,userFilter);
                               }
                 return suppliedList;
         }

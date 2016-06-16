@@ -146,13 +146,13 @@ public class ProofEnvironment {
       }
       ProofEnvironment pe = (ProofEnvironment) cmp;
       return pe.getJavaModel().equals(getJavaModel()) &&
-            pe.initConfig.getActivatedChoices().equals(initConfig.getActivatedChoices());
+            pe.initConfig.getActivatedTacletOptions().equals(initConfig.getActivatedTacletOptions());
    }
 
    public int hashCode() {
       int result = 5;
       result = result*17+ getJavaModel().hashCode();
-      result = result*17+ initConfig.getActivatedChoices().hashCode();
+      result = result*17+ initConfig.getActivatedTacletOptions().hashCode();
       return result;
    }
 

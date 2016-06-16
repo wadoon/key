@@ -101,10 +101,10 @@ public class CloseAfterJoin implements BuiltInRule {
         CloseAfterJoinRuleBuiltInRuleApp closeApp = (CloseAfterJoinRuleBuiltInRuleApp) ruleApp;
 
         final boolean generateIsWeakeningGoal = goal.proof().getSettings()
-                .getChoiceSettings().getDefaultChoices()
+                .getTacletOptionSettings().getDefaultTacletOptions()
                 .containsKey(JOIN_GENERATE_IS_WEAKENING_GOAL_CFG)
-                && goal.proof().getSettings().getChoiceSettings()
-                        .getDefaultChoices()
+                && goal.proof().getSettings().getTacletOptionSettings()
+                        .getDefaultTacletOptions()
                         .get(JOIN_GENERATE_IS_WEAKENING_GOAL_CFG)
                         .equals(JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON);
 

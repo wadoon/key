@@ -23,7 +23,7 @@ import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -182,7 +182,7 @@ public class TestTacletParser extends TestCase {
 	try {
 	    KeYParserF p = stringTacletParser(s);
 	    
-	    return p.taclet(DefaultImmutableSet.<Choice>nil());
+	    return p.taclet(DefaultImmutableSet.<TacletOption>nil());
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -481,7 +481,7 @@ public class TestTacletParser extends TestCase {
         boolean builderExceptionThrown = false;
         try {
             stringTacletParser(brokenTacletString)
-                    .taclet(DefaultImmutableSet.<Choice>nil());
+                    .taclet(DefaultImmutableSet.<TacletOption>nil());
         } catch ( Exception e ) {
             assertTrue ( "Expected IllegalArgumentException, but got " + e,
                          e instanceof IllegalArgumentException );

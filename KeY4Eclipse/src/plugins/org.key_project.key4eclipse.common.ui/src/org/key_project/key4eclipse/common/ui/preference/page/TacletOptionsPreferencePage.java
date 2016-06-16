@@ -24,15 +24,15 @@ import org.key_project.ui.util.KeYExampleUtil;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.TacletOptionSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Preference page to edit the taclet options.
  * @author Martin Hentschel
  */
-public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
+public class TacletOptionsPreferencePage extends AbstractTacletOptionPreferencePage {
    /**
     * {@inheritDoc}
     */
@@ -46,7 +46,7 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     * {@inheritDoc}
     */
    @Override
-   protected boolean isChoiceSettingsLoadingRequired() {
+   protected boolean isTacletOptionSettingsLoadingRequired() {
       return !SymbolicExecutionUtil.isChoiceSettingInitialised();
    }
 
@@ -54,10 +54,10 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     * {@inheritDoc}
     */
    @Override
-   protected void loadChoiceSettings(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+   protected void loadTacletOptionSettings(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
       try {
          monitor.beginTask("Computing Taclet Options", IProgressMonitor.UNKNOWN);
-         loadChoiceSettings();
+         loadTacletOptionSettings();
       }
       catch (Exception e) {
          throw new InvocationTargetException(e, e.getMessage());
@@ -72,7 +72,7 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     * that {@link ChoiceSettings} are loaded.
     * @throws ProblemLoaderException
     */
-   public static void loadChoiceSettings() throws ProblemLoaderException {
+   public static void loadTacletOptionSettings() throws ProblemLoaderException {
       KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null, null);
       env.dispose();
    }
@@ -81,8 +81,8 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     * {@inheritDoc}
     */
    @Override
-   protected ChoiceSettings getChoiceSettings() {
-      return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+   protected TacletOptionSettings getTacletOptionSettings() {
+      return ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings();
    }
 
    /**

@@ -18,7 +18,7 @@ import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.settings.ProofSettings;
 
@@ -48,8 +48,8 @@ public class TacletOptionsAction extends MainWindowAction {
                             "If you wish to see the available options "
                             + "for a proof, you have to load one first."));
         } else {
-            new ChoiceSelector
-            (ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
+            new TacletOptionSelector
+            (ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings());
         }
     }
 }

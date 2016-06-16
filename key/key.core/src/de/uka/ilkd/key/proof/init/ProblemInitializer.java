@@ -424,7 +424,7 @@ public final class ProblemInitializer {
                                             InitConfig initConfig)
                 throws ProofInputException {
         //TODO: what does this actually do?
-        ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(), false);
+        ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().updateChoices(initConfig.tacletOptionNS(), false);
 
         return initConfig;
     }

@@ -19,7 +19,7 @@ import java.io.StringWriter;
 import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.NamespaceSet;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -112,7 +112,7 @@ public class TestTacletTranslator extends TestCase {
         try {
             KeYParserF p = stringTacletParser(s);
 
-            return p.taclet(DefaultImmutableSet.<Choice> nil());
+            return p.taclet(DefaultImmutableSet.<TacletOption> nil());
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

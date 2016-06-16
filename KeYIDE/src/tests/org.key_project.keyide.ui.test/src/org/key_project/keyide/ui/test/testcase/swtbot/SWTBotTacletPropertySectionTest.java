@@ -68,7 +68,7 @@ public class SWTBotTacletPropertySectionTest extends AbstractSWTBotKeYEditorProp
             SWTBotTabbedPropertyList tabs = getPropertiesTabs(propertiesView);
             assertTrue(tabs.hasTabItem("Taclet"));
             assertTrue(tabs.selectTabItem("Taclet"));
-            Map<String,String> values = node.proof().getSettings().getChoiceSettings().getDefaultChoices();
+            Map<String,String> values = node.proof().getSettings().getTacletOptionSettings().getDefaultTacletOptions();
             int i = 0;
             for (Entry<String, String> entry : values.entrySet()) {
                assertEquals(validate(entry.getKey()), propertiesView.bot().clabel(i).getText());

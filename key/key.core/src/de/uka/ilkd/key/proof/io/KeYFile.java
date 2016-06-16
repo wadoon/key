@@ -344,7 +344,7 @@ public class KeYFile implements EnvInput {
                                 initConfig.getTaclet2Builder(), 
                                 initConfig.getTaclets()); 
                 problemParser.problem(); 
-                initConfig.addCategory2DefaultChoices(problemParser.
+                initConfig.addCategory2DefaultTacletOptions(problemParser.
                         getCategory2Default());
                 ImmutableList<Taclet> st = problemParser.getTaclets();
                 initConfig.setTaclets(st);
@@ -381,7 +381,7 @@ public class KeYFile implements EnvInput {
             try { 
                 p=createDeclParser(is);
                 p.parseSorts();
-                initConfig.addCategory2DefaultChoices(p.getCategory2Default());
+                initConfig.addCategory2DefaultTacletOptions(p.getCategory2Default());
             } finally {
                 is.close();
             }

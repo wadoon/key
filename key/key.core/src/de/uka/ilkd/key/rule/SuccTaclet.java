@@ -15,7 +15,7 @@ package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -52,7 +52,7 @@ public class SuccTaclet extends FindTaclet {
 		    TacletAttributes attrs,
 		    JavaDLTerm find,
                      boolean ignoreTopLevelUpdates,
-		     ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, ImmutableSet<Choice> choices,
+		     ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, ImmutableSet<TacletOption> choices,
 		     ImmutableSet<TacletAnnotation> tacletAnnotations){
         super(name, applPart, goalTemplates, heuristics, attrs,
 	      find, prefixMap, choices, tacletAnnotations);

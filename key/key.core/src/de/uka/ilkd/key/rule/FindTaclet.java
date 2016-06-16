@@ -16,7 +16,7 @@ package de.uka.ilkd.key.rule;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -73,7 +73,7 @@ public abstract class FindTaclet extends Taclet {
                       TacletAttributes attrs,
                       JavaDLTerm find,
                       ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-                      ImmutableSet<Choice> choices,
+                      ImmutableSet<TacletOption> choices,
                       boolean surviveSymbExec,
                       ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
@@ -102,7 +102,7 @@ public abstract class FindTaclet extends Taclet {
 		      ImmutableList<RuleSet> ruleSets,
 		      TacletAttributes attrs, JavaDLTerm find,
 		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
-		      ImmutableSet<Choice> choices,
+		      ImmutableSet<TacletOption> choices,
 		      ImmutableSet<TacletAnnotation> tacletAnnotations){
 	this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
              choices, false, tacletAnnotations);

@@ -49,17 +49,17 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.TacletOptionSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-public class ChoiceSelector extends JDialog {
+public class TacletOptionSelector extends JDialog {
 
     /**
      * 
      */
     private static final long serialVersionUID = -4470713015801365801L;
     private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
-    private ChoiceSettings settings;
+    private TacletOptionSettings settings;
     private HashMap<String, String> category2DefaultChoice;
     private HashMap<String, Set<String>> category2Choices;
     private boolean changed=false;
@@ -68,26 +68,26 @@ public class ChoiceSelector extends JDialog {
     /** the JList with the categories of choices*/
     private JList<String> catList;
     /** the JList with the choices for one category */
-    private JList<ChoiceEntry> choiceList;
+    private JList<TacletOptionEntry> choiceList;
     private JTextArea explanationArea;
     private static Properties explanationMap;
 
-    /** creates a new ChoiceSelector, using the <code>ChoiceSettings</code>
+    /** creates a new TacletOptionSelector, using the <code>TacletOptionSettings</code>
      * from <code>settings</code> */
-    public ChoiceSelector(ChoiceSettings settings) {  
+    public TacletOptionSelector(TacletOptionSettings settings) {  
 	super(new JFrame(), "Taclet Base Configuration", true);
        	this.settings = settings;
-	category2DefaultChoice = settings.getDefaultChoices();
+	category2DefaultChoice = settings.getDefaultTacletOptions();
 	if(category2DefaultChoice.isEmpty()) {
 	    JOptionPane.showConfirmDialog
-		(ChoiceSelector.this,
+		(TacletOptionSelector.this,
 		 "There are no Taclet Options available as the rule-files "+
 		 "have not been parsed yet!",
 		 "No Options available", 
 		 JOptionPane.DEFAULT_OPTION);
 	    dispose();
 	} else {
-	    category2Choices = settings.getChoices();
+	    category2Choices = settings.getTacletOptions();
 	    layoutChoiceSelector();
 	    setChoiceList();
 	    pack();
@@ -97,9 +97,9 @@ public class ChoiceSelector extends JDialog {
 	}
     }
 
-    /** creates a new ChoiceSelector */
-    public ChoiceSelector(){
-	this(ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
+    /** creates a new TacletOptionSelector */
+    public TacletOptionSelector(){
+	this(ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings());
     }
 
     /** layout */
@@ -134,8 +134,8 @@ public class ChoiceSelector extends JDialog {
             choiceList.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     Object selectedValue = choiceList.getSelectedValue();
-                    if (selectedValue instanceof ChoiceEntry) {
-                       setDefaultChoice(((ChoiceEntry) selectedValue).getChoice());
+                    if (selectedValue instanceof TacletOptionEntry) {
+                       setDefaultChoice(((TacletOptionEntry) selectedValue).getTacletOption());
                     }
                     else {
                        setDefaultChoice(null);
@@ -146,7 +146,7 @@ public class ChoiceSelector extends JDialog {
                     JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             choiceScrollPane.getViewport().setView(choiceList);
-            choiceScrollPane.setBorder(new TitledBorder("Choice"));
+            choiceScrollPane.setBorder(new TitledBorder("TacletOption"));
             Dimension paneDim = new Dimension(300, 300);
             choiceScrollPane.setPreferredSize(paneDim);
             choiceScrollPane.setMinimumSize(paneDim);
@@ -170,7 +170,7 @@ public class ChoiceSelector extends JDialog {
                 public void actionPerformed(ActionEvent e) {
                     if(changed){
                         int res = JOptionPane.showOptionDialog
-                                (ChoiceSelector.this,
+                                (TacletOptionSelector.this,
                                         "Your changes will become effective when "+
                                                 "the next problem is loaded.\n", 
                                                 "Taclet Options", 
@@ -178,7 +178,7 @@ public class ChoiceSelector extends JDialog {
                                                 JOptionPane.QUESTION_MESSAGE, null,
                                                 new Object[]{"OK", "Cancel"}, "OK");
                         if (res==0){
-                            settings.setDefaultChoices(
+                            settings.setDefaultTacletOptions(
                                     category2DefaultChoice);
                         }
                     }
@@ -236,9 +236,9 @@ public class ChoiceSelector extends JDialog {
      */
     private void setChoiceList() {
 	String selection = (String) catList.getSelectedValue();
-	ChoiceEntry[] choices = createChoiceEntries(category2Choices.get(selection));
+	TacletOptionEntry[] choices = createTacletOptionEntries(category2Choices.get(selection));
 	choiceList.setListData(choices);
-	ChoiceEntry selectedChoice = findChoice(choices, category2DefaultChoice.get(selection));
+	TacletOptionEntry selectedChoice = findTacletOption(choices, category2DefaultChoice.get(selection));
 	choiceList.setSelectedValue(selectedChoice, false);
 	explanationArea.setBorder(BorderFactory.createTitledBorder(selection));
 	explanationArea.setText(getExplanation(selection));
@@ -257,10 +257,10 @@ public class ChoiceSelector extends JDialog {
      * @return The explanation for the given category.
      */
     public static String getExplanation(String category) {
-        synchronized (ChoiceSelector.class) {
+        synchronized (TacletOptionSelector.class) {
             if(explanationMap == null) {
                 explanationMap = new Properties();
-                InputStream is = ChoiceSelector.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
+                InputStream is = TacletOptionSelector.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
                 try {
                     if (is == null) {
                         throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
@@ -331,31 +331,31 @@ public class ChoiceSelector extends JDialog {
     }
 
     /**
-     * Searches the choice in the given {@link ChoiceEntry}s.
-     * @param choices The {@link ChoiceEntry}s to search in.
-     * @param choice The choice to search.
-     * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
+     * Searches the taclet option in the given {@link TacletOptionEntry}s.
+     * @param tacletOptions The {@link TacletOptionEntry}s to search in.
+     * @param tacletOption The taclet option to search.
+     * @return The found {@link TacletOptionEntry} for the given choice or {@code null} otherwise.
      */
-    public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
-       return ArrayUtil.search(choices, new IFilter<ChoiceEntry>() {
+    public static TacletOptionEntry findTacletOption(TacletOptionEntry[] tacletOptions, final String tacletOption) {
+       return ArrayUtil.search(tacletOptions, new IFilter<TacletOptionEntry>() {
          @Override
-         public boolean select(ChoiceEntry element) {
-            return element.getChoice().equals(choice);
+         public boolean select(TacletOptionEntry element) {
+            return element.getTacletOption().equals(tacletOption);
          }
        });
     }
 
     /**
-     * Creates {@link ChoiceEntry}s for all given choices.
-     * @param choices The choices.
-     * @return The created {@link ChoiceEntry}s.
+     * Creates {@link TacletOptionEntry}s for all given taclet options.
+     * @param tacletOptions The taclet options.
+     * @return The created {@link TacletOptionEntry}s.
      */
-    public static ChoiceEntry[] createChoiceEntries(Set<String> choices) {
-       if (choices != null) {
-          ChoiceEntry[] entries = new ChoiceEntry[choices.size()];
+    public static TacletOptionEntry[] createTacletOptionEntries(Set<String> tacletOptions) {
+       if (tacletOptions != null) {
+          TacletOptionEntry[] entries = new TacletOptionEntry[tacletOptions.size()];
           int i = 0;
-          for (String choice : choices) {
-             entries[i] = createChoiceEntry(choice);
+          for (String choice : tacletOptions) {
+             entries[i] = createTacletOptionEntry(choice);
              i++;
           }
           return entries;
@@ -366,22 +366,22 @@ public class ChoiceSelector extends JDialog {
     }
 
     /**
-     * Creates a {@link ChoiceEntry} for the given choice.
-     * @param choice The choice.
-     * @return The created {@link ChoiceEntry}.
+     * Creates a {@link TacletOptionEntry} for the given choice.
+     * @param tacletOption The choice.
+     * @return The created {@link TacletOptionEntry}.
      */
-    public static ChoiceEntry createChoiceEntry(String choice) {
-       return new ChoiceEntry(choice, 
-                              isUnsound(choice), 
-                              isIncomplete(choice), 
-                              getInformation(choice));
+    public static TacletOptionEntry createTacletOptionEntry(String tacletOption) {
+       return new TacletOptionEntry(tacletOption, 
+                              isUnsound(tacletOption), 
+                              isIncomplete(tacletOption), 
+                              getInformation(tacletOption));
     }
     
    /**
     * Represents a choice with all its meta information.
     * @author Martin Hentschel
     */
-   public static class ChoiceEntry {
+   public static class TacletOptionEntry {
       /**
        * Text shown to the user in case of incompletness.
        */
@@ -395,7 +395,7 @@ public class ChoiceSelector extends JDialog {
       /**
        * The choice.
        */
-      private final String choice;
+      private final String tacletOption;
 
       /**
        * Is unsound?
@@ -414,25 +414,25 @@ public class ChoiceSelector extends JDialog {
 
       /**
        * Constructor.
-       * @param choice The choice.
+       * @param tacletOption The taclet option.
        * @param unsound Is unsound?
        * @param incomplete Is incomplete?
        * @param information An optionally information.
        */
-      public ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
-         assert choice != null;
-         this.choice = choice;
+      public TacletOptionEntry(String tacletOption, boolean unsound, boolean incomplete, String information) {
+         assert tacletOption != null;
+         this.tacletOption = tacletOption;
          this.unsound = unsound;
          this.incomplete = incomplete;
          this.information = information;
       }
 
       /**
-       * Returns the choice.
-       * @return The choice.
+       * Returns the taclet option.
+       * @return The taclet option.
        */
-      public String getChoice() {
-         return choice;
+      public String getTacletOption() {
+         return tacletOption;
       }
 
       /**
@@ -465,7 +465,7 @@ public class ChoiceSelector extends JDialog {
       @Override
       public int hashCode() {
          int hashcode = 5;
-         hashcode = hashcode * 17 + choice.hashCode();
+         hashcode = hashcode * 17 + tacletOption.hashCode();
          hashcode = hashcode * 17 + (incomplete ? 5 : 3);
          hashcode = hashcode * 17 + (unsound ? 5 : 3);
          if (information != null) {
@@ -479,9 +479,9 @@ public class ChoiceSelector extends JDialog {
        */
       @Override
       public boolean equals(Object obj) {
-         if (obj instanceof ChoiceEntry) {
-            ChoiceEntry other = (ChoiceEntry)obj;
-            return choice.equals(other.getChoice()) &&
+         if (obj instanceof TacletOptionEntry) {
+            TacletOptionEntry other = (TacletOptionEntry)obj;
+            return tacletOption.equals(other.getTacletOption()) &&
                    incomplete == other.isIncomplete() &&
                    unsound == other.isUnsound() &&
                    ObjectUtil.equals(information, other.getInformation());
@@ -498,34 +498,34 @@ public class ChoiceSelector extends JDialog {
       public String toString() {
          if (unsound && incomplete) {
             if (information != null) {
-               return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", " + information + ")";
+               return tacletOption + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", " + information + ")";
             }
             else {
-               return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ")";
+               return tacletOption + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ")";
             }
          }
          else if (unsound) {
             if (information != null) {
-               return choice + " (" + UNSOUND_TEXT + ", " + information + ")";
+               return tacletOption + " (" + UNSOUND_TEXT + ", " + information + ")";
             }
             else {
-               return choice + " (" + UNSOUND_TEXT + ")";
+               return tacletOption + " (" + UNSOUND_TEXT + ")";
             }
          }
          else if (incomplete) {
             if (information != null) {
-               return choice + " (" + INCOMPLETE_TEXT + ", " + information + ")";
+               return tacletOption + " (" + INCOMPLETE_TEXT + ", " + information + ")";
             }
             else {
-               return choice + " (" + INCOMPLETE_TEXT + ")";
+               return tacletOption + " (" + INCOMPLETE_TEXT + ")";
             }
          }
          else {
             if (information != null) {
-               return choice + " (" + information + ")";
+               return tacletOption + " (" + information + ")";
             }
             else {
-               return choice;
+               return tacletOption;
             }
          }
       }

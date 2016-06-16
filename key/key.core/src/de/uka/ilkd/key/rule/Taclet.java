@@ -25,7 +25,7 @@ import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -108,7 +108,7 @@ public abstract class Taclet implements Rule, Named {
     private final String displayName;
     
     /** the set of taclet options for this taclet */
-    protected final ImmutableSet<Choice> choices;
+    protected final ImmutableSet<TacletOption> choices;
     
     /**
      * the <tt>if</tt> sequent of the taclet
@@ -214,7 +214,7 @@ public abstract class Taclet implements Rule, Named {
            ImmutableList<RuleSet> ruleSets,
            TacletAttributes attrs,
            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-           ImmutableSet<Choice> choices,
+           ImmutableSet<TacletOption> choices,
            boolean surviveSmbExec,
            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
@@ -265,7 +265,7 @@ public abstract class Taclet implements Rule, Named {
            ImmutableList<RuleSet> ruleSets,
            TacletAttributes attrs,
            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-           ImmutableSet<Choice> choices,
+           ImmutableSet<TacletOption> choices,
            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false, tacletAnnotations);
     }
@@ -396,7 +396,7 @@ public abstract class Taclet implements Rule, Named {
 	return goalTemplates;
     } 
 
-    public ImmutableSet<Choice> getChoices(){
+    public ImmutableSet<TacletOption> getChoices(){
 	return choices;
     }
 

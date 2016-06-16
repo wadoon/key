@@ -24,8 +24,8 @@ import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.setup.ISetupParticipant;
 
-import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.TacletOptionSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -48,7 +48,7 @@ public class TacletOptionsSetupParticipant implements ISetupParticipant {
             protected IStatus run(IProgressMonitor monitor) {
                try {
                   monitor.beginTask(jobTitle, IProgressMonitor.UNKNOWN);
-                  TacletOptionsPreferencePage.loadChoiceSettings();
+                  TacletOptionsPreferencePage.loadTacletOptionSettings();
                   monitor.done();
                   return Status.OK_STATUS;
                }
@@ -61,10 +61,10 @@ public class TacletOptionsSetupParticipant implements ISetupParticipant {
          JobUtil.waitFor(job, 500);
       }
       // Set default choice settings
-      ChoiceSettings settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-      HashMap<String,String> defaults = settings.getDefaultChoices();
+      TacletOptionSettings settings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings();
+      HashMap<String,String> defaults = settings.getDefaultTacletOptions();
       defaults.putAll(TacletOptionsPreferencePage.getDefaultTacletOptions());
-      settings.setDefaultChoices(defaults);
+      settings.setDefaultTacletOptions(defaults);
    }
 
    /**

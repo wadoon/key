@@ -79,7 +79,7 @@ public class NamespaceSet {
         this.sortNS = sortNS;
     }
 
-    public Namespace choices() {
+    public Namespace tacletOptions() {
         return choiceNS;
     }
 
@@ -93,7 +93,7 @@ public class NamespaceSet {
         sorts().add(ns.sorts());
         ruleSets().add(ns.ruleSets());
         functions().add(ns.functions());
-        choices().add(ns.choices());
+        tacletOptions().add(ns.tacletOptions());
     }
 
     public NamespaceSet copy() {
@@ -103,7 +103,7 @@ public class NamespaceSet {
         c.setFunctions(functions().copy());
         c.setVariables(variables().copy());
         c.setProgramVariables(programVariables().copy());
-        c.setChoices(choices().copy());
+        c.setChoices(tacletOptions().copy());
         return c;
     }
 
@@ -116,7 +116,7 @@ public class NamespaceSet {
         sorts().startProtocol();
         ruleSets().startProtocol();
         functions().startProtocol();
-        choices().startProtocol();
+        tacletOptions().startProtocol();
     }
 
     /**
@@ -124,7 +124,7 @@ public class NamespaceSet {
      */
     private Namespace[] asArray() {
         return new Namespace[] { variables(), programVariables(), sorts(),
-                ruleSets(), functions(), choices() };
+                ruleSets(), functions(), tacletOptions() };
     }
 
     /**
@@ -190,7 +190,7 @@ public class NamespaceSet {
         return "Sorts: " + sorts() + "\n" + "Functions: " + functions() + "\n"
                 + "Variables: " + variables() + "\n" + "ProgramVariables: "
                 + programVariables() + "\n" + "Heuristics: " + ruleSets()
-                + "\n" + "Taclet Options: " + choices() + "\n";
+                + "\n" + "Taclet Options: " + tacletOptions() + "\n";
     }
 
     public <T extends Name> boolean contains(ImmutableSet<T> names) {

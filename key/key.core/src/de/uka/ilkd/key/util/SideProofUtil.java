@@ -2,7 +2,7 @@ package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
 
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -33,12 +33,12 @@ public final class SideProofUtil {
     * required for instance during parallel usage of site proofs because
     * {@link OneStepSimplifier} has an internal state.
     * @param source The {@link Proof} to copy its {@link ProofEnvironment}.
-    * @param enableChoices The {@link Choice}s that should be changed w.r.t. those derived from {@link Proof#getInitConfig()} 
+    * @param enableChoices The {@link TacletOption}s that should be changed w.r.t. those derived from {@link Proof#getInitConfig()} 
     * @return The created {@link ProofEnvironment} which is a copy of the environment of the given {@link Proof} but with its own {@link OneStepSimplifier} instance.
     */
    @SuppressWarnings("unchecked")
 public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source, 
-        final Choice... enableChoices) {
+        final TacletOption... enableChoices) {
       assert source != null;
       assert !source.isDisposed();
       // Get required source instances
@@ -49,11 +49,11 @@ public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(fin
       // Create new InitConfig
       final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, false));
       // Set modified taclet options in which runtime exceptions are banned.      
-      ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
-      for (Choice enabled : enableChoices) {
+      ImmutableSet<TacletOption> choices = sourceInitConfig.getActivatedTacletOptions();
+      for (TacletOption enabled : enableChoices) {
           choices = activateChoice(choices, enabled);
       }
-      initConfig.setActivatedChoices(choices);
+      initConfig.setActivatedTacletOptions(choices);
       // Initialize InitConfig with settings from the original InitConfig.
       final ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
       initConfig.setSettings(clonedSettings);
@@ -80,15 +80,15 @@ public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(fin
     * removes all choices with the same category as {@code choiceToActivate} from
     * {@code choices} and adds {@link choiceToActivate} to the set
     * @param choices the currently active choices
-    * @param choiceToActivate the {@link Choice} to activate
+    * @param choiceToActivate the {@link TacletOption} to activate
     * @return the set of choices with {@code choiceToActivate} added (i.e., 
     * {@code choices.contains(choiceToActivate)} will return true) and all
     * other choices of the same category removed 
     */
-   public static ImmutableSet<Choice> activateChoice(
-           ImmutableSet<Choice> choices, Choice choiceToActivate) {
+   public static ImmutableSet<TacletOption> activateChoice(
+           ImmutableSet<TacletOption> choices, TacletOption choiceToActivate) {
        boolean alreadySet = false;
-       for (Choice choice : choices) {
+       for (TacletOption choice : choices) {
            if (choiceToActivate.equals(choice)) {
                alreadySet = true;
            } else if (choice.category().equals(choiceToActivate.category())) {

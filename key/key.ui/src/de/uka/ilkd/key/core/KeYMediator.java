@@ -168,7 +168,7 @@ public class KeYMediator {
      */
     public Namespace choice_ns() {
        NamespaceSet namespaces = namespaces();
-       return namespaces != null ? namespaces.choices() : null;
+       return namespaces != null ? namespaces.tacletOptions() : null;
     }
 
     /** returns the prog var namespace

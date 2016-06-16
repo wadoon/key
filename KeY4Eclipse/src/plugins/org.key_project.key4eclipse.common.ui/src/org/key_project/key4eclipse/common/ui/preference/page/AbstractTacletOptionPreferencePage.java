@@ -14,8 +14,11 @@
 package org.key_project.key4eclipse.common.ui.preference.page;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -37,66 +40,66 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.ButtonViewer;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
-import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector.TacletOptionEntry;
+import de.uka.ilkd.key.settings.TacletOptionSettings;
 
 /**
  * Provides a basic {@link IPreferencePage} implementation to edit
- * {@link ChoiceSettings}.
+ * {@link TacletOptionSettings}.
  * @author Martin Hentschel
  */
-public abstract class AbstractChoicePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public abstract class AbstractTacletOptionPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
    /**
-    * The {@link ChoiceSettings} to edit.
+    * The {@link TacletOptionSettings} to edit.
     */
-   private ChoiceSettings choiceSettings;
+   private TacletOptionSettings choiceSettings;
    
    /**
-    * Reference to {@link ChoiceSettings#getDefaultChoices()} of {@link #choiceSettings}.
+    * Reference to {@link TacletOptionSettings#getDefaultTacletOptions()} of {@link #choiceSettings}.
     */
-   private HashMap<String, String> category2DefaultChoice;
+   private HashMap<String, String> category2DefaultTacletOption;
    
    /**
-    * Reference to {@link ChoiceSettings#getChoices()} of {@link #choiceSettings}.
+    * Reference to {@link TacletOptionSettings#getTacletOptions()} of {@link #choiceSettings}.
     */
-   private HashMap<String, Set<String>> category2Choices;
+   private HashMap<String, Set<String>> category2TacletOptions;
    
    /**
     * Maps the category to the {@link ButtonViewer} which allows the user to change the setting.
     */
-   private Map<String, ButtonViewer> category2ChoiceViewerMapping = new HashMap<String, ButtonViewer>();
+   private Map<String, ButtonViewer> category2TacletOptionViewerMapping = new HashMap<String, ButtonViewer>();
    
    /**
     * {@inheritDoc}
     */
    @Override
    public void init(IWorkbench workbench) {
-      if (isChoiceSettingsLoadingRequired()) {
-         doLoadChoiceSettings();
+      if (isTacletOptionSettingsLoadingRequired()) {
+         doLoadTacletOptionSettings();
       }
-      choiceSettings = getChoiceSettings();
-      category2DefaultChoice = choiceSettings.getDefaultChoices();
-      category2Choices = choiceSettings.getChoices();
+      choiceSettings = getTacletOptionSettings();
+      category2DefaultTacletOption = choiceSettings.getDefaultTacletOptions();
+      category2TacletOptions = choiceSettings.getTacletOptions();
    }
    
    /**
-    * Checks if it is required to load the {@link ChoiceSettings} or
+    * Checks if it is required to load the {@link TacletOptionSettings} or
     * if they are already available.
-    * @return {@code true} load {@link ChoiceSettings}, {@code false} {@link ChoiceSettings} already available.
+    * @return {@code true} load {@link TacletOptionSettings}, {@code false} {@link TacletOptionSettings} already available.
     */
-   protected abstract boolean isChoiceSettingsLoadingRequired();
+   protected abstract boolean isTacletOptionSettingsLoadingRequired();
 
    /**
-    * Loads the {@link ChoiceSettings} if required in a different {@link Thread}
+    * Loads the {@link TacletOptionSettings} if required in a different {@link Thread}
     * and shows the progress to the user in a dialog.
     */
-   protected void doLoadChoiceSettings() {
+   protected void doLoadTacletOptionSettings() {
       try {
          PlatformUI.getWorkbench().getProgressService().run(true, false, new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-               loadChoiceSettings(monitor);
+               loadTacletOptionSettings(monitor);
             }
          });
       }
@@ -107,18 +110,18 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
    }
    
    /**
-    * Loads the {@link ChoiceSettings}.
+    * Loads the {@link TacletOptionSettings}.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws InvocationTargetException Occurred Exception.
     * @throws InterruptedException Occurred Exception.
     */
-   protected abstract void loadChoiceSettings(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException;
+   protected abstract void loadTacletOptionSettings(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException;
    
    /**
-    * Returns the {@link ChoiceSettings} to edit.
-    * @return The {@link ChoiceSettings} to edit.
+    * Returns the {@link TacletOptionSettings} to edit.
+    * @return The {@link TacletOptionSettings} to edit.
     */
-   protected abstract ChoiceSettings getChoiceSettings();
+   protected abstract TacletOptionSettings getTacletOptionSettings();
 
    /**
     * {@inheritDoc}
@@ -131,7 +134,7 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
       // Create categories viewer
       TabFolder categoriesTabFolder = new TabFolder(rootComposite, SWT.NONE);
       categoriesTabFolder.setLayoutData(new GridData(GridData.FILL_BOTH));
-      String[] categories = computeCategories(category2DefaultChoice);
+      String[] categories = computeCategories(category2DefaultTacletOption);
       for (String category : categories) {
          TabItem categoryTabItem = new TabItem(categoriesTabFolder, SWT.NONE);
          categoryTabItem.setText(category);
@@ -145,10 +148,10 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
          settingsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
          ButtonViewer settingsViewer = new ButtonViewer(settingsGroup, SWT.RADIO);
          settingsViewer.setContentProvider(ArrayContentProvider.getInstance());
-         ChoiceEntry[] choices = ChoiceSelector.createChoiceEntries(category2Choices.get(category));
+         TacletOptionEntry[] choices = TacletOptionSelector.createTacletOptionEntries(category2TacletOptions.get(category));
          settingsViewer.setInput(choices);
-         settingsViewer.setSelection(SWTUtil.createSelection(ChoiceSelector.findChoice(choices, category2DefaultChoice.get(category))));
-         category2ChoiceViewerMapping.put(category, settingsViewer);
+         settingsViewer.setSelection(SWTUtil.createSelection(TacletOptionSelector.findTacletOption(choices, category2DefaultTacletOption.get(category))));
+         category2TacletOptionViewerMapping.put(category, settingsViewer);
          
          Group explanationGroup = new Group(tabComposite, SWT.NONE);
          explanationGroup.setText("Explanation");
@@ -156,7 +159,7 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
          explanationGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
          Text explanationText = new Text(explanationGroup, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
          explanationText.setEditable(false);
-         String explanation = ChoiceSelector.getExplanation(category);
+         String explanation = TacletOptionSelector.getExplanation(category);
          SWTUtil.setText(explanationText, StringUtil.trim(explanation));
       }
       return rootComposite;
@@ -172,11 +175,11 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
 
    /**
     * Computes the categories to show.
-    * @param category2DefaultChoice The category to setting mapping.
+    * @param category2DefaultTacletOption The category to setting mapping.
     * @return The categories to show.
     */
-   protected String[] computeCategories(HashMap<String, String> category2DefaultChoice) {
-      Set<String> keys = category2DefaultChoice.keySet();
+   protected String[] computeCategories(HashMap<String, String> category2DefaultTacletOption) {
+      Set<String> keys = category2DefaultTacletOption.keySet();
       String[] cats = keys.toArray(new String[keys.size()]);
       Arrays.sort(cats);
       return cats;
@@ -190,10 +193,10 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
       Map<String, String> defaults = getDefaults();
       if (defaults != null) {
          for (Entry<String, String> entry : defaults.entrySet()) {
-            ButtonViewer viewer = category2ChoiceViewerMapping.get(entry.getKey());
+            ButtonViewer viewer = category2TacletOptionViewerMapping.get(entry.getKey());
             if (viewer != null) { // Otherwise default value for not existing choice
-               ChoiceEntry[] choices = (ChoiceEntry[])viewer.getInput();
-               viewer.setSelection(SWTUtil.createSelection(ChoiceSelector.findChoice(choices, entry.getValue())));
+               TacletOptionEntry[] choices = (TacletOptionEntry[])viewer.getInput();
+               viewer.setSelection(SWTUtil.createSelection(TacletOptionSelector.findTacletOption(choices, entry.getValue())));
             }
          }
       }
@@ -224,17 +227,17 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
    }
    
    /**
-    * Applies the values defined by the user in the UI to the edited {@link ChoiceSettings}.
+    * Applies the values defined by the user in the UI to the edited {@link TacletOptionSettings}.
     */
    protected void applyChanges() {
-      Set<Entry<String, ButtonViewer>> entries = category2ChoiceViewerMapping.entrySet();
+      Set<Entry<String, ButtonViewer>> entries = category2TacletOptionViewerMapping.entrySet();
       for (Entry<String, ButtonViewer> entry : entries) {
          ISelection selection = entry.getValue().getSelection();
          Object selectedElement = SWTUtil.getFirstElement(selection);
-         if (selectedElement instanceof ChoiceEntry) {
-            category2DefaultChoice.put(entry.getKey(), ((ChoiceEntry)selectedElement).getChoice());
+         if (selectedElement instanceof TacletOptionEntry) {
+            category2DefaultTacletOption.put(entry.getKey(), ((TacletOptionEntry)selectedElement).getTacletOption());
          }
       }
-      choiceSettings.setDefaultChoices(category2DefaultChoice);
+      choiceSettings.setDefaultTacletOptions(category2DefaultTacletOption);
    }
 }

@@ -9,7 +9,7 @@ import java.util.Vector;
 
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -331,7 +331,7 @@ public abstract class AbstractTestGenerator {
    
    protected Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
       ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof,
-              new Choice("ban", "runtimeExceptions"));
+              new TacletOption("ban", "runtimeExceptions"));
       ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, newName);
       Proof proof = starter.getProof();
       proof.getServices().getSpecificationRepository().registerProof(proof.getServices().getSpecificationRepository().getProofOblInput(oldProof), proof);

@@ -830,7 +830,7 @@ public class ProofManager {
       JavaProfile profile = new JavaProfile();
       // Create new InitConfig and initialize it with value from initial one.
       InitConfig initConfig = new InitConfig(environment.getServices().copy(profile, false));
-      initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
+      initConfig.setActivatedTacletOptions(sourceInitConfig.getActivatedTacletOptions());
       ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
       initConfig.setSettings(clonedSettings);
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());

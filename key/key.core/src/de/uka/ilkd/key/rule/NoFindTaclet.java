@@ -16,7 +16,7 @@ package de.uka.ilkd.key.rule;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -50,7 +50,7 @@ public class NoFindTaclet extends Taclet {
             ImmutableList<RuleSet> ruleSets, 
             TacletAttributes attrs,
             ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
-            ImmutableSet<Choice> choices, ImmutableSet<TacletAnnotation> tacletAnnotations){
+            ImmutableSet<TacletOption> choices, ImmutableSet<TacletAnnotation> tacletAnnotations){
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, 
                 choices, tacletAnnotations);
         createTacletServices();

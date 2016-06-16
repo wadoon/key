@@ -54,7 +54,7 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
             int rows = 0;
 			int columns = 0;
 			for (final String choice : currentProof.getSettings().
-                    getChoiceSettings().getDefaultChoices().values()) {
+                    getTacletOptionSettings().getDefaultTacletOptions().values()) {
 				message += choice + "\n";
 				rows++;
 				if (columns < choice.length()) {

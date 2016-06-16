@@ -27,13 +27,13 @@ import java.util.StringTokenizer;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-public class ChoiceSettings implements Settings, Cloneable {
+public class TacletOptionSettings implements Settings, Cloneable {
 
-    private static final String DEFAULTCHOICES_KEY = "[Choice]DefaultChoices";
+    private static final String DEFAULTCHOICES_KEY = "[TacletOption]DefaultChoices";
     private LinkedList<SettingsListener> listenerList 
     	= new LinkedList<SettingsListener>();
     private HashMap<String,String> category2Default;
@@ -45,17 +45,17 @@ public class ChoiceSettings implements Settings, Cloneable {
     	= new LinkedHashMap<String, Set<String>>();
 
 
-    public ChoiceSettings() {
+    public TacletOptionSettings() {
 	category2Default = new LinkedHashMap<String, String>();
     }
 
     
-    public ChoiceSettings(HashMap<String, String> category2Default){
+    public TacletOptionSettings(HashMap<String, String> category2Default){
 	this.category2Default = category2Default;
     }
 
     
-    public void setDefaultChoices(HashMap<String, String> category2Default){
+    public void setDefaultTacletOptions(HashMap<String, String> category2Default){
 	HashMap<String, String> category2Defaultold = this.category2Default;
 	this.category2Default = category2Default;
 	if(category2Defaultold != null && 
@@ -68,7 +68,7 @@ public class ChoiceSettings implements Settings, Cloneable {
     /** returns a copy of the HashMap that maps categories to 
      * their choices. */ 
     @SuppressWarnings("unchecked")
-    public HashMap<String, Set<String>> getChoices(){
+    public HashMap<String, Set<String>> getTacletOptions(){
         return (HashMap<String, Set<String>>) category2Choices.clone();
     }
 
@@ -76,7 +76,7 @@ public class ChoiceSettings implements Settings, Cloneable {
     /** returns a copy of the HashMap that maps categories to 
      * their default choices. */ 
     @SuppressWarnings("unchecked")
-    public HashMap<String,String> getDefaultChoices(){
+    public HashMap<String,String> getDefaultTacletOptions(){
 	return (HashMap<String,String>) category2Default.clone();
     }
     
@@ -84,16 +84,16 @@ public class ChoiceSettings implements Settings, Cloneable {
     /** 
      * returns the current selected choices as set    
      */ 
-    public ImmutableSet<Choice> getDefaultChoicesAsSet() {              
+    public ImmutableSet<TacletOption> getDefaultTacletOptionsAsSet() {              
         return choiceMap2choiceSet(category2Default);   
     }
     
 
-    private ImmutableSet<Choice> choiceMap2choiceSet(HashMap<String, String> ccc) {
-        ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil();        
+    private ImmutableSet<TacletOption> choiceMap2choiceSet(HashMap<String, String> ccc) {
+        ImmutableSet<TacletOption> choices = DefaultImmutableSet.<TacletOption>nil();        
         for (final Map.Entry<String,String> entry : ccc.entrySet()) {
             choices = choices.
-              add(new Choice(new Name(entry.getValue()), entry.getKey()));
+              add(new TacletOption(new Name(entry.getValue()), entry.getKey()));
         }
         return choices;
     }
@@ -106,10 +106,10 @@ public class ChoiceSettings implements Settings, Cloneable {
     public void updateChoices(Namespace choiceNS, boolean remove){
 	Iterator<Named> it = choiceNS.allElements().iterator();
 	HashMap<String,Set<String>> c2C = new LinkedHashMap<String, Set<String>>();
-	Choice c;
+	TacletOption c;
 	Set<String> soc;
 	while(it.hasNext()){
-	    c=(Choice)it.next();
+	    c=(TacletOption)it.next();
 	    if(c2C.containsKey(c.category())){
 		soc=c2C.get(c.category());
 		soc.add(c.name().toString());
@@ -129,7 +129,7 @@ public class ChoiceSettings implements Settings, Cloneable {
 		ProofSettings.DEFAULT_SETTINGS.saveSettings();
 	    }
 	}
-	for (final String s : getDefaultChoices().keySet()) {
+	for (final String s : getDefaultTacletOptions().keySet()) {
 	    if(category2Choices.containsKey(s)){
 		if(!category2Choices.get(s).
 		   contains(category2Default.get(s))){
@@ -196,8 +196,8 @@ public class ChoiceSettings implements Settings, Cloneable {
     }
     
     
-    public ChoiceSettings updateWith(ImmutableSet<Choice> sc) {
-        for (final Choice c : sc) {
+    public TacletOptionSettings updateWith(ImmutableSet<TacletOption> sc) {
+        for (final TacletOption c : sc) {
             if (category2Default.containsKey(c.category())) {
                 category2Default.remove(c.category());
             }

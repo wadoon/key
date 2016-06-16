@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -32,15 +32,7 @@ import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.NotFreeIn;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletAnnotation;
-import de.uka.ilkd.key.rule.TacletAttributes;
-import de.uka.ilkd.key.rule.Trigger;
-import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.*;
 
 /** 
  * abstract taclet builder class to be inherited from taclet builders
@@ -65,8 +57,8 @@ public abstract class TacletBuilder<T extends Taclet> {
     /** List of additional generic conditions on the instantiations of
      * schema variables. */
     protected ImmutableList<VariableCondition> variableConditions       = ImmutableSLList.<VariableCondition>nil(); 
-    protected HashMap<TacletGoalTemplate, ImmutableSet<Choice>> goal2Choices          = null;
-    protected ImmutableSet<Choice> choices           = DefaultImmutableSet.<Choice>nil();
+    protected HashMap<TacletGoalTemplate, ImmutableSet<TacletOption>> goal2TacletOptions          = null;
+    protected ImmutableSet<TacletOption> choices           = DefaultImmutableSet.<TacletOption>nil();
     protected ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
 
     public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -150,25 +142,25 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     /**
-     * adds a mapping from GoalTemplate <code>gt</code> to SetOf<Choice> 
+     * adds a mapping from GoalTemplate <code>gt</code> to SetOf<TacletOption> 
      * <code>soc</code>
      */
-    public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ImmutableSet<Choice> soc){
-	if(goal2Choices==null){
-	    goal2Choices = new LinkedHashMap<TacletGoalTemplate, ImmutableSet<Choice>>();
+    public void addGoal2TacletOptionsMapping(TacletGoalTemplate gt, ImmutableSet<TacletOption> soc){
+	if(goal2TacletOptions==null){
+	    goal2TacletOptions = new LinkedHashMap<TacletGoalTemplate, ImmutableSet<TacletOption>>();
 	}
-	goal2Choices.put(gt, soc);
+	goal2TacletOptions.put(gt, soc);
     }
 	
-    public HashMap<TacletGoalTemplate, ImmutableSet<Choice>> getGoal2Choices(){
-	return goal2Choices;
+    public HashMap<TacletGoalTemplate, ImmutableSet<TacletOption>> getGoal2TacletOptions(){
+	return goal2TacletOptions;
     }
 
-    public void setChoices(ImmutableSet<Choice> choices){
+    public void setTacletOptions(ImmutableSet<TacletOption> choices){
 	this.choices = choices;
     }
 
-    public ImmutableSet<Choice> getChoices(){
+    public ImmutableSet<TacletOption> getTacletOptions(){
 	return choices;
     }
 
@@ -313,8 +305,8 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     public abstract T getTaclet();
 
-    public T getTacletWithoutInactiveGoalTemplates(ImmutableSet<Choice> active){
-       if(goal2Choices==null || goals.isEmpty()){
+    public T getTacletWithoutInactiveGoalTemplates(ImmutableSet<TacletOption> active){
+       if(goal2TacletOptions==null || goals.isEmpty()){
           return getTaclet();
        }else{
           ImmutableList<TacletGoalTemplate> oldGoals = goals;
@@ -322,8 +314,8 @@ public abstract class TacletBuilder<T extends Taclet> {
           T result;
           while(it.hasNext()){
              TacletGoalTemplate goal = it.next();
-             if(goal2Choices.get(goal) != null && 
-                   !goal2Choices.get(goal).subset(active)){
+             if(goal2TacletOptions.get(goal) != null && 
+                   !goal2TacletOptions.get(goal).subset(active)){
                 goals = goals.removeAll(goal);
              }
           }

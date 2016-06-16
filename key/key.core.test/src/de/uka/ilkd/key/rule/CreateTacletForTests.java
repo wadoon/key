@@ -27,7 +27,7 @@ import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -396,7 +396,7 @@ public class CreateTacletForTests extends TestCase {
    	try {
 	    KeYParserF p = stringTacletParser(s);
 	    
-	    return p.taclet(DefaultImmutableSet.<Choice>nil());
+	    return p.taclet(DefaultImmutableSet.<TacletOption>nil());
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);

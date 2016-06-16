@@ -977,7 +977,7 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     public final static boolean isOn() {
         final String setting =
-                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
+                ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().getDefaultTacletOptions().get(OPTION);
         if (setting.equals(OPTION + ":on")) {
             return true;
         } else if (setting.equals(OPTION + ":off")) {

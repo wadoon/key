@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -118,7 +118,7 @@ public class RewriteTaclet extends FindTaclet {
 			 JavaDLTerm                      find,
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_applicationRestriction,
-			 ImmutableSet<Choice> choices,
+			 ImmutableSet<TacletOption> choices,
 			 ImmutableSet<TacletAnnotation> tacletAnnotations){
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
              p_applicationRestriction, choices, false,
@@ -132,7 +132,7 @@ public class RewriteTaclet extends FindTaclet {
 			 JavaDLTerm                      find,
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_applicationRestriction,
-			 ImmutableSet<Choice> choices,
+			 ImmutableSet<TacletOption> choices,
              boolean surviveSymbExec,
              ImmutableSet<TacletAnnotation> tacletAnnotations){
 	super(name, applPart, goalTemplates, ruleSets, attrs,

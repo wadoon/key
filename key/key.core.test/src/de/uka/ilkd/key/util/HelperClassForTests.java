@@ -51,7 +51,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.TacletOptionSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
@@ -169,7 +169,7 @@ public class HelperClassForTests {
      */
     public static HashMap<String, String> setDefaultTacletOptions(String baseDir,
                                                                   String javaPathInBaseDir) throws ProblemLoaderException, ProofInputException {
-       if (!ProofSettings.isChoiceSettingInitialised()) {
+       if (!ProofSettings.isTacletOptionSettingInitialised()) {
           // Make sure that required files exists
           File javaFile = new File(baseDir, javaPathInBaseDir);
           Assert.assertTrue(javaFile.exists());
@@ -204,7 +204,7 @@ public class HelperClassForTests {
     public static HashMap<String, String> setDefaultTacletOptionsForTarget(File javaFile,
                                                                            String containerTypeName,
                                                                            final String targetName) throws ProblemLoaderException, ProofInputException {
-       if (!ProofSettings.isChoiceSettingInitialised()) {
+       if (!ProofSettings.isTacletOptionSettingInitialised()) {
           KeYEnvironment<?> environment = null;
           Proof proof = null;
           try {
@@ -247,15 +247,15 @@ public class HelperClassForTests {
      * @return The original settings which are overwritten.
      */
     public static HashMap<String, String> setDefaultTacletOptions() {
-       Assert.assertTrue(ProofSettings.isChoiceSettingInitialised());
+       Assert.assertTrue(ProofSettings.isTacletOptionSettingInitialised());
        // Set default taclet options
-       ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-       HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
+       TacletOptionSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings();
+       HashMap<String, String> oldSettings = choiceSettings.getDefaultTacletOptions();
        HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
        newSettings.putAll(MiscTools.getDefaultTacletOptions());
-       choiceSettings.setDefaultChoices(newSettings);
+       choiceSettings.setDefaultTacletOptions(newSettings);
        // Make sure that default taclet options are set
-       HashMap<String, String> updatedChoiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+       HashMap<String, String> updatedChoiceSettings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().getDefaultTacletOptions();
        for (Entry<String, String> entry : newSettings.entrySet()) {
           Assert.assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
        }
@@ -268,10 +268,10 @@ public class HelperClassForTests {
      */
     public static void restoreTacletOptions(HashMap<String, String> options) {
        if (options != null) {
-          Assert.assertTrue(ProofSettings.isChoiceSettingInitialised());
-          ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(options);
+          Assert.assertTrue(ProofSettings.isTacletOptionSettingInitialised());
+          ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().setDefaultTacletOptions(options);
           // Make sure that taclet options are restored
-          HashMap<String, String> updatedChoiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+          HashMap<String, String> updatedChoiceSettings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().getDefaultTacletOptions();
           for (Entry<String, String> entry : options.entrySet()) {
              Assert.assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
           }

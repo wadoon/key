@@ -106,8 +106,8 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector.TacletOptionEntry;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
@@ -870,10 +870,10 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                sb.append("<li><a href=\"#UnspecifiedMethods\">Unspecified Methods</a></li>" + StringUtil.NEW_LINE);
             }
             if (!status.unsoundTacletOptions.isEmpty()) {
-               sb.append("<li><a href=\"#TacletOptionsUnsound\">" + ChoiceEntry.UNSOUND_TEXT + " Taclet Options</a></li>" + StringUtil.NEW_LINE);
+               sb.append("<li><a href=\"#TacletOptionsUnsound\">" + TacletOptionEntry.UNSOUND_TEXT + " Taclet Options</a></li>" + StringUtil.NEW_LINE);
             }
             if (!status.incomplelteTacletOptions.isEmpty()) {
-               sb.append("<li><a href=\"#TacletOptionsIncomplete\">" + ChoiceEntry.INCOMPLETE_TEXT  + " Taclet Options</a></li>" + StringUtil.NEW_LINE);
+               sb.append("<li><a href=\"#TacletOptionsIncomplete\">" + TacletOptionEntry.INCOMPLETE_TEXT  + " Taclet Options</a></li>" + StringUtil.NEW_LINE);
             }
             if (!status.informationTacletOptions.isEmpty()) {
                sb.append("<li><a href=\"#TacletOptionsInformation\">Taclet Options with additional Information</a></li>" + StringUtil.NEW_LINE);
@@ -948,13 +948,13 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             }
             // Add unsound taclet options
             if (!status.unsoundTacletOptions.isEmpty()) {
-               sb.append("<h1><a name=\"TacletOptionsUnsound\">" + ChoiceEntry.UNSOUND_TEXT + " Taclet Options</a></h1>" + StringUtil.NEW_LINE);
-               sb.append("Proofs using a listed taclet options are " + ChoiceEntry.UNSOUND_TEXT + ":" + StringUtil.NEW_LINE);
+               sb.append("<h1><a name=\"TacletOptionsUnsound\">" + TacletOptionEntry.UNSOUND_TEXT + " Taclet Options</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("Proofs using a listed taclet options are " + TacletOptionEntry.UNSOUND_TEXT + ":" + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
                SWTUtil.checkCanceled(monitor);
                for (Entry<String, List<IFile>> entry : status.unsoundTacletOptions.entrySet()) {
                   sb.append("<li>" + StringUtil.NEW_LINE);
-                  sb.append(ChoiceSelector.createChoiceEntry(entry.getKey()) + StringUtil.NEW_LINE);
+                  sb.append(TacletOptionSelector.createTacletOptionEntry(entry.getKey()) + StringUtil.NEW_LINE);
                   sb.append("<ul>" + StringUtil.NEW_LINE);
                   for (IFile usedByFile : entry.getValue()) {
                      SWTUtil.checkCanceled(monitor);
@@ -969,13 +969,13 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             }
             // Add incomplete taclet options
             if (!status.incomplelteTacletOptions.isEmpty()) {
-               sb.append("<h1><a name=\"TacletOptionsIncomplete\">" + ChoiceEntry.INCOMPLETE_TEXT + " Taclet Options</a></h1>" + StringUtil.NEW_LINE);
-               sb.append("Proofs using a listed taclet options are " + ChoiceEntry.INCOMPLETE_TEXT + ":" + StringUtil.NEW_LINE);
+               sb.append("<h1><a name=\"TacletOptionsIncomplete\">" + TacletOptionEntry.INCOMPLETE_TEXT + " Taclet Options</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("Proofs using a listed taclet options are " + TacletOptionEntry.INCOMPLETE_TEXT + ":" + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
                for (Entry<String, List<IFile>> entry : status.incomplelteTacletOptions.entrySet()) {
                   SWTUtil.checkCanceled(monitor);
                   sb.append("<li>" + StringUtil.NEW_LINE);
-                  sb.append(ChoiceSelector.createChoiceEntry(entry.getKey()) + StringUtil.NEW_LINE);
+                  sb.append(TacletOptionSelector.createTacletOptionEntry(entry.getKey()) + StringUtil.NEW_LINE);
                   sb.append("<ul>" + StringUtil.NEW_LINE);
                   for (IFile usedByFile : entry.getValue()) {
                      SWTUtil.checkCanceled(monitor);
@@ -996,7 +996,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                for (Entry<String, List<IFile>> entry : status.informationTacletOptions.entrySet()) {
                   SWTUtil.checkCanceled(monitor);
                   sb.append("<li>" + StringUtil.NEW_LINE);
-                  sb.append(ChoiceSelector.createChoiceEntry(entry.getKey()) + StringUtil.NEW_LINE);
+                  sb.append(TacletOptionSelector.createTacletOptionEntry(entry.getKey()) + StringUtil.NEW_LINE);
                   sb.append("<ul>" + StringUtil.NEW_LINE);
                   for (IFile usedByFile : entry.getValue()) {
                      SWTUtil.checkCanceled(monitor);
@@ -1207,27 +1207,27 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             // Taclet options
             TacletOptionIssues issues = contractInfo.checkTaletOptions();
             if (issues != null) {
-               for (String choice : issues.getUnsoundOptions()) {
-                  List<IFile> list = status.unsoundTacletOptions.get(choice);
+               for (String tacletOption : issues.getUnsoundOptions()) {
+                  List<IFile> list = status.unsoundTacletOptions.get(tacletOption);
                   if (list == null) {
                      list = new LinkedList<IFile>();
-                     status.unsoundTacletOptions.put(choice, list);
+                     status.unsoundTacletOptions.put(tacletOption, list);
                   }
                   list.add(contractInfo.getProofFile());
                }
-               for (String choice : issues.getIncompleteOptions()) {
-                  List<IFile> list = status.incomplelteTacletOptions.get(choice);
+               for (String tacletOption : issues.getIncompleteOptions()) {
+                  List<IFile> list = status.incomplelteTacletOptions.get(tacletOption);
                   if (list == null) {
                      list = new LinkedList<IFile>();
-                     status.incomplelteTacletOptions.put(choice, list);
+                     status.incomplelteTacletOptions.put(tacletOption, list);
                   }
                   list.add(contractInfo.getProofFile());
                }
-               for (String choice : issues.getInformationOptions()) {
-                  List<IFile> list = status.informationTacletOptions.get(choice);
+               for (String tacletOption : issues.getInformationOptions()) {
+                  List<IFile> list = status.informationTacletOptions.get(tacletOption);
                   if (list == null) {
                      list = new LinkedList<IFile>();
-                     status.informationTacletOptions.put(choice, list);
+                     status.informationTacletOptions.put(tacletOption, list);
                   }
                   list.add(contractInfo.getProofFile());
                }

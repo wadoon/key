@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.TacletOptionSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -40,16 +40,16 @@ public class Main {
       List<File> includes = null; // Optionally: Additional includes to consider
       try {
          // Ensure that Taclets are parsed
-         if (!ProofSettings.isChoiceSettingInitialised()) {
+         if (!ProofSettings.isTacletOptionSettingInitialised()) {
             KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath, includes);
             env.dispose();
          }
          // Set Taclet options
-         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-         HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
+         TacletOptionSettings tacletOptionSettings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings();
+         HashMap<String, String> oldSettings = tacletOptionSettings.getDefaultTacletOptions();
          HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
          newSettings.putAll(MiscTools.getDefaultTacletOptions());
-         choiceSettings.setDefaultChoices(newSettings);
+         tacletOptionSettings.setDefaultTacletOptions(newSettings);
          // Load source code
          KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath, includes); // env.getLoadedProof() returns performed proof if a *.proof file is loaded
          try {

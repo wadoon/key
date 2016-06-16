@@ -19,7 +19,7 @@ import java.util.Properties;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -209,7 +209,7 @@ public abstract class AbstractPO implements IPersistablePO {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
                         + axiom.getName();
                 // only include if choices are appropriate
-                if (choicesApply(axiomTaclet, proofConfig.getActivatedChoices())) {
+                if (choicesApply(axiomTaclet, proofConfig.getActivatedTacletOptions())) {
                     register(axiomTaclet, proofConfig);
                 }
             }
@@ -219,8 +219,8 @@ public abstract class AbstractPO implements IPersistablePO {
     /** Check whether a taclet conforms with the currently active choices.
      * I.e., whether the taclet's given choices is a subset of <code>choices</code>.
      */
-    private boolean choicesApply (Taclet taclet, ImmutableSet<Choice> choices) {
-        for (Choice tacletChoices: taclet.getChoices())
+    private boolean choicesApply (Taclet taclet, ImmutableSet<TacletOption> choices) {
+        for (TacletOption tacletChoices: taclet.getChoices())
             if (!choices.contains(tacletChoices)) return false;
         return true;
     }

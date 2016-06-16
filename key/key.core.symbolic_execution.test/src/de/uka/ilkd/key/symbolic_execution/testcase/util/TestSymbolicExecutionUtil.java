@@ -118,7 +118,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
       try {
          assertTrue(SymbolicExecutionUtil.isChoiceSettingInitialised());
          // Store default choice settings
-         HashMap<String, String> defaultSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+         HashMap<String, String> defaultSettings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().getDefaultTacletOptions();
          assertFalse(defaultSettings.isEmpty());
          // Test initial value
          originalValue = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
@@ -128,7 +128,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
          assertEquals(newValue, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Make sure that all other settings are unchanged.
-         HashMap<String, String> changedSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+         HashMap<String, String> changedSettings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().getDefaultTacletOptions();
          defaultSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
          assertEquals(defaultSettings, changedSettings);
       }

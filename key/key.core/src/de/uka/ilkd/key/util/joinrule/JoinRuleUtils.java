@@ -35,7 +35,7 @@ import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -1412,7 +1412,7 @@ public class JoinRuleUtils {
         final ProofEnvironment sideProofEnv = SideProofUtil
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(
                         services.getProof(), // Parent Proof
-                        new Choice[] {}); // useSimplifyTermProfile
+                        new TacletOption[] {}); // useSimplifyTermProfile
 
         ApplyStrategyInfo proofResult = null;
         try {

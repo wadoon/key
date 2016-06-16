@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -16,10 +16,10 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public class RuleKey {
    public final Name name;
-   public final ImmutableSet<Choice> choices;
+   public final ImmutableSet<TacletOption> choices;
    public final Rule r;
 
-   RuleKey(Name name, ImmutableSet<Choice> choices, Rule r) {
+   RuleKey(Name name, ImmutableSet<TacletOption> choices, Rule r) {
       this.name = name;
       this.choices = choices;
       this.r = r;
@@ -27,7 +27,7 @@ public class RuleKey {
 
    public RuleKey(Rule r) {
       this(r.name(), (r instanceof Taclet ? ((Taclet) r).getChoices()
-            : DefaultImmutableSet.<Choice> nil()), r);
+            : DefaultImmutableSet.<TacletOption> nil()), r);
    }
 
    public boolean equals(Object o) {

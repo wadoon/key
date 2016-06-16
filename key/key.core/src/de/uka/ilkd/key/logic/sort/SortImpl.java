@@ -28,7 +28,7 @@ public final class SortImpl extends AbstractSort {
     /**
      * Any is a supersort of all sorts.
      */
-    public final static Sort ANY = new Sort.SpecialSort(new Name("any"));
+    public final static Sort ANY = new SortImpl(new Name("any"));
 
     public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         super(name, ext, isAbstract);

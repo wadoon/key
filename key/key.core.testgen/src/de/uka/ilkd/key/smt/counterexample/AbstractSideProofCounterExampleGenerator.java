@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.smt.counterexample;
 
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.Sequent;
@@ -23,7 +23,7 @@ public abstract class AbstractSideProofCounterExampleGenerator extends AbstractC
    protected Proof createProof(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent, String proofName) throws ProofInputException {
       Sequent newSequent = createNewSequent(oldSequent);
       ProofEnvironment env = 
-              SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof, new Choice("ban", "runtimeExceptions"));
+              SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof, new TacletOption("ban", "runtimeExceptions"));
       ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, proofName);
       Proof proof = starter.getProof();
       OneStepSimplifier.refreshOSS(proof);

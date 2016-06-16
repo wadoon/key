@@ -28,10 +28,10 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
-import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector.TacletOptionEntry;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.TacletOptionSettings;
 
 /**
  * SWTBot tests for {@link TacletOptionsPreferencePage}.
@@ -63,17 +63,17 @@ public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase
     */
    protected void doTestShownValuesAndModification(boolean approve) throws Exception{
       // Make sure that runtime options are available
-      if (!ProofSettings.isChoiceSettingInitialised()) {
-         TacletOptionsPreferencePage.loadChoiceSettings();
+      if (!ProofSettings.isTacletOptionSettingInitialised()) {
+         TacletOptionsPreferencePage.loadTacletOptionSettings();
       }
-      assertTrue(ProofSettings.isChoiceSettingInitialised());
+      assertTrue(ProofSettings.isTacletOptionSettingInitialised());
       // Get original settings
-      ChoiceSettings oldSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+      TacletOptionSettings oldSettings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings();
       assertNotNull(oldSettings);
-      HashMap<String, String> oldDefaultChoices = oldSettings.getDefaultChoices();
+      HashMap<String, String> oldDefaultChoices = oldSettings.getDefaultTacletOptions();
       assertNotNull(oldDefaultChoices);
       assertTrue(!oldDefaultChoices.isEmpty());
-      Map<String, Set<String>> oldChoices = oldSettings.getChoices();
+      Map<String, Set<String>> oldChoices = oldSettings.getTacletOptions();
       assertNotNull(oldChoices);
       assertTrue(!oldChoices.isEmpty());
       SWTBotShell preferenceShell = null;
@@ -119,9 +119,9 @@ public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase
             preferenceShell.bot().button("Cancel").click();
          }
          // Test current values
-         ChoiceSettings newSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+         TacletOptionSettings newSettings = ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings();
          assertNotNull(oldSettings);
-         Map<String, String> newDefaultChoices = newSettings.getDefaultChoices();
+         Map<String, String> newDefaultChoices = newSettings.getDefaultTacletOptions();
          assertNotNull(oldDefaultChoices);
          assertTrue(!oldDefaultChoices.isEmpty());
          Set<Entry<String, String>> newDefaultChoiceEntries = newDefaultChoices.entrySet();
@@ -142,7 +142,7 @@ public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase
       }
       finally {
          // Restore preferences
-         oldSettings.setDefaultChoices(oldDefaultChoices);
+         oldSettings.setDefaultTacletOptions(oldDefaultChoices);
          // Close preference dialog
          if (preferenceShell != null && preferenceShell.isOpen()) {
             preferenceShell.close();
@@ -157,8 +157,8 @@ public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase
     */
    protected String getChoice(SWTBotRadio radio) {
       Object data = TestUtilsUtil.getData(radio);
-      assertTrue(data instanceof ChoiceEntry);
-      return ((ChoiceEntry) data).getChoice();
+      assertTrue(data instanceof TacletOptionEntry);
+      return ((TacletOptionEntry) data).getTacletOption();
    }
 
    /**
@@ -167,6 +167,6 @@ public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase
     * @return The shown text.
     */
    protected String toDisplayText(String choice) {
-      return ChoiceSelector.createChoiceEntry(choice).toString();
+      return TacletOptionSelector.createTacletOptionEntry(choice).toString();
    }
 }

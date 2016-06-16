@@ -36,8 +36,8 @@ import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 import org.key_project.key4eclipse.resources.ui.util.ResourcesUiImages;
 import org.key_project.util.java.CollectionUtil;
 
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector.TacletOptionEntry;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 /**
@@ -292,19 +292,19 @@ public class ProjectInfoLabelProvider extends ColumnLabelProvider {
                   if (sb.length() >= 1) {
                      sb.append("\n");
                   }
-                  sb.append("- " + value + ": " + ChoiceEntry.UNSOUND_TEXT);
+                  sb.append("- " + value + ": " + TacletOptionEntry.UNSOUND_TEXT);
                }
                for (String value : tacletIssues.getIncompleteOptions()) {
                   if (sb.length() >= 1) {
                      sb.append("\n");
                   }
-                  sb.append("- " + value + ": " + ChoiceEntry.INCOMPLETE_TEXT);
+                  sb.append("- " + value + ": " + TacletOptionEntry.INCOMPLETE_TEXT);
                }
                for (String value : tacletIssues.getInformationOptions()) {
                   if (sb.length() >= 1) {
                      sb.append("\n");
                   }
-                  sb.append("- " + value + ": " + ChoiceSelector.getInformation(value));
+                  sb.append("- " + value + ": " + TacletOptionSelector.getInformation(value));
                }
             }
             return sb.length() == 0 ? null : sb.toString();

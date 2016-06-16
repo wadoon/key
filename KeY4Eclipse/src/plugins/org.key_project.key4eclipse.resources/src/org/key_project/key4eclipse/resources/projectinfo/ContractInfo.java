@@ -13,7 +13,7 @@ import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.KeYFile;
@@ -197,15 +197,15 @@ public class ContractInfo {
             List<String> unsoundTacletOptions = new LinkedList<String>();
             List<String> incompleteTacletOptions = new LinkedList<String>();
             List<String> informationTacletOptions = new LinkedList<String>();
-            Map<String,String> choices = settings.getChoiceSettings().getDefaultChoices();
+            Map<String,String> choices = settings.getTacletOptionSettings().getDefaultTacletOptions();
             for (String value : choices.values()) {
-               if (ChoiceSelector.isUnsound(value)) {
+               if (TacletOptionSelector.isUnsound(value)) {
                   unsoundTacletOptions.add(value);
                }
-               if (ChoiceSelector.isIncomplete(value)) {
+               if (TacletOptionSelector.isIncomplete(value)) {
                   incompleteTacletOptions.add(value);
                }
-               if (ChoiceSelector.getInformation(value) != null) {
+               if (TacletOptionSelector.getInformation(value) != null) {
                   informationTacletOptions.add(value);
                }
             }

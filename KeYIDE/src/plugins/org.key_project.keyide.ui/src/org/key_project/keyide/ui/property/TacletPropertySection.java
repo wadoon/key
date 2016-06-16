@@ -18,7 +18,7 @@ import java.util.Map.Entry;
 
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
+import de.uka.ilkd.key.gui.configuration.TacletOptionSelector;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -37,9 +37,9 @@ public class TacletPropertySection extends AbstractKeyValueNodePropertySection {
       // Show new values
       if (node != null) {
          Proof proof = node.proof();
-         Map<String,String> values = proof.getSettings().getChoiceSettings().getDefaultChoices();
+         Map<String,String> values = proof.getSettings().getTacletOptionSettings().getDefaultTacletOptions();
          for (Entry<String, String> entry : values.entrySet()) {
-            String tooltip = ChoiceSelector.getExplanation(entry.getKey());
+            String tooltip = TacletOptionSelector.getExplanation(entry.getKey());
             tooltip = StringUtil.trim(tooltip);
             showText(entry.getKey(), entry.getValue(), tooltip);
          }

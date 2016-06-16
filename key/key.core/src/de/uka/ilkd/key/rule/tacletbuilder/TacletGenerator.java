@@ -33,7 +33,7 @@ import org.key_project.common.core.logic.op.ParsableVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.rule.Choice;
+import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -222,13 +222,13 @@ public class TacletGenerator {
                                               findTerm);
         
         // choices, rule set
-        Choice choice = new Choice(satisfiabilityGuard? "showSatisfiability" : "treatAsAxiom", "modelFields");
+        TacletOption tacletOption = new TacletOption(satisfiabilityGuard? "showSatisfiability" : "treatAsAxiom", "modelFields");
         final RuleSet ruleSet = new RuleSet(new Name(
                 satisfiabilityGuard? "inReachableStateImplication" : "classAxiom"));
 
         //create taclet
         tacletBuilder.setName(tacletName);
-        tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(choice));
+        tacletBuilder.setTacletOptions(DefaultImmutableSet.<TacletOption>nil().add(tacletOption));
         tacletBuilder.setFind(findTerm);
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, selfSV);
@@ -392,9 +392,9 @@ public class TacletGenerator {
                 tacletBuilder.addVarsNotFreeIn(boundSV, paramSV);
             }
         }
-        Choice c = new Choice(satisfiability? "showSatisfiability" : "treatAsAxiom",
+        TacletOption tacletOption = new TacletOption(satisfiability? "showSatisfiability" : "treatAsAxiom",
                 "modelFields");
-        tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(c));
+        tacletBuilder.setTacletOptions(DefaultImmutableSet.<TacletOption>nil().add(tacletOption));
 
         if (satisfiability)
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs,

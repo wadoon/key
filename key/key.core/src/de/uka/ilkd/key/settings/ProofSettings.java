@@ -85,7 +85,7 @@ public class ProofSettings {
 	settings = new Settings[] {
             new StrategySettings(),
           //  new GeneralSettings(),
-	    new ChoiceSettings(),
+	    new TacletOptionSettings(),
 	    ProofDependentSMTSettings.getDefaultSettingsData(),
 	 //   new ViewSettings()
 	};
@@ -226,15 +226,15 @@ public class ProofSettings {
         return (StrategySettings) settings[STRATEGY_SETTINGS];
     }
 
-    /** returns the ChoiceSettings object
-     * @return the ChoiceSettings object
+    /** returns the TacletOptionSettings object
+     * @return the TacletOptionSettings object
      */
-    public ChoiceSettings getChoiceSettings() {
+    public TacletOptionSettings getTacletOptionSettings() {
             ensureInitialized();
-            return (ChoiceSettings) settings[CHOICE_SETTINGS];
+            return (TacletOptionSettings) settings[CHOICE_SETTINGS];
     }
 
-    public ProofSettings setChoiceSettings(ChoiceSettings cs) {
+    public ProofSettings setTacletOptionSettings(TacletOptionSettings cs) {
             settings[CHOICE_SETTINGS] = cs;
             return this;
     }
@@ -278,9 +278,9 @@ public class ProofSettings {
      * Checks if the choice settings are initialized.
      * @return {@code true} settings are initialized, {@code false} settings are not initialized.
      */
-    public static boolean isChoiceSettingInitialised() {
-       return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
-    }
+    public static boolean isTacletOptionSettingInitialised() {
+        return !ProofSettings.DEFAULT_SETTINGS.getTacletOptionSettings().getTacletOptions().isEmpty();
+     }
 
     /**
      * Update the proof settings according to the entries on the properties.

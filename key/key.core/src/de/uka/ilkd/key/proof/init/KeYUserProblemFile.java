@@ -80,7 +80,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             throw new IllegalStateException("InitConfig not set.");
         }	
         
-        //read activated choices
+        //read activated taclet options
         KeYParserF problemParser = null;
         try {
 
@@ -95,11 +95,11 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                         pc, pc, null, null);
             problemParser.parseWith();            
         
-            settings.getChoiceSettings()
-                    .updateWith(problemParser.getActivatedChoices());           
+            settings.getTacletOptionSettings()
+                    .updateWith(problemParser.getActivatedTacletOptions());           
             
-            initConfig.setActivatedChoices(settings.getChoiceSettings()
-        	      		                   .getDefaultChoicesAsSet());
+            initConfig.setActivatedTacletOptions(settings.getTacletOptionSettings()
+        	      		                   .getDefaultTacletOptionsAsSet());
             
         } catch(RecognitionException e) {
             // problemParser cannot be null here

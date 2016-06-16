@@ -57,10 +57,12 @@ options {
   import org.key_project.common.core.logic.Name;
   import org.key_project.common.core.logic.Named;
   import org.key_project.common.core.logic.Namespace;
+  import org.key_project.common.core.logic.NamespaceSet;
   import org.key_project.common.core.logic.calculus.*;
   import org.key_project.common.core.logic.label.TermLabel;
   import org.key_project.common.core.logic.op.*;
   import org.key_project.common.core.logic.sort.Sort;
+  import org.key_project.common.core.rule.TacletOption;
   import org.key_project.util.collection.*;
 
   import de.uka.ilkd.key.java.*;
@@ -136,8 +138,8 @@ options {
    private NamespaceSet nss;
    private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
    private boolean onlyWith=false;
-   private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
-   private HashSet usedChoiceCategories = new LinkedHashSet();
+   private ImmutableSet<TacletOption> activatedTacletOptions = DefaultImmutableSet.<TacletOption>nil();
+   private HashSet usedTacletOptionCategories = new LinkedHashSet();
    private HashMap taclet2Builder;
    private AbbrevMap scm;
    
@@ -331,7 +333,7 @@ options {
                                       "No file. KeYParser.parseTaclet(\n" + s + ")\n"),
                               services,
                               services.getNamespaces());
-	    return p.taclet(DefaultImmutableSet.<Choice>nil(), false);
+	    return p.taclet(DefaultImmutableSet.<TacletOption>nil(), false);
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -386,8 +388,8 @@ options {
         throw ex;
     }
 
-    public ImmutableSet<Choice> getActivatedChoices(){
-        return activatedChoices;
+    public ImmutableSet<TacletOption> getActivatedTacletOptions(){
+        return activatedTacletOptions;
     }
     
     public Includes getIncludes(){
@@ -439,8 +441,8 @@ options {
         return namespaces().programVariables();
     }
 
-    private Namespace choices(){
-        return namespaces().choices();
+    private Namespace tacletOptions(){
+        return namespaces().tacletOptions();
     }
 
     public ImmutableList<Taclet> getTaclets(){
@@ -695,8 +697,8 @@ options {
       problem();
     }
 
-    public Taclet taclet(ImmutableSet<Choice> choices) throws RecognitionException {
-       return taclet(choices, false);
+    public Taclet taclet(ImmutableSet<TacletOption> tacletOptions) throws RecognitionException {
+       return taclet(tacletOptions, false);
     }
 
     private void schema_var_decl(String name, 
@@ -1311,7 +1313,7 @@ options {
                                  Sequent addSeq,
                                  ImmutableList<Taclet> addRList,
                                  ImmutableSet<SchemaVariable> pvs,
-                                 ImmutableSet<Choice> soc) 
+                                 ImmutableSet<TacletOption> soc) 
         throws RecognitionException/*SemanticException*/
         {
             TacletGoalTemplate gt = null;
@@ -1356,7 +1358,7 @@ options {
             }
             gt.setName(id); 
             b.addTacletGoalTemplate(gt);
-            if(soc != null) b.addGoal2ChoicesMapping(gt,soc);
+            if(soc != null) b.addGoal2TacletOptionsMapping(gt,soc);
         }
      
     public void testLiteral(String l1, String l2)
@@ -1557,7 +1559,7 @@ top : a=formula {
 decls : 
         (one_include_statement)* {
            if(parse_includes) return;
-           activatedChoices = DefaultImmutableSet.<Choice>nil();  
+           activatedTacletOptions = DefaultImmutableSet.<TacletOption>nil();  
 	}
         (options_choice)? 
         (
@@ -1609,19 +1611,19 @@ options_choice
 
 activated_choice @init{
     String name;
-    Choice c;
+    TacletOption c;
 }:
         cat=IDENT COLON choice_=IDENT
-        {if(usedChoiceCategories.contains(cat.getText())){
+        {if(usedTacletOptionCategories.contains(cat.getText())){
             throw new IllegalArgumentException("You have already chosen a different option for "+cat.getText());
         }
-        usedChoiceCategories.add(cat.getText());
+        usedTacletOptionCategories.add(cat.getText());
         name = cat.getText()+":"+choice_.getText();
-        c = (Choice) choices().lookup(new Name(name));
+        c = (TacletOption) tacletOptions().lookup(new Name(name));
         if(c==null){
             throw new NotDeclException(input, "Option", choice_.getText());
         }else{
-            activatedChoices=activatedChoices.add(c);
+            activatedTacletOptions=activatedTacletOptions.add(c);
         }
         }
     ;
@@ -1637,8 +1639,8 @@ choice @init{
         category=IDENT {cat=category.getText();} (COLON LBRACE choice_option[cat] (COMMA choice_option[cat])* RBRACE)? 
         {
             if(!category2Default.containsKey(cat)){
-                choices().add(new Choice("On",cat));
-                choices().add(new Choice("Off",cat)); 
+                tacletOptions().add(new TacletOption("On",cat));
+                tacletOptions().add(new TacletOption("Off",cat)); 
                 category2Default.put(cat, cat+":On");               
             }
         }
@@ -1648,10 +1650,10 @@ choice_option[String cat]@init{
     String name;
 }:
         choice_=IDENT { name=cat+":"+choice_.getText();
-        Choice c = (Choice) choices().lookup(new Name(name));
+        TacletOption c = (TacletOption) tacletOptions().lookup(new Name(name));
         if(c==null){
-            c = new Choice(choice_.getText(),cat);
-            choices().add(c);
+            c = new TacletOption(choice_.getText(),cat);
+            tacletOptions().add(c);
         }
             if(!category2Default.containsKey(cat)){
                 category2Default.put(cat, name);
@@ -3635,7 +3637,7 @@ triggers[TacletBuilder b]
    }
 ;
 
-taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r] 
+taclet[ImmutableSet<TacletOption> choices, boolean axiomMode] returns [Taclet r] 
 @init{ 
     ifSeq = SequentFactory.instance().nil();
     TacletBuilder b = null;
@@ -3659,7 +3661,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
            DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.<SchemaVariable>nil();
            addGoalTemplate(b, null, null, addSeq, noTaclets, noSV, null);
            b.setName(new Name(name.getText()));
-           b.setChoices(choices_);
+           b.setTacletOptions(choices_);
            b.setAnnotations(tacletAnnotations);
            r = b.getTaclet(); 
            taclet2Builder.put(r,b);
@@ -3689,7 +3691,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         goalspecs[b, find != null]
         modifiers[b]
         { 
-            b.setChoices(choices_);
+            b.setTacletOptions(choices_);
             b.setAnnotations(tacletAnnotations);
             r = b.getTaclet(); 
             taclet2Builder.put(r,b);
@@ -4257,7 +4259,7 @@ goalspecs[TacletBuilder b, boolean ruleWithFind] :
 
 goalspecwithoption[TacletBuilder b, boolean ruleWithFind]
 @init{
-    soc = DefaultImmutableSet.<Choice>nil();
+    soc = DefaultImmutableSet.<TacletOption>nil();
 } :
         (( soc = option_list[soc]
                 LBRACE
@@ -4268,18 +4270,18 @@ goalspecwithoption[TacletBuilder b, boolean ruleWithFind]
         )
     ;
 
-option returns [Choice c=null]
+option returns [TacletOption c=null]
 :
         cat=IDENT COLON choice_=IDENT
         {
-            c = (Choice) choices().lookup(new Name(cat.getText()+":"+choice_.getText()));
+            c = (TacletOption) tacletOptions().lookup(new Name(cat.getText()+":"+choice_.getText()));
             if(c==null) {
                 throw new NotDeclException(input, "Option", choice_.getText());
 	    }
         }
     ;
     
-option_list[ImmutableSet<Choice> soc] returns [ImmutableSet<Choice> result = null]
+option_list[ImmutableSet<TacletOption> soc] returns [ImmutableSet<TacletOption> result = null]
 :
 LPAREN {result = soc; } 
   c = option {result = result.add(c);}
@@ -4287,7 +4289,7 @@ LPAREN {result = soc; }
 RPAREN
 ;
 
-goalspec[TacletBuilder b, ImmutableSet<Choice> soc, boolean ruleWithFind] 
+goalspec[TacletBuilder b, ImmutableSet<TacletOption> soc, boolean ruleWithFind] 
 @init{
     addSeq = SequentFactory.instance().nil();
     addRList = ImmutableSLList.<Taclet>nil();
@@ -4335,7 +4337,7 @@ tacletlist returns [ImmutableList<Taclet> _taclet_list]
 }
 @after{ _taclet_list = lor; }
     :
-        head=taclet[DefaultImmutableSet.<Choice>nil(), false]   
+        head=taclet[DefaultImmutableSet.<TacletOption>nil(), false]   
         ( /*empty*/ | COMMA lor=tacletlist) { lor = lor.prepend(head); }
     ;
 
@@ -4479,7 +4481,7 @@ problem returns [ JavaDLTerm _problem = null ]
 @init {
     boolean axiomMode = false;
     int beginPos = 0;
-    choices=DefaultImmutableSet.<Choice>nil();
+    choices=DefaultImmutableSet.<TacletOption>nil();
     chooseContract = this.chooseContract;
     proofObligation = this.proofObligation;
 }
@@ -4536,7 +4538,7 @@ problem returns [ JavaDLTerm _problem = null ]
                         }
                 }
             )*
-            RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
+            RBRACE {choices=DefaultImmutableSet.<TacletOption>nil();}
         ) *
 
         { if(input.index() == 0) {
