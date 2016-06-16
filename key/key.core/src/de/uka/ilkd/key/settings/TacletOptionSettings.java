@@ -33,7 +33,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 public class TacletOptionSettings implements Settings, Cloneable {
 
-    private static final String DEFAULTCHOICES_KEY = "[TacletOption]DefaultChoices";
+    private static final String DEFAULTCHOICES_KEY = "[Choice]DefaultChoices";
     private LinkedList<SettingsListener> listenerList 
     	= new LinkedList<SettingsListener>();
     private HashMap<String,String> category2Default;
