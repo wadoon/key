@@ -18,7 +18,6 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.CCNameAbstractionTable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -57,7 +56,7 @@ import org.key_project.util.collection.ImmutableSet;
  * "JavaTerm" or the like; from this class here, the java specific methods
  * have been removed.
  */
-public interface CCTerm<S, N extends CCNameAbstractionTable<S>, V extends CCVisitor<S, N, V, T>, T extends CCTerm<S, N, V, T>>
+public interface CCTerm<S, V extends CCVisitor<S, V, T>, T extends CCTerm<S, V, T>>
         extends SVSubstitute, Sorted {
 
     /** 
@@ -75,7 +74,7 @@ public interface CCTerm<S, N extends CCNameAbstractionTable<S>, V extends CCVisi
     /**
      * The modal content 
      */
-    public ModalContent<S,N> modalContent();
+    public ModalContent<S> modalContent();
 
     /**
      * Checks if the {@link ModalContent} or one of its direct or indirect children

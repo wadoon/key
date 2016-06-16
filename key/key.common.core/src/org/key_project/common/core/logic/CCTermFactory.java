@@ -5,7 +5,7 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
-public interface CCTermFactory<P extends ModalContent<?, ?>, T extends CCTerm<?, ?, ?, T>> {
+public interface CCTermFactory<P extends ModalContent<?>, T extends CCTerm<?, ?, T>> {
     
     /**
      * Master method for term creation. Should be the only place where terms are
