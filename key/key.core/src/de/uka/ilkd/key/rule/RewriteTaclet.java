@@ -21,12 +21,12 @@ import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;
+import org.key_project.common.core.rule.Choice;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;

@@ -23,6 +23,7 @@ import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.rule.Choice;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 

@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.util.BooleanContainer;
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
@@ -24,7 +25,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.SingletonIterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;

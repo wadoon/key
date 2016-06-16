@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.rule;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
@@ -55,7 +55,6 @@ public class Choice implements Named {
 	return category == c.category && name.equals(c.name);
 	    
     }
-
     
     @Override
     public int hashCode() {

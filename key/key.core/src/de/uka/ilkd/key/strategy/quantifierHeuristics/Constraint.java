@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import org.key_project.common.core.util.BooleanContainer;
+
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 
 /**

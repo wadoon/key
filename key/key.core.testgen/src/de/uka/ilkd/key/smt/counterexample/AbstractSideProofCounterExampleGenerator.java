@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.smt.counterexample;
 
+import org.key_project.common.core.rule.Choice;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;

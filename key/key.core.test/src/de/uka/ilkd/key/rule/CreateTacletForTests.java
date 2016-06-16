@@ -27,6 +27,7 @@ import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.rule.Choice;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 

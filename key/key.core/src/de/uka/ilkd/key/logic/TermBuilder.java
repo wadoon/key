@@ -643,7 +643,6 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, JavaDLTerm> {
             JavaDLTerm range,
             JavaDLTerm t,
             TermServices services) {
-        @SuppressWarnings("deprecation")
         final Function prod =
                 (Function) services.getNamespaces().functions().lookup("prod");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
@@ -666,7 +665,6 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, JavaDLTerm> {
             JavaDLTerm range,
             JavaDLTerm t,
             TermServices services) {
-        @SuppressWarnings("deprecation")
         final Function min =
                 (Function) services.getNamespaces().functions().lookup("min");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
@@ -689,7 +687,6 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, JavaDLTerm> {
             JavaDLTerm range,
             JavaDLTerm t,
             TermServices services) {
-        @SuppressWarnings("deprecation")
         final Function max =
                 (Function) services.getNamespaces().functions().lookup("max");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
@@ -2538,7 +2535,6 @@ public JavaDLTerm orPreserveLabels(JavaDLTerm t1, JavaDLTerm t2) {
     // information flow operators
     //-------------------------------------------------------------------------
 
-    @SuppressWarnings("deprecation")
     @Override
     public JavaDLTerm eqAtLocs(TermServices services,
                          JavaDLTerm heap1,
@@ -2554,7 +2550,6 @@ public JavaDLTerm orPreserveLabels(JavaDLTerm t1, JavaDLTerm t2) {
     }
 
 
-    @SuppressWarnings("deprecation")
     @Override
     public JavaDLTerm eqAtLocsPost(TermServices services,
                              JavaDLTerm heap1_pre,

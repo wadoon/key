@@ -9,10 +9,10 @@ import java.util.Vector;
 
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
+import org.key_project.common.core.rule.Choice;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.Semisequent;
