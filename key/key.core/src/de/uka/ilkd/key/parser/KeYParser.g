@@ -3735,15 +3735,17 @@ termorseq returns [Object o]
                 } else {
                     // A sequent with only head in the antecedent.
                     Semisequent ant = Semisequent.nil();
-                    ant = ant.insertFirst(
-                                          new SequentFormula(head)).semisequent();
+                    GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> ci =
+                                 ant.insertFirst(new SequentFormula(head));
+                    ant = ci.semisequent();
                     o = Sequent.createSequent(ant,ss);
                 }
             } else {
                 // A sequent.  Prepend head to the antecedent.
                 Semisequent newAnt = s.antecedent();
-                newAnt = newAnt .insertFirst(
-                                             new SequentFormula(head)).semisequent();
+                GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> ci =
+                            newAnt.insertFirst(new SequentFormula(head));
+                newAnt = ci.semisequent();
                 o = Sequent.createSequent(newAnt,s.succedent());
             }
         }
@@ -3763,7 +3765,9 @@ semisequent returns [Semisequent _semi_sequent]
         /* empty */ | 
         head=term ( COMMA ss=semisequent) ? 
         { 
-          ss = ss.insertFirst(new SequentFormula(head)).semisequent(); 
+             GenericSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> ci =
+                    ss.insertFirst(new SequentFormula(head));
+             ss = ci.semisequent(); 
         }
     ;
 
