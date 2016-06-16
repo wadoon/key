@@ -25,6 +25,8 @@ import org.key_project.util.collection.ImmutableList;
 public class Semisequent extends
         GenericSemisequent<SequentFormula<JavaDLTerm>, Semisequent> implements
         Iterable<SequentFormula<JavaDLTerm>> {
+    
+    private static final Semisequent EMPTY = new Semisequent();
 
     /**
      * TODO: Document.
@@ -44,6 +46,14 @@ public class Semisequent extends
         super(seqList);
     }
 
+    /**
+     * TODO: Document.
+     *
+     */
+    public Semisequent() {
+        super();
+    }
+
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.logic.GenericSemisequent#createSemisequentChangeInfo(org.key_project.util.collection.ImmutableList)
      */
@@ -53,8 +63,7 @@ public class Semisequent extends
         return new SemisequentChangeInfo(formulas);
     }
 
-    @SuppressWarnings("unchecked")
     public static Semisequent nil() {
-        return GenericSemisequent.<SequentFormula<JavaDLTerm>, Semisequent>nil();
+        return EMPTY;
     }
 }

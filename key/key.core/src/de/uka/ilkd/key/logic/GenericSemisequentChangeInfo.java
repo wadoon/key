@@ -221,14 +221,7 @@ public abstract class GenericSemisequentChangeInfo<SeqFor extends SequentFormula
      * returns the semisequent that is the result of the change operation
      */
     public SemiSeq semisequent() {
-        final SemiSeq semisequent;
-        if (modifiedSemisequent.isEmpty()) {
-            semisequent = GenericSemisequent.<SeqFor, SemiSeq> nil();
-        }
-        else {
-            semisequent = createSemisequent(modifiedSemisequent);
-        }
-        return semisequent;
+        return createSemisequent(modifiedSemisequent);
     }
 
     /**

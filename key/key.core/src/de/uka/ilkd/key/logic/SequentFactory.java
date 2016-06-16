@@ -13,9 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.calculus.SequentFormula;
-
-
 /**
  * TODO: Document.
  *
@@ -48,7 +45,7 @@ public class SequentFactory extends AbstractSequentFactory<Semisequent, Sequent>
             return nil();
         }
         
-        return createSequent(ante, GenericSemisequent.<SequentFormula<JavaDLTerm>, Semisequent>nil());
+        return createSequent(ante, Semisequent.nil());
     }
 
     /**
@@ -79,7 +76,7 @@ public class SequentFactory extends AbstractSequentFactory<Semisequent, Sequent>
             return nil();
         }
         
-        return createSequent(GenericSemisequent.<SequentFormula<JavaDLTerm>, Semisequent>nil(), succ);
+        return createSequent(Semisequent.nil(), succ);
     }
 
     /* (non-Javadoc)

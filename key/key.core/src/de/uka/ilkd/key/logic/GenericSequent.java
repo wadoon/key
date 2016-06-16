@@ -53,20 +53,8 @@ public abstract class GenericSequent<T extends GenericTerm<?, ?, ?, T>, SeqFor e
             Seq composeSequent,
             Seq genericSequent);
 
-    /**
-     * must only be called by NILSequent
-     *
-     */
-    protected GenericSequent() {
-        antecedent =
-                GenericSemisequent.<SeqFor, SemiSeq> nil();
-        succedent =
-                GenericSemisequent.<SeqFor, SemiSeq> nil();
-    }
-
     /** creates new GenericSequent<T, SeqFor> with antecedence and succedence */
     protected GenericSequent(SemiSeq antecedent, SemiSeq succedent) {
-        assert !antecedent.isEmpty() || !succedent.isEmpty();
         this.antecedent = antecedent;
         this.succedent = succedent;
     }
