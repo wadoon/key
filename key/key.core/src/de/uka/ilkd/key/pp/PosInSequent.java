@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.pp;
 
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 
 /**
  * describes a position in a sequent including the bounds within a string

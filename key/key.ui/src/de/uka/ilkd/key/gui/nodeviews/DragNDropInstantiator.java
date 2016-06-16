@@ -29,6 +29,8 @@ import java.util.List;
 
 import javax.swing.JPopupMenu;
 
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
+import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
@@ -38,8 +40,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.FindTaclet;

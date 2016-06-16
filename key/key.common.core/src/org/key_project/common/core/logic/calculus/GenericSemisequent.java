@@ -1,9 +1,8 @@
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic.calculus;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -34,7 +33,7 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>, SemiS
      * exactly the same as when creating the sequent by subsequently inserting
      * all formulas
      */
-    GenericSemisequent(ImmutableList<SeqFor> seqList) {
+    protected GenericSemisequent(ImmutableList<SeqFor> seqList) {
         assert !seqList.isEmpty();
         this.seqList = seqList;
     }
@@ -474,10 +473,11 @@ public abstract class GenericSemisequent<SeqFor extends SequentFormula<?>, SemiS
         return seqList;
     }
 
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
-        if (!(o instanceof Semisequent))
+        if (!(o instanceof GenericSemisequent))
             return false;
-        return seqList.equals(((Semisequent) o).seqList);
+        return seqList.equals(((GenericSemisequent<SeqFor, SemiSeq>) o).seqList);
     }
 
     public int hashCode() {

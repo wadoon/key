@@ -4,28 +4,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.*;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.collection.Pair;
@@ -36,11 +22,7 @@ import de.uka.ilkd.key.gui.smt.InformationWindow;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.SolverListener.InternSMTProblem;
 import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.model.Heap;
-import de.uka.ilkd.key.smt.model.LocationSet;
-import de.uka.ilkd.key.smt.model.Model;
-import de.uka.ilkd.key.smt.model.ObjectVal;
-import de.uka.ilkd.key.smt.model.Sequence;
+import de.uka.ilkd.key.smt.model.*;
 
 /**
  * A {@link PropertyPage} which shows the result of an {@link InternSMTProblem}.

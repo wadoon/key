@@ -13,11 +13,7 @@
 
 package org.key_project.key4eclipse.common.ui.wizard;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,11 +31,7 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.ResourceUtil.IFileOpener;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.*;
 
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.ExampleChooser.Example;

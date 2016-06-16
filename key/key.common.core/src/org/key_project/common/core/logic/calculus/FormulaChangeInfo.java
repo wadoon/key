@@ -1,6 +1,5 @@
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic.calculus;
 
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 /**
  * This class is used to hold information about modified formulas.

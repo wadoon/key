@@ -14,11 +14,7 @@
 package org.key_project.key4eclipse.common.ui.util;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
-import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
-import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
-import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
-import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
+import org.key_project.key4eclipse.common.ui.starter.*;
 import org.key_project.util.collection.ImmutableList;
 
 /**

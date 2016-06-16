@@ -19,6 +19,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
 import org.eclipse.ui.IPageLayout;
+import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 

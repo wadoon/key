@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.PIOPathIterator;
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
@@ -26,8 +28,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;

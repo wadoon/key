@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
@@ -20,7 +21,6 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;

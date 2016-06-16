@@ -16,6 +16,7 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.key_project.common.core.logic.calculus.GenericSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;

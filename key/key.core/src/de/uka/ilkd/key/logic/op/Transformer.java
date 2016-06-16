@@ -15,6 +15,8 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.calculus.PIOPathIterator;
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Operator;
@@ -23,8 +25,6 @@ import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level

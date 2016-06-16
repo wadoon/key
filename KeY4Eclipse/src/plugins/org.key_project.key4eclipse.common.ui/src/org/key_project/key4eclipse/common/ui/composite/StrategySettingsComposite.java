@@ -13,11 +13,7 @@
 
 package org.key_project.key4eclipse.common.ui.composite;
 
-import java.util.EventObject;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.eclipse.swt.SWT;

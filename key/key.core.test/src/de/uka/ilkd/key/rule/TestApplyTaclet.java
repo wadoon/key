@@ -18,6 +18,8 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
+import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.op.SchemaVariable;
@@ -30,8 +32,6 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;

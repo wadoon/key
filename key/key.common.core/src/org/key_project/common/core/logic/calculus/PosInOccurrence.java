@@ -11,10 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic.calculus;
 
 import org.key_project.common.core.logic.GenericTerm;
-import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.IntIterator;
 
 /**
  * This class describes a position in an occurrence of a term. A
@@ -159,7 +159,7 @@ public final class PosInOccurrence<T extends GenericTerm<?,?,?,T>, SeqFor extend
     }
 
     public boolean isTopLevel () {
-	return posInTerm == PosInTerm.<JavaDLTerm>getTopLevel();
+	return posInTerm == PosInTerm.<T>getTopLevel();
     }
 
     /**

@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.proof.proofevent;
 
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 
 
 /** Information about a formula that has been added or removed from a

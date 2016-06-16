@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.visitor;
 
+import org.key_project.common.core.logic.IntIterator;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -24,7 +25,6 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.SynchronizedBlock;
 import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 

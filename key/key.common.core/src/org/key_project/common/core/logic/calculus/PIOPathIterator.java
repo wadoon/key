@@ -11,10 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic.calculus;
 
 import org.key_project.common.core.logic.GenericTerm;
-import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.IntIterator;
 
 /**
  * This interface represents an iterator, iterating the nodes on the

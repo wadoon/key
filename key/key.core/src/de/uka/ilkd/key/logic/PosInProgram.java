@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.IntIterator;
+
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 

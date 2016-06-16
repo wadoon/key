@@ -13,33 +13,18 @@
 
 package org.key_project.key4eclipse.common.ui.preference.page;
 
-import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.ComboFieldEditor;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.PreferenceDialog;
-import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.preference.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
-import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
-import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
-import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
-import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
+import org.key_project.key4eclipse.common.ui.starter.*;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;

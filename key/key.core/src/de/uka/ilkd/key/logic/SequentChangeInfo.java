@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.calculus.GenericSequentChangeInfo;
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 /**

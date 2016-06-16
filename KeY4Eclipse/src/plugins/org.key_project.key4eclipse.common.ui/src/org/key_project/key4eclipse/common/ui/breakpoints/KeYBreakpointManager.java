@@ -24,11 +24,7 @@ import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.internal.debug.core.breakpoints.JavaClassPrepareBreakpoint;
-import org.eclipse.jdt.internal.debug.core.breakpoints.JavaExceptionBreakpoint;
-import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
-import org.eclipse.jdt.internal.debug.core.breakpoints.JavaMethodBreakpoint;
-import org.eclipse.jdt.internal.debug.core.breakpoints.JavaWatchpoint;
+import org.eclipse.jdt.internal.debug.core.breakpoints.*;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.jdt.JDTUtil;
 

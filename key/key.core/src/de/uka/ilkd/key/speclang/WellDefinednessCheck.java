@@ -817,10 +817,9 @@ public abstract class WellDefinednessCheck implements Contract {
     final void setAssignable(JavaDLTerm ass, JavaDLTermServices services) {
         this.assignable = ass;
         if (TB.strictlyNothing().equals(ass) || TB.FALSE().equals(ass)
-                || ass == null || ass.op() == BooleanLiteral.FALSE) {
+                || ass == null || ass.equals(services.getTermBuilder().ff())) {
             this.assignable = TB.strictlyNothing();
-        } else if (TB.tt().equals(ass) || TB.TRUE().equals(ass)
-                || ass.op().equals(BooleanLiteral.TRUE)) {
+        } else if (TB.tt().equals(ass) || TB.TRUE().equals(ass)) {
             this.assignable = TB.allLocs();
         }
     }

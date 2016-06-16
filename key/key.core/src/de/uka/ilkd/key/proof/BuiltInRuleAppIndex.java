@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
-import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.calculus.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

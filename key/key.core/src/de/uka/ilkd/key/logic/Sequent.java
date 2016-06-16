@@ -15,6 +15,9 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.calculus.AbstractSequentFactory;
+import org.key_project.common.core.logic.calculus.GenericSemisequentChangeInfo;
+import org.key_project.common.core.logic.calculus.GenericSequent;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableSLList;

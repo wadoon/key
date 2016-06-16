@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 
 public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
     

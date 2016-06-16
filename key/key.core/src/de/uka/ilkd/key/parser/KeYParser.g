@@ -57,7 +57,7 @@ options {
   import org.key_project.common.core.logic.Name;
   import org.key_project.common.core.logic.Named;
   import org.key_project.common.core.logic.Namespace;
-  import org.key_project.common.core.logic.calculus.SequentFormula;
+  import org.key_project.common.core.logic.calculus.*;
   import org.key_project.common.core.logic.label.TermLabel;
   import org.key_project.common.core.logic.op.*;
   import org.key_project.common.core.logic.sort.Sort;

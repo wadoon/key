@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.calculus.AbstractSequentFactory;
+
 /**
  * TODO: Document.
  *

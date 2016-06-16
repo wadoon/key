@@ -16,11 +16,11 @@ package de.uka.ilkd.key.proof.io.intermediate;
 import java.util.LinkedList;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInTerm;
 
 /**
  * Encapsulates intermediate information for constructing a taclet application.

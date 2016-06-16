@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule.executor.javadl;
 
+import org.key_project.common.core.logic.calculus.GenericSequentChangeInfo;
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;

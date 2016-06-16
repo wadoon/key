@@ -15,11 +15,7 @@ package org.key_project.key4eclipse.common.ui.util;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.key_project.key4eclipse.common.ui.Activator;
-import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
-import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
-import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
-import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
-import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
+import org.key_project.key4eclipse.common.ui.starter.*;
 
 /**
  * Provides utility methods to edit the starter preferences.

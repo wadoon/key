@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.sort.Sort;
@@ -23,7 +24,6 @@ import org.key_project.util.LRUCache;
 import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
