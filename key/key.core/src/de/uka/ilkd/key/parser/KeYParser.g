@@ -1124,8 +1124,7 @@ options {
             String baseName = varfunc_name.substring(separatorIndex + 2);
             Sort sort = lookupSort(sortName);
             SortDependingFunction firstInstance 
-            	= SortDependingFunction.getFirstInstance(new Name(baseName), 
-            					         getServices());
+            	= getServices().getFirstInstance(new Name(baseName));
                         
             if(sort != null && firstInstance != null) {
                 v = firstInstance.getInstanceFor(sort, getServices());
@@ -2047,7 +2046,8 @@ pred_decl
 		    	    		new Name(baseName),
 		    	    		Sort.FORMULA,
 		    	    		argSorts,
-		    	    		false);
+		    	    		false, 
+		    	    		SortImpl.ANY);
 		    }
 	        }
             
@@ -2142,7 +2142,8 @@ func_decl
 		    	    		new Name(baseName),
 		    	    		retSort,
 		    	    		argSorts,
-		    	    		unique);
+		    	    		unique,
+		    	    		SortImpl.ANY);
 		    }
 	        }
 	        

@@ -368,7 +368,7 @@ public final class HeapLDT extends LDT {
 	    final Name kind = new Name(name.toString().substring(index + 2));
 	    
 	    SortDependingFunction firstInstance 
-		= SortDependingFunction.getFirstInstance(kind, services);
+		= services.getFirstInstance(kind);
 	    if(firstInstance != null) {
 		Sort sortDependingOn = fieldPV.getContainerType().getSort();		
 		result = firstInstance.getInstanceFor(sortDependingOn, services);

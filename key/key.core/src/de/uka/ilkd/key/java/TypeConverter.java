@@ -569,7 +569,7 @@ public final class TypeConverter {
             if (function instanceof SortDependingFunction) {
                 SortDependingFunction sdf = (SortDependingFunction) function;
                 SortDependingFunction castFunction =
-                        SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
+                        services.getFirstInstance(Sort.CAST_NAME);
                 if(sdf.isSimilar(castFunction)) {
                     Sort s = sdf.getSortDependingOn();
                     KeYJavaType kjt = services.getProgramServices().getJavaInfo().getKeYJavaType(s);

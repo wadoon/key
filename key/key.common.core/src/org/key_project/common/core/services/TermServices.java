@@ -16,6 +16,8 @@ package org.key_project.common.core.services;
 import org.key_project.common.core.logic.CCNamespaceSet;
 import org.key_project.common.core.logic.CCTermBuilder;
 import org.key_project.common.core.logic.CCTermFactory;
+import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 
 /**
  * This interface defines the basic functionalities of services
@@ -49,4 +51,6 @@ public interface TermServices {
      */
     public abstract <TF extends CCTermFactory<?, ?>> TF getTermFactory();
 
+    
+    public abstract SortDependingFunction getFirstInstance(Name kind);
 }

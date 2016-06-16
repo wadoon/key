@@ -20,7 +20,9 @@ import java.util.Map.Entry;
 import org.key_project.common.core.logic.CCTermBuilder;
 import org.key_project.common.core.logic.CCTermFactory;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.services.ProgramServices;
+import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
@@ -28,6 +30,7 @@ import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
@@ -283,6 +286,12 @@ public class Services implements JavaDLTermServices, ProofServices {
         return namespaces;
     }
     
+    @Override
+    public SortDependingFunction getFirstInstance(Name kind) {
+        return (SortDependingFunction) namespaces.functions().lookup(SortDependingFunction.instantiateName(kind, SortImpl.ANY));
+    }
+
+
     
     /* (non-Javadoc)
      * @see org.key_project.common.core.services.ProofServices#setNamespaces(de.uka.ilkd.key.logic.NamespaceSet)

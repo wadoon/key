@@ -100,8 +100,7 @@ public abstract class LDT implements Named {
             JavaDLTermServices services, 
 	    					String kind) {	
 	final SortDependingFunction f 
-		= SortDependingFunction.getFirstInstance(new Name(kind), 
-							 services);
+		= services.getFirstInstance(new Name(kind));
 	assert f != null : "LDT: Sort depending function " 
 	                   + kind + " not found";
 	addFunction(f);

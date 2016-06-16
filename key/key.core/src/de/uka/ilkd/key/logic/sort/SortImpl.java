@@ -23,6 +23,13 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public final class SortImpl extends AbstractSort {
 
+    // TODO: Hacked this in again, there is another one in SortImpl. Only
+    //       did this to get SortDependingFunction compile again.
+    /**
+     * Any is a supersort of all sorts.
+     */
+    public final static Sort ANY = new Sort.SpecialSort(new Name("any"));
+
     public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         super(name, ext, isAbstract);
     }    

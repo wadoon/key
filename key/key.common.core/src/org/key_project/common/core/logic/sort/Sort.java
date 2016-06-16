@@ -101,13 +101,6 @@ public interface Sort extends Named {
      */
     final Sort TERMLABEL = new SpecialSort(new Name("TermLabel"));
     
-    // TODO: Hacked this in again, there is another one in SortImpl. Only
-    //       did this to get SortDependingFunction compile again.
-    /**
-     * Any is a supersort of all sorts.
-     */
-    final Sort ANY = new SpecialSort(new Name("any"));
-
     public final Name CAST_NAME = new Name("cast");
     final Name INSTANCE_NAME = new Name("instance");
     final Name EXACT_INSTANCE_NAME = new Name("exactInstance");    

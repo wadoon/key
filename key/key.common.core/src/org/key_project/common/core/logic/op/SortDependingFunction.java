@@ -48,7 +48,7 @@ public final class SortDependingFunction extends Function {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private static Name instantiateName(Name kind, Sort sortDependingOn) {
+    public static Name instantiateName(Name kind, Sort sortDependingOn) {
         return new Name(sortDependingOn + "::" + kind);
     }
 
@@ -75,17 +75,11 @@ public final class SortDependingFunction extends Function {
 
     public static SortDependingFunction createFirstInstance(
             Sort sortDependingOn, Name kind, Sort sort, Sort[] argSorts,
-            boolean unique) {
+            boolean unique, Sort firstInstanceSort) {
         SortDependingFunctionTemplate template =
                 new SortDependingFunctionTemplate(sortDependingOn, kind, sort,
                         new ImmutableArray<Sort>(argSorts), unique);
-        return new SortDependingFunction(template, Sort.ANY);
-    }
-
-    public static SortDependingFunction getFirstInstance(Name kind,
-            TermServices services) {
-        return (SortDependingFunction) services.getNamespaces().getNamespace("functions")
-                .lookup(instantiateName(kind, Sort.ANY));
+        return new SortDependingFunction(template, firstInstanceSort);
     }
 
     public SortDependingFunction getInstanceFor(Sort sort, TermServices services) {
