@@ -14,9 +14,9 @@
 package de.uka.ilkd.key.java;
 
 import org.key_project.common.core.logic.CCTermBuilder;
+import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.services.TermServices;
 
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 

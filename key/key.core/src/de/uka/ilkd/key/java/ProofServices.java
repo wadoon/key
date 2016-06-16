@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.java;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.services.CCProofServices;
 
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;

@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
@@ -29,7 +30,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;

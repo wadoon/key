@@ -13,7 +13,7 @@
 
 package org.key_project.common.core.services;
 
-import org.key_project.common.core.logic.CCNamespaceSet;
+import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.CCTermBuilder;
 import org.key_project.common.core.logic.CCTermFactory;
 import org.key_project.common.core.logic.Name;
@@ -37,7 +37,7 @@ public interface TermServices {
      * returns the namespaces for functions, predicates etc.
      * @return the proof specific namespaces
      */
-    public abstract CCNamespaceSet getNamespaces();
+    public abstract NamespaceSet getNamespaces();
 
     /**
      * Returns the {@link CCTermBuilder} used to create {@link Term}s.

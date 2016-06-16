@@ -64,7 +64,6 @@ public final class CharListLDT extends LDT {
     //constructors
     //------------------------------------------------------------------------- 
     
-    @SuppressWarnings("deprecation")
     public CharListLDT(JavaDLTermServices services) {
 	super(NAME, (Sort) services.getNamespaces().sorts().lookup(SeqLDT.NAME));
 	clIndexOfChar     = addFunction(services, "clIndexOfChar");

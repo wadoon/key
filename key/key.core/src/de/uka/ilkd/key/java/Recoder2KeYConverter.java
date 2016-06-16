@@ -22,6 +22,7 @@ import java.util.LinkedList;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
@@ -179,7 +180,6 @@ import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;

@@ -11,17 +11,13 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic;
 
 import java.util.Iterator;
 
-import org.key_project.common.core.logic.CCNamespaceSet;
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Named;
-import org.key_project.common.core.logic.Namespace;
 import org.key_project.util.collection.ImmutableSet;
 
-public class NamespaceSet implements CCNamespaceSet {
+public class NamespaceSet {
 
     private Namespace varNS = new Namespace();
     private Namespace progVarNS = new Namespace();
@@ -206,42 +202,4 @@ public class NamespaceSet implements CCNamespaceSet {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.key_project.common.core.logic.GenericNamespaceSet#getNamespace(java
-     * .lang.String)
-     */
-    @Override
-    public Namespace getNamespace(String name) {
-        switch (name) {
-        case "choices":
-            return choiceNS;
-        case "functions":
-            return funcNS;
-        case "progvars":
-            return progVarNS;
-        case "rules":
-            return ruleSetNS;
-        case "sorts":
-            return sortNS;
-        case "variables":
-            return varNS;
-        default:
-            return null;
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.key_project.common.core.logic.GenericNamespaceSet#getNamespaceNames()
-     */
-    @Override
-    public String[] getNamespaceNames() {
-        return new String[] { "choices", "functions", "progvars", "rules",
-                "sorts", "variables" };
-    }
 }

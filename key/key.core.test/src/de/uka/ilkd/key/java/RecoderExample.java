@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java;
 
 
+import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -23,7 +24,6 @@ import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 /** this class is an example how to work with a java AST. Therefore we

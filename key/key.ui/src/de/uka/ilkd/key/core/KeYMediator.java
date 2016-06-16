@@ -20,6 +20,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -33,7 +34,6 @@ import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;

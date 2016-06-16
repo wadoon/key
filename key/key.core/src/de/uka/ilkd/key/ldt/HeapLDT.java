@@ -101,7 +101,6 @@ public final class HeapLDT extends LDT {
     //constructors
     //------------------------------------------------------------------------- 
     
-    @SuppressWarnings("deprecation")
     public HeapLDT(JavaDLTermServices services) {
 	super(NAME, services);
 	final Namespace sorts    = services.getNamespaces().sorts();

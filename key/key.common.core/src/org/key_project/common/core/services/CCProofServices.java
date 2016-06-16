@@ -13,7 +13,7 @@
 
 package org.key_project.common.core.services;
 
-import org.key_project.common.core.logic.CCNamespaceSet;
+import org.key_project.common.core.logic.NamespaceSet;
 
 /**
  * TODO: Document.
@@ -31,6 +31,6 @@ public interface CCProofServices {
      * returns the namespaces for functions, predicates etc.
      * @return the proof specific namespaces
      */
-    CCNamespaceSet getNamespaces();
+    NamespaceSet getNamespaces();
 
 }
