@@ -13,13 +13,13 @@
 
 package de.uka.ilkd.key.logic.util;
 
+import org.key_project.common.core.logic.op.IfThenElse;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.logic.JavaDLTerm;
-import de.uka.ilkd.key.logic.op.IfThenElse;
 
 
 /**

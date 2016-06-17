@@ -17,15 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.common.core.logic.op.ElementaryUpdate;
-import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.Junctor;
-import org.key_project.common.core.logic.op.LogicVariable;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.Quantifier;
-import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.logic.op.SortDependingFunction;
-import org.key_project.common.core.logic.op.UpdateApplication;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
@@ -33,17 +25,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IfExThenElse;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.WarySubstOp;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
 

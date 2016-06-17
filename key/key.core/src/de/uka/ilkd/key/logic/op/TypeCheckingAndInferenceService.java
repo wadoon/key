@@ -16,11 +16,7 @@ package de.uka.ilkd.key.logic.op;
 import java.util.HashMap;
 
 import org.key_project.common.core.logic.CCTerm;
-import org.key_project.common.core.logic.op.AbstractSortedOperator;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.SortedOperator;
-import org.key_project.common.core.logic.op.UpdateApplication;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;

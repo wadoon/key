@@ -18,16 +18,12 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.key_project.common.core.logic.op.ElementaryUpdate;
-import org.key_project.common.core.logic.op.SVSubstitute;
-import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.logic.op.UpdateableOperator;
+import org.key_project.common.core.logic.op.*;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaDLTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;

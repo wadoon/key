@@ -168,7 +168,14 @@ public class PosInProgram {
         }
         return true;
     }
-
+    
+    public int hashCode () {
+        int hashCode = 0;
+        for (int i : pos) {
+          hashCode = 31*hashCode + i;
+        }
+        return hashCode;
+    }
     
     public boolean leq(PosInProgram pip) {
 	final IntIterator longerIt  = iterator();	
@@ -244,13 +251,5 @@ public class PosInProgram {
 	    return pip.pos[next++];
 	}
 		
-    }
-
-    public int hashCode () {
-        int hashCode = 0;
-        for (int i : pos) {
-          hashCode = 31*hashCode + i;
-        }
-        return hashCode;
     }
 }
