@@ -2,13 +2,7 @@ package org.key_project.util.collection;
 
 import junit.framework.TestCase;
 
-import org.junit.Assert;
 import org.junit.Test;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Immutables;
 
 public class TestImmutables extends TestCase {
 
