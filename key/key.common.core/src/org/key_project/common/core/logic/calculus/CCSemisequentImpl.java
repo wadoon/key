@@ -1,6 +1,5 @@
 package org.key_project.common.core.logic.calculus;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
@@ -306,26 +305,21 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
     public CCSemisequentChangeInfo<SeqFor, SemiSeq> remove(int idx) {
 
         ImmutableList<SeqFor> newList = seqList;
-        ImmutableList<SeqFor> queue = ImmutableSLList.<SeqFor> nil();
 
         if (idx < 0 || idx >= size()) {
             return createSemisequentChangeInfo(seqList);
         }
 
-        final ArrayList<SeqFor> temp = new ArrayList<>();
-
+        ImmutableList<SeqFor> temp = ImmutableSLList.<SeqFor>nil();
         for (int i = 0; i < idx; i++) {// go to idx
-            temp.add(newList.head());
+            temp = temp.prepend(newList.head());
             newList = newList.tail();
         }
-
-        for (int k = temp.size() - 1; k >= 0; k--)
-            queue = queue.prepend(temp.get(k));
 
         // remove the element that is at head of newList
         final SeqFor removedFormula = newList.head();
         newList = newList.tail();
-        newList = newList.prepend(queue);
+        newList = newList.prepend(temp);
 
         // create change info object
         final CCSemisequentChangeInfo<SeqFor, SemiSeq> sci =

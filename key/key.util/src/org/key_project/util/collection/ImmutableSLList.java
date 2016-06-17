@@ -31,7 +31,6 @@ import java.util.Iterator;
  * with O(1) costs (see Osaka) then having tail and head with
  * amortized O(1). This will be done later (if necessary).
  */
-
 @SuppressWarnings("unchecked")
 public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
