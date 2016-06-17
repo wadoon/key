@@ -11,9 +11,18 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.logic;
+package org.key_project.common.core.logic.visitors;
 
-public interface CCVisitor<T extends CCTerm<?, ?, T>> {
+import org.key_project.common.core.logic.CCTerm;
+
+/**
+ * Interface for a term visitor.
+ *
+ * @author Dominic Scheurer
+ *
+ * @param <T>
+ */
+public interface CCTermVisitor<T extends CCTerm<?, ?, T>> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      * @param visited The currently visited {@link Term}.

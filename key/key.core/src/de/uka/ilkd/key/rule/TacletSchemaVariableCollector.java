@@ -15,13 +15,13 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
-import org.key_project.common.core.logic.CCVisitor;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.visitors.CCTermVisitor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -92,7 +92,7 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
     
     
     /** 
-     * visits the JavaDLTerm in post order {@link JavaDLTerm#execPostOrder(CCVisitor)} and 
+     * visits the JavaDLTerm in post order {@link JavaDLTerm#execPostOrder(CCTermVisitor)} and 
      * collects all found schema variables 
      * @param t the JavaDLTerm whose schema variables are collected 
      */  

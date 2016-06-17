@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.CCTerm;
-import org.key_project.common.core.logic.CCVisitor;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.SourceElement;

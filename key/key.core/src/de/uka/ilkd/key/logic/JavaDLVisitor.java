@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.logic;
 
-import org.key_project.common.core.logic.CCVisitor;
+import org.key_project.common.core.logic.visitors.CCTermVisitor;
 
-public interface JavaDLVisitor extends CCVisitor<JavaDLTerm> {
+public interface JavaDLVisitor extends CCTermVisitor<JavaDLTerm> {
 
 }

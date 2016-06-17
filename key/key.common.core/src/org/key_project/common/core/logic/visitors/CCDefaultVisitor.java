@@ -14,14 +14,13 @@
 package org.key_project.common.core.logic.visitors;
 
 import org.key_project.common.core.logic.CCTerm;
-import org.key_project.common.core.logic.CCVisitor;
 
 /**
  * This abstract Vistor class declares the interface for a common term visitor.
  *
  * @author Dominic Scheurer
  */
-public abstract class CCDefaultVisitor<T extends CCTerm<?, ?, T>> implements CCVisitor<T> {
+public abstract class CCDefaultVisitor<T extends CCTerm<?, ?, T>> implements CCTermVisitor<T> {
 
     /* (non-Javadoc)
      * @see org.key_project.common.core.logic.CCVisitor#visitSubtree(org.key_project.common.core.logic.CCTerm)

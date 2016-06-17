@@ -18,6 +18,7 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.logic.visitors.CCTermVisitor;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -48,15 +49,15 @@ import org.key_project.util.collection.ImmutableSet;
  *  <li> as it is immutable, most (all) attributes should be declared final
  * </li>
  * </ol>
- * Term supports the {@link CCVisitor} pattern. Two different visit strategies are
- * currently supported: {@link Term#execPostOrder(CCVisitor)} and
- * {@link Term#execPreOrder(CCVisitor)}.<br/>
+ * Term supports the {@link CCTermVisitor} pattern. Two different visit strategies are
+ * currently supported: {@link Term#execPostOrder(CCTermVisitor)} and
+ * {@link Term#execPreOrder(CCTermVisitor)}.<br/>
  * 
  * <strong>TODO</strong>: Rename to "Term", and the previous {@link Term} to
  * "JavaTerm" or the like; from this class here, the java specific methods
  * have been removed.
  */
-public interface CCTerm<S, V extends CCVisitor<T>, T extends CCTerm<S, V, T>>
+public interface CCTerm<S, V extends CCTermVisitor<T>, T extends CCTerm<S, V, T>>
         extends SVSubstitute, Sorted {
 
     /** 
