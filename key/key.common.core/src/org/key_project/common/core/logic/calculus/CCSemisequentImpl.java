@@ -1,6 +1,6 @@
 package org.key_project.common.core.logic.calculus;
 
-import java.util.Iterator;
+import java.util.*;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -106,73 +106,78 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
     public boolean isEmpty() {
         return seqList.isEmpty();
     }
-
+    
     /**
-     * inserts new SeqFor at index idx and removes duplicates, perform
-     * simplifications etc.
-     * 
-     * @param fci
-     *            null if the formula to be added is new, otherwise an object
+     * Creates a list from a given {@link Iterable}.
+     * <p>
+     * TODO: Should be a member of {@link ImmutableList}.
+     *
+     * @param it The {@link Iterable} to transform.
+     * @return A list with the elements of the {@link Iterable}.
+     */
+    private static <T> List<T> toList(Iterable<T> it) {
+        final ArrayList<T> result = new ArrayList<T>();
+        for (T elem : it) {
+            result.add(elem);
+        }
+        return result;
+    }
+    
+    /**
+     * Inserts new SeqFor at index idx and removes duplicates.
+     *
+     * @param idx
+     * @param sequentFormula
+     * @param semiSeqCI
+     * @param fci null if the formula to be added is new, otherwise an object
      *            telling which formula is replaced with the new formula
      *            <code>sequentFormula</code>, and what are the differences
      *            between the two formulas
-     * @return a semi sequent change information object with the new semisequent
-     *         and information which formulas have been added or removed
+     * @return a {@link CCSemisequentChangeInfo} object with the new semisequent
+     *         and information about which formulas have been added or removed
      */
     private CCSemisequentChangeInfo<SeqFor, SemiSeq> insertAndRemoveRedundancyHelper(
             int idx,
             SeqFor sequentFormula,
-            CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI,
+            CCSemisequentChangeInfo<SeqFor, SemiSeq> semiSeqCI,
             FormulaChangeInfo<SeqFor> fci) {
 
-        // Search for equivalent formulas and weakest constraint
-        ImmutableList<SeqFor> searchList = semiCI.getFormulaList();
-        ImmutableList<SeqFor> newSeqList = ImmutableSLList.<SeqFor> nil();
-        SeqFor cf;
-        int pos = -1;
-
-        while (!searchList.isEmpty()) {
-            ++pos;
-            cf = searchList.head();
-            searchList = searchList.tail();
-
-            // FIXME (DS):
-            // the lines below compile if we set the generic type argument of
-            // GenericSemisequent to "<T extends GenericTerm<?, ?, ?, T>, SeqFor
-            // extends SequentFormula<T>".
+        // Search for equivalent formulas
+        for (SeqFor formula : semiSeqCI.getFormulaList()) {
             if (sequentFormula != null
-                    && cf.formula().equalsModRenaming(sequentFormula.formula())) {
+                    && formula.formula().equalsModRenaming(sequentFormula.formula())) {
 
-                semiCI.rejectedFormula(sequentFormula);
-                return semiCI; // semisequent already contains formula
-
+                semiSeqCI.rejectedFormula(sequentFormula);
+                return semiSeqCI; // semisequent already contains formula
             }
-            newSeqList = newSeqList.prepend(cf);
         }
-
-        // compose resulting formula list
-        if (fci == null)
-            semiCI.addedFormula(idx, sequentFormula);
-        else
-            semiCI.modifiedFormula(idx, fci);
-
-        if (idx > pos) {
-            searchList = searchList.prepend(sequentFormula);
+        
+        final List<SeqFor> existingFormulas = toList(semiSeqCI.getFormulaList());
+        ImmutableList<SeqFor> newFormulaList = ImmutableSLList.<SeqFor>nil();
+        
+        if (fci == null) {
+            semiSeqCI.addedFormula(idx, sequentFormula);
+        } else {
+            semiSeqCI.modifiedFormula(idx, fci);
         }
+        
+        // Border cases: Empty semisequent or addition at the end
+        if (existingFormulas.isEmpty() || idx >= existingFormulas.size()) {
+            newFormulaList = newFormulaList.prepend(sequentFormula);
+        }
+        
+        for (int i = existingFormulas.size() - 1; i >= 0; i--) {
+            newFormulaList = newFormulaList.prepend(existingFormulas.get(i));
 
-        while (!newSeqList.isEmpty()) {
-            searchList = searchList.prepend(newSeqList.head());
-            newSeqList = newSeqList.tail();
-            if (idx == pos) {
-                searchList = searchList.prepend(sequentFormula);
+            if (idx == i) {
+                newFormulaList = newFormulaList.prepend(sequentFormula);
             }
-            --pos;
         }
 
         // add new formula list to result object
-        semiCI.setFormulaList(searchList);
+        semiSeqCI.setFormulaList(newFormulaList);
 
-        return semiCI;
+        return semiSeqCI;
     }
 
     /**

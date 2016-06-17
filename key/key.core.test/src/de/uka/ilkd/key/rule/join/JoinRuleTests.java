@@ -241,7 +241,7 @@ public class JoinRuleTests extends TestCase {
             return proof;
         }
         catch (ProblemLoaderException e) {
-            fail("Proof could not be loaded.");
+            fail("Proof could not be loaded.\n" + e.getMessage());
             return null;
         }
     }
