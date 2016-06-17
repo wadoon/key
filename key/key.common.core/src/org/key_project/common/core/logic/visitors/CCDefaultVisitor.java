@@ -27,8 +27,7 @@ public abstract class CCDefaultVisitor<T extends CCTerm<?, ?, T>> implements CCT
      */
     @Override
     public boolean visitSubtree(T visited) {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     /* (non-Javadoc)
@@ -36,8 +35,6 @@ public abstract class CCDefaultVisitor<T extends CCTerm<?, ?, T>> implements CCT
      */
     @Override
     public void subtreeEntered(T subtreeRoot) {
-        // TODO Auto-generated method stub
-        
     }
 
     /* (non-Javadoc)
@@ -45,8 +42,6 @@ public abstract class CCDefaultVisitor<T extends CCTerm<?, ?, T>> implements CCT
      */
     @Override
     public void subtreeLeft(T subtreeRoot) {
-        // TODO Auto-generated method stub
-        
     }
 
 }
