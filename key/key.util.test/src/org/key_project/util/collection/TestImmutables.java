@@ -2,6 +2,7 @@ package org.key_project.util.collection;
 
 import junit.framework.TestCase;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -13,8 +14,8 @@ public class TestImmutables extends TestCase {
 
     @Test
     public void testRemoveDuplicatesLarge() {
-        ImmutableList<Integer> l = ImmutableSLList.<Integer>nil();
-        for(int i = 0; i < 100; i++) {
+        ImmutableList<Integer> l = ImmutableSLList.<Integer> nil();
+        for (int i = 0; i < 100; i++) {
             l = l.prepend((i * 2) % 160);
         }
 
@@ -28,7 +29,7 @@ public class TestImmutables extends TestCase {
 
         l = cleaned;
         for (int i = 79; i >= 0; i--) {
-            assertEquals(i*2, l.head().intValue());
+            assertEquals(i * 2, l.head().intValue());
             l = l.tail();
         }
     }
@@ -38,7 +39,7 @@ public class TestImmutables extends TestCase {
 
         String[][] a = {
                 { "a", "b", "a", "c", "d", "d", "a", "e" },
-                { null, "a" , null },
+                { null, "a", null },
                 { "1", "1", "1", "1", "1" }
         };
 
@@ -49,13 +50,13 @@ public class TestImmutables extends TestCase {
         };
 
         for (int i = 0; i < a.length; i++) {
-            ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(a[i]).reverse();
+            ImmutableList<String> l =
+                    ImmutableSLList.<String> nil().prepend(a[i]).reverse();
 
             assertFalse(Immutables.isDuplicateFree(l));
 
             ImmutableList<String> cleaned = Immutables.removeDuplicates(l);
             String[] a2 = cleaned.reverse().toArray(String.class);
-
 
             assertTrue(Immutables.isDuplicateFree(cleaned));
             assertDeepEquals(expected[i], a2);
@@ -65,7 +66,7 @@ public class TestImmutables extends TestCase {
     @Test
     public void testRemoveDuplicatesIdentical() {
         String[] a = { "a", "b", "c", "d", "e" };
-        ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(a);
+        ImmutableList<String> l = ImmutableSLList.<String> nil().prepend(a);
 
         ImmutableList<String> cleaned = Immutables.removeDuplicates(l);
 
@@ -75,26 +76,55 @@ public class TestImmutables extends TestCase {
     @Test
     public void testIsDuplicateFree() throws Exception {
         String[][] a = { { "a", "b", "c", "d", "e" },
-                {  }, {"a"}, { null }, { null, "a" } };
+                {}, { "a" }, { null }, { null, "a" } };
 
         for (String[] strings : a) {
-            ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(strings);
+            ImmutableList<String> l =
+                    ImmutableSLList.<String> nil().prepend(strings);
             assertTrue(Immutables.isDuplicateFree(l));
         }
 
-        String[][] b = { { "a", "a"},
+        String[][] b = { { "a", "a" },
                 { "a", "b", "c", "d", "a" },
                 { "a", "b", "a", "d", "e" },
                 { "a", "b", "d", "d", "e" },
                 { "a", "b", "c", "d", "d" },
-                { null, "a", null }};
+                { null, "a", null } };
 
         for (String[] strings : b) {
-            ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(strings);
+            ImmutableList<String> l =
+                    ImmutableSLList.<String> nil().prepend(strings);
             assertFalse(Immutables.isDuplicateFree(l));
         }
 
+    }
 
+    /**
+     * This test documents a specialty of the current implementation of
+     * ImmutableList (inconsistent behavior when prepending
+     * {@link ImmutableList} compared to prepending {@link Iterable}s). Changing
+     * this behavior might be intended, but then it will break some other stuff.
+     */
+    @Test
+    public void testPrepend() {
+        ImmutableList<Integer> tailList =
+                ImmutableSLList.<Integer> nil().append(
+                        new Integer[] { 4, 5, 6 });
+
+        ImmutableList<Integer> headList =
+                ImmutableSLList.<Integer> nil().append(
+                        new Integer[] { 1, 2, 3 });
+
+        // When prepending an ImmutableList, the prepended elements are not
+        // reversed. The current implementation of Cons<T> reverses them before.
+        assertEquals(ImmutableSLList.<Integer> nil().append(
+                new Integer[] { 1, 2, 3, 4, 5, 6 }), tailList.prepend(headList));
+
+        // When prepending an ImmutableList, the prepended elements *are*
+        // reversed, because no reverse is done before prepending.
+        assertEquals(ImmutableSLList.<Integer> nil().append(
+                new Integer[] { 3, 2, 1, 4, 5, 6 }),
+                tailList.prepend((Iterable<Integer>) headList));
     }
 
     private static void assertDeepEquals(Object[] expected, Object[] array) {
@@ -105,27 +135,32 @@ public class TestImmutables extends TestCase {
     }
 
     public void testImprovedSetUnion() {
-        String[][] a = { { "a", "b", "c", "d"}, { "a", "b2", "c", "d3"},
+        String[][] a = { { "a", "b", "c", "d" }, { "a", "b2", "c", "d3" },
                 { "a", "b", "a", "d", "e" }, { "a", "b", "d", "d", "e" },
-                { "a" }, { },
-                { "a", "b", "c" }, {"c","a", "b" } ,
-                { null, "a"}, { "b" } };
+                { "a" }, {},
+                { "a", "b", "c" }, { "c", "a", "b" },
+                { null, "a" }, { "b" } };
 
-        for (int i = 0; i < a.length; i+=2) {
-            ImmutableSet<String> s1 = DefaultImmutableSet.<String>nil();
+        for (int i = 0; i < a.length; i += 2) {
+            ImmutableSet<String> s1 = DefaultImmutableSet.<String> nil();
             for (int j = 0; j < a[i].length; j++) {
                 s1 = s1.add(a[i][j]);
             }
-            ImmutableSet<String> s2 = DefaultImmutableSet.<String>nil();
-            for (int j = 0; j < a[i+1].length; j++) {
-                s2 = s2.add(a[i+1][j]);
+            ImmutableSet<String> s2 = DefaultImmutableSet.<String> nil();
+            for (int j = 0; j < a[i + 1].length; j++) {
+                s2 = s2.add(a[i + 1][j]);
             }
 
-            DefaultImmutableSet<String> newUnion = ((DefaultImmutableSet<String>) s1).newUnion((DefaultImmutableSet<String>) s2);
-            DefaultImmutableSet<String> oldUnion = ((DefaultImmutableSet<String>) s2).originalUnion(s1);
+            DefaultImmutableSet<String> newUnion =
+                    ((DefaultImmutableSet<String>) s1)
+                            .newUnion((DefaultImmutableSet<String>) s2);
+            DefaultImmutableSet<String> oldUnion =
+                    ((DefaultImmutableSet<String>) s2).originalUnion(s1);
             assertEquals(oldUnion, newUnion);
 
-            newUnion = ((DefaultImmutableSet<String>) s2).newUnion((DefaultImmutableSet<String>) s1);
+            newUnion =
+                    ((DefaultImmutableSet<String>) s2)
+                            .newUnion((DefaultImmutableSet<String>) s1);
             oldUnion = ((DefaultImmutableSet<String>) s2).originalUnion(s1);
             assertEquals(oldUnion, newUnion);
         }
@@ -133,18 +168,19 @@ public class TestImmutables extends TestCase {
     }
 
     public void testEqualityEmpty() throws Exception {
-        ImmutableSet<Object> s1 = DefaultImmutableSet.<Object>nil();
-        ImmutableSet<Object> s2 = DefaultImmutableSet.fromImmutableList(ImmutableSLList.nil());
+        ImmutableSet<Object> s1 = DefaultImmutableSet.<Object> nil();
+        ImmutableSet<Object> s2 =
+                DefaultImmutableSet.fromImmutableList(ImmutableSLList.nil());
         assertEquals(0, s1.size());
         assertEquals(0, s2.size());
 
-        assertEquals(s1,s2);
+        assertEquals(s1, s2);
     }
 
     public void testIntersectEmpty() {
-        ImmutableSet<Object> s0 = DefaultImmutableSet.<Object>nil();
-        ImmutableSet<Object> s1 = DefaultImmutableSet.<Object>nil().add("1");
-        ImmutableSet<Object> s2 = DefaultImmutableSet.<Object>nil().add("2");
+        ImmutableSet<Object> s0 = DefaultImmutableSet.<Object> nil();
+        ImmutableSet<Object> s1 = DefaultImmutableSet.<Object> nil().add("1");
+        ImmutableSet<Object> s2 = DefaultImmutableSet.<Object> nil().add("2");
 
         ImmutableSet<Object> sIntersect = s1.intersect(s2);
         assertEquals(0, sIntersect.size());
@@ -153,8 +189,10 @@ public class TestImmutables extends TestCase {
 
     public void testHashCodes() {
 
-        ImmutableSet<Object> s1 = DefaultImmutableSet.<Object>nil().add("one").add("two");
-        ImmutableSet<Object> s2 = DefaultImmutableSet.<Object>nil().add("two").add("one");
+        ImmutableSet<Object> s1 =
+                DefaultImmutableSet.<Object> nil().add("one").add("two");
+        ImmutableSet<Object> s2 =
+                DefaultImmutableSet.<Object> nil().add("two").add("one");
 
         assertEquals(s1, s2);
         int hash1 = s1.hashCode();

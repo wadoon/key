@@ -324,7 +324,7 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
         // remove the element that is at head of newList
         final SeqFor removedFormula = newList.head();
         newList = newList.tail();
-        newList = newList.prepend(temp);
+        newList = newList.prepend((Iterable<SeqFor>) temp);
 
         // create change info object
         final CCSemisequentChangeInfo<SeqFor, SemiSeq> sci =
