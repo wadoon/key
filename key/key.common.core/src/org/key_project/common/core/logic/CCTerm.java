@@ -56,7 +56,7 @@ import org.key_project.util.collection.ImmutableSet;
  * "JavaTerm" or the like; from this class here, the java specific methods
  * have been removed.
  */
-public interface CCTerm<S, V extends CCVisitor<S, V, T>, T extends CCTerm<S, V, T>>
+public interface CCTerm<S, V extends CCVisitor<T>, T extends CCTerm<S, V, T>>
         extends SVSubstitute, Sorted {
 
     /** 

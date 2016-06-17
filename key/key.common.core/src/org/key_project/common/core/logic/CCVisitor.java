@@ -13,7 +13,7 @@
 
 package org.key_project.common.core.logic;
 
-public interface CCVisitor<S, V extends CCVisitor<S, V, T>, T extends CCTerm<S, V, T>> {
+public interface CCVisitor<T extends CCTerm<?, ?, T>> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      * @param visited The currently visited {@link Term}.
@@ -25,7 +25,7 @@ public interface CCVisitor<S, V extends CCVisitor<S, V, T>, T extends CCTerm<S, 
      * the entry method for the visitor pattern
      * @param visited the Term to be visited
      */
-    public abstract void visit(T visited);
+    public void visit(T visited);
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term

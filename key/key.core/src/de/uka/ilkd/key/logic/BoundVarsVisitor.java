@@ -13,8 +13,11 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.common.core.logic.CCTerm;
+import org.key_project.common.core.logic.calculus.CCSequent;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.visitors.CCDefaultVisitor;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -23,7 +26,7 @@ import org.key_project.util.collection.ImmutableSet;
  * visitor implements also a continuation on sequents, traversing all of the
  * formulas occuring in the sequent.
  */
-public class BoundVarsVisitor extends DefaultVisitor {
+public class BoundVarsVisitor<T extends CCTerm<?, ?, T>> extends CCDefaultVisitor<T> {
 
     private ImmutableSet<QuantifiableVariable> bdVars =
             DefaultImmutableSet.<QuantifiableVariable> nil();
@@ -38,7 +41,7 @@ public class BoundVarsVisitor extends DefaultVisitor {
     /**
      * only called by execPostOrder in JavaDLTerm.
      */
-    public void visit(JavaDLTerm visited) {
+    public void visit(T visited) {
         for (int i = 0, ar = visited.arity(); i < ar; i++) {
             for (int j = 0, boundVarsSize =
                     visited.varsBoundHere(i).size(); j < boundVarsSize; j++) {
@@ -50,8 +53,8 @@ public class BoundVarsVisitor extends DefaultVisitor {
     /**
      * visits a sequent
      */
-    public void visit(Sequent visited) {
-        for (SequentFormula<JavaDLTerm> cf : visited) {
+    public void visit(CCSequent<T, ?, ?, ?> visited) {
+        for (SequentFormula<T> cf : visited) {
             visit(cf.formula());
         }
     }

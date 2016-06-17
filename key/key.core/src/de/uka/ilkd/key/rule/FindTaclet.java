@@ -176,7 +176,7 @@ public abstract class FindTaclet extends Taclet {
      * returns the variables that occur bound in the find part
      */
     protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {
-        final BoundVarsVisitor bvv = new BoundVarsVisitor();
+        final BoundVarsVisitor<JavaDLTerm> bvv = new BoundVarsVisitor<JavaDLTerm>();
         bvv.visit(find());
         return bvv.getBoundVariables();
     }

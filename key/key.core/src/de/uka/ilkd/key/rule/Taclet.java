@@ -300,7 +300,7 @@ public abstract class Taclet implements Rule, Named {
                 result = result.union(tgt.getBoundVariables());
             }
 
-            final BoundVarsVisitor bvv = new BoundVarsVisitor();
+            final BoundVarsVisitor<JavaDLTerm> bvv = new BoundVarsVisitor<JavaDLTerm>();
             bvv.visit(ifSequent());
             result = result.union(bvv.getBoundVariables()).
                     union(getBoundVariablesHelper());

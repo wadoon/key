@@ -18,6 +18,7 @@
 */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import de.uka.ilkd.key.logic.JavaDLTerm;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -70,7 +71,7 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
      */
     @Override
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
-        final BoundVarsVisitor bvv = new BoundVarsVisitor();
+        final BoundVarsVisitor<JavaDLTerm> bvv = new BoundVarsVisitor<JavaDLTerm>();
         bvv.visit(replaceWith());
         return bvv.getBoundVariables().union(super.getBoundVariables());
     }

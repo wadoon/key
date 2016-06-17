@@ -78,7 +78,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      */
     @Override
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
-        final BoundVarsVisitor bvv = new BoundVarsVisitor();
+        final BoundVarsVisitor<JavaDLTerm> bvv = new BoundVarsVisitor<JavaDLTerm>();
         bvv.visit(replaceWith());
         return bvv.getBoundVariables().union(super.getBoundVariables());
     }
