@@ -11,13 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic.visitors;
 
 import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.calculus.CCSequent;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.visitors.CCDefaultVisitor;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
