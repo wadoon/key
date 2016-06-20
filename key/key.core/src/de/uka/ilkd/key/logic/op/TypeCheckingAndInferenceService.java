@@ -84,18 +84,18 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
         } else {// ignore anonymous classes as these are hacks
             return new TypeCheckingAndInferenceService<C>() {
                 @Override
-                public Sort sort(ImmutableArray<? extends CCTerm<?, ?,?>> terms, C op) {
+                public Sort sort(ImmutableArray<? extends CCTerm<?,?>> terms, C op) {
                     return ((SortedOperator)op).sort();
                 }
 
                 @Override
-                public boolean additionalValidTopLevel(CCTerm<?, ?,?> term,
+                public boolean additionalValidTopLevel(CCTerm<?,?> term,
                         C op) {
                     return true;
                 }
 
                 @Override
-                public boolean validTopLevel(CCTerm<?, ?,?> term, C op) {
+                public boolean validTopLevel(CCTerm<?,?> term, C op) {
                     return true;
                 }
             };
@@ -106,9 +106,9 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
     // //////// PUBLIC__INTERFACE //////// //
     // /////////////////////////////////// //
 
-    public abstract Sort sort(ImmutableArray<? extends CCTerm<?, ?,?>> terms, O op);
+    public abstract Sort sort(ImmutableArray<? extends CCTerm<?,?>> terms, O op);
 
-    public abstract boolean additionalValidTopLevel(CCTerm<?, ?,?> term, O op);
+    public abstract boolean additionalValidTopLevel(CCTerm<?,?> term, O op);
 
     /**
      * Checks whether the top level structure of the given @link GenericTerm is
@@ -118,7 +118,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
      * 
      * @return true iff the top level structure of the {@link CCTerm} is valid.
      */
-    public abstract boolean validTopLevel(CCTerm<?, ?,?> term, O op);
+    public abstract boolean validTopLevel(CCTerm<?,?> term, O op);
 
     // /////////////////////////////////// //
     // ///////// TEMPLATE__CLASS ///////// //
@@ -127,7 +127,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
     static abstract class DefaultTypeCheckingAndInferenceService<O extends Operator>
             extends TypeCheckingAndInferenceService<O> {
         @Override
-        public boolean validTopLevel(CCTerm<?, ?,?> term, O op) {
+        public boolean validTopLevel(CCTerm<?,?> term, O op) {
             if (op.arity() != term.arity() || op.arity() != term.subs().size()
                     || ( op.bindsVars() == term.boundVars().isEmpty() ) ) {
                 return false;
@@ -154,11 +154,11 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             // This class should be a Singleton.
         }
 
-        public Sort sort(ImmutableArray<? extends CCTerm<?, ?,?>> terms, AbstractSortedOperator op) {
+        public Sort sort(ImmutableArray<? extends CCTerm<?,?>> terms, AbstractSortedOperator op) {
             return op.sort();
         }
 
-        public boolean additionalValidTopLevel(CCTerm<?, ?,?> term,
+        public boolean additionalValidTopLevel(CCTerm<?,?> term,
                 AbstractSortedOperator op) {
             for (int i = 0, n = op.arity(); i < n; i++) {
                 if (!possibleSub(i, term.sub(i), op)) {
@@ -181,7 +181,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
          * @return true iff the given term can be subterm at the indicated
          *         position
          */
-        private boolean possibleSub(int at, CCTerm<?, ?,?> possibleSub,
+        private boolean possibleSub(int at, CCTerm<?,?> possibleSub,
                 AbstractSortedOperator op) {
             final Sort s = possibleSub.sort();
 
@@ -200,11 +200,11 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             // This class should be a Singleton.
         }
 
-        public Sort sort(ImmutableArray<? extends CCTerm<?, ?,?>> terms, IfExThenElse op) {
+        public Sort sort(ImmutableArray<? extends CCTerm<?,?>> terms, IfExThenElse op) {
             return terms.get(1).sort();
         }
 
-        public boolean additionalValidTopLevel(CCTerm<?, ?,?> term, IfExThenElse op) {
+        public boolean additionalValidTopLevel(CCTerm<?,?> term, IfExThenElse op) {
             for (QuantifiableVariable var : term.varsBoundHere(0)) {
                 if (!var.sort().name().toString().equals("int")) {
                     return false;
@@ -226,7 +226,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             // This class should be a Singleton.
         }
 
-        public Sort sort(ImmutableArray<? extends CCTerm<?, ?,?>> terms, IfThenElse op) {
+        public Sort sort(ImmutableArray<? extends CCTerm<?,?>> terms, IfThenElse op) {
             final Sort s2 = terms.get(1).sort();
             final Sort s3 = terms.get(2).sort();
             if (s2 instanceof ProgramSVSort
@@ -242,7 +242,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             }
         }
 
-        public boolean additionalValidTopLevel(CCTerm<?, ?,?> term, IfThenElse op) {
+        public boolean additionalValidTopLevel(CCTerm<?,?> term, IfThenElse op) {
             final Sort s0 = term.sub(0).sort();
             final Sort s1 = term.sub(1).sort();
             final Sort s2 = term.sub(2).sort();
@@ -298,7 +298,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             // This class should be a Singleton.
         }
 
-        public Sort sort(ImmutableArray<? extends CCTerm<?, ?,?>> terms, SubstOp op) {
+        public Sort sort(ImmutableArray<? extends CCTerm<?,?>> terms, SubstOp op) {
             if (terms.size() == 2) {
                 return terms.get(1).sort();
             }
@@ -308,7 +308,7 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             }
         }
 
-        public boolean additionalValidTopLevel(CCTerm<?, ?,?> term, SubstOp op) {
+        public boolean additionalValidTopLevel(CCTerm<?,?> term, SubstOp op) {
             if (term.varsBoundHere(1).size() != 1) {
                 return false;
             }
@@ -325,11 +325,11 @@ public abstract class TypeCheckingAndInferenceService<O extends Operator> {
             // This class should be a Singleton.
         }
 
-        public Sort sort(ImmutableArray<? extends CCTerm<?, ?,?>> terms, UpdateApplication op) {
+        public Sort sort(ImmutableArray<? extends CCTerm<?,?>> terms, UpdateApplication op) {
             return terms.get(1).sort();
         }
 
-        public boolean additionalValidTopLevel(CCTerm<?, ?,?> term, UpdateApplication op) {
+        public boolean additionalValidTopLevel(CCTerm<?,?> term, UpdateApplication op) {
             return term.sub(0).sort() == Sort.UPDATE;
         }
     }

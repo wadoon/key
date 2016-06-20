@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.JavaDLVisitor;
+import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -81,7 +81,7 @@ public class ContainsTermFeature implements Feature {
     }
 
 
-    private class ContainsTermVisitor implements JavaDLVisitor {
+    private class ContainsTermVisitor implements Visitor {
         boolean found = false;
         Term term;
 

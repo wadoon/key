@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.JavaDLVisitor;
+import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -121,7 +121,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    class QuantifiableVariableVisitor implements JavaDLVisitor {
+    class QuantifiableVariableVisitor implements Visitor {
 
         private LinkedList<QuantifiableVariable> vars = new LinkedList<QuantifiableVariable>();
 

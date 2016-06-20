@@ -210,7 +210,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public void execPostOrder(JavaDLVisitor visitor) {
+    public void execPostOrder(Visitor visitor) {
         visitor.subtreeEntered(this);
         if (visitor.visitSubtree(this)) {
             for (int i = 0, ar = arity(); i < ar; i++) {
@@ -222,7 +222,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public void execPreOrder(JavaDLVisitor visitor) {
+    public void execPreOrder(Visitor visitor) {
         visitor.subtreeEntered(this);
         visitor.visit(this);
         if (visitor.visitSubtree(this)) {

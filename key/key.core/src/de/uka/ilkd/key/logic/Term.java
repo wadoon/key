@@ -16,15 +16,13 @@ package de.uka.ilkd.key.logic;
 import org.key_project.common.core.logic.CCTerm;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.SourceElement;
-
 /**
  * {@link CCTerm} extension for Java terms, provides methods related to
  * contained Java statements.
  *
  * @author Dominic Scheurer
  */
-public interface Term extends CCTerm<SourceElement, JavaDLVisitor, Term> {
+public interface Term extends CCTerm<Visitor, Term> {
 
     @Override
     public ImmutableArray<Term> subs();
@@ -39,6 +37,6 @@ public interface Term extends CCTerm<SourceElement, JavaDLVisitor, Term> {
     public JavaBlock modalContent();
 
     @Override
-    void execPostOrder(JavaDLVisitor visitor);
+    void execPostOrder(Visitor visitor);
 
 }

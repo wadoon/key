@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.JavaDLVisitor;
+import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -191,7 +191,7 @@ abstract class ReplaceAndRegisterMethod {
         return qvVisitor.getResult();
     }
 
-    final private static class QuantifiableVariableVisitor implements JavaDLVisitor {
+    final private static class QuantifiableVariableVisitor implements Visitor {
         private HashSet<QuantifiableVariable> vars = new LinkedHashSet<QuantifiableVariable>();
 
         @Override

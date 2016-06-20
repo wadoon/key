@@ -6,7 +6,7 @@ import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
-public interface CCSequent<T extends CCTerm<?, ?, T>, SeqFor extends SequentFormula<T>, 
+public interface CCSequent<T extends CCTerm<?, T>, SeqFor extends SequentFormula<T>,
                            SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<T, SeqFor, SemiSeq, Seq>>
           extends Iterable<SeqFor>{
 

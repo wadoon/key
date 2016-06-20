@@ -57,7 +57,7 @@ import org.key_project.util.collection.ImmutableSet;
  * "JavaTerm" or the like; from this class here, the java specific methods
  * have been removed.
  */
-public interface CCTerm<S, V extends CCTermVisitor<T>, T extends CCTerm<S, V, T>>
+public interface CCTerm<V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
         extends SVSubstitute, Sorted {
 
     /** 
@@ -75,7 +75,7 @@ public interface CCTerm<S, V extends CCTermVisitor<T>, T extends CCTerm<S, V, T>
     /**
      * The modal content 
      */
-    public ModalContent<S> modalContent();
+    public ModalContent<?> modalContent();
 
     /**
      * Checks if the {@link ModalContent} or one of its direct or indirect children

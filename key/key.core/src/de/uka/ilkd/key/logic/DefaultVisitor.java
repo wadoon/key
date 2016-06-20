@@ -18,4 +18,4 @@ import org.key_project.common.core.logic.visitors.CCDefaultVisitor;
 /**
  * This abstract Vistor class declares the interface for a common term visitor.
  */
-public abstract class DefaultVisitor extends CCDefaultVisitor<Term> implements JavaDLVisitor {}
+public abstract class DefaultVisitor extends CCDefaultVisitor<Term> implements Visitor {}

@@ -27,7 +27,7 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  * @author Dominic Scheurer
  */
-public class CCSequentChangeInfo<T extends CCTerm<?, ?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<T, SeqFor, SemiSeq, Seq>> {
+public class CCSequentChangeInfo<T extends CCTerm<?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<T, SeqFor, SemiSeq, Seq>> {
 
     /**
      * change information related to the antecedent, this means the there added

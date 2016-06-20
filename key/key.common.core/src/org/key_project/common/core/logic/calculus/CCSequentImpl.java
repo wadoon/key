@@ -28,7 +28,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author Dominic Scheurer
  *
  */
-public abstract class CCSequentImpl<T extends CCTerm<?, ?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<T, SeqFor, SemiSeq, Seq>> 
+public abstract class CCSequentImpl<T extends CCTerm<?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<T, SeqFor, SemiSeq, Seq>>
                           implements CCSequent<T, SeqFor, SemiSeq, Seq> {
 
     private final SemiSeq antecedent;

@@ -22,7 +22,7 @@ import org.key_project.common.core.logic.CCTerm;
  *
  * @param <T>
  */
-public interface CCTermVisitor<T extends CCTerm<?, ?, T>> {
+public interface CCTermVisitor<T extends CCTerm<?, T>> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      * @param visited The currently visited {@link Term}.
