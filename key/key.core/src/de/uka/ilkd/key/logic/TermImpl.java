@@ -13,14 +13,17 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.java.SourceElement;
+
+import org.key_project.common.core.logic.CCTermImpl;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -28,7 +31,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * The currently only class implementing the Term interface. TermFactory should
  * be the only class dealing directly with the TermImpl class.
  */
-class TermImpl extends CCTermImpl<JavaBlock, Visitor, Term> implements Term {
+class TermImpl extends CCTermImpl<SourceElement, JavaBlock, Visitor, Term> implements Term {
 
     private static final ImmutableArray<Term> EMPTY_TERM_LIST =
             new ImmutableArray<Term>();
@@ -105,8 +108,8 @@ class TermImpl extends CCTermImpl<JavaBlock, Visitor, Term> implements Term {
     }
 
     @Override
-    protected NameAbstractionTable unifyModalContent(Term t0, Term t1,
-            NameAbstractionTable nat, NameAbstractionTable failResult) {
+    protected NameAbstractionTable<SourceElement> unifyModalContent(Term t0, Term t1,
+                                                                    NameAbstractionTable<SourceElement> nat, NameAbstractionTable<SourceElement> failResult) {
 
         if (!t0.modalContent().isEmpty() || !t1.modalContent().isEmpty()) {
             nat = checkNat(nat);
@@ -134,8 +137,8 @@ class TermImpl extends CCTermImpl<JavaBlock, Visitor, Term> implements Term {
     protected boolean unifyTermsModuloBoundRenaming(Term t0, Term t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
-            NameAbstractionTable nat,
-            NameAbstractionTable failResult){
+            NameAbstractionTable<SourceElement> nat,
+            NameAbstractionTable<SourceElement> failResult){
 
             if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
                 return true;
@@ -170,9 +173,9 @@ class TermImpl extends CCTermImpl<JavaBlock, Visitor, Term> implements Term {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private static NameAbstractionTable checkNat(NameAbstractionTable nat) {
+    private static NameAbstractionTable<SourceElement> checkNat(NameAbstractionTable<SourceElement> nat) {
         if (nat == null) {
-            return new NameAbstractionTable();
+            return new NameAbstractionTable<SourceElement>();
         }
         return nat;
     }

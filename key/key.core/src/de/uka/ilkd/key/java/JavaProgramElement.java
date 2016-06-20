@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -128,7 +129,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
      */
     @Override    
     public boolean equalsModRenaming(SourceElement se, 
-            NameAbstractionTable nat) {
+            NameAbstractionTable<SourceElement> nat) {
     	return (this.getClass() == se.getClass());
     }
     
@@ -168,7 +169,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
     /** this class is used by method call. As in this case we do not
      * want to abstract from  names
      */
-    static class NameAbstractionTableDisabled extends NameAbstractionTable {
+    static class NameAbstractionTableDisabled extends NameAbstractionTable<SourceElement> {
 	
 	
     public static final NameAbstractionTableDisabled INSTANCE = new NameAbstractionTableDisabled();

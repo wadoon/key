@@ -16,10 +16,10 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.program.NameAbstractionTable;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -171,7 +171,7 @@ public class ProgramElementName extends Name
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, 
-            NameAbstractionTable nat) {
+            NameAbstractionTable<SourceElement> nat) {
 	if (!(se instanceof ProgramElementName)) {
 	    return false;
 	}

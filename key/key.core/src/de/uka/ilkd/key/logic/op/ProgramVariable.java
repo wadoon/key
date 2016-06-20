@@ -20,11 +20,11 @@ import org.key_project.common.core.logic.op.AbstractSortedOperator;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.ParsableVariable;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -262,7 +262,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
      */
     @Override    
     public boolean equalsModRenaming(SourceElement se, 
-            NameAbstractionTable nat) {
+            NameAbstractionTable<SourceElement> nat) {
 	return nat.sameAbstractName(this, se);
     }
 

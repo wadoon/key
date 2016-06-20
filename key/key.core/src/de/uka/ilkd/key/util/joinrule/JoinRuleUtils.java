@@ -30,6 +30,7 @@ import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -39,7 +40,6 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -893,7 +893,7 @@ public class JoinRuleUtils {
 
         // Quick short cut for the special case where no program variables
         // have to be renamed.
-        if (se1.equalsModRenaming(se2, new NameAbstractionTable())) {
+        if (se1.equalsModRenaming(se2, new NameAbstractionTable<SourceElement>())) {
             return true;
         }
 
@@ -909,7 +909,7 @@ public class JoinRuleUtils {
         replVisitor2.start();
 
         return replVisitor1.result().equalsModRenaming(replVisitor2.result(),
-                new NameAbstractionTable());
+                new NameAbstractionTable<SourceElement>());
     }
 
     // /////////////////////////////////////////////////

@@ -11,21 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.key_project.common.core.logic.CCTerm;
-import org.key_project.common.core.logic.ModalContent;
-import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.visitors.CCTermVisitor;
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.collection.*;
-
-import de.uka.ilkd.key.java.NameAbstractionTable;
 
 /**
  * TODO: Document.
@@ -33,7 +29,7 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
  * @author Dominic Scheurer
  *
  */
-public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
+public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
         implements CCTerm<V, T> {
 
     static enum ThreeValuedTruth {
@@ -51,12 +47,6 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
 
     static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST =
             new ImmutableArray<TermLabel>();
-
-    /**
-     * used to encode that <tt>unifyModalContent</tt> results in an
-     * unsatisfiable constraint (faster than using exceptions)
-     */
-    private static NameAbstractionTable FAILED = new NameAbstractionTable();
 
     // -------------------------------------------------------------------
     // instance variables
@@ -80,7 +70,7 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
      * contains a non empty {@link JavaBlock}. {@link Term}s which provides a
      * {@link JavaBlock} directly or indirectly can't be cached because it is
      * possible that the contained meta information inside the {@link JavaBlock}
-     * , e.g. {@link PositionInfo}s, are different.
+     * , e.g. PositionInfos, are different.
      */
     ThreeValuedTruth containsModalContentRecursive =
             ThreeValuedTruth.UNKNOWN;
@@ -137,8 +127,8 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
      * @param failResult
      * @return
      */
-    protected abstract NameAbstractionTable unifyModalContent(T t0, T t1,
-            NameAbstractionTable nat, NameAbstractionTable failResult);
+    protected abstract NameAbstractionTable<S> unifyModalContent(T t0, T t1,
+                                                                             NameAbstractionTable<S> nat, NameAbstractionTable<S> failResult);
 
     /**
      * 
@@ -155,8 +145,8 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
     protected abstract boolean unifyTermsModuloBoundRenaming(T t0, T t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
-            NameAbstractionTable nat,
-            NameAbstractionTable failResult);
+            NameAbstractionTable<S> nat,
+            NameAbstractionTable<S> failResult);
 
     // -------------------------------------------------------------------------
     // public interface
@@ -293,7 +283,7 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
 
         return unifyTermsModuloBoundRenaming(thisAsT(), (T) o,
                 ImmutableSLList.<QuantifiableVariable> nil(),
-                ImmutableSLList.<QuantifiableVariable> nil(), null, FAILED);
+                ImmutableSLList.<QuantifiableVariable> nil(), null, failed());
     }
 
     /**
@@ -310,7 +300,8 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
             return false;
         }
 
-        final TermImpl t = (TermImpl) o;
+        @SuppressWarnings("unchecked")
+        final CCTermImpl<S, P, V, T> t = (CCTermImpl<S, P, V, T>) o;
 
         return op.equals(t.op) && t.hasLabels() == hasLabels()
                 && subs.equals(t.subs) && boundVars.equals(t.boundVars)
@@ -412,6 +403,55 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
         }
         return true;
     }
+    
+    // Methods needed for equalsModRenaming
+
+    /**
+     * 
+     * TODO: Document.
+     *
+     * @param t0
+     * @param t1
+     * @param ownBoundVars
+     * @param cmpBoundVars
+     * @param nat
+     * @return
+     */
+    protected boolean descendRecursively(T t0, T t1,
+            ImmutableList<QuantifiableVariable> ownBoundVars,
+            ImmutableList<QuantifiableVariable> cmpBoundVars,
+            NameAbstractionTable<S> nat) {
+
+        for (int i = 0; i < t0.arity(); i++) {
+            ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
+            ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
+
+            if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size()) {
+                return false;
+            }
+            for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
+                final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
+                final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
+                if (ownVar.sort() != cmpVar.sort()) {
+                    return false;
+                }
+
+                subOwnBoundVars = subOwnBoundVars.prepend(ownVar);
+                subCmpBoundVars = subCmpBoundVars.prepend(cmpVar);
+            }
+
+            boolean newConstraint =
+                    unifyTermsModuloBoundRenaming(t0.sub(i), t1.sub(i),
+                            subOwnBoundVars,
+                            subCmpBoundVars, nat, failed());
+
+            if (!newConstraint) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     // -------------------------------------------------------------------------
     // private instance methods
@@ -439,54 +479,20 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
         }
     }
 
-    // Methods needed for equalsModRenaming
-
     /**
-     * 
-     * TODO: Document.
-     *
-     * @param t0
-     * @param t1
-     * @param ownBoundVars
-     * @param cmpBoundVars
-     * @param nat
-     * @return
+     * used to encode that <tt>unifyModalContent</tt> results in an
+     * unsatisfiable constraint (faster than using exceptions).
+     * <p>
+     * Note: This was previously a static field; was turned into this method for
+     * type safety in the course of refactoring KeY (removing the Java elements
+     * from the core). Now we definitely have more objects...
      */
-    protected boolean descendRecursively(T t0, T t1,
-            ImmutableList<QuantifiableVariable> ownBoundVars,
-            ImmutableList<QuantifiableVariable> cmpBoundVars,
-            NameAbstractionTable nat) {
-
-        for (int i = 0; i < t0.arity(); i++) {
-            ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
-            ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
-
-            if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size()) {
-                return false;
-            }
-            for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
-                final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
-                final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
-                if (ownVar.sort() != cmpVar.sort()) {
-                    return false;
-                }
-
-                subOwnBoundVars = subOwnBoundVars.prepend(ownVar);
-                subCmpBoundVars = subCmpBoundVars.prepend(cmpVar);
-            }
-
-            boolean newConstraint =
-                    unifyTermsModuloBoundRenaming(t0.sub(i), t1.sub(i),
-                            subOwnBoundVars,
-                            subCmpBoundVars, nat, FAILED);
-
-            if (!newConstraint) {
-                return false;
-            }
-        }
-
-        return true;
+    private NameAbstractionTable<S> failed() {
+        return new NameAbstractionTable<S>();
     }
+    
+//    @SuppressWarnings("rawtypes")
+//    private static NameAbstractionTable FAILED = new NameAbstractionTable();
 
     // -------------------------------------------------------------------------
     // private static methods

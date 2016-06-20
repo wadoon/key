@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java;
 
 import java.util.ArrayList;
 
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -86,7 +87,7 @@ public class StatementBlock extends JavaStatement
     }
 
     @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
+    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable<SourceElement> nat) {
        return super.equalsModRenaming(se, nat)
                 && (this.getStartPosition().equals(Position.UNDEFINED) ||  // why do we care here about position info and nowhere else?
                         se.getStartPosition().equals(Position.UNDEFINED) ||

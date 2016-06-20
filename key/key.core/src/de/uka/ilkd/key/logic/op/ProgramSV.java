@@ -19,12 +19,12 @@ import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.AbstractSV;
 import org.key_project.common.core.logic.op.UpdateableOperator;
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.LoopInitializer;
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -92,7 +92,7 @@ public final class ProgramSV extends AbstractSV
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, 
-            NameAbstractionTable nat) {
+            NameAbstractionTable<SourceElement> nat) {
 	return se == this;
     }    
         

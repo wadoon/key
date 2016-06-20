@@ -11,13 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java;
+package org.key_project.common.core.program;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.key_project.common.core.program.CCNameAbstractionTable;
 
 /** 
  * This class is used for the equals modulo renaming method in
@@ -28,23 +26,23 @@ import org.key_project.common.core.program.CCNameAbstractionTable;
  * o2 instead of their real name. For this comparision a method is
  * offered so that the assigned name is not given outside.
  */
-public class NameAbstractionTable implements CCNameAbstractionTable<SourceElement> {
+public class NameAbstractionTable<S> implements CCNameAbstractionTable<S> {
 
     /**
      * The order in which symbols are declared in the two terms or programs that
      * are compared. The latest declaration of a symbol will be the first
      * matching entry in the list
      */
-    private List<SourceElement> declarations0 = null, declarations1 = null;
+    private List<S> declarations0 = null, declarations1 = null;
     
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.java.GenericNameAbstractionTable#add(de.uka.ilkd.key.java.SourceElement, de.uka.ilkd.key.java.SourceElement)
      */
     @Override
-    public void add(SourceElement pe1, SourceElement pe2) {
+    public void add(S pe1, S pe2) {
         if ( declarations0 == null ) {
-            declarations0 = new LinkedList<SourceElement> ();
-            declarations1 = new LinkedList<SourceElement> ();
+            declarations0 = new LinkedList<S> ();
+            declarations1 = new LinkedList<S> ();
         }
 
         declarations0.add ( 0, pe1 );
@@ -55,10 +53,10 @@ public class NameAbstractionTable implements CCNameAbstractionTable<SourceElemen
      * @see de.uka.ilkd.key.java.GenericNameAbstractionTable#sameAbstractName(de.uka.ilkd.key.java.SourceElement, de.uka.ilkd.key.java.SourceElement)
      */
     @Override
-    public boolean sameAbstractName(SourceElement pe0, SourceElement pe1) {
+    public boolean sameAbstractName(S pe0, S pe1) {
         if ( declarations0 != null ) {
-            final Iterator<SourceElement> it0 = declarations0.iterator ();
-            final Iterator<SourceElement> it1 = declarations1.iterator ();
+            final Iterator<S> it0 = declarations0.iterator ();
+            final Iterator<S> it1 = declarations1.iterator ();
 
             while ( it0.hasNext () ) {
                 // both lists are assumed to hold the same number of elements

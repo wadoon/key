@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java;
 
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -72,7 +73,7 @@ public abstract class JavaNonTerminalProgramElement
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, 
-				     NameAbstractionTable nat) {
+				     NameAbstractionTable<SourceElement> nat) {
 
     if (se == this) {
         return true;

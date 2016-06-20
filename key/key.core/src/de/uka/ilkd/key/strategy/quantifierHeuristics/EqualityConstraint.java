@@ -20,10 +20,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.java.SourceElement;
+
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.util.BooleanContainer;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -32,7 +35,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -324,7 +326,7 @@ public class EqualityConstraint implements Constraint {
                                    Term                       t1,
                                    ImmutableList<QuantifiableVariable> ownBoundVars, 
                                    ImmutableList<QuantifiableVariable> cmpBoundVars,
-                                   NameAbstractionTable       nat,
+                                   NameAbstractionTable<SourceElement> nat,
                                    boolean                    modifyThis, 
                                    JavaDLTermServices services ) {
 
@@ -434,11 +436,11 @@ public class EqualityConstraint implements Constraint {
      * used to encode that <tt>handleJava</tt> results in an unsatisfiable constraint
      * (faster than using exceptions)
      */
-    private static NameAbstractionTable FAILED = new NameAbstractionTable();
+    private static NameAbstractionTable<SourceElement> FAILED = new NameAbstractionTable<SourceElement>();
     
-    private static NameAbstractionTable handleJava (Term t0,
-                                                    Term t1,
-                                                    NameAbstractionTable nat) {
+    private static NameAbstractionTable<SourceElement> handleJava (Term t0,
+                                                                   Term t1,
+                                                                   NameAbstractionTable<SourceElement> nat) {
 
 
         if ( !t0.modalContent ().isEmpty()
@@ -469,7 +471,7 @@ public class EqualityConstraint implements Constraint {
                        Term t1,
                        ImmutableList<QuantifiableVariable> ownBoundVars,
                        ImmutableList<QuantifiableVariable> cmpBoundVars,
-                       NameAbstractionTable nat,
+                       NameAbstractionTable<SourceElement> nat,
                        boolean modifyThis,
                        JavaDLTermServices services) {
         Constraint newConstraint = this;
@@ -503,8 +505,8 @@ public class EqualityConstraint implements Constraint {
         return newConstraint;
     }
 
-    private static NameAbstractionTable checkNat (NameAbstractionTable nat) {
-        if ( nat == null ) return new NameAbstractionTable ();
+    private static NameAbstractionTable<SourceElement> checkNat (NameAbstractionTable<SourceElement> nat) {
+        if ( nat == null ) return new NameAbstractionTable<SourceElement>();
         return nat;
     }
 

@@ -16,9 +16,9 @@ package de.uka.ilkd.key.java.expression.literal;
 import java.math.BigInteger;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -94,7 +94,7 @@ public final class BigintLiteral extends Literal {
      */
     @Override
     public boolean equalsModRenaming
-	( SourceElement o, NameAbstractionTable nat) {
+	( SourceElement o, NameAbstractionTable<SourceElement> nat) {
 	if (!(o instanceof BigintLiteral)) {
 	    return false;
 	}

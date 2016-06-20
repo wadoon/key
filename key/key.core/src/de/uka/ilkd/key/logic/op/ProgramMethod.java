@@ -16,12 +16,12 @@ package de.uka.ilkd.key.logic.op;
 import java.io.IOException;
 
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -298,7 +298,7 @@ public final class ProgramMethod extends ObserverFunction
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, 
-	    NameAbstractionTable nat) {
+	    NameAbstractionTable<SourceElement> nat) {
 	if (se == null || !(se instanceof IProgramMethod)) {
 	    return false;
 	}
