@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -195,18 +196,18 @@ public abstract class TacletIndex  {
      * adds a set of NoPosTacletApp to this index
      * @param tacletAppList the NoPosTacletApps to be added
      */
-    public void addTaclets(ImmutableSet<NoPosTacletApp> tacletAppList) {
+    public void addTaclets(Iterable<NoPosTacletApp> tacletAppList) {
 	for(NoPosTacletApp taclet : tacletAppList) {
 	    add(taclet);
 	}
     }
 
     public static ImmutableSet<NoPosTacletApp> toNoPosTacletApp(Iterable<Taclet> rule) {
-	ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.<NoPosTacletApp>nil();
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	for (Taclet t : rule) {
-	    result = result.add(NoPosTacletApp.createNoPosTacletApp(t));
+	    result = result.prepend(NoPosTacletApp.createNoPosTacletApp(t));
 	}
-	return result;
+	return DefaultImmutableSet.fromImmutableList(result);
     }
 
     /** adds a new Taclet with instantiation information to this index. 
@@ -287,31 +288,29 @@ public abstract class TacletIndex  {
         return this.copy();
     }
     
-    private ImmutableSet<NoPosTacletApp> addToSet(ImmutableList<NoPosTacletApp> list,
-				       ImmutableSet<NoPosTacletApp> set) {	
+    private void addToSet(ImmutableList<NoPosTacletApp> list, Set<NoPosTacletApp> result) {
 	for(NoPosTacletApp tacletApp : list) {
-	    set = set.add(tacletApp);
+            result.add(tacletApp);
 	}
-	return set;
     }
 
 	
 
-    public ImmutableSet<NoPosTacletApp> allNoPosTacletApps() {
-	ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.<NoPosTacletApp>nil();
+    public Set<NoPosTacletApp> allNoPosTacletApps() {
+	Set<NoPosTacletApp> result = new LinkedHashSet<NoPosTacletApp>();
 	for(ImmutableList<NoPosTacletApp> tacletApps : rwList.values()) {
-	    result = addToSet(tacletApps, result);
+	    addToSet(tacletApps, result);
 	}
 
 	for(ImmutableList<NoPosTacletApp> tacletApps : antecList.values()) {
-	    result = addToSet(tacletApps, result);
+	    addToSet(tacletApps, result);
 	}
 
 	for(ImmutableList<NoPosTacletApp> tacletApps : succList.values()) {
-	    result = addToSet(tacletApps, result);
+	    addToSet(tacletApps, result);
 	}
 	
-	result = addToSet(noFindList, result);
+	addToSet(noFindList, result);
 
 	return result;
     }
