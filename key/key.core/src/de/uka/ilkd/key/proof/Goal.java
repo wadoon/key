@@ -67,7 +67,7 @@ public final class Goal  {
     /** all possible rule applications at this node are managed with this index */
     private RuleAppIndex ruleAppIndex;
 
-    /** list of all applied rule applications at this branch */
+    /** list of all executed rule applications at this branch */
     private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.<RuleApp>nil();
 
     /** this object manages the tags for all formulas of the sequent */

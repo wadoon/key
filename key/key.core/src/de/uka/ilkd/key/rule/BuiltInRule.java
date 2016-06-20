@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 
 /**
- * Buit-in rule interface.
+ * Built-in rule interface.
  * As applications of this rule kind may
  * not be successful in each case one has to ensure that the goal split is
  * done only iff the application was successful.

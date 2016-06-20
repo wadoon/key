@@ -55,6 +55,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.io.AbstractKeYParserEnvInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
@@ -581,7 +582,7 @@ public final class ProblemInitializer {
     }
     
     
-    public void tryReadProof(IProofFileParser pfp, KeYUserProblemFile kupf) 
+    public void tryReadProof(IProofFileParser pfp, AbstractKeYParserEnvInput kupf) 
                 throws ProofInputException {
         reportStatus("Loading proof", kupf.getNumberOfChars());
         try {
@@ -589,8 +590,10 @@ public final class ProblemInitializer {
            setProgress(kupf.getNumberOfChars() / 2);
         }
         finally {
-           kupf.close();
-           setProgress(kupf.getNumberOfChars());
+            if (kupf instanceof KeYFile) {
+                ((KeYFile) kupf).closeLexerStream();
+            }
+            setProgress(kupf.getNumberOfChars());
         }
     }
 

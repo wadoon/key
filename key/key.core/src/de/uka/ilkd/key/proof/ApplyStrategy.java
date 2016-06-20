@@ -397,6 +397,9 @@ public class ApplyStrategy {
 
     IGoalChooser goalChooser;
 
+    public ApplyStrategy(Proof proof) {
+        this(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
+    }
 
     // Please create this object beforehand and re-use it.
     // Otherwise the addition/removal of the InteractiveProofListener
@@ -461,10 +464,9 @@ public class ApplyStrategy {
         SingleRuleApplicationInfo srInfo = null;
         try{
             Debug.out("Strategy started.");
-            boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof,
-                                                          goalChooser, time, countApplied, srInfo);
 
-            while (!shouldStop) {
+            while (!stopCondition.shouldStop(maxApplications, timeout, proof,
+                    goalChooser, time, countApplied, srInfo)) {
                 srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonCloseableGoal);
                 if (!srInfo.isSuccess()) {
                     return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(),
@@ -476,16 +478,12 @@ public class ApplyStrategy {
                 if (Thread.interrupted()) {
                     throw new InterruptedException();
                 }
-                shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, goalChooser,
-                                                      time, countApplied, srInfo);
             }
-            if (shouldStop) {
-                return new ApplyStrategyInfo(
-                        stopCondition.getStopMessage(maxApplications, timeout, proof, goalChooser,
-                                                     time, countApplied, srInfo),
-                        proof, null, (Goal) null, System.currentTimeMillis()-time,
-                        countApplied, closedGoals);
-            }
+            return new ApplyStrategyInfo(
+                    stopCondition.getStopMessage(maxApplications, timeout, proof, goalChooser,
+                                                 time, countApplied, srInfo),
+                    proof, null, (Goal) null, System.currentTimeMillis()-time,
+                    countApplied, closedGoals);
         } catch (InterruptedException e) {
             cancelled = true;
             return new ApplyStrategyInfo("Interrupted.", proof, null, goalChooser.getNextGoal(),
@@ -500,9 +498,6 @@ public class ApplyStrategy {
             Debug.out("Applied ", countApplied);
             Debug.out("Time elapsed: ", time);
         }
-        assert srInfo != null;
-        return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,
-                                     countApplied, closedGoals);
     }
 
     private synchronized void fireTaskStarted (int maxSteps) {

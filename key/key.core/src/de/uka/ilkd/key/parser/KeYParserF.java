@@ -58,6 +58,10 @@ public class KeYParserF extends KeYParser {
         super(mode, new CommonTokenStream(keYLexerF), services, nss);
     }
 
+    public KeYParserF(ParserMode mode, KeYLexerF lexer, ParserConfig pc) {
+        this(mode, lexer, pc, pc, null, null);
+    }
+
     /**
      * Gets a better error message for a recognition exception from the parser.
      *

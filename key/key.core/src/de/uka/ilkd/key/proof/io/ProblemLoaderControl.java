@@ -6,12 +6,12 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.proof.io.FileProblemLoader.ReplayResult;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 /**
- * Allows to observe and control the loading performed by an {@link AbstractProblemLoader}.
+ * Allows to observe and control the loading performed by an {@link FileProblemLoader}.
  * @author Martin Hentschel
  */
 public interface ProblemLoaderControl extends ProblemInitializerListener, ProgressMonitor {

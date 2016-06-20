@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -40,6 +41,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
+import de.uka.ilkd.key.proof.io.AbstractKeYParserEnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
@@ -59,6 +61,22 @@ public final class SLEnvInput extends AbstractEnvInput {
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
+
+    public SLEnvInput(String javaPath,
+            Profile profile) {
+        this(javaPath, null, null, profile);
+    }
+    
+    public SLEnvInput(AbstractKeYParserEnvInput f) throws ProofInputException, IOException {
+        this(f.readJavaPath(), f.readClassPath(), f.readBootClassPath(), f.getProfile());
+    }
+    
+    public SLEnvInput(String javaPath,
+            List<File> classPath,
+            File bootClassPath,
+            Profile profile) {
+        this(javaPath, classPath, bootClassPath, profile, null);
+    }
     
     public SLEnvInput(String javaPath,
   	      	      List<File> classPath,
@@ -71,18 +89,10 @@ public final class SLEnvInput extends AbstractEnvInput {
 	      bootClassPath, profile, includes);
     }
     
-    
-    public SLEnvInput(String javaPath,
-                      Profile profile) {
-	this(javaPath, null, null, profile, null);
-    }    
-    
-
-    
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
-    
+
     public static String getLanguage() {      
     	GeneralSettings gs 
         = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();

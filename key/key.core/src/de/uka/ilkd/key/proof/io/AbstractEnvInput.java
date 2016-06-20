@@ -47,19 +47,19 @@ public abstract class AbstractEnvInput implements EnvInput {
 	    		    List<File> classPath,
 	    		    File bootClassPath,
 	    		    Profile profile,
- 	    		    List<File> includes) {
-   assert profile != null;
-	this.name     = name;
-	this.javaPath = javaPath;
-	this.classPath = classPath;
-	this.bootClassPath = bootClassPath;
-	this.profile = profile;
-   this.includes = new Includes();
-   if (includes != null) {
-      for (File path : includes) {
-         this.includes.put(path.toString(), RuleSourceFactory.initRuleFile(path));
-      }
-   }
+            List<File> includes) {
+        assert profile != null;
+        this.name = name;
+        this.javaPath = javaPath;
+        this.classPath = classPath;
+        this.bootClassPath = bootClassPath;
+        this.profile = profile;
+        this.includes = new Includes();
+        if (includes != null) {
+            for (File path : includes) {
+                this.includes.put(path.toString(), RuleSourceFactory.initRuleFile(path));
+            }
+        }
     }
 
 

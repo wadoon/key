@@ -24,9 +24,10 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.proof.io.FileProblemLoader;
+import de.uka.ilkd.key.proof.io.FileProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.StringProblemLoader;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
 /**
@@ -81,7 +82,11 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
       this.replayResult = replayResult;
    }
 
-   /**
+    private KeYEnvironment(U ui, FileProblemLoader loader) {
+        this(ui, loader.getInitConfig(), loader.getProof(), loader.getResult());
+    }
+
+/**
     * Returns the {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     * @return The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     */
@@ -158,7 +163,21 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
    public Proof createProof(ProofOblInput input) throws ProofInputException {
       return ui.createProof(getInitConfig(), input);
    }
-   
+
+    /**
+     * Create of {@link KeYEnvironment} from a string. In other words, we load a
+     * string and parse it into a formula. From that formula results a proof obligation.
+     */
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(String problem) throws ProblemLoaderException {
+        DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
+        StringProblemLoader loader = ui.load(problem);
+        return new KeYEnvironment<DefaultUserInterfaceControl>(ui, loader.getInitConfig(), loader.getProof(), null);
+    }
+    
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile) throws ProblemLoaderException {
+        return load(keyFile, null, null, null);
+    }
+
    /**
     * Loads the given location and returns all required references as {@link KeYEnvironment}.
     * The {@link MainWindow} is not involved in the whole process.
@@ -173,7 +192,9 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
                                                                   List<File> classPaths,
                                                                   File bootClassPath,
                                                                   List<File> includes) throws ProblemLoaderException {
-      return load(null, location, classPaths, bootClassPath, includes, false);
+       DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
+       FileProblemLoader loader = ui.load(location, classPaths, bootClassPath, includes);
+       return new KeYEnvironment<DefaultUserInterfaceControl>(ui, loader);
    }
    
    /**
@@ -239,13 +260,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
                                                                   RuleCompletionHandler ruleCompletionHandler,
                                                                   boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
       DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
-      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs); 
-      InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(), loader.getResult());
-   }
-   
-   public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile) throws ProblemLoaderException {
-      return load(keyFile, null, null, null);
+      FileProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs);
+      return new KeYEnvironment<DefaultUserInterfaceControl>(ui, loader);
    }
 
    /**

@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.FileProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
@@ -52,7 +52,7 @@ public interface UserInterfaceControl {
    
     /**
      * <p>
-     * Opens a java file in this {@link UserInterfaceControl} and returns the instantiated {@link AbstractProblemLoader}
+     * Opens a java file in this {@link UserInterfaceControl} and returns the instantiated {@link FileProblemLoader}
      * which can be used to instantiated proofs programmatically.
      * </p>
      * <p>
@@ -65,10 +65,10 @@ public interface UserInterfaceControl {
      * @param includes Optional includes to consider.
      * @param poPropertiesToForce Some optional {@link Properties} for the PO which extend or overwrite saved PO {@link Properties}.
      * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
-     * @return The opened {@link AbstractProblemLoader}.
+     * @return The opened {@link FileProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    AbstractProblemLoader load(Profile profile, 
+    FileProblemLoader load(Profile profile, 
                                File file, 
                                List<File> classPaths, 
                                File bootClassPath, 

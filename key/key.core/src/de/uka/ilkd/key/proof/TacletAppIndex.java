@@ -172,7 +172,11 @@ public class TacletAppIndex  {
      * the cache is fully up-to-date (NewRuleListener gets informed)
      */
     public void fillCache() {
-        ensureIndicesExist ();
+        Debug.assertFalse(getGoal() == null, "TacletAppIndex does not know to which goal it " + "refers");
+
+        if (!isUpToDateForGoal())
+            // Indices are not up to date
+            createAllFromGoal();
     }
 
     private void createAllFromGoal() {
@@ -192,16 +196,6 @@ public class TacletAppIndex  {
                                                     indexCaches );
     }
 
-    private void ensureIndicesExist () {
-    	Debug.assertFalse ( getGoal () == null,
-    	                    "TacletAppIndex does not know to which goal it " +
-                            "refers" );
-
-    	if ( !isUpToDateForGoal() )
-    	    // Indices are not up to date
-            createAllFromGoal ();	    
-    }
-
     /**
      * @return true iff this index currently is up to date with respect to the
      * sequent of the associated goal; this does not detect other modifications
@@ -212,7 +206,7 @@ public class TacletAppIndex  {
     }
 
     private SemisequentTacletAppIndex getIndex(PosInOccurrence pos) {
-        ensureIndicesExist ();
+        fillCache();
         return pos.isInAntec () ? antecIndex : succIndex;
     }
 

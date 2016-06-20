@@ -40,7 +40,7 @@ public final class RuleAppIndex  {
 
     private Goal                goal;
 
-    private TacletIndex         tacletIndex;
+    private final TacletIndex         tacletIndex;
 
     /**
      * Two <code>TacletAppIndex</code> objects, one of which only contains rules
@@ -48,12 +48,12 @@ public final class RuleAppIndex  {
      * can also be applied automatic. This is used as an optimization, as only
      * the latter index has to be kept up to date while applying rules automated
      */
-    private TacletAppIndex      interactiveTacletAppIndex;
-    private TacletAppIndex      automatedTacletAppIndex;
+    private final TacletAppIndex      interactiveTacletAppIndex;
+    private final TacletAppIndex      automatedTacletAppIndex;
 
-    private BuiltInRuleAppIndex builtInRuleAppIndex;
+    private final BuiltInRuleAppIndex builtInRuleAppIndex;
 
-    private List<NewRuleListener>                listenerList =
+    private final List<NewRuleListener>                listenerList =
         Collections.synchronizedList ( new ArrayList<NewRuleListener> ( 10 ) );
 
     /**
@@ -402,7 +402,7 @@ public final class RuleAppIndex  {
     }
 
     /**
-     * Ensures that all caches are fully up-to-date
+     * Fill cache of taclet app indices.
      */
     public void fillCache () {
 	if ( !autoMode )

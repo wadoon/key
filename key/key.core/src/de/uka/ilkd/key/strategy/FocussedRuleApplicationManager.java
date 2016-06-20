@@ -177,8 +177,8 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
         }
     }
 
-    @Override
     public AutomatedRuleApplicationManager getDelegate () {
         return delegate;
     }
+    
 }

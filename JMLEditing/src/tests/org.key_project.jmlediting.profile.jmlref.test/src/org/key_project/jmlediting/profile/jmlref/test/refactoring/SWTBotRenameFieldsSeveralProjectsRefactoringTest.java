@@ -17,7 +17,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Robert Heimbach
  *
  */
-public class RenameFieldsSeveralProjectsRefactoringTest {
+public class SWTBotRenameFieldsSeveralProjectsRefactoringTest {
 
    private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
@@ -27,7 +27,7 @@ public class RenameFieldsSeveralProjectsRefactoringTest {
    }
 
    @Test
-   public void test19BasicReferencing() throws InterruptedException, CoreException {
+   public void test19BasicReferencing() throws Exception {
       // Create projects and set references
       final IProject referencedProject = TestUtilsRefactoring.createProjectWithFiles(
             "referencedProject",
@@ -58,7 +58,7 @@ public class RenameFieldsSeveralProjectsRefactoringTest {
    }
 
    @Test
-   public void test20BasicPlusOwnField() throws InterruptedException, CoreException {
+   public void test20BasicPlusOwnField() throws Exception {
       // Create projects and set references
       final IProject referencedProject = TestUtilsRefactoring.createProjectWithFiles(
             "referencedProject",
