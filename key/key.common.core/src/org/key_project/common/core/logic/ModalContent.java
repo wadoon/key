@@ -1,7 +1,7 @@
 package org.key_project.common.core.logic;
 
 
-public interface ModalContent<S/* program AST */> {
+public interface ModalContent {
 
     /**
      * returns true if the program is empty

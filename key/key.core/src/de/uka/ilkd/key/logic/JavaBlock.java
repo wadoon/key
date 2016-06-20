@@ -21,10 +21,9 @@ import org.key_project.common.core.logic.ModalContent;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 
-public class JavaBlock implements ModalContent<SourceElement> {
+public class JavaBlock implements ModalContent {
 
     /**
      * Attention using the JavaBlock below means no program not the empty
