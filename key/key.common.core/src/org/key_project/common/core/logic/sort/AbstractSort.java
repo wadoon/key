@@ -11,11 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.sort;
+package org.key_project.common.core.logic.sort;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.SortDependingFunction;
-import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.CCProofServices;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.DefaultImmutableSet;

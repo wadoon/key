@@ -10,12 +10,12 @@ import java.util.Set;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;

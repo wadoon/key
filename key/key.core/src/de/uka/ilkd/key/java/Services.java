@@ -22,6 +22,7 @@ import org.key_project.common.core.logic.CCTermFactory;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.common.core.services.ProgramServices;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;

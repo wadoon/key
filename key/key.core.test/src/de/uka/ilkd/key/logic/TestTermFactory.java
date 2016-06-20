@@ -23,6 +23,7 @@ import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
@@ -32,7 +33,6 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the term factory

@@ -20,10 +20,10 @@ import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.SortImpl;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Goal;

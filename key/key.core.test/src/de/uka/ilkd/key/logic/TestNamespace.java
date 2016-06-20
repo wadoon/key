@@ -19,8 +19,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.sort.Sort;
-
-import de.uka.ilkd.key.logic.sort.SortImpl;
+import org.key_project.common.core.logic.sort.SortImpl;
 
 
 /** class tests the namespace

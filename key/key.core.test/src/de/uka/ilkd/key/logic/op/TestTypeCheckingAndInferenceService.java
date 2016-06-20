@@ -18,11 +18,11 @@ import java.io.File;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.LogicVariable;
+import org.key_project.common.core.logic.sort.SortImpl;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.TestCase;

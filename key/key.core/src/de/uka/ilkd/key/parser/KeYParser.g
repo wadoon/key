@@ -61,7 +61,7 @@ options {
   import org.key_project.common.core.logic.calculus.*;
   import org.key_project.common.core.logic.label.TermLabel;
   import org.key_project.common.core.logic.op.*;
-  import org.key_project.common.core.logic.sort.Sort;
+  import org.key_project.common.core.logic.sort.*;
   import org.key_project.common.core.rule.TacletOption;
   import org.key_project.util.collection.*;
 

@@ -4,13 +4,13 @@ import java.io.IOException;
 
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.SortImpl;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 
 /**
  * This class is used by LogicPrinter.java to print out select-terms, i.e. terms

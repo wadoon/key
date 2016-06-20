@@ -22,10 +22,10 @@ import org.key_project.common.core.logic.op.AbstractSortedOperator;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.SortImpl;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 import de.uka.ilkd.key.util.Debug;

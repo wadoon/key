@@ -24,6 +24,7 @@ import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.*;
 
@@ -39,7 +40,6 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;

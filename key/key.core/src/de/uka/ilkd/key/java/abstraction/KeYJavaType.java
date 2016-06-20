@@ -16,11 +16,11 @@ package de.uka.ilkd.key.java.abstraction;
 import java.util.Comparator;
 
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.logic.sort.SortImpl;
 
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
