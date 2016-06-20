@@ -13,14 +13,10 @@
 
 package de.uka.ilkd.key.strategy.termfeature;
 
-import org.key_project.common.core.logic.op.IfThenElse;
-import org.key_project.common.core.logic.op.Junctor;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.Quantifier;
+import org.key_project.common.core.logic.op.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
 
 public class AtomTermFeature extends BinaryTermFeature {
 

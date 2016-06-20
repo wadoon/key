@@ -11,34 +11,33 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractSV;
 import org.key_project.common.core.logic.sort.Sort;
 
-
-/** 
+/**
  * A schema variable that is used as placeholder for formulas.
- */  
+ */
 public final class FormulaSV extends AbstractSV {
-    
-    /** 
-     * @param name the name of the SchemaVariable
-     * @param isRigid true iff this SV may only match rigid formulas
+
+    /**
+     * @param name
+     *            the name of the SchemaVariable
+     * @param isRigid
+     *            true iff this SV may only match rigid formulas
      */
-    FormulaSV(Name name, boolean isRigid) {
-	super(name, Sort.FORMULA, isRigid, true);
+    public FormulaSV(Name name, boolean isRigid) {
+        super(name, Sort.FORMULA, isRigid, true);
     }
-    
+
     @Override
     public String toString() {
-	return toString("formula");
-    }	
-    
-    
+        return toString("formula");
+    }
+
     @Override
     public String proofToString() {
-	return "\\schemaVar \\formula " + name() + ";\n";
+        return "\\schemaVar \\formula " + name() + ";\n";
     }
 }

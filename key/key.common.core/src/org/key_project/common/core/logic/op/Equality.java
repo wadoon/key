@@ -11,39 +11,35 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractSortedOperator;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
 
-
 /**
- * This class defines the equality operator "=". It is a binary
- * predicate accepting arbitrary terms (sort "any") as arguments.
+ * This class defines the equality operator "=". It is a binary predicate
+ * accepting arbitrary terms (sort "any") as arguments.
  * 
- * It also defines the formula equivalence operator "<->" (which
- * could alternatively be seen as a Junctor).
+ * It also defines the formula equivalence operator "<->" (which could
+ * alternatively be seen as a Junctor).
  */
 public final class Equality extends AbstractSortedOperator {
 
-    /** 
+    /**
      * the usual 'equality' operator '='
      */
-    public static final Equality EQUALS = new Equality(new Name("equals"), 
-	    					       SortImpl.ANY);
-    
-    /** 
-     * the usual 'equivalence' operator '<->' (be A, B formulae then
-     * 'A <->  B' is true if and only if A and B have the same truth
-     * value
-     */ 
+    public static final Equality EQUALS = new Equality(new Name("equals"),
+            SortImpl.ANY);
+
+    /**
+     * the usual 'equivalence' operator '<->' (be A, B formulae then 'A <-> B'
+     * is true if and only if A and B have the same truth value
+     */
     public static final Equality EQV = new Equality(new Name("equiv"),
-        					    Sort.FORMULA);
-    
-    
-    private Equality(Name name, Sort targetSort){
-	super(name, new Sort[]{targetSort, targetSort}, Sort.FORMULA, true);
+            Sort.FORMULA);
+
+    private Equality(Name name, Sort targetSort) {
+        super(name, new Sort[] { targetSort, targetSort }, Sort.FORMULA, true);
     }
 }

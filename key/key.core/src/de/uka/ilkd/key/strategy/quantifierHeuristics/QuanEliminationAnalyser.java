@@ -15,13 +15,9 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.logic.op.Junctor;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.Quantifier;
+import org.key_project.common.core.logic.op.*;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
 
 public class QuanEliminationAnalyser {
     

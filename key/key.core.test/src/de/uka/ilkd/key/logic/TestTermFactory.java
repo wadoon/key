@@ -17,11 +17,7 @@ import junit.framework.TestCase;
 
 import org.junit.Assert;
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.Junctor;
-import org.key_project.common.core.logic.op.LogicVariable;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.Quantifier;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -30,7 +26,6 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.rule.TacletForTests;

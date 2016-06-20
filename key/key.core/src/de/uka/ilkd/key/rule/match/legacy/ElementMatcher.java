@@ -1,21 +1,13 @@
 package de.uka.ilkd.key.rule.match.legacy;
 
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.common.core.logic.op.AbstractSV;
-import org.key_project.common.core.logic.op.ElementaryUpdate;
-import org.key_project.common.core.logic.op.LogicVariable;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.SVSubstitute;
-import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.testgen.oracle;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.op.Equality;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.sort.Sort;
 
@@ -12,7 +13,6 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;

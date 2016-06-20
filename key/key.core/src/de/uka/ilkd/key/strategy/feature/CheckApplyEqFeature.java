@@ -16,10 +16,10 @@ package de.uka.ilkd.key.strategy.feature;
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.op.Equality;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
