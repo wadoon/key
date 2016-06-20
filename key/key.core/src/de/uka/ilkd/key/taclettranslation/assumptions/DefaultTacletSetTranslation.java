@@ -28,7 +28,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
@@ -256,7 +256,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                 return toStore;
         }
 
-        private String convertTerm(JavaDLTerm term) {
+        private String convertTerm(Term term) {
                 String ret = LogicPrinter.quickPrintTerm(term, null);
                 ret = "(" + ret + ")";
                 return ret;
@@ -278,7 +278,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
         }
 
         public boolean eventInstantiationFailure(GenericSort dest, Sort sort,
-                        Taclet t, JavaDLTerm term) {
+                        Taclet t, Term term) {
                 /*
                  * String s = ""; s += "taclet: " + t.name()+"\n"; s += "term: "
                  * + term +"\n"; s += "generic sort: " + dest + "\n"; s +=

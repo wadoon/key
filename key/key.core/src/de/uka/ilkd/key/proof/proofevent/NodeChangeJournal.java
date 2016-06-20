@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -97,7 +97,7 @@ public class NodeChangeJournal implements GoalListener {
      * of goal
      */
     public void sequentChanged ( Goal              source,
-				 CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci ) {
+				 CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci ) {
         NodeChangesHolder nc = getChangeObj(source.node ());
         
 	if ( nc != null )

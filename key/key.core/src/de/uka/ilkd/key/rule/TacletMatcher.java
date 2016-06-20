@@ -5,7 +5,7 @@ import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 public interface TacletMatcher {
 
@@ -24,7 +24,7 @@ public interface TacletMatcher {
     * against p_template, and the corresponding MatchConditions.
     */
    public abstract IfMatchResult matchIf(
-         Iterable<IfFormulaInstantiation> p_toMatch, JavaDLTerm p_template,
+         Iterable<IfFormulaInstantiation> p_toMatch, Term p_template,
          MatchConditions p_matchCond, Services p_services);
 
    /**
@@ -72,7 +72,7 @@ public interface TacletMatcher {
     * matches the given term against the taclet's find term 
     * if the taclet has no find term or the match is unsuccessful <code>null</null>
     * is returned
-    * @param term the JavaDLTerm to be matched against the find expression 
+    * @param term the Term to be matched against the find expression 
     * of the taclet
     * @param matchCond the MatchConditions with side conditions to be 
     * satisfied, eg. partial instantiations of schema variables; before
@@ -84,19 +84,19 @@ public interface TacletMatcher {
     * @return the found schema variable mapping or <tt>null</tt> if 
     * the matching failed
     */
-   public abstract MatchConditions matchFind(JavaDLTerm term, MatchConditions matchCond, Services services);
+   public abstract MatchConditions matchFind(Term term, MatchConditions matchCond, Services services);
    
    
    /** 
-    * checks whether the given {@link SchemaVariable} {@code sv} matches the {@link JavaDLTerm} {@code term} w.r.t.
+    * checks whether the given {@link SchemaVariable} {@code sv} matches the {@link Term} {@code term} w.r.t.
     * the constraints (e.g., previous matches of {@code sv}) specified in the {@link MatchConditions} {@code matchCond}
     * @param sv the {@link SchemaVariable} 
-    * @param term the {@link JavaDLTerm} as a candidate for instantition of {@code sv} 
+    * @param term the {@link Term} as a candidate for instantition of {@code sv} 
     * @param matchCond the {@link MatchConditions} with additional constraints that need to be considered
     * @param services the {@link Services}
     * @return {@code null} if the match is not possible or the new {@link MatchConditions} with the instantiation {@code sv <- term} added
     */
-   public abstract MatchConditions matchSV(SchemaVariable sv, JavaDLTerm term, MatchConditions matchCond, Services services);
+   public abstract MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchCond, Services services);
 
    /** 
     * checks whether the given {@link SchemaVariable} {@code sv} matches the {@link ProgramElement} {@code pe} w.r.t.

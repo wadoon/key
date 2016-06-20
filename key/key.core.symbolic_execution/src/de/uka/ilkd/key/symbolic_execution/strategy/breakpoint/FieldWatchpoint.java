@@ -21,7 +21,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -68,8 +68,8 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
          Assignment assignment = (Assignment) activeStatement;
          SourceElement firstElement = assignment.getChildAt(0);
          if(firstElement instanceof FieldReference){
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = ruleApp.posInOccurrence();
-            JavaDLTerm term = pio.subTerm();
+            PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
+            Term term = pio.subTerm();
             getProof().getServices().getTermBuilder();
             term = TermBuilder.goBelowUpdates(term);
             if(((FieldReference) firstElement).getProgramVariable().name().toString().equals(fullFieldName)&&isModification&&hitcountExceeded(node)){

@@ -23,7 +23,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 
@@ -34,17 +34,17 @@ public class PredictCostProver {
 
     private final TermBuilder tb;
 
-    private final JavaDLTerm trueT, falseT;
+    private final Term trueT, falseT;
 
     /** assume that all literal in <code>assertLiterals</code> are true */
-    private ImmutableSet<JavaDLTerm> assertLiterals;
+    private ImmutableSet<Term> assertLiterals;
     
     /** clauses from <code>instance</code> of CNF */
     private Set<Clause> clauses = new LinkedHashSet<Clause>();
 
     private final Services services;
 
-    private PredictCostProver(JavaDLTerm instance, ImmutableSet<JavaDLTerm> assertList,
+    private PredictCostProver(Term instance, ImmutableSet<Term> assertList,
 	    Services services) {
 	this.assertLiterals = assertList;
 	this.services = services;
@@ -54,8 +54,8 @@ public class PredictCostProver {
 	initClauses(instance);
     }
 
-    public static long computerInstanceCost(Substitution sub, JavaDLTerm matrix,
-	    ImmutableSet<JavaDLTerm> assertList, Services services) {
+    public static long computerInstanceCost(Substitution sub, Term matrix,
+	    ImmutableSet<Term> assertList, Services services) {
 
 	if (!sub.isGround()) {
 	    // non-ground substitutions not supported yet
@@ -68,22 +68,22 @@ public class PredictCostProver {
     }
 
     // init context
-    private void initClauses(JavaDLTerm instance) {
+    private void initClauses(Term instance) {
 
-	for (JavaDLTerm t : TriggerUtils.setByOperator(instance, Junctor.AND)) {
- 	    for (ImmutableSet<JavaDLTerm> lit : createClause(TriggerUtils.setByOperator(t, Junctor.OR))) {
+	for (Term t : TriggerUtils.setByOperator(instance, Junctor.AND)) {
+ 	    for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Junctor.OR))) {
 		clauses.add(new Clause(lit));
 	    }
 	}
     }
 
-    private ImmutableSet<ImmutableSet<JavaDLTerm>> createClause(ImmutableSet<JavaDLTerm> set)  {
-	final ImmutableSet<ImmutableSet<JavaDLTerm>> nil =
-	    DefaultImmutableSet.<ImmutableSet<JavaDLTerm>>nil();	
-	ImmutableSet<ImmutableSet<JavaDLTerm>> res = nil.add(DefaultImmutableSet.<JavaDLTerm>nil());
-	for (JavaDLTerm t : set) {	    
-            ImmutableSet<ImmutableSet<JavaDLTerm>> tmp = nil;
-	    for (ImmutableSet<JavaDLTerm> cl : res) {
+    private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set)  {
+	final ImmutableSet<ImmutableSet<Term>> nil =
+	    DefaultImmutableSet.<ImmutableSet<Term>>nil();	
+	ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
+	for (Term t : set) {	    
+            ImmutableSet<ImmutableSet<Term>> tmp = nil;
+	    for (ImmutableSet<Term> cl : res) {
 		tmp = createClauseHelper(tmp, t, cl);
 	    }
 	    res = tmp;
@@ -91,8 +91,8 @@ public class PredictCostProver {
 	return res;
     }
 
-    private ImmutableSet<ImmutableSet<JavaDLTerm>> createClauseHelper(ImmutableSet<ImmutableSet<JavaDLTerm>> res, 
-	    JavaDLTerm self, ImmutableSet<JavaDLTerm> ts) {
+    private ImmutableSet<ImmutableSet<Term>> createClauseHelper(ImmutableSet<ImmutableSet<Term>> res, 
+	    Term self, ImmutableSet<Term> ts) {
 	res = res.add(ts.add(self));
 	return res;
     }
@@ -105,9 +105,9 @@ public class PredictCostProver {
      * operation(=,>=, <=), this method will try to prove it by finding the
      * relation between its two subterms.
      */
-    private JavaDLTerm provedBySelf(JavaDLTerm problem) {
+    private Term provedBySelf(Term problem) {
 	boolean negated = false;
-	JavaDLTerm pro = problem;
+	Term pro = problem;
 	Operator op = pro.op();
 	while (op == Junctor.NOT) {
 	    negated = !negated;
@@ -117,7 +117,7 @@ public class PredictCostProver {
 	if ((op == Equality.EQUALS || op == Equality.EQV) && 
 		pro.sub(0).equalsModRenaming(pro.sub(1)))
 	    return negated ? falseT : trueT;
-	JavaDLTerm arithRes = HandleArith.provedByArith(pro, services);
+	Term arithRes = HandleArith.provedByArith(pro, services);
 	if (TriggerUtils.isTrueOrFalse(arithRes))
 	    return negated ? tb.not(arithRes) : arithRes;
 	else
@@ -129,14 +129,14 @@ public class PredictCostProver {
      * @return trueT if problem is equal axiom, false if problem's negation is
      *         equal axiom. Otherwise retrun problem.
      */
-    private JavaDLTerm directConsequenceOrContradictionOfAxiom(JavaDLTerm problem, JavaDLTerm axiom) {
+    private Term directConsequenceOrContradictionOfAxiom(Term problem, Term axiom) {
 	boolean negated = false;
-	JavaDLTerm pro = problem;
+	Term pro = problem;
 	while (pro.op() == Junctor.NOT) {
 	    pro = pro.sub(0);
 	    negated = !negated;
 	}
-	JavaDLTerm ax = axiom;
+	Term ax = axiom;
 	while (ax.op() == Junctor.NOT) {
 	    ax = ax.sub(0);
 	    negated = !negated;
@@ -153,8 +153,8 @@ public class PredictCostProver {
      * @return if axiom conduct problem then return trueT. If axiom conduct
      *         negation of problem return fastT. Otherwise, return problem
      */
-    private JavaDLTerm provedByAnother(JavaDLTerm problem, JavaDLTerm axiom) {
-	JavaDLTerm res = directConsequenceOrContradictionOfAxiom(problem, axiom);
+    private Term provedByAnother(Term problem, Term axiom) {
+	Term res = directConsequenceOrContradictionOfAxiom(problem, axiom);
 	if (TriggerUtils.isTrueOrFalse(res))
 	    return res;
 	return HandleArith.provedByArith(problem, axiom, services);
@@ -172,8 +172,8 @@ public class PredictCostProver {
      *         <code> falseT</code> if false, and <code>atom</code> if it cann't
      *         be proved.
      */
-    private JavaDLTerm proveLiteral(JavaDLTerm problem, Iterable<? extends JavaDLTerm> assertLits) {
-	JavaDLTerm res;
+    private Term proveLiteral(Term problem, Iterable<? extends Term> assertLits) {
+	Term res;
 	/*
 	 * res = provedFromCache(problem, cache); if (res.equals(trueT) ||
 	 * res.equals(falseT)) { return res; }
@@ -183,7 +183,7 @@ public class PredictCostProver {
 	    // addToCache(problem,res,cache);
 	    return res;
 	}
-	for (JavaDLTerm t : assertLits) {
+	for (Term t : assertLits) {
 	    res = provedByAnother(problem, t);
 	    if (TriggerUtils.isTrueOrFalse(res)) {
 		// addToCache(problem, res,cache);
@@ -242,13 +242,13 @@ public class PredictCostProver {
 
     /** A sat() procedure with back searching */
     /*
-     * private long secondRefineX(SetOf<JavaDLTerm> assertLits, Map cache, Object[]
+     * private long secondRefineX(SetOf<Term> assertLits, Map cache, Object[]
      * cls, int index) { long cost = 1; for ( int i = index; i < cls.length; i++
-     * ) { Clause c = (Clause)cls[i]; final SetOf<JavaDLTerm> ls = c.refine (
+     * ) { Clause c = (Clause)cls[i]; final SetOf<Term> ls = c.refine (
      * assertLits, cache ); if ( ls.contains ( falseT ) ) return 0; if (
      * ls.contains ( trueT ) ) return secondRefine ( assertLits, cache, cls, i +
-     * 1 ); final Iterator<JavaDLTerm> it = ls.iterator (); while ( it.hasNext () ) {
-     * SetOf<JavaDLTerm> nextLits = SetAsListOf.<JavaDLTerm>nil().union ( assertLits );
+     * 1 ); final Iterator<Term> it = ls.iterator (); while ( it.hasNext () ) {
+     * SetOf<Term> nextLits = SetAsListOf.<Term>nil().union ( assertLits );
      * nextLits = nextLits.add ( it.next () ); final Map nextCache = new HashMap
      * (); nextCache.putAll ( cache ); long nextCost = secondRefine ( nextLits,
      * nextCache, cls, i + 1 ); cost = cost + nextCost;
@@ -256,12 +256,12 @@ public class PredictCostProver {
      * } } return cost; }
      */
 
-    private class Clause implements Iterable<JavaDLTerm>{
+    private class Clause implements Iterable<Term>{
 
 	/** all literals contains in this clause */
-	public ImmutableSet<JavaDLTerm> literals = DefaultImmutableSet.<JavaDLTerm> nil();
+	public ImmutableSet<Term> literals = DefaultImmutableSet.<Term> nil();
 
-	public Clause(ImmutableSet<JavaDLTerm> lits) {
+	public Clause(ImmutableSet<Term> lits) {
 	    literals = lits;
 	}	
 	
@@ -278,7 +278,7 @@ public class PredictCostProver {
 	    return literals.hashCode();
 	}
 
-	public Iterator<JavaDLTerm> iterator() {
+	public Iterator<Term> iterator() {
 	    return literals.iterator();
 	}
 
@@ -301,7 +301,7 @@ public class PredictCostProver {
 	 */
 	public void firstRefine() {
 	    // if (selfRefine(literals)) {
-	    // literals = SetAsListOf.<JavaDLTerm>nil().add(trueT);
+	    // literals = SetAsListOf.<Term>nil().add(trueT);
 	    // return;
 	    // }
 	    literals = this.refine(assertLiterals);
@@ -311,12 +311,12 @@ public class PredictCostProver {
 	 * Refine literals in this clause, but it does not change literlas, only
 	 * return literals that can't be removed by refining
 	 */
-	public ImmutableSet<JavaDLTerm> refine(Iterable<? extends JavaDLTerm> assertLits) {
-	    ImmutableSet<JavaDLTerm> res = DefaultImmutableSet.<JavaDLTerm> nil();
-	    for (final JavaDLTerm lit : this) {
+	public ImmutableSet<Term> refine(Iterable<? extends Term> assertLits) {
+	    ImmutableSet<Term> res = DefaultImmutableSet.<Term> nil();
+	    for (final Term lit : this) {
 		final Operator op = proveLiteral(lit, assertLits).op();
 		if (op == Junctor.TRUE) {
-		    res = DefaultImmutableSet.<JavaDLTerm> nil().add(trueT);
+		    res = DefaultImmutableSet.<Term> nil().add(trueT);
 		    break;
 		}
 		if (op == Junctor.FALSE) {
@@ -337,15 +337,15 @@ public class PredictCostProver {
 	 * used to proved (!Li->Lj). Some examples are (!a|a) which is (!!a->a)
 	 * and (a>=1|a<=0) which is !a>=1->a<=0
 	 */
-	public boolean selfRefine(ImmutableSet<JavaDLTerm> lits) {
+	public boolean selfRefine(ImmutableSet<Term> lits) {
 	    if (lits.size() <= 1)
 		return false;
-	    JavaDLTerm[] terms = lits.toArray(new JavaDLTerm[lits.size()]);
-	    ImmutableSet<JavaDLTerm> next = lits.remove(terms[0]);
+	    Term[] terms = lits.toArray(new Term[lits.size()]);
+	    ImmutableSet<Term> next = lits.remove(terms[0]);
 	    boolean opNot = terms[0].op() == Junctor.NOT;
-	    JavaDLTerm axiom = opNot ? terms[0].sub(0) : tb.not(terms[0]);
+	    Term axiom = opNot ? terms[0].sub(0) : tb.not(terms[0]);
 	    for (int j = 1; j < terms.length; j++) {
-		JavaDLTerm pro = provedByAnother(terms[j], axiom);
+		Term pro = provedByAnother(terms[j], axiom);
 		final Operator op = pro.op();
 		if (op == Junctor.TRUE)
 		    return true;

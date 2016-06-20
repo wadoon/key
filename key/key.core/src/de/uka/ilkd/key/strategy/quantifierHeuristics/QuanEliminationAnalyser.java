@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.Quantifier;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 
 public class QuanEliminationAnalyser {
@@ -32,14 +32,14 @@ public class QuanEliminationAnalyser {
      *         <code>Integer.MAX_VALUE</code> if the subformula is not an
      *         eliminable definition
      */
-    public int eliminableDefinition(JavaDLTerm definition, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> envPIO) {
-        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> matrixPIO = walkUpMatrix ( envPIO );
-        final JavaDLTerm matrix = matrixPIO.subTerm ();
+    public int eliminableDefinition(Term definition, PosInOccurrence<Term, SequentFormula<Term>> envPIO) {
+        final PosInOccurrence<Term, SequentFormula<Term>> matrixPIO = walkUpMatrix ( envPIO );
+        final Term matrix = matrixPIO.subTerm ();
 
         if ( matrixPIO.isTopLevel () ) return Integer.MAX_VALUE;
         
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> quantPIO = matrixPIO.up ();
-        JavaDLTerm quantTerm = quantPIO.subTerm ();
+        PosInOccurrence<Term, SequentFormula<Term>> quantPIO = matrixPIO.up ();
+        Term quantTerm = quantPIO.subTerm ();
         final boolean ex;
         if ( quantTerm.op () == Quantifier.EX ) {
             ex = true;
@@ -72,12 +72,12 @@ public class QuanEliminationAnalyser {
         }
     }
 
-    private boolean isDefinitionCandidate(JavaDLTerm t, JavaDLTerm env, boolean ex) {
+    private boolean isDefinitionCandidate(Term t, Term env, boolean ex) {
         if ( !hasDefinitionShape ( t, ex ) ) return false;
         return !ex || !isBelowOr ( t, env );
     }
 
-    private boolean isBelowOr(JavaDLTerm t, JavaDLTerm env) {
+    private boolean isBelowOr(Term t, Term env) {
         final Operator envOp = env.op ();
         if ( envOp == Junctor.OR && ( env.sub ( 0 ) == t || env.sub ( 1 ) == t ) )
             return true;
@@ -87,16 +87,16 @@ public class QuanEliminationAnalyser {
         return false;
     }
     
-    private boolean hasDefinitionShape(JavaDLTerm t, boolean ex) {
+    private boolean hasDefinitionShape(Term t, boolean ex) {
         for (QuantifiableVariable quantifiableVariable : t.freeVars()) {
             if (isDefinition(t, quantifiableVariable, ex)) return true;
         }
         return false;
     }
     
-    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> walkUpMatrix(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+    private PosInOccurrence<Term, SequentFormula<Term>> walkUpMatrix(PosInOccurrence<Term, SequentFormula<Term>> pio) {
         while ( !pio.isTopLevel () ) {
-            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> parent = pio.up ();
+            final PosInOccurrence<Term, SequentFormula<Term>> parent = pio.up ();
             final Operator parentOp = parent.subTerm ().op ();
             if ( parentOp != Junctor.AND && parentOp != Junctor.OR ) return pio;
             pio = parent;
@@ -110,7 +110,7 @@ public class QuanEliminationAnalyser {
      * (depending on whether <code>ex</code> is true/false)
      */
     public boolean isEliminableVariableSomePaths(QuantifiableVariable var,
-                                                 JavaDLTerm matrix,
+                                                 Term matrix,
                                                  boolean ex) {
         if ( !matrix.freeVars ().contains ( var ) ) return true;
         
@@ -139,7 +139,7 @@ public class QuanEliminationAnalyser {
      * whether <code>ex</code> is true/false)
      */
     public boolean isEliminableVariableAllPaths(QuantifiableVariable var,
-                                                JavaDLTerm matrix,
+                                                Term matrix,
                                                 boolean ex) {
         final Operator op = matrix.op ();
 
@@ -157,14 +157,14 @@ public class QuanEliminationAnalyser {
             return isDefiningEquationAll ( matrix, var );
     }
     
-    private boolean isDefinition(JavaDLTerm t, QuantifiableVariable var, boolean ex) {
+    private boolean isDefinition(Term t, QuantifiableVariable var, boolean ex) {
         if ( ex )
             return isDefinitionEx ( t, var );
         else
             return isDefiningEquationAll ( t, var );
     }
     
-    private boolean isDefinitionEx(JavaDLTerm t, QuantifiableVariable var) {
+    private boolean isDefinitionEx(Term t, QuantifiableVariable var) {
         if ( t.op () == Junctor.OR ) {
             return isDefinitionEx ( t.sub ( 0 ), var )
                    && isDefinitionEx ( t.sub ( 1 ), var );
@@ -172,19 +172,19 @@ public class QuanEliminationAnalyser {
         return isDefiningEquationEx ( t, var );
     }
     
-    private boolean isDefiningEquationAll(JavaDLTerm t, QuantifiableVariable var) {
+    private boolean isDefiningEquationAll(Term t, QuantifiableVariable var) {
         if ( t.op () != Junctor.NOT ) return false;
         return isDefiningEquation ( t.sub ( 0 ), var );
     }
 
-    private boolean isDefiningEquationEx(JavaDLTerm t, QuantifiableVariable var) {
+    private boolean isDefiningEquationEx(Term t, QuantifiableVariable var) {
         return isDefiningEquation ( t, var );
     }
 
-    private boolean isDefiningEquation(JavaDLTerm t, QuantifiableVariable var) {
+    private boolean isDefiningEquation(Term t, QuantifiableVariable var) {
         if ( t.op () != Equality.EQUALS ) return false;
-        final JavaDLTerm left = t.sub ( 0 );
-        final JavaDLTerm right = t.sub ( 1 );
+        final Term left = t.sub ( 0 );
+        final Term right = t.sub ( 1 );
         final Operator leftOp = left.op ();
         final Operator rightOp = right.op ();
         return leftOp == var && !right.freeVars ().contains ( var )

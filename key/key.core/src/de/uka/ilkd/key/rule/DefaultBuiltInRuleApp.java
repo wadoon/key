@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 
 /**
@@ -29,19 +29,19 @@ import de.uka.ilkd.key.proof.Goal;
 public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp  {
 
    public DefaultBuiltInRuleApp(BuiltInRule builtInRule,
-			  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+			  PosInOccurrence<Term, SequentFormula<Term>> pio) {
         super(builtInRule, pio);
     }
 
 
     public DefaultBuiltInRuleApp(BuiltInRule builtInRule,
-			  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
-			  ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
+			  PosInOccurrence<Term, SequentFormula<Term>> pio,
+			  ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
         super(builtInRule, pio, ifInsts);
     }
 
     @Override
-    public DefaultBuiltInRuleApp replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos) {
+    public DefaultBuiltInRuleApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos) {
 	    return new DefaultBuiltInRuleApp(builtInRule, newPos, ifInsts);
     }
 
@@ -51,7 +51,7 @@ public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp  {
     }
 
     @Override
-    public DefaultBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
+    public DefaultBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
         setMutable(ifInsts);
         return this;
         //return new DefaultBuiltInRuleApp(builtInRule, pio, ifInsts);

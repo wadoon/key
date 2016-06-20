@@ -6,7 +6,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -117,12 +117,12 @@ public class Location {
    }
 
    /**
-    * Converts this {@link Location} into a {@link JavaDLTerm}.
+    * Converts this {@link Location} into a {@link Term}.
     * @param services The {@link Services} to use.
-    * @return The created {@link JavaDLTerm}.
+    * @return The created {@link Term}.
     */
-   public JavaDLTerm toTerm(Services services) {
-      JavaDLTerm parent = null;
+   public Term toTerm(Services services) {
+      Term parent = null;
       for (Access access : accesses) {         
          if (access.isArrayIndex()) {
             // Special handling for array indices.

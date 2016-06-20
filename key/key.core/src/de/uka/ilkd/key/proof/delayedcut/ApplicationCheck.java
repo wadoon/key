@@ -22,7 +22,7 @@ import java.util.TreeSet;
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -41,7 +41,7 @@ public interface ApplicationCheck {
      *         delayed cut application for the given node and cut formula or
      *         null if there is no conflict.
      */
-    String check(Node cutNode, JavaDLTerm cutFormula);
+    String check(Node cutNode, Term cutFormula);
 
     /**
      * Implementation of an ApplicationCheck which examines if there are new
@@ -66,7 +66,7 @@ public interface ApplicationCheck {
                 + "as required by the corresponding rule definitions.";
 
         @Override
-        public String check(Node cutNode, JavaDLTerm cutFormula) {
+        public String check(Node cutNode, Term cutFormula) {
             if (cutNode == null) {
                 throw new IllegalArgumentException("cutNode is null");
             }
@@ -101,11 +101,11 @@ public interface ApplicationCheck {
             }
         }
 
-        private String checkFormula(JavaDLTerm formula) {
+        private String checkFormula(Term formula) {
             final List<String> newSymbols = new LinkedList<String>();
             formula.execPreOrder(new DefaultVisitor() {
                 @Override
-                public void visit(JavaDLTerm visited) {
+                public void visit(Term visited) {
                     String name = visited.op().name().toString();
                     if (names.contains(name)) {
                         newSymbols.add(name);

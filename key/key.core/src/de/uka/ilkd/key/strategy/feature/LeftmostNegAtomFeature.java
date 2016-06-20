@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
@@ -37,12 +37,12 @@ public class LeftmostNegAtomFeature extends AbstractBetaFeature {
     private LeftmostNegAtomFeature () {}
     
     @Override
-    protected RuleAppCost doComputation (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, JavaDLTerm findTerm, ServiceCaches caches) {
-        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator ();
+    protected RuleAppCost doComputation (PosInOccurrence<Term, SequentFormula<Term>> pos, Term findTerm, ServiceCaches caches) {
+        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
         boolean positive = pos.isInAntec ();
 
         while ( it.next () != -1 ) {
-            final JavaDLTerm subTerm = it.getSubTerm ();
+            final Term subTerm = it.getSubTerm ();
             final Operator op = subTerm.op ();
 
             if ( it.getChild () == 0 ) {

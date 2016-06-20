@@ -28,10 +28,10 @@ import org.key_project.util.java.ObjectUtil;
  * attached.
  * 
  * Two labeled terms are equal if they have equal term structure and equal annotations. In 
- * contrast the method {@link JavaDLTerm#equalsModRenaming(Object)} does not care about annotations and will just 
+ * contrast the method {@link Term#equalsModRenaming(Object)} does not care about annotations and will just 
  * compare the term structure alone modula renaming.
  * 
- * @see JavaDLTerm
+ * @see Term
  * @see TermImpl
  */
 class LabeledTermImpl extends TermImpl {
@@ -41,17 +41,17 @@ class LabeledTermImpl extends TermImpl {
 	/**
 	 * creates an instance of a labeled term.
 	 * @param op the top level operator 
-	 * @param subs the JavaDLTerm that are the subterms of this term 
+	 * @param subs the Term that are the subterms of this term 
 	 * @param boundVars logic variables bound by the operator
 	 * @param javaBlock contains the program part of the term (if any) 
 	 * @param labels the terms labels (must not be null or empty)
 	 */
-	public LabeledTermImpl(Operator op, Sort sort,ImmutableArray<JavaDLTerm> subs,
+	public LabeledTermImpl(Operator op, Sort sort,ImmutableArray<Term> subs,
 			ImmutableArray<QuantifiableVariable> boundVars, 
 			JavaBlock javaBlock,
 			ImmutableArray<TermLabel> labels) {
 		super(op, sort, subs, boundVars, javaBlock);
-		assert labels != null : "JavaDLTerm labels must not be null";
+		assert labels != null : "Term labels must not be null";
 		assert !labels.isEmpty() : "There must be at least one term label";
 		this.labels = labels;
 	}

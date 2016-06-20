@@ -31,7 +31,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -69,7 +69,7 @@ public final class DLSpecFactory {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private JavaDLTerm extractPre(JavaDLTerm fma) throws ProofInputException {
+    private Term extractPre(Term fma) throws ProofInputException {
 	if(!fma.op().equals(Junctor.IMP)) {
 	    throw new ProofInputException("Implication expected");
 	} else {
@@ -78,10 +78,10 @@ public final class DLSpecFactory {
     }
     
     
-    private LocationVariable extractHeapAtPre(JavaDLTerm fma) 
+    private LocationVariable extractHeapAtPre(Term fma) 
     		throws ProofInputException {
 	if(fma.sub(1).op() instanceof UpdateApplication) {
-	    final JavaDLTerm update = fma.sub(1).sub(0);
+	    final Term update = fma.sub(1).sub(0);
 	    assert update.sort() == Sort.UPDATE;
 	    if(!(update.op() instanceof ElementaryUpdate)) {
 		throw new ProofInputException("Elementary update expected, "
@@ -103,8 +103,8 @@ public final class DLSpecFactory {
     }
     
     
-    private ProgramVariable extractExcVar(JavaDLTerm fma) {
-	final JavaDLTerm modFma = fma.sub(1).op() instanceof UpdateApplication
+    private ProgramVariable extractExcVar(Term fma) {
+	final Term modFma = fma.sub(1).op() instanceof UpdateApplication
 	                    ? fma.sub(1).sub(1)
 	                    : fma.sub(1);	
 	
@@ -117,7 +117,7 @@ public final class DLSpecFactory {
     }
 
     
-    private UseOperationContractRule.Instantiation extractInst(JavaDLTerm fma) 
+    private UseOperationContractRule.Instantiation extractInst(Term fma) 
     		throws ProofInputException {
 	final UseOperationContractRule.Instantiation result 
 		= UseOperationContractRule.computeInstantiation(fma.sub(1), 
@@ -165,7 +165,7 @@ public final class DLSpecFactory {
 	    	throws ProofInputException {
 	ImmutableList<ProgramVariable> result 
 		= ImmutableSLList.<ProgramVariable> nil();	
-	for(JavaDLTerm param : inst.actualParams) {
+	for(Term param : inst.actualParams) {
 	    if(param.op() instanceof ProgramVariable) {
 		result = result.append((ProgramVariable) param.op());
 	    } else {
@@ -191,8 +191,8 @@ public final class DLSpecFactory {
     }
     
 
-    private JavaDLTerm extractPost(JavaDLTerm fma) {
-	final JavaDLTerm modFma = fma.sub(1).op() instanceof UpdateApplication
+    private Term extractPost(Term fma) {
+	final Term modFma = fma.sub(1).op() instanceof UpdateApplication
 	                    ? fma.sub(1).sub(1)
 	                    : fma.sub(1);
 	return modFma.sub(0);
@@ -211,7 +211,7 @@ public final class DLSpecFactory {
     public ClassInvariant createDLClassInvariant(String name,
 	    					 String displayName, 
 	    					 ParsableVariable selfVar, 
-	    					 JavaDLTerm inv)
+	    					 Term inv)
 	    throws ProofInputException {
 	assert name != null;
 	if(displayName == null) {
@@ -241,8 +241,8 @@ public final class DLSpecFactory {
      * clause.
      */
     public FunctionalOperationContract createDLOperationContract(String name, 
-	    					       JavaDLTerm fma, 
-	    					       JavaDLTerm modifies)
+	    					       Term fma, 
+	    					       Term modifies)
 	    throws ProofInputException {
 	assert name != null;
 	assert fma != null;
@@ -251,7 +251,7 @@ public final class DLSpecFactory {
 	final ContractFactory cf = new ContractFactory(services);
 
 	//extract parts of fma
-	final JavaDLTerm pre = extractPre(fma);
+	final Term pre = extractPre(fma);
 	LocationVariable heapAtPreVar = extractHeapAtPre(fma);
 	ProgramVariable excVar = extractExcVar(fma);	
 	final UseOperationContractRule.Instantiation inst = extractInst(fma);
@@ -264,7 +264,7 @@ public final class DLSpecFactory {
 	ProgramVariable resultVar = pm.isConstructor() 
 		                    ? null
 		                    : extractResultVar(inst);
-	JavaDLTerm post = extractPost(fma);
+	Term post = extractPost(fma);
 	
 	//heapAtPre must not occur in precondition or in modifies clause
 	if(heapAtPreVar != null) {
@@ -288,7 +288,7 @@ public final class DLSpecFactory {
 	}
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         atPreVars.put(heapLDT.getHeap(), heapAtPreVar);
-        Map<LocationVariable,JavaDLTerm> mods = new LinkedHashMap<LocationVariable,JavaDLTerm>();
+        Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         mods.put(heapLDT.getHeap(), modifies);
 
 	//result variable may be omitted
@@ -299,7 +299,7 @@ public final class DLSpecFactory {
 	//exception variable may be omitted
 	if(excVar == null) {
 	    excVar = tb.excVar(pm, false);
-	    JavaDLTerm excNullTerm = tb.equals(tb.var(excVar), tb.NULL());
+	    Term excNullTerm = tb.equals(tb.var(excVar), tb.NULL());
 	    if(modality == Modality.DIA) {
 		post = tb.and(post, excNullTerm);
 	    } else if(modality == Modality.BOX) {
@@ -311,10 +311,10 @@ public final class DLSpecFactory {
 	    }
 	}
 
-        Map<LocationVariable,JavaDLTerm> pres = new LinkedHashMap<LocationVariable,JavaDLTerm>();
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
         pres.put(heapLDT.getHeap(), pre);
 
-        Map<LocationVariable,JavaDLTerm> posts = new LinkedHashMap<LocationVariable,JavaDLTerm>();
+        Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>();
         posts.put(heapLDT.getHeap(), post);
       	
         Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
@@ -333,13 +333,13 @@ public final class DLSpecFactory {
 	               pm,
 	               modality,
 	               pres,
-	               new LinkedHashMap<LocationVariable,JavaDLTerm>(),
+	               new LinkedHashMap<LocationVariable,Term>(),
 	               null,// TODO measured_by in DL contracts not supported yet
 	               posts,
-	               new LinkedHashMap<LocationVariable,JavaDLTerm>(),
+	               new LinkedHashMap<LocationVariable,Term>(),
 	               null, // TODO no model methods in DL contracts
 	               mods,
-	               new LinkedHashMap<ProgramVariable,JavaDLTerm>(),
+	               new LinkedHashMap<ProgramVariable,Term>(),
 	               hasMod, // TODO strictly pure in DL contracts not supported yet
 	               selfVar,
 	               paramVars,

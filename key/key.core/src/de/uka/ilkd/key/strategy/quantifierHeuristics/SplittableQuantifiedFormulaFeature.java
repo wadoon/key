@@ -22,7 +22,7 @@ import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
@@ -35,7 +35,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
     public static final Feature INSTANCE =
         new SplittableQuantifiedFormulaFeature ();
     
-    protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Analyser analyser = new Analyser ();
@@ -61,9 +61,9 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
         public ImmutableSet<QuantifiableVariable> existentialVars =
             DefaultImmutableSet.<QuantifiableVariable>nil();
         public Operator binOp;
-        public JavaDLTerm left, right;
+        public Term left, right;
         
-        public boolean analyse(JavaDLTerm formula) {
+        public boolean analyse(Term formula) {
             final Operator op = formula.op();
             
             if ( op == Quantifier.ALL ) {

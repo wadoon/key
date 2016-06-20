@@ -15,7 +15,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -55,7 +55,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         if (goals == null || goals.head() == null
                 || goals.head().node() == null
                 || goals.head().node().parent() == null) {
@@ -87,7 +87,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
                                                    ifVars.c2,
                                                    blockRuleApp.getExecutionContext(),
                                                    services);
-        final JavaDLTerm selfComposedExec =
+        final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
@@ -97,7 +97,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
+                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
                                           ProverTaskListener listener) throws Exception {
         final BlockContractBuiltInRuleApp blockRuleApp = 
                 (BlockContractBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();

@@ -35,7 +35,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -75,7 +75,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     private FunctionalOperationContract contract;
 
-    protected JavaDLTerm mbyAtPre;
+    protected Term mbyAtPre;
 
     static {
       TRANSACTION_TAGS.put(false, "transaction_inactive");
@@ -178,9 +178,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected JavaDLTerm generateMbyAtPreDef(ProgramVariable selfVar,
+    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
                                        ImmutableList<ProgramVariable> paramVars, Services services) {
-        final JavaDLTerm mbyAtPreDef;
+        final Term mbyAtPreDef;
         if (contract.hasMby()) {
 /*
             final Function mbyAtPreFunc =
@@ -190,7 +190,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
 */
-            final JavaDLTerm mby = contract.getMby(selfVar, paramVars, services);
+            final Term mby = contract.getMby(selfVar, paramVars, services);
 //            mbyAtPreDef = TB.equals(mbyAtPre, mby);
             mbyAtPreDef = tb.measuredBy(mby);
         } else {
@@ -204,13 +204,13 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected JavaDLTerm getPre(List<LocationVariable> modHeaps,
+    protected Term getPre(List<LocationVariable> modHeaps,
                           ProgramVariable selfVar,
                           ImmutableList<ProgramVariable> paramVars,
                           Map<LocationVariable, LocationVariable> atPreVars,
                           Services services) {
-        final JavaDLTerm freePre = contract.getFreePre(modHeaps, selfVar, paramVars, atPreVars, services);
-        final JavaDLTerm pre = contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
+        final Term freePre = contract.getFreePre(modHeaps, selfVar, paramVars, atPreVars, services);
+        final Term pre = contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
         return freePre != null ? services.getTermBuilder().and(pre, freePre) : pre;
     }
 
@@ -218,7 +218,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected JavaDLTerm getPost(List<LocationVariable> modHeaps,
+    protected Term getPost(List<LocationVariable> modHeaps,
                            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
                            ProgramVariable resultVar,
                            ProgramVariable exceptionVar,
@@ -228,7 +228,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     }
 
     @Override
-    protected JavaDLTerm getGlobalDefs (LocationVariable heap, JavaDLTerm heapTerm, JavaDLTerm selfTerm, ImmutableList<JavaDLTerm> paramTerms, Services services) {
+    protected Term getGlobalDefs (LocationVariable heap, Term heapTerm, Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
         return contract.getGlobalDefs(heap, heapTerm, selfTerm, paramTerms, services);
     }
 
@@ -236,13 +236,13 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected JavaDLTerm buildFrameClause(List<LocationVariable> modHeaps,
-                                    Map<JavaDLTerm, JavaDLTerm> heapToAtPre,
+    protected Term buildFrameClause(List<LocationVariable> modHeaps,
+                                    Map<Term, Term> heapToAtPre,
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars, Services services) {
-       JavaDLTerm frameTerm = null;
+       Term frameTerm = null;
        for(LocationVariable heap : modHeaps) {
-          final JavaDLTerm ft;
+          final Term ft;
           if(!getContract().hasModifiesClause(heap)) {
             // strictly pure have a different contract.
             ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
@@ -272,13 +272,13 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected JavaDLTerm buildUpdate(ImmutableList<ProgramVariable> paramVars,
+    protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
                                ImmutableList<LocationVariable> formalParamVars,
                                Map<LocationVariable,LocationVariable> atPreVars, Services services) {
-       JavaDLTerm update = null;
+       Term update = null;
        for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
           final LocationVariable heap = atPreEntry.getKey();
-          final JavaDLTerm u = tb.elementary(atPreEntry.getValue(), heap == getSavedHeap(services) ?
+          final Term u = tb.elementary(atPreEntry.getValue(), heap == getSavedHeap(services) ?
                   tb.getBaseHeap() : tb.var(heap));
           if(update == null) {
              update = u;
@@ -289,7 +289,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
         Iterator<ProgramVariable> paramIt = paramVars.iterator();
         while (formalParamIt.hasNext()) {
-            JavaDLTerm paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
+            Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
             update = tb.parallel(update, paramUpdate);
         }
         return update;
@@ -315,7 +315,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    public JavaDLTerm getMbyAtPre() {
+    public Term getMbyAtPre() {
         return mbyAtPre;
     }
 

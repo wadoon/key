@@ -86,7 +86,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Use Operation Contract");
 
-    private static JavaDLTerm lastFocusTerm;
+    private static Term lastFocusTerm;
     private static Instantiation lastInstantiation;
 
 
@@ -215,7 +215,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
-    private static JavaDLTerm getActualSelf(MethodOrConstructorReference mr,
+    private static Term getActualSelf(MethodOrConstructorReference mr,
 	    		              IProgramMethod pm,
 	    		              ExecutionContext ec,
 	    		              Services services) {
@@ -239,13 +239,13 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
-    private static ImmutableList<JavaDLTerm> getActualParams(
+    private static ImmutableList<Term> getActualParams(
 	    					MethodOrConstructorReference mr,
 	    					ExecutionContext ec,
 	    					Services services) {
-	ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
+	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
 	for(Expression expr : mr.getArguments()) {
-	    JavaDLTerm actualParam
+	    Term actualParam
 	    	= services.getProgramServices().getTypeConverter().convertToLogicElement(expr, ec);
 	    result = result.append(actualParam);
 	}
@@ -302,7 +302,7 @@ public final class UseOperationContractRule implements BuiltInRule {
      */
     private static AnonUpdateData createAnonUpdate(LocationVariable heap,
                                                    IProgramMethod pm, 
-	                                     	   JavaDLTerm mod, 
+	                                     	   Term mod, 
 	                                     	   Services services) {
 	assert pm != null;
 	assert mod != null;
@@ -312,15 +312,15 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Name methodHeapName = new Name(TB.newName(heap+"After_" + pm.getName()));
 	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(methodHeapFunc);
-	final JavaDLTerm methodHeap = TB.func(methodHeapFunc);
+	final Term methodHeap = TB.func(methodHeapFunc);
 	final Name anonHeapName = new Name(TB.newName("anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final JavaDLTerm anonHeap = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
-	final JavaDLTerm assumption =
+	final Term anonHeap = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+	final Term assumption =
 	        TB.equals(TB.anon(TB.var(heap), mod, anonHeap),
                           methodHeap); 
-	final JavaDLTerm anonUpdate = TB.elementary(heap, methodHeap);
+	final Term anonUpdate = TB.elementary(heap, methodHeap);
 
 	return new AnonUpdateData(assumption, anonUpdate, methodHeap,
 	                          TB.getBaseHeap(), anonHeap);
@@ -336,25 +336,25 @@ public final class UseOperationContractRule implements BuiltInRule {
      * meaning created or null for reference types, inInt(), etc., for integer types,
      * and for location sets containing only locations that belong to created objects.
      */
-    private static JavaDLTerm getFreePost(List<LocationVariable> heapContext,
+    private static Term getFreePost(List<LocationVariable> heapContext,
                                     IProgramMethod pm,
                                     KeYJavaType kjt,
-                                    JavaDLTerm resultTerm,
-                                    JavaDLTerm selfTerm,
-                                    Map<LocationVariable, JavaDLTerm> heapAtPres,
-                                    JavaDLTerm freeSpecPost,
+                                    Term resultTerm,
+                                    Term selfTerm,
+                                    Map<LocationVariable, Term> heapAtPres,
+                                    Term freeSpecPost,
                                     Services services) {
         final TermBuilder TB = services.getTermBuilder();
-        final JavaDLTerm result;
+        final Term result;
         if(pm.isConstructor()) {
             assert resultTerm == null;
             assert selfTerm != null;
-            JavaDLTerm createdForm = null;
+            Term createdForm = null;
             for(LocationVariable heap : heapContext) {
             	if(heap == services.getTheories().getHeapLDT().getSavedHeap()) {
             		continue;
             	}
-            	final JavaDLTerm cr = TB.and(OpReplacer.replace(TB.var(heap),
+            	final Term cr = TB.and(OpReplacer.replace(TB.var(heap),
 	                  	 heapAtPres.get(heap),
 	                   	 TB.not(TB.created(TB.var(heap), selfTerm)), 
 	                   	 services.getTermFactory()),
@@ -436,7 +436,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
-    private static Instantiation instantiate(JavaDLTerm focusTerm, Services services) {
+    private static Instantiation instantiate(Term focusTerm, Services services) {
 	//result cached?
 	if(focusTerm == lastFocusTerm) {
 	    return lastInstantiation;
@@ -454,13 +454,13 @@ public final class UseOperationContractRule implements BuiltInRule {
     private static void applyInfFlow(Goal goal,
                                      final FunctionalOperationContract contract,
                                      final Instantiation inst,
-                                     final JavaDLTerm self,
-                                     final ImmutableList<JavaDLTerm> params,
-                                     final JavaDLTerm result,
-                                     final JavaDLTerm exception,
-                                     final JavaDLTerm mby,
-                                     final JavaDLTerm atPreUpdates,
-                                     final JavaDLTerm finalPreTerm,
+                                     final Term self,
+                                     final ImmutableList<Term> params,
+                                     final Term result,
+                                     final Term exception,
+                                     final Term mby,
+                                     final Term atPreUpdates,
+                                     final Term finalPreTerm,
                                      final ImmutableList<AnonUpdateData> anonUpdateDatas,
                                      Services services) {
         if (!InfFlowCheckInfo.isInfFlow(goal)) {
@@ -474,8 +474,8 @@ public final class UseOperationContractRule implements BuiltInRule {
                                              "non-base-heap setting";
         AnonUpdateData anonUpdateData = anonUpdateDatas.head();
 
-        final JavaDLTerm heapAtPre = anonUpdateData.methodHeapAtPre;
-        final JavaDLTerm heapAtPost = anonUpdateData.methodHeap;
+        final Term heapAtPre = anonUpdateData.methodHeapAtPre;
+        final Term heapAtPost = anonUpdateData.methodHeap;
 
         // generate proof obligation variables
         final boolean hasSelf = self != null;
@@ -505,7 +505,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
         ifContractBuilder.setProofObligationVars(poVars);
 
-        JavaDLTerm contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
+        Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
         Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
 
         // add term and taclet to post goal
@@ -534,10 +534,10 @@ public final class UseOperationContractRule implements BuiltInRule {
      * Computes instantiation for contract rule on passed focus term.
      * Internally only serves as helper for instantiate().
      */
-    public static Instantiation computeInstantiation(JavaDLTerm focusTerm, Services services) {
+    public static Instantiation computeInstantiation(Term focusTerm, Services services) {
 	//leading update?
-	final JavaDLTerm u;
-	final JavaDLTerm progPost;
+	final Term u;
+	final Term progPost;
    final TermBuilder TB = services.getTermBuilder();
 	if(focusTerm.op() instanceof UpdateApplication) {
 	    u = UpdateApplication.getUpdate(focusTerm);
@@ -583,8 +583,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        services);
 	assert pm != null : "Getting program method failed.\nReference: " + mr +
 	                    ", static type: "+staticType+", execution context: " + ec;
-	final JavaDLTerm actualSelf = getActualSelf(mr, pm, ec, services);
-	final ImmutableList<JavaDLTerm> actualParams  = getActualParams(mr, ec, services);
+	final Term actualSelf = getActualSelf(mr, pm, ec, services);
+	final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
 
 	//cache and return result
 	final Instantiation result = new Instantiation(u,
@@ -603,7 +603,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal,
-                                PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+                                PosInOccurrence<Term, SequentFormula<Term>> pio) {
 	//focus must be top level succedent
 	if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
 	    return false;
@@ -675,7 +675,7 @@ public final class UseOperationContractRule implements BuiltInRule {
      	  goal.addProgramVariable(v);
         }
 
-        Map<LocationVariable,JavaDLTerm> atPres = HeapContext.getAtPres(atPreVars, services);
+        Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, services);
 
         //create variables for result and exception
         final ProgramVariable resultVar = computeResultVar(inst, services); 
@@ -690,29 +690,29 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
         //translate the contract
-        final JavaDLTerm baseHeapTerm = tb.getBaseHeap();
-        final ImmutableList<JavaDLTerm> contractParams = computeParams(baseHeapTerm, atPres, baseHeap, inst, tb.tf());
-        final JavaDLTerm contractResult
+        final Term baseHeapTerm = tb.getBaseHeap();
+        final ImmutableList<Term> contractParams = computeParams(baseHeapTerm, atPres, baseHeap, inst, tb.tf());
+        final Term contractResult
         	= inst.pm.isConstructor() || resultVar == null
         	  ? null
                   : tb.var(resultVar);
-        final JavaDLTerm contractSelf = computeSelf(baseHeapTerm, atPres, baseHeap, 
+        final Term contractSelf = computeSelf(baseHeapTerm, atPres, baseHeap, 
                 inst, contractResult == null && resultVar != null ? tb.var(resultVar) : contractResult,
                 services.getTermFactory());
-        Map<LocationVariable, JavaDLTerm> heapTerms = new LinkedHashMap<LocationVariable,JavaDLTerm>();
+        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable h : heapContext) {
            heapTerms.put(h, tb.var(h));
         }
-        final JavaDLTerm globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf,
+        final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf,
                                                        contractParams, services);
-        final JavaDLTerm originalPre  = contract.getPre(heapContext,
+        final Term originalPre  = contract.getPre(heapContext,
                                           heapTerms,
         				  contractSelf,
         				  contractParams,
                                           atPres,
         				  services);
-        final JavaDLTerm pre = globalDefs==null? originalPre: tb.apply(globalDefs, originalPre);
-        final JavaDLTerm originalPost = contract.getPost(heapContext,
+        final Term pre = globalDefs==null? originalPre: tb.apply(globalDefs, originalPre);
+        final Term originalPost = contract.getPost(heapContext,
                                            heapTerms,
                                            contractSelf,
                                            contractParams,
@@ -720,7 +720,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                            tb.var(excVar),
                                            atPres,
                                            services);
-        JavaDLTerm originalFreePost = contract.getFreePost(heapContext,
+        Term originalFreePost = contract.getFreePost(heapContext,
                                                            heapTerms,
                                                            contractSelf,
                                                            contractParams,
@@ -729,17 +729,17 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                            atPres,
                                                            services);
         originalFreePost = originalFreePost != null ? originalFreePost : tb.tt();
-        final JavaDLTerm post = globalDefs==null? originalPost: tb.apply(globalDefs, originalPost);
-        final JavaDLTerm freeSpecPost = globalDefs==null? originalFreePost: tb.apply(globalDefs, originalFreePost);
-        final Map<LocationVariable,JavaDLTerm> mods = new LinkedHashMap<LocationVariable,JavaDLTerm>();
+        final Term post = globalDefs==null? originalPost: tb.apply(globalDefs, originalPost);
+        final Term freeSpecPost = globalDefs==null? originalFreePost: tb.apply(globalDefs, originalFreePost);
+        final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 
         for(LocationVariable heap : heapContext) {
-           final JavaDLTerm m = contract.getMod(heap, tb.var(heap),
+           final Term m = contract.getMod(heap, tb.var(heap),
                 contractSelf,contractParams, services);
            mods.put(heap, m);
         }
 
-        final JavaDLTerm mby = contract.hasMby()
+        final Term mby = contract.hasMby()
                          ? contract.getMby(heapTerms,
                         	 	   contractSelf,
                         	 	   contractParams,
@@ -776,11 +776,11 @@ public final class UseOperationContractRule implements BuiltInRule {
         excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
 
         //prepare common stuff for the three branches
-        JavaDLTerm anonAssumption = null;
-        JavaDLTerm anonUpdate = null;
-        JavaDLTerm wellFormedAnon = null;
-        JavaDLTerm atPreUpdates = null;
-        JavaDLTerm reachableState = null;
+        Term anonAssumption = null;
+        Term anonUpdate = null;
+        Term wellFormedAnon = null;
+        Term atPreUpdates = null;
+        Term reachableState = null;
         ImmutableList<AnonUpdateData> anonUpdateDatas =
                 ImmutableSLList.<AnonUpdateData>nil();
 
@@ -807,7 +807,7 @@ public final class UseOperationContractRule implements BuiltInRule {
            } else {
              wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
            }
-           final JavaDLTerm up = tb.elementary(atPreVars.get(heap), tb.var(heap));
+           final Term up = tb.elementary(atPreVars.get(heap), tb.var(heap));
            if(atPreUpdates == null) {
              atPreUpdates = up;
            }else{
@@ -820,9 +820,9 @@ public final class UseOperationContractRule implements BuiltInRule {
            }
         }
 
-        final JavaDLTerm excNull = tb.equals(tb.var(excVar), tb.NULL());
-        final JavaDLTerm excCreated = tb.created(tb.var(excVar));
-        final JavaDLTerm freePost = getFreePost(heapContext,
+        final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
+        final Term excCreated = tb.created(tb.var(excVar));
+        final Term freePost = getFreePost(heapContext,
                                           inst.pm,
                                           inst.staticType,
                                           contractResult,
@@ -830,17 +830,17 @@ public final class UseOperationContractRule implements BuiltInRule {
                                           atPres,
                                           freeSpecPost,
                                           services);
-        final JavaDLTerm freeExcPost = inst.pm.isConstructor()
+        final Term freeExcPost = inst.pm.isConstructor()
                                  ? freePost
                                  : tb.tt();
-        final JavaDLTerm postAssumption
-                = tb.applySequential(new JavaDLTerm[]{inst.u, atPreUpdates},
+        final Term postAssumption
+                = tb.applySequential(new Term[]{inst.u, atPreUpdates},
                                      tb.and(anonAssumption,
                                             tb.apply(anonUpdate,
                                                      tb.and(excNull, freePost, post),
                                                      null)));
-        final JavaDLTerm excPostAssumption
-        	= tb.applySequential(new JavaDLTerm[]{inst.u, atPreUpdates},
+        final Term excPostAssumption
+        	= tb.applySequential(new Term[]{inst.u, atPreUpdates},
         		   tb.and(anonAssumption,
                                   tb.apply(anonUpdate, tb.and(tb.not(excNull),
                                           excCreated,
@@ -849,19 +849,19 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         //create "Pre" branch
 	int i = 0;
-	for(JavaDLTerm arg : contractParams) {
+	for(Term arg : contractParams) {
 	    KeYJavaType argKJT = contract.getTarget().getParameterType(i++);
 	    reachableState = tb.and(reachableState,
 		                    tb.reachableValue(arg, argKJT));
 	}
 
-        JavaDLTerm finalPreTerm;
+        Term finalPreTerm;
         if(!InfFlowCheckInfo.isInfFlow(goal)) {
             final ContractPO po
                     = services.getSpecificationRepository()
                               .getPOForProof(goal.proof());
 
-            final JavaDLTerm mbyOk;
+            final Term mbyOk;
          // see #1417
             if(inst.mod != Modality.BOX && inst.mod != Modality.BOX_TRANSACTION && po != null && mby != null ) {
 //          mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
@@ -872,16 +872,16 @@ public final class UseOperationContractRule implements BuiltInRule {
                 mbyOk = tb.tt();
             }
             finalPreTerm =
-                    tb.applySequential(new JavaDLTerm[]{inst.u, atPreUpdates},
-                                       tb.and(new JavaDLTerm[]{pre,
+                    tb.applySequential(new Term[]{inst.u, atPreUpdates},
+                                       tb.and(new Term[]{pre,
                                                          reachableState,
                                                          mbyOk}));
         } else {
             // termination has already been shown in the functional proof,
             // thus we do not need to show it again in information flow proofs.
             finalPreTerm =
-                    tb.applySequential(new JavaDLTerm[]{inst.u, atPreUpdates},
-                                                  tb.and(new JavaDLTerm[]{pre,
+                    tb.applySequential(new Term[]{inst.u, atPreUpdates},
+                                                  tb.and(new Term[]{pre,
                                                                     reachableState}));
         }
 
@@ -903,14 +903,14 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock postSB
         	= replaceStatement(jb, resultAssign);
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        final JavaDLTerm normalPost = tb.apply(anonUpdate,
+        final Term normalPost = tb.apply(anonUpdate,
                                          tb.prog(inst.mod,
                                                  postJavaBlock,
                                                  inst.progPost.sub(0),
                                                  TermLabelManager.instantiateLabels(termLabelState,
                                                          services, ruleApp.posInOccurrence(), this, ruleApp,
                                                          postGoal, "PostModality", null, inst.mod,
-                                                         new ImmutableArray<JavaDLTerm>(inst.progPost.sub(0)),
+                                                         new ImmutableArray<Term>(inst.progPost.sub(0)),
                                                          null, postJavaBlock, inst.progPost.getLabels())
                                                  ),
                                          null);
@@ -930,16 +930,16 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock excPostSB
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final JavaDLTerm originalExcPost = tb.apply(anonUpdate,
+        final Term originalExcPost = tb.apply(anonUpdate,
                                               tb.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
                                                       TermLabelManager.instantiateLabels(termLabelState, services, 
                                                               ruleApp.posInOccurrence(), this, ruleApp,
                                                               excPostGoal, "ExceptionalPostModality",
                                                               null, inst.mod,
-                                                              new ImmutableArray<JavaDLTerm>(
+                                                              new ImmutableArray<Term>(
                                                                       inst.progPost.sub(0)),
                                                               null, excJavaBlock, inst.progPost.getLabels())), null);
-        final JavaDLTerm excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
+        final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
         excPostGoal.addFormula(new SequentFormula<>(wellFormedAnon),
                 	       true,
                 	       false);
@@ -952,7 +952,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         //create "Null Reference" branch
         if(nullGoal != null) {
-            final JavaDLTerm actualSelfNotNull
+            final Term actualSelfNotNull
             	= tb.not(tb.equals(inst.actualSelf, tb.NULL()));
             nullGoal.changeFormula(new SequentFormula<>(tb.apply(inst.u, 
         					               actualSelfNotNull,
@@ -999,26 +999,26 @@ public final class UseOperationContractRule implements BuiltInRule {
     //-------------------------------------------------------------------------
 
     public static final class Instantiation {
-	public final JavaDLTerm u;
-	public final JavaDLTerm progPost;
+	public final Term u;
+	public final Term progPost;
 	public final Modality mod;
 	public final Expression actualResult;
-	public final JavaDLTerm actualSelf;
+	public final Term actualSelf;
 	public final KeYJavaType staticType;
 	public final MethodOrConstructorReference mr;
 	public final IProgramMethod pm;
-	public final ImmutableList<JavaDLTerm> actualParams;
+	public final ImmutableList<Term> actualParams;
 	public final boolean transaction;
 
-	public Instantiation(JavaDLTerm u,
-			     JavaDLTerm progPost,
+	public Instantiation(Term u,
+			     Term progPost,
 			     Modality mod,
 			     Expression actualResult,
-			     JavaDLTerm actualSelf,
+			     Term actualSelf,
 			     KeYJavaType staticType,
 			     MethodOrConstructorReference mr,
 			     IProgramMethod pm,
-			     ImmutableList<JavaDLTerm> actualParams,
+			     ImmutableList<Term> actualParams,
 			     boolean transaction) {
 	    assert u != null;
 	    assert u.sort() == Sort.UPDATE;
@@ -1041,12 +1041,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
     }
 
-    public ContractRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+    public ContractRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pos) {
        return createApp(pos, null);
     }
 
     @Override
-    public ContractRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, JavaDLTermServices services) {
+    public ContractRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pos, JavaDLTermServices services) {
 		return new ContractRuleApp(this, pos);
     }
 
@@ -1056,18 +1056,18 @@ public final class UseOperationContractRule implements BuiltInRule {
       return HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
    }
 
-   public static JavaDLTerm computeSelf(JavaDLTerm baseHeapTerm, 
-                                  Map<LocationVariable,JavaDLTerm> atPres, 
+   public static Term computeSelf(Term baseHeapTerm, 
+                                  Map<LocationVariable,Term> atPres, 
                                   LocationVariable baseHeap, 
                                   Instantiation inst, 
-                                  JavaDLTerm resultTerm, TermFactory tf) {
+                                  Term resultTerm, TermFactory tf) {
       return OpReplacer.replace(baseHeapTerm,
                                 atPres.get(baseHeap),
                                 inst.pm.isConstructor() ? resultTerm : inst.actualSelf, tf);
    }
 
-   public static ImmutableList<JavaDLTerm> computeParams(JavaDLTerm baseHeapTerm, 
-                                                   Map<LocationVariable,JavaDLTerm> atPres, 
+   public static ImmutableList<Term> computeParams(Term baseHeapTerm, 
+                                                   Map<LocationVariable,Term> atPres, 
                                                    LocationVariable baseHeap, 
                                                    Instantiation inst,
                                                    TermFactory tf) {
@@ -1082,14 +1082,14 @@ public final class UseOperationContractRule implements BuiltInRule {
    }
 
    private static class AnonUpdateData {
-        public final JavaDLTerm assumption, anonUpdate, methodHeap, methodHeapAtPre, anonHeap;
+        public final Term assumption, anonUpdate, methodHeap, methodHeapAtPre, anonHeap;
 
 
-        public AnonUpdateData(JavaDLTerm assumption,
-                              JavaDLTerm anonUpdate,
-                              JavaDLTerm methodHeap,
-                              JavaDLTerm methodHeapAtPre,
-                              JavaDLTerm anonHeap) {
+        public AnonUpdateData(Term assumption,
+                              Term anonUpdate,
+                              Term methodHeap,
+                              Term methodHeapAtPre,
+                              Term anonHeap) {
             this.assumption = assumption;
             this.anonUpdate = anonUpdate;
             this.methodHeap = methodHeap;

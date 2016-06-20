@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -63,7 +63,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
      */
     private static boolean hasModality(Node node) {
         Sequent sequent = node.sequent();
-        for (SequentFormula<JavaDLTerm> sequentFormula : sequent) {
+        for (SequentFormula<Term> sequentFormula : sequent) {
             if(hasModality(sequentFormula.formula())) {
                 return true;
             }
@@ -75,7 +75,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     /*
      * recursively descent into the term to detect a modality.
      */
-    private static boolean hasModality(JavaDLTerm term) {
+    private static boolean hasModality(Term term) {
         if(term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
             // ignore self composition terms
             return false;
@@ -85,7 +85,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
             return true;
         }
 
-        for (JavaDLTerm sub : term.subs()) {
+        for (Term sub : term.subs()) {
             if(hasModality(sub)) {
                 return true;
             }
@@ -95,7 +95,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         return new FilterSymbexStrategy(
                 proof.getActiveStrategy());
     }
@@ -118,7 +118,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
             if(!hasModality(goal.node())) {
                 return false;
             }

@@ -39,7 +39,7 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -182,14 +182,14 @@ public final class SpecificationRepository {
        assert limited.arity() == unlimited.arity();
 
         // create schema terms
-        final JavaDLTerm[] subs = new JavaDLTerm[limited.arity()];
+        final Term[] subs = new Term[limited.arity()];
         for (int i = 0; i < subs.length; i++) {
             final SchemaVariable argSV = SchemaVariableFactory.createTermSV(
                     new Name("t" + i), limited.argSort(i), false, false);
             subs[i] = tb.var(argSV);
         }
-        final JavaDLTerm limitedTerm = tb.func(limited, subs);
-        final JavaDLTerm unlimitedTerm = tb.func(unlimited, subs);
+        final Term limitedTerm = tb.func(limited, subs);
+        final Term unlimitedTerm = tb.func(unlimited, subs);
 
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
@@ -208,19 +208,19 @@ public final class SpecificationRepository {
 
         final TermBuilder tb = services.getTermBuilder();
         // create schema terms
-        final JavaDLTerm[] subs = new JavaDLTerm[limited.arity()];
+        final Term[] subs = new Term[limited.arity()];
         for (int i = 0; i < subs.length; i++) {
             final SchemaVariable argSV = SchemaVariableFactory.createTermSV(
                     new Name("t" + i), limited.argSort(i), false, false);
             subs[i] = tb.var(argSV);
         }
-        final JavaDLTerm limitedTerm = tb.func(limited, subs);
-        final JavaDLTerm unlimitedTerm = tb.func(unlimited, subs);
+        final Term limitedTerm = tb.func(limited, subs);
+        final Term unlimitedTerm = tb.func(unlimited, subs);
 
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         tacletBuilder.setFind(tb.func(unlimited, subs));
-        final SequentFormula<JavaDLTerm> cf = new SequentFormula<>(tb.equals(limitedTerm,
+        final SequentFormula<Term> cf = new SequentFormula<>(tb.equals(limitedTerm,
                 unlimitedTerm));
         final Sequent addedSeq = Sequent
                 .createAnteSequent(Semisequent.nil()
@@ -467,9 +467,9 @@ public final class SpecificationRepository {
                 && targetMethod.getContainerType().equals(
                         services.getProgramServices().getJavaInfo().getJavaLangObject())) {
             // Create or extend a well-definedness check for a class invariant
-            final JavaDLTerm deps = contract.getAccessible(services
+            final Term deps = contract.getAccessible(services
             .getTheories().getHeapLDT().getHeap());
-            final JavaDLTerm mby = contract.getMby();
+            final Term mby = contract.getMby();
             final String invName = "JML model class invariant in "
                     + targetKJT.getName();
             final ClassInvariant inv = new ClassInvariantImpl(invName, invName,
@@ -1071,7 +1071,7 @@ public final class SpecificationRepository {
                 if (kjt != selfKjt && JavaInfo.isPrivate(kjt)) continue; // only non-private classes
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
                 final ProgramVariable selfVar = tb.selfVar(kjt, false);
-                JavaDLTerm invDef = tb.tt();
+                Term invDef = tb.tt();
                 for (ClassInvariant inv : myInvs) {
                     invDef = tb.and(invDef, inv.getInv(selfVar, services));
                 }
@@ -1158,11 +1158,11 @@ public final class SpecificationRepository {
                         }
                     }
                     for(FunctionalOperationContract fop : lookupContracts) {
-                        JavaDLTerm representsFromContract =
+                        Term representsFromContract =
                                 fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars,
                                                        tb.resultVar(pm, false), atPreVars,
                                                        services);
-                        JavaDLTerm preContract = fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
+                        Term preContract = fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
                         if(preContract == null) preContract = tb.tt();
                         if(representsFromContract != null) {
                             // TODO Wojtek: I do not understand the visibility issues of model fields/methods.
@@ -1180,14 +1180,14 @@ public final class SpecificationRepository {
                     }
                     for(FunctionalOperationContract fop : getOperationContracts(kjt,pm)) {
                     	if(!fop.getSpecifiedIn().equals(kjt)) continue;
-                    	JavaDLTerm preFromContract =
+                    	Term preFromContract =
                     	        fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
-                    	JavaDLTerm postFromContract =
+                    	Term postFromContract =
                     	        fop.getPost(heaps, selfVar, paramVars, resultVar, null,
                     	                    atPreVars, services);
                     	if(preFromContract != null && postFromContract != null
                     	        && postFromContract != tb.tt()) {
-                    		JavaDLTerm mbyFromContract = fop.hasMby() ?
+                    		Term mbyFromContract = fop.hasMby() ?
                     		        fop.getMby(selfVar, paramVars, services) : null;
                     		final ClassAxiom modelMethodContractAxiom
                     		= new ContractAxiom("Contract axiom for " + pm.getName()
@@ -1601,7 +1601,7 @@ public final class SpecificationRepository {
                 if (ch.modelField() && ch.getTarget().equals(rep.getTarget())) {
                     dep = true;
                     unregisterContract(ch);
-                    JavaDLTerm represents = rep.getAxiom(heap, ch.getOrigVars().self, services);
+                    Term represents = rep.getAxiom(heap, ch.getOrigVars().self, services);
                     WellDefinednessCheck newCh = ch.addRepresents(represents);
                     registerContract(newCh);
                 }

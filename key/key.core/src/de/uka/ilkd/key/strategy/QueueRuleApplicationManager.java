@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.SingletonIterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
@@ -105,7 +105,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * Implementation of the method from <code>NewRuleListener</code>. The new
      * rule app is added to the heap
      */
-    public void ruleAdded(RuleApp rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+    public void ruleAdded(RuleApp rule, PosInOccurrence<Term, SequentFormula<Term>> pos) {
         //System.out.println ( "Rule added: " + rule + "\n");
         
         	//ensureQueueExists ();
@@ -127,7 +127,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * rule app is added to the heap
      */
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term, SequentFormula<Term>> pos) {
         if ( queue == null )
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us

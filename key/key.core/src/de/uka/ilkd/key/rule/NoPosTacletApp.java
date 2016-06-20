@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -181,7 +181,7 @@ public class NoPosTacletApp extends TacletApp {
         
 	    final ImmutableSet<QuantifiableVariable> boundVarSet =
 	        boundAtOccurrenceSet ( prefix, instantiations );
-	    final JavaDLTerm inst = (JavaDLTerm)instantiations.getInstantiation ( sv );
+	    final Term inst = (Term)instantiations.getInstantiation ( sv );
 	    if ( !inst.freeVars ().subset ( boundVarSet ) ) return false;
 	}
     
@@ -191,11 +191,11 @@ public class NoPosTacletApp extends TacletApp {
 
     /** adds a new instantiation to this TacletApp 
      * @param sv the SchemaVariable to be instantiated
-     * @param term the JavaDLTerm the SchemaVariable is instantiated with
+     * @param term the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
     public TacletApp addInstantiation(SchemaVariable sv, 
-	    			      JavaDLTerm term,
+	    			      Term term,
 				      boolean interesting,
 				      Services services) {
 	if (interesting)
@@ -339,11 +339,11 @@ public class NoPosTacletApp extends TacletApp {
 
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula<JavaDLTerm> and
+     * returns the PositionInOccurrence (representing a SequentFormula<Term> and
      * a position in the corresponding formula)
-     * @return the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
+     * @return the PosInOccurrence<Term, SequentFormula<Term>>
      */
-    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence() {
+    public PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence() {
 	return null;
     }
 
@@ -352,7 +352,7 @@ public class NoPosTacletApp extends TacletApp {
      *               ( pos == null || termConstraint.isSatisfiable () )
      * @return TacletApp with the resulting instantiations or null
      */
-    public NoPosTacletApp matchFind(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+    public NoPosTacletApp matchFind(PosInOccurrence<Term, SequentFormula<Term>> pos,
 				    Services        services) {
         NoPosTacletApp result = matchFind(pos, services, null);
 	return result;
@@ -364,9 +364,9 @@ public class NoPosTacletApp extends TacletApp {
        a recursive descent in a term (where the current subterm is known 
        anyway).
      */
-    public NoPosTacletApp matchFind(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+    public NoPosTacletApp matchFind(PosInOccurrence<Term, SequentFormula<Term>> pos,
 				    Services        services,
-				    JavaDLTerm t) {
+				    Term t) {
         if ((t==null) && (pos!=null)) t = pos.subTerm ();
 
         MatchConditions mc = setupMatchConditions(pos, services);
@@ -409,7 +409,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     
-    protected MatchConditions setupMatchConditions(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+    protected MatchConditions setupMatchConditions(PosInOccurrence<Term, SequentFormula<Term>> pos,
 		  				   JavaDLTermServices services) {
 	SVInstantiations svInst = taclet() instanceof NoFindTaclet ? 
                 instantiations   () : instantiations   ().clearUpdateContext ();

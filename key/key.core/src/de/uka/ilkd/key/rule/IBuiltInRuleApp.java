@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -50,10 +50,10 @@ public interface IBuiltInRuleApp extends RuleApp {
      */
     boolean isSufficientlyComplete();
     
-    ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts();
+    ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts();
 
-    IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts);
+    IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts);
 
-    IBuiltInRuleApp replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos);
+    IBuiltInRuleApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos);
 
 }

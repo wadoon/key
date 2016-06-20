@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
@@ -11,7 +11,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
 /**
- * Tests the conditional values provided by {@link IExecutionNode#getVariables(de.uka.ilkd.key.logic.JavaDLTerm)}.
+ * Tests the conditional values provided by {@link IExecutionNode#getVariables(de.uka.ilkd.key.logic.Term)}.
  * @author Martin Hentschel
  */
 public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase {
@@ -66,9 +66,9 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
    }
    
    /**
-    * Ensures that the result of {@link IExecutionNode#getVariables(JavaDLTerm)} is correct.
+    * Ensures that the result of {@link IExecutionNode#getVariables(Term)} is correct.
     * @param expected The expected {@link IExecutionVariable}s.
-    * @param node The current {@link IExecutionNode} to call {@link IExecutionNode#getVariables(JavaDLTerm)} on.
+    * @param node The current {@link IExecutionNode} to call {@link IExecutionNode#getVariables(Term)} on.
     * @param condition The condition to use.
     * @param compareParent Compare parents?
     * @param compareChildren Compare children?
@@ -77,7 +77,7 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
     */
    protected static void assertConditionalVariables(IExecutionVariable[] expected, 
                                                     IExecutionNode<?> node,
-                                                    JavaDLTerm condition,
+                                                    Term condition,
                                                     boolean compareParent, 
                                                     boolean compareChildren,
                                                     boolean compareConstraints) throws ProofInputException {

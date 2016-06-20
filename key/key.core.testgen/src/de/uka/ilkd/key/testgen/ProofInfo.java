@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -70,12 +70,12 @@ public class ProofInfo {
 		return po.getContract();
 	}
 
-	public JavaDLTerm getPostCondition2(){
+	public Term getPostCondition2(){
 		Contract c = getContract();
 		if(c instanceof FunctionalOperationContract){
 			FunctionalOperationContract t = (FunctionalOperationContract) c;
 			OriginalVariables orig = t.getOrigVars();
-			JavaDLTerm post = t.getPost(services.getTheories().getHeapLDT().getHeap(), orig.self, orig.params, orig.result, orig.exception, orig.atPres, services);
+			Term post = t.getPost(services.getTheories().getHeapLDT().getHeap(), orig.self, orig.params, orig.result, orig.exception, orig.atPres, services);
 			//System.out.println("Alt post: "+getPostCondition2());
 			return post;
 
@@ -84,9 +84,9 @@ public class ProofInfo {
 		return services.getTermBuilder().tt();
 	}
 
-	public JavaDLTerm getPostCondition(){
-		JavaDLTerm t = getPO();
-		JavaDLTerm post = services.getTermBuilder().tt();
+	public Term getPostCondition(){
+		Term t = getPO();
+		Term post = services.getTermBuilder().tt();
 		try{
 			post = t.sub(1).sub(1).sub(0);
 		}catch(Exception e){
@@ -101,26 +101,26 @@ public class ProofInfo {
 
 
 
-	public JavaDLTerm getPreConTerm(){
+	public Term getPreConTerm(){
 		Contract c = getContract();		
 		if(c instanceof FunctionalOperationContract){
 			FunctionalOperationContract t = (FunctionalOperationContract) c;
 			OriginalVariables orig = t.getOrigVars();
-			JavaDLTerm post = t.getPre(services.getTheories().getHeapLDT().getHeap(), orig.self, orig.params, orig.atPres, services);
+			Term post = t.getPre(services.getTheories().getHeapLDT().getHeap(), orig.self, orig.params, orig.atPres, services);
 			return post;
 		}
 		//no pre <==> false
 		return services.getTermBuilder().ff();
 	}
 
-	public JavaDLTerm getAssignable(){
+	public Term getAssignable(){
 		Contract c = getContract();
 		return c.getAssignable(services.getTheories().getHeapLDT().getHeap());
 	}
 
 	public String getCode() {
 
-		JavaDLTerm f = getPO();
+		Term f = getPO();
 		JavaBlock block = getJavaBlock(f);
 
 		//	getUpdate(f);
@@ -139,7 +139,7 @@ public class ProofInfo {
 
 	}
 
-	public void getProgramVariables(JavaDLTerm t, Set<JavaDLTerm> vars){
+	public void getProgramVariables(Term t, Set<Term> vars){
 
 //		System.out.println("FindConstants: "+t+ " cls "+t.op().getClass().getName());
 //		if(t.op() instanceof LocationVariable && t.subs().size() == 0 && isRelevantConstant(t)){
@@ -150,13 +150,13 @@ public class ProofInfo {
 			vars.add(t);
 		}
 
-		for(JavaDLTerm sub : t.subs()){
+		for(Term sub : t.subs()){
 			getProgramVariables(sub, vars);
 		}
 
 	}
 
-	private boolean isRelevantConstant(JavaDLTerm c){
+	private boolean isRelevantConstant(Term c){
 		Operator op = c.op();
 		
 		if(isTrueConstant(op) || isFalseConstant(op)){
@@ -190,7 +190,7 @@ public class ProofInfo {
 		return o.equals(services.getTheories().getBooleanLDT().getFalseConst());
 	}
 
-	public JavaDLTerm getPO() {
+	public Term getPO() {
 		return proof.root().sequent().succedent().get(0).formula();
 	}
 
@@ -199,14 +199,14 @@ public class ProofInfo {
 
 
 
-	public String getUpdate(JavaDLTerm t){
+	public String getUpdate(Term t){
 		if(t.op() instanceof UpdateApplication){
 			//UpdateApplication u = (UpdateApplication) t.op();
 			return processUpdate(UpdateApplication.getUpdate(t));
 		}
 		else{
 			String result = "";
-			for(JavaDLTerm s : t.subs()){
+			for(Term s : t.subs()){
 				result += getUpdate(s);
 			}
 			return result;
@@ -217,7 +217,7 @@ public class ProofInfo {
 
 
 
-	private String processUpdate(JavaDLTerm update) {
+	private String processUpdate(Term update) {
 		if(update.op() instanceof ElementaryUpdate){			
 			ElementaryUpdate up = (ElementaryUpdate) update.op();			
 			if(up.lhs().sort().extendsTrans(services.getTheories().getHeapLDT().targetSort())){
@@ -226,19 +226,19 @@ public class ProofInfo {
 			return "   \n"+up.lhs().sort()+" "+up.lhs().toString()+" = "+update.sub(0)+";";
 		}
 		String result = "";
-		for(JavaDLTerm sub : update.subs()){
+		for(Term sub : update.subs()){
 			result += processUpdate(sub);
 		}
 		return result;
 	}
 
-	public JavaBlock getJavaBlock(JavaDLTerm t){		
+	public JavaBlock getJavaBlock(Term t){		
 		if(t.containsModalContentRecursive()){
 			if(!t.modalContent().isEmpty()){
 				return t.modalContent();
 			}
 			else{
-				for(JavaDLTerm s : t.subs()){
+				for(Term s : t.subs()){
 					if(s.containsModalContentRecursive()){
 						return getJavaBlock(s);
 					}

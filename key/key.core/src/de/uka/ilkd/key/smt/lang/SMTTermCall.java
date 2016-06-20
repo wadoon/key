@@ -245,7 +245,7 @@ public class SMTTermCall extends SMTTerm{
 		return true;
 	}
 
-	//	public boolean equals (JavaDLTerm term) {
+	//	public boolean equals (Term term) {
 	//		if (term == null)
 	//			return false;
 	//	

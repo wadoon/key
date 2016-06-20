@@ -16,7 +16,7 @@ package de.uka.ilkd.key.proof.delayedcut;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -37,13 +37,13 @@ public class DelayedCut {
     private final Node node;
     private final ImmutableList<Node> subtrees;
     private final int cutMode;
-    private final JavaDLTerm decisionPredicate;
+    private final Term decisionPredicate;
     private final RuleApp firstAppliedRuleApp;
     private NoPosTacletApp hideApp = null;
     private ImmutableList<NodeGoalPair> goalsAfterUncovering = null;
     private Goal remainingGoal = null;
 
-    public DelayedCut(Proof proof, Node node, JavaDLTerm formula,
+    public DelayedCut(Proof proof, Node node, Term formula,
             ImmutableList<Node> subtrees, int sideOfDecisionPredicate,
             RuleApp firstAppliedRuleApp) {
         super();
@@ -58,7 +58,7 @@ public class DelayedCut {
 
     }
 
-    public JavaDLTerm getFormula() {
+    public Term getFormula() {
         return decisionPredicate;
     }
 

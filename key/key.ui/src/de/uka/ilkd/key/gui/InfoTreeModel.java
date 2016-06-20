@@ -107,7 +107,7 @@ public class InfoTreeModel extends DefaultTreeModel {
         private static final long serialVersionUID = 7447092361863294242L;
 
         TermLabelsNode(MainWindow mainWindow, Properties termLabelExplanations) {
-            super("JavaDLTerm Labels", "Show descriptions for currently available term labels.");
+            super("Term Labels", "Show descriptions for currently available term labels.");
 
             List<Name> labelNames = mainWindow.getSortedTermLabelNames();
             for (Name name : labelNames) {

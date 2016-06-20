@@ -32,7 +32,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -100,7 +100,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
     */
    protected ExecutionContext extractContext(Node node, Services services) {
       RuleApp app = node.getAppliedRuleApp();
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = app.posInOccurrence();
+      PosInOccurrence<Term, SequentFormula<Term>> pio = app.posInOccurrence();
       JavaBlock jb = TermBuilder.goBelowUpdates(pio.subTerm()).modalContent();
       return JavaTools.getInnermostExecutionContext(jb, services);
    }

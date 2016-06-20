@@ -25,12 +25,12 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 class UniTrigger implements Trigger {
   
-    private final JavaDLTerm trigger;
+    private final Term trigger;
     private final ImmutableSet<QuantifiableVariable> uqvs;
     
     private final TriggersSet triggerSetThisBelongsTo;
@@ -38,9 +38,9 @@ class UniTrigger implements Trigger {
     private final boolean onlyUnify;
     private final boolean isElementOfMultitrigger;
    
-    private final LRUCache<JavaDLTerm, ImmutableSet<Substitution>> matchResults = new LRUCache<JavaDLTerm, ImmutableSet<Substitution>> ( 1000 );
+    private final LRUCache<Term, ImmutableSet<Substitution>> matchResults = new LRUCache<Term, ImmutableSet<Substitution>> ( 1000 );
     
-    UniTrigger(JavaDLTerm trigger,ImmutableSet<QuantifiableVariable> uqvs,
+    UniTrigger(Term trigger,ImmutableSet<QuantifiableVariable> uqvs,
                boolean isUnify,boolean isElementOfMultitrigger,
                TriggersSet triggerSetThisBelongsTo){
         this.trigger = trigger;
@@ -50,14 +50,14 @@ class UniTrigger implements Trigger {
         this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
     }
         
-    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<JavaDLTerm> targetTerm, 
+    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm, 
             JavaDLTermServices services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
-        for (JavaDLTerm aTargetTerm : targetTerm) allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
+        for (Term aTargetTerm : targetTerm) allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
         return allsubs;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTerm(JavaDLTerm t, JavaDLTermServices services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTerm(Term t, JavaDLTermServices services) {
         ImmutableSet<Substitution> res = matchResults.get ( t );
         if ( res == null ) {
             res = getSubstitutionsFromTermHelp ( t, services );
@@ -66,7 +66,7 @@ class UniTrigger implements Trigger {
         return res;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(JavaDLTerm t, JavaDLTermServices services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, JavaDLTermServices services) {
         ImmutableSet<Substitution> newSubs = DefaultImmutableSet.<Substitution>nil();
         if ( t.freeVars ().size () > 0 || t.op () instanceof Quantifier )
             newSubs = Matching.twoSidedMatching ( this, t, services );
@@ -76,7 +76,7 @@ class UniTrigger implements Trigger {
     }
 
     
-    public JavaDLTerm getTriggerTerm() {
+    public Term getTriggerTerm() {
         return trigger;
     }
 
@@ -108,7 +108,7 @@ class UniTrigger implements Trigger {
      * @param candidate
      * @param searchTerm
      */
-    public static boolean passedLoopTest(JavaDLTerm candidate, JavaDLTerm searchTerm) {
+    public static boolean passedLoopTest(Term candidate, Term searchTerm) {
         final ImmutableSet<Substitution> substs =
             BasicMatching.getSubstitutions ( candidate, searchTerm );
 
@@ -134,12 +134,12 @@ class UniTrigger implements Trigger {
     /**
      * Code copied from logic.EqualityConstraint
      */
-    private static boolean containsLoop(ImmutableMap<QuantifiableVariable,JavaDLTerm> varMap,
+    private static boolean containsLoop(ImmutableMap<QuantifiableVariable,Term> varMap,
                                         QuantifiableVariable var) {
         ImmutableList<QuantifiableVariable> body          =
             ImmutableSLList.<QuantifiableVariable>nil();
-        ImmutableList<JavaDLTerm>                 fringe        = ImmutableSLList.<JavaDLTerm>nil();
-        JavaDLTerm                       checkForCycle = varMap.get( var );
+        ImmutableList<Term>                 fringe        = ImmutableSLList.<Term>nil();
+        Term                       checkForCycle = varMap.get( var );
         
         if ( checkForCycle.op () == var ) return false;
         
@@ -147,7 +147,7 @@ class UniTrigger implements Trigger {
             for (QuantifiableVariable quantifiableVariable : checkForCycle.freeVars()) {
                 final QuantifiableVariable termVar = quantifiableVariable;
                 if (!body.contains(termVar)) {
-                    final JavaDLTerm termVarterm = varMap.get(termVar);
+                    final Term termVarterm = varMap.get(termVar);
                     if (termVarterm != null) {
                         if (termVarterm.freeVars().contains(var))
                             return true;

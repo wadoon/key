@@ -45,7 +45,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
@@ -288,11 +288,11 @@ public class SymbolicExecutionTreeBuilder {
     */
    protected void initMethodCallStack(final Node root, Services services) {
       // Find all modalities in the succedent
-      final List<JavaDLTerm> modalityTerms = new LinkedList<JavaDLTerm>();
-      for (SequentFormula<JavaDLTerm> sequentFormula : root.sequent().succedent()) {
+      final List<Term> modalityTerms = new LinkedList<Term>();
+      for (SequentFormula<Term> sequentFormula : root.sequent().succedent()) {
          sequentFormula.formula().execPreOrder(new DefaultVisitor() {
             @Override
-            public void visit(JavaDLTerm visited) {
+            public void visit(Term visited) {
                if (visited.op() instanceof Modality && SymbolicExecutionUtil.hasSymbolicExecutionLabel(visited)) {
                   modalityTerms.add(visited);
                }
@@ -308,7 +308,7 @@ public class SymbolicExecutionTreeBuilder {
          throw new IllegalStateException("Sequent contains multiple modalities with symbolic execution label.");
       }
       // Make sure that modality has symbolic execution label
-      JavaDLTerm modalityTerm = modalityTerms.get(0);
+      Term modalityTerm = modalityTerms.get(0);
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
       if (label == null) {
          throw new IllegalStateException("Modality \"" + modalityTerm + "\" has no symbolic execution term label.");
@@ -341,7 +341,7 @@ public class SymbolicExecutionTreeBuilder {
     * Returns the method {@link Node}s of method calls for
     * which its return should be ignored. If not already
     * available an empty method {@link Set} is created.
-    * @param ruleApp The {@link RuleApp} which modifies a modality {@link JavaDLTerm} with a {@link SymbolicExecutionTermLabel}.
+    * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a {@link SymbolicExecutionTermLabel}.
     * @return The {@link Set} of {@link Node}s to ignore its return.
     */
    protected Set<Node> getMethodReturnsToIgnore(RuleApp ruleApp) {
@@ -383,8 +383,8 @@ public class SymbolicExecutionTreeBuilder {
    /**
     * Returns the method call stack. If not already
     * available an empty method call stack is created.
-    * @param ruleApp The {@link RuleApp} which modifies a modality {@link JavaDLTerm} with a {@link SymbolicExecutionTermLabel}.
-    * @return The method call stack of the ID of the modified modality {@link JavaDLTerm} with a {@link SymbolicExecutionTermLabel}.
+    * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a {@link SymbolicExecutionTermLabel}.
+    * @return The method call stack of the ID of the modified modality {@link Term} with a {@link SymbolicExecutionTermLabel}.
     */
    protected Map<Node, ImmutableList<Node>> getMethodCallStack(RuleApp ruleApp) {
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
@@ -1028,7 +1028,7 @@ public class SymbolicExecutionTreeBuilder {
             }
             else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
                if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
-                  JavaDLTerm modalityTerm = TermBuilder.goBelowUpdates(node.getAppliedRuleApp().posInOccurrence().subTerm());
+                  Term modalityTerm = TermBuilder.goBelowUpdates(node.getAppliedRuleApp().posInOccurrence().subTerm());
                   BlockContractValidityTermLabel bcLabel = (BlockContractValidityTermLabel) modalityTerm.getLabel(BlockContractValidityTermLabel.NAME);
                   result = new ExecutionTermination(settings, 
                                                     node, 
@@ -1403,7 +1403,7 @@ public class SymbolicExecutionTreeBuilder {
     * @return {@code true} is not implicit, {@code false} is implicit 
     */
    protected boolean isNotInImplicitMethod(Node node) {
-      JavaDLTerm term = node.getAppliedRuleApp().posInOccurrence().subTerm();
+      Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
       term = TermBuilder.goBelowUpdates(term);
       Services services = proof.getServices();
       IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.modalContent(), services);
@@ -1419,7 +1419,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param node The {@link Node} on which the loop invariant rule is applied.
     */
    protected void initNewLoopBodyMethodCallStack(Node node) {
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
+      PosInOccurrence<Term, SequentFormula<Term>> childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
       initNewMethodCallStack(node, childPIO);
    }
    
@@ -1431,24 +1431,24 @@ public class SymbolicExecutionTreeBuilder {
     * @param node The {@link Node} on which the block contract rule is applied.
     */
    protected void initNewValidiityMethodCallStack(Node node) {
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(0).sequent());
+      PosInOccurrence<Term, SequentFormula<Term>> childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(0).sequent());
       initNewMethodCallStack(node, childPIO);
    }
    
    /**
     * Initializes a new method call stack.
     * @param currentNode The current {@link Node}.
-    * @param childPIO The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} where the modality has a new symbolic execution label counter.
+    * @param childPIO The {@link PosInOccurrence<Term, SequentFormula<Term>>} where the modality has a new symbolic execution label counter.
     */
-   protected void initNewMethodCallStack(Node currentNode, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> childPIO) {
-      JavaDLTerm newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
+   protected void initNewMethodCallStack(Node currentNode, PosInOccurrence<Term, SequentFormula<Term>> childPIO) {
+      Term newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
       assert newModality != null;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
       assert label != null;
       JavaBlock jb = newModality.modalContent();
       MethodFrameCounterJavaASTVisitor newCounter = new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
       int newCount = newCounter.run();
-      JavaDLTerm oldModality = currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
+      Term oldModality = currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
       oldModality = TermBuilder.goBelowUpdates(oldModality);
       Map<Node, ImmutableList<Node>> currentMethodCallStackMap = getMethodCallStack(currentNode.getAppliedRuleApp());
       Map<Node, ImmutableList<Node>> newMethodCallStackMap = getMethodCallStack(label.getId());

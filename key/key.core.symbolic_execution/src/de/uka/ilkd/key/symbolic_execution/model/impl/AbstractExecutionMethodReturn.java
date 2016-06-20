@@ -9,7 +9,7 @@ import org.key_project.common.core.logic.op.UpdateApplication;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -39,7 +39,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
    /**
     * The method return condition to reach this node from its calling {@link IExecutionMethodCall}.
     */
-   private JavaDLTerm methodReturnCondition;
+   private Term methodReturnCondition;
    
    /**
     * The human readable method return condition to reach this node from its calling {@link IExecutionMethodCall}.
@@ -98,7 +98,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getMethodReturnCondition() throws ProofInputException {
+   public Term getMethodReturnCondition() throws ProofInputException {
       if (methodReturnCondition == null) {
          lazyComputeMethodReturnCondition();
       }
@@ -126,7 +126,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
       if (initConfig != null) { // Otherwise Proof is disposed.
          final Services services = initConfig.getServices();
          // Collect branch conditions
-         List<JavaDLTerm> bcs = new LinkedList<JavaDLTerm>();
+         List<Term> bcs = new LinkedList<Term>();
          AbstractExecutionNode<?> parent = getParent();
          while (parent != null && parent != methodCall) {
             if (parent instanceof IExecutionBranchCondition) {
@@ -169,17 +169,17 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
       // Get relevant information in current node
       Node proofNode = methodCall.getProofNode();
       assert proofNode.childrenCount() == 1;
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> originalPIO = methodCall.getModalityPIO();
+      PosInOccurrence<Term, SequentFormula<Term>> originalPIO = methodCall.getModalityPIO();
       int index = originalPIO.isInAntec() ?
                   proofNode.sequent().antecedent().indexOf(originalPIO.sequentFormula()) :
                   proofNode.sequent().succedent().indexOf(originalPIO.sequentFormula());
       // Search relevant position in child node
       Node childNode = proofNode.child(0);
-      SequentFormula<JavaDLTerm> nodeSF = originalPIO.isInAntec() ?
+      SequentFormula<Term> nodeSF = originalPIO.isInAntec() ?
                               childNode.sequent().antecedent().get(index) :
                               childNode.sequent().succedent().get(index);
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
-      JavaDLTerm modalityTerm = modalityPIO.subTerm();
+      PosInOccurrence<Term, SequentFormula<Term>> modalityPIO = new PosInOccurrence<Term, SequentFormula<Term>>(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
+      Term modalityTerm = modalityPIO.subTerm();
       while (modalityTerm.op() instanceof UpdateApplication) {
          modalityPIO = modalityPIO.down(1);
          modalityTerm = modalityPIO.subTerm();

@@ -30,7 +30,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -56,7 +56,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
         // Describes how a schema variable is mapped to another operator, e.g.
         // logical variable.
-        private HashMap<SchemaVariable, JavaDLTerm> mapping = new LinkedHashMap<SchemaVariable, JavaDLTerm>();
+        private HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<SchemaVariable, Term>();
        
         @Override
         public TacletFormula translate(Taclet taclet, JavaDLTermServices services) {
@@ -64,7 +64,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 if(result != null){
                         throw new IllegalTacletException(result);
                 }
-                JavaDLTerm formula = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR
+                Term formula = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR
                                 .translate(taclet, services);
                 formula = rebuild(taclet, formula, services,
                                 new LinkedHashSet<QuantifiableVariable>());
@@ -75,7 +75,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return new LemmaFormula(taclet, formula);
         }
         
-        private JavaDLTerm replace(Taclet taclet, JavaDLTerm term, JavaDLTermServices services) {
+        private Term replace(Taclet taclet, Term term, JavaDLTermServices services) {
                 if (term.op() instanceof SchemaVariable) {
                         return getInstantiation(taclet,
                                         (SchemaVariable) term.op(), services);
@@ -90,7 +90,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                TacletVisitor visitor = new TacletVisitor() {
                 
                        @Override
-                       public void visit(JavaDLTerm visited) {
+                       public void visit(Term visited) {
                               String res = checkForIllegalOps(visited, taclet, true);
                               if(res !=null){
                                       failureOccurred(res);
@@ -128,7 +128,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return null;
         }
         
-        public static String checkForIllegalOps(JavaDLTerm formula, Taclet owner, boolean schemaVarsAreAllowed){
+        public static String checkForIllegalOps(Term formula, Taclet owner, boolean schemaVarsAreAllowed){
              if((!schemaVarsAreAllowed && formula.op() instanceof SchemaVariable) ||
                 formula.op() instanceof Modality ||
                 formula.op() instanceof ModalOperatorSV ||
@@ -139,7 +139,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                                      + " contains a operator that is not allowed:\n"
                                      + formula.op().name();
              }
-             for(JavaDLTerm sub : formula.subs()){
+             for(Term sub : formula.subs()){
                      String s = checkForIllegalOps(sub, owner,schemaVarsAreAllowed);
                      if(s != null){
                              return s;
@@ -159,9 +159,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @param services
          * @return instantiation of the schema variable <code>var</code>.
          */
-        protected final JavaDLTerm getInstantiation(Taclet owner, SchemaVariable var,
+        protected final Term getInstantiation(Taclet owner, SchemaVariable var,
                         JavaDLTermServices services) {
-                JavaDLTerm instantiation = mapping.get(var);
+                Term instantiation = mapping.get(var);
                 if (instantiation == null) {
                         instantiation = createInstantiation(owner, var,
                                         services);
@@ -181,9 +181,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @param services
          * 
          */
-        private JavaDLTerm getInstantation(Taclet owner, VariableSV var,
+        private Term getInstantation(Taclet owner, VariableSV var,
                         JavaDLTermServices services) {
-                JavaDLTerm instantiation = mapping.get(var);
+                Term instantiation = mapping.get(var);
                 if (instantiation == null) {
                         instantiation = createInstantiation(owner, var,
                                         services);
@@ -192,7 +192,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return instantiation;
         }
 
-        private JavaDLTerm createInstantiation(Taclet owner, SchemaVariable sv,
+        private Term createInstantiation(Taclet owner, SchemaVariable sv,
                         JavaDLTermServices services) {
                 if (sv instanceof VariableSV) {
                         return createInstantiation(owner, (VariableSV) sv,
@@ -227,7 +227,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * @return a term that can be used for instantiating the schema
          *         variable.
          */
-        private JavaDLTerm createInstantiation(Taclet owner, VariableSV sv,
+        private Term createInstantiation(Taclet owner, VariableSV sv,
                         JavaDLTermServices services) {
                 Name name = createUniqueName(services, "v_"+sv.name().toString());
                 Sort sort = replaceSort(sv.sort(), services);
@@ -240,7 +240,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * a skolem function is returned that depends on the prefix of
          * <code>sv</code>.
          */
-        private JavaDLTerm createInstantiation(Taclet owner, TermSV sv,
+        private Term createInstantiation(Taclet owner, TermSV sv,
                         JavaDLTermServices services) {
                 return createSimpleInstantiation(owner, sv, services);
         }
@@ -250,7 +250,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * a skolem function is returned that depends on the prefix of
          * <code>sv</code>.
          */
-        private JavaDLTerm createInstantiation(Taclet owner, FormulaSV sv,
+        private Term createInstantiation(Taclet owner, FormulaSV sv,
                         JavaDLTermServices services) {
                 return createSimpleInstantiation(owner, sv, services);
         }
@@ -260,15 +260,15 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * there is no need to make it also dependend on program variables.
          * (See: Ensuring the Correctness of Lightweight Tactics for JavaCard
          * Dynamic Logic.) This method is used for both Formula schema variables
-         * and JavaDLTerm schema variables.
+         * and Term schema variables.
          */
-        private JavaDLTerm createSimpleInstantiation(Taclet owner, SchemaVariable sv,
+        private Term createSimpleInstantiation(Taclet owner, SchemaVariable sv,
                         JavaDLTermServices services) {
                 ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv)
                                 .prefix();
 
                 Sort[] argSorts = computeArgSorts(prefix, services);
-                JavaDLTerm[] args = computeArgs(owner, prefix, services);
+                Term[] args = computeArgs(owner, prefix, services);
                 Name name = createUniqueName(services, "f_"+sv.name().toString());
 
                 Function function = new Function(name, replaceSort(sv.sort(), services), argSorts);
@@ -289,9 +289,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return argSorts;
         }
 
-        private JavaDLTerm[] computeArgs(Taclet owner,
+        private Term[] computeArgs(Taclet owner,
                         ImmutableSet<SchemaVariable> svSet, JavaDLTermServices services) {
-                JavaDLTerm[] args = new JavaDLTerm[svSet.size()];
+                Term[] args = new Term[svSet.size()];
                 int i = 0;
                 for (SchemaVariable sv : svSet) {
                         args[i] = getInstantiation(owner, sv, services);
@@ -304,9 +304,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          * Rebuilds a term recursively and replaces all schema variables with
          * skolem terms/variables. 
          *   */
-        private JavaDLTerm rebuild(Taclet taclet, JavaDLTerm term, JavaDLTermServices services,
+        private Term rebuild(Taclet taclet, Term term, JavaDLTermServices services,
                         HashSet<QuantifiableVariable> boundedVariables) {
-                JavaDLTerm[] newSubs = new JavaDLTerm[term.arity()];
+                Term[] newSubs = new Term[term.arity()];
                 int i = 0;
                 LinkedList<QuantifiableVariable> qvars = new LinkedList<QuantifiableVariable>();
                 for (QuantifiableVariable qvar : term.boundVars()) {
@@ -318,7 +318,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                         }
                 }
 
-                for (JavaDLTerm sub : term.subs()) {
+                for (Term sub : term.subs()) {
                         newSubs[i] = replace(taclet, sub, services);
                         // if(newSubs[i] == null){
                         // newSubs[i] = rebuild(taclet,sub,services);

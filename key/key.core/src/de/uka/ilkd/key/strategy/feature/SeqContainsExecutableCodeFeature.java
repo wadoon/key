@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
@@ -42,12 +42,12 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
     public final static Feature PROGRAMS_OR_QUERIES =
         new SeqContainsExecutableCodeFeature ( true );
 
-    protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         return containsExec ( goal.sequent ().succedent ().iterator (), goal.proof().getServices() )
             || containsExec ( goal.sequent ().antecedent().iterator (), goal.proof().getServices() );
     }
 
-    private boolean containsExec(Iterator<SequentFormula<JavaDLTerm>> it, Services services) {
+    private boolean containsExec(Iterator<SequentFormula<Term>> it, Services services) {
         while ( it.hasNext () ) {
             if ( tf.compute ( it.next ().formula (), services ).equals (
                  BinaryTermFeature.ZERO_COST ) )

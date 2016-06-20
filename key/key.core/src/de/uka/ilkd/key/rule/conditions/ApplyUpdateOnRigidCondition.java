@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -40,12 +40,12 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     }
     
     
-    private static JavaDLTerm applyUpdateOnRigid(JavaDLTerm update, JavaDLTerm target, JavaDLTermServices services) {
-	JavaDLTerm[] updatedSubs = new JavaDLTerm[target.arity()];
+    private static Term applyUpdateOnRigid(Term update, Term target, JavaDLTermServices services) {
+	Term[] updatedSubs = new Term[target.arity()];
 	for(int i = 0; i < updatedSubs.length; i++) {
 	    updatedSubs[i] = services.getTermBuilder().apply(update, target.sub(i), null);
 	}
-	JavaDLTerm result = services.getTermFactory().createTerm(target.op(), 
+	Term result = services.getTermFactory().createTerm(target.op(), 
 				         updatedSubs,
 				         target.boundVars(), 
 				         target.modalContent());
@@ -59,9 +59,9 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 	    		  	 MatchConditions mc, 
 	    		  	 Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
-	JavaDLTerm uInst  = (JavaDLTerm) svInst.getInstantiation(u);
-	JavaDLTerm xInst  = (JavaDLTerm) svInst.getInstantiation(x);
-	JavaDLTerm x2Inst = (JavaDLTerm) svInst.getInstantiation(x2);
+	Term uInst  = (Term) svInst.getInstantiation(u);
+	Term xInst  = (Term) svInst.getInstantiation(x);
+	Term x2Inst = (Term) svInst.getInstantiation(x2);
 	if(uInst == null || xInst == null) {
 	    return mc;
 	}
@@ -70,7 +70,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 	    return null;
 	}
 	
-	JavaDLTerm properX2Inst = applyUpdateOnRigid(uInst, xInst, services);
+	Term properX2Inst = applyUpdateOnRigid(uInst, xInst, services);
 	if(x2Inst == null) {
 	    svInst = svInst.add(x2, properX2Inst, services);
 	    return mc.setInstantiations(svInst);

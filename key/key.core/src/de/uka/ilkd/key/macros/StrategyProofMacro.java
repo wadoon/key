@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
@@ -33,7 +33,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  * which use their own strategy.
  *
  * In order to implement a {@link StrategyProofMacro}, override
- * {@link #createStrategy(KeYMediator, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>)}.
+ * {@link #createStrategy(KeYMediator, PosInOccurrence<Term, SequentFormula<Term>>)}.
  *
  * This class is aware of Position in occurrences and can also be applied to
  * inner nodes. Both {@link AutomatedRuleApplicationManager} and
@@ -45,7 +45,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  */
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
-    protected abstract Strategy createStrategy(Proof proof, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc);
+    protected abstract Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc);
 
     /**
      * {@inheritDoc}
@@ -58,7 +58,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
@@ -81,7 +81,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
+                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         if (goals == null || goals.isEmpty()) {
             // should not happen, because in this case canApplyTo returns

@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
@@ -128,7 +128,7 @@ public class TacletInstantiationModel {
 	return proof;
     }
 
-    public JavaDLTerm ifFma(int i) {
+    public Term ifFma(int i) {
 	return ifChoiceModel(i).ifFma();
     }
 
@@ -143,8 +143,8 @@ public class TacletInstantiationModel {
 	    ImmutableList<IfFormulaInstantiation> succCand  =
 		IfFormulaInstSeq.createList ( seq, false );
 
-	    Iterator<SequentFormula<JavaDLTerm>> it        = ifseq.iterator();
-	    JavaDLTerm                         ifFma;
+	    Iterator<SequentFormula<Term>> it        = ifseq.iterator();
+	    Term                         ifFma;
 	    MatchConditions              matchCond = app.matchConditions ();
 
 	    ifChoiceModel                          = new TacletAssumesModel[size];

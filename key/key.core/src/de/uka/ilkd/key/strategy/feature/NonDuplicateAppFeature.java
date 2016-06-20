@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -33,7 +33,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     protected boolean containsRuleApp (ImmutableList<RuleApp> list,
                                        TacletApp rapp,
-                                       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+                                       PosInOccurrence<Term, SequentFormula<Term>> pio) {
 
         for (RuleApp aList : list) {
             if (sameApplication(aList, rapp, pio)) return true;
@@ -42,7 +42,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
         return false;
     }
 
-    public boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         if ( !app.ifInstsComplete () ) {
             return true;
         }
@@ -56,12 +56,12 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     protected boolean comparePio(TacletApp newApp,
                                  TacletApp oldApp,
-                                 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPio, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPio) {
+                                 PosInOccurrence<Term, SequentFormula<Term>> newPio, PosInOccurrence<Term, SequentFormula<Term>> oldPio) {
         return oldPio.equals ( newPio );
     }
 
     protected boolean semiSequentContains(Semisequent semisequent,
-                                          SequentFormula<JavaDLTerm> cfma) {
+                                          SequentFormula<Term> cfma) {
         return semisequent.contains ( cfma );
     }
 }

@@ -22,7 +22,7 @@ import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -67,7 +67,7 @@ public class SVInstantiationCP implements Feature {
         this.manager = manager;
     }
 
-    public RuleAppCost compute(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public RuleAppCost compute(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         manager.passChoicePoint ( new CP (app, pos, goal), this );
         return NumberRuleAppCost.getZeroCost();
     }
@@ -95,11 +95,11 @@ public class SVInstantiationCP implements Feature {
     
     private class CP implements ChoicePoint {
         
-        private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos;
+        private final PosInOccurrence<Term, SequentFormula<Term>> pos;
         private final RuleApp         app;
         private final Goal            goal;
     
-        private CP(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+        private CP(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;
@@ -112,7 +112,7 @@ public class SVInstantiationCP implements Feature {
             final TacletApp tapp = (TacletApp)oldApp;
             
             final SchemaVariable sv = findSVWithName ( tapp );
-            final JavaDLTerm instTerm = value.toTerm ( app, pos, goal );
+            final Term instTerm = value.toTerm ( app, pos, goal );
 
             final RuleApp newApp =
                 tapp.addCheckedInstantiation ( sv,

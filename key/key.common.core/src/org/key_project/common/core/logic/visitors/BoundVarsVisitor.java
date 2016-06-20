@@ -38,7 +38,7 @@ public class BoundVarsVisitor<T extends CCTerm<?, ?, T>> extends CCDefaultVisito
     }
 
     /**
-     * only called by execPostOrder in JavaDLTerm.
+     * only called by execPostOrder in Term.
      */
     public void visit(T visited) {
         for (int i = 0, ar = visited.arity(); i < ar; i++) {

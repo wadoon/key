@@ -116,7 +116,7 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * replaces the element at place idx with sequentFormula
      * 
      * @param pos
-     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
+     *            the PosInOccurrence<Term, SequentFormula<Term>>
      *            describing the position of and within the formula below which
      *            the formula differs from the new formula
      *            <code>sequentFormula</code>

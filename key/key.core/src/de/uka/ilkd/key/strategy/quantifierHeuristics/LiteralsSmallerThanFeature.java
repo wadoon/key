@@ -23,7 +23,7 @@ import org.key_project.common.core.logic.op.Operator;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -42,7 +42,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     
     // ugly, but we need some services
     private Services               services = null;
-    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>        focus = null;
+    private PosInOccurrence<Term, SequentFormula<Term>>        focus = null;
 
     private LiteralsSmallerThanFeature(ProjectionToTerm left,
                                        ProjectionToTerm right,
@@ -58,15 +58,15 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return new LiteralsSmallerThanFeature ( left, right, numbers );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
-        final JavaDLTerm leftTerm = left.toTerm ( app, pos, goal );
-        final JavaDLTerm rightTerm = right.toTerm ( app, pos, goal );
+    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+        final Term leftTerm = left.toTerm ( app, pos, goal );
+        final Term rightTerm = right.toTerm ( app, pos, goal );
 
         return compareTerms ( leftTerm, rightTerm, pos, goal.proof ().getServices () );
     }
 
-    protected boolean compareTerms(JavaDLTerm leftTerm, JavaDLTerm rightTerm,
-                                   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Services p_services) {
+    protected boolean compareTerms(Term leftTerm, Term rightTerm,
+                                   PosInOccurrence<Term, SequentFormula<Term>> pos, Services p_services) {
         services = p_services;
         focus = pos;
         
@@ -87,7 +87,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(JavaDLTerm t1, JavaDLTerm t2, ServiceCaches caches) {
+    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
 
         final int t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
         final int t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
@@ -134,9 +134,9 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return super.lessThan ( t1, t2, caches );
     }
 
-    private int comparePolynomials(JavaDLTerm t1, JavaDLTerm t2) {
-        final Iterator<JavaDLTerm> it1 = new MonomialIterator ( t1 );
-        final Iterator<JavaDLTerm> it2 = new MonomialIterator ( t2 );
+    private int comparePolynomials(Term t1, Term t2) {
+        final Iterator<Term> it1 = new MonomialIterator ( t1 );
+        final Iterator<Term> it2 = new MonomialIterator ( t2 );
 
         while ( true ) {
             if ( it1.hasNext () ) {
@@ -153,17 +153,17 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         }
     }
     
-    private JavaDLTerm discardNegation(JavaDLTerm t) {
+    private Term discardNegation(Term t) {
         while ( t.op () == Junctor.NOT )
             t = t.sub ( 0 );
         return t;
     }
     
-    private boolean isBinaryIntRelation(JavaDLTerm t) {
+    private boolean isBinaryIntRelation(Term t) {
         return formulaKind ( t ) >= 0;
     }
 
-    private int formulaKind(JavaDLTerm t) {
+    private int formulaKind(Term t) {
         final Operator op = t.op ();
         if ( op == numbers.getLessOrEquals () ) return 1;
         if ( op == numbers.getGreaterOrEquals () ) return 2;
@@ -172,11 +172,11 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return -1;
     }
 
-    private class MonomialIterator implements Iterator<JavaDLTerm> {
-        private JavaDLTerm polynomial;
-        private JavaDLTerm nextMonomial = null;
+    private class MonomialIterator implements Iterator<Term> {
+        private Term polynomial;
+        private Term nextMonomial = null;
 
-        private MonomialIterator(JavaDLTerm polynomial) {
+        private MonomialIterator(Term polynomial) {
             this.polynomial = polynomial;
             findNextMonomial ();
         }
@@ -200,8 +200,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
             return nextMonomial != null;
         }
 
-        public JavaDLTerm next() {
-            final JavaDLTerm res = nextMonomial;
+        public Term next() {
+            final Term res = nextMonomial;
             nextMonomial = null;
             findNextMonomial ();
             return res;
@@ -216,7 +216,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
     
     private class LiteralCollector extends Collector {
-        protected void collect(JavaDLTerm te) {
+        protected void collect(Term te) {
             final Operator op = te.op ();
             if ( op == Junctor.OR ) {
                 collect ( te.sub ( 0 ) );

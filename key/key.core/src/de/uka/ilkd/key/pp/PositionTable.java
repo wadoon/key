@@ -19,12 +19,12 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * A PositionTable describes the start and end positions of substrings of a
  * String in order to get a PosInSequent from an int describing a position in a
- * string representing a JavaDLTerm or a Sequent, etc. A PositionTable therefore
+ * string representing a Term or a Sequent, etc. A PositionTable therefore
  * represents a table consisting of two columns of type int (start and end
  * position) and a reference to another PositionTable representing the position
  * information for that substring. A PositionTable is valid (in order to support
@@ -58,7 +58,7 @@ public class PositionTable {
 
     /**
      * creates a new PositionTable with the number of subterms (or number of
-     * SequentFormula<JavaDLTerm> in a Semisequent, or the number of Semisequents in a
+     * SequentFormula<Term> in a Semisequent, or the number of Semisequents in a
      * Sequent, etc.)
      *
      * @param rows
@@ -270,10 +270,10 @@ public class PositionTable {
 	SequentPrintFilterEntry filterEntry = 
 	    getFilterEntry(cfmaNo, filter);
 
-	SequentFormula<JavaDLTerm> cfma = filterEntry.getOriginalFormula();
+	SequentFormula<Term> cfma = filterEntry.getOriginalFormula();
 
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> currentPos = 
-	    new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( cfma, PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> currentPos = 
+	    new PosInOccurrence<Term, SequentFormula<Term>> ( cfma, PosInTerm.<Term>getTopLevel(),
 				  filter.getSequent ().antecedent().contains(cfma) );
 	
 	return child[cfmaNo].getTermPIS(filterEntry,tail,
@@ -283,7 +283,7 @@ public class PositionTable {
     /**
      * Returns a PosInSequent for a given position list, but without filling in
      * the bounds. It is assumed that this is a position table corresponding to
-     * the JavaDLTerm <code>term</code>, which has one child table for each subterm.
+     * the Term <code>term</code>, which has one child table for each subterm.
      *
      * @param filterEntry
      *            the print filter entry that contains information about which
@@ -292,16 +292,16 @@ public class PositionTable {
      * @param posList
      *            the position list that navigates through the position tables.
      * @param pio
-     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> leading to the current term
+     *            the PosInOccurrence<Term, SequentFormula<Term>> leading to the current term
      */
     private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry,
 				    ImmutableList<Integer> posList,
-				    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+				    PosInOccurrence<Term, SequentFormula<Term>> pio) {
 	if(posList.isEmpty()) {
 	    return PosInSequent.createCfmaPos(pio);
 	} else {
 	    int subNo  =  posList.head().intValue();
-	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> subpio = pio.down ( subNo );	   
+	    PosInOccurrence<Term, SequentFormula<Term>> subpio = pio.down ( subNo );	   
 
 	    return child[subNo].getTermPIS(filterEntry,
 					   posList.tail(),

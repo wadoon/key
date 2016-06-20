@@ -3,7 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -16,22 +16,22 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
  */
 public class ExecutionConstraint extends AbstractExecutionElement implements IExecutionConstraint {
    /**
-    * The {@link JavaDLTerm} representing the constraint.
+    * The {@link Term} representing the constraint.
     */
-   private final JavaDLTerm term;
+   private final Term term;
    
    /**
-    * The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
+    * The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
     */
-   private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO;
+   private final PosInOccurrence<Term, SequentFormula<Term>> modalityPIO;
 
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
-    * @param term The {@link JavaDLTerm} representing the constraint.
+    * @param term The {@link Term} representing the constraint.
     */
-   public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO, JavaDLTerm term) {
+   public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence<Term, SequentFormula<Term>> modalityPIO, Term term) {
       super(settings, proofNode);
       assert term != null;
       assert modalityPIO != null;
@@ -59,7 +59,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getTerm() {
+   public Term getTerm() {
       return term;
    }
 
@@ -67,7 +67,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
+   public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
       return modalityPIO;
    }
 }

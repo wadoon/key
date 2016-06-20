@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 
 /**
@@ -38,13 +38,13 @@ import de.uka.ilkd.key.logic.Sequent;
 public class BoundUniquenessChecker {
 
     private HashSet<QuantifiableVariable> boundVars = new LinkedHashSet<QuantifiableVariable>();
-    private ImmutableList<JavaDLTerm> terms = ImmutableSLList.<JavaDLTerm>nil();
+    private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
 
     public BoundUniquenessChecker(Sequent seq) {
         addAll(seq);
     }
 
-    public BoundUniquenessChecker(JavaDLTerm t, Sequent seq) {
+    public BoundUniquenessChecker(Term t, Sequent seq) {
 	addTerm(t);
 	addAll(seq);
     }
@@ -52,9 +52,9 @@ public class BoundUniquenessChecker {
     /**
      * adds <tt>term</tt> to the list of terms to include in
      * the uniqueness check
-     * @param term a JavaDLTerm
+     * @param term a Term
      */
-    public void addTerm(JavaDLTerm term) {
+    public void addTerm(Term term) {
 	terms = terms.prepend(term);
     }
 
@@ -64,13 +64,13 @@ public class BoundUniquenessChecker {
      * @param seq the Sequent with the formulas to add
      */
     public void addAll(Sequent seq) {
-	for (final SequentFormula<JavaDLTerm> cf : seq) {
+	for (final SequentFormula<Term> cf : seq) {
 	    terms = terms.prepend(cf.formula());
 	}
     }
 
     //recursive helper
-    private boolean correct(JavaDLTerm t) {
+    private boolean correct(Term t) {
 	/* Note that a term can bound a variable in several
 	 * subterms.
          */
@@ -104,7 +104,7 @@ public class BoundUniquenessChecker {
      * given set of terms
      */
     public boolean correct() {
-        for (final JavaDLTerm term : terms) {
+        for (final Term term : terms) {
             if (!correct(term)) {
                 return false;
             }

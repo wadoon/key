@@ -38,7 +38,7 @@ import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
@@ -89,12 +89,12 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    private TextPresentation textPresentation;
    
    /**
-    * The first range used to highlight the selected {@link JavaDLTerm}.
+    * The first range used to highlight the selected {@link Term}.
     */
    private StyleRange marked1;
    
    /**
-    * The second range used to highlight the selected {@link JavaDLTerm}.
+    * The second range used to highlight the selected {@link Term}.
     */
    private StyleRange marked2;
    /**
@@ -218,7 +218,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
             mergeRanges(textPresentation, false);
          }   
          else {
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = node.getAppliedRuleApp().posInOccurrence();
+            PosInOccurrence<Term, SequentFormula<Term>> pio = node.getAppliedRuleApp().posInOccurrence();
             setGreenBackground(pio);
          }
       }
@@ -252,7 +252,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    
    
    /**
-    * Shows the given {@link JavaDLTerm} with help of the given {@link KeYMediator}
+    * Shows the given {@link Term} with help of the given {@link KeYMediator}
     * in the decorated {@link ISourceViewer}.
     * @param sequent The {@link Sequent} to be displayed.
     * @param services The {@link Services} to use.
@@ -367,10 +367,10 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    }
    /**
     * Sets up {@link StyleRange} for green background color.
-    * @param pos PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, where green color should be applied.
+    * @param pos PosInOccurrence<Term, SequentFormula<Term>>, where green color should be applied.
     * 
     */
-   protected void setGreenBackground(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos){
+   protected void setGreenBackground(PosInOccurrence<Term, SequentFormula<Term>> pos){
       TextPresentation textPresentation = new TextPresentation();
       marked1 = initializeValuesForBackground(greenColor, textPresentation);
       if (pos != null) {

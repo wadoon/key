@@ -7,7 +7,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.java.CollectionUtil;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 
 /**
@@ -19,11 +19,11 @@ public class FormulaTermLabelMerger implements TermLabelMerger {
     * {@inheritDoc}
     */
    @Override
-   public boolean mergeLabels(SequentFormula<JavaDLTerm> existingSF, 
-                              JavaDLTerm existingTerm, 
+   public boolean mergeLabels(SequentFormula<Term> existingSF, 
+                              Term existingTerm, 
                               TermLabel existingLabel, 
-                              SequentFormula<JavaDLTerm> rejectedSF, 
-                              JavaDLTerm rejectedTerm, 
+                              SequentFormula<Term> rejectedSF, 
+                              Term rejectedTerm, 
                               TermLabel rejectedLabel, 
                               List<TermLabel> mergedLabels) {
       if (existingLabel != null) {

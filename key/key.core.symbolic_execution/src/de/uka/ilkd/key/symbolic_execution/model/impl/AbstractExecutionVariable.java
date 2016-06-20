@@ -3,7 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -31,17 +31,17 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
    /**
     * The index in the parent array.
     */
-   private final JavaDLTerm arrayIndex;
+   private final Term arrayIndex;
    
    /**
     * An optional additional condition to consider.
     */
-   private final JavaDLTerm additionalCondition;
+   private final Term additionalCondition;
    
    /**
-    * The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
+    * The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
     */
-   private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO;
+   private final PosInOccurrence<Term, SequentFormula<Term>> modalityPIO;
 
    /**
     * Constructor.
@@ -51,15 +51,15 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
     * @param arrayIndex The index in the parent array.
     * @param additionalCondition An optional additional condition to consider.
-    * @param modalityPIO The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
+    * @param modalityPIO The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
     */
    public AbstractExecutionVariable(ITreeSettings settings, 
                                     Node proofNode, 
                                     IProgramVariable programVariable, 
                                     IExecutionValue parentValue, 
-                                    JavaDLTerm arrayIndex, 
-                                    JavaDLTerm additionalCondition,
-                                    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO) {
+                                    Term arrayIndex, 
+                                    Term additionalCondition,
+                                    PosInOccurrence<Term, SequentFormula<Term>> modalityPIO) {
       super(settings, proofNode);
       this.programVariable = programVariable;
       this.parentValue = parentValue;
@@ -72,7 +72,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getAdditionalCondition() {
+   public Term getAdditionalCondition() {
       return additionalCondition;
    }
 
@@ -102,7 +102,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getArrayIndex() {
+   public Term getArrayIndex() {
       return arrayIndex;
    }
 
@@ -142,7 +142,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
+   public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
       return modalityPIO;
    }
 }

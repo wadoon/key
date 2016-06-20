@@ -26,5 +26,5 @@ public interface TermOrdering {
      * <code>p_b</code> regarding the ordering given by the
      * implementing class
      */
-    int compare ( JavaDLTerm p_a, JavaDLTerm p_b );
+    int compare ( Term p_a, Term p_b );
 }

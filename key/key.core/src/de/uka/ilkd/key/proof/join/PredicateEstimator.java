@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -49,7 +49,7 @@ public interface PredicateEstimator {
      * common parent node at which to prune, i.e. apply the delayed cut.
      */
     public interface Result {
-        JavaDLTerm getPredicate();
+        Term getPredicate();
 
         Node getCommonParent();
     }
@@ -83,13 +83,13 @@ class StdPredicateEstimator implements PredicateEstimator {
                 branchLabel = branchLabel.substring(CUT_LABEL.length());
             }
 
-            final JavaDLTerm term = translate(branchLabel, proof.getServices());
+            final Term term = translate(branchLabel, proof.getServices());
 
             if (term != null) {
                 return new Result() {
 
                     @Override
-                    public JavaDLTerm getPredicate() {
+                    public Term getPredicate() {
                         if (!positive) {
                             return proof.getServices().getTermBuilder()
                                     .not(term);
@@ -110,7 +110,7 @@ class StdPredicateEstimator implements PredicateEstimator {
         return new Result() {
 
             @Override
-            public JavaDLTerm getPredicate() {
+            public Term getPredicate() {
                 // The decision predicate has to be specified by the user.
                 return null;
             }
@@ -177,7 +177,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      *            The services object.
      * @return A term corresponding to the branch label.
      */
-    private JavaDLTerm translate(String estimation, Services services) {
+    private Term translate(String estimation, Services services) {
         try {
             KeYParserF parser = new KeYParserF(ParserMode.TERM, new KeYLexerF(
                     estimation, ""), services, // should not be needed

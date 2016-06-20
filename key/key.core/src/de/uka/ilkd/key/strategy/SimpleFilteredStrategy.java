@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -60,7 +60,7 @@ public class SimpleFilteredStrategy implements Strategy {
      * (it is discarded by the strategy).
      */
     public RuleAppCost computeCost ( RuleApp         app,
-	                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+	                             PosInOccurrence<Term, SequentFormula<Term>> pio,
 	                             Goal            goal ) {
 	if ( app instanceof TacletApp &&
 	     !ruleFilter.filter ( app.rule () ) )
@@ -84,7 +84,7 @@ public class SimpleFilteredStrategy implements Strategy {
      * @return true iff the rule should be applied, false otherwise
      */
     public boolean isApprovedApp ( RuleApp         app,
-	                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+	                           PosInOccurrence<Term, SequentFormula<Term>> pio,
 	                           Goal            goal ) {
     	// do not apply a rule twice
     	if ( app instanceof TacletApp &&
@@ -95,7 +95,7 @@ public class SimpleFilteredStrategy implements Strategy {
     }
 
     public void instantiateApp(RuleApp app,
-                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+                               PosInOccurrence<Term, SequentFormula<Term>> pio,
                                Goal goal,
                                RuleAppCostCollector collector) {}
 

@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
@@ -33,8 +33,8 @@ public class RuleCommand extends AbstractCommand {
 
     private static class Parameters {
         String rulename;
-        JavaDLTerm on;
-        JavaDLTerm formula;
+        Term on;
+        Term formula;
         int occ = -1;
     }
 
@@ -145,23 +145,23 @@ public class RuleCommand extends AbstractCommand {
         index.autoModeStopped ();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
-        for (SequentFormula<JavaDLTerm> sf : g.node().sequent().antecedent()) {
+        for (SequentFormula<Term> sf : g.node().sequent().antecedent()) {
             if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;
             }
             allApps = allApps.append(
                     index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(), true),
+                            new PosInOccurrence<Term, SequentFormula<Term>>(sf, PosInTerm.<Term>getTopLevel(), true),
                             services));
         }
 
-        for (SequentFormula<JavaDLTerm> sf : g.node().sequent().succedent()) {
+        for (SequentFormula<Term> sf : g.node().sequent().succedent()) {
             if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;
             }
             allApps = allApps.append(
                     index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(), false),
+                            new PosInOccurrence<Term, SequentFormula<Term>>(sf, PosInTerm.<Term>getTopLevel(), false),
                             services));
         }
 

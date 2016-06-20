@@ -73,56 +73,56 @@ import de.uka.ilkd.key.util.HelperClassForTests;
  */
 public class TestTermLabelManager extends TestCase {
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Rule, Goal, JavaDLTerm)}
+    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<Term, SequentFormula<Term>>, Rule, Goal, Term)}
     */
    public void testrefactorGoal_childrenAndGrandchildren_allRules() throws ProblemLoaderException {
       doRefactoringTestLogging(true, true, RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE);
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Rule, Goal, JavaDLTerm)}
+    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<Term, SequentFormula<Term>>, Rule, Goal, Term)}
     */
    public void testrefactorGoal_childrenAndGrandchildren_ruleSpecific() throws ProblemLoaderException {
       doRefactoringTestLogging(true, false, RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE, "rule");
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Rule, Goal, JavaDLTerm)}
+    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<Term, SequentFormula<Term>>, Rule, Goal, Term)}
     */
    public void testrefactorGoal_directChildren_allRules() throws ProblemLoaderException {
       doRefactoringTestLogging(true, true, RefactoringScope.APPLICATION_DIRECT_CHILDREN);
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Rule, Goal, JavaDLTerm)}
+    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<Term, SequentFormula<Term>>, Rule, Goal, Term)}
     */
    public void testrefactorGoal_directChildren_ruleSpecific() throws ProblemLoaderException {
       doRefactoringTestLogging(true, false, RefactoringScope.APPLICATION_DIRECT_CHILDREN, "rule");
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Rule, Goal, JavaDLTerm)}
+    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<Term, SequentFormula<Term>>, Rule, Goal, Term)}
     */
    public void testrefactorGoal_none_allRules() throws ProblemLoaderException {
       doRefactoringTestLogging(false, false, RefactoringScope.NONE);
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Rule, Goal, JavaDLTerm)}
+    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<Term, SequentFormula<Term>>, Rule, Goal, Term)}
     */
    public void testrefactorGoal_none_ruleSpecific() throws ProblemLoaderException {
       doRefactoringTestLogging(false, false, RefactoringScope.NONE, "rule");
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Rule, Goal, JavaDLTerm)}
+    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<Term, SequentFormula<Term>>, Rule, Goal, Term)}
     */
    public void testrefactorGoal_sequent_allRules() throws ProblemLoaderException {
       doRefactoringTestLogging(true, true, RefactoringScope.SEQUENT);
    }
 
    /**
-    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Rule, Goal, JavaDLTerm)}
+    * Tests {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<Term, SequentFormula<Term>>, Rule, Goal, Term)}
     */
    public void testrefactorGoal_sequent_ruleSpecific() throws ProblemLoaderException {
       doRefactoringTestLogging(true, false, RefactoringScope.SEQUENT, "rule");
@@ -138,10 +138,10 @@ public class TestTermLabelManager extends TestCase {
       Services services = initConfig.getServices();
       TermBuilder TB = services.getTermBuilder();
       // Create sequent
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = createTestPosInOccurrence(services);
+      PosInOccurrence<Term, SequentFormula<Term>> pos = createTestPosInOccurrence(services);
       IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
-      JavaDLTerm one = integerLDT.translateLiteral(new IntLiteral(1), services);
-      JavaDLTerm two = integerLDT.translateLiteral(new IntLiteral(2), services);
+      Term one = integerLDT.translateLiteral(new IntLiteral(1), services);
+      Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
       one = TB.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
       two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
       Sequent sequent = Sequent.EMPTY_SEQUENT;
@@ -150,7 +150,7 @@ public class TestTermLabelManager extends TestCase {
       sequent = sequent.addFormula(new SequentFormula<>(TB.inInt(two)), false, true).sequent();
       // Test supported rule
       Rule rule = new DummyRule("rule");
-      JavaDLTerm taclet = TB.tt();
+      Term taclet = TB.tt();
       Goal goal = createGoal(initConfig, sequent);
       TermLabelManager.refactorGoal(new TermLabelState(), services, pos, rule, goal, null, taclet);
       compareSequents(sequent, goal.sequent(), ruleChanged, scope);
@@ -168,18 +168,18 @@ public class TestTermLabelManager extends TestCase {
    }
 
    protected void compareSequents(Sequent expected, Sequent current, boolean changed, RefactoringScope scope) {
-      Iterator<SequentFormula<JavaDLTerm>> expectedIter = expected.iterator();
-      Iterator<SequentFormula<JavaDLTerm>> currentIter = current.iterator();
+      Iterator<SequentFormula<Term>> expectedIter = expected.iterator();
+      Iterator<SequentFormula<Term>> currentIter = current.iterator();
       while (expectedIter.hasNext() && currentIter.hasNext()) {
-         SequentFormula<JavaDLTerm> expectedSF = expectedIter.next();
-         SequentFormula<JavaDLTerm> currentSF = currentIter.next();
+         SequentFormula<Term> expectedSF = expectedIter.next();
+         SequentFormula<Term> currentSF = currentIter.next();
          compareTerms(expectedSF.formula(), currentSF.formula(), changed, scope);
       }
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
    }
 
-   protected void compareTerms(JavaDLTerm expected, JavaDLTerm current, boolean changed, RefactoringScope scope) {
+   protected void compareTerms(Term expected, Term current, boolean changed, RefactoringScope scope) {
       assertEquals(expected.arity(), current.arity());
       for (int i = 0; i < expected.arity(); i++) {
          compareTerms(expected.sub(i), current.sub(i), changed, scope);
@@ -226,7 +226,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, JavaDLTerm, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_updates_allRules() {
       LoggingTermLabelUpdate update = new LoggingTermLabelUpdate(new ParameterlessTermLabel(new Name("UPDATED")));
@@ -236,9 +236,9 @@ public class TestTermLabelManager extends TestCase {
     } catch (ProblemLoaderException e) {
         fail();
     }
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = createTestPosInOccurrence(services);
+      PosInOccurrence<Term, SequentFormula<Term>> pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      JavaDLTerm taclet = services.getTermBuilder().tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null, null, null, taclet, null, null, null, null, null);
       assertNotNull(labels);
@@ -253,7 +253,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, JavaDLTerm, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_updates_ruleSpecific() {
       LoggingTermLabelUpdate update = new LoggingTermLabelUpdate(new ParameterlessTermLabel(new Name("UPDATED")), "rule");
@@ -263,9 +263,9 @@ public class TestTermLabelManager extends TestCase {
     } catch (ProblemLoaderException e) {
         fail();
     }
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = createTestPosInOccurrence(services);
+      PosInOccurrence<Term, SequentFormula<Term>> pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      JavaDLTerm taclet = services.getTermBuilder().tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null, null, null, taclet, null, null, null, null, null);
       assertNotNull(labels);
@@ -279,7 +279,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, JavaDLTerm, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_childAndGrandchildPolicies_allRules() {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy();
@@ -289,9 +289,9 @@ public class TestTermLabelManager extends TestCase {
     } catch (ProblemLoaderException e) {
         fail();
     }
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = createTestPosInOccurrence(services);
+      PosInOccurrence<Term, SequentFormula<Term>> pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      JavaDLTerm taclet = services.getTermBuilder().tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null, null, null, taclet, null, null, null, null, null);
       assertNotNull(labels);
@@ -328,7 +328,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, JavaDLTerm, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_childAndGrandchildPolicies_ruleSpecific() {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy("rule");
@@ -338,9 +338,9 @@ public class TestTermLabelManager extends TestCase {
     } catch (ProblemLoaderException e) {
         fail();
     }
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = createTestPosInOccurrence(services);
+      PosInOccurrence<Term, SequentFormula<Term>> pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      JavaDLTerm taclet = services.getTermBuilder().tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null, null, null, taclet, null, null, null, null, null);
       assertNotNull(labels);
@@ -365,15 +365,15 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, JavaDLTerm, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     * @throws ProblemLoaderException Occurred Exception
     */
    public void testInstantiateLabels_directChildPolicies_allRules() throws ProblemLoaderException {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy();
       Services services = createTestServices(null, null, policy, null, null, null).getServices();
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = createTestPosInOccurrence(services);
+      PosInOccurrence<Term, SequentFormula<Term>> pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      JavaDLTerm taclet = services.getTermBuilder().tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null, null, null, taclet, null, null, null, null, null);
       assertNotNull(labels);
@@ -400,7 +400,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, JavaDLTerm, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_directChildPolicies_ruleSpecific() {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy("rule");
@@ -410,9 +410,9 @@ public class TestTermLabelManager extends TestCase {
     } catch (ProblemLoaderException e) {
         fail();
     }
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = createTestPosInOccurrence(services);
+      PosInOccurrence<Term, SequentFormula<Term>> pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      JavaDLTerm taclet = services.getTermBuilder().tt();
+      Term taclet = services.getTermBuilder().tt();
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null, null, null, taclet, null, null, null, null, null);
       assertNotNull(labels);
@@ -433,7 +433,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, JavaDLTerm, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_modalityTermPolicies() {
       LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
@@ -444,12 +444,12 @@ public class TestTermLabelManager extends TestCase {
         fail();
     }
       TermBuilder TB = services.getTermBuilder();
-      JavaDLTerm modality = TB.label(TB.box(JavaBlock.EMPTY_JAVABLOCK, TB.label(TB.tt(), new ParameterlessTermLabel(new Name("POST")))), new ParameterlessTermLabel(new Name("ONE")));
+      Term modality = TB.label(TB.box(JavaBlock.EMPTY_JAVABLOCK, TB.label(TB.tt(), new ParameterlessTermLabel(new Name("POST")))), new ParameterlessTermLabel(new Name("ONE")));
       LocationVariable heap = services.getTheories().getHeapLDT().getSavedHeap();
-      JavaDLTerm update = TB.label(TB.elementary(TB.var(heap), TB.var(heap)), new ParameterlessTermLabel(new Name("UPDATE")));
-      JavaDLTerm updateApp = TB.apply(update, modality, new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(updateApp), PosInTerm.<JavaDLTerm>getTopLevel(), true);
-      JavaDLTerm taclet = TB.tt();
+      Term update = TB.label(TB.elementary(TB.var(heap), TB.var(heap)), new ParameterlessTermLabel(new Name("UPDATE")));
+      Term updateApp = TB.apply(update, modality, new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("UPDATE-APPLICATION"))));
+      PosInOccurrence<Term, SequentFormula<Term>> pos = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(updateApp), PosInTerm.<Term>getTopLevel(), true);
+      Term taclet = TB.tt();
       Rule rule = new DummyRule("rule");
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null, null, null, taclet, null, null, null, null, null);
@@ -462,7 +462,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, JavaDLTerm, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_applicationTermPolicies() {
       LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
@@ -472,8 +472,8 @@ public class TestTermLabelManager extends TestCase {
     } catch (ProblemLoaderException e) {
         fail();
     }
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = createTestPosInOccurrence(services);
-      JavaDLTerm taclet = services.getTermBuilder().tt();
+      PosInOccurrence<Term, SequentFormula<Term>> pos = createTestPosInOccurrence(services);
+      Term taclet = services.getTermBuilder().tt();
       Rule rule = new DummyRule("rule");
       // Create labels
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null, null, null, taclet, null, null, null, null, null);
@@ -486,7 +486,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, JavaDLTerm, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_taclet() {
       Services services = null;
@@ -495,9 +495,9 @@ public class TestTermLabelManager extends TestCase {
     } catch (ProblemLoaderException e) {
         fail();
     }
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = createTestPosInOccurrence(services);
+      PosInOccurrence<Term, SequentFormula<Term>> pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
-      JavaDLTerm taclet = services.getTermBuilder().label(services.getTermBuilder().tt(), new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("TACLET"))));
+      Term taclet = services.getTermBuilder().label(services.getTermBuilder().tt(), new ImmutableArray<TermLabel>(new ParameterlessTermLabel(new Name("TACLET"))));
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null, null, null, taclet, null, null, null, null, null);
       assertNotNull(labels);
       assertEquals(1, labels.size());
@@ -505,7 +505,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, JavaDLTerm, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, org.key_project.common.core.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_null() {
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), null, null, null, null, null, null, null, null, null, null, null, null);
@@ -513,22 +513,22 @@ public class TestTermLabelManager extends TestCase {
       assertTrue(labels.isEmpty());
    }
 
-   protected PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> createTestPosInOccurrence(Services services) {
-      JavaDLTerm testTerm = createTestTerm(services);
-      JavaDLTerm inInt = services.getTermBuilder().inInt(testTerm);
-      return new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(inInt), PosInTerm.<JavaDLTerm>parseReverseString("0"), true);
+   protected PosInOccurrence<Term, SequentFormula<Term>> createTestPosInOccurrence(Services services) {
+      Term testTerm = createTestTerm(services);
+      Term inInt = services.getTermBuilder().inInt(testTerm);
+      return new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(inInt), PosInTerm.<Term>parseReverseString("0"), true);
    }
 
-   protected JavaDLTerm createTestTerm(Services services) {
+   protected Term createTestTerm(Services services) {
       IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
-      JavaDLTerm one = integerLDT.translateLiteral(new IntLiteral(1), services);
-      JavaDLTerm two = integerLDT.translateLiteral(new IntLiteral(2), services);
-      JavaDLTerm three = integerLDT.translateLiteral(new IntLiteral(3), services);
+      Term one = integerLDT.translateLiteral(new IntLiteral(1), services);
+      Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
+      Term three = integerLDT.translateLiteral(new IntLiteral(3), services);
       TermBuilder TB = services.getTermBuilder();
       one = TB.label(one, new ParameterlessTermLabel(new Name("ONE")));
       two = TB.label(one, new ParameterlessTermLabel(new Name("TWO")));
       three = TB.label(one, new ParameterlessTermLabel(new Name("THREE")));
-      JavaDLTerm innerAdd = TB.label(TB.add(two, three), new ParameterlessTermLabel(new Name("ADD")));
+      Term innerAdd = TB.label(TB.add(two, three), new ParameterlessTermLabel(new Name("ADD")));
       return TB.label(TB.add(one, innerAdd), new ParameterlessTermLabel(new Name("APPLICATION")));
    }
 
@@ -680,12 +680,12 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public RefactoringScope defineRefactoringScope(TermLabelState state, Services services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, JavaDLTerm applicationTerm, Rule rule, Goal goal, Object hint, JavaDLTerm tacletTerm) {
+      public RefactoringScope defineRefactoringScope(TermLabelState state, Services services, PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm) {
          return scope;
       }
 
       @Override
-      public void refactoreLabels(TermLabelState state, Services services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, JavaDLTerm applicationTerm, Rule rule, Goal goal, Object hint, JavaDLTerm tacletTerm, JavaDLTerm term, List<TermLabel> labels) {
+      public void refactoreLabels(TermLabelState state, Services services, PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
          List<TermLabel> changedLabels = new LinkedList<TermLabel>();
          for (TermLabel label : labels) {
             if (label.name().toString().endsWith("-CHANGED")) {
@@ -719,7 +719,7 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public void updateLabels(TermLabelState state, Services services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, JavaDLTerm applicationTerm, JavaDLTerm modalityTerm, Rule rule, RuleApp ruleApp, Goal goal, Object hint, JavaDLTerm tacletTerm, Operator newTermOp, ImmutableArray<JavaDLTerm> newTermSubs, 
+      public void updateLabels(TermLabelState state, Services services, PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, Term applicationTerm, Term modalityTerm, Rule rule, RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, 
               ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
          if (!labels.contains(toAdd)) {
             labels.add(toAdd);
@@ -744,16 +744,16 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public boolean isRuleApplicationSupported(JavaDLTermServices services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, JavaDLTerm applicationTerm, Rule rule, 
-              Goal goal, Object hint, JavaDLTerm tacletTerm, Operator newTermOp, ImmutableArray<JavaDLTerm> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, 
+      public boolean isRuleApplicationSupported(JavaDLTermServices services, PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, Term applicationTerm, Rule rule, 
+              Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, 
               JavaBlock newTermJavaBlock) {
          return true;
       }
 
       @Override
-      public boolean addLabel(JavaDLTermServices services, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, JavaDLTerm applicationTerm, Rule rule, Goal goal, Object hint, 
-              JavaDLTerm tacletTerm, Operator newTermOp, ImmutableArray<JavaDLTerm> newTermSubs, 
-              ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, JavaDLTerm childTerm, TermLabel label) {
+      public boolean addLabel(JavaDLTermServices services, PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, 
+              Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, 
+              ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Term childTerm, TermLabel label) {
          log.add(label);
          return true;
       }
@@ -769,14 +769,14 @@ public class TestTermLabelManager extends TestCase {
       @Override
       public TermLabel keepLabel(TermLabelState state,
                                  Services services,
-                                 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
-                                 JavaDLTerm applicationTerm,
+                                 PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+                                 Term applicationTerm,
                                  Rule rule,
                                  Goal goal,
                                  Object hint,
-                                 JavaDLTerm tacletTerm,
+                                 Term tacletTerm,
                                  Operator newTermOp,
-                                 ImmutableArray<JavaDLTerm> newTermSubs,
+                                 ImmutableArray<Term> newTermSubs,
                                  ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                  JavaBlock newTermJavaBlock,
                                  ImmutableArray<TermLabel> newTermOriginalLabels,

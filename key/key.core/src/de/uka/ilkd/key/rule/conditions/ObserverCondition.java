@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -44,7 +44,7 @@ public final class ObserverCondition implements VariableCondition {
 	    		  	 MatchConditions mc, 
 	    		  	 Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
-	final JavaDLTerm obsInst  = (JavaDLTerm) svInst.getInstantiation(obs);
+	final Term obsInst  = (Term) svInst.getInstantiation(obs);
 	
 	if(obsInst == null) {
 	    return mc;
@@ -52,8 +52,8 @@ public final class ObserverCondition implements VariableCondition {
 	    return null;
 	} 
 	
-	final JavaDLTerm heapInst = (JavaDLTerm) svInst.getInstantiation(heap);
-	final JavaDLTerm properHeapInst = obsInst.sub(0);
+	final Term heapInst = (Term) svInst.getInstantiation(heap);
+	final Term properHeapInst = obsInst.sub(0);
 	if(heapInst == null) {
 	    svInst = svInst.add(heap, properHeapInst, services);
 	    return mc.setInstantiations(svInst);

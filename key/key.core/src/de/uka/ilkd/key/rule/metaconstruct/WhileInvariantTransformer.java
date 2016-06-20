@@ -42,7 +42,7 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -87,7 +87,7 @@ public final class WhileInvariantTransformer {
     private TermFactory tf;
 
     private ProgramElement body;
-    private JavaDLTerm inv, post;
+    private Term inv, post;
     private JavaNonTerminalProgramElement root; 
     private Modality modality;
     
@@ -99,11 +99,11 @@ public final class WhileInvariantTransformer {
    
     /**
      * initialises this meta operator
-     * @param term the instantiated JavaDLTerm passed to the TermTransformer 
+     * @param term the instantiated Term passed to the TermTransformer 
      * @param services the Services providing access to signature and
      * type model
      */
-    private void init(JavaDLTerm initialPost, JavaDLTerm invariantFramingTermination, Services services) {
+    private void init(Term initialPost, Term invariantFramingTermination, Services services) {
         root = (JavaNonTerminalProgramElement)
               initialPost.modalContent().program();  
         modality = (Modality)initialPost.op();
@@ -128,7 +128,7 @@ public final class WhileInvariantTransformer {
     
     
     /** calculates the resulting term. */
-    public JavaDLTerm transform(TermLabelState termLabelState, Rule rule, RuleApp ruleApp, Goal goal, Sequent applicationSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, JavaDLTerm initialPost, JavaDLTerm invariantFramingTermination, SVInstantiations svInst, Services services) {
+    public Term transform(TermLabelState termLabelState, Rule rule, RuleApp ruleApp, Goal goal, Sequent applicationSequent, PosInOccurrence<Term, SequentFormula<Term>> applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
         
         // global initialisation
         init(initialPost, invariantFramingTermination, services);
@@ -152,10 +152,10 @@ public final class WhileInvariantTransformer {
             returnExpression = getNewLocalvariable("returnExpr", returnType, services);
         }
         
-        JavaDLTerm contFlagTerm   = null;
-        JavaDLTerm returnFlagTerm = null;
-        JavaDLTerm breakFlagTerm  = null;
-        JavaDLTerm excFlagTerm    = null;
+        Term contFlagTerm   = null;
+        Term returnFlagTerm = null;
+        Term breakFlagTerm  = null;
+        Term excFlagTerm    = null;
         
         // end of initialisation............
         
@@ -191,7 +191,7 @@ public final class WhileInvariantTransformer {
                                              breakList, services);
         w.start();
         
-        ArrayList<JavaDLTerm> resultSubterms = new ArrayList<JavaDLTerm>();
+        ArrayList<Term> resultSubterms = new ArrayList<Term>();
         
         // normal case and continue
         if (w.continueOccurred()) {
@@ -259,7 +259,7 @@ public final class WhileInvariantTransformer {
         (normalCaseAndContinue(termLabelState, services, applicationPos, rule, ruleApp, goal, applicationSequent, contFlagTerm, returnFlagTerm,
                                breakFlagTerm, excFlagTerm, AbstractOperationPO.addUninterpretedPredicateIfRequired(services, inv)));
         
-        JavaDLTerm result = createLongJunctorTerm(Junctor.AND, resultSubterms);
+        Term result = createLongJunctorTerm(Junctor.AND, resultSubterms);
         
         stmnt.add(w.result());
         StatementBlock s = new StatementBlock
@@ -284,30 +284,30 @@ public final class WhileInvariantTransformer {
     
     /**
      * Computes the {@link TermLabel} which should be added to the created
-     * loop body modality {@link JavaDLTerm}.
+     * loop body modality {@link Term}.
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services}.
-     * @param applicationPos The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the {@link Sequent} to rewrite.
+     * @param applicationPos The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the {@link Sequent} to rewrite.
      * @param rule The {@link Rule} to apply.
      * @param goal The {@link Goal} to compute the result for. 
      * @param loopBodyModality The {@link Modality} of the loop body.
      * @param result The postcondition of the modality.
      * @param mainJavaBlock The {@link JavaBlock} to execute within the modality.
      * @param applicationSequent The {@link Sequent} to rewrite.
-     * @return The {@link TermLabel}s to add to the loop body modality {@link JavaDLTerm}.
+     * @return The {@link TermLabel}s to add to the loop body modality {@link Term}.
      */
     private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(TermLabelState termLabelState,
                                                                     Services services,
-                                                                    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, 
+                                                                    PosInOccurrence<Term, SequentFormula<Term>> applicationPos, 
                                                                     Rule rule, 
                                                                     RuleApp ruleApp,
                                                                     Goal goal, 
                                                                     Operator loopBodyModality, 
-                                                                    JavaDLTerm result, 
+                                                                    Term result, 
                                                                     JavaBlock mainJavaBlock, 
                                                                     Sequent applicationSequent,
                                                                     ImmutableArray<TermLabel> newTermOriginalLabels) {
-       return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "LoopBodyModality", null, loopBodyModality, new ImmutableArray<JavaDLTerm>(result), null, mainJavaBlock, newTermOriginalLabels);
+       return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "LoopBodyModality", null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock, newTermOriginalLabels);
     }
 
     /**
@@ -374,13 +374,13 @@ public final class WhileInvariantTransformer {
     //---------------------------------------------------------------
 
 
-    private JavaDLTerm createLongJunctorTerm(Junctor junctor, ArrayList<JavaDLTerm> terms) {
+    private Term createLongJunctorTerm(Junctor junctor, ArrayList<Term> terms) {
         if (terms.size() == 1)
             return terms.get(0);
         else if (terms.size() == 2)
             return tf.createTerm(junctor, terms.get(0), terms.get(1));
         else {
-            JavaDLTerm arg1 = terms.get(0);
+            Term arg1 = terms.get(0);
             terms.remove(0);
             return 
                 tf.createTerm(junctor, 
@@ -397,21 +397,21 @@ public final class WhileInvariantTransformer {
                     javaInfo.getKeYJavaType("boolean"));
     }
 
-    private JavaDLTerm returnCase(TermLabelState termLabelState,
+    private Term returnCase(TermLabelState termLabelState,
                             ProgramVariable returnFlag,
                             KeYJavaType returnType,
                             ProgramVariable returnExpression,
-                            JavaDLTerm post,
+                            Term post,
                             Rule rule,
                             RuleApp ruleApp,
                             Goal goal,
-                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, 
+                            PosInOccurrence<Term, SequentFormula<Term>> applicationPos, 
                             Services services) {
         JavaBlock returnJavaBlock = addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
-        JavaDLTerm executeReturn = services.getTermBuilder().prog(modality, 
+        Term executeReturn = services.getTermBuilder().prog(modality, 
                                                  returnJavaBlock, 
                                                  post,
-                                                 TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "ReturnCaseModality", null, modality, new ImmutableArray<JavaDLTerm>(post), null, returnJavaBlock, post.getLabels()));
+                                                 TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "ReturnCaseModality", null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock, post.getLabels()));
         
         return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(returnFlag), services.getTermBuilder().TRUE()),
                                   executeReturn);
@@ -430,43 +430,43 @@ public final class WhileInvariantTransformer {
                     javaInfo.getKeYJavaType("boolean"));
     }
 
-    private JavaDLTerm breakCase(TermLabelState termLabelState,
+    private Term breakCase(TermLabelState termLabelState,
                            ProgramVariable breakFlag,
-                           JavaDLTerm post,
+                           Term post,
                            ArrayList<If> breakIfCascade,
                            Rule rule,
                            RuleApp ruleApp,
                            Goal goal,
-                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, 
+                           PosInOccurrence<Term, SequentFormula<Term>> applicationPos, 
                            Services services) {
         JavaBlock executeJavaBlock = addContext(root, new StatementBlock(breakIfCascade.toArray(new Statement[breakIfCascade.size()])));
-        JavaDLTerm executeBreak = services.getTermBuilder().prog(modality, 
+        Term executeBreak = services.getTermBuilder().prog(modality, 
                                                 executeJavaBlock, 
                                                 post,
-                                                TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "BreakCaseModality", null, modality, new ImmutableArray<JavaDLTerm>(post), null, executeJavaBlock, post.getLabels()));
+                                                TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "BreakCaseModality", null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock, post.getLabels()));
         return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(breakFlag), 
                                 services.getTheories().getBooleanLDT().getTrueTerm()), 
                                 executeBreak); 
     }
 
 
-    private JavaDLTerm  normalCaseAndContinue(TermLabelState termLabelState,
+    private Term  normalCaseAndContinue(TermLabelState termLabelState,
                                         Services services,
-                                        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos,
+                                        PosInOccurrence<Term, SequentFormula<Term>> applicationPos,
                                         Rule rule,
                                         RuleApp ruleApp,
                                         Goal goal,
                                         Sequent applicationSequent,
-                                        JavaDLTerm contFlagTerm,
-                                        JavaDLTerm returnFlagTerm,
-                                        JavaDLTerm breakFlagTerm,
-                                        JavaDLTerm excFlagTerm,
-                                        JavaDLTerm inv) {
+                                        Term contFlagTerm,
+                                        Term returnFlagTerm,
+                                        Term breakFlagTerm,
+                                        Term excFlagTerm,
+                                        Term inv) {
 
         final TermBuilder TB = services.getTermBuilder();
-        final JavaDLTerm TRUE_TERM = services.getTheories().getBooleanLDT().getTrueTerm();
+        final Term TRUE_TERM = services.getTheories().getBooleanLDT().getTrueTerm();
 
-        ArrayList<JavaDLTerm> al = new ArrayList<JavaDLTerm>();
+        ArrayList<Term> al = new ArrayList<Term>();
 
         if (returnFlagTerm != null)
             al.add(TB.equals(returnFlagTerm, TRUE_TERM));
@@ -481,15 +481,15 @@ public final class WhileInvariantTransformer {
                 return TB.label(inv, labels);
             }
             else {
-                ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, Junctor.IMP, new ImmutableArray<JavaDLTerm>(contFlagTerm, inv), applicationSequent);
+                ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, Junctor.IMP, new ImmutableArray<Term>(contFlagTerm, inv), applicationSequent);
                 return TB.imp(contFlagTerm, inv, labels);
             }
         } else {
-            JavaDLTerm premiss = TB.not(createLongJunctorTerm(Junctor.OR, al));
+            Term premiss = TB.not(createLongJunctorTerm(Junctor.OR, al));
             if (contFlagTerm != null)
                 premiss = TB.imp(contFlagTerm, premiss);            
             
-            ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, Junctor.IMP, new ImmutableArray<JavaDLTerm>(premiss, inv), applicationSequent);
+            ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, Junctor.IMP, new ImmutableArray<Term>(premiss, inv), applicationSequent);
             return TB.imp(premiss, inv, labels);
         }       
     }
@@ -499,42 +499,42 @@ public final class WhileInvariantTransformer {
      * of the normal termination branch of a loop body.
     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services}.
-     * @param applicationPos The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the {@link Sequent} to rewrite.
+     * @param applicationPos The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the {@link Sequent} to rewrite.
      * @param rule The {@link Rule} to apply.
      * @param goal The {@link Goal} to compute the result for. 
-     * @param operator The {@link Operator} of the new {@link JavaDLTerm}.
-     * @param subs The children of the new {@link JavaDLTerm}.
+     * @param operator The {@link Operator} of the new {@link Term}.
+     * @param subs The children of the new {@link Term}.
      * @param applicationSequent The {@link Sequent} to rewrite.
-     * @return The {@link TermLabel}s to add to the new {@link JavaDLTerm}.
+     * @return The {@link TermLabel}s to add to the new {@link Term}.
      */
     private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(TermLabelState termLabelState,
                                                                       Services services,
-                                                                      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, 
+                                                                      PosInOccurrence<Term, SequentFormula<Term>> applicationPos, 
                                                                       Rule rule, 
                                                                       RuleApp ruleApp,
                                                                       Goal goal, 
                                                                       Operator operator, 
-                                                                      ImmutableArray<JavaDLTerm> subs, 
+                                                                      ImmutableArray<Term> subs, 
                                                                       Sequent applicationSequent) {
        return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "LoopBodyImplication", null, operator, subs, null, null, post.getLabels());
     }
     
 
-    private JavaDLTerm throwCase(TermLabelState termLabelState,
+    private Term throwCase(TermLabelState termLabelState,
                            ProgramVariable excFlag,
                            ProgramVariable thrownException,
-                           JavaDLTerm post,
+                           Term post,
                            Rule rule,
                            RuleApp ruleApp,
                            Goal goal,
-                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPos, 
+                           PosInOccurrence<Term, SequentFormula<Term>> applicationPos, 
                            Services services) {
         final TermBuilder TB = services.getTermBuilder();
         JavaBlock throwJavaBlock = addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
-        JavaDLTerm throwException = TB.prog(modality, 
+        Term throwException = TB.prog(modality, 
                                                   throwJavaBlock, 
                                                   post,
-                                                  TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "ThrowCaseModality", null, modality, new ImmutableArray<JavaDLTerm>(post), null, throwJavaBlock, post.getLabels()));
+                                                  TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "ThrowCaseModality", null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock, post.getLabels()));
         return TB.imp( 
               TB.equals(typeConv.convertToLogicElement(excFlag), 
                       services.getTheories().getBooleanLDT().getTrueTerm()), 

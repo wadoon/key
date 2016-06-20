@@ -16,7 +16,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 import org.key_project.common.core.logic.op.Junctor;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
@@ -36,7 +36,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
    /**
     * The array index.
     */
-   private final JavaDLTerm arrayIndex;
+   private final Term arrayIndex;
    
    /**
     * The {@link IProgramVariable}.
@@ -51,7 +51,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
    /**
     * The optional condition under which this association is valid.
     */
-   private final JavaDLTerm condition;
+   private final Term condition;
    
    /**
     * Constructor.
@@ -62,9 +62,9 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     * @param settings The {@link IModelSettings} to use.
     */
    public SymbolicAssociation(Services services, 
-                              JavaDLTerm arrayIndex, 
+                              Term arrayIndex, 
                               ISymbolicObject target, 
-                              JavaDLTerm condition,
+                              Term condition,
                               IModelSettings settings) {
       super(settings);
       assert services != null;
@@ -87,7 +87,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
    public SymbolicAssociation(Services services, 
                               IProgramVariable programVariable, 
                               ISymbolicObject target, 
-                              JavaDLTerm condition,
+                              Term condition,
                               IModelSettings settings) {
       super(settings);
       assert services != null;
@@ -134,7 +134,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getArrayIndex() {
+   public Term getArrayIndex() {
       return arrayIndex;
    }
 
@@ -174,7 +174,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getCondition() {
+   public Term getCondition() {
       return condition;
    }
 

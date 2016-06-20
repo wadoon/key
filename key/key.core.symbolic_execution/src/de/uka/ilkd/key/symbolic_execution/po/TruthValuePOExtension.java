@@ -4,7 +4,7 @@ import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -31,7 +31,7 @@ public class TruthValuePOExtension implements POExtension {
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm modifyPostTerm(InitConfig proofConfig, Services services, JavaDLTerm postTerm) {
+   public Term modifyPostTerm(InitConfig proofConfig, Services services, Term postTerm) {
       if (SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(proofConfig)) {
          return labelPostTerm(services, postTerm);
       }
@@ -41,28 +41,28 @@ public class TruthValuePOExtension implements POExtension {
    }
    
    /**
-    * Labels all predicates in the given {@link JavaDLTerm} and its children with
+    * Labels all predicates in the given {@link Term} and its children with
     * a {@link FormulaTermLabel}.
     * @param services The {@link Services} to use.
-    * @param term The {@link JavaDLTerm} to label.
-    * @return The labeled {@link JavaDLTerm}.
+    * @param term The {@link Term} to label.
+    * @return The labeled {@link Term}.
     */
-   protected JavaDLTerm labelPostTerm(Services services, JavaDLTerm term) {
+   protected Term labelPostTerm(Services services, Term term) {
       if (term != null) {
          final TermFactory tf = services.getTermFactory();
          // Label children of operator
          if (TruthValueTracingUtil.isLogicOperator(term)) {
-            JavaDLTerm[] newSubs = new JavaDLTerm[term.arity()];
+            Term[] newSubs = new Term[term.arity()];
             boolean subsChanged = false;
             for (int i = 0; i < newSubs.length; i++) {
-               JavaDLTerm oldTerm = term.sub(i);
+               Term oldTerm = term.sub(i);
                newSubs[i] = labelPostTerm(services, oldTerm);
                if (oldTerm != newSubs[i]) {
                   subsChanged = true;
                }
             }
             term = subsChanged ?
-                   tf.createTerm(term.op(), new ImmutableArray<JavaDLTerm>(newSubs), term.boundVars(), term.modalContent(), term.getLabels()) :
+                   tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.modalContent(), term.getLabels()) :
                    term;
          }
          ImmutableArray<TermLabel> oldLabels = term.getLabels();

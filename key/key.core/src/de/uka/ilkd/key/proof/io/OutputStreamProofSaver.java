@@ -34,7 +34,7 @@ import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -133,7 +133,7 @@ public class OutputStreamProofSaver {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
-              for (SequentFormula<JavaDLTerm> s: proof.root().sequent().succedent().asList()) {
+              for (SequentFormula<Term> s: proof.root().sequent().succedent().asList()) {
                   ((InfFlowProof)proof).addLabeledTotalTerm(s.formula());
               }
           } else {
@@ -433,7 +433,7 @@ public class OutputStreamProofSaver {
    }
 
 
-    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence<Term, SequentFormula<Term>> pos) {
         if (pos == null) return "";
         return " (formula \""+seq.formulaNumberInSequent(pos.isInAntec(),
                 pos.sequentFormula())+"\")"+
@@ -441,8 +441,8 @@ public class OutputStreamProofSaver {
     }
 
 
-   public static String posInTerm2Proof(PosInTerm<JavaDLTerm> pos) {
-      if (pos == PosInTerm.<JavaDLTerm>getTopLevel()) return "";
+   public static String posInTerm2Proof(PosInTerm<Term> pos) {
+      if (pos == PosInTerm.<Term>getTopLevel()) return "";
       String s = " (term \"";
       String list = pos.integerList(pos.reverseIterator()); // cheaper to read in
       s = s + list.substring(1,list.length()-1); // chop off "[" and "]"
@@ -460,7 +460,7 @@ public class OutputStreamProofSaver {
 	 
          final Object value = pair.value().getInstantiation();
 	 
-         if (!(value instanceof JavaDLTerm || value instanceof ProgramElement || value instanceof Name)) {
+         if (!(value instanceof Term || value instanceof ProgramElement || value instanceof Name)) {
              throw new RuntimeException("Saving failed.\n"+
                          "FIXME: Unhandled instantiation type: " +  value.getClass());
          }
@@ -481,7 +481,7 @@ public class OutputStreamProofSaver {
        for (IfFormulaInstantiation aL : l) {
            IfFormulaInstantiation iff = aL;
            if (iff instanceof IfFormulaInstSeq) {
-               SequentFormula<JavaDLTerm> f = iff.getConstrainedFormula();
+               SequentFormula<Term> f = iff.getConstrainedFormula();
                s += " (ifseqformula \"" +
                        node.sequent().formulaNumberInSequent(
                                ((IfFormulaInstSeq) iff).inAntec(), f) +
@@ -500,9 +500,9 @@ public class OutputStreamProofSaver {
 
 
    public String builtinRuleIfInsts(Node node, 
-	   			    ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
+	   			    ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
        String s = "";
-       for(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ifInst : ifInsts) {
+       for(PosInOccurrence<Term, SequentFormula<Term>> ifInst : ifInsts) {
 	   s += " (ifInst \"\" ";
 	   s += posInOccurrence2Proof(node.sequent(), ifInst);
 	   s += ")";
@@ -538,12 +538,12 @@ public class OutputStreamProofSaver {
     }
 
 
-    public static StringBuffer printTerm(JavaDLTerm t, Services serv) {
+    public static StringBuffer printTerm(Term t, Services serv) {
         return printTerm(t, serv, false);
     }
 
 
-    public static StringBuffer printTerm(JavaDLTerm t, Services serv, 
+    public static StringBuffer printTerm(Term t, Services serv, 
             boolean shortAttrNotation) {
         StringBuffer result;
         LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
@@ -567,8 +567,8 @@ public class OutputStreamProofSaver {
             return printProgramElement((ProgramElement) val);
         }
         else
-            if (val instanceof JavaDLTerm) {
-                return printTerm((JavaDLTerm) val, services, shortAttrNotation);
+            if (val instanceof Term) {
+                return printTerm((Term) val, services, shortAttrNotation);
             } else if (val instanceof Sequent) {
                 return printSequent((Sequent) val, services);
             } else if (val instanceof Name) {

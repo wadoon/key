@@ -15,7 +15,7 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -34,10 +34,10 @@ public class ProofObligationVars {
     public final StateVars pre, post;
 
     /** Exception Variable for the try-catch statement. */
-    public final JavaDLTerm exceptionParameter;
+    public final Term exceptionParameter;
 
     /** The formal parameters of a method. */
-    public final ImmutableList<JavaDLTerm> formalParams;
+    public final ImmutableList<Term> formalParams;
 
     /** If this object was created form another ProofObligationVars
      *  object by adding a postfix to the variable names, then this
@@ -75,8 +75,8 @@ public class ProofObligationVars {
 
     public ProofObligationVars(StateVars pre,
                                StateVars post,
-                               JavaDLTerm exceptionParameter,
-                               ImmutableList<JavaDLTerm> formalParams,
+                               Term exceptionParameter,
+                               ImmutableList<Term> formalParams,
                                Services services) {
         this.pre = pre;
         this.post = post;
@@ -88,8 +88,8 @@ public class ProofObligationVars {
 
     public ProofObligationVars(StateVars pre,
                                StateVars post,
-                               JavaDLTerm exceptionParameter,
-                               ImmutableList<JavaDLTerm> formalParams,
+                               Term exceptionParameter,
+                               ImmutableList<Term> formalParams,
                                TermBuilder tb) {
         this.pre = pre;
         this.post = post;
@@ -136,7 +136,7 @@ public class ProofObligationVars {
      * @param services  the services object.
      * @return  the generated variable.
      */
-    private JavaDLTerm buildExceptionParameter(Services services) {
+    private Term buildExceptionParameter(Services services) {
         JavaInfo javaInfo = services.getProgramServices().getJavaInfo();
         final KeYJavaType eType =
             javaInfo.getTypeByClassName("java.lang.Exception");
@@ -148,17 +148,17 @@ public class ProofObligationVars {
      * Create formal parameters.
      * @throws IllegalArgumentException
      */
-    private ImmutableList<JavaDLTerm> buildFormalParamVars(
+    private ImmutableList<Term> buildFormalParamVars(
             Services services) throws IllegalArgumentException {
-        ImmutableList<JavaDLTerm> formalParamVars = ImmutableSLList.<JavaDLTerm>nil();
-        for (JavaDLTerm param : pre.localVars) {
+        ImmutableList<Term> formalParamVars = ImmutableSLList.<Term>nil();
+        for (Term param : pre.localVars) {
             ProgramVariable paramVar = param.op(ProgramVariable.class);
             ProgramElementName pen = new ProgramElementName("_" +
                      paramVar.name());
             LocationVariable formalParamVar =
                     new LocationVariable(pen, paramVar.getKeYJavaType());
             register(formalParamVar, services);
-            JavaDLTerm formalParam = tb.var(formalParamVar);
+            Term formalParam = tb.var(formalParamVar);
             formalParamVars = formalParamVars.append(formalParam);
         }
         return formalParamVars;

@@ -4,7 +4,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
@@ -23,12 +23,12 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private SymbolicExecutionState joinNodeState = null;
     private SymbolicExecutionState partnerState = null;
-    private JavaDLTerm pc = null;
+    private Term pc = null;
 
     public CloseAfterJoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Node thePartnerNode,
+            PosInOccurrence<Term, SequentFormula<Term>> pio, Node thePartnerNode,
             Node correspondingJoinNode, SymbolicExecutionState joinNodeState,
-            SymbolicExecutionState partnerState, JavaDLTerm pc) {
+            SymbolicExecutionState partnerState, Term pc) {
         this(builtInRule, pio);
         setThePartnerNode(thePartnerNode);
         setCorrespondingJoinNode(correspondingJoinNode);
@@ -38,17 +38,17 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public CloseAfterJoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+            PosInOccurrence<Term, SequentFormula<Term>> pio) {
         super(builtInRule, pio);
     }
 
     @Override
-    public AbstractBuiltInRuleApp replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos) {
+    public AbstractBuiltInRuleApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos) {
         return null;
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
+    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -98,11 +98,11 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.partnerState = thisSEState;
     }
 
-    public JavaDLTerm getPc() {
+    public Term getPc() {
         return pc;
     }
 
-    public void setPc(JavaDLTerm pc) {
+    public void setPc(Term pc) {
         this.pc = pc;
     }
 

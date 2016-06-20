@@ -148,7 +148,7 @@ public final class SymbolicExecutionUtil {
    public static final Name RESULT_LABEL_NAME = new Name("RES");
 
    /**
-    * Label attached to a {@link JavaDLTerm} to evaluate in a side proof.
+    * Label attached to a {@link Term} to evaluate in a side proof.
     */
    public static final TermLabel RESULT_LABEL = new ParameterlessTermLabel(RESULT_LABEL_NAME);
 
@@ -183,41 +183,41 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Simplifies the given {@link JavaDLTerm} in a side proof. 
+    * Simplifies the given {@link Term} in a side proof. 
     * @param initConfig The {@link InitConfig} to use.
-    * @param term The {@link JavaDLTerm} to simplify.
-    * @return The simplified {@link JavaDLTerm}.
+    * @param term The {@link Term} to simplify.
+    * @return The simplified {@link Term}.
     * @throws ProofInputException Occurred Exception.
     */
-   public static JavaDLTerm simplify(InitConfig initConfig,
-                               JavaDLTerm term) throws ProofInputException {
+   public static Term simplify(InitConfig initConfig,
+                               Term term) throws ProofInputException {
       return simplify(initConfig, null, term);
    }
    
    /**
-    * Simplifies the given {@link JavaDLTerm} in a side proof. 
+    * Simplifies the given {@link Term} in a side proof. 
     * @param parentProof The parent {@link Proof}.
-    * @param term The {@link JavaDLTerm} to simplify.
-    * @return The simplified {@link JavaDLTerm}.
+    * @param term The {@link Term} to simplify.
+    * @return The simplified {@link Term}.
     * @throws ProofInputException Occurred Exception.
     */
-   public static JavaDLTerm simplify(Proof parentProof,
-                               JavaDLTerm term) throws ProofInputException {
+   public static Term simplify(Proof parentProof,
+                               Term term) throws ProofInputException {
       assert !parentProof.isDisposed();
       return simplify(parentProof.getInitConfig(), parentProof, term);
    }
    
    /**
-    * Simplifies the given {@link JavaDLTerm} in a side proof. 
+    * Simplifies the given {@link Term} in a side proof. 
     * @param initConfig The {@link InitConfig} to use.
     * @param parentProof The parent {@link Proof} which provides the {@link StrategySettings}.
-    * @param term The {@link JavaDLTerm} to simplify.
-    * @return The simplified {@link JavaDLTerm}.
+    * @param term The {@link Term} to simplify.
+    * @return The simplified {@link Term}.
     * @throws ProofInputException Occurred Exception.
     */
-   public static JavaDLTerm simplify(InitConfig initConfig,
+   public static Term simplify(InitConfig initConfig,
                                Proof parentProof,
-                               JavaDLTerm term) throws ProofInputException {
+                               Term term) throws ProofInputException {
       final Services services = initConfig.getServices();
       final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       // Create Sequent to prove
@@ -232,9 +232,9 @@ public final class SymbolicExecutionUtil {
             return tb.tt();
          }
          else {
-            ImmutableList<JavaDLTerm> goalImplications = ImmutableSLList.nil(); 
+            ImmutableList<Term> goalImplications = ImmutableSLList.nil(); 
             for (Goal goal : openGoals) {
-               JavaDLTerm goalImplication = sequentToImplication(goal.sequent(), goal.proof().getServices());
+               Term goalImplication = sequentToImplication(goal.sequent(), goal.proof().getServices());
                goalImplication = tb.not(goalImplication);
                goalImplications = goalImplications.append(goalImplication);
             }
@@ -252,13 +252,13 @@ public final class SymbolicExecutionUtil {
     * @param services The {@link Services} to use.
     * @return The created implication.
     */
-   public static JavaDLTerm sequentToImplication(Sequent sequent, Services services) {
+   public static Term sequentToImplication(Sequent sequent, Services services) {
       if (sequent != null) {
-         ImmutableList<JavaDLTerm> antecedents = listSemisequentTerms(sequent.antecedent());
-         ImmutableList<JavaDLTerm> succedents = listSemisequentTerms(sequent.succedent());
+         ImmutableList<Term> antecedents = listSemisequentTerms(sequent.antecedent());
+         ImmutableList<Term> succedents = listSemisequentTerms(sequent.succedent());
          // Construct branch condition from created antecedent and succedent terms as new implication 
-         JavaDLTerm left = services.getTermBuilder().and(antecedents);
-         JavaDLTerm right = services.getTermBuilder().or(succedents);
+         Term left = services.getTermBuilder().and(antecedents);
+         Term right = services.getTermBuilder().or(succedents);
          return services.getTermBuilder().imp(left, right);
       }
       else {
@@ -267,14 +267,14 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Lists the {@link JavaDLTerm}s contained in the given {@link Semisequent}.
+    * Lists the {@link Term}s contained in the given {@link Semisequent}.
     * @param semisequent The {@link Semisequent} to list terms of.
-    * @return The list with all contained {@link JavaDLTerm}s.
+    * @return The list with all contained {@link Term}s.
     */
-   public static ImmutableList<JavaDLTerm> listSemisequentTerms(Semisequent semisequent) {
-      ImmutableList<JavaDLTerm> terms = ImmutableSLList.nil();
+   public static ImmutableList<Term> listSemisequentTerms(Semisequent semisequent) {
+      ImmutableList<Term> terms = ImmutableSLList.nil();
       if (semisequent != null) {
-         for (SequentFormula<JavaDLTerm> sf : semisequent) {
+         for (SequentFormula<Term> sf : semisequent) {
             terms = terms.append(sf.formula());
          }
       }
@@ -282,7 +282,7 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Improves the {@link JavaDLTerm} to increase its readability.
+    * Improves the {@link Term} to increase its readability.
     * The following changes will be performed:
     * <ul>
     *    <li>{@code a < 1 + b} => {@code a <= b}</li>
@@ -306,11 +306,11 @@ public final class SymbolicExecutionUtil {
     *    <li>{@code !a <= b} => {@code a > b}</li>
     *    <li>{@code !a < b} => {@code a >= b}</li>
     * </ul>
-    * @param term The {@link JavaDLTerm} to improve.
+    * @param term The {@link Term} to improve.
     * @param services The {@link Services} to use.
-    * @return The improved {@link JavaDLTerm} or the {@link JavaDLTerm} itself if no improvements are possible.
+    * @return The improved {@link Term} or the {@link Term} itself if no improvements are possible.
     */
-   public static JavaDLTerm improveReadability(JavaDLTerm term, Services services) {
+   public static Term improveReadability(Term term, Services services) {
       if (term != null && services != null) {
          IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
          term = improveReadabilityRecursive(term, services, integerLDT);
@@ -319,20 +319,20 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Helper method of {@link #improveReadability(JavaDLTerm, Services)}.
-    * @param term The {@link JavaDLTerm} to improve.
+    * Helper method of {@link #improveReadability(Term, Services)}.
+    * @param term The {@link Term} to improve.
     * @param services The {@link Services} to use.
     * @param integerLDT The {@link IntegerLDT} to use.
-    * @return The improved {@link JavaDLTerm} or the {@link JavaDLTerm} itself if no improvements are possible.
+    * @return The improved {@link Term} or the {@link Term} itself if no improvements are possible.
     */
-   private static JavaDLTerm improveReadabilityRecursive(JavaDLTerm term,
+   private static Term improveReadabilityRecursive(Term term,
                                                    Services services,
                                                    IntegerLDT integerLDT) {
       // Improve children
       boolean subChanged = false;
-      List<JavaDLTerm> newSubs = new LinkedList<JavaDLTerm>();
-      for (JavaDLTerm sub : term.subs()) {
-         JavaDLTerm newSub = improveReadabilityRecursive(sub, services, integerLDT);
+      List<Term> newSubs = new LinkedList<Term>();
+      for (Term sub : term.subs()) {
+         Term newSub = improveReadabilityRecursive(sub, services, integerLDT);
          if (newSub != sub) {
             newSubs.add(newSub);
             subChanged = true;
@@ -342,12 +342,12 @@ public final class SymbolicExecutionUtil {
          }
       }
       if (subChanged) {
-         term = services.getTermFactory().createTerm(term.op(), new ImmutableArray<JavaDLTerm>(newSubs), term.boundVars(), term.modalContent(), term.getLabels());
+         term = services.getTermFactory().createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.modalContent(), term.getLabels());
       }
       // Improve readability: a < 1 + b, a < b + 1
       final TermBuilder tb = services.getTermBuilder();
       if (term.op() == integerLDT.getLessThan()) {
-         JavaDLTerm subOne = term.sub(1);
+         Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (isOne(subOne.sub(0), integerLDT)) {
                term = tb.leq(term.sub(0), subOne.sub(1));
@@ -359,7 +359,7 @@ public final class SymbolicExecutionUtil {
       }
       // Improve readability: a >= 1 + b, a >= b + 1
       else if (term.op() == integerLDT.getGreaterOrEquals()) {
-         JavaDLTerm subOne = term.sub(1);
+         Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (isOne(subOne.sub(0), integerLDT)) {
                term = tb.gt(term.sub(0), subOne.sub(1));
@@ -371,7 +371,7 @@ public final class SymbolicExecutionUtil {
       }
       // Improve readability: a <= -1 + b, a <= 1 + -b, a <= 1 - b
       else if (term.op() == integerLDT.getLessOrEquals()) {
-         JavaDLTerm subOne = term.sub(1);
+         Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (isMinusOne(subOne.sub(0), integerLDT)) {
                term = tb.lt(term.sub(0), subOne.sub(1));
@@ -388,7 +388,7 @@ public final class SymbolicExecutionUtil {
       }
       // Improve readability: a > -1 + b, a > 1 + -b, a > 1 - b
       else if (term.op() == integerLDT.getGreaterThan()) {
-         JavaDLTerm subOne = term.sub(1);
+         Term subOne = term.sub(1);
          if (subOne.op() == integerLDT.getAdd()) {
             if (isMinusOne(subOne.sub(0), integerLDT)) {
                term = tb.geq(term.sub(0), subOne.sub(1));
@@ -405,7 +405,7 @@ public final class SymbolicExecutionUtil {
       }
       // Improve readability: !a >= b, !a > b, !a <= b, !a < b
       else if (term.op() == Junctor.NOT) {
-         JavaDLTerm sub = term.sub(0);
+         Term sub = term.sub(0);
          if (sub.op() == integerLDT.getLessOrEquals()) {
             term = tb.gt(sub.sub(0), sub.sub(1));
          }
@@ -428,17 +428,17 @@ public final class SymbolicExecutionUtil {
     * @param integerLDT the LDT for integers
     * @return true if the term represents the one
     */
-   private static boolean isOne(JavaDLTerm subOne, IntegerLDT integerLDT) {
+   private static boolean isOne(Term subOne, IntegerLDT integerLDT) {
        return subOne.equals(integerLDT.one());
    }
 
    /**
-    * Checks if the given {@link JavaDLTerm} represents the integer constant {@code -1}.
-    * @param term The {@link JavaDLTerm} to check.
+    * Checks if the given {@link Term} represents the integer constant {@code -1}.
+    * @param term The {@link Term} to check.
     * @param integerLDT The {@link IntegerLDT} to use.
-    * @return {@code true} {@link JavaDLTerm} represents {@code -1}, {@code false} {@link JavaDLTerm} is something else.
+    * @return {@code true} {@link Term} represents {@code -1}, {@code false} {@link Term} is something else.
     */
-   private static boolean isMinusOne(JavaDLTerm term, IntegerLDT integerLDT) {
+   private static boolean isMinusOne(Term term, IntegerLDT integerLDT) {
       if (term.op() == integerLDT.getNumberSymbol()) {
          term = term.sub(0);
          if (term.op() == integerLDT.getNegativeNumberSign()) {
@@ -508,12 +508,12 @@ public final class SymbolicExecutionUtil {
       // Create predicate which will be used in formulas to store the value interested in.
       Function newPredicate = new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
-      JavaDLTerm newTerm = services.getTermBuilder().func(newPredicate, services.getTermBuilder().var((ProgramVariable)variable));
+      Term newTerm = services.getTermBuilder().func(newPredicate, services.getTermBuilder().var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
-      JavaDLTerm modalityTerm = services.getTermBuilder().dia(newJavaBlock, newTerm);
+      Term modalityTerm = services.getTermBuilder().dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
-      JavaDLTerm originalModifiedFormula = methodReturnNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
-      ImmutableList<JavaDLTerm> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
+      Term originalModifiedFormula = methodReturnNode.getAppliedRuleApp().posInOccurrence().sequentFormula().formula();
+      ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
       // Create Sequent to prove with new succedent.
       Sequent sequentToProve = createSequentToProveWithNewSuccedent(methodCallEmptyNode, null, modalityTerm, originalUpdates, false);
       // Return created sequent and the used predicate to identify the value interested in.
@@ -526,15 +526,15 @@ public final class SymbolicExecutionUtil {
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param node The original {@link Node} which provides the sequent to extract from.
-    * @param pio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the SE modality.
+    * @param pio The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the SE modality.
     * @param additionalConditions Optional additional conditions.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractVariableValueSequent(Services services,
                                                                                Node node,
-                                                                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
-                                                                               JavaDLTerm additionalConditions,
+                                                                               PosInOccurrence<Term, SequentFormula<Term>> pio,
+                                                                               Term additionalConditions,
                                                                                IProgramVariable variable) {
       // Make sure that correct parameters are given
       assert node != null;
@@ -542,7 +542,7 @@ public final class SymbolicExecutionUtil {
       // Create predicate which will be used in formulas to store the value interested in.
       Function newPredicate = new Function(new Name(services.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
-      JavaDLTerm newTerm = services.getTermBuilder().func(newPredicate, services.getTermBuilder().var((ProgramVariable)variable));
+      Term newTerm = services.getTermBuilder().func(newPredicate, services.getTermBuilder().var((ProgramVariable)variable));
       // Create Sequent to prove with new succedent.
       Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, pio, additionalConditions, newTerm, false);
       // Return created sequent and the used predicate to identify the value interested in.
@@ -555,7 +555,7 @@ public final class SymbolicExecutionUtil {
     * sequent of the given {@link Node}.
     * @param sideProofServices The {@link Services} of the side proof to use.
     * @param node The original {@link Node} which provides the sequent to extract from.
-    * @param pio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality or its updates.
+    * @param pio The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality or its updates.
     * @param additionalConditions Additional conditions to add to the antecedent.
     * @param term The new succedent term.
     * @param keepUpdates {@code true} keep updates, {@code false} throw updates away.
@@ -563,9 +563,9 @@ public final class SymbolicExecutionUtil {
     */
    public static SiteProofVariableValueInput createExtractTermSequent(Services sideProofServices,
                                                                       Node node,
-                                                                      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
-                                                                      JavaDLTerm additionalConditions,
-                                                                      JavaDLTerm term,
+                                                                      PosInOccurrence<Term, SequentFormula<Term>> pio,
+                                                                      Term additionalConditions,
+                                                                      Term term,
                                                                       boolean keepUpdates) {
       // Make sure that correct parameters are given
       assert node != null;
@@ -573,7 +573,7 @@ public final class SymbolicExecutionUtil {
       // Create predicate which will be used in formulas to store the value interested in.
       Function newPredicate = new Function(new Name(sideProofServices.getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, term.sort());
       // Create formula which contains the value interested in.
-      JavaDLTerm newTerm = sideProofServices.getTermBuilder().func(newPredicate, term);
+      Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, term);
       // Create Sequent to prove with new succedent.
       Sequent sequentToProve = keepUpdates ? 
                                createSequentToProveWithNewSuccedent(node, pio, additionalConditions, newTerm, false) :
@@ -628,18 +628,18 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given {@link JavaDLTerm} represents a heap update,
+    * Checks if the given {@link Term} represents a heap update,
     * in particular a store or create operation on a heap.
     * @param services The {@link Services} to use.
-    * @param term The {@link JavaDLTerm} to check.
+    * @param term The {@link Term} to check.
     * @return {@code true} is heap update, {@code false} is something else.
     */
-   public static boolean isHeapUpdate(Services services, JavaDLTerm term) {
+   public static boolean isHeapUpdate(Services services, Term term) {
       boolean heapUpdate = false;
       if (term != null) {
-         ImmutableArray<JavaDLTerm> subs = term.subs();
+         ImmutableArray<Term> subs = term.subs();
          if (subs.size() == 1) {
-            JavaDLTerm sub = subs.get(0);
+            Term sub = subs.get(0);
             if (sub.op() == services.getTheories().getHeapLDT().getStore() ||
                 sub.op() == services.getTheories().getHeapLDT().getCreate()) {
                heapUpdate = true;
@@ -675,12 +675,12 @@ public final class SymbolicExecutionUtil {
          List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
          Node proofNode = node.getProofNode();
          Sequent sequent = proofNode.sequent();
-         for (SequentFormula<JavaDLTerm> sf : sequent.antecedent()) {
+         for (SequentFormula<Term> sf : sequent.antecedent()) {
             if (!containsSymbolicExecutionLabel(sf.formula())) {
                constraints.add(new ExecutionConstraint(node.getSettings(), proofNode, node.getModalityPIO(), sf.formula()));
             }
          }
-         for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
+         for (SequentFormula<Term> sf : sequent.succedent()) {
             if (!containsSymbolicExecutionLabel(sf.formula())) {
                constraints.add(new ExecutionConstraint(node.getSettings(), proofNode, node.getModalityPIO(), tb.not(sf.formula())));
             }
@@ -693,12 +693,12 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the {@link JavaDLTerm} or one of its sub terms contains
+    * Checks if the {@link Term} or one of its sub terms contains
     * a symbolic execution label.
-    * @param term The {@link JavaDLTerm} to check.
+    * @param term The {@link Term} to check.
     * @return {@code true} SE label is somewhere contained, {@code false} SE label is not contained at all.
     */
-   public static boolean containsSymbolicExecutionLabel(JavaDLTerm term) {
+   public static boolean containsSymbolicExecutionLabel(Term term) {
       boolean hasModality = false;
       term = TermBuilder.goBelowUpdates(term);
       if (term.op() instanceof Modality) {
@@ -729,11 +729,11 @@ public final class SymbolicExecutionUtil {
     * Creates for the given {@link IExecutionNode} the contained
     * root {@link IExecutionVariable}s.
     * @param node The {@link IExecutionNode} to create variables for.
-    * @param condition A {@link JavaDLTerm} specifying some additional constraints to consider.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
     * @return The created {@link IExecutionVariable}s.
     * @throws ProofInputException 
     */
-   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, JavaDLTerm condition) throws ProofInputException {
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, Term condition) throws ProofInputException {
       if (node != null) {
          return createExecutionVariables(node, node.getProofNode(), node.getModalityPIO(), condition);
       }
@@ -747,15 +747,15 @@ public final class SymbolicExecutionUtil {
     * root {@link IExecutionVariable}s.
     * @param node The {@link IExecutionNode} to create variables for.
     * @param proofNode The proof {@link Node} to work with.
-    * @param modalityPIO The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
-    * @param condition A {@link JavaDLTerm} specifying some additional constraints to consider.
+    * @param modalityPIO The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
     * @return The created {@link IExecutionVariable}s.
     * @throws ProofInputException 
     */
    public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, 
                                                                Node proofNode, 
-                                                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO, 
-                                                               JavaDLTerm condition) throws ProofInputException {
+                                                               PosInOccurrence<Term, SequentFormula<Term>> modalityPIO, 
+                                                               Term condition) throws ProofInputException {
       if (node.getSettings().isVariablesAreOnlyComputedFromUpdates()) {
          ExecutionVariableExtractor extractor = new ExecutionVariableExtractor(proofNode, modalityPIO, node, condition, node.getSettings().isSimplifyConditions());
          return extractor.analyse();
@@ -770,14 +770,14 @@ public final class SymbolicExecutionUtil {
     * root {@link IExecutionVariable}s.
     * @param node The {@link IExecutionNode} to create variables for.
     * @param proofNode The proof {@link Node} to work with.
-    * @param modalityPIO The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
-    * @param condition A {@link JavaDLTerm} specifying some additional constraints to consider.
+    * @param modalityPIO The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
     * @return The created {@link IExecutionVariable}s.
     */
    public static IExecutionVariable[] createAllExecutionVariables(IExecutionNode<?> node, 
                                                                   Node proofNode, 
-                                                                  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO, 
-                                                                  JavaDLTerm condition) {
+                                                                  PosInOccurrence<Term, SequentFormula<Term>> modalityPIO, 
+                                                                  Term condition) {
       if (proofNode != null) {
          List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
          // Add self variable
@@ -824,10 +824,10 @@ public final class SymbolicExecutionUtil {
       if (node != null) {
          Services services = node.proof().getServices();
          List<IProgramVariable> result = new LinkedList<IProgramVariable>();
-         for (SequentFormula<JavaDLTerm> sf : node.sequent().antecedent()) {
+         for (SequentFormula<Term> sf : node.sequent().antecedent()) {
             internalCollectAllElementaryUpdateTerms(services, result, sf.formula());
          }
-         for (SequentFormula<JavaDLTerm> sf : node.sequent().succedent()) {
+         for (SequentFormula<Term> sf : node.sequent().succedent()) {
             internalCollectAllElementaryUpdateTerms(services, result, sf.formula());
          }
          return result;
@@ -847,7 +847,7 @@ public final class SymbolicExecutionUtil {
     */
    private static void internalCollectAllElementaryUpdateTerms(Services services,
                                                                List<IProgramVariable> result,
-                                                               JavaDLTerm term) {
+                                                               Term term) {
       if (term != null) {
          if (term.op() instanceof ElementaryUpdate) {
             if (SymbolicExecutionUtil.isHeapUpdate(services, term)) {
@@ -865,7 +865,7 @@ public final class SymbolicExecutionUtil {
             }
          }
          else {
-            for (JavaDLTerm sub : term.subs()) {
+            for (Term sub : term.subs()) {
                internalCollectAllElementaryUpdateTerms(services, result, sub);
             }
          }
@@ -873,7 +873,7 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Utility method of {@link #internalCollectAllElementaryUpdateTerms(Services, List, JavaDLTerm)}
+    * Utility method of {@link #internalCollectAllElementaryUpdateTerms(Services, List, Term)}
     * which collects static field manipulations on the given heap update.
     * @param services The {@link Services} to use.
     * @param result The result {@link List} to fill.
@@ -881,14 +881,14 @@ public final class SymbolicExecutionUtil {
     */
    private static void internalCollectStaticProgramVariablesOnHeap(Services services,
                                                                    Set<IProgramVariable> result,
-                                                                   JavaDLTerm term) {
+                                                                   Term term) {
       final HeapLDT heapLDT = services.getTheories().getHeapLDT();
       try {
          if (term.op() == heapLDT.getStore()) {
-            ImmutableArray<JavaDLTerm> subs = term.subs();
+            ImmutableArray<Term> subs = term.subs();
             if (term.arity() == 4) {
-               JavaDLTerm innerMostSelect = findInnerMostSelect(subs.get(1), services);
-               JavaDLTerm locationTerm = innerMostSelect != null ? innerMostSelect.sub(2) : subs.get(2);
+               Term innerMostSelect = findInnerMostSelect(subs.get(1), services);
+               Term locationTerm = innerMostSelect != null ? innerMostSelect.sub(2) : subs.get(2);
                ProgramVariable attribute = getProgramVariable(services, heapLDT, locationTerm);
                if (attribute != null && attribute.isStatic()) {
                   result.add(attribute);
@@ -899,12 +899,12 @@ public final class SymbolicExecutionUtil {
       catch (Exception e) {
          // Can go wrong, nothing to do
       }
-      for (JavaDLTerm sub : term.subs()) {
+      for (Term sub : term.subs()) {
          internalCollectStaticProgramVariablesOnHeap(services, result, sub);
       }
    }
    
-   private static JavaDLTerm findInnerMostSelect(JavaDLTerm term, Services services) {
+   private static Term findInnerMostSelect(Term term, Services services) {
       if (isSelect(services, term)) {
          while (isSelect(services, term.sub(1))) {
             term = term.sub(1);
@@ -917,14 +917,14 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Returns the {@link ProgramVariable} defined by the given {@link JavaDLTerm}.
+    * Returns the {@link ProgramVariable} defined by the given {@link Term}.
     * @param services The {@link Services} to use.
     * @param heapLDT The {@link HeapLDT} to use.
-    * @param locationTerm The {@link JavaDLTerm} to extract {@link ProgramVariable} from.
-    * @return The {@link JavaDLTerm}s {@link ProgramVariable} or {@code null} if not available.
+    * @param locationTerm The {@link Term} to extract {@link ProgramVariable} from.
+    * @return The {@link Term}s {@link ProgramVariable} or {@code null} if not available.
     */
    public static ProgramVariable getProgramVariable(Services services, HeapLDT heapLDT,
-                                                    JavaDLTerm locationTerm) {
+                                                    Term locationTerm) {
       ProgramVariable result = null;
       if (locationTerm.op() instanceof Function) {
          Function function = (Function)locationTerm.op();
@@ -942,13 +942,13 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Returns the array index defined by the given {@link JavaDLTerm}.
+    * Returns the array index defined by the given {@link Term}.
     * @param services The {@link Services} to use.
     * @param heapLDT The {@link HeapLDT} to use.
-    * @param arrayIndexTerm The {@link JavaDLTerm} to extract the array index from.
+    * @param arrayIndexTerm The {@link Term} to extract the array index from.
     * @return The array index or {@code null} if the term defines no array index.
     */
-   public static JavaDLTerm getArrayIndex(Services services, HeapLDT heapLDT, JavaDLTerm arrayIndexTerm) {
+   public static Term getArrayIndex(Services services, HeapLDT heapLDT, Term arrayIndexTerm) {
       // Make sure that the term is an array index
       if (arrayIndexTerm.op() == heapLDT.getArr() && arrayIndexTerm.arity() == 1) {
          return arrayIndexTerm.sub(0);
@@ -961,12 +961,12 @@ public final class SymbolicExecutionUtil {
    /**
     * Searches the {@link IProgramVariable} of the current {@code this}/{@code self} reference.
     * @param node The {@link Node} to search in.
-    * @param pio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} describing the location of the modality of interest.
+    * @param pio The {@link PosInOccurrence<Term, SequentFormula<Term>>} describing the location of the modality of interest.
     * @return The found {@link IProgramVariable} with the current {@code this}/{@code self} reference or {@code null} if no one is available.
     */
-   public static IProgramVariable findSelfTerm(Node node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+   public static IProgramVariable findSelfTerm(Node node, PosInOccurrence<Term, SequentFormula<Term>> pio) {
       if (pio != null) {
-         JavaDLTerm term = pio.subTerm();
+         Term term = pio.subTerm();
          term = TermBuilder.goBelowUpdates(term);
          JavaBlock jb = term.modalContent();
          Services services = node.proof().getServices();
@@ -1184,13 +1184,13 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the {@link JavaDLTerm} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
     * @param ruleApp The {@link RuleApp} to check.
     * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
     */
    public static boolean hasLoopBodyLabel(RuleApp ruleApp) {
       if (ruleApp != null && ruleApp.posInOccurrence() != null) {
-         JavaDLTerm term = ruleApp.posInOccurrence().subTerm();
+         Term term = ruleApp.posInOccurrence().subTerm();
          if (term != null) {
             term = TermBuilder.goBelowUpdates(term);
             return term.containsLabel(LOOP_BODY_LABEL);
@@ -1205,13 +1205,13 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the {@link JavaDLTerm} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
     * @param ruleApp The {@link RuleApp} to check.
     * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
     */
    public static boolean hasLoopBodyTerminationLabel(RuleApp ruleApp) {
       if (ruleApp != null && ruleApp.posInOccurrence() != null) {
-         JavaDLTerm term = ruleApp.posInOccurrence().subTerm();
+         Term term = ruleApp.posInOccurrence().subTerm();
          return term.containsLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
       }
       else {
@@ -1220,7 +1220,7 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the {@link JavaDLTerm} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
     * @param ruleApp The {@link RuleApp} to check.
     * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
     */
@@ -1243,20 +1243,20 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the given {@link JavaDLTerm} contains a {@link SymbolicExecutionTermLabel}.
-    * @param term The {@link JavaDLTerm} to check.
-    * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link JavaDLTerm} is {@code null}.
+    * Checks if the given {@link Term} contains a {@link SymbolicExecutionTermLabel}.
+    * @param term The {@link Term} to check.
+    * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link Term} is {@code null}.
     */
-   public static boolean hasSymbolicExecutionLabel(JavaDLTerm term) {
+   public static boolean hasSymbolicExecutionLabel(Term term) {
       return getSymbolicExecutionLabel(term) != null;
    }
    
    /**
     * Returns the contained {@link SymbolicExecutionTermLabel} if available.
-    * @param term The {@link JavaDLTerm} to search in.
+    * @param term The {@link Term} to search in.
     * @return The first found {@link SymbolicExecutionTermLabel} or {@code null} if no {@link SymbolicExecutionTermLabel} is provided.
     */
-   public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(JavaDLTerm term) {
+   public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(Term term) {
       if (term != null) {
          term = TermBuilder.goBelowUpdates(term);
          return (SymbolicExecutionTermLabel)CollectionUtil.search(term.getLabels(),
@@ -1273,15 +1273,15 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Searches the modality {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link PosInOccurrence<Term, SequentFormula<Term>>} with the maximal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Sequent}.
     * @param sequent The {@link Sequent} to search in.
-    * @return The modality {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} with the maximal ID if available or {@code null} otherwise.
+    * @return The modality {@link PosInOccurrence<Term, SequentFormula<Term>>} with the maximal ID if available or {@code null} otherwise.
     */
-   public static PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> findModalityWithMaxSymbolicExecutionLabelId(Sequent sequent) {
+   public static PosInOccurrence<Term, SequentFormula<Term>> findModalityWithMaxSymbolicExecutionLabelId(Sequent sequent) {
       if (sequent != null) {
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> nextAntecedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.antecedent(), true);
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> nextSuccedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.succedent(), false);
+         PosInOccurrence<Term, SequentFormula<Term>> nextAntecedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.antecedent(), true);
+         PosInOccurrence<Term, SequentFormula<Term>> nextSuccedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.succedent(), false);
          if (nextAntecedent != null) {
             if (nextSuccedent != null) {
                SymbolicExecutionTermLabel antecedentLabel = getSymbolicExecutionLabel(nextAntecedent.subTerm());
@@ -1303,20 +1303,20 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Searches the modality {@link JavaDLTerm} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Semisequent}.
     * @param semisequent The {@link Semisequent} to search in.
     * @param inAntec {@code true} antecedent, {@code false} succedent.
-    * @return The modality {@link JavaDLTerm} with the maximal ID if available or {@code null} otherwise.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
     */
-   public static PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> findModalityWithMaxSymbolicExecutionLabelId(Semisequent semisequent, boolean inAntec) {
+   public static PosInOccurrence<Term, SequentFormula<Term>> findModalityWithMaxSymbolicExecutionLabelId(Semisequent semisequent, boolean inAntec) {
       if (semisequent != null) {
          int maxId = Integer.MIN_VALUE;
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> maxPio = null;
-         for (SequentFormula<JavaDLTerm> sf : semisequent) {
-            PosInTerm<JavaDLTerm> current = findModalityWithMaxSymbolicExecutionLabelId(sf.formula());
+         PosInOccurrence<Term, SequentFormula<Term>> maxPio = null;
+         for (SequentFormula<Term> sf : semisequent) {
+            PosInTerm<Term> current = findModalityWithMaxSymbolicExecutionLabelId(sf.formula());
             if (current != null) {
-               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, current, inAntec);
+               PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(sf, current, inAntec);
                SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
                if (maxPio == null || label.getId() > maxId) {
                   maxPio = pio;
@@ -1332,12 +1332,12 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Searches the modality {@link PosInTerm<JavaDLTerm>} with the maximal {@link SymbolicExecutionTermLabel} ID
-    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link JavaDLTerm}.
-    * @param term The {@link JavaDLTerm} to search in.
-    * @return The modality {@link PosInTerm<JavaDLTerm>} with the maximal ID if available or {@code null} otherwise.
+    * Searches the modality {@link PosInTerm<Term>} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
+    * @param term The {@link Term} to search in.
+    * @return The modality {@link PosInTerm<Term>} with the maximal ID if available or {@code null} otherwise.
     */
-   public static PosInTerm<JavaDLTerm> findModalityWithMaxSymbolicExecutionLabelId(JavaDLTerm term) {
+   public static PosInTerm<Term> findModalityWithMaxSymbolicExecutionLabelId(Term term) {
       if (term != null) {
          FindModalityWithSymbolicExecutionLabelId visitor = new FindModalityWithSymbolicExecutionLabelId(true);
          term.execPreOrder(visitor);
@@ -1349,15 +1349,15 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Searches the modality {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link PosInOccurrence<Term, SequentFormula<Term>>} with the minimal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Sequent}.
     * @param sequent The {@link Sequent} to search in.
-    * @return The modality {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} with the maximal ID if available or {@code null} otherwise.
+    * @return The modality {@link PosInOccurrence<Term, SequentFormula<Term>>} with the maximal ID if available or {@code null} otherwise.
     */
-   public static PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> findModalityWithMinSymbolicExecutionLabelId(Sequent sequent) {
+   public static PosInOccurrence<Term, SequentFormula<Term>> findModalityWithMinSymbolicExecutionLabelId(Sequent sequent) {
       if (sequent != null) {
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> nextAntecedent = findModalityWithMinSymbolicExecutionLabelId(sequent.antecedent(), true);
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> nextSuccedent = findModalityWithMinSymbolicExecutionLabelId(sequent.succedent(), false);
+         PosInOccurrence<Term, SequentFormula<Term>> nextAntecedent = findModalityWithMinSymbolicExecutionLabelId(sequent.antecedent(), true);
+         PosInOccurrence<Term, SequentFormula<Term>> nextSuccedent = findModalityWithMinSymbolicExecutionLabelId(sequent.succedent(), false);
          if (nextAntecedent != null) {
             if (nextSuccedent != null) {
                SymbolicExecutionTermLabel antecedentLabel = getSymbolicExecutionLabel(nextAntecedent.subTerm());
@@ -1378,20 +1378,20 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Searches the modality {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link PosInOccurrence<Term, SequentFormula<Term>>} with the minimal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Semisequent}.
     * @param semisequent The {@link Semisequent} to search in.
     * @param inAntec {@code true} antecedent, {@code false} succedent.
-    * @return The modality {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} with the minimal ID if available or {@code null} otherwise.
+    * @return The modality {@link PosInOccurrence<Term, SequentFormula<Term>>} with the minimal ID if available or {@code null} otherwise.
     */
-   public static PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> findModalityWithMinSymbolicExecutionLabelId(Semisequent semisequent, boolean inAntec) {
+   public static PosInOccurrence<Term, SequentFormula<Term>> findModalityWithMinSymbolicExecutionLabelId(Semisequent semisequent, boolean inAntec) {
       if (semisequent != null) {
          int maxId = Integer.MIN_VALUE;
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> minPio = null;
-         for (SequentFormula<JavaDLTerm> sf : semisequent) {
-            PosInTerm<JavaDLTerm> current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
+         PosInOccurrence<Term, SequentFormula<Term>> minPio = null;
+         for (SequentFormula<Term> sf : semisequent) {
+            PosInTerm<Term> current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
             if (current != null) {
-               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, current, inAntec);
+               PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(sf, current, inAntec);
                SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
                if (minPio == null || label.getId() < maxId) {
                   minPio = pio;
@@ -1407,12 +1407,12 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Searches the modality {@link PosInTerm<JavaDLTerm>} with the minimal {@link SymbolicExecutionTermLabel} ID
-    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link JavaDLTerm}.
-    * @param term The {@link JavaDLTerm} to search in.
-    * @return The modality {@link PosInTerm<JavaDLTerm>} with the maximal ID if available or {@code null} otherwise.
+    * Searches the modality {@link PosInTerm<Term>} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
+    * @param term The {@link Term} to search in.
+    * @return The modality {@link PosInTerm<Term>} with the maximal ID if available or {@code null} otherwise.
     */
-   public static PosInTerm<JavaDLTerm> findModalityWithMinSymbolicExecutionLabelId(JavaDLTerm term) {
+   public static PosInTerm<Term> findModalityWithMinSymbolicExecutionLabelId(Term term) {
       if (term != null) {
          FindModalityWithSymbolicExecutionLabelId visitor = new FindModalityWithSymbolicExecutionLabelId(false);
          term.execPreOrder(visitor);
@@ -1424,15 +1424,15 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Utility class used to find the maximal modality JavaDLTerm
-    * used by {@link SymbolicExecutionUtil#findModalityWithMaxSymbolicExecutionLabelId(JavaDLTerm)}.
+    * Utility class used to find the maximal modality Term
+    * used by {@link SymbolicExecutionUtil#findModalityWithMaxSymbolicExecutionLabelId(Term)}.
     * @author Martin Hentschel
     */
    private static final class FindModalityWithSymbolicExecutionLabelId extends DefaultVisitor {
       /**
-       * The modality {@link PosInTerm<JavaDLTerm>} with the maximal ID.
+       * The modality {@link PosInTerm<Term>} with the maximal ID.
        */
-      private PosInTerm<JavaDLTerm> posInTerm;
+      private PosInTerm<Term> posInTerm;
       
       /**
        * The maximal ID.
@@ -1445,9 +1445,9 @@ public final class SymbolicExecutionUtil {
       private boolean maximum;
       
       /**
-       * The current {@link PosInTerm<JavaDLTerm>}.
+       * The current {@link PosInTerm<Term>}.
        */
-      private PosInTerm<JavaDLTerm> currentPosInTerm = null;
+      private PosInTerm<Term> currentPosInTerm = null;
       
       private Deque<Integer> indexStack = new LinkedList<Integer>();
       
@@ -1463,7 +1463,7 @@ public final class SymbolicExecutionUtil {
        * {@inheritDoc}
        */
       @Override
-      public void visit(JavaDLTerm visited) {
+      public void visit(Term visited) {
          SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
          if (label != null) {
             if (posInTerm == null || (maximum ? label.getId() > maxId : label.getId() < maxId)) {
@@ -1477,9 +1477,9 @@ public final class SymbolicExecutionUtil {
        * {@inheritDoc}
        */
       @Override
-      public void subtreeEntered(JavaDLTerm subtreeRoot) {
+      public void subtreeEntered(Term subtreeRoot) {
          if (currentPosInTerm == null) {
-            currentPosInTerm = PosInTerm.<JavaDLTerm>getTopLevel();
+            currentPosInTerm = PosInTerm.<Term>getTopLevel();
          }
          else {
             int index = indexStack.getFirst();
@@ -1492,7 +1492,7 @@ public final class SymbolicExecutionUtil {
        * {@inheritDoc}
        */
       @Override
-      public void subtreeLeft(JavaDLTerm subtreeRoot) {
+      public void subtreeLeft(Term subtreeRoot) {
          currentPosInTerm = currentPosInTerm.up();
          indexStack.removeFirst();
          if (!indexStack.isEmpty()) {
@@ -1502,10 +1502,10 @@ public final class SymbolicExecutionUtil {
       }
 
       /**
-       * Returns the modality {@link PosInTerm<JavaDLTerm>} with the maximal ID.
-       * @return The modality {@link PosInTerm<JavaDLTerm>} with the maximal ID.
+       * Returns the modality {@link PosInTerm<Term>} with the maximal ID.
+       * @return The modality {@link PosInTerm<Term>} with the maximal ID.
        */
-      public PosInTerm<JavaDLTerm> getPosInTerm() {
+      public PosInTerm<Term> getPosInTerm() {
          return posInTerm;
       }
    }
@@ -1580,7 +1580,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is in implicit method, {@code false} is not in implicit method.
     */
    public static boolean isInImplicitMethod(Node node, RuleApp ruleApp) {
-      JavaDLTerm term = ruleApp.posInOccurrence().subTerm();
+      Term term = ruleApp.posInOccurrence().subTerm();
       term = TermBuilder.goBelowUpdates(term);
       JavaBlock block = term.modalContent();
       IExecutionContext context =
@@ -1590,18 +1590,18 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Compute the stack size of the given {@link JavaDLTerm} described by the given {@link RuleApp}.
-    * @param ruleApp The {@link RuleApp} which defines the {@link JavaDLTerm} to compute its stack size.
+    * Compute the stack size of the given {@link Term} described by the given {@link RuleApp}.
+    * @param ruleApp The {@link RuleApp} which defines the {@link Term} to compute its stack size.
     * @return The stack size.
     */
    public static int computeStackSize(RuleApp ruleApp) {
       int result = 0;
       if (ruleApp != null) {
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOc = ruleApp.posInOccurrence();
+         PosInOccurrence<Term, SequentFormula<Term>> posInOc = ruleApp.posInOccurrence();
          if (posInOc != null) {
-            JavaDLTerm subTerm = posInOc.subTerm();
+            Term subTerm = posInOc.subTerm();
             if (subTerm != null) {
-               JavaDLTerm modality = TermBuilder.goBelowUpdates(subTerm);
+               Term modality = TermBuilder.goBelowUpdates(subTerm);
                if (modality != null) {
                   JavaBlock block = modality.modalContent();
                   if (block != null) {
@@ -1684,13 +1684,13 @@ public final class SymbolicExecutionUtil {
     * which also represents a symbolic execution tree node
     * (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
     * @param node The {@link Node} to start search in.
-    * @param pio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality.
+    * @param pio The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality.
     * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
     */
-   public static Node findMethodCallNode(Node node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+   public static Node findMethodCallNode(Node node, PosInOccurrence<Term, SequentFormula<Term>> pio) {
       if (node != null && pio != null) {
          // Get current program method
-         JavaDLTerm term = pio.subTerm();
+         Term term = pio.subTerm();
          term = TermBuilder.goBelowUpdates(term);
          Services services = node.proof().getServices();
          MethodFrame mf = JavaTools.getInnermostMethodFrame(term.modalContent(), services);
@@ -1753,7 +1753,7 @@ public final class SymbolicExecutionUtil {
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   public static JavaDLTerm computeBranchCondition(Node node,
+   public static Term computeBranchCondition(Node node,
                                              boolean simplify,
                                              boolean improveReadability) throws ProofInputException {
       // Get applied taclet on parent proof node
@@ -1792,7 +1792,7 @@ public final class SymbolicExecutionUtil {
     * <ul>
     *    <li>Last semisequent in antecedent contains contract</li>
     *    <li>Contract is defined as {@code exc_0 = null} and {@code pre -> post}/{@code excPre -> !exc_0 = null & signals} terms</li>
-    *    <li>Find {@code exc_0 = null} JavaDLTerm</li>
+    *    <li>Find {@code exc_0 = null} Term</li>
     *    <li>List all implications</li>
     *    <li>Filter implications for post/exceptional post branch based on the negation of {@code exc_0 = null}</li>
     *    <li>Return disjunction of all filtered implication conditions or return true if no implications were found</li>
@@ -1805,7 +1805,7 @@ public final class SymbolicExecutionUtil {
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   private static JavaDLTerm computeContractRuleAppBranchCondition(Node parent,
+   private static Term computeContractRuleAppBranchCondition(Node parent,
                                                              Node node,
                                                              boolean simplify,
                                                              boolean improveReadability) throws ProofInputException {
@@ -1820,30 +1820,30 @@ public final class SymbolicExecutionUtil {
       }
       else if (childIndex == 2) {
          // Assumption: Original formula in parent is replaced
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = parent.getAppliedRuleApp().posInOccurrence();
-         JavaDLTerm workingTerm = posInOccurrenceInOtherNode(parent, pio, node);
+         PosInOccurrence<Term, SequentFormula<Term>> pio = parent.getAppliedRuleApp().posInOccurrence();
+         Term workingTerm = posInOccurrenceInOtherNode(parent, pio, node);
          if (workingTerm == null) {
-            throw new ProofInputException("JavaDLTerm not find in precondition branch, implementation of UseOperationContractRule might have changed!");
+            throw new ProofInputException("Term not find in precondition branch, implementation of UseOperationContractRule might have changed!");
          }
          workingTerm = TermBuilder.goBelowUpdates(workingTerm);
          if (workingTerm.op() != Junctor.AND) {
             throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might have changed!");
          }
-         JavaDLTerm preconditions = workingTerm.sub(0);
+         Term preconditions = workingTerm.sub(0);
          return services.getTermBuilder().not(preconditions);
       }
       else {
          // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
-         // Find JavaDLTerm to extract implications from.
+         // Find Term to extract implications from.
          ContractPostOrExcPostExceptionVariableResult search = searchContractPostOrExcPostExceptionVariable(node, node.proof().getServices());
          
-         List<JavaDLTerm> normalConditions = new LinkedList<JavaDLTerm>();
-         List<JavaDLTerm> exceptinalConditions = new LinkedList<JavaDLTerm>();
+         List<Term> normalConditions = new LinkedList<Term>();
+         List<Term> exceptinalConditions = new LinkedList<Term>();
          collectContractPreconditions(services, search, normalConditions, exceptinalConditions);
-         List<JavaDLTerm> relevantConditions = childIndex == 1 ? // Exceptional case
+         List<Term> relevantConditions = childIndex == 1 ? // Exceptional case
                                          exceptinalConditions :
                                          normalConditions;
-         JavaDLTerm result;
+         Term result;
          if (relevantConditions.isEmpty()) {
             result = services.getTermBuilder().tt();
          }
@@ -1851,14 +1851,14 @@ public final class SymbolicExecutionUtil {
             result = services.getTermBuilder().or(relevantConditions);
          }
          // Add exception equality
-         JavaDLTerm excEquality = search.getExceptionEquality();
+         Term excEquality = search.getExceptionEquality();
          if (childIndex == 1) { // exception branch
             excEquality = services.getTermBuilder().not(excEquality);
          }
          result = services.getTermBuilder().and(excEquality, result);
          // Add caller not null to condition
          if (parent.childrenCount() == 4) {
-            JavaDLTerm callerNotNullTerm = posInOccurrenceInOtherNode(parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(3));
+            Term callerNotNullTerm = posInOccurrenceInOtherNode(parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(3));
             callerNotNullTerm = TermBuilder.goBelowUpdates(callerNotNullTerm);
             if (callerNotNullTerm.op() != Junctor.NOT) {
                throw new ProofInputException("Not operation expected, implementation of UseOperationContractRule might have changed!");
@@ -1875,10 +1875,10 @@ public final class SymbolicExecutionUtil {
             result = services.getTermBuilder().and(callerNotNullTerm, result);
          }
          // Create formula which contains the value interested in.
-         JavaDLTerm condition;
+         Term condition;
          if (simplify) {
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
-            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (JavaDLTerm)null, result, true);
+            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term)null, result, true);
             condition = evaluateInSideProof(services, 
                                             parent.proof(), 
                                             sideProofEnv,
@@ -1908,16 +1908,16 @@ public final class SymbolicExecutionUtil {
     */
    private static void collectContractPreconditions(Services services, 
                                                     ContractPostOrExcPostExceptionVariableResult search,
-                                                    List<JavaDLTerm> normalConditions,
-                                                    List<JavaDLTerm> exceptinalConditions) throws ProofInputException {
+                                                    List<Term> normalConditions,
+                                                    List<Term> exceptinalConditions) throws ProofInputException {
       // Treat general conditions
       if (search.getWorkingTerm().op() != Junctor.AND) {
          throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
       }
-      JavaDLTerm specificationCasesTerm = search.getWorkingTerm().sub(1);
-      JavaDLTerm excDefinition = search.getExceptionDefinition();
-      JavaDLTerm normalExcDefinition;
-      JavaDLTerm exceptionalExcDefinition;
+      Term specificationCasesTerm = search.getWorkingTerm().sub(1);
+      Term excDefinition = search.getExceptionDefinition();
+      Term normalExcDefinition;
+      Term exceptionalExcDefinition;
       if (excDefinition.op() == Junctor.NOT) {
          exceptionalExcDefinition = excDefinition;
          normalExcDefinition = search.getExceptionEquality();
@@ -1933,23 +1933,23 @@ public final class SymbolicExecutionUtil {
     * Collects recursively the preconditions of specification cases.
     * @param normalExcDefinition The normal exception equality.
     * @param exceptionalExcDefinition The exceptional equality.
-    * @param term The current {@link JavaDLTerm}.
+    * @param term The current {@link Term}.
     * @param normalConditions The {@link List} with the normal case conditions to fill.
     * @param exceptinalConditions The {@link List} with the exceptional case conditions to fill.
     * @throws ProofInputException Occurred Exception.
     */
-   private static void collectSpecifcationCasesPreconditions(JavaDLTerm normalExcDefinition, 
-                                                             JavaDLTerm exceptionalExcDefinition, 
-                                                             JavaDLTerm term,
-                                                             List<JavaDLTerm> normalConditions,
-                                                             List<JavaDLTerm> exceptinalConditions) throws ProofInputException {
+   private static void collectSpecifcationCasesPreconditions(Term normalExcDefinition, 
+                                                             Term exceptionalExcDefinition, 
+                                                             Term term,
+                                                             List<Term> normalConditions,
+                                                             List<Term> exceptinalConditions) throws ProofInputException {
       if (term.op() == Junctor.AND) {
-         JavaDLTerm lastChild = term.sub(term.arity() - 1);
+         Term lastChild = term.sub(term.arity() - 1);
          if (lastChild.equals(normalExcDefinition) || lastChild.equals(exceptionalExcDefinition)) {
             // Nothing to do, condition is just true
          }
          else {
-            JavaDLTerm firstChild = term.sub(0);
+            Term firstChild = term.sub(0);
             if (firstChild.equals(normalExcDefinition) || firstChild.equals(exceptionalExcDefinition)) {
                // Nothing to do, condition is just true
             }
@@ -1961,12 +1961,12 @@ public final class SymbolicExecutionUtil {
          }
       }
       else if (term.op() == Junctor.IMP) {
-         JavaDLTerm leftTerm = term.sub(0);
+         Term leftTerm = term.sub(0);
          if (leftTerm.equals(normalExcDefinition) || leftTerm.equals(exceptionalExcDefinition)) {
             // Nothing to do, condition is just true
          }
          else {
-            JavaDLTerm rightTerm = term.sub(1);
+            Term rightTerm = term.sub(1);
             // Deal with heavy weight specification cases
             if (rightTerm.op() == Junctor.AND &&
                 rightTerm.sub(0).op() == Junctor.IMP &&
@@ -1988,7 +1988,7 @@ public final class SymbolicExecutionUtil {
                exceptinalConditions.add(leftTerm);
             }
             else {
-               JavaDLTerm excCondition = rightTerm;
+               Term excCondition = rightTerm;
                // Check if right child is exception definition
                if (excCondition.op() == Junctor.AND) {
                   excCondition = excCondition.sub(excCondition.arity() - 1);
@@ -2031,22 +2031,22 @@ public final class SymbolicExecutionUtil {
     */
    public static ContractPostOrExcPostExceptionVariableResult searchContractPostOrExcPostExceptionVariable(Node node, Services services) throws ProofInputException {
       Semisequent antecedent = node.sequent().antecedent();
-      SequentFormula<JavaDLTerm> sf = antecedent.get(antecedent.size() - 1);
-      JavaDLTerm workingTerm = sf.formula();
-      Pair<ImmutableList<JavaDLTerm>,JavaDLTerm> updatesAndTerm = TermBuilder.goBelowUpdates2(workingTerm);
+      SequentFormula<Term> sf = antecedent.get(antecedent.size() - 1);
+      Term workingTerm = sf.formula();
+      Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.goBelowUpdates2(workingTerm);
       workingTerm = updatesAndTerm.second;
       if (workingTerm.op() != Junctor.AND) {
          throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
       }
       workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
       workingTerm = TermBuilder.goBelowUpdates(workingTerm);
-      // Find JavaDLTerm exc_n = null which is added (maybe negated) to all exceptional preconditions
-      JavaDLTerm exceptionDefinition = searchExceptionDefinition(workingTerm, services);
+      // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
+      Term exceptionDefinition = searchExceptionDefinition(workingTerm, services);
       if (exceptionDefinition == null) {
          throw new ProofInputException("Exception definition not found, implementation of UseOperationContractRule might has changed!"); 
       }
       // Make sure that exception equality was found
-      JavaDLTerm exceptionEquality = exceptionDefinition.op() == Junctor.NOT ?
+      Term exceptionEquality = exceptionDefinition.op() == Junctor.NOT ?
                                exceptionDefinition.sub(0) :
                                exceptionDefinition;
       return new ContractPostOrExcPostExceptionVariableResult(workingTerm, updatesAndTerm, exceptionDefinition, exceptionEquality);
@@ -2054,11 +2054,11 @@ public final class SymbolicExecutionUtil {
    
    /**
     * Searches the exception definition.
-    * @param term The {@link JavaDLTerm} to start search in.
+    * @param term The {@link Term} to start search in.
     * @param services the {@link Services} to use.
     * @return The found exception definition or {@code null} if not available.
     */
-   private static JavaDLTerm searchExceptionDefinition(JavaDLTerm term, Services services) {
+   private static Term searchExceptionDefinition(Term term, Services services) {
       if (term.op() == Equality.EQUALS && 
           term.sub(0).op() instanceof LocationVariable && 
           term.sub(0).toString().startsWith("exc_") &&
@@ -2067,7 +2067,7 @@ public final class SymbolicExecutionUtil {
          return term;
       }
       else {
-         JavaDLTerm result = null;
+         Term result = null;
          int i = term.arity() - 1;
          while (result == null && i >= 0) {
             result = searchExceptionDefinition(term.sub(i), services);
@@ -2083,36 +2083,36 @@ public final class SymbolicExecutionUtil {
     */
    public static class ContractPostOrExcPostExceptionVariableResult {
       /**
-       * The working {@link JavaDLTerm}.
+       * The working {@link Term}.
        */
-      private JavaDLTerm workingTerm;
+      private Term workingTerm;
       
       /**
        * The updates.
        */
-      private Pair<ImmutableList<JavaDLTerm>,JavaDLTerm> updatesAndTerm;
+      private Pair<ImmutableList<Term>,Term> updatesAndTerm;
       
       /**
        * The exception definition.
        */
-      private JavaDLTerm exceptionDefinition;
+      private Term exceptionDefinition;
       
       /**
        * The equality which contains the equality.
        */
-      private JavaDLTerm exceptionEquality;
+      private Term exceptionEquality;
       
       /**
        * Constructor.
-       * @param workingTerm The working {@link JavaDLTerm}.
+       * @param workingTerm The working {@link Term}.
        * @param updatesAndTerm The updates.
        * @param exceptionDefinition The exception definition.
        * @param exceptionEquality The equality which contains the equality.
        */
-      public ContractPostOrExcPostExceptionVariableResult(JavaDLTerm workingTerm, 
-                                                          Pair<ImmutableList<JavaDLTerm>, JavaDLTerm> updatesAndTerm, 
-                                                          JavaDLTerm exceptionDefinition,
-                                                          JavaDLTerm exceptionEquality) {
+      public ContractPostOrExcPostExceptionVariableResult(Term workingTerm, 
+                                                          Pair<ImmutableList<Term>, Term> updatesAndTerm, 
+                                                          Term exceptionDefinition,
+                                                          Term exceptionEquality) {
          this.workingTerm = workingTerm;
          this.updatesAndTerm = updatesAndTerm;
          this.exceptionDefinition = exceptionDefinition;
@@ -2120,10 +2120,10 @@ public final class SymbolicExecutionUtil {
       }
       
       /**
-       * Returns the working {@link JavaDLTerm}.
-       * @return The working {@link JavaDLTerm}.
+       * Returns the working {@link Term}.
+       * @return The working {@link Term}.
        */
-      public JavaDLTerm getWorkingTerm() {
+      public Term getWorkingTerm() {
          return workingTerm;
       }
 
@@ -2131,7 +2131,7 @@ public final class SymbolicExecutionUtil {
        * Returns the updates.
        * @return The updates.
        */
-      public Pair<ImmutableList<JavaDLTerm>, JavaDLTerm> getUpdatesAndTerm() {
+      public Pair<ImmutableList<Term>, Term> getUpdatesAndTerm() {
          return updatesAndTerm;
       }
       
@@ -2139,7 +2139,7 @@ public final class SymbolicExecutionUtil {
        * Returns the exception definition.
        * @return The exception definition.
        */
-      public JavaDLTerm getExceptionDefinition() {
+      public Term getExceptionDefinition() {
          return exceptionDefinition;
       }
       
@@ -2147,7 +2147,7 @@ public final class SymbolicExecutionUtil {
        * Returns the equality which contains the equality.
        * @return The equality which contains the equality.
        */
-      public JavaDLTerm getExceptionEquality() {
+      public Term getExceptionEquality() {
          return exceptionEquality;
       }
    }
@@ -2170,7 +2170,7 @@ public final class SymbolicExecutionUtil {
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   private static JavaDLTerm computeLoopInvariantBuiltInRuleAppBranchCondition(Node parent,
+   private static Term computeLoopInvariantBuiltInRuleAppBranchCondition(Node parent,
                                                                          Node node,
                                                                          boolean simplify,
                                                                          boolean improveReadability) throws ProofInputException {
@@ -2186,10 +2186,10 @@ public final class SymbolicExecutionUtil {
          Services services = parent.proof().getServices();
          Node useNode = parent.child(2);
          Semisequent antecedent = useNode.sequent().antecedent();
-         JavaDLTerm invTerm = antecedent.get(antecedent.size() - 1).formula();
+         Term invTerm = antecedent.get(antecedent.size() - 1).formula();
          // Extract loop condition from child
-         JavaDLTerm loopConditionModalityTerm = posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
-         Pair<ImmutableList<JavaDLTerm>,JavaDLTerm> pair = TermBuilder.goBelowUpdates2(loopConditionModalityTerm);
+         Term loopConditionModalityTerm = posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
+         Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(loopConditionModalityTerm);
          loopConditionModalityTerm = pair.second;
          if (childIndex == 1) { // Body Preserves Invariant
             if (loopConditionModalityTerm.op() != Junctor.IMP) {
@@ -2201,7 +2201,7 @@ public final class SymbolicExecutionUtil {
             if (loopConditionModalityTerm.op() != Modality.BOX) {
                throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
             }
-            JavaDLTerm sub = loopConditionModalityTerm.sub(0);
+            Term sub = loopConditionModalityTerm.sub(0);
             if (sub.op() != Junctor.IMP) {
                throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
             }
@@ -2215,15 +2215,15 @@ public final class SymbolicExecutionUtil {
          }
          // Create formula which contains the value interested in.
          invTerm = TermBuilder.goBelowUpdates(invTerm);
-         JavaDLTerm loopCondAndInv = services.getTermBuilder().and(loopConditionModalityTerm.sub(0), invTerm);
-         JavaDLTerm newTerm = loopCondAndInv;
-         JavaDLTerm modalityTerm = childIndex == 1 ?
+         Term loopCondAndInv = services.getTermBuilder().and(loopConditionModalityTerm.sub(0), invTerm);
+         Term newTerm = loopCondAndInv;
+         Term modalityTerm = childIndex == 1 ?
                              services.getTermBuilder().box(loopConditionModalityTerm.modalContent(), newTerm) :
                              services.getTermBuilder().dia(loopConditionModalityTerm.modalContent(), newTerm);
-         JavaDLTerm condition;
+         Term condition;
          if (simplify) {
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
-            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (JavaDLTerm)null, modalityTerm, pair.first, true);
+            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term)null, modalityTerm, pair.first, true);
             condition = evaluateInSideProof(services, 
                                             parent.proof(), 
                                             sideProofEnv,
@@ -2263,7 +2263,7 @@ public final class SymbolicExecutionUtil {
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   private static JavaDLTerm computeBlockContractBuiltInRuleAppBranchCondition(Node parent, Node node, boolean simplify, boolean improveReadability) throws ProofInputException {
+   private static Term computeBlockContractBuiltInRuleAppBranchCondition(Node parent, Node node, boolean simplify, boolean improveReadability) throws ProofInputException {
       // Make sure that a computation is possible
       if (!(parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp)) {
          throw new ProofInputException("Only BlockContractBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
@@ -2277,10 +2277,10 @@ public final class SymbolicExecutionUtil {
          // Compute invariant (last antecedent formula of the use branch)
          Services services = parent.proof().getServices();
          Semisequent antecedent = node.sequent().antecedent();
-         JavaDLTerm condition = antecedent.get(antecedent.size() - 1).formula();
+         Term condition = antecedent.get(antecedent.size() - 1).formula();
          if (simplify) {
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
-            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (JavaDLTerm)null, condition, null, true);
+            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term)null, condition, null, true);
             condition = evaluateInSideProof(services, 
                                             parent.proof(), 
                                             sideProofEnv,
@@ -2300,15 +2300,15 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Returns the {@link JavaDLTerm} described by the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the original {@link Node}
+    * Returns the {@link Term} described by the given {@link PosInOccurrence<Term, SequentFormula<Term>>} of the original {@link Node}
     * in the {@link Node} to apply on.
-    * @param original The original {@link Node} on which the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} works.
-    * @param pio The given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}.
-    * @param toApplyOn The new {@link Node} to apply the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} on.
-    * @return The {@link JavaDLTerm} in the other {@link Node} described by the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} or {@code null} if not available.
+    * @param original The original {@link Node} on which the given {@link PosInOccurrence<Term, SequentFormula<Term>>} works.
+    * @param pio The given {@link PosInOccurrence<Term, SequentFormula<Term>>}.
+    * @param toApplyOn The new {@link Node} to apply the {@link PosInOccurrence<Term, SequentFormula<Term>>} on.
+    * @return The {@link Term} in the other {@link Node} described by the {@link PosInOccurrence<Term, SequentFormula<Term>>} or {@code null} if not available.
     */
-   public static JavaDLTerm posInOccurrenceInOtherNode(Node original, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Node toApplyOn) {
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> appliedPIO = posInOccurrenceToOtherSequent(original, pio, toApplyOn);
+   public static Term posInOccurrenceInOtherNode(Node original, PosInOccurrence<Term, SequentFormula<Term>> pio, Node toApplyOn) {
+      PosInOccurrence<Term, SequentFormula<Term>> appliedPIO = posInOccurrenceToOtherSequent(original, pio, toApplyOn);
       if (appliedPIO != null) {
          return appliedPIO.subTerm();
       }
@@ -2318,15 +2318,15 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Returns the {@link JavaDLTerm} described by the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the original {@link Sequent}
+    * Returns the {@link Term} described by the given {@link PosInOccurrence<Term, SequentFormula<Term>>} of the original {@link Sequent}
     * in the {@link Sequent} to apply on.
-    * @param original The original {@link Sequent} on which the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} works.
-    * @param pio The given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}.
-    * @param toApplyOn The new {@link Sequent} to apply the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} on.
-    * @return The {@link JavaDLTerm} in the other {@link Sequent} described by the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} or {@code null} if not available.
+    * @param original The original {@link Sequent} on which the given {@link PosInOccurrence<Term, SequentFormula<Term>>} works.
+    * @param pio The given {@link PosInOccurrence<Term, SequentFormula<Term>>}.
+    * @param toApplyOn The new {@link Sequent} to apply the {@link PosInOccurrence<Term, SequentFormula<Term>>} on.
+    * @return The {@link Term} in the other {@link Sequent} described by the {@link PosInOccurrence<Term, SequentFormula<Term>>} or {@code null} if not available.
     */
-   public static JavaDLTerm posInOccurrenceInOtherNode(Sequent original, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Sequent toApplyOn) {
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> appliedPIO = posInOccurrenceToOtherSequent(original, pio, toApplyOn);
+   public static Term posInOccurrenceInOtherNode(Sequent original, PosInOccurrence<Term, SequentFormula<Term>> pio, Sequent toApplyOn) {
+      PosInOccurrence<Term, SequentFormula<Term>> appliedPIO = posInOccurrenceToOtherSequent(original, pio, toApplyOn);
       if (appliedPIO != null) {
          return appliedPIO.subTerm();
       }
@@ -2336,14 +2336,14 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Returns the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} described by the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the original {@link Node}
+    * Returns the {@link PosInOccurrence<Term, SequentFormula<Term>>} described by the given {@link PosInOccurrence<Term, SequentFormula<Term>>} of the original {@link Node}
     * in the {@link Node} to apply too.
-    * @param original The original {@link Node} on which the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} works.
-    * @param pio The given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}.
-    * @param toApplyTo The new {@link Node} to apply the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} to.
-    * @return The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the other {@link Node} described by the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} or {@code null} if not available.
+    * @param original The original {@link Node} on which the given {@link PosInOccurrence<Term, SequentFormula<Term>>} works.
+    * @param pio The given {@link PosInOccurrence<Term, SequentFormula<Term>>}.
+    * @param toApplyTo The new {@link Node} to apply the {@link PosInOccurrence<Term, SequentFormula<Term>>} to.
+    * @return The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the other {@link Node} described by the {@link PosInOccurrence<Term, SequentFormula<Term>>} or {@code null} if not available.
     */
-   public static PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrenceToOtherSequent(Node original, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Node toApplyTo) {
+   public static PosInOccurrence<Term, SequentFormula<Term>> posInOccurrenceToOtherSequent(Node original, PosInOccurrence<Term, SequentFormula<Term>> pio, Node toApplyTo) {
       if (original != null && toApplyTo != null) {
          return posInOccurrenceToOtherSequent(original.sequent(), pio, toApplyTo.sequent());
       }
@@ -2353,18 +2353,18 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Returns the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} described by the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the original {@link Sequent}
+    * Returns the {@link PosInOccurrence<Term, SequentFormula<Term>>} described by the given {@link PosInOccurrence<Term, SequentFormula<Term>>} of the original {@link Sequent}
     * in the {@link Sequent} to apply too.
-    * @param original The original {@link Sequent} on which the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} works.
-    * @param pio The given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}.
-    * @param toApplyTo The new {@link Sequent} to apply the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} to.
-    * @return The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the other {@link Sequent} described by the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} or {@code null} if not available.
+    * @param original The original {@link Sequent} on which the given {@link PosInOccurrence<Term, SequentFormula<Term>>} works.
+    * @param pio The given {@link PosInOccurrence<Term, SequentFormula<Term>>}.
+    * @param toApplyTo The new {@link Sequent} to apply the {@link PosInOccurrence<Term, SequentFormula<Term>>} to.
+    * @return The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the other {@link Sequent} described by the {@link PosInOccurrence<Term, SequentFormula<Term>>} or {@code null} if not available.
     */
-   public static PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrenceToOtherSequent(Sequent original, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+   public static PosInOccurrence<Term, SequentFormula<Term>> posInOccurrenceToOtherSequent(Sequent original, PosInOccurrence<Term, SequentFormula<Term>> pio,
                                                                Sequent toApplyTo) {
       if (original != null && pio != null && toApplyTo != null) {
          // Search index of formula in original sequent
-         SequentFormula<JavaDLTerm> originalSF = pio.sequentFormula();
+         SequentFormula<Term> originalSF = pio.sequentFormula();
          boolean antecendet = pio.isInAntec();
          int index;
          if (antecendet) {
@@ -2374,8 +2374,8 @@ public final class SymbolicExecutionUtil {
             index = original.succedent().indexOf(originalSF);
          }
          if (index >= 0) {
-            final SequentFormula<JavaDLTerm> toApplyToSF = (antecendet ? toApplyTo.antecedent() : toApplyTo.succedent()).get(index);
-            return new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(toApplyToSF, pio.posInTerm(), antecendet);
+            final SequentFormula<Term> toApplyToSF = (antecendet ? toApplyTo.antecedent() : toApplyTo.succedent()).get(index);
+            return new PosInOccurrence<Term, SequentFormula<Term>>(toApplyToSF, pio.posInTerm(), antecendet);
          }
          else {
             return null;
@@ -2395,7 +2395,7 @@ public final class SymbolicExecutionUtil {
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   private static JavaDLTerm computeTacletAppBranchCondition(Node parent,
+   private static Term computeTacletAppBranchCondition(Node parent,
                                                        Node node,
                                                        boolean simplify,
                                                        boolean improveReadability) throws ProofInputException {
@@ -2405,8 +2405,8 @@ public final class SymbolicExecutionUtil {
       TacletApp app = (TacletApp)parent.getAppliedRuleApp();
       Services services = node.proof().getServices();
       // List new sequent formulas in the child node.
-      ImmutableList<JavaDLTerm> newAntecedents = listNewSemisequentTerms(parent.sequent().antecedent(), node.sequent().antecedent());
-      ImmutableList<JavaDLTerm> newSuccedents = listNewSemisequentTerms(parent.sequent().succedent(), node.sequent().succedent());
+      ImmutableList<Term> newAntecedents = listNewSemisequentTerms(parent.sequent().antecedent(), node.sequent().antecedent());
+      ImmutableList<Term> newSuccedents = listNewSemisequentTerms(parent.sequent().succedent(), node.sequent().succedent());
       // Find goal template which has created the represented proof node
       int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
       TacletGoalTemplate goalTemplate;
@@ -2427,26 +2427,26 @@ public final class SymbolicExecutionUtil {
             // Remove replace part of symbolic execution rules
             if (NodeInfo.isSymbolicExecution(app.taclet())) {
                Sequent sequent = (Sequent) goalTemplate.replaceWithExpressionAsObject();
-               for (SequentFormula<JavaDLTerm> sf : sequent.antecedent()) {
-                  JavaDLTerm replaceTerm = instantiateTerm(node, sf.formula(), app, services);
+               for (SequentFormula<Term> sf : sequent.antecedent()) {
+                  Term replaceTerm = instantiateTerm(node, sf.formula(), app, services);
                   replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
-                  JavaDLTerm originalTerm = findReplacement(node.sequent().antecedent(), app.posInOccurrence(), replaceTerm);
+                  Term originalTerm = findReplacement(node.sequent().antecedent(), app.posInOccurrence(), replaceTerm);
                   assert originalTerm != null;
                   newAntecedents = newAntecedents.removeFirst(originalTerm);
                }
-               for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
-                  JavaDLTerm replaceTerm = instantiateTerm(node, sf.formula(), app, services);
+               for (SequentFormula<Term> sf : sequent.succedent()) {
+                  Term replaceTerm = instantiateTerm(node, sf.formula(), app, services);
                   replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
-                  JavaDLTerm originalTerm = findReplacement(node.sequent().succedent(), app.posInOccurrence(), replaceTerm);
+                  Term originalTerm = findReplacement(node.sequent().succedent(), app.posInOccurrence(), replaceTerm);
                   assert originalTerm != null;
                   newSuccedents = newSuccedents.removeFirst(originalTerm);
                }
             }
          }
-         else if (goalTemplate.replaceWithExpressionAsObject() instanceof JavaDLTerm) {
-            JavaDLTerm replaceTerm = (JavaDLTerm)goalTemplate.replaceWithExpressionAsObject();
+         else if (goalTemplate.replaceWithExpressionAsObject() instanceof Term) {
+            Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
             replaceTerm = instantiateTerm(node, replaceTerm, app, services);
-            JavaDLTerm originalTerm = findReplacement(app.posInOccurrence().isInAntec() ? node.sequent().antecedent() : node.sequent().succedent(),
+            Term originalTerm = findReplacement(app.posInOccurrence().isInAntec() ? node.sequent().antecedent() : node.sequent().succedent(),
                                                 app.posInOccurrence(),
                                                 replaceTerm);
             assert originalTerm != null;
@@ -2462,14 +2462,14 @@ public final class SymbolicExecutionUtil {
                   throw new ProofInputException("Only PosTacletApp are allowed with a replace term in branch computation but rule \"" + app + "\" was found.");
                }
                // Create new lists
-               ImmutableList<JavaDLTerm> tempAntecedents = ImmutableSLList.nil();
-               ImmutableList<JavaDLTerm> tempSuccedents = ImmutableSLList.nil();
+               ImmutableList<Term> tempAntecedents = ImmutableSLList.nil();
+               ImmutableList<Term> tempSuccedents = ImmutableSLList.nil();
                // Apply updates on antecedents and add result to new antecedents list
-               for (JavaDLTerm a : newAntecedents) {
+               for (Term a : newAntecedents) {
                   tempAntecedents = tempAntecedents.append(services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), a));
                }
                // Apply updates on succedents and add result to new succedents list
-               for (JavaDLTerm suc : newSuccedents) {
+               for (Term suc : newSuccedents) {
                   tempSuccedents = tempSuccedents.append(services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), suc));
                }
                // Add additional equivalenz term to antecedent with the replace object which must be equal to the find term 
@@ -2485,19 +2485,19 @@ public final class SymbolicExecutionUtil {
             }      
          }
          else if (goalTemplate.replaceWithExpressionAsObject() != null) {
-            throw new ProofInputException("Expected replacement as Sequent or JavaDLTerm during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
+            throw new ProofInputException("Expected replacement as Sequent or Term during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
          }
       }
       // Compute branch condition
-      JavaDLTerm newLeft = services.getTermBuilder().and(newAntecedents);
-      JavaDLTerm newRight = services.getTermBuilder().or(newSuccedents);
-      JavaDLTerm newLeftAndRight = services.getTermBuilder().and(newLeft, services.getTermBuilder().not(newRight));
+      Term newLeft = services.getTermBuilder().and(newAntecedents);
+      Term newRight = services.getTermBuilder().or(newSuccedents);
+      Term newLeftAndRight = services.getTermBuilder().and(newLeft, services.getTermBuilder().not(newRight));
       // Simplify condition if required
-      JavaDLTerm condition;
+      Term condition;
       if (simplify) {
          // Create formula which contains the value interested in.
          final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
-         Sequent newSequent = createSequentToProveWithNewSuccedent(parent, null, (JavaDLTerm)null, newLeftAndRight, true);
+         Sequent newSequent = createSequentToProveWithNewSuccedent(parent, null, (Term)null, newLeftAndRight, true);
          condition = evaluateInSideProof(services, 
                                          parent.proof(), 
                                          sideProofEnv,
@@ -2516,19 +2516,19 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Lists the {@link JavaDLTerm}s of all new {@link SequentFormula} in the child {@link Semisequent}.
+    * Lists the {@link Term}s of all new {@link SequentFormula} in the child {@link Semisequent}.
     * @param parent The parent {@link Semisequent}.
     * @param child The child {@link Semisequent}.
-    * @return An {@link ImmutableList} with all new {@link JavaDLTerm}s.
+    * @return An {@link ImmutableList} with all new {@link Term}s.
     */
-   private static ImmutableList<JavaDLTerm> listNewSemisequentTerms(Semisequent parent, 
+   private static ImmutableList<Term> listNewSemisequentTerms(Semisequent parent, 
                                                               Semisequent child) {
-      Set<SequentFormula<JavaDLTerm>> parentSFs = new HashSet<SequentFormula<JavaDLTerm>>();
-      for (SequentFormula<JavaDLTerm> sf : parent) {
+      Set<SequentFormula<Term>> parentSFs = new HashSet<SequentFormula<Term>>();
+      for (SequentFormula<Term> sf : parent) {
          parentSFs.add(sf);
       }
-      ImmutableList<JavaDLTerm> result = ImmutableSLList.nil();
-      for (SequentFormula<JavaDLTerm> sf : child) {
+      ImmutableList<Term> result = ImmutableSLList.nil();
+      for (SequentFormula<Term> sf : child) {
          if (!parentSFs.contains(sf)) {
             result = result.append(sf.formula());
          }
@@ -2537,19 +2537,19 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Searches the by {@link Rule} application instantiated replace {@link JavaDLTerm}
-    * which is equal modulo labels to the given replace {@link JavaDLTerm}.
+    * Searches the by {@link Rule} application instantiated replace {@link Term}
+    * which is equal modulo labels to the given replace {@link Term}.
     * @param terms The available candidates created by {@link Rule} application.
-    * @param posInOccurrence The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} on which the rule was applied.
-    * @param replaceTerm The {@link JavaDLTerm} to find.
-    * @return The found {@link JavaDLTerm} or {@code null} if not available.
+    * @param posInOccurrence The {@link PosInOccurrence<Term, SequentFormula<Term>>} on which the rule was applied.
+    * @param replaceTerm The {@link Term} to find.
+    * @return The found {@link Term} or {@code null} if not available.
     */
-   private static JavaDLTerm findReplacement(Semisequent semisequent, 
-                                       final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence, 
-                                       final JavaDLTerm replaceTerm) {
-      SequentFormula<JavaDLTerm> sf = CollectionUtil.search(semisequent, new IFilter<SequentFormula<JavaDLTerm>>() {
+   private static Term findReplacement(Semisequent semisequent, 
+                                       final PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence, 
+                                       final Term replaceTerm) {
+      SequentFormula<Term> sf = CollectionUtil.search(semisequent, new IFilter<SequentFormula<Term>>() {
          @Override
-         public boolean select(SequentFormula<JavaDLTerm> element) {
+         public boolean select(SequentFormula<Term> element) {
             return checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm);
          }
       });
@@ -2557,14 +2557,14 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given replace {@link JavaDLTerm} is equal module labels to the {@link JavaDLTerm} to check.
-    * @param toCheck The {@link JavaDLTerm} to check.
-    * @param posInOccurrence The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the {@link Rule} application.
-    * @param replaceTerm The {@link JavaDLTerm} to compare with.
+    * Checks if the given replace {@link Term} is equal module labels to the {@link Term} to check.
+    * @param toCheck The {@link Term} to check.
+    * @param posInOccurrence The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the {@link Rule} application.
+    * @param replaceTerm The {@link Term} to compare with.
     * @return {@code true} equal modulo labels, {@code false} not equal at all.
     */
-   private static boolean checkReplaceTerm(JavaDLTerm toCheck, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence, JavaDLTerm replaceTerm) {
-      JavaDLTerm termAtPio = followPosInOccurrence(posInOccurrence, toCheck);
+   private static boolean checkReplaceTerm(Term toCheck, PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence, Term replaceTerm) {
+      Term termAtPio = followPosInOccurrence(posInOccurrence, toCheck);
       if (termAtPio != null) {
          return termAtPio.equalsModRenaming(replaceTerm);
       }
@@ -2574,13 +2574,13 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Returns the sub {@link JavaDLTerm} at the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} 
-    * but on the given {@link JavaDLTerm} instead of the one contained in the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}.
-    * @param posInOccurrence The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} which defines the sub term position.
-    * @param term The {@link JavaDLTerm} to work with.
-    * @return The found sub {@link JavaDLTerm} or {@code null} if the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} is not compatible.
+    * Returns the sub {@link Term} at the given {@link PosInOccurrence<Term, SequentFormula<Term>>} 
+    * but on the given {@link Term} instead of the one contained in the {@link PosInOccurrence<Term, SequentFormula<Term>>}.
+    * @param posInOccurrence The {@link PosInOccurrence<Term, SequentFormula<Term>>} which defines the sub term position.
+    * @param term The {@link Term} to work with.
+    * @return The found sub {@link Term} or {@code null} if the {@link PosInOccurrence<Term, SequentFormula<Term>>} is not compatible.
     */
-   public static JavaDLTerm followPosInOccurrence(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence, JavaDLTerm term) {
+   public static Term followPosInOccurrence(PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence, Term term) {
       boolean matches = true;
       IntIterator iter = posInOccurrence.posInTerm().iterator();
       while (matches && iter.hasNext()) {
@@ -2596,15 +2596,15 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Instantiates the given {@link JavaDLTerm} of the applied {@link TacletApp}.
+    * Instantiates the given {@link Term} of the applied {@link TacletApp}.
     * @param node The current {@link Node}.
-    * @param term The {@link JavaDLTerm} to instantiate.
+    * @param term The {@link Term} to instantiate.
     * @param tacletApp The {@link TacletApp} to consider.
     * @param services The {@link Services} to use.
-    * @return The instantiated {@link JavaDLTerm} or {@code null} if no {@link JavaDLTerm} was given.
+    * @return The instantiated {@link Term} or {@code null} if no {@link Term} was given.
     */
-   public static JavaDLTerm instantiateTerm(Node node,
-                                      JavaDLTerm term, 
+   public static Term instantiateTerm(Node node,
+                                      Term term, 
                                       TacletApp tacletApp, 
                                       Services services) {
       if (term != null) {
@@ -2618,24 +2618,24 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Starts the side proof and evaluates the {@link Sequent} to prove into a single {@link JavaDLTerm}.
+    * Starts the side proof and evaluates the {@link Sequent} to prove into a single {@link Term}.
     * @param services The {@link Services} to use.
     * @param proof The {@link Proof} from on which the side proof si performed.
     * @param sequentToProve The {@link Sequent} to prove in a side proof.
     * @param label The {@link TermLabel} which is used to compute the result.
     * @param description The side proof description.
     * @param splittingOption The splitting options to use.
-    * @return The result {@link JavaDLTerm}.
+    * @return The result {@link Term}.
     * @throws ProofInputException Occurred Exception.
     */
-   private static JavaDLTerm evaluateInSideProof(Services services, 
+   private static Term evaluateInSideProof(Services services, 
                                            Proof proof, 
                                            ProofEnvironment sideProofEnvironment,
                                            Sequent sequentToProve, 
                                            TermLabel label, 
                                            String description, 
                                            String splittingOption) throws ProofInputException {
-      List<Pair<JavaDLTerm, Node>> resultValuesAndConditions = SymbolicExecutionSideProofUtil.computeResults(services, 
+      List<Pair<Term, Node>> resultValuesAndConditions = SymbolicExecutionSideProofUtil.computeResults(services, 
                                                                                       proof, 
                                                                                       sideProofEnvironment,
                                                                                       sequentToProve, 
@@ -2646,9 +2646,9 @@ public final class SymbolicExecutionUtil {
                                                                                       StrategyProperties.QUERY_OFF, // Stop at queries to to avoid endless executions and scenarios in which a precondition or null pointer check can't be shown
                                                                                       splittingOption, 
                                                                                       false);
-      ImmutableList<JavaDLTerm> goalCondtions = ImmutableSLList.<JavaDLTerm>nil();
-      for (Pair<JavaDLTerm, Node> pair : resultValuesAndConditions) {
-         JavaDLTerm goalCondition = pair.first;
+      ImmutableList<Term> goalCondtions = ImmutableSLList.<Term>nil();
+      for (Pair<Term, Node> pair : resultValuesAndConditions) {
+         Term goalCondition = pair.first;
          goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(pair.second.sequent(), goalCondition, services);
          goalCondition = removeLabelRecursive(services.getTermFactory(), goalCondition, label);
          goalCondtions = goalCondtions.append(goalCondition);
@@ -2686,45 +2686,45 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given {@link JavaDLTerm} is null in the {@link Sequent} of the given {@link Node}. 
+    * Checks if the given {@link Term} is null in the {@link Sequent} of the given {@link Node}. 
     * @param node The {@link Node} which provides the original {@link Sequent}
     * @param additionalAntecedent An additional antecedent.
-    * @param newSuccedent The {@link JavaDLTerm} to check.
-    * @return {@code true} {@link JavaDLTerm} was evaluated to null, {@code false} {@link JavaDLTerm} was not evaluated to null.
+    * @param newSuccedent The {@link Term} to check.
+    * @return {@code true} {@link Term} was evaluated to null, {@code false} {@link Term} was not evaluated to null.
     * @throws ProofInputException Occurred Exception
     */
    public static boolean isNull(Node node, 
-                                JavaDLTerm additionalAntecedent, 
-                                JavaDLTerm newSuccedent) throws ProofInputException {
+                                Term additionalAntecedent, 
+                                Term newSuccedent) throws ProofInputException {
       return checkNull(node, additionalAntecedent, newSuccedent, true);
    }
 
    /**
-    * Checks if the given {@link JavaDLTerm} is not null in the {@link Sequent} of the given {@link Node}. 
+    * Checks if the given {@link Term} is not null in the {@link Sequent} of the given {@link Node}. 
     * @param node The {@link Node} which provides the original {@link Sequent}
     * @param additionalAntecedent An additional antecedent.
-    * @param newSuccedent The {@link JavaDLTerm} to check.
-    * @return {@code true} {@link JavaDLTerm} was evaluated to not null, {@code false} {@link JavaDLTerm} was not evaluated to not null.
+    * @param newSuccedent The {@link Term} to check.
+    * @return {@code true} {@link Term} was evaluated to not null, {@code false} {@link Term} was not evaluated to not null.
     * @throws ProofInputException Occurred Exception
     */
    public static boolean isNotNull(Node node, 
-                                   JavaDLTerm additionalAntecedent, 
-                                   JavaDLTerm newSuccedent) throws ProofInputException {
+                                   Term additionalAntecedent, 
+                                   Term newSuccedent) throws ProofInputException {
       return checkNull(node, additionalAntecedent, newSuccedent, false);
    }
    
    /**
-    * Checks if the given {@link JavaDLTerm} is null or not in the {@link Sequent} of the given {@link Node}.
+    * Checks if the given {@link Term} is null or not in the {@link Sequent} of the given {@link Node}.
     * @param node The {@link Node} which provides the original {@link Sequent}
     * @param additionalAntecedent An additional antecedent.
-    * @param newSuccedent The {@link JavaDLTerm} to check.
-    * @param nullExpected {@code true} expect that {@link JavaDLTerm} is null, {@code false} expect that term is not null.
+    * @param newSuccedent The {@link Term} to check.
+    * @param nullExpected {@code true} expect that {@link Term} is null, {@code false} expect that term is not null.
     * @return {@code true} term is null value matches the expected nullExpected value, {@code false} otherwise.
     * @throws ProofInputException Occurred Exception
     */
    private static boolean checkNull(Node node, 
-                                    JavaDLTerm additionalAntecedent, 
-                                    JavaDLTerm newSuccedent,
+                                    Term additionalAntecedent, 
+                                    Term newSuccedent,
                                     boolean nullExpected) throws ProofInputException {
       // Make sure that correct parameters are given
       assert node != null;
@@ -2732,8 +2732,8 @@ public final class SymbolicExecutionUtil {
       // Create Sequent to prove
       final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       final TermBuilder tb = sideProofEnv.getServicesForEnvironment().getTermBuilder();
-      JavaDLTerm isNull = tb.equals(newSuccedent, tb.NULL());
-      JavaDLTerm isNotNull = tb.not(isNull);
+      Term isNull = tb.equals(newSuccedent, tb.NULL());
+      Term isNotNull = tb.not(isNull);
       Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalAntecedent, nullExpected ? isNull : isNotNull, false);
       // Execute proof in the current thread
       ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(), 
@@ -2759,8 +2759,8 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link Sequent}.
     */
    public static Sequent createSequentToProveWithNewSuccedent(Node node,
-                                                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
-                                                              JavaDLTerm newSuccedent) {
+                                                              PosInOccurrence<Term, SequentFormula<Term>> pio,
+                                                              Term newSuccedent) {
       return createSequentToProveWithNewSuccedent(node, pio, null, newSuccedent, false);
    }
 
@@ -2773,8 +2773,8 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link Sequent}.
     */
    public static Sequent createSequentToProveWithNewSuccedent(Node node, 
-                                                              JavaDLTerm additionalAntecedent,
-                                                              JavaDLTerm newSuccedent,
+                                                              Term additionalAntecedent,
+                                                              Term newSuccedent,
                                                               boolean addResultLabel) {
       return createSequentToProveWithNewSuccedent(node, 
                                                   node.getAppliedRuleApp() != null ? node.getAppliedRuleApp().posInOccurrence() : null, 
@@ -2792,18 +2792,18 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link Sequent}.
     */
    public static Sequent createSequentToProveWithNewSuccedent(Node node, 
-                                                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
-                                                              JavaDLTerm additionalAntecedent,
-                                                              JavaDLTerm newSuccedent,
+                                                              PosInOccurrence<Term, SequentFormula<Term>> pio,
+                                                              Term additionalAntecedent,
+                                                              Term newSuccedent,
                                                               boolean addResultLabel) {
       if (pio != null) {
          // Get the updates from the return node which includes the value interested in.
-         ImmutableList<JavaDLTerm> originalUpdates;
+         ImmutableList<Term> originalUpdates;
          if (node.proof().root() == node) {
             originalUpdates = computeRootElementaryUpdates(node);
          }
          else {
-            JavaDLTerm originalModifiedFormula = pio.sequentFormula().formula();
+            Term originalModifiedFormula = pio.sequentFormula().formula();
             originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
          }
          // Create new sequent
@@ -2819,11 +2819,11 @@ public final class SymbolicExecutionUtil {
     * @param root The root {@link Node} of the {@link Proof}.
     * @return The found initial {@link ElementaryUpdate}s.
     */
-   public static ImmutableList<JavaDLTerm> computeRootElementaryUpdates(Node root) {
-      ImmutableList<JavaDLTerm> result = ImmutableSLList.nil();
+   public static ImmutableList<Term> computeRootElementaryUpdates(Node root) {
+      ImmutableList<Term> result = ImmutableSLList.nil();
       Sequent sequent = root.sequent();
-      for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
-         JavaDLTerm term = sf.formula();
+      for (SequentFormula<Term> sf : sequent.succedent()) {
+         Term term = sf.formula();
          if (Junctor.IMP.equals(term.op())) {
             result = result.prepend(collectElementaryUpdates(term.sub(1)));
          }
@@ -2832,27 +2832,27 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Collects the {@link ElementaryUpdate}s in the given {@link JavaDLTerm}.
-    * @param term The {@link JavaDLTerm} to collect its updates.
+    * Collects the {@link ElementaryUpdate}s in the given {@link Term}.
+    * @param term The {@link Term} to collect its updates.
     * @return The found {@link ElementaryUpdate}s.
     */
-   public static ImmutableList<JavaDLTerm> collectElementaryUpdates(JavaDLTerm term) {
+   public static ImmutableList<Term> collectElementaryUpdates(Term term) {
       if (term.op() instanceof UpdateApplication) {
-         JavaDLTerm updateTerm = UpdateApplication.getUpdate(term);
+         Term updateTerm = UpdateApplication.getUpdate(term);
          return collectElementaryUpdates(updateTerm);
       }
       else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
-         ImmutableList<JavaDLTerm> result = ImmutableSLList.nil();
+         ImmutableList<Term> result = ImmutableSLList.nil();
          for (int i = 0; i < term.arity(); i++) {
             result = result.prepend(collectElementaryUpdates(term.sub(i)));
          }
          return result;
       }
       else if (term.op() instanceof ElementaryUpdate) {
-         return ImmutableSLList.<JavaDLTerm>nil().prepend(term);
+         return ImmutableSLList.<Term>nil().prepend(term);
       }
       else {
-         return ImmutableSLList.<JavaDLTerm>nil();
+         return ImmutableSLList.<Term>nil();
       }
    }
    
@@ -2866,9 +2866,9 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link Sequent}.
     */
    public static Sequent createSequentToProveWithNewSuccedent(Node node, 
-                                                              JavaDLTerm additionalAntecedent,
-                                                              JavaDLTerm newSuccedent,
-                                                              ImmutableList<JavaDLTerm> updates,
+                                                              Term additionalAntecedent,
+                                                              Term newSuccedent,
+                                                              ImmutableList<Term> updates,
                                                               boolean addResultLabel) {
       return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp().posInOccurrence(), additionalAntecedent, newSuccedent, updates, addResultLabel);
    }
@@ -2883,14 +2883,14 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link Sequent}.
     */
    public static Sequent createSequentToProveWithNewSuccedent(Node node, 
-                                                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
-                                                              JavaDLTerm additionalAntecedent,
-                                                              JavaDLTerm newSuccedent,
-                                                              ImmutableList<JavaDLTerm> updates,
+                                                              PosInOccurrence<Term, SequentFormula<Term>> pio,
+                                                              Term additionalAntecedent,
+                                                              Term newSuccedent,
+                                                              ImmutableList<Term> updates,
                                                               boolean addResultLabel) {
       final TermBuilder tb = node.proof().getServices().getTermBuilder();
       // Combine method frame, formula with value predicate and the updates which provides the values
-      JavaDLTerm newSuccedentToProve;
+      Term newSuccedentToProve;
       if (updates != null) {
          if (newSuccedent != null) {
             newSuccedentToProve = tb.applySequential(updates, newSuccedent);
@@ -2904,13 +2904,13 @@ public final class SymbolicExecutionUtil {
       }
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       Sequent originalSequentWithoutMethodFrame = SymbolicExecutionSideProofUtil.computeGeneralSequentToProve(node.sequent(), pio != null ? pio.sequentFormula() : null);
-      Set<JavaDLTerm> skolemTerms = newSuccedentToProve != null ? 
+      Set<Term> skolemTerms = newSuccedentToProve != null ? 
                               collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve) :
                               collectSkolemConstants(originalSequentWithoutMethodFrame, tb.parallel(updates));
       originalSequentWithoutMethodFrame = removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
       if (addResultLabel) {
          TermFactory factory = node.proof().getServices().getTermFactory();
-         Set<JavaDLTerm> skolemInNewTerm = collectSkolemConstantsNonRecursive(newSuccedentToProve);
+         Set<Term> skolemInNewTerm = collectSkolemConstantsNonRecursive(newSuccedentToProve);
          originalSequentWithoutMethodFrame = labelSkolemConstants(originalSequentWithoutMethodFrame, skolemInNewTerm, factory);
          newSuccedentToProve = addLabelRecursiveToNonSkolem(factory, newSuccedentToProve, RESULT_LABEL);
       }
@@ -2931,32 +2931,32 @@ public final class SymbolicExecutionUtil {
     * @return The modified {@link Sequent}.
     */
    protected static Sequent labelSkolemConstants(Sequent sequent, 
-                                                 Set<JavaDLTerm> constantsToLabel, 
+                                                 Set<Term> constantsToLabel, 
                                                  TermFactory factory) {
-      for (SequentFormula<JavaDLTerm> sf : sequent.antecedent()) {
+      for (SequentFormula<Term> sf : sequent.antecedent()) {
          int skolemEquality = checkSkolemEquality(sf);
          if (skolemEquality == -1) {
-            JavaDLTerm equality = sf.formula();
+            Term equality = sf.formula();
             if (constantsToLabel.contains(equality.sub(0))) {
-               JavaDLTerm definition = addLabelRecursiveToNonSkolem(factory, equality.sub(1), RESULT_LABEL);
-               JavaDLTerm skolem = addLabelRecursiveToNonSkolem(factory, equality.sub(0), RESULT_LABEL);
-               List<JavaDLTerm> newSubs = new LinkedList<JavaDLTerm>();
+               Term definition = addLabelRecursiveToNonSkolem(factory, equality.sub(1), RESULT_LABEL);
+               Term skolem = addLabelRecursiveToNonSkolem(factory, equality.sub(0), RESULT_LABEL);
+               List<Term> newSubs = new LinkedList<Term>();
                newSubs.add(definition);
                newSubs.add(skolem);
-               JavaDLTerm newEquality = factory.createTerm(equality.op(), new ImmutableArray<JavaDLTerm>(newSubs), equality.boundVars(), equality.modalContent(), equality.getLabels());
-               sequent = sequent.changeFormula(new SequentFormula<>(newEquality), new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(), true)).sequent();
+               Term newEquality = factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs), equality.boundVars(), equality.modalContent(), equality.getLabels());
+               sequent = sequent.changeFormula(new SequentFormula<>(newEquality), new PosInOccurrence<Term, SequentFormula<Term>>(sf, PosInTerm.<Term>getTopLevel(), true)).sequent();
             }
          }
          else if (skolemEquality == 1) {
-            JavaDLTerm equality = sf.formula();
+            Term equality = sf.formula();
             if (constantsToLabel.contains(equality.sub(1))) {
-               JavaDLTerm definition = addLabelRecursiveToNonSkolem(factory, equality.sub(0), RESULT_LABEL);
-               JavaDLTerm skolem = addLabelRecursiveToNonSkolem(factory, equality.sub(1), RESULT_LABEL);
-               List<JavaDLTerm> newSubs = new LinkedList<JavaDLTerm>();
+               Term definition = addLabelRecursiveToNonSkolem(factory, equality.sub(0), RESULT_LABEL);
+               Term skolem = addLabelRecursiveToNonSkolem(factory, equality.sub(1), RESULT_LABEL);
+               List<Term> newSubs = new LinkedList<Term>();
                newSubs.add(definition);
                newSubs.add(skolem);
-               JavaDLTerm newEquality = factory.createTerm(equality.op(), new ImmutableArray<JavaDLTerm>(newSubs), equality.boundVars(), equality.modalContent(), equality.getLabels());
-               sequent = sequent.changeFormula(new SequentFormula<>(newEquality), new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(), true)).sequent();
+               Term newEquality = factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs), equality.boundVars(), equality.modalContent(), equality.getLabels());
+               sequent = sequent.changeFormula(new SequentFormula<>(newEquality), new PosInOccurrence<Term, SequentFormula<Term>>(sf, PosInTerm.<Term>getTopLevel(), true)).sequent();
             }
          }
       }
@@ -2964,20 +2964,20 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Adds the given {@link TermLabel} to the given {@link JavaDLTerm} and to all of its children.
+    * Adds the given {@link TermLabel} to the given {@link Term} and to all of its children.
     * @param tf The {@link CCTermFactory} to use.
-    * @param term The {@link JavaDLTerm} to add label to.
+    * @param term The {@link Term} to add label to.
     * @param label The {@link TermLabel} to add.
-    * @return A new {@link JavaDLTerm} with the given {@link TermLabel}.
+    * @return A new {@link Term} with the given {@link TermLabel}.
     */
-   private static JavaDLTerm addLabelRecursiveToNonSkolem(TermFactory tf, JavaDLTerm term, TermLabel label) {
-      List<JavaDLTerm> newSubs = new LinkedList<JavaDLTerm>();
-      for (JavaDLTerm oldSub : term.subs()) {
+   private static Term addLabelRecursiveToNonSkolem(TermFactory tf, Term term, TermLabel label) {
+      List<Term> newSubs = new LinkedList<Term>();
+      for (Term oldSub : term.subs()) {
          newSubs.add(addLabelRecursiveToNonSkolem(tf, oldSub, label));
       }
       if (checkSkolemEquality(term) != 0 || isSkolemConstant(term)) {
          // Do not label skolem equality and skolem terms
-         return tf.createTerm(term.op(), new ImmutableArray<JavaDLTerm>(newSubs), term.boundVars(), term.modalContent(), term.getLabels());
+         return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.modalContent(), term.getLabels());
       }
       else {
          /// Label term which is not a skolem equality and not a skolem term
@@ -2986,22 +2986,22 @@ public final class SymbolicExecutionUtil {
             newLabels.add(oldLabel);
          }
          newLabels.add(label);
-         return tf.createTerm(term.op(), new ImmutableArray<JavaDLTerm>(newSubs), term.boundVars(), term.modalContent(), new ImmutableArray<TermLabel>(newLabels));
+         return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.modalContent(), new ImmutableArray<TermLabel>(newLabels));
       }
    }
    
    /**
-    * Removes the given {@link TermLabel} from the given {@link JavaDLTerm} and from all of its children.
+    * Removes the given {@link TermLabel} from the given {@link Term} and from all of its children.
     * @param tf The {@link CCTermFactory} to use.
-    * @param term The {@link JavaDLTerm} to remove label from.
+    * @param term The {@link Term} to remove label from.
     * @param label The {@link TermLabel} to remove.
-    * @return A new {@link JavaDLTerm} without the given {@link TermLabel}.
+    * @return A new {@link Term} without the given {@link TermLabel}.
     */
-   public static JavaDLTerm removeLabelRecursive(TermFactory tf, JavaDLTerm term, TermLabel label) {
+   public static Term removeLabelRecursive(TermFactory tf, Term term, TermLabel label) {
       // Update children
-      List<JavaDLTerm> newSubs = new LinkedList<JavaDLTerm>();
-      ImmutableArray<JavaDLTerm> oldSubs = term.subs();
-      for (JavaDLTerm oldSub : oldSubs) {
+      List<Term> newSubs = new LinkedList<Term>();
+      ImmutableArray<Term> oldSubs = term.subs();
+      for (Term oldSub : oldSubs) {
          newSubs.add(removeLabelRecursive(tf, oldSub, label));
       }
       // Update label
@@ -3012,29 +3012,29 @@ public final class SymbolicExecutionUtil {
             newLabels.add(oldLabel);
          }
       }
-      return tf.createTerm(term.op(), new ImmutableArray<JavaDLTerm>(newSubs), term.boundVars(), term.modalContent(), new ImmutableArray<TermLabel>(newLabels));
+      return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.modalContent(), new ImmutableArray<TermLabel>(newLabels));
    }
 
    /**
-    * Collects all contained skolem {@link JavaDLTerm}s which fulfill
-    * {@link #isSkolemConstant(JavaDLTerm)} as well as the skolem constants
+    * Collects all contained skolem {@link Term}s which fulfill
+    * {@link #isSkolemConstant(Term)} as well as the skolem constants
     * used in the find once recursive.
     * @param sequent The {@link Sequent} which provides the skolem equalities.
-    * @param term The {@link JavaDLTerm} to start collection in.
-    * @return The found skolem {@link JavaDLTerm}s.
+    * @param term The {@link Term} to start collection in.
+    * @return The found skolem {@link Term}s.
     */
-   private static Set<JavaDLTerm> collectSkolemConstants(Sequent sequent, JavaDLTerm term) {
+   private static Set<Term> collectSkolemConstants(Sequent sequent, Term term) {
       if (term != null) {
          // Collect skolem constants in term
-         Set<JavaDLTerm> result = collectSkolemConstantsNonRecursive(term);
+         Set<Term> result = collectSkolemConstantsNonRecursive(term);
          // Collect all skolem constants used in skolem constants
-         List<JavaDLTerm> toCheck = new LinkedList<JavaDLTerm>(result);
+         List<Term> toCheck = new LinkedList<Term>(result);
          while (!toCheck.isEmpty()) {
-            JavaDLTerm skolemConstant = toCheck.remove(0);
-            List<JavaDLTerm> replacements = findSkolemReplacements(sequent, skolemConstant, null);
-            for (JavaDLTerm replacement : replacements) {
-               Set<JavaDLTerm> checkResult = collectSkolemConstantsNonRecursive(replacement);
-               for (JavaDLTerm checkConstant : checkResult) {
+            Term skolemConstant = toCheck.remove(0);
+            List<Term> replacements = findSkolemReplacements(sequent, skolemConstant, null);
+            for (Term replacement : replacements) {
+               Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
+               for (Term checkConstant : checkResult) {
                   if (result.add(checkConstant)) {
                      toCheck.add(checkConstant);
                   }
@@ -3044,21 +3044,21 @@ public final class SymbolicExecutionUtil {
          return result;
       }
       else {
-         return new HashSet<JavaDLTerm>();
+         return new HashSet<Term>();
       }
    }
 
    /**
-    * Collects all contained skolem {@link JavaDLTerm}s which fulfill
-    * {@link #isSkolemConstant(JavaDLTerm)}.
-    * @param term The {@link JavaDLTerm} to collect in.
-    * @return The found skolem {@link JavaDLTerm}s.
+    * Collects all contained skolem {@link Term}s which fulfill
+    * {@link #isSkolemConstant(Term)}.
+    * @param term The {@link Term} to collect in.
+    * @return The found skolem {@link Term}s.
     */
-   private static Set<JavaDLTerm> collectSkolemConstantsNonRecursive(JavaDLTerm term) {
-      final Set<JavaDLTerm> result = new HashSet<JavaDLTerm>();
+   private static Set<Term> collectSkolemConstantsNonRecursive(Term term) {
+      final Set<Term> result = new HashSet<Term>();
       term.execPreOrder(new DefaultVisitor() {
          @Override
-         public void visit(JavaDLTerm visited) {
+         public void visit(Term visited) {
             if (isSkolemConstant(visited)) {
                result.add(visited);
             }
@@ -3068,29 +3068,29 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given {@link JavaDLTerm} is a skolem {@link JavaDLTerm} meaning
+    * Checks if the given {@link Term} is a skolem {@link Term} meaning
     * that it has the {@link SelectSkolemConstantTermLabel}.
-    * @param term The {@link JavaDLTerm} to check.
-    * @return {@code true} is skolem {@link JavaDLTerm}, {@code false} is not a skolem {@link JavaDLTerm}.
+    * @param term The {@link Term} to check.
+    * @return {@code true} is skolem {@link Term}, {@code false} is not a skolem {@link Term}.
     */
-   public static boolean isSkolemConstant(JavaDLTerm term) {
+   public static boolean isSkolemConstant(Term term) {
       return term.containsLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL);
    }
 
    /**
     * Removes all {@link SequentFormula}s with a skolem equality from the given {@link Sequent}
-    * if the skolem {@link JavaDLTerm} is not contained in the given {@link Collection}.
+    * if the skolem {@link Term} is not contained in the given {@link Collection}.
     * @param sequent The {@link Sequent} to modify.
-    * @param skolemConstants The allowed skolem {@link JavaDLTerm}s.
-    * @return The modified {@link Sequent} in which all not listed skolem {@link JavaDLTerm} equalites are removed.
+    * @param skolemConstants The allowed skolem {@link Term}s.
+    * @return The modified {@link Sequent} in which all not listed skolem {@link Term} equalites are removed.
     */
    private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent,
-                                                          Collection<JavaDLTerm> skolemConstants) {
+                                                          Collection<Term> skolemConstants) {
       Sequent result = sequent;
-      for (SequentFormula<JavaDLTerm> sf : sequent.antecedent()) {
+      for (SequentFormula<Term> sf : sequent.antecedent()) {
          result = removeAllUnusedSkolemEqualities(result, sf, true, skolemConstants);
       }
-      for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
+      for (SequentFormula<Term> sf : sequent.succedent()) {
          result = removeAllUnusedSkolemEqualities(result, sf, false, skolemConstants);
       }
       return result;
@@ -3100,16 +3100,16 @@ public final class SymbolicExecutionUtil {
     * Helper method of {@link #removeAllUnusedSkolemEqualities(Sequent, Collection)}
     * which removes the given {@link SequentFormula} if required.
     * @param sequent The {@link Sequent} to modify.
-    * @param sf The {@link SequentFormula} to remove if its skolem {@link JavaDLTerm} is not listed.
+    * @param sf The {@link SequentFormula} to remove if its skolem {@link Term} is not listed.
     * @param antecedent {@code true} antecedent, {@code false} succedent.
-    * @param skolemConstants The allowed skolem {@link JavaDLTerm}s.
+    * @param skolemConstants The allowed skolem {@link Term}s.
     * @return The modified {@link Sequent} in which the {@link SequentFormula} might be removed.
     */
    private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent,
-                                                          SequentFormula<JavaDLTerm> sf,
+                                                          SequentFormula<Term> sf,
                                                           boolean antecedent,
-                                                          Collection<JavaDLTerm> skolemConstants) {
-      JavaDLTerm term = sf.formula();
+                                                          Collection<Term> skolemConstants) {
+      Term term = sf.formula();
       boolean remove = false;
       if (term.op() == Equality.EQUALS) {
          if (isSkolemConstant(term.sub(0))) {
@@ -3121,7 +3121,7 @@ public final class SymbolicExecutionUtil {
       }
       if (remove) {
          return sequent.removeFormula(
-                 new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sf, PosInTerm.<JavaDLTerm>getTopLevel(), antecedent)).sequent();
+                 new PosInOccurrence<Term, SequentFormula<Term>>(sf, PosInTerm.<Term>getTopLevel(), antecedent)).sequent();
       }
       else {
          return sequent;
@@ -3133,16 +3133,16 @@ public final class SymbolicExecutionUtil {
     * @param sf The {@link SequentFormula} to check.
     * @return {@code -1} left side of skolem equality, {@code 0} no skolem equality, {@code 1} right side of skolem equality.
     */
-   public static int checkSkolemEquality(SequentFormula<JavaDLTerm> sf) {
+   public static int checkSkolemEquality(SequentFormula<Term> sf) {
       return checkSkolemEquality(sf.formula());
    }
 
    /**
-    * Checks if the given {@link JavaDLTerm} is a skolem equality.
-    * @param sf The {@link JavaDLTerm} to check.
+    * Checks if the given {@link Term} is a skolem equality.
+    * @param sf The {@link Term} to check.
     * @return {@code -1} left side of skolem equality, {@code 0} no skolem equality, {@code 1} right side of skolem equality.
     */
-   public static int checkSkolemEquality(JavaDLTerm term) {
+   public static int checkSkolemEquality(Term term) {
       if (term.op() == Equality.EQUALS) {
          if (isSkolemConstant(term.sub(0))) {
             return -1;
@@ -3155,21 +3155,21 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Replaces all skolem constants in the given {@link JavaDLTerm}.
+    * Replaces all skolem constants in the given {@link Term}.
     * @param sequent The {@link Sequent} which provides the skolem equalities.
-    * @param term The {@link JavaDLTerm} to replace its skolem constants.
+    * @param term The {@link Term} to replace its skolem constants.
     * @param services The {@link Services} to use.
-    * @return The skolem constant free {@link JavaDLTerm}.
+    * @return The skolem constant free {@link Term}.
     */
-   public static JavaDLTerm replaceSkolemConstants(Sequent sequent, JavaDLTerm term, Services services) {
+   public static Term replaceSkolemConstants(Sequent sequent, Term term, Services services) {
       int skolemCheck = checkSkolemEquality(term);
       if (skolemCheck == -1) {
          TermBuilder tb = services.getTermBuilder();
-         List<JavaDLTerm> replacements = findSkolemReplacements(sequent, term.sub(0), term);
+         List<Term> replacements = findSkolemReplacements(sequent, term.sub(0), term);
          if (!replacements.isEmpty()) {
-            JavaDLTerm other = term.sub(1);
-            List<JavaDLTerm> newTerms = new LinkedList<JavaDLTerm>();
-            for (JavaDLTerm replacement : replacements) {
+            Term other = term.sub(1);
+            List<Term> newTerms = new LinkedList<Term>();
+            for (Term replacement : replacements) {
                newTerms.add(tb.equals(replacement, other));
             }
             term = tb.and(newTerms);
@@ -3181,11 +3181,11 @@ public final class SymbolicExecutionUtil {
       }
       else if (skolemCheck == 1) {
          TermBuilder tb = services.getTermBuilder();
-         List<JavaDLTerm> replacements = findSkolemReplacements(sequent, term.sub(1), term);
+         List<Term> replacements = findSkolemReplacements(sequent, term.sub(1), term);
          if (!replacements.isEmpty()) {
-            JavaDLTerm other = term.sub(0);
-            List<JavaDLTerm> newTerms = new LinkedList<JavaDLTerm>();
-            for (JavaDLTerm replacement : replacements) {
+            Term other = term.sub(0);
+            List<Term> newTerms = new LinkedList<Term>();
+            for (Term replacement : replacements) {
                newTerms.add(tb.equals(other, replacement));
             }
             term = tb.and(newTerms);
@@ -3198,18 +3198,18 @@ public final class SymbolicExecutionUtil {
       else {
          if (isSkolemConstant(term)) {
             // Skolem term
-            List<JavaDLTerm> replacements = findSkolemReplacements(sequent, term, null);
+            List<Term> replacements = findSkolemReplacements(sequent, term, null);
             return !replacements.isEmpty() ? 
                    replacements.get(0) : // Any of the replacements can be used, for simplicity use the first one. Alternatively may the one with the lowest depth or with least symbols might be used.
                    term;
          }
          else {
             // No skolem term
-            List<JavaDLTerm> newChildren = new LinkedList<JavaDLTerm>();
+            List<Term> newChildren = new LinkedList<Term>();
             boolean changed = false;
             for (int i = 0; i < term.arity(); i++) {
-               JavaDLTerm oldChild = term.sub(i);
-               JavaDLTerm newChild = replaceSkolemConstants(sequent, oldChild, services);
+               Term oldChild = term.sub(i);
+               Term newChild = replaceSkolemConstants(sequent, oldChild, services);
                if (newChild != oldChild) {
                   changed = true;
                }
@@ -3221,7 +3221,7 @@ public final class SymbolicExecutionUtil {
                   assert newChildren.size() == 1;
                   assert term.boundVars().isEmpty();
                   assert term.modalContent() == JavaBlock.EMPTY_JAVABLOCK;
-                  JavaDLTerm result = services.getTermBuilder().not(newChildren.get(0));
+                  Term result = services.getTermBuilder().not(newChildren.get(0));
                   if (term.hasLabels()) {
                      result = services.getTermBuilder().label(result, term.getLabels());
                   }
@@ -3231,7 +3231,7 @@ public final class SymbolicExecutionUtil {
                   // Create new OR term using build in simplification of GenericTermBuilder.
                   assert term.boundVars().isEmpty();
                   assert term.modalContent() == JavaBlock.EMPTY_JAVABLOCK;
-                  JavaDLTerm result = services.getTermBuilder().or(newChildren);
+                  Term result = services.getTermBuilder().or(newChildren);
                   if (term.hasLabels()) {
                      result = services.getTermBuilder().label(result, term.getLabels());
                   }
@@ -3241,7 +3241,7 @@ public final class SymbolicExecutionUtil {
                   // Create new AND term using build in simplification of GenericTermBuilder.
                   assert term.boundVars().isEmpty();
                   assert term.modalContent() == JavaBlock.EMPTY_JAVABLOCK;
-                  JavaDLTerm result = services.getTermBuilder().and(newChildren);
+                  Term result = services.getTermBuilder().and(newChildren);
                   if (term.hasLabels()) {
                      result = services.getTermBuilder().label(result, term.getLabels());
                   }
@@ -3257,7 +3257,7 @@ public final class SymbolicExecutionUtil {
                else {
                   // Create new term in general.
                   return services.getTermFactory().createTerm(term.op(),
-                                                              new ImmutableArray<JavaDLTerm>(newChildren),
+                                                              new ImmutableArray<Term>(newChildren),
                                                               term.boundVars(),
                                                               term.modalContent(),
                                                               term.getLabels());
@@ -3271,17 +3271,17 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Utility method of {@link #replaceSkolemConstants(Sequent, JavaDLTerm, Services)} to
+    * Utility method of {@link #replaceSkolemConstants(Sequent, Term, Services)} to
     * find all equality parts of the given skolem constant.
     * @param sequent The {@link Sequent} which provides the skolem equalities.
     * @param skolemConstant The skolem constant to solve.
     * @param skolemEquality The optional skolem equality to ignore.
     * @return The equality parts of the given skolem equality.
     */
-   private static List<JavaDLTerm> findSkolemReplacements(Sequent sequent, JavaDLTerm skolemConstant, JavaDLTerm skolemEquality) {
-      List<JavaDLTerm> result = new LinkedList<JavaDLTerm>();
-      for (SequentFormula<JavaDLTerm> sf : sequent) {
-         JavaDLTerm term = sf.formula();
+   private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemConstant, Term skolemEquality) {
+      List<Term> result = new LinkedList<Term>();
+      for (SequentFormula<Term> sf : sequent) {
+         Term term = sf.formula();
          if (term != skolemEquality) {
             int skolemCheck = checkSkolemEquality(term);
             if (skolemCheck == -1) {
@@ -3342,7 +3342,7 @@ public final class SymbolicExecutionUtil {
     * @return The computed path condition.
     * @throws ProofInputException Occurred Exception.
     */
-   public static JavaDLTerm computePathCondition(Node node,
+   public static Term computePathCondition(Node node,
                                            boolean simplify,
                                            boolean improveReadability) throws ProofInputException {
       return computePathCondition(null, node, simplify, improveReadability);
@@ -3357,17 +3357,17 @@ public final class SymbolicExecutionUtil {
     * @return The computed path condition.
     * @throws ProofInputException Occurred Exception.
     */
-   public static JavaDLTerm computePathCondition(Node parentNode,
+   public static Term computePathCondition(Node parentNode,
                                            Node childNode,
                                            boolean simplify,
                                            boolean improveReadability) throws ProofInputException {
       if (childNode != null) {
          final Services services = childNode.proof().getServices();
-         JavaDLTerm pathCondition = services.getTermBuilder().tt();
+         Term pathCondition = services.getTermBuilder().tt();
          while (childNode != null && childNode != parentNode) {
             Node parent = childNode.parent();
             if (parent != null && parent.childrenCount() >= 2) {
-               JavaDLTerm branchCondition = computeBranchCondition(childNode, simplify, improveReadability);
+               Term branchCondition = computeBranchCondition(childNode, simplify, improveReadability);
                pathCondition = services.getTermBuilder().and(branchCondition, pathCondition);
             }
             childNode = parent;
@@ -3383,12 +3383,12 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the {@link Sort} of the given {@link JavaDLTerm} is a reference type.
+    * Checks if the {@link Sort} of the given {@link Term} is a reference type.
     * @param services The {@link Services} to use.
-    * @param term The {@link JavaDLTerm} to check.
+    * @param term The {@link Term} to check.
     * @return {@code true} is reference sort, {@code false} is no reference sort.
     */
-   public static boolean hasReferenceSort(Services services, JavaDLTerm term) {
+   public static boolean hasReferenceSort(Services services, Term term) {
       if (services != null && term != null) {
          return hasReferenceSort(services, term.sort());
       }
@@ -3481,8 +3481,8 @@ public final class SymbolicExecutionUtil {
     */
    public static IProgramVariable extractExceptionVariable(Proof proof) {
       Node root = proof.root();
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityTermPIO = SymbolicExecutionUtil.findModalityWithMinSymbolicExecutionLabelId(root.sequent());
-      JavaDLTerm modalityTerm = modalityTermPIO != null ? modalityTermPIO.subTerm() : null;
+      PosInOccurrence<Term, SequentFormula<Term>> modalityTermPIO = SymbolicExecutionUtil.findModalityWithMinSymbolicExecutionLabelId(root.sequent());
+      Term modalityTerm = modalityTermPIO != null ? modalityTermPIO.subTerm() : null;
       if (modalityTerm != null) {
          modalityTerm = TermBuilder.goBelowUpdates(modalityTerm);
          JavaProgramElement updateContent = modalityTerm.modalContent().program();
@@ -3607,7 +3607,7 @@ public final class SymbolicExecutionUtil {
             result = true; // Implication removed (not done if left part is false)
          }
          else {
-            JavaDLTerm term = ruleApp.posInOccurrence().subTerm();
+            Term term = ruleApp.posInOccurrence().subTerm();
             if (term.op() == Junctor.IMP && term.sub(0).op() == Junctor.TRUE) {
                result = true; // Left part is true
             }
@@ -3657,12 +3657,12 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given {@link JavaDLTerm} is a select on a heap.
+    * Checks if the given {@link Term} is a select on a heap.
     * @param services The {@link Services} to use.
-    * @param term The {@link JavaDLTerm} to check.
+    * @param term The {@link Term} to check.
     * @return {@code true} is select, {@code false} is something else.
     */
-   public static boolean isSelect(Services services, JavaDLTerm term) {
+   public static boolean isSelect(Services services, Term term) {
       if (!isNullSort(term.sort(), services)) {
          Function select = services.getTheories().getHeapLDT().getSelect(term.sort(), services);
          return select == term.op();
@@ -3710,18 +3710,18 @@ public final class SymbolicExecutionUtil {
    
    /**
     * <p>
-    * Converts the given {@link JavaDLTerm} into a {@link String} respecting {@link #isUsePretty()}.
+    * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
     * </p>
     * <p>
-    * The functionality is similar to {@link ProofSaver#printTerm(JavaDLTerm, Services, boolean)} but allows to set custom settings.
+    * The functionality is similar to {@link ProofSaver#printTerm(Term, Services, boolean)} but allows to set custom settings.
     * </p>
-    * @param term The {@link JavaDLTerm} to convert.
+    * @param term The {@link Term} to convert.
     * @param services The {@link Services} to use.
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
-    * @return The {@link String} representation of the given {@link JavaDLTerm}.
+    * @return The {@link String} representation of the given {@link Term}.
     */
-   public static String formatTerm(JavaDLTerm term, 
+   public static String formatTerm(Term term, 
                                    Services services, 
                                    boolean useUnicode,
                                    boolean usePrettyPrinting) {
@@ -3915,7 +3915,7 @@ public final class SymbolicExecutionUtil {
     * @param services The {@link Services} to use.
     * @return The created term.
     */
-   public static JavaDLTerm createSelectTerm(IExecutionVariable variable) {
+   public static Term createSelectTerm(IExecutionVariable variable) {
       final Services services = variable.getServices();
       if (SymbolicExecutionUtil.isStaticVariable(variable.getProgramVariable())) {
          // Static field access
@@ -3928,7 +3928,7 @@ public final class SymbolicExecutionUtil {
             return services.getTermBuilder().var((ProgramVariable)variable.getProgramVariable());
          }
          else {
-            JavaDLTerm parentTerm = variable.getParentValue().getVariable().createSelectTerm();
+            Term parentTerm = variable.getParentValue().getVariable().createSelectTerm();
             if (variable.getProgramVariable() != null) {
                if (services.getProgramServices().getJavaInfo().getArrayLength() == variable.getProgramVariable()) {
                   // Special handling for length attribute of arrays
@@ -3990,7 +3990,7 @@ public final class SymbolicExecutionUtil {
    public static boolean lazyComputeIsMainBranchVerified(Node node) {
       if (!node.proof().isDisposed()) {
          // Find uninterpreted predicate
-         JavaDLTerm predicate = AbstractOperationPO.getUninterpretedPredicate(node.proof());
+         Term predicate = AbstractOperationPO.getUninterpretedPredicate(node.proof());
          // Check if node can be treated as verified/closed
          if (predicate != null) {
             boolean verified = true;
@@ -3998,10 +3998,10 @@ public final class SymbolicExecutionUtil {
             while (verified && leafsIter.hasNext()) {
                Node leaf = leafsIter.next();
                if (!leaf.isClosed()) {
-                  final JavaDLTerm toSearch = predicate;
-                  SequentFormula<JavaDLTerm> topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula<JavaDLTerm>>() {
+                  final Term toSearch = predicate;
+                  SequentFormula<Term> topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula<Term>>() {
                      @Override
-                     public boolean select(SequentFormula<JavaDLTerm> element) {
+                     public boolean select(SequentFormula<Term> element) {
                         return toSearch.op() == element.formula().op();
                      }
                   });
@@ -4029,7 +4029,7 @@ public final class SymbolicExecutionUtil {
    public static boolean lazyComputeIsAdditionalBranchVerified(Node node) {
       if (!node.proof().isDisposed()) {
          // Find uninterpreted predicate
-         Set<JavaDLTerm> additinalPredicates = AbstractOperationPO.getAdditionalUninterpretedPredicates(node.proof());
+         Set<Term> additinalPredicates = AbstractOperationPO.getAdditionalUninterpretedPredicates(node.proof());
          // Check if node can be treated as verified/closed
          if (!CollectionUtil.isEmpty(additinalPredicates)) {
             boolean verified = true;
@@ -4038,12 +4038,12 @@ public final class SymbolicExecutionUtil {
                Node leaf = leafsIter.next();
                if (!leaf.isClosed()) {
                   final Set<Operator> additinalOperatos = new HashSet<Operator>();
-                  for (JavaDLTerm term : additinalPredicates) {
+                  for (Term term : additinalPredicates) {
                      additinalOperatos.add(term.op());
                   }
-                  SequentFormula<JavaDLTerm> topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula<JavaDLTerm>>() {
+                  SequentFormula<Term> topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula<Term>>() {
                      @Override
-                     public boolean select(SequentFormula<JavaDLTerm> element) {
+                     public boolean select(SequentFormula<Term> element) {
                         return additinalOperatos.contains(element.formula().op());
                      }
                   });
@@ -4085,10 +4085,10 @@ public final class SymbolicExecutionUtil {
       Sort result = null;
       if (exceptionVariable != null) {
          // Search final value of the exceptional variable which is used to check if the verified program terminates normally
-         ImmutableArray<JavaDLTerm> value = null;
-         for (SequentFormula<JavaDLTerm> f : node.sequent().succedent()) {
-            Pair<ImmutableList<JavaDLTerm>,JavaDLTerm> updates = TermBuilder.goBelowUpdates2(f.formula());
-            Iterator<JavaDLTerm> iter = updates.first.iterator();
+         ImmutableArray<Term> value = null;
+         for (SequentFormula<Term> f : node.sequent().succedent()) {
+            Pair<ImmutableList<Term>,Term> updates = TermBuilder.goBelowUpdates2(f.formula());
+            Iterator<Term> iter = updates.first.iterator();
             while (value == null && iter.hasNext()) {
                value = extractValueFromUpdate(iter.next(), exceptionVariable);
             }
@@ -4108,15 +4108,15 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} for that the value is needed.
     * @return The found value or {@code null} if it is not defined in the given update term.
     */
-	protected static ImmutableArray<JavaDLTerm> extractValueFromUpdate(JavaDLTerm term, IProgramVariable variable) {
-		ImmutableArray<JavaDLTerm> result = null;
+	protected static ImmutableArray<Term> extractValueFromUpdate(Term term, IProgramVariable variable) {
+		ImmutableArray<Term> result = null;
 		if (term.op() instanceof ElementaryUpdate) {
 			ElementaryUpdate update = (ElementaryUpdate) term.op();
 			if (ObjectUtil.equals(variable, update.lhs())) {
 				result = term.subs();
 			}
 		} else if (term.op() instanceof UpdateJunctor) {
-			Iterator<JavaDLTerm> iter = term.subs().iterator();
+			Iterator<Term> iter = term.subs().iterator();
 			while (result == null && iter.hasNext()) {
 				result = extractValueFromUpdate(iter.next(), variable);
 			}
@@ -4150,13 +4150,13 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the modality at the given {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} represents the validity branch of an applied block contract.
-    * @param pio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} to check.
+    * Checks if the modality at the given {@link PosInOccurrence<Term, SequentFormula<Term>>} represents the validity branch of an applied block contract.
+    * @param pio The {@link PosInOccurrence<Term, SequentFormula<Term>>} to check.
     * @return validitiy branch, {@code false} otherwise.
     */
-   public static boolean isBlockContractValidityBranch(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+   public static boolean isBlockContractValidityBranch(PosInOccurrence<Term, SequentFormula<Term>> pio) {
       if (pio != null) {
-         JavaDLTerm applicationTerm = TermBuilder.goBelowUpdates(pio.subTerm());
+         Term applicationTerm = TermBuilder.goBelowUpdates(pio.subTerm());
          return applicationTerm.getLabel(BlockContractValidityTermLabel.NAME) != null;
       }
       else {

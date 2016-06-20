@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * Complete this class if you want to add support for the JML \real type.
@@ -44,7 +44,7 @@ public final class RealLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    			 JavaDLTerm[] subs,
+	    			 Term[] subs,
 	    			 Services services,
 	    			 ExecutionContext ec) {
 	return false;
@@ -53,8 +53,8 @@ public final class RealLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    		         JavaDLTerm left,
-	    		         JavaDLTerm right,
+	    		         Term left,
+	    		         Term right,
 	    		         Services services,
 	    		         ExecutionContext ec) {
 	return false;
@@ -63,7 +63,7 @@ public final class RealLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    		         JavaDLTerm sub,
+	    		         Term sub,
 	    		         JavaDLTermServices services,
 	    		         ExecutionContext ec) {
 	return false;
@@ -71,7 +71,7 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public JavaDLTerm translateLiteral(Literal lit, Services services) {
+    public Term translateLiteral(Literal lit, Services services) {
         // return skolem term
         final Function sk = new Function(new Name(""+NAME+lit),targetSort());
         return services.getTermBuilder().func(sk);
@@ -94,13 +94,13 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
+    public Expression translateTerm(Term t, ExtList children, Services services) {
 	return null;
     }
 
 
     @Override
-    public final Type getType(JavaDLTerm t) {
+    public final Type getType(Term t) {
 	if(t.sort() == targetSort()) {
 	    return PrimitiveType.JAVA_REAL;
 	} else {

@@ -27,7 +27,7 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacle
      */
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-            CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+            CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
             MatchConditions matchCond,
             Goal goal,
             RuleApp ruleApp,
@@ -50,8 +50,8 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacle
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState, 
-            CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+            CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent,
+            PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
             MatchConditions matchCond,
             Goal goal,
             RuleApp ruleApp,

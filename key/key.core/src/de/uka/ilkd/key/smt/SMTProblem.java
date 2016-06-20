@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
@@ -37,7 +37,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
  */
 public class SMTProblem {
 
-        private JavaDLTerm term;
+        private Term term;
         private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
         private final Goal goal;
         private Sequent sequent;
@@ -61,7 +61,7 @@ public class SMTProblem {
          * initialized with a goal, the goal is transformed to the term that can
          * be accessed by this method.
          */
-        public JavaDLTerm getTerm() {
+        public Term getTerm() {
                 return term;
         }
 
@@ -83,9 +83,9 @@ public class SMTProblem {
             this.term = sequentToTerm(s, services);
         }
 
-        public SMTProblem(JavaDLTerm t){
+        public SMTProblem(Term t){
         	this.goal = null;
-        	name = "JavaDLTerm "+t.toString();
+        	name = "Term "+t.toString();
         	this.term = t;
         }
 
@@ -147,19 +147,19 @@ public class SMTProblem {
                 solvers.add(solver);
         }
         
-        private static JavaDLTerm sequentToTerm(Sequent s, Services services) {
+        private static Term sequentToTerm(Sequent s, Services services) {
 
-            ImmutableList<JavaDLTerm> ante = ImmutableSLList.nil();
+            ImmutableList<Term> ante = ImmutableSLList.nil();
 
             final TermBuilder tb = services.getTermBuilder();
             ante = ante.append(tb.tt());
-            for (SequentFormula<JavaDLTerm> f : s.antecedent()) {
+            for (SequentFormula<Term> f : s.antecedent()) {
                     ante = ante.append(f.formula());
             }
 
-            ImmutableList<JavaDLTerm> succ = ImmutableSLList.nil();
+            ImmutableList<Term> succ = ImmutableSLList.nil();
             succ = succ.append(tb.ff());
-            for (SequentFormula<JavaDLTerm> f : s.succedent()) {
+            for (SequentFormula<Term> f : s.succedent()) {
                     succ = succ.append(f.formula());
             }
 
@@ -168,19 +168,19 @@ public class SMTProblem {
         }
 
 
-        private JavaDLTerm sequentToTerm(Sequent s) {
+        private Term sequentToTerm(Sequent s) {
 
-                ImmutableList<JavaDLTerm> ante = ImmutableSLList.nil();
+                ImmutableList<Term> ante = ImmutableSLList.nil();
 
                 final TermBuilder tb = goal.proof().getServices().getTermBuilder();
                 ante = ante.append(tb.tt());
-                for (SequentFormula<JavaDLTerm> f : s.antecedent()) {
+                for (SequentFormula<Term> f : s.antecedent()) {
                         ante = ante.append(f.formula());
                 }
 
-                ImmutableList<JavaDLTerm> succ = ImmutableSLList.nil();
+                ImmutableList<Term> succ = ImmutableSLList.nil();
                 succ = succ.append(tb.ff());
-                for (SequentFormula<JavaDLTerm> f : s.succedent()) {
+                for (SequentFormula<Term> f : s.succedent()) {
                         succ = succ.append(f.formula());
                 }
 
@@ -188,7 +188,7 @@ public class SMTProblem {
 
         }
 
-        private JavaDLTerm goalToTerm(Goal g) {
+        private Term goalToTerm(Goal g) {
                 sequent = g.sequent();
                 return sequentToTerm(sequent);
         }

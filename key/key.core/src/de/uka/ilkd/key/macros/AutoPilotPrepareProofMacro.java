@@ -24,7 +24,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
@@ -88,7 +88,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
      */
     private static boolean hasModality(Node node) {
         Sequent sequent = node.sequent();
-        for (SequentFormula<JavaDLTerm> sequentFormula : sequent) {
+        for (SequentFormula<Term> sequentFormula : sequent) {
             if(hasModality(sequentFormula.formula())) {
                 return true;
             }
@@ -100,12 +100,12 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     /*
      * recursively descent into the term to detect a modality.
      */
-    private static boolean hasModality(JavaDLTerm term) {
+    private static boolean hasModality(Term term) {
         if(term.op() instanceof Modality) {
             return true;
         }
 
-        for (JavaDLTerm sub : term.subs()) {
+        for (Term sub : term.subs()) {
             if(hasModality(sub)) {
                 return true;
             }
@@ -137,7 +137,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         private static final Name NAME = new Name("Autopilot filter strategy");
         private final Strategy delegate;
 
-        public AutoPilotStrategy(Proof proof, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+        public AutoPilotStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
             this.delegate = proof.getActiveStrategy();
         }
 
@@ -147,7 +147,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
             return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
                    // Assumptions are normally not considered by the cost
                    // computation, because they are normally not yet
@@ -163,7 +163,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
 
             Rule rule = app.rule();
             if(isNonHumanInteractionTagged(rule)) {
@@ -181,7 +181,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             
             // apply OSS to <inv>() calls.
             if(rule instanceof OneStepSimplifier) {
-                JavaDLTerm target = pio.subTerm();
+                Term target = pio.subTerm();
                 if(target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();
                     if(updatedOp instanceof ObserverFunction) {
@@ -194,7 +194,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal,
+        public void instantiateApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal,
                 RuleAppCostCollector collector) {
             delegate.instantiateApp(app, pio, goal, collector);
         }
@@ -207,7 +207,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         return new AutoPilotStrategy(proof, posInOcc);
     }
 }

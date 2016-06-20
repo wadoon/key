@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Sequent#EMPTY_SEQUENT}.
  */
 public class Sequent
-        extends CCSequentImpl<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> {
+        extends CCSequentImpl<Term, SequentFormula<Term>, Semisequent, Sequent> {
 
     public static final Sequent EMPTY_SEQUENT = new NILSequent();
 
@@ -104,8 +104,8 @@ public class Sequent
             return true;
         }
 
-        public Iterator<SequentFormula<JavaDLTerm>> iterator() {
-            return ImmutableSLList.<SequentFormula<JavaDLTerm>> nil()
+        public Iterator<SequentFormula<Term>> iterator() {
+            return ImmutableSLList.<SequentFormula<Term>> nil()
                     .iterator();
         }
 
@@ -137,7 +137,7 @@ public class Sequent
     @Override
     protected SequentChangeInfo createSequentChangeInfo(
             boolean inAntec,
-            CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> semiCI,
+            CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> semiCI,
             Sequent result, Sequent original) {
         assert semiCI instanceof SemisequentChangeInfo;
 

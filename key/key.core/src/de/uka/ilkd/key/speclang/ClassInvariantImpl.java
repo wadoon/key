@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -41,7 +41,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     private final String displayName;
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;    
-    private final JavaDLTerm originalInv;
+    private final Term originalInv;
     private final ParsableVariable originalSelfVar;
     private final boolean isStatic;
     
@@ -64,7 +64,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
                               String displayName,
                               KeYJavaType kjt,
                               VisibilityModifier visibility,
-                              JavaDLTerm inv,
+                              Term inv,
                               ParsableVariable selfVar) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
@@ -126,18 +126,18 @@ public final class ClassInvariantImpl implements ClassInvariant {
     
     
     @Override
-    public JavaDLTerm getInv(ParsableVariable selfVar, JavaDLTermServices services) {
+    public Term getInv(ParsableVariable selfVar, JavaDLTermServices services) {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
-        JavaDLTerm res = or.replace(originalInv);
+        Term res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);
         return res;
     }
 
 
     @Override
-    public JavaDLTerm getOriginalInv() {
+    public Term getOriginalInv() {
         return originalInv;
     }
     

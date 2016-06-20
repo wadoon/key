@@ -22,7 +22,7 @@ import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYBlockContract;
 import org.key_project.sed.key.core.model.KeYMethodContract;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -71,12 +71,12 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Triple<JavaDLTerm, PosInTerm<JavaDLTerm>, JavaDLTerm> computeTermToShow(IKeYSENode<?> node,
+   protected Triple<Term, PosInTerm<Term>, Term> computeTermToShow(IKeYSENode<?> node,
                                                              IExecutionNode<?> executionNode, 
                                                              Node keyNode) {
       if (node instanceof KeYMethodContract || node instanceof KeYBlockContract) {
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = executionNode.getModalityPIO();
-         JavaDLTerm term;
+         PosInOccurrence<Term, SequentFormula<Term>> pio = executionNode.getModalityPIO();
+         Term term;
          if (pio.isInAntec()) {
             int index = executionNode.getProofNode().sequent().antecedent().indexOf(pio.sequentFormula());
             term = keyNode.sequent().antecedent().get(index).formula();
@@ -88,7 +88,7 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
          if (!INCLUDE_UPDATES) {
             term = TermBuilder.goBelowUpdates(term);
          }
-         return new Triple<JavaDLTerm, PosInTerm<JavaDLTerm>, JavaDLTerm>(term, null, null);
+         return new Triple<Term, PosInTerm<Term>, Term>(term, null, null);
       }
       else {
          throw new IllegalArgumentException("Unsupported node.");

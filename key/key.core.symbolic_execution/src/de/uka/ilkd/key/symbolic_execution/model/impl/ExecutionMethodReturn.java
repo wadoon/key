@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -273,16 +273,16 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                try {
                   if (info.getProof().openGoals().size() == 1) {
                      Goal goal = info.getProof().openGoals().head();
-                     JavaDLTerm returnValue = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, input.getOperator());
+                     Term returnValue = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
                      returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, services);
                      return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getProofNode(), getModalityPIO(), returnValue, null)};
                   }
                   else {
                      // Group equal values of different branches
-                     Map<JavaDLTerm, List<Node>> valueNodeMap = new LinkedHashMap<JavaDLTerm, List<Node>>();
+                     Map<Term, List<Node>> valueNodeMap = new LinkedHashMap<Term, List<Node>>();
                      for (Goal goal : info.getProof().openGoals()) {
-                        JavaDLTerm returnValue = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, input.getOperator());
+                        Term returnValue = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, input.getOperator());
                         assert returnValue != null;
                         returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue, services);
                         List<Node> nodeList = valueNodeMap.get(returnValue);
@@ -294,19 +294,19 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                      }
                      // Create result
                      if (valueNodeMap.size() == 1) {
-                        JavaDLTerm returnValue = valueNodeMap.keySet().iterator().next();
+                        Term returnValue = valueNodeMap.keySet().iterator().next();
                         return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getProofNode(), getModalityPIO(), returnValue, null)};
                      }
                      else {
                         IExecutionMethodReturnValue[] result = new IExecutionMethodReturnValue[valueNodeMap.size()];
                         int i = 0;
-                        for (Entry<JavaDLTerm, List<Node>> entry : valueNodeMap.entrySet()) {
-                           List<JavaDLTerm> conditions = new LinkedList<JavaDLTerm>();
+                        for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
+                           List<Term> conditions = new LinkedList<Term>();
                            for (Node node : entry.getValue()) {
-                              JavaDLTerm condition = SymbolicExecutionUtil.computePathCondition(node, getSettings().isSimplifyConditions(), false);
+                              Term condition = SymbolicExecutionUtil.computePathCondition(node, getSettings().isSimplifyConditions(), false);
                               conditions.add(condition);
                            }
-                           JavaDLTerm condition = services.getTermBuilder().or(conditions);
+                           Term condition = services.getTermBuilder().or(conditions);
                            if (conditions.size() >= 2) {
                               if (getSettings().isSimplifyConditions()) {
                                  condition = SymbolicExecutionUtil.simplify(initConfig, info.getProof(), condition);

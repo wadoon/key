@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * A collection of static methods to deal with {@link TermLabel}.
@@ -75,12 +75,12 @@ class TermLabelOperationsInterpreter {
      * structural identical 
      * 
      * This method should be used in case to implement more complex redundancy checks.
-     * @param t1 the JavaDLTerm t1 which is structural equivalent to t2 (except maybe labels)
-     * @param t2 the JavaDLTerm t2
+     * @param t1 the Term t1 which is structural equivalent to t2 (except maybe labels)
+     * @param t2 the Term t2
      * @return a list which represents a redundancy free result of merging labels in t1 and t2
      */
-    public static ImmutableList<JavaDLTerm> resolveRedundancy(JavaDLTerm t1, JavaDLTerm t2) {
-        ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
+    public static ImmutableList<Term> resolveRedundancy(Term t1, Term t2) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         if (!t2.hasLabels()) {
             return result.prepend(t1);
         } else if (!t1.hasLabels()) {

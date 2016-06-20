@@ -23,7 +23,7 @@ import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * This class is used to create metavariables for every universal variables in 
@@ -36,15 +36,15 @@ class ReplacerOfQuanVariablesWithMetavariables {
 
     private ReplacerOfQuanVariablesWithMetavariables () {}
     
-    public static Substitution createSubstitutionForVars(JavaDLTerm allTerm, JavaDLTermServices services) {
-        ImmutableMap<QuantifiableVariable,JavaDLTerm> res =
-            DefaultImmutableMap.<QuantifiableVariable,JavaDLTerm>nilMap();
-        JavaDLTerm t = allTerm;
+    public static Substitution createSubstitutionForVars(Term allTerm, JavaDLTermServices services) {
+        ImmutableMap<QuantifiableVariable,Term> res =
+            DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
+        Term t = allTerm;
         Operator op = t.op ();
         while ( op instanceof Quantifier ) {
             QuantifiableVariable q =
                 t.varsBoundHere ( 0 ).get ( 0 );
-            JavaDLTerm m;
+            Term m;
             if ( op == Quantifier.ALL ) {
                 Metavariable mv = new Metavariable ( ARBITRARY_NAME, q.sort () );
                 m = services.getTermBuilder().var ( mv );

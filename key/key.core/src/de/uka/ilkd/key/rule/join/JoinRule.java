@@ -46,7 +46,7 @@ import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -167,7 +167,7 @@ public class JoinRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final JoinProcedure joinRule = joinRuleApp.getConcreteRule();
         final Node currentNode = newGoal.node();
-        final ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
+        final ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
                 joinRuleApp.getJoinPartners();
 
         final SymbolicExecutionStateWithProgCnt thisSEState =
@@ -178,7 +178,7 @@ public class JoinRule implements BuiltInRule {
 
         // Unify names in join partner symbolic state and path condition
         {
-            ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> tmpJoinPartners =
+            ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> tmpJoinPartners =
                     joinPartners;
             for (final SymbolicExecutionState joinPartnerState : joinRuleApp
                     .getJoinPartnerStates()) {
@@ -188,11 +188,11 @@ public class JoinRule implements BuiltInRule {
                 final ProgVarReplacer replacer =
                         new ProgVarReplacer(replMap, services);
 
-                ImmutableList<JavaDLTerm> newElementaries = ImmutableSLList.nil();
-                final LinkedList<JavaDLTerm> elementaries =
+                ImmutableList<Term> newElementaries = ImmutableSLList.nil();
+                final LinkedList<Term> elementaries =
                         JoinRuleUtils.getElementaryUpdates(joinPartnerState
                                 .getSymbolicState());
-                for (final JavaDLTerm elementary : elementaries) {
+                for (final Term elementary : elementaries) {
                     final ElementaryUpdate upd =
                             (ElementaryUpdate) elementary.op();
                     final LocationVariable lhs =
@@ -232,12 +232,12 @@ public class JoinRule implements BuiltInRule {
             joinedState.setCorrespondingNode(newGoal.node());
         }
 
-        final JavaDLTerm resultPathCondition = joinedState.second;
+        final Term resultPathCondition = joinedState.second;
 
         // NOTE (DS): The following simplification has been commented
         // out since it was usually not successful and consumed an
         // inadequate amount of time.
-        // final JavaDLTerm previousResultPathCondition = resultPathCondition;
+        // final Term previousResultPathCondition = resultPathCondition;
         // resultPathCondition = trySimplify(services.getProof(),
         // resultPathCondition, true);
 
@@ -249,19 +249,19 @@ public class JoinRule implements BuiltInRule {
                 newGoal.indexOfTaclets().getPartialInstantiatedApps());
 
         // Add new antecedent (path condition)
-        for (JavaDLTerm antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
-            final SequentFormula<JavaDLTerm> newAntecedent =
+        for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
+            final SequentFormula<Term> newAntecedent =
                     new SequentFormula<>(antecedentFormula);
             newGoal.addFormula(newAntecedent, true, false);
         }
 
         // Add new succedent (symbolic state & program counter)
-        final JavaDLTerm succedentFormula =
+        final Term succedentFormula =
                 tb.apply(joinedState.first, thisSEState.third);
-        final SequentFormula<JavaDLTerm> newSuccedent =
+        final SequentFormula<Term> newSuccedent =
                 new SequentFormula<>(succedentFormula);
-        newGoal.addFormula(newSuccedent, new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(newSuccedent,
-                PosInTerm.<JavaDLTerm>getTopLevel(), false));
+        newGoal.addFormula(newSuccedent, new PosInOccurrence<Term, SequentFormula<Term>>(newSuccedent,
+                PosInTerm.<Term>getTopLevel(), false));
         
         // The following line has the only effect of emptying the
         // name recorder -- the name recorder for currentNode will
@@ -271,7 +271,7 @@ public class JoinRule implements BuiltInRule {
         services.saveNameRecorder(currentNode);
 
         // Close partner goals
-        for (Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
+        for (Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
             closeJoinPartnerGoal(
                     newGoal.node(),
                     joinPartner.first,
@@ -291,7 +291,7 @@ public class JoinRule implements BuiltInRule {
     
     /**
      * Joins two SE states (U1,C1,p) and (U2,C2,p) according to the method
-     * {@link JoinRule#joinValuesInStates(LocationVariable, SymbolicExecutionState, JavaDLTerm, SymbolicExecutionState, JavaDLTerm, Services)}
+     * {@link JoinRule#joinValuesInStates(LocationVariable, SymbolicExecutionState, Term, SymbolicExecutionState, Term, Services)}
      * . p must be the same in both states, so it is supplied separately.
      * <p>
      * 
@@ -317,8 +317,8 @@ public class JoinRule implements BuiltInRule {
     @SuppressWarnings("unused") /* For deactivated equiv check */
     protected Pair<SymbolicExecutionState, ImmutableSet<Name>> joinStates(
             JoinProcedure joinRule, SymbolicExecutionState state1,
-            SymbolicExecutionState state2, JavaDLTerm programCounter,
-            JavaDLTerm distinguishingFormula, Services services) {
+            SymbolicExecutionState state2, Term programCounter,
+            Term distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -326,7 +326,7 @@ public class JoinRule implements BuiltInRule {
         ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
 
         // Construct path condition as (optimized) disjunction
-        JavaDLTerm newPathCondition =
+        Term newPathCondition =
                 createSimplifiedDisjunctivePathCondition(state1.second,
                         state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
 
@@ -339,12 +339,12 @@ public class JoinRule implements BuiltInRule {
         progVars = progVars.union(getUpdateLeftSideLocations(state1.first));
         progVars = progVars.union(getUpdateLeftSideLocations(state2.first));
 
-        ImmutableList<JavaDLTerm> newElementaryUpdates = ImmutableSLList.nil();
+        ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
 
         for (LocationVariable v : progVars) {
 
-            JavaDLTerm rightSide1 = getUpdateRightSideFor(state1.first, v);
-            JavaDLTerm rightSide2 = getUpdateRightSideFor(state2.first, v);
+            Term rightSide1 = getUpdateRightSideFor(state1.first, v);
+            Term rightSide2 = getUpdateRightSideFor(state2.first, v);
 
             if (rightSide1 == null) {
                 rightSide1 = tb.var(v);
@@ -356,7 +356,7 @@ public class JoinRule implements BuiltInRule {
 
             // Check if location v is set to different value in both states.
 
-            // Easy check: JavaDLTerm equality
+            // Easy check: Term equality
             boolean proofClosed = rightSide1.equalsModRenaming(rightSide2);
 
             // We skip the check for equal valuation of this variable if
@@ -368,12 +368,12 @@ public class JoinRule implements BuiltInRule {
                     && !proofClosed
                     && !JoinRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
 
-                JavaDLTerm predicateTerm =
+                Term predicateTerm =
                         tb.func(new Function(new Name("P"), Sort.FORMULA, v
                                 .sort()), tb.var(v));
-                JavaDLTerm appl1 = tb.apply(state1.first, predicateTerm);
-                JavaDLTerm appl2 = tb.apply(state2.first, predicateTerm);
-                JavaDLTerm toProve =
+                Term appl1 = tb.apply(state1.first, predicateTerm);
+                Term appl2 = tb.apply(state2.first, predicateTerm);
+                Term toProve =
                         tb.and(tb.imp(appl1, appl2), tb.imp(appl2, appl1));
 
                 proofClosed =
@@ -401,7 +401,7 @@ public class JoinRule implements BuiltInRule {
 
                 if (v.sort().equals(heapSort)) {
 
-                    Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinedHeaps =
+                    Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedHeaps =
                             joinHeaps(joinRule, v, rightSide1, rightSide2,
                                     state1, state2, distinguishingFormula, services);
                     newElementaryUpdates =
@@ -414,7 +414,7 @@ public class JoinRule implements BuiltInRule {
                 }
                 else {
 
-                    Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinedVal =
+                    Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedVal =
                             joinRule.joinValuesInStates(tb.var(v), state1,
                                     rightSide1, state2, rightSide2, distinguishingFormula, services);
 
@@ -434,7 +434,7 @@ public class JoinRule implements BuiltInRule {
         } // end for (LocationVariable v : progVars)
 
         // Construct weakened symbolic state
-        JavaDLTerm newSymbolicState = tb.parallel(newElementaryUpdates);
+        Term newSymbolicState = tb.parallel(newElementaryUpdates);
 
         return new Pair<SymbolicExecutionState, ImmutableSet<Name>>(
                 new SymbolicExecutionState(newSymbolicState, newPathCondition),
@@ -466,27 +466,27 @@ public class JoinRule implements BuiltInRule {
      *            automatic generation).
      * @return A joined heap term.
      */
-    protected Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinHeaps(
+    protected Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinHeaps(
             final JoinProcedure joinRule, final LocationVariable heapVar,
-            final JavaDLTerm heap1, final JavaDLTerm heap2,
+            final Term heap1, final Term heap2,
             final SymbolicExecutionState state1,
-            final SymbolicExecutionState state2, JavaDLTerm distinguishingFormula,
+            final SymbolicExecutionState state2, Term distinguishingFormula,
             final Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableSet<JavaDLTerm> newConstraints = DefaultImmutableSet.nil();
+        ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
         ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
 
         if (heap1.equals(heap2)) {
             // Keep equal heaps
-            return new Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>>(
+            return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                     newConstraints, heap1, newNames);
         }
 
         if (!(heap1.op() instanceof Function)
                 || !(heap2.op() instanceof Function)) {
             // Covers the case of two different symbolic heaps
-            return new Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>>(
+            return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                     newConstraints, JoinIfThenElse.createIfThenElseTerm(state1,
                             state2, heap1, heap2, distinguishingFormula, services), newNames);
         }
@@ -505,26 +505,26 @@ public class JoinRule implements BuiltInRule {
             // Store operations.
 
             // Decompose the heap operations.
-            final JavaDLTerm subHeap1 = heap1.sub(0);
-            final JavaDLTerm pointer1 = heap1.sub(1);
-            final JavaDLTerm field1 = heap1.sub(2);
-            final JavaDLTerm value1 = heap1.sub(3);
+            final Term subHeap1 = heap1.sub(0);
+            final Term pointer1 = heap1.sub(1);
+            final Term field1 = heap1.sub(2);
+            final Term value1 = heap1.sub(3);
 
-            final JavaDLTerm subHeap2 = heap2.sub(0);
-            final JavaDLTerm pointer2 = heap2.sub(1);
-            final JavaDLTerm field2 = heap2.sub(2);
-            final JavaDLTerm value2 = heap2.sub(3);
+            final Term subHeap2 = heap2.sub(0);
+            final Term pointer2 = heap2.sub(1);
+            final Term field2 = heap2.sub(2);
+            final Term value2 = heap2.sub(3);
 
             if (pointer1.equals(pointer2) && field1.equals(field2)) {
                 // Potential for deep merge: Access of same object / field.
 
-                Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinedSubHeap =
+                Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedSubHeap =
                         joinHeaps(joinRule, heapVar, subHeap1, subHeap2,
                                 state1, state2, distinguishingFormula, services);
                 newConstraints = newConstraints.union(joinedSubHeap.first);
                 newNames = newNames.union(joinedSubHeap.third);
 
-                JavaDLTerm joinedVal = null;
+                Term joinedVal = null;
 
                 if (value1.equals(value2)) {
                     // Idempotency...
@@ -533,7 +533,7 @@ public class JoinRule implements BuiltInRule {
                 }
                 else {
 
-                    Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinedValAndConstr =
+                    Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedValAndConstr =
                             joinRule.joinValuesInStates(field1, state1, value1,
                                     state2, value2, distinguishingFormula, services);
 
@@ -544,7 +544,7 @@ public class JoinRule implements BuiltInRule {
 
                 }
 
-                return new Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>>(
+                return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                         newConstraints, tb.func((Function) heap1.op(),
                                 joinedSubHeap.second, heap1.sub(1), field1,
                                 joinedVal), newNames);
@@ -558,22 +558,22 @@ public class JoinRule implements BuiltInRule {
             // Create operations.
 
             // Decompose the heap operations.
-            JavaDLTerm subHeap1 = heap1.sub(0);
-            JavaDLTerm pointer1 = heap1.sub(1);
+            Term subHeap1 = heap1.sub(0);
+            Term pointer1 = heap1.sub(1);
 
-            JavaDLTerm subHeap2 = heap2.sub(0);
-            JavaDLTerm pointer2 = heap2.sub(1);
+            Term subHeap2 = heap2.sub(0);
+            Term pointer2 = heap2.sub(1);
 
             if (pointer1.equals(pointer2)) {
                 // Same objects are created: Join.
 
-                Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>> joinedSubHeap =
+                Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedSubHeap =
                         joinHeaps(joinRule, heapVar, subHeap1, subHeap2,
                                 state1, state2, distinguishingFormula, services);
                 newConstraints = newConstraints.union(joinedSubHeap.first);
                 newNames = newNames.union(joinedSubHeap.third);
 
-                return new Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>>(
+                return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                         newConstraints, tb.func((Function) heap1.op(),
                                 joinedSubHeap.second, pointer1), newNames);
             }
@@ -584,7 +584,7 @@ public class JoinRule implements BuiltInRule {
         } // end else of else if (((Function) heap1.op()).equals(createFunc) &&
           // ((Function) heap2.op()).equals(createFunc))
 
-        return new Triple<ImmutableSet<JavaDLTerm>, JavaDLTerm, ImmutableSet<Name>>(
+        return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                 newConstraints, JoinIfThenElse.createIfThenElseTerm(state1,
                         state2, heap1, heap2, distinguishingFormula, services), newNames);
 
@@ -602,7 +602,7 @@ public class JoinRule implements BuiltInRule {
      * @return true iff a suitable top level formula for joining.
      */
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio) {
         // Note: We do not check for join partner existence
         // to save time during automatic execution.
         // As a result, the rule is applicable for any
@@ -628,7 +628,7 @@ public class JoinRule implements BuiltInRule {
      *            true.
      * @return true iff a suitable top level formula for joining.
      */
-    public static boolean isOfAdmissibleForm(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+    public static boolean isOfAdmissibleForm(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio,
             boolean doJoinPartnerCheck) {
         // We admit top level formulas of the form \<{ ... }\> phi
         // and U \<{ ... }\> phi, where U must be an update
@@ -639,12 +639,12 @@ public class JoinRule implements BuiltInRule {
             return false;
         }
 
-        JavaDLTerm selected = pio.subTerm();
+        Term selected = pio.subTerm();
 
-        JavaDLTerm termAfterUpdate = selected;
+        Term termAfterUpdate = selected;
 
         if (selected.op() instanceof UpdateApplication) {
-            JavaDLTerm update = selected.sub(0);
+            Term update = selected.sub(0);
 
             if (isUpdateNormalForm(update) && selected.subs().size() > 1) {
                 termAfterUpdate = selected.sub(1);
@@ -664,7 +664,7 @@ public class JoinRule implements BuiltInRule {
             return false;
         }
 
-        // JavaDLTerm after update must have the form "phi" or "\<{...}\> phi" or
+        // Term after update must have the form "phi" or "\<{...}\> phi" or
         // "\[{...}\]", where phi must not contain a Java block.
         if (termAfterUpdate.op() instanceof Modality
                 && !termAfterUpdate.sub(0).modalContent()
@@ -686,7 +686,7 @@ public class JoinRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, JavaDLTermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pio, JavaDLTermServices services) {
         return new JoinRuleBuiltInRuleApp(this, pio);
     }
 
@@ -701,8 +701,8 @@ public class JoinRule implements BuiltInRule {
      *            The services object.
      * @return A list of suitable join partners. May be empty if none exist.
      */
-    public static ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
-            Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+    public static ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
+            Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio) {
         return findPotentialJoinPartners(goal, pio, goal.proof().root());
     }
 
@@ -719,8 +719,8 @@ public class JoinRule implements BuiltInRule {
      *            The services object.
      * @return A list of suitable join partners. May be empty if none exist.
      */
-    public static ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
-            Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Node start) {
+    public static ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
+            Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio, Node start) {
 
         Services services = goal.proof().getServices();
 
@@ -729,21 +729,21 @@ public class JoinRule implements BuiltInRule {
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
-        ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> potentialPartners =
+        ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> potentialPartners =
                 ImmutableSLList.nil();
         for (Goal g : allGoals) {
             if (!g.equals(goal) && !g.isLinked()) {
                 Semisequent succedent = g.sequent().succedent();
                 for (int i = 0; i < succedent.size(); i++) {
-                    SequentFormula<JavaDLTerm> f = succedent.get(i);
+                    SequentFormula<Term> f = succedent.get(i);
 
-                    PosInTerm<JavaDLTerm> pit = PosInTerm.<JavaDLTerm>getTopLevel();
+                    PosInTerm<Term> pit = PosInTerm.<Term>getTopLevel();
 
-                    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> gPio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(f, pit, false);
+                    PosInOccurrence<Term, SequentFormula<Term>> gPio = new PosInOccurrence<Term, SequentFormula<Term>>(f, pit, false);
                     if (isOfAdmissibleForm(g, gPio, false)) {
-                        Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> ownSEState =
+                        Triple<Term, Term, Term> ownSEState =
                                 sequentToSETriple(goal.node(), pio, services);
-                        Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> partnerSEState =
+                        Triple<Term, Term, Term> partnerSEState =
                                 sequentToSETriple(g.node(), gPio, services);
 
                         // NOTE: The equality check for the Java blocks can be
@@ -764,10 +764,10 @@ public class JoinRule implements BuiltInRule {
                         JavaProgramElement partnerProgramElem =
                                 partnerSEState.third.modalContent().program();
 
-                        JavaDLTerm ownPostCond =
+                        Term ownPostCond =
                                 ownSEState.third.op() instanceof Modality ? ownSEState.third
                                         .sub(0) : ownSEState.third;
-                        JavaDLTerm partnerPostCond =
+                        Term partnerPostCond =
                                 partnerSEState.third.op() instanceof Modality ? partnerSEState.third
                                         .sub(0) : partnerSEState.third;
 
@@ -788,7 +788,7 @@ public class JoinRule implements BuiltInRule {
 
                             potentialPartners =
                                     potentialPartners
-                                            .prepend(new Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>(
+                                            .prepend(new Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>(
                                                     g, gPio, matchVisitor
                                                             .getMatches()
                                                             .getValue()));

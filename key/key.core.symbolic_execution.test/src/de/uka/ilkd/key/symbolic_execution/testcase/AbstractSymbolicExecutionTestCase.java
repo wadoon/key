@@ -47,7 +47,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -1386,9 +1386,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Node node = proof.root();
       Sequent sequent = node.sequent();
       assertEquals(1, sequent.succedent().size());
-      JavaDLTerm succedent = sequent.succedent().get(0).formula();
+      Term succedent = sequent.succedent().get(0).formula();
       assertEquals(2, succedent.arity());
-      JavaDLTerm updateApplication = succedent.subs().get(1);
+      Term updateApplication = succedent.subs().get(1);
       assertEquals(2, updateApplication.arity());
       JavaProgramElement updateContent = updateApplication.subs().get(1).modalContent().program();
       assertTrue(updateContent instanceof StatementBlock);
@@ -2020,11 +2020,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    }
 
       /**
-    * Makes sure that two {@link JavaDLTerm}s are equal.
-    * @param expected The expected {@link JavaDLTerm}.
-    * @param actual The actual {@link JavaDLTerm}.
+    * Makes sure that two {@link Term}s are equal.
+    * @param expected The expected {@link Term}.
+    * @param actual The actual {@link Term}.
     */
-   protected void assertTerm(JavaDLTerm expected, JavaDLTerm actual) {
+   protected void assertTerm(Term expected, Term actual) {
       if (expected != null) {
          assertEquals(expected.op(), actual.op());
          assertEquals(expected.modalContent(), actual.modalContent());

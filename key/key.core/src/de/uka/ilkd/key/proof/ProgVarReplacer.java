@@ -83,15 +83,15 @@ public final class ProgVarReplacer {
                               int idx) {
         assert next.modifiedFormulas().isEmpty();
 
-        Iterator<SequentFormula<JavaDLTerm>> remIt = next.removedFormulas().iterator();
+        Iterator<SequentFormula<Term>> remIt = next.removedFormulas().iterator();
         assert remIt.hasNext();
-        SequentFormula<JavaDLTerm> remCf = remIt.next();
+        SequentFormula<Term> remCf = remIt.next();
         assert !remIt.hasNext();
         base.removedFormula(idx, remCf);
 
-        Iterator<SequentFormula<JavaDLTerm>> addIt = next.addedFormulas().iterator();
+        Iterator<SequentFormula<Term>> addIt = next.addedFormulas().iterator();
         assert addIt.hasNext();
-        SequentFormula<JavaDLTerm> addCf = addIt.next();
+        SequentFormula<Term> addCf = addIt.next();
         assert !addIt.hasNext();
         base.addedFormula(idx, addCf);
 
@@ -203,8 +203,8 @@ public final class ProgVarReplacer {
 		    result = result.replace(sv, newA, services);
 		}
 	    } else if(ie instanceof TermInstantiation) {
-		JavaDLTerm t = (JavaDLTerm) inst;
-		JavaDLTerm newT = replace(t);
+		Term t = (Term) inst;
+		Term newT = replace(t);
 		if(newT != t) {
 		    result = result.replace(sv, newT, services);
 		}
@@ -220,7 +220,7 @@ public final class ProgVarReplacer {
     /**
      * replaces in a sequent
      */
-    public CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> replace(Sequent s) {
+    public CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> replace(Sequent s) {
         SemisequentChangeInfo anteCI = replace(s.antecedent());
         SemisequentChangeInfo succCI = replace(s.succedent());
 
@@ -230,7 +230,7 @@ public final class ProgVarReplacer {
         Sequent newSequent = Sequent.createSequent(newAntecedent,
                                                    newSuccedent);
 
-        CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> result = SequentChangeInfo.createSequentChangeInfo
+        CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> result = SequentChangeInfo.createSequentChangeInfo
                                               (anteCI, succCI, newSequent, s);
         return result;
     }
@@ -243,11 +243,11 @@ public final class ProgVarReplacer {
     	  SemisequentChangeInfo result = new SemisequentChangeInfo();
         result.setFormulaList(s.asList());
 
-        final Iterator<SequentFormula<JavaDLTerm>> it = s.iterator();
+        final Iterator<SequentFormula<Term>> it = s.iterator();
         
         for (int formulaNumber = 0; it.hasNext(); formulaNumber++) {            
-            final SequentFormula<JavaDLTerm> oldcf = it.next();
-            final SequentFormula<JavaDLTerm> newcf = replace(oldcf);
+            final SequentFormula<Term> oldcf = it.next();
+            final SequentFormula<Term> newcf = replace(oldcf);
 
             if(newcf != oldcf) {
                 result.combine(result.semisequent().replace(formulaNumber, newcf));
@@ -261,10 +261,10 @@ public final class ProgVarReplacer {
     /**
      * replaces in a constrained formula
      */
-    public SequentFormula<JavaDLTerm> replace(SequentFormula<JavaDLTerm> cf) {
-        SequentFormula<JavaDLTerm> result = cf;
+    public SequentFormula<Term> replace(SequentFormula<Term> cf) {
+        SequentFormula<Term> result = cf;
 
-	final JavaDLTerm newFormula = replace(cf.formula());
+	final Term newFormula = replace(cf.formula());
 
 	if(newFormula != cf.formula()) {
             result = new SequentFormula<>(newFormula);
@@ -273,27 +273,27 @@ public final class ProgVarReplacer {
     }
     
     
-    private JavaDLTerm replaceProgramVariable(JavaDLTerm t) {
+    private Term replaceProgramVariable(Term t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
         Object o = map.get(pv);
         if (o instanceof ProgramVariable) {
             return services.getTermFactory().createTerm((ProgramVariable)o, t.getLabels());
-        } else if (o instanceof JavaDLTerm) {
-            return (JavaDLTerm) o;
+        } else if (o instanceof Term) {
+            return (Term) o;
         }
         return t;
     }
     
     
-    private JavaDLTerm standardReplace(JavaDLTerm t) {
-        JavaDLTerm result = t;
+    private Term standardReplace(Term t) {
+        Term result = t;
         
-        final JavaDLTerm newSubTerms[] = new JavaDLTerm[t.arity()];
+        final Term newSubTerms[] = new Term[t.arity()];
 
         boolean changedSubTerm = false;
         
         for(int i = 0, ar = t.arity(); i < ar; i++) {
-            final JavaDLTerm subTerm = t.sub(i);
+            final Term subTerm = t.sub(i);
             newSubTerms[i] = replace(subTerm);
             if(newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
@@ -323,7 +323,7 @@ public final class ProgVarReplacer {
     /**
      * replaces in a term
      */
-    public JavaDLTerm replace(JavaDLTerm t) {
+    public Term replace(Term t) {
         final Operator op = t.op();
         if (op instanceof ProgramVariable) {
             return replaceProgramVariable(t);       

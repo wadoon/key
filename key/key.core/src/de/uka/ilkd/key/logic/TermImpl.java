@@ -33,13 +33,13 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
- * The currently only class implementing the JavaDLTerm interface. GenericTermFactory should
+ * The currently only class implementing the Term interface. GenericTermFactory should
  * be the only class dealing directly with the TermImpl class.
  */
-class TermImpl implements JavaDLTerm {
+class TermImpl implements Term {
 
-    private static final ImmutableArray<JavaDLTerm> EMPTY_TERM_LIST =
-            new ImmutableArray<JavaDLTerm>();
+    private static final ImmutableArray<Term> EMPTY_TERM_LIST =
+            new ImmutableArray<Term>();
 
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST =
             new ImmutableArray<QuantifiableVariable>();
@@ -53,7 +53,7 @@ class TermImpl implements JavaDLTerm {
     // content
     private final Operator op;
     private final Sort sort;
-    private final ImmutableArray<JavaDLTerm> subs;
+    private final ImmutableArray<Term> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
     private final JavaBlock javaBlock;
 
@@ -68,8 +68,8 @@ class TermImpl implements JavaDLTerm {
     private int hashcode = -1;
 
     /**
-     * This flag indicates that the {@link JavaDLTerm} itself or one of its children
-     * contains a non empty {@link JavaBlock}. {@link JavaDLTerm}s which provides a
+     * This flag indicates that the {@link Term} itself or one of its children
+     * contains a non empty {@link JavaBlock}. {@link Term}s which provides a
      * {@link JavaBlock} directly or indirectly can't be cached because it is
      * possible that the contained meta information inside the {@link JavaBlock}
      * , e.g. {@link PositionInfo}s, are different.
@@ -81,7 +81,7 @@ class TermImpl implements JavaDLTerm {
     // constructors
     // -------------------------------------------------------------------------
 
-    public TermImpl(Operator op, Sort sort, ImmutableArray<JavaDLTerm> subs,
+    public TermImpl(Operator op, Sort sort, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
         assert op != null;
         assert subs != null;
@@ -133,12 +133,12 @@ class TermImpl implements JavaDLTerm {
     }
 
     @Override
-    public ImmutableArray<JavaDLTerm> subs() {
+    public ImmutableArray<Term> subs() {
         return subs;
     }
 
     @Override
-    public JavaDLTerm sub(int nr) {
+    public Term sub(int nr) {
         return subs.get(nr);
     }
 
@@ -237,14 +237,14 @@ class TermImpl implements JavaDLTerm {
 
     @Override
     public boolean equalsModRenaming(Object o) {
-        if (!(o instanceof JavaDLTerm)) {
+        if (!(o instanceof Term)) {
             return false;
         }
         
         if (o == this) {
             return true;
         }
-        return unifyHelp(this, (JavaDLTerm) o, ImmutableSLList.<QuantifiableVariable> nil(),
+        return unifyHelp(this, (Term) o, ImmutableSLList.<QuantifiableVariable> nil(),
                 ImmutableSLList.<QuantifiableVariable> nil(), null);
     }
 
@@ -314,7 +314,7 @@ class TermImpl implements JavaDLTerm {
      * @return <code>true</code> is returned iff the terms are equal modulo
      *         bound renaming
      */
-    private boolean unifyHelp(JavaDLTerm t0, JavaDLTerm t1,
+    private boolean unifyHelp(Term t0, Term t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
             NameAbstractionTable nat) {
@@ -348,7 +348,7 @@ class TermImpl implements JavaDLTerm {
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
     }
 
-    private boolean handleQuantifiableVariable(JavaDLTerm t0, JavaDLTerm t1,
+    private boolean handleQuantifiableVariable(Term t0, Term t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars) {
         if (!((t1.op() instanceof QuantifiableVariable) && compareBoundVariables(
@@ -365,7 +365,7 @@ class TermImpl implements JavaDLTerm {
      */
     private static NameAbstractionTable FAILED = new NameAbstractionTable();
 
-    private static NameAbstractionTable handleJava(JavaDLTerm t0, JavaDLTerm t1,
+    private static NameAbstractionTable handleJava(Term t0, Term t1,
             NameAbstractionTable nat) {
 
         if (!t0.modalContent().isEmpty() || !t1.modalContent().isEmpty()) {
@@ -390,7 +390,7 @@ class TermImpl implements JavaDLTerm {
         return nat;
     }
 
-    private boolean descendRecursively(JavaDLTerm t0, JavaDLTerm t1,
+    private boolean descendRecursively(Term t0, Term t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
             NameAbstractionTable nat) {

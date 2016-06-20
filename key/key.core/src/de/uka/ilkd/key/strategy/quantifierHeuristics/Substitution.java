@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.util.Debug;
 
@@ -32,17 +32,17 @@ import de.uka.ilkd.key.util.Debug;
  * variable to a term(instance).
  */
 public class Substitution {
-    private final ImmutableMap<QuantifiableVariable,JavaDLTerm> varMap;
+    private final ImmutableMap<QuantifiableVariable,Term> varMap;
     
-    public Substitution(ImmutableMap<QuantifiableVariable,JavaDLTerm> map){
+    public Substitution(ImmutableMap<QuantifiableVariable,Term> map){
         varMap = map;
     }
     
-    public ImmutableMap<QuantifiableVariable,JavaDLTerm> getVarMap(){
+    public ImmutableMap<QuantifiableVariable,Term> getVarMap(){
         return varMap;
     }
     
-    public JavaDLTerm getSubstitutedTerm(QuantifiableVariable var){
+    public Term getSubstitutedTerm(QuantifiableVariable var){
     	return varMap.get(var);
     }
     
@@ -60,7 +60,7 @@ public class Substitution {
     public boolean isGround() {
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
-            final JavaDLTerm t = getSubstitutedTerm(it.next ()); 
+            final Term t = getSubstitutedTerm(it.next ()); 
             if ( t.freeVars ().size () != 0 ) {
             	Debug.out("evil free vars in term: " + t);
                 return false;
@@ -70,7 +70,7 @@ public class Substitution {
     }   
   
     
-    public JavaDLTerm apply(JavaDLTerm t, JavaDLTermServices services) {
+    public Term apply(Term t, JavaDLTermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
@@ -79,7 +79,7 @@ public class Substitution {
             final Sort quantifiedVarSort = var.sort ();
             final Function quantifiedVarSortCast =
                 quantifiedVarSort.getCastSymbol (services);
-            JavaDLTerm instance = getSubstitutedTerm( var );
+            Term instance = getSubstitutedTerm( var );
             if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) )
             	instance = services.getTermBuilder().func ( quantifiedVarSortCast, instance );
             t = applySubst ( var, instance, t, services );
@@ -87,7 +87,7 @@ public class Substitution {
         return t;
     }
 
-    private JavaDLTerm applySubst(QuantifiableVariable var, JavaDLTerm instance, JavaDLTerm t, JavaDLTermServices services) {
+    private Term applySubst(QuantifiableVariable var, Term instance, Term t, JavaDLTermServices services) {
         final ClashFreeSubst subst = new ClashFreeSubst ( var,  instance, services);
         return subst.apply ( t );
     }
@@ -96,13 +96,13 @@ public class Substitution {
      * Try to apply the substitution to a term, introducing casts if
      * necessary (may never be the case any more, XXX)
      */
-    public JavaDLTerm applyWithoutCasts(JavaDLTerm t, JavaDLTermServices services) {
+    public Term applyWithoutCasts(Term t, JavaDLTermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
-            JavaDLTerm instance = getSubstitutedTerm( var );
+            Term instance = getSubstitutedTerm( var );
             
             try {
                 t = applySubst ( var, instance, t, services );
@@ -135,8 +135,8 @@ public class Substitution {
     	return "" + varMap;
     }
     
-    public boolean termContainsValue(JavaDLTerm term) {
-        Iterator<JavaDLTerm> it = varMap.valueIterator ();
+    public boolean termContainsValue(Term term) {
+        Iterator<Term> it = varMap.valueIterator ();
         while ( it.hasNext () ) {
             if ( recOccurCheck ( it.next (), term ) ) return true;
         }
@@ -146,7 +146,7 @@ public class Substitution {
     /**
      * check whether term "sub" is in term "term"
      */
-    private boolean recOccurCheck(JavaDLTerm sub, JavaDLTerm term) {
+    private boolean recOccurCheck(Term sub, Term term) {
         if ( sub.equals ( term ) ) return true;
         for ( int i = 0; i < term.arity (); i++ ) {
             if ( recOccurCheck ( sub, term.sub ( i ) ) ) return true;

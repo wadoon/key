@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractRule;
@@ -74,12 +74,12 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
    @Override
    public RefactoringScope defineRefactoringScope(TermLabelState state,
                                                   Services services,
-                                                  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
-                                                  JavaDLTerm applicationTerm,
+                                                  PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+                                                  Term applicationTerm,
                                                   Rule rule,
                                                   Goal goal,
                                                   Object hint, 
-                                                  JavaDLTerm tacletTerm) {
+                                                  Term tacletTerm) {
       if (goal != null) {
          if (rule instanceof UseOperationContractRule &&
                (goal.node().getNodeInfo().getBranchLabel().startsWith("Pre") ||
@@ -109,13 +109,13 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
    @Override
    public void refactoreLabels(TermLabelState state,
                                Services services,
-                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
-                               JavaDLTerm applicationTerm,
+                               PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+                               Term applicationTerm,
                                Rule rule,
                                Goal goal,
                                Object hint, 
-                               JavaDLTerm tacletTerm,
-                               JavaDLTerm term,
+                               Term tacletTerm,
+                               Term term,
                                List<TermLabel> labels) {
       Iterator<TermLabel> iter = labels.iterator();
       while (iter.hasNext()) {

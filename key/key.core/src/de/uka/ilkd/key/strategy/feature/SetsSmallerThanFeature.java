@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
@@ -50,24 +50,24 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
     @Override
     protected boolean filter(TacletApp app,
-                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+                             PosInOccurrence<Term, SequentFormula<Term>> pos,
                              Goal goal) {
-        final JavaDLTerm leftTerm = left.toTerm(app, pos, goal);
-        final JavaDLTerm rightTerm = right.toTerm(app, pos, goal);
+        final Term leftTerm = left.toTerm(app, pos, goal);
+        final Term rightTerm = right.toTerm(app, pos, goal);
 
         return origLessThan(leftTerm, rightTerm, goal.proof().getServices().getCaches());
     }
 
 
-    protected boolean origLessThan(JavaDLTerm leftTerm,
-                                   JavaDLTerm rightTerm, ServiceCaches caches) {// TODO: Why is this method needed?
+    protected boolean origLessThan(Term leftTerm,
+                                   Term rightTerm, ServiceCaches caches) {// TODO: Why is this method needed?
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
-        final ImmutableList<JavaDLTerm> literalsLeftTerm = m1.getResult();
+        final ImmutableList<Term> literalsLeftTerm = m1.getResult();
 
         final LiteralCollector m2 = new LiteralCollector();
         m2.collect(rightTerm);
-        final ImmutableList<JavaDLTerm> literalsRightTerm = m2.getResult();
+        final ImmutableList<Term> literalsRightTerm = m2.getResult();
 
         return super.lessThan(literalsLeftTerm, literalsRightTerm, caches);
     }
@@ -75,7 +75,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
     private class LiteralCollector extends Collector {
 
-        protected void collect(JavaDLTerm te) {
+        protected void collect(Term te) {
             final Operator op = te.op();
             if (op == locSetLDT.getUnion() ||
                     op == locSetLDT.getIntersect() ||

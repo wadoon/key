@@ -36,8 +36,8 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
        
     SVInstantiations insts=null;
 
-    JavaDLTerm rw;
-    JavaDLTerm t_allxpxpx;
+    Term rw;
+    Term t_allxpxpx;
 
 
     public TestSyntacticalReplaceVisitor(String s) {
@@ -72,10 +72,10 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	LogicVariable y=new LogicVariable(new Name("y"), s);
 	Function p=new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
 
-	JavaDLTerm t_x=TB.tf().createTerm(x);
-	JavaDLTerm t_px=TB.tf().createTerm(p, new JavaDLTerm[]{t_x}, null, null);
-	JavaDLTerm t_y=TB.tf().createTerm(y);
-	JavaDLTerm t_py=TB.tf().createTerm(p, new JavaDLTerm[]{t_y}, null, null);
+	Term t_x=TB.tf().createTerm(x);
+	Term t_px=TB.tf().createTerm(p, new Term[]{t_x}, null, null);
+	Term t_y=TB.tf().createTerm(y);
+	Term t_py=TB.tf().createTerm(p, new Term[]{t_y}, null, null);
 
 	Services services = TacletForTests.services();
 	insts=SVInstantiations.EMPTY_SVINSTANTIATIONS.add(b, t_px, services).add(v, t_y, services)
@@ -99,13 +99,13 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
    
 
     public void testSubstitutionReplacement() {
-	JavaDLTerm orig=TacletForTests.parseTerm("{\\subst s x; f(const)}(\\forall s y; p(x))");
-	JavaDLTerm result=TacletForTests.parseTerm("(\\forall s y; p(f(const)))");
+	Term orig=TacletForTests.parseTerm("{\\subst s x; f(const)}(\\forall s y; p(x))");
+	Term result=TacletForTests.parseTerm("(\\forall s y; p(f(const)))");
 	SyntacticalReplaceVisitor v = new
 	    SyntacticalReplaceVisitor
 	    (new TermLabelState(), null, null, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, null, null, TacletForTests.services());
 	orig.execPostOrder(v);
-	assertEquals("Substitution JavaDLTerm not resolved correctly.",
+	assertEquals("Substitution Term not resolved correctly.",
 		     v.getTerm().sub(0), result.sub(0));
     }
 }

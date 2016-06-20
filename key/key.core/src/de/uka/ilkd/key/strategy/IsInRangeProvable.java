@@ -11,7 +11,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -48,7 +48,7 @@ public class IsInRangeProvable implements Feature {
      * @param services the {@link Services}
      * @return the set of axioms
      */
-    private ImmutableSet<JavaDLTerm> collectAxioms(Sequent seq, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ignore, Services services) {
+    private ImmutableSet<Term> collectAxioms(Sequent seq, PosInOccurrence<Term, SequentFormula<Term>> ignore, Services services) {
         final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
 
         // collect the operators used to identify the formulas of interest in the sequent
@@ -59,11 +59,11 @@ public class IsInRangeProvable implements Feature {
         ops.add(integerLDT.getGreaterOrEquals());
         
         // when extracting we want to ignore the formula on which the rule is applied
-        final SequentFormula<JavaDLTerm> formulaToIgnore = ignore.sequentFormula();
+        final SequentFormula<Term> formulaToIgnore = ignore.sequentFormula();
         
         // extract formulas with equality (on integer terms) or one of the operators in <code>ops</code> as top level operator
-        final ImmutableSet<JavaDLTerm> result = 
-                extractAssumptionsFrom(seq.antecedent(), false, DefaultImmutableSet.<JavaDLTerm>nil(), ops, formulaToIgnore, services);
+        final ImmutableSet<Term> result = 
+                extractAssumptionsFrom(seq.antecedent(), false, DefaultImmutableSet.<Term>nil(), ops, formulaToIgnore, services);
         
         return extractAssumptionsFrom(seq.succedent(), true, result, ops, formulaToIgnore, services);
     }
@@ -78,16 +78,16 @@ public class IsInRangeProvable implements Feature {
      * @param services the {@link Services}
      * @return the set of axioms (including the already found axioms {@code assumptions}
      */
-    private ImmutableSet<JavaDLTerm> extractAssumptionsFrom(
-            final Semisequent semisequent, boolean negated, ImmutableSet<JavaDLTerm> assumptions,
-            final HashSet<Operator> ops, final SequentFormula<JavaDLTerm> formulaToIgnore, Services services) {
+    private ImmutableSet<Term> extractAssumptionsFrom(
+            final Semisequent semisequent, boolean negated, ImmutableSet<Term> assumptions,
+            final HashSet<Operator> ops, final SequentFormula<Term> formulaToIgnore, Services services) {
         
         final TermBuilder tb = services.getTermBuilder();
         final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
         
-        for (final SequentFormula<JavaDLTerm> sf : semisequent) {
+        for (final SequentFormula<Term> sf : semisequent) {
             if (formulaToIgnore != sf) {
-                final JavaDLTerm formula = sf.formula();
+                final Term formula = sf.formula();
                 if (filterSequent(ops, integerLDT, formula)) {
                     assumptions = assumptions.add(negated ? tb.not(formula) : formula);
                 }
@@ -107,7 +107,7 @@ public class IsInRangeProvable implements Feature {
      * @return true if the formula should be used axiom
      */
     private boolean filterSequent(final HashSet<Operator> ops,
-            final IntegerLDT integerLDT, final JavaDLTerm formula) {
+            final IntegerLDT integerLDT, final Term formula) {
         return (formula.op() == Equality.EQUALS && 
                 formula.sub(0).sort().extendsTrans(integerLDT.targetSort())) || ops.contains(formula.op());
     }
@@ -162,12 +162,12 @@ public class IsInRangeProvable implements Feature {
 
 
     @Override
-    public RuleAppCost compute(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public RuleAppCost compute(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         final Services services = goal.proof().getServices();
        
-        final ImmutableSet<JavaDLTerm> axioms = collectAxioms(goal.sequent(), pos, services);
+        final ImmutableSet<Term> axioms = collectAxioms(goal.sequent(), pos, services);
                 
-        JavaDLTerm toProve = createConsequence(pos, services);              
+        Term toProve = createConsequence(pos, services);              
         
         if (isProvable(toSequent(axioms, toProve), services)) {
             return NumberRuleAppCost.getZeroCost();
@@ -179,13 +179,13 @@ public class IsInRangeProvable implements Feature {
 
     /**
      * creates the term to be proven to follow from a (possibly empty) set of axioms
-     * @param pos the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the focus term
+     * @param pos the {@link PosInOccurrence<Term, SequentFormula<Term>>} of the focus term
      * @param services the {@link Services}
      * @return the term to prove
      */
-    protected JavaDLTerm createConsequence(final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, final Services services) {
+    protected Term createConsequence(final PosInOccurrence<Term, SequentFormula<Term>> pos, final Services services) {
         
-        final JavaDLTerm termToCheck = pos.subTerm().sub(0);
+        final Term termToCheck = pos.subTerm().sub(0);
         final TermBuilder tb = services.getTermBuilder();
         final IntegerLDT intLDT = services.getTheories().getIntegerLDT();
         
@@ -212,7 +212,7 @@ public class IsInRangeProvable implements Feature {
             return tb.ff();
         }
         
-        final JavaDLTerm toProve = tb.and(tb.geq(termToCheck, tb.zTerm(lowerBound)), 
+        final Term toProve = tb.and(tb.geq(termToCheck, tb.zTerm(lowerBound)), 
                 tb.leq(termToCheck, tb.zTerm(upperBound)));
         return toProve;
     }
@@ -221,12 +221,12 @@ public class IsInRangeProvable implements Feature {
     /**
      * creates the sequent <code>axioms ==> toProve</code>
      * @param axioms set of terms (conjunctive)
-     * @param toProve the JavaDLTerm to be proven
+     * @param toProve the Term to be proven
      * @return the sequent to be proven valid
      */
-    protected Sequent toSequent(ImmutableSet<JavaDLTerm> axioms, JavaDLTerm toProve) {
+    protected Sequent toSequent(ImmutableSet<Term> axioms, Term toProve) {
         Sequent result = Sequent.EMPTY_SEQUENT;        
-        for (final JavaDLTerm axiom : axioms) {
+        for (final Term axiom : axioms) {
             result = result.addFormula(new SequentFormula<>(axiom), true, true).sequent();
         }        
         return result.addFormula(new SequentFormula<>(toProve), false, true).sequent();

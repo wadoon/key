@@ -22,15 +22,15 @@ import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link TermLabel} as long
- * the new {@link JavaDLTerm} has the same {@link Operator} as the
- * previous best matching {@link JavaDLTerm} from which it was created.
+ * the new {@link Term} has the same {@link Operator} as the
+ * previous best matching {@link Term} from which it was created.
  * @author Martin Hentschel 
  */
 public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
@@ -40,14 +40,14 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
    @Override
    public TermLabel keepLabel(TermLabelState state,
                               Services services,
-                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
-                              JavaDLTerm applicationTerm,
+                              PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+                              Term applicationTerm,
                               Rule rule,
                               Goal goal,
                               Object hint,
-                              JavaDLTerm tacletTerm,
+                              Term tacletTerm,
                               Operator newTermOp,
-                              ImmutableArray<JavaDLTerm> newTermSubs,
+                              ImmutableArray<Term> newTermSubs,
                               ImmutableArray<QuantifiableVariable> newTermBoundVars,
                               JavaBlock newTermJavaBlock,
                               ImmutableArray<TermLabel> newTermOriginalLabels,

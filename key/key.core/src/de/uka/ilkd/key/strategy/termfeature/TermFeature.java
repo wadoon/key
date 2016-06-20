@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
@@ -22,5 +22,5 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
  */
 public interface TermFeature {
 
-    RuleAppCost compute(JavaDLTerm term, Services services);
+    RuleAppCost compute(Term term, Services services);
 }

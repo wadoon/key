@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
@@ -33,18 +33,18 @@ public class NotBelowBinderFeature extends BinaryFeature {
 
     private NotBelowBinderFeature () {}
     
-    public boolean filter (RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public boolean filter (RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         Debug.assertFalse ( pos == null,
                             "Feature is only applicable to rules with find" );
 
         return !belowBinder ( pos );
     }
 
-    private boolean belowBinder (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
-        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator ();
+    private boolean belowBinder (PosInOccurrence<Term, SequentFormula<Term>> pos) {
+        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
 
         while ( it.next () != -1 ) {
-            final JavaDLTerm t = it.getSubTerm ();
+            final Term t = it.getSubTerm ();
 
             if ( t.varsBoundHere ( it.getChild () ).size () > 0 ) return true;
         }

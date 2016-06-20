@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.model.Model;
@@ -341,7 +341,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
-        private String[] translateToCommand(JavaDLTerm term)
+        private String[] translateToCommand(Term term)
         		throws IllegalFormulaException, IOException {
 
 

@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 public class PermissionLDT extends LDT {
 
@@ -42,22 +42,22 @@ public class PermissionLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JavaDLTerm[] subs, Services services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, Services services, ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JavaDLTerm left, JavaDLTerm right, Services services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right, Services services, ExecutionContext ec) {
         return false;
     }
 
 
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JavaDLTerm sub, JavaDLTermServices services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub, JavaDLTermServices services, ExecutionContext ec) {
         return false;
     }
 
     @Override
-    public JavaDLTerm translateLiteral(Literal lit, Services services) {
+    public Term translateLiteral(Literal lit, Services services) {
         assert false : "PermissionLDT: there are no permission literals: " + lit;
         return null;
     }
@@ -74,13 +74,13 @@ public class PermissionLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
+    public Expression translateTerm(Term t, ExtList children, Services services) {
         assert false : "PermissionLDT: Cannot convert term to program: " + t;
         return null;
     }
 
     @Override
-    public Type getType(JavaDLTerm t) {
+    public Type getType(Term t) {
         assert false : "PermissionLDT: there are no types associated with permissions " + t;
         return null;
     }

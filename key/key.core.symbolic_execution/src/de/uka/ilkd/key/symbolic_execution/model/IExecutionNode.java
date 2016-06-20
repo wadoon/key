@@ -17,7 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
@@ -75,10 +75,10 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
    public boolean isPathConditionChanged();
    
    /**
-    * Returns the path condition to reach this node as {@link JavaDLTerm}.
-    * @return The path condition to reach this node as {@link JavaDLTerm}.
+    * Returns the path condition to reach this node as {@link Term}.
+    * @return The path condition to reach this node as {@link Term}.
     */
-   public JavaDLTerm getPathCondition() throws ProofInputException;
+   public Term getPathCondition() throws ProofInputException;
    
    /**
     * Returns the human readable path condition to reach this node as string. 
@@ -119,10 +119,10 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
    
    /**
     * Returns the variable value pairs of the current state under the given condition.
-    * @param condition A {@link JavaDLTerm} specifying some additional constraints to consider.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
     * @return The variable value pairs.
     */
-   public IExecutionVariable[] getVariables(JavaDLTerm condition) throws ProofInputException;
+   public IExecutionVariable[] getVariables(Term condition) throws ProofInputException;
    
    /**
     * Returns the number of memory layouts.
@@ -167,7 +167,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     * @param completedNode The completed {@link IExecutionBlockStartNode} for which the condition is requested.
     * @return The condition under which this node completes the code block of the given {@link IExecutionBlockStartNode}.
     */
-   public JavaDLTerm getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException;
+   public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException;
    
    /**
     * Returns the human readable condition under which this node completes the code block of the given {@link IExecutionBlockStartNode}.

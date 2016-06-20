@@ -4,7 +4,7 @@ import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -43,7 +43,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
             }
         } else {
             Object peForCompare = pe;
-            if (inMap instanceof JavaDLTerm) {
+            if (inMap instanceof Term) {
                 try {
                     peForCompare = services.getProgramServices().getTypeConverter()
                             .convertToLogicElement(
@@ -78,7 +78,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(JavaDLTerm instantiationCandidate,  MatchConditions matchCond, Services services) {
+    public MatchConditions match(Term instantiationCandidate,  MatchConditions matchCond, Services services) {
         final ProgramSVSort svSort = (ProgramSVSort)op.sort();
 
         if (svSort.canStandFor(instantiationCandidate)) {

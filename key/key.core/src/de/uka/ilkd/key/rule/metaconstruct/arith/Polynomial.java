@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 
 /**
@@ -46,8 +46,8 @@ public class Polynomial {
     public final static Polynomial ONE =
         new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ONE );    
 
-    public static Polynomial create(JavaDLTerm polyTerm, Services services) {
-       final LRUCache<JavaDLTerm, Polynomial> cache = services.getCaches().getPolynomialCache();
+    public static Polynomial create(Term polyTerm, Services services) {
+       final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
        
        Polynomial res;
        synchronized (cache) {
@@ -63,7 +63,7 @@ public class Polynomial {
         return res;
     }
 
-    private static Polynomial createHelp(JavaDLTerm polynomial, Services services) {
+    private static Polynomial createHelp(Term polynomial, Services services) {
         final Analyser a = new Analyser ( services );
         a.analyse ( polynomial );
         return new Polynomial ( a.parts, a.constantPart );
@@ -193,10 +193,10 @@ public class Polynomial {
         return difference ( parts, p.parts ).isEmpty ();
     }
     
-    public JavaDLTerm toTerm (Services services) {
+    public Term toTerm (Services services) {
         final Operator add = 
             services.getTheories().getIntegerLDT().getAdd();
-        JavaDLTerm res = null;
+        Term res = null;
         
         final Iterator<Monomial> it = parts.iterator ();
         if ( it.hasNext () ) {
@@ -206,7 +206,7 @@ public class Polynomial {
                               ( add, res, it.next ().toTerm ( services ) );
         }
         
-        final JavaDLTerm cTerm = services.getTermBuilder().zTerm(constantPart.toString());
+        final Term cTerm = services.getTermBuilder().zTerm(constantPart.toString());
         
         if ( res == null )
             res = cTerm;
@@ -238,7 +238,7 @@ public class Polynomial {
             add = intLDT.getAdd();
         }
         
-        public void analyse(JavaDLTerm polynomial) {
+        public void analyse(Term polynomial) {
             final Operator op = polynomial.op ();
             if ( op == add ) {
                 analyse ( polynomial.sub ( 0 ) );

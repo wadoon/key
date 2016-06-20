@@ -34,7 +34,7 @@ import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
@@ -200,13 +200,13 @@ public class TacletFindModel extends AbstractTableModel {
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */
-    private JavaDLTerm parseTerm(String s, Namespace varNS, Namespace functNS)
+    private Term parseTerm(String s, Namespace varNS, Namespace functNS)
         throws ParserException
     {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
-        JavaDLTerm term = new DefaultTermParser().parse(
+        Term term = new DefaultTermParser().parse(
            new StringReader(s), null, services, copy, scm);
         return term;
     }
@@ -260,7 +260,7 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     /**
-     * parses the indicated row and returns a JavaDLTerm corresponding to the
+     * parses the indicated row and returns a Term corresponding to the
      * entry in the row
      *
      * @param irow the row to be parsed
@@ -268,7 +268,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace that will be passed to parseTerm
      * @return the parsed term
      */
-    private JavaDLTerm parseRow(int irow, Namespace varNS, Namespace functNS)
+    private Term parseRow(int irow, Namespace varNS, Namespace functNS)
         throws SVInstantiationParserException,
                MissingInstantiationException {
 
@@ -476,7 +476,7 @@ public class TacletFindModel extends AbstractTableModel {
                         Namespace functNS =
                             result.extendedFunctionNameSpace(nss.functions());
                         
-                        final JavaDLTerm instance = parseRow(irow, extVarNS, functNS);
+                        final Term instance = parseRow(irow, extVarNS, functNS);
                         sort = instance.sort ();                    
                         
                         try {

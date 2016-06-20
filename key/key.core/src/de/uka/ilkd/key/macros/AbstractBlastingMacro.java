@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SortCollector;
@@ -51,7 +51,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
+                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
        for (Goal goal : goals) {
           addInvariantFormula(goal);
@@ -64,14 +64,14 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
        SortCollector sortCollector = new SortCollector();
 
-       for(SequentFormula<JavaDLTerm> sf : goal.sequent()){
+       for(SequentFormula<Term> sf : goal.sequent()){
            sf.formula().execPreOrder(sortCollector);
        }
 
        Set<Sort> sorts = sortCollector.getSorts();
        sorts.remove(nullSort);
-       List<SequentFormula<JavaDLTerm>> formulae =  createFormulae(goal.proof().getServices(), sorts);
-       for(SequentFormula<JavaDLTerm> sf : formulae){
+       List<SequentFormula<Term>> formulae =  createFormulae(goal.proof().getServices(), sorts);
+       for(SequentFormula<Term> sf : formulae){
            Sequent s = goal.sequent();
            Semisequent antecedent = s.antecedent();
            if(!antecedent.containsEqual(sf)){
@@ -81,7 +81,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }    
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         return new SemanticsBlastingStrategy();
     }
     
@@ -94,8 +94,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return false;
     }
 
-    private List<SequentFormula<JavaDLTerm>> createFormulae(Services services, Set<Sort> sorts){
-        List<SequentFormula<JavaDLTerm>> result = new LinkedList<SequentFormula<JavaDLTerm>>();
+    private List<SequentFormula<Term>> createFormulae(Services services, Set<Sort> sorts){
+        List<SequentFormula<Term>> result = new LinkedList<SequentFormula<Term>>();
 
         JavaInfo info = services.getProgramServices().getJavaInfo();
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
@@ -126,7 +126,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
 
             LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
-            JavaDLTerm exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
+            Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
             for(ClassAxiom c : spec.getClassAxioms(kjt)){
 
                 if(c instanceof RepresentsAxiom && c.getKJT().equals(kjt)){
@@ -134,27 +134,27 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
                     try{
 
-                        JavaDLTerm t = ra.getAxiom(h, o, services);
+                        Term t = ra.getAxiom(h, o, services);
                         //System.err.println(c.getName());
                         if(t.op().equals(Equality.EQV)){
 
-                            JavaDLTerm left = t.sub(0);
-                            JavaDLTerm right = t.sub(1);
+                            Term left = t.sub(0);
+                            Term right = t.sub(1);
 
-                            JavaDLTerm equivalence = t;
-                            JavaDLTerm implication;
+                            Term equivalence = t;
+                            Term implication;
 
-                            JavaDLTerm[] heaps = new JavaDLTerm[1];
+                            Term[] heaps = new Term[1];
                             heaps[0] = tb.var(h);
 
-                            JavaDLTerm inv = tb.inv(heaps, tb.var(o));
+                            Term inv = tb.inv(heaps, tb.var(o));
 
                             if(left.op().name().equals(inv.op().name())){
 
                                 implication = tb.imp(left, right);
 
-                                JavaDLTerm exactInstanceEquiv = tb.imp(exactInstance, equivalence);
-                                JavaDLTerm instanceImpl = implication;
+                                Term exactInstanceEquiv = tb.imp(exactInstance, equivalence);
+                                Term instanceImpl = implication;
 
                                 exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                                 instanceImpl = tb.all(h, tb.all(o, instanceImpl));
@@ -167,9 +167,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                             }
                             else if(right.op().name().equals(inv.op().name())){
 
-                                JavaDLTerm exactInstanceEquiv = tb.imp(exactInstance, equivalence);
+                                Term exactInstanceEquiv = tb.imp(exactInstance, equivalence);
                                 implication = tb.imp(right, left);
-                                JavaDLTerm instanceImpl = implication;
+                                Term instanceImpl = implication;
 
                                 exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                                 instanceImpl = tb.all(h, tb.all(o, instanceImpl));
@@ -182,13 +182,13 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
                             }
                             else{
-                                JavaDLTerm f = t;
+                                Term f = t;
                                 f = tb.all(h, tb.all(o, f));                            
                                 result.add(new SequentFormula<>(f));
                             }
                         }
                         else{
-                            JavaDLTerm f = t;
+                            Term f = t;
                             f = tb.all(h, tb.all(o, f));                            
                             result.add(new SequentFormula<>(f));
                         }
@@ -216,7 +216,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio,
                 Goal goal) {
 
             if(app.rule() instanceof OneStepSimplifier){
@@ -232,7 +232,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 return NumberRuleAppCost.create(10);
             }
             else if(app.rule().name().toString().equals("pullOut")){
-                JavaDLTerm t = pio.subTerm();
+                Term t = pio.subTerm();
 
                 //System.out.println(t);
 
@@ -250,7 +250,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
 
             if(app.rule() instanceof OneStepSimplifier){
                 return true;
@@ -271,7 +271,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal,
+        public void instantiateApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal,
                 RuleAppCostCollector collector) {}
 
         @Override

@@ -29,7 +29,7 @@ import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -67,7 +67,7 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     private final WellDefinednessCheck check;
-    private JavaDLTerm mbyAtPre;
+    private Term mbyAtPre;
     private InitConfig proofConfig;
     private TermBuilder tb;
 
@@ -259,21 +259,21 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc preCond =
                 check.getPre(po.pre, vars.self, vars.heap, vars.params, false, proofServices);
-        final JavaDLTerm wdPre = tb.wd(preCond.term);
-        final JavaDLTerm wdMod = tb.wd(po.mod);
-        final JavaDLTerm wdRest = tb.and(tb.wd(po.rest));
+        final Term wdPre = tb.wd(preCond.term);
+        final Term wdMod = tb.wd(po.mod);
+        final Term wdRest = tb.and(tb.wd(po.rest));
         register(preCond.func, proofServices);
         mbyAtPre = preCond.func != null ? check.replace(tb.func(preCond.func), vars) : null;
-        final JavaDLTerm post = check.getPost(po.post, vars.result, proofServices);
-        final JavaDLTerm pre = preCond.term;
-        final JavaDLTerm updates = check.getUpdates(po.mod, vars.heap, vars.heapAtPre,
+        final Term post = check.getPost(po.post, vars.result, proofServices);
+        final Term pre = preCond.term;
+        final Term updates = check.getUpdates(po.mod, vars.heap, vars.heapAtPre,
                                               vars.anonHeap, proofServices);
-        final JavaDLTerm wfAnon = tb.wellFormed(vars.anonHeap);
-        final JavaDLTerm uPost = check instanceof ClassWellDefinedness ?
+        final Term wfAnon = tb.wellFormed(vars.anonHeap);
+        final Term uPost = check instanceof ClassWellDefinedness ?
                 tb.tt() : tb.apply(updates, tb.wd(post));
-        final JavaDLTerm imp = tb.imp(tb.and(pre, wfAnon),
+        final Term imp = tb.imp(tb.and(pre, wfAnon),
                                 tb.and(wdMod, wdRest, uPost));
-        final JavaDLTerm poTerms = tb.and(wdPre, imp);
+        final Term poTerms = tb.and(wdPre, imp);
         assignPOTerms(poTerms);
         // add axioms
         collectClassAxioms(getKJT(), proofConfig);
@@ -304,7 +304,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     @Override
-    public JavaDLTerm getMbyAtPre() {
+    public Term getMbyAtPre() {
         return this.mbyAtPre;
     }
 
@@ -355,7 +355,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         public final ImmutableList<ProgramVariable> params;
         public final LocationVariable heap;
         public final ProgramVariable heapAtPre;
-        public final JavaDLTerm anonHeap;
+        public final Term anonHeap;
 
         public Variables(final ProgramVariable self,
                          final ProgramVariable result,
@@ -363,7 +363,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                          final Map<LocationVariable, ProgramVariable> atPres,
                          final ImmutableList<ProgramVariable> params,
                          final LocationVariable heap,
-                         final JavaDLTerm anonHeap) {
+                         final Term anonHeap) {
             this.self = self;
             this.result = result;
             this.exception = exception;

@@ -36,7 +36,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -178,13 +178,13 @@ public final class QueryAxiom extends ClassAxiom {
 
 	//create update and postcondition linking schema variables and 
 	//program variables
-	JavaDLTerm update = null;
+	Term update = null;
 	int hc = 0;
 	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
 		if(hc >= target.getHeapCount(services)) {
 			break;
 		}
-		JavaDLTerm u = TB.elementary(heap, TB.var(heapSVs.get(hc++)));
+		Term u = TB.elementary(heap, TB.var(heapSVs.get(hc++)));
 		if(update == null) {
 			update = u;
 		}else{
@@ -201,7 +201,7 @@ public final class QueryAxiom extends ClassAxiom {
 		                 TB.elementary(paramProgSVs[i],
 		                	       TB.var(paramSVs[i])));
 	}
-	final JavaDLTerm post = TB.imp(TB.reachableValue(TB.var(resultProgSV),
+	final Term post = TB.imp(TB.reachableValue(TB.var(resultProgSV),
 						   target.getReturnType()),
 	                  	 TB.equals(TB.var(skolemSV), TB.var(resultProgSV)));
 	
@@ -229,15 +229,15 @@ public final class QueryAxiom extends ClassAxiom {
 	if(target.isStatic()) {
 	    ifSeq = null;
 	} else {
-	    final JavaDLTerm ifFormula = TB.exactInstance(kjt.getSort(), TB.var(selfSV));
-	    final SequentFormula<JavaDLTerm> ifCf = new SequentFormula<>(ifFormula);
+	    final Term ifFormula = TB.exactInstance(kjt.getSort(), TB.var(selfSV));
+	    final SequentFormula<Term> ifCf = new SequentFormula<>(ifFormula);
 	    final Semisequent ifSemiSeq
 	    	= Semisequent.nil().insertFirst(ifCf).semisequent();
 	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
 	}
 
 	//create find
-	final JavaDLTerm[] subs = new JavaDLTerm[target.arity()];
+	final Term[] subs = new Term[target.arity()];
 	int offset = 0;
 	for(SchemaVariable heapSV : heapSVs) {
 		subs[offset++] = TB.var(heapSV);
@@ -248,15 +248,15 @@ public final class QueryAxiom extends ClassAxiom {
 	for(int i = 0; i < paramSVs.length; i++) {
 	    subs[offset++] = TB.var(paramSVs[i]);	    
 	}
-	final JavaDLTerm find = TB.func(target, subs);
+	final Term find = TB.func(target, subs);
 	
 	//create replacewith
-	final JavaDLTerm replacewith = TB.var(skolemSV);
+	final Term replacewith = TB.var(skolemSV);
 	
 	//create added sequent
-	final JavaDLTerm addedFormula 
+	final Term addedFormula 
 		= TB.apply(update, TB.prog(Modality.BOX, jb, post), null);
-	final SequentFormula<JavaDLTerm> addedCf = new SequentFormula<>(addedFormula);
+	final SequentFormula<Term> addedCf = new SequentFormula<>(addedFormula);
 	final Semisequent addedSemiSeq = Semisequent.nil()
 	                                            .insertFirst(addedCf)
 	                                            .semisequent();

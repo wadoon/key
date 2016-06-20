@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -86,19 +86,19 @@ class BasicSnippetData {
          * Returns the contracted block.
          */
         TARGET_BLOCK(StatementBlock.class),
-        PRECONDITION(JavaDLTerm.class),
-        POSTCONDITION(JavaDLTerm.class),
+        PRECONDITION(Term.class),
+        POSTCONDITION(Term.class),
         LOOP_INVARIANT(LoopInvariant.class),
-        LOOP_INVARIANT_TERM(JavaDLTerm.class),
-        MODIFIES(JavaDLTerm.class),
-        DEPENDENS(JavaDLTerm.class),
-        MEASURED_BY(JavaDLTerm.class),
+        LOOP_INVARIANT_TERM(Term.class),
+        MODIFIES(Term.class),
+        DEPENDENS(Term.class),
+        MEASURED_BY(Term.class),
         MODALITY(Modality.class),
         INF_FLOW_SPECS(ImmutableList.class),
         /**
          * Self term of the transformed block contract
          */
-        BLOCK_SELF(JavaDLTerm.class),
+        BLOCK_SELF(Term.class),
         /**
          * Variables originally used during parsing.
          */
@@ -134,7 +134,7 @@ class BasicSnippetData {
         contractContents.put(Key.MEASURED_BY, contract.getMby());
         contractContents.put(Key.MODALITY, contract.getModality());
 
-        final JavaDLTerm heap = tb.getBaseHeap();
+        final Term heap = tb.getBaseHeap();
         origVars =
                 new StateVars(contract.getSelf(), contract.getParams(),
                               contract.getResult(), contract.getExc(), heap);
@@ -142,7 +142,7 @@ class BasicSnippetData {
     
     BasicSnippetData(LoopInvariant invariant,
                      ExecutionContext context,
-                     JavaDLTerm guardTerm,
+                     Term guardTerm,
                      Services services) {
         this.hasMby = false;
         this.services = services;
@@ -163,9 +163,9 @@ class BasicSnippetData {
         ImmutableList<InfFlowSpec> modifedSpecs =
                 ImmutableSLList.<InfFlowSpec>nil();
         for(InfFlowSpec infFlowSpec : infFlowSpecs) {
-            ImmutableList<JavaDLTerm> modifiedPreExps =
+            ImmutableList<Term> modifiedPreExps =
                     infFlowSpec.preExpressions.append(guardTerm);
-            ImmutableList<JavaDLTerm> modifiedPostExps =
+            ImmutableList<Term> modifiedPostExps =
                     infFlowSpec.postExpressions.append(guardTerm);
             InfFlowSpec modifiedSpec =
                     new InfFlowSpec(modifiedPreExps, modifiedPostExps,
@@ -174,16 +174,16 @@ class BasicSnippetData {
         }
         contractContents.put(Key.INF_FLOW_SPECS, modifedSpecs);
 
-        final JavaDLTerm heap = tb.getBaseHeap();
+        final Term heap = tb.getBaseHeap();
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(invariant.getLoop(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
                 MiscTools.getLocalOuts(invariant.getLoop(), services);
-        final ImmutableList<JavaDLTerm> localInTerms = toTermList(localInVariables);
-        final ImmutableList<JavaDLTerm> localOutTerms = toTermList(localOutVariables);
-        final ImmutableList<JavaDLTerm> localInsWithoutOutDuplicates =
+        final ImmutableList<Term> localInTerms = toTermList(localInVariables);
+        final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
+        final ImmutableList<Term> localInsWithoutOutDuplicates =
                     MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
-        final ImmutableList<JavaDLTerm> localVarsTerms = localInsWithoutOutDuplicates.append(localOutTerms);
+        final ImmutableList<Term> localVarsTerms = localInsWithoutOutDuplicates.append(localOutTerms);
 
         origVars = new StateVars(invariant.getInternalSelfTerm(),
                                  guardTerm, localVarsTerms, heap);
@@ -205,7 +205,7 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, contract.getModality());
         contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
 
-        final JavaDLTerm heap = tb.getBaseHeap();
+        final Term heap = tb.getBaseHeap();
         origVars =
                 new StateVars(contract.getSelf(), contract.getParams(),
                               contract.getResult(), contract.getExc(), heap);
@@ -234,25 +234,25 @@ class BasicSnippetData {
                              labels.toArray(new Label[labels.size()]));
         contractContents.put(Key.EXECUTION_CONTEXT, context);
 
-        final JavaDLTerm heap = tb.getBaseHeap();
+        final Term heap = tb.getBaseHeap();
         BlockContract.Terms vars = contract.getVariablesAsTerms(services);
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(contract.getBlock(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
                 MiscTools.getLocalOuts(contract.getBlock(), services);
-        final ImmutableList<JavaDLTerm> localInTerms = toTermList(localInVariables);
-        final ImmutableList<JavaDLTerm> localOutTerms = toTermList(localOutVariables);
-        final ImmutableList<JavaDLTerm> localInsWithoutOutDuplicates =
+        final ImmutableList<Term> localInTerms = toTermList(localInVariables);
+        final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
+        final ImmutableList<Term> localInsWithoutOutDuplicates =
                     MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
-        final ImmutableList<JavaDLTerm> localVarsTerms = localInsWithoutOutDuplicates.append(localOutTerms);
+        final ImmutableList<Term> localVarsTerms = localInsWithoutOutDuplicates.append(localOutTerms);
 
         origVars = new StateVars(vars.self, localVarsTerms,
                                  vars.result, vars.exception, heap);
     }
 
 
-    private ImmutableList<JavaDLTerm> toTermList(ImmutableSet<ProgramVariable> vars) {
-        ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
+    private ImmutableList<Term> toTermList(ImmutableSet<ProgramVariable> vars) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (ProgramVariable v : vars) {
             result = result.append(tb.var(v));
         }

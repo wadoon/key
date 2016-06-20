@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -137,7 +137,7 @@ public class TryCloseMacro extends AbstractProofMacro {
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
@@ -148,7 +148,7 @@ public class TryCloseMacro extends AbstractProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
+                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         if (goals == null || goals.isEmpty()) {
             // should not happen, because in this case canApplyTo returns

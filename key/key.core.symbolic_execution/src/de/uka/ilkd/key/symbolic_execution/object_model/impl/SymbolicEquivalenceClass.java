@@ -20,7 +20,7 @@ import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
@@ -37,9 +37,9 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
    private final Services services;
    
    /**
-    * The contained {@link JavaDLTerm}s which represents the same {@link ISymbolicObject}.
+    * The contained {@link Term}s which represents the same {@link ISymbolicObject}.
     */
-   private ImmutableList<JavaDLTerm> terms;
+   private ImmutableList<Term> terms;
 
    /**
     * Constructor.
@@ -47,16 +47,16 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     * @param settings The {@link IModelSettings} to use.
     */
    public SymbolicEquivalenceClass(Services services, IModelSettings settings) {
-      this(services, ImmutableSLList.<JavaDLTerm>nil(), settings);
+      this(services, ImmutableSLList.<Term>nil(), settings);
    }
 
    /**
     * Constructor.
     * @param services The {@link Services} to use.
-    * @param terms The contained {@link JavaDLTerm}s which represents the same {@link ISymbolicObject}.
+    * @param terms The contained {@link Term}s which represents the same {@link ISymbolicObject}.
     * @param settings The {@link IModelSettings} to use.
     */
-   public SymbolicEquivalenceClass(Services services, ImmutableList<JavaDLTerm> terms, IModelSettings settings) {
+   public SymbolicEquivalenceClass(Services services, ImmutableList<Term> terms, IModelSettings settings) {
       super(settings);
       this.services = services;
       this.terms = terms;
@@ -66,15 +66,15 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     * {@inheritDoc}
     */
    @Override
-   public ImmutableList<JavaDLTerm> getTerms() {
+   public ImmutableList<Term> getTerms() {
       return terms;
    }
    
    /**
-    * Adds a new {@link JavaDLTerm}.
-    * @param value The new {@link JavaDLTerm} to add.
+    * Adds a new {@link Term}.
+    * @param value The new {@link Term} to add.
     */
-   public void addTerm(JavaDLTerm term) {
+   public void addTerm(Term term) {
       terms = terms.append(term);
    }
    
@@ -82,7 +82,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     * {@inheritDoc}
     */
    @Override
-   public boolean containsTerm(JavaDLTerm term) {
+   public boolean containsTerm(Term term) {
       return terms.contains(term);
    }
 
@@ -92,7 +92,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
    @Override
    public ImmutableList<String> getTermStrings() {
       ImmutableList<String> strings = ImmutableSLList.nil();
-      for (JavaDLTerm term : terms) {
+      for (Term term : terms) {
          strings = strings.append(formatTerm(term, services));
       }
       return strings;
@@ -102,12 +102,12 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getRepresentative() {
+   public Term getRepresentative() {
       // Prefer null if contained in equivalence class
       final HeapLDT heapLDT = services.getTheories().getHeapLDT();
-      JavaDLTerm nullTerm = CollectionUtil.search(terms, new IFilter<JavaDLTerm>() {
+      Term nullTerm = CollectionUtil.search(terms, new IFilter<Term>() {
          @Override
-         public boolean select(JavaDLTerm element) {
+         public boolean select(Term element) {
             return element.op() == heapLDT.getNull();
          }
       });
@@ -116,9 +116,9 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
       }
       else {
          // Prefer terms which are a program variable
-         JavaDLTerm representative = CollectionUtil.search(terms, new IFilter<JavaDLTerm>() {
+         Term representative = CollectionUtil.search(terms, new IFilter<Term>() {
             @Override
-            public boolean select(JavaDLTerm element) {
+            public boolean select(Term element) {
                return element.op() instanceof IProgramVariable;
             }
          });
@@ -133,7 +133,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     */
    @Override
    public String getRepresentativeString() {
-      JavaDLTerm representative = getRepresentative();
+      Term representative = getRepresentative();
       if (representative != null) {
          return formatTerm(representative, services);
       }

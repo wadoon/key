@@ -4,7 +4,7 @@
  */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicSelfNotNullSnippet implements FactoryMethod {
 
     @Override
-    public JavaDLTerm produce(BasicSnippetData d,
+    public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         IObserverFunction targetMethod =

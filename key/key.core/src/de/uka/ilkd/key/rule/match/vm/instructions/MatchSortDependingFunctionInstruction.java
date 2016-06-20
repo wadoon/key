@@ -4,7 +4,7 @@ import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
@@ -59,12 +59,12 @@ public class MatchSortDependingFunctionInstruction extends
      * Tries to match the top level operator of the given term with this instruction's sort depending function symbol.
      * It returns the resulting match conditions or {@code null} if no match is possible because the top level operator is
      * not a sort depending function or the resulting constraints on the sorts are unsatisfiable.
-     * @param instantiationCandidate the {@link JavaDLTerm} to be matched
+     * @param instantiationCandidate the {@link Term} to be matched
      * @param matchConditions the {@link MatchConditions} specifying the constraints to be considered
      * @param services the {@link Services} 
      */
     @Override    
-    public final MatchConditions match(JavaDLTerm instantiationCandidate, 
+    public final MatchConditions match(Term instantiationCandidate, 
                                        MatchConditions matchConditions,
                                        Services services) {  
         MatchConditions result = null; 

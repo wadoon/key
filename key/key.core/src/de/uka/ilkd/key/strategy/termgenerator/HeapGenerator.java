@@ -8,7 +8,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -34,16 +34,16 @@ public class HeapGenerator implements TermGenerator {
     }
     
     @Override
-    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
-        LinkedHashSet<JavaDLTerm> heaps = new LinkedHashSet<>();
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+        LinkedHashSet<Term> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();
-        for (SequentFormula<JavaDLTerm> sf : seq) {
+        for (SequentFormula<Term> sf : seq) {
             collectHeaps(sf.formula(), heaps, goal.proof().getServices());
         }
         return heaps.iterator();
     }
 
-    private void collectHeaps(JavaDLTerm term, LinkedHashSet<JavaDLTerm> heaps, Services services) {
+    private void collectHeaps(Term term, LinkedHashSet<Term> heaps, Services services) {
         if (term.sort().equals(services.getTheories().getHeapLDT().targetSort())) {
             heaps.add(term);
         } else {

@@ -19,7 +19,7 @@ import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -31,7 +31,7 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
 
 /**
  * An extended {@link ProofSourceViewerDecorator} to visualize {@link BranchResult}s
- * via {@link #showSequent(JavaDLTerm, Services, KeYMediator, BranchResult)}.
+ * via {@link #showSequent(Term, Services, KeYMediator, BranchResult)}.
  * @author Martin Hentschel
  */
 public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator {
@@ -82,18 +82,18 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
    }
 
    /**
-    * Shows the given {@link JavaDLTerm} and visualizes the {@link BranchResult}.
-    * @param sequent The {@link JavaDLTerm} to show.
+    * Shows the given {@link Term} and visualizes the {@link BranchResult}.
+    * @param sequent The {@link Term} to show.
     * @param services The {@link Services} to use.
     * @param notationInfo The {@link NotationInfo} to use.
     * @param branchResult The {@link BranchResult}s to visualize.
-    * @return The shown {@link TruthValue} of {@link JavaDLTerm} to show.
+    * @return The shown {@link TruthValue} of {@link Term} to show.
     */
    public TruthValue showSequent(Sequent sequent, 
                                  Services services, 
                                  NotationInfo notationInfo, 
                                  final BranchResult branchResult) {
-      // Show JavaDLTerm
+      // Show Term
       VisibleTermLabels visibleTermLabels = new VisibleTermLabels() {
          @Override
          public boolean contains(Name name) {
@@ -140,7 +140,7 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
    }
 
    /**
-    * Utility method used by {@link #showSequent(JavaDLTerm, Services, KeYMediator, BranchResult)}
+    * Utility method used by {@link #showSequent(Term, Services, KeYMediator, BranchResult)}
     * to fill the {@link TextPresentation} to highlight {@link TruthValue}s recursively.
     * @param sequent The current {@link Sequent}.
     * @param positionTable The {@link InitialPositionTable} to use.
@@ -154,19 +154,19 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
                                           BranchResult branchResult,
                                           int textLength,
                                           List<StyleRange> styleRanges) {
-      Map<JavaDLTerm, TruthValue> termValueMap = new HashMap<JavaDLTerm, TruthValue>();
+      Map<Term, TruthValue> termValueMap = new HashMap<Term, TruthValue>();
       ImmutableList<Integer> path = ImmutableSLList.<Integer>nil().prepend(0); // Sequent arrow
       // Evaluate antecedent
       int i = 0;
       TruthValue antecedentValue = TruthValue.TRUE;
-      for (SequentFormula<JavaDLTerm> sf : sequent.antecedent()) {
+      for (SequentFormula<Term> sf : sequent.antecedent()) {
          TruthValue truthValue = fillTermRanges(sf.formula(), positionTable, branchResult, textLength, termValueMap, path.append(i), styleRanges);
          antecedentValue = TruthValue.and(antecedentValue, truthValue);
          i++;
       }
       // Evaluate succedent
       TruthValue succedentValue = TruthValue.FALSE;
-      for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
+      for (SequentFormula<Term> sf : sequent.succedent()) {
          TruthValue truthValue = fillTermRanges(sf.formula(), positionTable, branchResult, textLength, termValueMap, path.append(i), styleRanges);
          succedentValue = TruthValue.or(succedentValue, truthValue);
          i++;
@@ -182,22 +182,22 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
    }
 
    /**
-    * Utility method used by {@link #showSequent(JavaDLTerm, Services, KeYMediator, BranchResult)}
+    * Utility method used by {@link #showSequent(Term, Services, KeYMediator, BranchResult)}
     * to fill the {@link TextPresentation} to highlight {@link TruthValue}s recursively.
-    * @param term The current {@link JavaDLTerm}.
+    * @param term The current {@link Term}.
     * @param positionTable The {@link PositionTable} to use.
     * @param branchResult The {@link BranchResult} to use.
     * @param textLength The length of the complete text.
     * @param termValueMap The already computed {@link TruthValue}s.
-    * @param path The path to the current {@link JavaDLTerm}.
+    * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
-    * @return The {@link TruthValue} of the current {@link JavaDLTerm}.
+    * @return The {@link TruthValue} of the current {@link Term}.
     */
-   protected TruthValue fillTermRanges(JavaDLTerm term, 
+   protected TruthValue fillTermRanges(Term term, 
                                        PositionTable positionTable, 
                                        BranchResult branchResult,
                                        int textLength,
-                                       Map<JavaDLTerm, TruthValue> termValueMap,
+                                       Map<Term, TruthValue> termValueMap,
                                        ImmutableList<Integer> path,
                                        List<StyleRange> styleRanges) {
       if (term.op() instanceof UpdateApplication) {
@@ -231,7 +231,7 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
             }
          }
          else if (label != null) {
-            // The BranchResult knows the result of the current JavaDLTerm.
+            // The BranchResult knows the result of the current Term.
             TruthValue value = branchResult.evaluate(label);
             if (value == null) {
                value = TruthValue.UNKNOWN;
@@ -247,28 +247,28 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
    }
    
    /**
-    * Utility method used by {@link #fillTermRanges(JavaDLTerm, PositionTable, BranchResult, int, Map, ImmutableList, List)}
+    * Utility method used by {@link #fillTermRanges(Term, PositionTable, BranchResult, int, Map, ImmutableList, List)}
     * to deal with {@code if-then-else} formulas.
-    * @param term The current {@link JavaDLTerm}.
+    * @param term The current {@link Term}.
     * @param positionTable The {@link PositionTable} to use.
     * @param branchResult The {@link BranchResult} to use.
     * @param textLength The length of the complete text.
     * @param termValueMap The already computed {@link TruthValue}s.
-    * @param path The path to the current {@link JavaDLTerm}.
+    * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
-    * @param label The {@link FormulaTermLabel} of the current {@link JavaDLTerm} or {@code null} if {@link JavaDLTerm} is not labeled.
+    * @param label The {@link FormulaTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
     */
-   protected void fillIfThenElse(JavaDLTerm term, 
+   protected void fillIfThenElse(Term term, 
                                  PositionTable positionTable, 
                                  BranchResult branchResult,
                                  int textLength,
-                                 Map<JavaDLTerm, TruthValue> termValueMap,
+                                 Map<Term, TruthValue> termValueMap,
                                  ImmutableList<Integer> path,
                                  List<StyleRange> styleRanges,
                                  FormulaTermLabel label) {
-      JavaDLTerm conditionTerm = term.sub(0);
-      JavaDLTerm thenTerm = term.sub(1);
-      JavaDLTerm elseTerm = term.sub(2);
+      Term conditionTerm = term.sub(0);
+      Term thenTerm = term.sub(1);
+      Term elseTerm = term.sub(2);
       fillTermRanges(conditionTerm, positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
       fillTermRanges(thenTerm, positionTable, branchResult, textLength, termValueMap, path.append(1), styleRanges);
       fillTermRanges(elseTerm, positionTable, branchResult, textLength, termValueMap, path.append(2), styleRanges);
@@ -318,29 +318,29 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
    }
    
    /**
-    * Utility method used by {@link #fillTermRanges(JavaDLTerm, PositionTable, BranchResult, int, Map, ImmutableList, List)}
+    * Utility method used by {@link #fillTermRanges(Term, PositionTable, BranchResult, int, Map, ImmutableList, List)}
     * to deal with logical operators of arity {@code 2}.
-    * @param term The current {@link JavaDLTerm}.
+    * @param term The current {@link Term}.
     * @param positionTable The {@link PositionTable} to use.
     * @param branchResult The {@link BranchResult} to use.
     * @param textLength The length of the complete text.
     * @param termValueMap The already computed {@link TruthValue}s.
-    * @param path The path to the current {@link JavaDLTerm}.
+    * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
-    * @param operator The {@link Operator} of the current {@link JavaDLTerm}.
-    * @param label The {@link FormulaTermLabel} of the current {@link JavaDLTerm} or {@code null} if {@link JavaDLTerm} is not labeled.
+    * @param operator The {@link Operator} of the current {@link Term}.
+    * @param label The {@link FormulaTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
     */
-   protected void fillArity2(JavaDLTerm term, 
+   protected void fillArity2(Term term, 
                              PositionTable positionTable, 
                              BranchResult branchResult,
                              int textLength,
-                             Map<JavaDLTerm, TruthValue> termValueMap,
+                             Map<Term, TruthValue> termValueMap,
                              ImmutableList<Integer> path,
                              List<StyleRange> styleRanges,
                              Operator operator,
                              FormulaTermLabel label) {
-      JavaDLTerm sub0 = term.sub(0);
-      JavaDLTerm sub1 = term.sub(1);
+      Term sub0 = term.sub(0);
+      Term sub1 = term.sub(1);
       fillTermRanges(sub0, positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
       fillTermRanges(sub1, positionTable, branchResult, textLength, termValueMap, path.append(1), styleRanges);
       TruthValue leftValue = termValueMap.get(sub0);
@@ -397,28 +397,28 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
    }
    
    /**
-    * Utility method used by {@link #fillTermRanges(JavaDLTerm, PositionTable, BranchResult, int, Map, ImmutableList, List)}
+    * Utility method used by {@link #fillTermRanges(Term, PositionTable, BranchResult, int, Map, ImmutableList, List)}
     * to deal with logical operators of arity {@code 1}.
-    * @param term The current {@link JavaDLTerm}.
+    * @param term The current {@link Term}.
     * @param positionTable The {@link PositionTable} to use.
     * @param branchResult The {@link BranchResult} to use.
     * @param textLength The length of the complete text.
     * @param termValueMap The already computed {@link TruthValue}s.
-    * @param path The path to the current {@link JavaDLTerm}.
+    * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
-    * @param operator The {@link Operator} of the current {@link JavaDLTerm}.
-    * @param label The {@link FormulaTermLabel} of the current {@link JavaDLTerm} or {@code null} if {@link JavaDLTerm} is not labeled.
+    * @param operator The {@link Operator} of the current {@link Term}.
+    * @param label The {@link FormulaTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
     */
-   protected void fillArity1(JavaDLTerm term, 
+   protected void fillArity1(Term term, 
                              PositionTable positionTable, 
                              BranchResult branchResult,
                              int textLength,
-                             Map<JavaDLTerm, TruthValue> termValueMap,
+                             Map<Term, TruthValue> termValueMap,
                              ImmutableList<Integer> path,
                              List<StyleRange> styleRanges,
                              Operator operator,
                              FormulaTermLabel label) {
-      JavaDLTerm sub = term.sub(0);
+      Term sub = term.sub(0);
       fillTermRanges(sub, positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
       TruthValue childValue = termValueMap.get(sub);
       TruthValue junctorResult;
@@ -453,22 +453,22 @@ public class TruthValueTracingViewerDecorator extends ProofSourceViewerDecorator
    }
    
    /**
-    * Utility method used by {@link #fillTermRanges(JavaDLTerm, PositionTable, BranchResult, int, Map, ImmutableList, List)}
+    * Utility method used by {@link #fillTermRanges(Term, PositionTable, BranchResult, int, Map, ImmutableList, List)}
     * to deal with logical operators of arity {@code 0}.
-    * @param term The current {@link JavaDLTerm}.
+    * @param term The current {@link Term}.
     * @param positionTable The {@link PositionTable} to use.
     * @param branchResult The {@link BranchResult} to use.
     * @param textLength The length of the complete text.
     * @param termValueMap The already computed {@link TruthValue}s.
-    * @param path The path to the current {@link JavaDLTerm}.
+    * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
-    * @param operator The {@link Operator} of the current {@link JavaDLTerm}.
+    * @param operator The {@link Operator} of the current {@link Term}.
     */
-   protected void fillArity0(JavaDLTerm term, 
+   protected void fillArity0(Term term, 
                              PositionTable positionTable, 
                              BranchResult branchResult,
                              int textLength,
-                             Map<JavaDLTerm, TruthValue> termValueMap,
+                             Map<Term, TruthValue> termValueMap,
                              ImmutableList<Integer> path,
                              List<StyleRange> styleRanges,
                              Operator operator) {

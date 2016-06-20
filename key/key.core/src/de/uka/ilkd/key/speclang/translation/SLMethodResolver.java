@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -71,7 +71,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
                 new SLParameters(ps).getSignature(javaInfo.getServices());
         
         IProgramMethod pm = null;
-        JavaDLTerm recTerm = receiver.getTerm(); 
+        Term recTerm = receiver.getTerm(); 
         
         while (true) {
             pm = javaInfo.getToplevelPM(containingType, methodName, signature);
@@ -105,7 +105,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
     	}
         ImmutableList<SLExpression> params = parameters.getParameters();
         int i = 0;
-        JavaDLTerm[] subs = new JavaDLTerm[params.size() - pm.getHeapCount(services) + pm.getStateCount()*pm.getHeapCount(services) + (pm.isStatic() ? 0 : 1) ];
+        Term[] subs = new Term[params.size() - pm.getHeapCount(services) + pm.getStateCount()*pm.getHeapCount(services) + (pm.isStatic() ? 0 : 1) ];
         for(LocationVariable heap : heaps ) {
           if(pm.getStateCount() >= 1) {
             subs[i++] = services.getTermBuilder().var(heap);

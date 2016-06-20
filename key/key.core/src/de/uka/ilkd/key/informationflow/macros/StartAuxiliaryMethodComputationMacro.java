@@ -15,7 +15,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -52,7 +52,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro imp
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         if (goals == null || goals.head() == null) {
             return false;
         }
@@ -72,7 +72,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro imp
                 POSnippetFactory.getInfFlowFactory(po.getContract(),
                                                    po.getIFVars().c1,
                                                    po.getIFVars().c2, services);
-        final JavaDLTerm selfComposedExec =
+        final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
@@ -82,7 +82,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro imp
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
+                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
                                           ProverTaskListener listener) throws Exception {
         final Services services = proof.getServices();
         final InfFlowContractPO po = (InfFlowContractPO) services.getSpecificationRepository().getProofOblInput(proof);

@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
@@ -58,9 +58,9 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         };
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {        
-        final JavaDLTerm dividendT = dividend.toTerm ( app, pos, goal );
-        final JavaDLTerm divisorT = divisor.toTerm ( app, pos, goal );
+    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {        
+        final Term dividendT = dividend.toTerm ( app, pos, goal );
+        final Term divisorT = divisor.toTerm ( app, pos, goal );
         
         final Services services = goal.proof().getServices();
         final Monomial mDividend = Monomial.create ( dividendT, services );

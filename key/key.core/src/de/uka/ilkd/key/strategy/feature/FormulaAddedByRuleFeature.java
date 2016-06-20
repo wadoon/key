@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.feature;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -41,10 +41,10 @@ public class FormulaAddedByRuleFeature extends BinaryFeature {
         return new FormulaAddedByRuleFeature ( p_filter );
     }
 
-    public boolean filter (RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public boolean filter (RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final SequentFormula<JavaDLTerm> cfma = pos.sequentFormula ();
+        final SequentFormula<Term> cfma = pos.sequentFormula ();
         final boolean antec = pos.isInAntec ();
         
         Node node = goal.node ();

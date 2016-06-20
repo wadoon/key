@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -72,7 +72,7 @@ public class ContractFactory {
      * has been added as a postcondition (regardless of termination case).
      */
     public FunctionalOperationContract
-                addPost(FunctionalOperationContract old, JavaDLTerm addedPost, ProgramVariable selfVar,
+                addPost(FunctionalOperationContract old, Term addedPost, ProgramVariable selfVar,
                         ProgramVariable resultVar, ProgramVariable excVar,
                         ImmutableList<ProgramVariable> paramVars,
                         Map<LocationVariable, LocationVariable> atPreVars) {
@@ -83,7 +83,7 @@ public class ContractFactory {
                                      foci.originalExcVar, foci.originalParamVars,
                                      foci.originalAtPreVars);
 
-    Map<LocationVariable,JavaDLTerm> newPosts = new LinkedHashMap<LocationVariable,JavaDLTerm>(10);
+    Map<LocationVariable,Term> newPosts = new LinkedHashMap<LocationVariable,Term>(10);
     for(LocationVariable h : foci.originalPosts.keySet()) {
        if(h == services.getTheories().getHeapLDT().getHeap()) {
           newPosts.put(h, tb.andSC(foci.originalPosts.get(h), addedPost));
@@ -130,7 +130,7 @@ public class ContractFactory {
      * has been added as a precondition.
      */
     public FunctionalOperationContract addPre(FunctionalOperationContract old,
-                                              JavaDLTerm addedPre,
+                                              Term addedPre,
                                               ProgramVariable selfVar,
                                               ImmutableList<ProgramVariable> paramVars,
                                               Map<LocationVariable,LocationVariable> atPreVars) {
@@ -141,7 +141,7 @@ public class ContractFactory {
                 replaceVariables(addedPre, selfVar, paramVars, atPreVars,
                                  foci.originalSelfVar, foci.originalParamVars, foci.originalAtPreVars);
 
-      Map<LocationVariable,JavaDLTerm> newPres = new LinkedHashMap<LocationVariable,JavaDLTerm>(10);
+      Map<LocationVariable,Term> newPres = new LinkedHashMap<LocationVariable,Term>(10);
       for(LocationVariable h : foci.originalPres.keySet()) {
          if(h == services.getTheories().getHeapLDT().getHeap()) {
             newPres.put(h, tb.and(foci.originalPres.get(h), addedPre));
@@ -183,7 +183,7 @@ public class ContractFactory {
      * Add global variable definitions (aka. old clause) to the contract.
      */
     public FunctionalOperationContract addGlobalDefs(FunctionalOperationContract opc,
-                                                     JavaDLTerm globalDefs) {
+                                                     Term globalDefs) {
         assert opc instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci =
                 (FunctionalOperationContractImpl) opc;
@@ -203,13 +203,13 @@ public class ContractFactory {
     public DependencyContract dep(KeYJavaType containerType,
                                   IObserverFunction pm,
                                   KeYJavaType specifiedIn,
-                                  Map<LocationVariable,JavaDLTerm> requires,
-                                  JavaDLTerm measuredBy,
-                                  Map<ProgramVariable,JavaDLTerm> accessibles,
+                                  Map<LocationVariable,Term> requires,
+                                  Term measuredBy,
+                                  Map<ProgramVariable,Term> accessibles,
                                   ProgramVariable selfVar,
                                   ImmutableList<ProgramVariable> paramVars,
                                   Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                                  JavaDLTerm globalDefs) {
+                                  Term globalDefs) {
         assert (selfVar == null) == pm.isStatic();
         return dep("JML accessible clause", containerType, pm, specifiedIn,
                    requires, measuredBy, accessibles, selfVar, paramVars, atPreVars, globalDefs);
@@ -217,15 +217,15 @@ public class ContractFactory {
 
     public DependencyContract dep(KeYJavaType kjt,
     							  LocationVariable targetHeap,
-                                  Triple<IObserverFunction, JavaDLTerm, JavaDLTerm> dep,
+                                  Triple<IObserverFunction, Term, Term> dep,
                                   ProgramVariable selfVar) {
         final ImmutableList<ProgramVariable> paramVars =
                 tb.paramVars(dep.first, false);
         assert (selfVar == null) == dep.first.isStatic();
-        Map<LocationVariable,JavaDLTerm> pres = new LinkedHashMap<LocationVariable, JavaDLTerm>();
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
         pres.put(services.getTheories().getHeapLDT().getHeap(),
                  selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
-        Map<ProgramVariable,JavaDLTerm> accessibles = new LinkedHashMap<ProgramVariable, JavaDLTerm>();
+        Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
         for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
         	if(heap == targetHeap) {
               accessibles.put(heap, dep.second);
@@ -242,13 +242,13 @@ public class ContractFactory {
                                   KeYJavaType containerType,
                                   IObserverFunction pm,
                                   KeYJavaType specifiedIn,
-                                  Map<LocationVariable, JavaDLTerm> requires,
-                                  JavaDLTerm measuredBy,
-                                  Map<ProgramVariable, JavaDLTerm> accessibles,
+                                  Map<LocationVariable, Term> requires,
+                                  Term measuredBy,
+                                  Map<ProgramVariable, Term> accessibles,
                                   ProgramVariable selfVar,
                                   ImmutableList<ProgramVariable> paramVars,
                                   Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                                  JavaDLTerm globalDefs) {
+                                  Term globalDefs) {
         assert (selfVar == null) == pm.isStatic();
         return new DependencyContractImpl(string, null, containerType, pm, specifiedIn,
                                           requires, measuredBy, accessibles,
@@ -261,21 +261,21 @@ public class ContractFactory {
             IProgramMethod pm,
             KeYJavaType specifiedIn,
             Modality modality,
-            JavaDLTerm requires,
-            JavaDLTerm measuredBy,
-            JavaDLTerm modifies,
+            Term requires,
+            Term measuredBy,
+            Term modifies,
             boolean hasMod,
             ProgramVariableCollection progVars,
-            JavaDLTerm accessible,
+            Term accessible,
             ImmutableList<InfFlowSpec> infFlowSpecs,
             boolean toBeSaved) {
         final LocationVariable baseHeap = services.getTheories().getHeapLDT().getHeap();
-        final JavaDLTerm atPre = tb.var(progVars.atPreVars.get(baseHeap));
-        final JavaDLTerm self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
-        final ImmutableList<JavaDLTerm> params = tb.var(progVars.paramVars);
-        final JavaDLTerm result = progVars.resultVar != null ? tb.var(
+        final Term atPre = tb.var(progVars.atPreVars.get(baseHeap));
+        final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
+        final ImmutableList<Term> params = tb.var(progVars.paramVars);
+        final Term result = progVars.resultVar != null ? tb.var(
                 progVars.resultVar) : null;
-        final JavaDLTerm exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
+        final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
         return new InformationFlowContractImpl(
                 INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm, specifiedIn,
                 modality, requires, measuredBy, modifies, hasMod, self, params,
@@ -299,14 +299,14 @@ public class ContractFactory {
                                              KeYJavaType kjt,
                                              IProgramMethod pm,
                                              Modality modality,
-                                             Map<LocationVariable,JavaDLTerm> pres,
-                                             Map<LocationVariable,JavaDLTerm> freePres,
-                                             JavaDLTerm mby,
-                                             Map<LocationVariable,JavaDLTerm> posts,
-                                             Map<LocationVariable,JavaDLTerm> freePosts,
-                                             Map<LocationVariable,JavaDLTerm> axioms,
-                                             Map<LocationVariable,JavaDLTerm> mods,
-                                             Map<ProgramVariable, JavaDLTerm> accs,
+                                             Map<LocationVariable,Term> pres,
+                                             Map<LocationVariable,Term> freePres,
+                                             Term mby,
+                                             Map<LocationVariable,Term> posts,
+                                             Map<LocationVariable,Term> freePosts,
+                                             Map<LocationVariable,Term> axioms,
+                                             Map<LocationVariable,Term> mods,
+                                             Map<ProgramVariable, Term> accs,
                                              Map<LocationVariable,Boolean> hasMod,
                                              ProgramVariable selfVar,
                                              ImmutableList<ProgramVariable> paramVars,
@@ -326,14 +326,14 @@ public class ContractFactory {
     public FunctionalOperationContract func (String baseName,
                                              IProgramMethod pm,
                                              boolean terminates,
-                                             Map<LocationVariable, JavaDLTerm> pres,
-                                             Map<LocationVariable, JavaDLTerm> freePres,
-                                             JavaDLTerm mby,
-                                             Map<LocationVariable, JavaDLTerm> posts,
-                                             Map<LocationVariable, JavaDLTerm> freePosts,
-                                             Map<LocationVariable, JavaDLTerm> axioms,
-                                             Map<LocationVariable, JavaDLTerm> mods,
-                                             Map<ProgramVariable, JavaDLTerm> accessibles,
+                                             Map<LocationVariable, Term> pres,
+                                             Map<LocationVariable, Term> freePres,
+                                             Term mby,
+                                             Map<LocationVariable, Term> posts,
+                                             Map<LocationVariable, Term> freePosts,
+                                             Map<LocationVariable, Term> axioms,
+                                             Map<LocationVariable, Term> mods,
+                                             Map<ProgramVariable, Term> accessibles,
                                              Map<LocationVariable, Boolean> hasMod,
                                              ProgramVariableCollection pv) {
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres,
@@ -346,14 +346,14 @@ public class ContractFactory {
     public FunctionalOperationContract func (String baseName,
                                              IProgramMethod pm,
                                              Modality modality,
-                                             Map<LocationVariable, JavaDLTerm> pres,
-                                             Map<LocationVariable, JavaDLTerm> freePres,
-                                             JavaDLTerm mby,
-                                             Map<LocationVariable, JavaDLTerm> posts,
-                                             Map<LocationVariable, JavaDLTerm> freePosts,
-                                             Map<LocationVariable, JavaDLTerm> axioms,
-                                             Map<LocationVariable, JavaDLTerm> mods,
-                                             Map<ProgramVariable, JavaDLTerm> accessibles,
+                                             Map<LocationVariable, Term> pres,
+                                             Map<LocationVariable, Term> freePres,
+                                             Term mby,
+                                             Map<LocationVariable, Term> posts,
+                                             Map<LocationVariable, Term> freePosts,
+                                             Map<LocationVariable, Term> axioms,
+                                             Map<LocationVariable, Term> mods,
+                                             Map<ProgramVariable, Term> accessibles,
                                              Map<LocationVariable, Boolean> hasMod,
                                              ProgramVariableCollection progVars,
                                              boolean toBeSaved, boolean transaction) {
@@ -394,21 +394,21 @@ public class ContractFactory {
         }
 
         //collect information
-        Map<LocationVariable,JavaDLTerm> pres =
-                new LinkedHashMap<LocationVariable, JavaDLTerm>(t.originalPres.size());
+        Map<LocationVariable,Term> pres =
+                new LinkedHashMap<LocationVariable, Term>(t.originalPres.size());
         for(LocationVariable h : t.originalPres.keySet()) {
            pres.put(h, t.originalPres.get(h));
         }
-        JavaDLTerm mby = t.originalMby;
+        Term mby = t.originalMby;
         Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable,Boolean>();
-        Map<LocationVariable,JavaDLTerm> posts =
-                new LinkedHashMap<LocationVariable, JavaDLTerm>(t.originalPosts.size());
-        Map<LocationVariable,JavaDLTerm> freePosts =
-                new LinkedHashMap<LocationVariable, JavaDLTerm>(t.originalFreePosts.size());
+        Map<LocationVariable,Term> posts =
+                new LinkedHashMap<LocationVariable, Term>(t.originalPosts.size());
+        Map<LocationVariable,Term> freePosts =
+                new LinkedHashMap<LocationVariable, Term>(t.originalFreePosts.size());
         for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
            hasMod.put(h, false);
-           JavaDLTerm oriPost = t.originalPosts.get(h);
-           JavaDLTerm oriFreePost = t.originalFreePosts.get(h);
+           Term oriPost = t.originalPosts.get(h);
+           Term oriFreePost = t.originalFreePosts.get(h);
            if(oriPost != null) {
               posts.put(h,tb.imp(atPreify(t.originalPres.get(h),
                         t.originalAtPreVars),
@@ -420,18 +420,18 @@ public class ContractFactory {
             }
         }
 
-        Map<LocationVariable,JavaDLTerm> axioms = new LinkedHashMap<LocationVariable,JavaDLTerm>();
+        Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
         if(t.originalAxioms != null) { // TODO: what about the others?
             for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
-                JavaDLTerm oriAxiom = t.originalAxioms.get(h);
+                Term oriAxiom = t.originalAxioms.get(h);
                 if(oriAxiom != null) {
                     axioms.put(h,tb.imp(atPreify(t.originalPres.get(h), t.originalAtPreVars),
                                         oriAxiom));
                 }
             }
         }
-        Map<LocationVariable,JavaDLTerm> mods = t.originalMods;
-        Map<ProgramVariable,JavaDLTerm> deps = t.originalDeps;
+        Map<LocationVariable,Term> mods = t.originalMods;
+        Map<ProgramVariable,Term> deps = t.originalDeps;
         Modality moda = t.modality;
         for(FunctionalOperationContract other : others) {
             Modality otherModality = other.getModality();
@@ -446,29 +446,29 @@ public class ContractFactory {
                     moda = Modality.BOX;
                 }
             }
-            JavaDLTerm otherMby = other.hasMby()
+            Term otherMby = other.hasMby()
             ? other.getMby(t.originalSelfVar,
                     t.originalParamVars,
                     services)
                     : null;
             for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
-                JavaDLTerm otherPre = other.getPre(h, t.originalSelfVar,
+                Term otherPre = other.getPre(h, t.originalSelfVar,
                         t.originalParamVars,
                         t.originalAtPreVars,
                         services);
-                JavaDLTerm otherPost = other.getPost(h, t.originalSelfVar,
+                Term otherPost = other.getPost(h, t.originalSelfVar,
                         t.originalParamVars,
                         t.originalResultVar,
                         t.originalExcVar,
                         t.originalAtPreVars,
                         services);
-                JavaDLTerm otherFreePost = other.getFreePost(h, t.originalSelfVar,
+                Term otherFreePost = other.getFreePost(h, t.originalSelfVar,
                                                        t.originalParamVars,
                                                        t.originalResultVar,
                                                        t.originalExcVar,
                                                        t.originalAtPreVars,
                                                        services);
-                JavaDLTerm otherAxiom = other.getRepresentsAxiom(h, t.originalSelfVar,
+                Term otherAxiom = other.getRepresentsAxiom(h, t.originalSelfVar,
                         t.originalParamVars,
                         t.originalResultVar,
                         t.originalAtPreVars,
@@ -488,13 +488,13 @@ public class ContractFactory {
                 // the modifies clause must be computed before the preconditions
                 if (hasMod.get(h) || other.hasModifiesClause(h)) {
                     hasMod.put(h, true);
-                    JavaDLTerm m1 = mods.get(h);
-                    JavaDLTerm m2 = other.getMod(h, t.originalSelfVar,
+                    Term m1 = mods.get(h);
+                    Term m2 = other.getMod(h, t.originalSelfVar,
                             t.originalParamVars,
                             services);
                     Function emptyMod = services.getTheories().getLocSetLDT().getEmpty();
                     if (m1 != null || m2 != null) {
-                        JavaDLTerm nm;
+                        Term nm;
                         if (m1 == null) {
                             nm = m2;
                         } else if (m2 == null) {
@@ -504,7 +504,7 @@ public class ContractFactory {
                         	// fixes bug #1557
                         	nm = m1;
                         } else {
-                            JavaDLTerm ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
+                            Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
                             nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
                                     tb.ife(otherPre, m2, tb.allLocs()));
                         }
@@ -516,15 +516,15 @@ public class ContractFactory {
                     pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
                 }
                 if(otherPost != null) {
-                    final JavaDLTerm oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
+                    final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
                     posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
                 }
                 if(otherFreePost != null) {
-                    final JavaDLTerm oFreePost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherFreePost);
+                    final Term oFreePost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherFreePost);
                     freePosts.put(h, freePosts.get(h) == null ? oFreePost : tb.and(freePosts.get(h), oFreePost));
                 }
                 if(otherAxiom != null) {
-                    final JavaDLTerm oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
+                    final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
                     axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
                 }
 
@@ -532,14 +532,14 @@ public class ContractFactory {
             }
 
             for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
-                JavaDLTerm a1 = deps.get(h);
-                JavaDLTerm a2 = other.getDep(h, false,
+                Term a1 = deps.get(h);
+                Term a2 = other.getDep(h, false,
                                        t.originalSelfVar,
                                        t.originalParamVars,
                                        t.originalAtPreVars,
                                        services);
                 if (a1 != null || a2 != null) {
-                    JavaDLTerm na = null;
+                    Term na = null;
                     if(a1 == null){
                         na = a2;
                     } else if(a2 == null) {
@@ -552,14 +552,14 @@ public class ContractFactory {
                 boolean preHeap = t.originalAtPreVars.get(h) != null;
                 if (preHeap) {
                     LocationVariable hPre = t.originalAtPreVars.get(h);
-                    JavaDLTerm a1Pre = deps.get(hPre);
-                    JavaDLTerm a2Pre = other.getDep(hPre, true,
+                    Term a1Pre = deps.get(hPre);
+                    Term a2Pre = other.getDep(hPre, true,
                                               t.originalSelfVar,
                                               t.originalParamVars,
                                               t.originalAtPreVars,
                                               services);
                     if (a1Pre != null || a2Pre != null) {
-                        JavaDLTerm naPre = null;
+                        Term naPre = null;
                         if(a1Pre == null){
                             naPre = a2Pre;
                         }else if(a2Pre == null) {
@@ -586,7 +586,7 @@ public class ContractFactory {
                                                    t.specifiedIn,
                                                    moda,
                                                    pres,
-                                                   new LinkedHashMap<LocationVariable, JavaDLTerm>(), // (*)
+                                                   new LinkedHashMap<LocationVariable, Term>(), // (*)
                                                    mby,
                                                    posts,
                                                    freePosts,
@@ -615,8 +615,8 @@ public class ContractFactory {
         }
     }
 
-    private JavaDLTerm atPreify(JavaDLTerm t, Map<LocationVariable,? extends ProgramVariable> atPreVars) {
-        final Map<JavaDLTerm,JavaDLTerm> map = new LinkedHashMap<JavaDLTerm, JavaDLTerm>(atPreVars.size());
+    private Term atPreify(Term t, Map<LocationVariable,? extends ProgramVariable> atPreVars) {
+        final Map<Term,Term> map = new LinkedHashMap<Term, Term>(atPreVars.size());
         for(LocationVariable h : atPreVars.keySet()) {
           if(atPreVars.get(h) != null) {
             map.put(tb.var(h), tb.var(atPreVars.get(h)));
@@ -627,7 +627,7 @@ public class ContractFactory {
 
 
     /** replace in original the variables used for self and parameters */
-    private JavaDLTerm replaceVariables(JavaDLTerm original, ProgramVariable selfVar,
+    private Term replaceVariables(Term original, ProgramVariable selfVar,
                                   ImmutableList<ProgramVariable> paramVars,
                                   Map<LocationVariable,LocationVariable> atPreVars,
                                   ProgramVariable originalSelfVar,
@@ -639,7 +639,7 @@ public class ContractFactory {
     }
 
     /** replace in original the variables used for self, result, exception, heap, and parameters */
-    private JavaDLTerm replaceVariables(JavaDLTerm original, ProgramVariable selfVar,
+    private Term replaceVariables(Term original, ProgramVariable selfVar,
                                   ProgramVariable resultVar, ProgramVariable excVar,
                                   ImmutableList<ProgramVariable> paramVars,
                                   Map<LocationVariable,LocationVariable> atPreVars,

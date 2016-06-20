@@ -14,7 +14,7 @@ import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.BlockInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -36,7 +36,7 @@ public class FinishAuxiliaryBlockComputationMacro
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {        
+                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {        
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                     proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -57,7 +57,7 @@ public class FinishAuxiliaryBlockComputationMacro
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           final Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
+                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
                                           ProverTaskListener listener) {
         assert canApplyTo(proof, goals, posInOcc);
 
@@ -82,7 +82,7 @@ public class FinishAuxiliaryBlockComputationMacro
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
 
         // create and register resulting taclets
-        final JavaDLTerm result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet = buildBlockInfFlowUnfoldTaclet(
                 services, blockRuleApp, contract, ifVars, result);
         
@@ -114,7 +114,7 @@ public class FinishAuxiliaryBlockComputationMacro
             final Services services,
             final BlockContractBuiltInRuleApp blockRuleApp,
             final BlockContract contract, IFProofObligationVars ifVars,
-            final JavaDLTerm result) {
+            final Term result) {
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =
                 new BlockInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(contract);

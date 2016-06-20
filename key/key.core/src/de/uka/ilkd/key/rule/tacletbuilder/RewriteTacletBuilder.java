@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 
@@ -56,7 +56,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      * term.
      * @return this RewriteTacletBuilder
      */ 
-    public RewriteTacletBuilder<T> setFind(JavaDLTerm findTerm) {
+    public RewriteTacletBuilder<T> setFind(Term findTerm) {
 	checkContainsFreeVarSV(findTerm, this.getName(), "find term");
 	find=findTerm;
 	return this;
@@ -116,7 +116,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
     }
 
 
-    public void addGoalTerm(JavaDLTerm goalTerm) {
+    public void addGoalTerm(Term goalTerm) {
         final TacletGoalTemplate axiomTemplate =
                 new RewriteTacletGoalTemplate(goalTerm);
         addTacletGoalTemplate(axiomTemplate);

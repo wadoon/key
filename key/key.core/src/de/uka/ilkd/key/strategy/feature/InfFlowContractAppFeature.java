@@ -22,7 +22,7 @@ import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
@@ -53,15 +53,15 @@ public class InfFlowContractAppFeature implements Feature {
 
     /**
      * Compare whether two
-     * <code>PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>></code>s are equal. This can be done using
+     * <code>PosInOccurrence<Term, SequentFormula<Term>></code>s are equal. This can be done using
      * <code>equals</code> or
      * <code>eqEquals</code> (checking for same or equal formulas), which has to
      * be decided by the subclasses
      */
     protected boolean comparePio(TacletApp newApp,
                                  TacletApp oldApp,
-                                 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPio,
-                                 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPio) {
+                                 PosInOccurrence<Term, SequentFormula<Term>> newPio,
+                                 PosInOccurrence<Term, SequentFormula<Term>> oldPio) {
         return oldPio.eqEquals(newPio);
     }
 
@@ -71,7 +71,7 @@ public class InfFlowContractAppFeature implements Feature {
      * search for the same or an equal formula
      */
     protected boolean semiSequentContains(Semisequent semisequent,
-                                          SequentFormula<JavaDLTerm> cfma) {
+                                          SequentFormula<Term> cfma) {
         return semisequent.containsEqual(cfma);
     }
 
@@ -85,7 +85,7 @@ public class InfFlowContractAppFeature implements Feature {
      */
     protected boolean sameApplication(RuleApp ruleCmp,
                                       TacletApp newApp,
-                                      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPio) {
+                                      PosInOccurrence<Term, SequentFormula<Term>> newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -98,7 +98,7 @@ public class InfFlowContractAppFeature implements Feature {
             if (!(cmp instanceof PosTacletApp)) {
                 return false;
             }
-            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPio =
+            final PosInOccurrence<Term, SequentFormula<Term>> oldPio =
                     ((PosTacletApp) cmp).posInOccurrence();
             if (!comparePio(newApp, cmp, newPio, oldPio)) {
                 return false;
@@ -179,15 +179,15 @@ public class InfFlowContractAppFeature implements Feature {
      * occurs in the sequent
      */
     protected boolean duplicateFindTaclet(TacletApp app,
-                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+                                          PosInOccurrence<Term, SequentFormula<Term>> pos,
                                           Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert app.ifFormulaInstantiations().size() >= 1 :
                 "Featureis only applicable to rules with at least one assumes.";
 
-        final SequentFormula<JavaDLTerm> focusFor = pos.sequentFormula();
+        final SequentFormula<Term> focusFor = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
-        final SequentFormula<JavaDLTerm> assumesFor =
+        final SequentFormula<Term> assumesFor =
                 app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 
         // assumtion has to occour before the find-term in the sequent in order
@@ -235,7 +235,7 @@ public class InfFlowContractAppFeature implements Feature {
 
     @Override
     public RuleAppCost compute(RuleApp ruleApp,
-                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+                               PosInOccurrence<Term, SequentFormula<Term>> pos,
                                Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " +
@@ -255,11 +255,11 @@ public class InfFlowContractAppFeature implements Feature {
 
         // only relate the n-th called method in execution A with the n-th
         // called method in execution B automatically
-        final SequentFormula<JavaDLTerm> focusFor = pos.sequentFormula();
-        final SequentFormula<JavaDLTerm> assumesFor =
+        final SequentFormula<Term> focusFor = pos.sequentFormula();
+        final SequentFormula<Term> assumesFor =
                 app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 
-        ArrayList<SequentFormula<JavaDLTerm>> relatesTerms = getRelatesTerms(goal);
+        ArrayList<SequentFormula<Term>> relatesTerms = getRelatesTerms(goal);
         final int numOfContractAppls = relatesTerms.size() / 2;
         int assumesApplNumber = 0;
         for (int i = 0; i < numOfContractAppls; i++) {
@@ -287,10 +287,10 @@ public class InfFlowContractAppFeature implements Feature {
     }
 
 
-    private ArrayList<SequentFormula<JavaDLTerm>> getRelatesTerms(Goal goal) {
-        ArrayList<SequentFormula<JavaDLTerm>> list = new ArrayList<SequentFormula<JavaDLTerm>>();
+    private ArrayList<SequentFormula<Term>> getRelatesTerms(Goal goal) {
+        ArrayList<SequentFormula<Term>> list = new ArrayList<SequentFormula<Term>>();
         Semisequent antecedent = goal.node().sequent().antecedent();
-        for (SequentFormula<JavaDLTerm> f : antecedent) {
+        for (SequentFormula<Term> f : antecedent) {
             if (f.formula().op().toString().startsWith("RELATED_BY_")) {
                 list.add(f);
             }

@@ -30,7 +30,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * An "LDT" or "language data type" class corresponds to a standard rule file 
@@ -183,7 +183,7 @@ public abstract class LDT implements Named {
      */
     public abstract boolean isResponsible(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
-                        JavaDLTerm[] subs, 
+                        Term[] subs, 
                         Services services, 
                         ExecutionContext ec);
 
@@ -201,8 +201,8 @@ public abstract class LDT implements Named {
      */
     public abstract boolean isResponsible(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
-	    		JavaDLTerm left, 
-	    		JavaDLTerm right, 
+	    		Term left, 
+	    		Term right, 
 	    		Services services, ExecutionContext ec);
 
     
@@ -218,17 +218,17 @@ public abstract class LDT implements Named {
      */
     public abstract boolean isResponsible(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
-	    		JavaDLTerm sub, 
+	    		Term sub, 
 	    		JavaDLTermServices services, 
 	    		ExecutionContext ec);
 
 
     /** translates a given literal to its logic counterpart 
      * @param lit the Literal to be translated
-     * @return the JavaDLTerm that represents the given literal in its logic
+     * @return the Term that represents the given literal in its logic
      * form
      */ 
-    public abstract JavaDLTerm translateLiteral(Literal lit, Services services);
+    public abstract Term translateLiteral(Literal lit, Services services);
 
     /** returns the function symbol for the given operation 
      * @return  the function symbol for the given operation 
@@ -241,7 +241,7 @@ public abstract class LDT implements Named {
     public abstract boolean hasLiteralFunction(Function f);
 
     /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
-    public abstract Expression translateTerm(JavaDLTerm t, ExtList children, Services services);
+    public abstract Expression translateTerm(Term t, ExtList children, Services services);
     
-    public abstract Type getType(JavaDLTerm t);
+    public abstract Type getType(Term t);
 }

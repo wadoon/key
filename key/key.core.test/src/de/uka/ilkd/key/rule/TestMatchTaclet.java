@@ -38,7 +38,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -65,7 +65,7 @@ public class TestMatchTaclet extends TestCase {
     FindTaclet all_left;
     FindTaclet assign_n;
     TacletApp close_rule;
-    JavaDLTerm matchExc;
+    Term matchExc;
     Taclet[] conflict;
     Services services;
     
@@ -136,7 +136,7 @@ public class TestMatchTaclet extends TestCase {
     
         
     public void testProgramMatch4() {
-	JavaDLTerm match = TacletForTests.parseTerm
+	Term match = TacletForTests.parseTerm
 	    ("\\<{{while (1==1) {if (1==2) {break;}} return 1==3;}}\\>A");
 
 	FindTaclet taclet
@@ -151,7 +151,7 @@ public class TestMatchTaclet extends TestCase {
 
     public void testVarOccursInIfAndAddRule() {
 
-	JavaDLTerm match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
+	Term match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
 	assertTrue(match.arity() == 1);
 	
 	// test at the subformula p(z) -> A that has a free variable
@@ -169,7 +169,7 @@ public class TestMatchTaclet extends TestCase {
 	       
  	// we bind the free variable now a match should be found
 	seq = Sequent.createSequent
-	    (Semisequent.nil().insert(0, new SequentFormula<JavaDLTerm>
+	    (Semisequent.nil().insert(0, new SequentFormula<Term>
 		(match)).semisequent(), 
 	     Semisequent.nil() );
 
@@ -180,7 +180,7 @@ public class TestMatchTaclet extends TestCase {
 
 
     public void testVarOccursInFindAndAddRule() {
-	JavaDLTerm match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
+	Term match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
 
     
 	//seq contains term that can match but has a free variable, so
@@ -190,8 +190,8 @@ public class TestMatchTaclet extends TestCase {
 	(find_addrule_conflict,
 	        find_addrule_conflict.getMatcher().matchFind(match.sub(0), 
 	                MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
-                    new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(match),
-                            PosInTerm.<JavaDLTerm>getTopLevel().down(0), true), services);
+                    new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(match),
+                            PosInTerm.<Term>getTopLevel().down(0), true), services);
         
     
 	assertTrue("A match has been found but there is a free variable in"+
@@ -204,8 +204,8 @@ public class TestMatchTaclet extends TestCase {
 	(find_addrule_conflict,
             find_addrule_conflict.getMatcher().matchFind(match, 
                     MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
-                    new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(match),
-                            PosInTerm.<JavaDLTerm>getTopLevel(), true), services);
+                    new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(match),
+                            PosInTerm.<Term>getTopLevel(), true), services);
 	assertTrue("A match should have been found,"+
 		   " because here there formerly free variable is bound.",
 		   app != null);	           
@@ -219,14 +219,14 @@ public class TestMatchTaclet extends TestCase {
 	// contains a free variable, no match should be possible  
 	//seq contains term that can match but has a free variable, so
 	//matching to a should be not possible
-	JavaDLTerm match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
+	Term match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
 	TacletApp app = PosTacletApp.createPosTacletApp
 	(if_find_clash,
             if_find_clash.getMatcher().matchFind(match.sub(0),  
                MatchConditions.EMPTY_MATCHCONDITIONS, 
                services).getInstantiations(),
-               new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(match.sub(0)),
-                       PosInTerm.<JavaDLTerm>getTopLevel().down(0), true), services);
+               new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(match.sub(0)),
+                       PosInTerm.<Term>getTopLevel().down(0), true), services);
         
 	assertTrue("Match found but match term contains free var and"+
 		   "matching var occurs in two instantiation areas"+
@@ -241,7 +241,7 @@ public class TestMatchTaclet extends TestCase {
     public void testRWVarOccursInAddAndIf() {
 	// no clash should happen because in this case the add and if
 	// sections are the same area
-	JavaDLTerm match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
+	Term match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
 
 	assertTrue("Match not found but should exist"+
 		   " because add and if are same area",
@@ -252,7 +252,7 @@ public class TestMatchTaclet extends TestCase {
 
     
     public void testXNotFreeInYConflict() {
-	JavaDLTerm free_in = TacletForTests.parseTerm("\\forall testSort z; (p(z) & p(f(z)))");
+	Term free_in = TacletForTests.parseTerm("\\forall testSort z; (p(z) & p(f(z)))");
 	// matching the not_free_conflict Taclet with (P(f(z),z) should
 	// result in a conflict, because z is free in f(z) but
 	// the Taclet demands z not free in f(z)
@@ -263,7 +263,7 @@ public class TestMatchTaclet extends TestCase {
 		    (free_in, 
 		     MatchConditions.EMPTY_MATCHCONDITIONS, services), services) == null);
 
-	JavaDLTerm not_free_in = TacletForTests.parseTerm("\\forall testSort z; (p(z) & p(c))");
+	Term not_free_in = TacletForTests.parseTerm("\\forall testSort z; (p(z) & p(c))");
  	assertTrue("Match should be found because .. not free in.. "+
 		   "is not relevant", NoPosTacletApp.createNoPosTacletApp
 		   (not_free_conflict,
@@ -274,8 +274,8 @@ public class TestMatchTaclet extends TestCase {
 
 
     public void testCloseWithBoundRenaming() {
-	JavaDLTerm closeable_one = TacletForTests.parseTerm("\\forall testSort z; p(z)");
-	JavaDLTerm closeable_two = TacletForTests.parseTerm("\\forall testSort y; p(y)");
+	Term closeable_one = TacletForTests.parseTerm("\\forall testSort z; p(z)");
+	Term closeable_two = TacletForTests.parseTerm("\\forall testSort y; p(y)");
 	Sequent seq = Sequent.createSequent
 	    (Semisequent.nil().insert
 	     (0, new SequentFormula<>(closeable_one)).semisequent(), 
@@ -283,8 +283,8 @@ public class TestMatchTaclet extends TestCase {
 	     (0, new SequentFormula<>(closeable_two)).semisequent()); 	
 	TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
 	index.add(close_rule.taclet());
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(closeable_two),
-                PosInTerm.<JavaDLTerm>getTopLevel(), false);
+        PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(closeable_two),
+                PosInTerm.<Term>getTopLevel(), false);
 
 	TacletApp tacletApp = index.getSuccedentTaclet(pio,
 	                                               new IHTacletFilter (true, ImmutableSLList.<RuleSet>nil()),
@@ -295,7 +295,7 @@ public class TestMatchTaclet extends TestCase {
    
     // a greater test 
     public void testConflict() {
-	JavaDLTerm match = TacletForTests.parseTerm("p1(m1(n))");
+	Term match = TacletForTests.parseTerm("p1(m1(n))");
 	for (int i=0; i<conflict.length; i++) {
 	    assertTrue("Match should not be found because of area conflict:"+i,
 		       conflict[i].getMatcher().matchFind
@@ -310,14 +310,14 @@ public class TestMatchTaclet extends TestCase {
 	   = new LocationVariable(new ProgramElementName("i"), 
 	        	          services.getProgramServices().getJavaInfo().getKeYJavaType("int"));
 	services.getNamespaces().programVariables().add(i);
-	JavaDLTerm match = TacletForTests.parseTerm("\\<{}\\>{i:=2}(\\forall nat z; (q1(z)))");
+	Term match = TacletForTests.parseTerm("\\<{}\\>{i:=2}(\\forall nat z; (q1(z)))");
 	match = match.sub(0);
 	assertTrue("Instantiations should be found as updates can be ignored if "+
 		   "only the term that is matched has an update and the "+
 		   "template it is matched to has none.",
 		   all_left.getMatcher().matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
 		
-	JavaDLTerm match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true");
+	Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true");
 	match2 = match2.sub(0);
 	assertTrue("Instantiations should be found.",
 		   assign_n.getMatcher().matchFind(match2, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
@@ -325,7 +325,7 @@ public class TestMatchTaclet extends TestCase {
 
 
     public void testProgramMatchEmptyBlock() {
-	JavaDLTerm match = TacletForTests.parseTerm("\\<{ }\\>true ");
+	Term match = TacletForTests.parseTerm("\\<{ }\\>true ");
 	FindTaclet taclet
 	    =(FindTaclet)TacletForTests.getTaclet("empty_diamond").taclet();   
 	MatchConditions mc=(taclet.getMatcher().matchFind
@@ -360,7 +360,7 @@ public class TestMatchTaclet extends TestCase {
 					       DefaultImmutableSet.<Sort>nil()
 					      .add(osort2).add(osort3), false);
 	Function v4=new Function(new Name("v4"), osort4, new Sort[0]);	
-	JavaDLTerm match=TB.tf().createTerm(v4);
+	Term match=TB.tf().createTerm(v4);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_termSV").taclet();   
 	MatchConditions mc=taclet.getMatcher().matchFind(match, 
@@ -378,8 +378,8 @@ public class TestMatchTaclet extends TestCase {
 					       DefaultImmutableSet.<Sort>nil()
 					      .add(osort2).add(osort3), false);	
 	Function aPred = (Function)TacletForTests.getFunctions().lookup(new Name("A"));
-	JavaDLTerm sub = TB.tf().createTerm(aPred);
-	JavaDLTerm match=TB.all(new LogicVariable(new Name("lv"), osort4), 
+	Term sub = TB.tf().createTerm(aPred);
+	Term match=TB.all(new LogicVariable(new Name("lv"), osort4), 
 					   sub);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_variableSV").taclet();   
@@ -389,7 +389,7 @@ public class TestMatchTaclet extends TestCase {
     }
 
     public void testNoContextMatching() {
-	JavaDLTerm match = TacletForTests.parseTerm("\\<{{ int i = 0;}}\\>true ");
+	Term match = TacletForTests.parseTerm("\\<{{ int i = 0;}}\\>true ");
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_nocontext").taclet();   
 	MatchConditions mc=(taclet.getMatcher().matchFind(match, 
@@ -398,7 +398,7 @@ public class TestMatchTaclet extends TestCase {
     }
 
     public void testPrefixMatching() {
-	JavaDLTerm match = TacletForTests.parseTerm("\\<{return;}\\>true ");
+	Term match = TacletForTests.parseTerm("\\<{return;}\\>true ");
 	StatementBlock prg = (StatementBlock)match.modalContent().program();
 	ExecutionContext ec = new ExecutionContext
 	    (new TypeRef(new KeYJavaType
@@ -418,7 +418,7 @@ public class TestMatchTaclet extends TestCase {
 					   services));
 	assertNotNull("Method-Frame should match", mc);
 
-	JavaDLTerm termWithPV=TacletForTests.parseTerm("\\<{int i;}\\>i=0");
+	Term termWithPV=TacletForTests.parseTerm("\\<{int i;}\\>i=0");
 	match = TacletForTests.parseTerm("\\<{return 2;}\\>true ");
 	prg = (StatementBlock)match.modalContent().program();
 	mframe = new MethodFrame((IProgramVariable)termWithPV.sub(0).sub(0).op(),
@@ -435,7 +435,7 @@ public class TestMatchTaclet extends TestCase {
 
     public void testBugsThathaveBeenRemoved() {
 
-	JavaDLTerm match = TacletForTests.parseTerm("\\<{ int i = 0; }\\>true ");
+	Term match = TacletForTests.parseTerm("\\<{ int i = 0; }\\>true ");
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_eliminate_variable_declaration").taclet();   
 	MatchConditions mc=(taclet.getMatcher().matchFind(match, 
@@ -496,7 +496,7 @@ public class TestMatchTaclet extends TestCase {
 	FindTaclet unrestrictedTaclet =
                 (FindTaclet) TacletForTests.getTaclet("testInsequentState_2").taclet();
 
-        JavaDLTerm match = TacletForTests.parseTerm("{ i := 0 } (i = 0)");
+        Term match = TacletForTests.parseTerm("{ i := 0 } (i = 0)");
 	MatchConditions mc=(restrictedTaclet.getMatcher().matchFind(match,
                                                        MatchConditions.EMPTY_MATCHCONDITIONS,
                                                        services));

@@ -84,7 +84,7 @@ public class SMTTermVariable extends SMTTerm {
 				this.id.equals(tv.id);
 	}
 
-//	public boolean equals (JavaDLTerm term) {
+//	public boolean equals (Term term) {
 //		if (term == null)
 //			return false;
 //		

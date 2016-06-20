@@ -19,7 +19,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.Contract;
@@ -54,7 +54,7 @@ public final class InfFlowMethodContractTacletBuilder
 
 
     @Override
-    JavaDLTerm generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
+    Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
                                Services services) {
         BasicPOSnippetFactory fAssumes =
                 POSnippetFactory.getBasicFactory(methodContract, schemaDataAssumes, services);
@@ -63,7 +63,7 @@ public final class InfFlowMethodContractTacletBuilder
 
 
     @Override
-    JavaDLTerm generateSchemaFind(ProofObligationVars schemaDataFind,
+    Term generateSchemaFind(ProofObligationVars schemaDataFind,
                             Services services) {
         BasicPOSnippetFactory fFind =
                 POSnippetFactory.getBasicFactory(methodContract, schemaDataFind, services);
@@ -72,7 +72,7 @@ public final class InfFlowMethodContractTacletBuilder
 
 
     @Override
-    JavaDLTerm getContractApplPred(ProofObligationVars appData) {
+    Term getContractApplPred(ProofObligationVars appData) {
         BasicPOSnippetFactory f =
                 POSnippetFactory.getBasicFactory(methodContract, appData,
                                                  services);
@@ -81,13 +81,13 @@ public final class InfFlowMethodContractTacletBuilder
 
 
     @Override
-    JavaDLTerm buildContractApplications(ProofObligationVars contAppData,
+    Term buildContractApplications(ProofObligationVars contAppData,
                                    ProofObligationVars contAppData2,
                                    Services services) {
         ImmutableSet<InformationFlowContract> ifContracts =
                 getInformFlowContracts(methodContract.getTarget(), services);
-        ImmutableList<JavaDLTerm> contractsApplications =
-                ImmutableSLList.<JavaDLTerm>nil();
+        ImmutableList<Term> contractsApplications =
+                ImmutableSLList.<Term>nil();
         for (InformationFlowContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,

@@ -40,7 +40,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.*;
@@ -132,11 +132,11 @@ public class LogicPrinter {
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
             QuantifiableVariablePrintMode.NORMAL;
 
-    public static String quickPrintTerm(JavaDLTerm t, Services services) {
+    public static String quickPrintTerm(Term t, Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX, NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
 
-    public static String quickPrintTerm(JavaDLTerm t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+    public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
             ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
@@ -642,8 +642,8 @@ public class LogicPrinter {
 		printConstant(sv.name().toString());
 	    }
 	} else {
-	    if (o instanceof JavaDLTerm) {
-		printTerm((JavaDLTerm)o);
+	    if (o instanceof Term) {
+		printTerm((Term)o);
 	    } else if (o instanceof ProgramElement) {
 		printProgramElement((ProgramElement)o);
 	    } else {
@@ -701,7 +701,7 @@ public class LogicPrinter {
         layouter.pre(w.toString());
     }
 
-    protected void printRewrite(JavaDLTerm t) throws IOException {
+    protected void printRewrite(Term t) throws IOException {
         layouter.beginC(2).print("\\replacewith (").brk();
         printTerm(t);
         layouter.brk(1,-2).print(")").end();
@@ -827,7 +827,7 @@ public class LogicPrinter {
      *
      * @param cfma the constrained formula to be printed
      */
-    public void printConstrainedFormula(SequentFormula<JavaDLTerm> cfma)
+    public void printConstrainedFormula(SequentFormula<Term> cfma)
         throws IOException {
 	printTerm(cfma.formula());
     }
@@ -838,9 +838,9 @@ public class LogicPrinter {
      * Pretty-prints a term or formula.  How it is rendered depends on
      * the NotationInfo given to the constructor.
      *
-     * @param t the JavaDLTerm to be printed
+     * @param t the Term to be printed
      */
-    public void printTerm(JavaDLTerm t) throws IOException {
+    public void printTerm(Term t) throws IOException {
         if(notationInfo.getAbbrevMap().isEnabled(t)){
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
@@ -862,25 +862,25 @@ public class LogicPrinter {
 
     /**
      * Determine the Set of labels that will be printed out for a specific
-     * {@link JavaDLTerm}. The class {@link SequentViewLogicPrinter} overrides this
+     * {@link Term}. The class {@link SequentViewLogicPrinter} overrides this
      * method. {@link TermLabel} visibility can be configured via GUI, see
      * {@link de.uka.ilkd.key.gui.actions.TermLabelMenu}. Default is to print
      * all TermLabels.
      *
-     * @param t {@link JavaDLTerm} whose visible {@link TermLabel}s will be
+     * @param t {@link Term} whose visible {@link TermLabel}s will be
      * determined.
      * @return List of visible {@link TermLabel}s, i.e. labels that are
-     * syntactically added to a {@link JavaDLTerm} while printing.
+     * syntactically added to a {@link Term} while printing.
      */
-    protected ImmutableArray<TermLabel> getVisibleTermLabels(JavaDLTerm t) {
+    protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
         return t.getLabels();
     }
 
-    public void printLabels(JavaDLTerm t) throws IOException {
+    public void printLabels(Term t) throws IOException {
         notationInfo.getNotation(TermLabel.class).print(t, this);
     }
 
-    void printLabels(JavaDLTerm t, String left, String right) throws IOException {
+    void printLabels(Term t, String left, String right) throws IOException {
 
         ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
         if (termLabelList.isEmpty()) {
@@ -916,10 +916,10 @@ public class LogicPrinter {
      * Pretty-prints a set of terms.
      * @param terms the terms to be printed
      */
-    public void printTerm(ImmutableSet<JavaDLTerm> terms)
+    public void printTerm(ImmutableSet<Term> terms)
         throws IOException {
         getLayouter().print("{");
-        Iterator<JavaDLTerm> it = terms.iterator();
+        Iterator<Term> it = terms.iterator();
         while (it.hasNext()) {
             printTerm(it.next());
             if (it.hasNext()) {
@@ -952,8 +952,8 @@ public class LogicPrinter {
      * </pre>
      *
      *
-     * @param t the JavaDLTerm to be printed */
-    public void printTermContinuingBlock(JavaDLTerm t) throws IOException {
+     * @param t the Term to be printed */
+    public void printTermContinuingBlock(Term t) throws IOException {
        if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
 				&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
            layouter.print("(");
@@ -975,7 +975,7 @@ public class LogicPrinter {
      * <code>t1</code>.
      *
      * @param t the term to be printed.  */
-    public void printFunctionTerm(JavaDLTerm t) throws IOException {
+    public void printFunctionTerm(Term t) throws IOException {
        boolean isKeyword = false;
        if (services != null) {
            Function measuredByEmpty =  services.getTermBuilder().getMeasuredByEmpty();
@@ -1049,7 +1049,7 @@ public class LogicPrinter {
 
     public void printCast(String pre,
 	    		  String post,
-	    		  JavaDLTerm t,
+	    		  Term t,
 	    		  int ass) throws IOException {
         final SortDependingFunction cast = (SortDependingFunction)t.op();
 
@@ -1060,7 +1060,7 @@ public class LogicPrinter {
         maybeParens(t.sub(0), ass);
     }
 
-    protected boolean printEmbeddedHeapConstructorTerm(JavaDLTerm t) throws IOException {
+    protected boolean printEmbeddedHeapConstructorTerm(Term t) throws IOException {
 
         Notation notation = notationInfo.getNotation(t.op());
         if (notation instanceof HeapConstructorNotation) {
@@ -1077,14 +1077,14 @@ public class LogicPrinter {
         layouter.print(className);
     }
 
-    public void printHeapConstructor(JavaDLTerm t, boolean closingBrace) throws IOException {
+    public void printHeapConstructor(Term t, boolean closingBrace) throws IOException {
         assert t.boundVars().isEmpty();
 
         final HeapLDT heapLDT = getHeapLDT();
 
         if(notationInfo.isPrettySyntax() && heapLDT != null) {
             startTerm(t.arity());
-            final JavaDLTerm heapTerm = t.sub(0);
+            final Term heapTerm = t.sub(0);
             final String opName = t.op().name().toString();
 
             assert heapTerm.sort() == heapLDT.targetSort();
@@ -1130,12 +1130,12 @@ public class LogicPrinter {
         }
     }
 
-    protected void printEmbeddedObserver(final JavaDLTerm heapTerm, final JavaDLTerm objectTerm)
+    protected void printEmbeddedObserver(final Term heapTerm, final Term objectTerm)
             throws IOException {
         Notation notation = notationInfo.getNotation(objectTerm.op());
         if(notation instanceof ObserverNotation) {
             ObserverNotation obsNotation = (ObserverNotation)notation;
-            JavaDLTerm innerheap = objectTerm.sub(0);
+            Term innerheap = objectTerm.sub(0);
             boolean paren = !heapTerm.equals(innerheap);
             if(paren) {
                 layouter.print("(");
@@ -1152,21 +1152,21 @@ public class LogicPrinter {
     /*
      * Print a term of the form: T::select(heap, object, field).
      */
-    public void printSelect(JavaDLTerm t, JavaDLTerm tacitHeap) throws IOException {
+    public void printSelect(Term t, Term tacitHeap) throws IOException {
         selectPrinter.printSelect(t, tacitHeap);
     }
 
     /*
      * Print a term of the form: store(heap, object, field, value).
      */
-    public void printStore(JavaDLTerm t, boolean closingBrace) throws IOException {
+    public void printStore(Term t, boolean closingBrace) throws IOException {
         storePrinter.printStore(t, closingBrace);
     }
     
     /*
      * Print a term of the form: T::seqGet(Seq, int).
      */
-    public void printSeqGet(JavaDLTerm t) throws IOException {
+    public void printSeqGet(Term t) throws IOException {
         if (notationInfo.isPrettySyntax()) {
             startTerm(2);
             if (!t.sort().equals(SortImpl.ANY)) {
@@ -1186,7 +1186,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printPostfix(JavaDLTerm t, String postfix) throws IOException {
+    public void printPostfix(Term t, String postfix) throws IOException {
 	if(notationInfo.isPrettySyntax()) {
 	    startTerm(t.arity());
 
@@ -1199,7 +1199,7 @@ public class LogicPrinter {
 	}
     }
 
-    public void printObserver(JavaDLTerm t, JavaDLTerm tacitHeap) throws IOException {
+    public void printObserver(Term t, Term tacitHeap) throws IOException {
         assert t.op() instanceof IObserverFunction;
         assert t.boundVars().isEmpty();
 
@@ -1256,7 +1256,7 @@ public class LogicPrinter {
                 JavaInfo javaInfo = services.getProgramServices().getJavaInfo();
                 if (t.arity() > 1) {
                     // in case arity > 1 we assume fieldName refers to a query (method call)
-                    JavaDLTerm object = t.sub(1);
+                    Term object = t.sub(1);
                     KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
                     if (obs.isStatic()
                             || ((obs instanceof IProgramMethod) && javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType))) {
@@ -1291,7 +1291,7 @@ public class LogicPrinter {
             }
 
             // must the heap be printed at all: no, if default heap.
-            final JavaDLTerm heapTerm = t.sub(0);
+            final Term heapTerm = t.sub(0);
             if (!heapTerm.equals(tacitHeap)) {
                 layouter.brk(0).print("@");
                 markStartSub(0);
@@ -1310,7 +1310,7 @@ public class LogicPrinter {
     }
 
 
-    public void printSingleton(JavaDLTerm t) throws IOException {
+    public void printSingleton(Term t) throws IOException {
 	assert t.arity() == 2;
 	startTerm(2);
 	layouter.print("{(").beginC(0);
@@ -1329,7 +1329,7 @@ public class LogicPrinter {
     }
 
 
-    public void printSeqSingleton(JavaDLTerm t, String lDelimiter, String rDelimiter) throws IOException {
+    public void printSeqSingleton(Term t, String lDelimiter, String rDelimiter) throws IOException {
 	assert t.arity() == 1;
 	startTerm(1);
 	layouter.print(lDelimiter).beginC(0);
@@ -1340,7 +1340,7 @@ public class LogicPrinter {
     }
 
 
-    public void printElementOf(JavaDLTerm t) throws IOException {
+    public void printElementOf(Term t) throws IOException {
    	assert t.arity() == 3;
    	startTerm(3);
    
@@ -1368,7 +1368,7 @@ public class LogicPrinter {
    	markEndSub();
     }
 
-    public void printElementOf(JavaDLTerm t, String symbol) throws IOException {
+    public void printElementOf(Term t, String symbol) throws IOException {
         if (symbol == null) {
             printElementOf(t);
             return;
@@ -1407,8 +1407,8 @@ public class LogicPrinter {
      * @param ass  the associativity for the subterm
      * @throws IOException
      */
-    public void printPrefixTerm(String name, JavaDLTerm t,
-                                JavaDLTerm sub,int ass)
+    public void printPrefixTerm(String name, Term t,
+                                Term sub,int ass)
         throws IOException
     {
         startTerm(1);
@@ -1431,7 +1431,7 @@ public class LogicPrinter {
      * @param t    the subterm to be printed
      * @param ass  the associativity for the subterm
      */
-     public void printPostfixTerm(JavaDLTerm t,int ass,String name)
+     public void printPostfixTerm(Term t,int ass,String name)
         throws IOException
     {
         startTerm(1);
@@ -1450,7 +1450,7 @@ public class LogicPrinter {
      * </pre>
      *
      * The subterms are printed using
-     * {@link #printTermContinuingBlock(JavaDLTerm)}.
+     * {@link #printTermContinuingBlock(Term)}.
      *
      * @param l    the left subterm
      * @param assLeft associativity for left subterm
@@ -1459,9 +1459,9 @@ public class LogicPrinter {
      * @param r    the right subterm
      * @param assRight associativity for right subterm
      */
-    public void printInfixTerm(JavaDLTerm l,int assLeft,
-                               String name, JavaDLTerm t,
-                               JavaDLTerm r,int assRight)
+    public void printInfixTerm(Term l,int assLeft,
+                               String name, Term t,
+                               Term r,int assRight)
         throws IOException
     {
         int indent = name.length()+1;
@@ -1473,9 +1473,9 @@ public class LogicPrinter {
     }
 
     /** Print a binary term in infix style, continuing a containing
-     * block.  See {@link #printTermContinuingBlock(JavaDLTerm)} for the
+     * block.  See {@link #printTermContinuingBlock(Term)} for the
      * idea.  Otherwise like
-     * {@link #printInfixTerm(JavaDLTerm,int,String,JavaDLTerm,int)}.
+     * {@link #printInfixTerm(Term,int,String,Term,int)}.
      *
      * @param l    the left subterm
      * @param assLeft associativity for left subterm
@@ -1485,9 +1485,9 @@ public class LogicPrinter {
      * @param assRight associativity for right subterm
      * @throws IOException
      * */
-    public void printInfixTermContinuingBlock(JavaDLTerm l,int assLeft,
-                                              String name, JavaDLTerm t,
-                                              JavaDLTerm r,int assRight)
+    public void printInfixTermContinuingBlock(Term l,int assLeft,
+                                              String name, Term t,
+                                              Term r,int assRight)
         throws IOException
     {
         boolean isKeyword = false;
@@ -1530,7 +1530,7 @@ public class LogicPrinter {
      */
     public void printUpdateApplicationTerm (String l,
                                             String r,
-                                            JavaDLTerm t,
+                                            Term t,
                                             int ass3) throws IOException {
 	assert t.op() instanceof UpdateApplication && t.arity() == 2;
 
@@ -1560,7 +1560,7 @@ public class LogicPrinter {
      * @param ass2    associativity for the new values
      */
     public void printElementaryUpdate(String asgn,
-                                      JavaDLTerm t,
+                                      Term t,
                                       int ass2) throws IOException {
 	ElementaryUpdate op = (ElementaryUpdate)t.op();
 
@@ -1575,7 +1575,7 @@ public class LogicPrinter {
     }
 
 
-    private void printParallelUpdateHelper(String separator, JavaDLTerm t, int ass)
+    private void printParallelUpdateHelper(String separator, Term t, int ass)
     					    throws IOException {
 	assert t.arity() == 2;
 	startTerm(2);
@@ -1600,7 +1600,7 @@ public class LogicPrinter {
     }
 
 
-    public void printParallelUpdate(String separator, JavaDLTerm t, int ass)
+    public void printParallelUpdate(String separator, Term t, int ass)
     					    throws IOException {
 	layouter.beginC(0);
 	printParallelUpdateHelper(separator, t, ass);
@@ -1638,7 +1638,7 @@ public class LogicPrinter {
     }
 
 
-    public void printIfThenElseTerm(JavaDLTerm t, String keyword) throws IOException {
+    public void printIfThenElseTerm(Term t, String keyword) throws IOException {
         startTerm(t.arity());
 
         layouter.beginC ( 0 ); 
@@ -1692,7 +1692,7 @@ public class LogicPrinter {
      *
      * @param l       the String used as left brace symbol
      * @param v       the {@link QuantifiableVariable} to be substituted
-     * @param t       the JavaDLTerm to be used as new value
+     * @param t       the Term to be used as new value
      * @param ass2    the int defining the associativity for the new value
      * @param r       the String used as right brace symbol
      * @param phi     the substituted term/formula
@@ -1700,9 +1700,9 @@ public class LogicPrinter {
      */
     public void printSubstTerm(String l,
                                QuantifiableVariable v,
-                               JavaDLTerm t,int ass2,
+                               Term t,int ass2,
                                String r,
-                               JavaDLTerm phi,int ass3)
+                               Term phi,int ass3)
         throws IOException
     {
         layouter.beginC(2).print(l);
@@ -1735,7 +1735,7 @@ public class LogicPrinter {
      */
     public void printQuantifierTerm(String name,
                                     ImmutableArray<QuantifiableVariable> vars,
-                                    JavaDLTerm phi,
+                                    Term phi,
                                     int ass)
         throws IOException {
         layouter.beginC(2);
@@ -1767,7 +1767,7 @@ public class LogicPrinter {
      * @param s name of the constant
      * @throws IOException
      */
-    public void printConstant(JavaDLTerm t, String s)
+    public void printConstant(Term t, String s)
         throws IOException {
         startTerm(0);
         boolean isKeyword = false;
@@ -1920,7 +1920,7 @@ public class LogicPrinter {
     public void printModalityTerm(String left,
                                   JavaBlock jb,
                                   String right,
-                                  JavaDLTerm phi,
+                                  Term phi,
                                   int ass)
         throws IOException {
 	assert jb != null;
@@ -1942,11 +1942,11 @@ public class LogicPrinter {
                     startTerm(0);
                     layouter.print(notationInfo.getAbbrevMap().getAbbrev(phi));
                 } else {
-                    JavaDLTerm[] ta = new JavaDLTerm[phi.arity()];
+                    Term[] ta = new Term[phi.arity()];
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    JavaDLTerm term = services.getTermFactory().
+                    Term term = services.getTermFactory().
 			createTerm((Modality)o, ta, phi.boundVars(), phi.modalContent());
                     notationInfo.getNotation((Modality)o).print(term, this);
                     return;
@@ -2072,17 +2072,17 @@ public class LogicPrinter {
      * are needed.
      *
      * <p>If prio and associativity are equal, the subterm is printed
-     * using {@link #printTermContinuingBlock(JavaDLTerm)}.  This currently
+     * using {@link #printTermContinuingBlock(Term)}.  This currently
      * only makes a difference for infix operators.
      *
      * @param t   the the subterm to print
      * @param ass the associativity for this subterm */
-    protected void maybeParens(JavaDLTerm t, int ass)
+    protected void maybeParens(Term t, int ass)
         throws IOException {
         if (t.op() instanceof SchemaVariable && instantiations != null &&
 	    instantiations.getInstantiation((SchemaVariable)t.op())
-	    instanceof JavaDLTerm) {
-	    t = (JavaDLTerm) instantiations.getInstantiation((SchemaVariable)t.op());
+	    instanceof Term) {
+	    t = (Term) instantiations.getInstantiation((SchemaVariable)t.op());
 	}
 
 	if (notationInfo.getNotation(t.op()).getPriority() < ass){
@@ -2233,11 +2233,11 @@ public class LogicPrinter {
      * it takes care of meta variable instantiations
      * @param attributeProgramName the String of the attribute's program
      * name
-     * @param t the JavaDLTerm used as reference prefix
+     * @param t the Term used as reference prefix
      * @return true if an attribute term shall be printed in short form.
      */
     public boolean printInShortForm(String attributeProgramName,
-                                    JavaDLTerm t) {
+                                    Term t) {
         final Sort prefixSort;
         prefixSort = t.sort();
         return printInShortForm(attributeProgramName, prefixSort);

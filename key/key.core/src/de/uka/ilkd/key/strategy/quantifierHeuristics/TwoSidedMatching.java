@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 
 /**
@@ -38,12 +38,12 @@ import de.uka.ilkd.key.logic.op.Modality;
 class TwoSidedMatching {
 	    
     private final UniTrigger trigger;
-    private final JavaDLTerm triggerWithMVs;
+    private final Term triggerWithMVs;
     private final Substitution targetSubstWithMVs;
     private final Substitution triggerSubstWithMVs;
-    private final JavaDLTerm targetWithMVs;
+    private final Term targetWithMVs;
     
-    TwoSidedMatching(UniTrigger trigger, JavaDLTerm targetTerm, JavaDLTermServices services) {
+    TwoSidedMatching(UniTrigger trigger, Term targetTerm, JavaDLTermServices services) {
         this.trigger = trigger;
         this.targetSubstWithMVs =
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm, services );
@@ -72,7 +72,7 @@ class TwoSidedMatching {
 	return getAllSubstitutions ( targetWithMVs, services );
     }
     
-    private ImmutableSet<Substitution> getAllSubstitutions(JavaDLTerm target, JavaDLTermServices services) {
+    private ImmutableSet<Substitution> getAllSubstitutions(Term target, JavaDLTermServices services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         Substitution sub = match ( triggerWithMVs, target, services );
         if ( sub != null
@@ -92,18 +92,18 @@ class TwoSidedMatching {
     }
     
     /** find a substitution in a allterm by using unification */
-    private Substitution match(JavaDLTerm triggerTerm, JavaDLTerm targetTerm, 
+    private Substitution match(Term triggerTerm, Term targetTerm, 
             JavaDLTermServices services) {
         final Constraint c =
             Constraint.BOTTOM.unify ( targetTerm, triggerTerm,
                                       services );
         if ( c.isSatisfiable () ) {
-            ImmutableMap<QuantifiableVariable,JavaDLTerm> sub =
-                DefaultImmutableMap.<QuantifiableVariable,JavaDLTerm>nilMap();
+            ImmutableMap<QuantifiableVariable,Term> sub =
+                DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
             for (QuantifiableVariable quantifiableVariable : trigger.getUniVariables()) {
                 QuantifiableVariable q = quantifiableVariable;
-                JavaDLTerm mv = triggerSubstWithMVs.getSubstitutedTerm(q);
-                JavaDLTerm t = c.getInstantiation((Metavariable) (mv.op()), services);
+                Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);
+                Term t = c.getInstantiation((Metavariable) (mv.op()), services);
                 if (t == null || t.op() instanceof Metavariable)
                     return null;
                 if (isGround(t))
@@ -114,7 +114,7 @@ class TwoSidedMatching {
         return null;
     }
 
-    private boolean isGround(JavaDLTerm t) {
+    private boolean isGround(Term t) {
         return !triggerSubstWithMVs.termContainsValue ( t )
                && !targetSubstWithMVs.termContainsValue ( t );
     } 

@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -25,7 +25,7 @@ public class OracleInvariantTranslator {
 		this.services = services;
 	}
 
-	public JavaDLTerm getInvariantTerm(Sort s){
+	public Term getInvariantTerm(Sort s){
 		JavaInfo info = services.getProgramServices().getJavaInfo();
 		TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
 		SpecificationRepository spec = services.getSpecificationRepository();
@@ -45,23 +45,23 @@ public class OracleInvariantTranslator {
 
 		LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
 		
-		JavaDLTerm result = tb.tt();
+		Term result = tb.tt();
 		
 		for(ClassAxiom c : spec.getClassAxioms(kjt)){
 
 			if(c instanceof RepresentsAxiom && c.getKJT().equals(kjt)){
 				RepresentsAxiom ra = (RepresentsAxiom) c;
 				
-				 JavaDLTerm t = ra.getAxiom(h, o, services);
+				 Term t = ra.getAxiom(h, o, services);
 				 
 				 if(t.op().equals(Equality.EQV)){
 					 
-					 JavaDLTerm[] heaps = new JavaDLTerm[1];
+					 Term[] heaps = new Term[1];
                      heaps[0] = tb.var(h);
 
-                     JavaDLTerm inv = tb.inv(heaps, tb.var(o));
-                     JavaDLTerm left = t.sub(0);
-                     JavaDLTerm right = t.sub(1);
+                     Term inv = tb.inv(heaps, tb.var(o));
+                     Term left = t.sub(0);
+                     Term right = t.sub(1);
                      
                      if(left.op().name().equals(inv.op().name())){
                     	 if(!right.equals(tb.tt())){

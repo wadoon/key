@@ -38,10 +38,10 @@ public class SortCollector extends DefaultVisitor {
 	}	
 	
 	/* (non-Javadoc)
-	 * @see de.uka.ilkd.key.logic.DefaultVisitor#visit(de.uka.ilkd.key.logic.JavaDLTerm)
+	 * @see de.uka.ilkd.key.logic.DefaultVisitor#visit(de.uka.ilkd.key.logic.Term)
 	 */
 	@Override
-	public void visit(JavaDLTerm visited) {
+	public void visit(Term visited) {
 		sorts.add(visited.sort());
 	}	
 

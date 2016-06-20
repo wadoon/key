@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * Instances of this interface are used to customize and extend the behavior of a {@link ProofOblInput}.
@@ -25,5 +25,5 @@ public interface POExtension {
     * @param postTerm The post condition to modify.
     * @return The modified post condition or the original post condition if no modifications were performed.
     */
-   public JavaDLTerm modifyPostTerm(InitConfig proofConfig, Services services, JavaDLTerm postTerm);
+   public Term modifyPostTerm(InitConfig proofConfig, Services services, Term postTerm);
 }

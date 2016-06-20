@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
@@ -45,7 +45,7 @@ public interface IExecutionVariable extends IExecutionElement {
     * Returns the index in the parent array if an array cell value is represented.
     * @return The index in the parent array or {@code null} if no array cell value is represented.
     */
-   public JavaDLTerm getArrayIndex();
+   public Term getArrayIndex();
    
    /**
     * Returns the human readable index in the parent array if an array cell value is represented.
@@ -63,7 +63,7 @@ public interface IExecutionVariable extends IExecutionElement {
     * Returns the optional additional condition considered during value computation.
     * @return The optional additional condition considered during value computation.
     */
-   public JavaDLTerm getAdditionalCondition();
+   public Term getAdditionalCondition();
    
    /**
     * Returns the parent {@link IExecutionValue} if available.
@@ -82,5 +82,5 @@ public interface IExecutionVariable extends IExecutionElement {
     * of {@link #getProgramVariable()}.
     * @return The created term.
     */
-   public JavaDLTerm createSelectTerm();
+   public Term createSelectTerm();
 }

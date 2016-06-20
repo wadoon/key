@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 /**
@@ -32,7 +32,7 @@ public class RemoveParentUpdateModifier implements Modifier {
 
 
     @Override
-    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modifyPosistion(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+    public PosInOccurrence<Term, SequentFormula<Term>> modifyPosistion(PosInOccurrence<Term, SequentFormula<Term>> pos) {
         if (!pos.isTopLevel() &&
             pos.up().subTerm().op() instanceof UpdateApplication) {
             return modifyPosistion(pos.up());

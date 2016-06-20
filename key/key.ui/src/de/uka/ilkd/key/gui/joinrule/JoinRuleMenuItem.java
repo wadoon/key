@@ -25,7 +25,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
@@ -50,7 +50,7 @@ public class JoinRuleMenuItem extends JMenuItem {
      * @param mediator
      *            The KeY mediator.
      */
-    public JoinRuleMenuItem(final Goal goal, final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+    public JoinRuleMenuItem(final Goal goal, final PosInOccurrence<Term, SequentFormula<Term>> pio,
             final KeYMediator mediator) {
         final Services services = goal.proof().getServices();
 

@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -40,8 +40,8 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
     }
     
     
-    private static boolean clearlyDisjoint(JavaDLTerm t1, 
-	    				   JavaDLTerm t2, 
+    private static boolean clearlyDisjoint(Term t1, 
+	    				   Term t2, 
 	    				   Services services) {
 	final LocSetLDT setLDT = services.getTheories().getLocSetLDT();
 	if(t1.op() instanceof Function && ((Function)t1.op()).isUnique()
@@ -50,14 +50,14 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 	    return true;
 	} else if(t1.sort().equals(setLDT.targetSort()) 
 		  && t2.sort().equals(setLDT.targetSort())) {
-	    final ImmutableSet<JavaDLTerm> t1set = services.getTermBuilder().unionToSet(t1);
-	    final ImmutableSet<JavaDLTerm> t2set = services.getTermBuilder().unionToSet(t2);
+	    final ImmutableSet<Term> t1set = services.getTermBuilder().unionToSet(t1);
+	    final ImmutableSet<Term> t2set = services.getTermBuilder().unionToSet(t2);
 
 	    ImmutableSet<Operator> t1Ops 
 	    	= DefaultImmutableSet.<Operator>nil();
 	    ImmutableSet<Operator> t2Ops 
 	    	= DefaultImmutableSet.<Operator>nil();
-	    for(JavaDLTerm t : t1set) {
+	    for(Term t : t1set) {
 		if(t.op().equals(setLDT.getSingleton())
 		   && t.sub(0).op() instanceof Function 
 		   && ((Function)t.sub(0).op()).isUnique()) {
@@ -68,7 +68,7 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 		    return false;
 		}
 	    }
-	    for(JavaDLTerm t : t2set) {
+	    for(Term t : t2set) {
 		if(t.op().equals(setLDT.getSingleton())
 		   && t.sub(0).op() instanceof Function 
 		   && ((Function)t.sub(0).op()).isUnique()) {
@@ -92,8 +92,8 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 			 SVSubstitute subst, 
 			 SVInstantiations svInst,
 			 Services services) {
-	final JavaDLTerm s1Inst = (JavaDLTerm) svInst.getInstantiation(var1);
-	final JavaDLTerm s2Inst = (JavaDLTerm) svInst.getInstantiation(var2);
+	final Term s1Inst = (Term) svInst.getInstantiation(var1);
+	final Term s2Inst = (Term) svInst.getInstantiation(var2);
 	if(s1Inst == null || s2Inst == null) {
 	    return true;
 	} else {

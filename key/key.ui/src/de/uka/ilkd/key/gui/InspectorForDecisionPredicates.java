@@ -22,7 +22,7 @@ import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
@@ -56,13 +56,13 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
         if(toBeChecked.isEmpty()){
             return CheckedUserInputInspector.NO_USER_INPUT;
         }
-        JavaDLTerm term = translate(services,toBeChecked);
+        Term term = translate(services,toBeChecked);
         
         Semisequent semisequent = cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? 
                 node.sequent().antecedent() : node.sequent().succedent();
         String position = cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? "antecedent":"succedent";   
         
-        for(SequentFormula<JavaDLTerm> sf : semisequent){
+        for(SequentFormula<Term> sf : semisequent){
             if(sf.formula() == term){
                 return "Formula already exists in "+position+".";
             }
@@ -85,7 +85,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
 
     }
     
-    public static JavaDLTerm translate(Services services, String toBeChecked){
+    public static Term translate(Services services, String toBeChecked){
         try {
             KeYParserF parser =
                     new KeYParserF (ParserMode.TERM,

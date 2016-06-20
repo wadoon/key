@@ -16,10 +16,10 @@ package de.uka.ilkd.key.strategy.termfeature;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
- * JavaDLTerm feature for checking whether the top operator of a term is
+ * Term feature for checking whether the top operator of a term is
  * identical to a given one
  */
 public class OperatorTF extends BinaryTermFeature {
@@ -34,7 +34,7 @@ public class OperatorTF extends BinaryTermFeature {
         return new OperatorTF ( op );
     }
 
-    protected boolean filter(JavaDLTerm term, Services services) {
+    protected boolean filter(Term term, Services services) {
         return op == term.op ();
     }
 }

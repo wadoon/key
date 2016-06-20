@@ -32,7 +32,7 @@ import de.uka.ilkd.key.java.statement.Continue;
 import de.uka.ilkd.key.java.statement.LabelJumpStatement;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -64,32 +64,32 @@ public interface BlockContract extends SpecificationElement {
     public boolean hasModifiesClause(LocationVariable heap);
 
     // TODO Why do we need remembranceHeaps for the precondition? Do we also need remembranceLocalVariables?
-    public JavaDLTerm getPrecondition(LocationVariable heap,
+    public Term getPrecondition(LocationVariable heap,
                                 ProgramVariable self,
                                 Map<LocationVariable, LocationVariable> remembranceHeaps,
                                 Services services);
-    public JavaDLTerm getPrecondition(LocationVariable heapVariable,
-                                JavaDLTerm heap,
-                                JavaDLTerm self,
-                                Map<LocationVariable, JavaDLTerm> remembranceHeaps,
+    public Term getPrecondition(LocationVariable heapVariable,
+                                Term heap,
+                                Term self,
+                                Map<LocationVariable, Term> remembranceHeaps,
                                 Services services);
-    public JavaDLTerm getPrecondition(LocationVariable heap, Services services);
+    public Term getPrecondition(LocationVariable heap, Services services);
 
-    public JavaDLTerm getPostcondition(LocationVariable heap, Variables variables, Services services);
-    public JavaDLTerm getPostcondition(LocationVariable heapVariable, JavaDLTerm heap,
+    public Term getPostcondition(LocationVariable heap, Variables variables, Services services);
+    public Term getPostcondition(LocationVariable heapVariable, Term heap,
                                  Terms terms, Services services);
-    public JavaDLTerm getPostcondition(LocationVariable heap, Services services);
+    public Term getPostcondition(LocationVariable heap, Services services);
 
-    public JavaDLTerm getModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
-    public JavaDLTerm getModifiesClause(LocationVariable heapVariable, JavaDLTerm heap,
-                                  JavaDLTerm self, Services services);
-    public JavaDLTerm getModifiesClause(LocationVariable heap, Services services);
+    public Term getModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
+    public Term getModifiesClause(LocationVariable heapVariable, Term heap,
+                                  Term self, Services services);
+    public Term getModifiesClause(LocationVariable heap, Services services);
 
-    public JavaDLTerm getRequires(LocationVariable heap);
+    public Term getRequires(LocationVariable heap);
 
-    public JavaDLTerm getEnsures(LocationVariable heap);
+    public Term getEnsures(LocationVariable heap);
 
-    public JavaDLTerm getAssignable(LocationVariable heap);
+    public Term getAssignable(LocationVariable heap);
     
     public JoinProcedure getJoinProcedure();
 
@@ -103,9 +103,9 @@ public interface BlockContract extends SpecificationElement {
 
     // TODO Find better name: Creates a new block contract with the given changes.
     public BlockContract update(StatementBlock newBlock,
-                                Map<LocationVariable,JavaDLTerm> newPreconditions,
-                                Map<LocationVariable,JavaDLTerm> newPostconditions,
-                                Map<LocationVariable,JavaDLTerm> newModifiesClauses,
+                                Map<LocationVariable,Term> newPreconditions,
+                                Map<LocationVariable,Term> newPostconditions,
+                                Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newInfFlowSpecs,
                                 final JoinProcedure newJoinProcedure,
                                 Variables newVariables);
@@ -132,32 +132,32 @@ public interface BlockContract extends SpecificationElement {
     public boolean hasJoinProcedure();
 
 
-    public void setInstantiationSelf(JavaDLTerm selfInstantiation);
+    public void setInstantiationSelf(Term selfInstantiation);
 
 
     /**
      * Returns the term internally used for self or a newly instantiated one.
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
-    public JavaDLTerm getInstantiationSelfTerm(JavaDLTermServices services);
+    public Term getInstantiationSelfTerm(JavaDLTermServices services);
 
 
     /**
      * Returns the original precondition of the contract.
      */
-    JavaDLTerm getPre(Services services);
+    Term getPre(Services services);
 
 
     /**
      * Returns the original postcondition of the contract.
      */
-    JavaDLTerm getPost(Services services);
+    Term getPost(Services services);
 
 
     /**
      * Returns the original modifies clause of the contract.
      */
-    JavaDLTerm getMod(Services services);
+    Term getMod(Services services);
 
 
     /**
@@ -230,7 +230,7 @@ public interface BlockContract extends SpecificationElement {
             return result;
         }
 
-        public Terms termify(JavaDLTerm self)
+        public Terms termify(Term self)
         {
             return new BlockContract.Terms(
                 self,
@@ -244,18 +244,18 @@ public interface BlockContract extends SpecificationElement {
             );
         }
 
-        private Map<Label, JavaDLTerm> termifyFlags(final Map<Label, ProgramVariable> flags)
+        private Map<Label, Term> termifyFlags(final Map<Label, ProgramVariable> flags)
         {
-            final Map<Label, JavaDLTerm> result = new LinkedHashMap<Label, JavaDLTerm>();
+            final Map<Label, Term> result = new LinkedHashMap<Label, Term>();
             for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
                 result.put(flag.getKey(), termifyVariable(flag.getValue()));
             }
             return result;
         }
 
-        private Map<LocationVariable, JavaDLTerm> termifyRemembranceVariables(
+        private Map<LocationVariable, Term> termifyRemembranceVariables(
                     final Map<LocationVariable, LocationVariable> remembranceVariables) {
-            final Map<LocationVariable, JavaDLTerm> result = new LinkedHashMap<LocationVariable, JavaDLTerm>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
                     : remembranceVariables.entrySet()) {
                 result.put(remembranceVariable.getKey(),
@@ -264,7 +264,7 @@ public interface BlockContract extends SpecificationElement {
             return result;
         }
 
-        private JavaDLTerm termifyVariable(final ProgramVariable variable)
+        private Term termifyVariable(final ProgramVariable variable)
         {
             if (variable != null) {
                 return services.getTermBuilder().var(variable);
@@ -482,23 +482,23 @@ public interface BlockContract extends SpecificationElement {
 
     public static class Terms {
 
-        public final JavaDLTerm self;
-        public final Map<Label, JavaDLTerm> breakFlags;
-        public final Map<Label, JavaDLTerm> continueFlags;
-        public final JavaDLTerm returnFlag;
-        public final JavaDLTerm result;
-        public final JavaDLTerm exception;
-        public final Map<LocationVariable, JavaDLTerm> remembranceHeaps;
-        public final Map<LocationVariable, JavaDLTerm> remembranceLocalVariables;
+        public final Term self;
+        public final Map<Label, Term> breakFlags;
+        public final Map<Label, Term> continueFlags;
+        public final Term returnFlag;
+        public final Term result;
+        public final Term exception;
+        public final Map<LocationVariable, Term> remembranceHeaps;
+        public final Map<LocationVariable, Term> remembranceLocalVariables;
 
-        public Terms(final JavaDLTerm self,
-                     final Map<Label, JavaDLTerm> breakFlags,
-                     final Map<Label, JavaDLTerm> continueFlags,
-                     final JavaDLTerm returnFlag,
-                     final JavaDLTerm result,
-                     final JavaDLTerm exception,
-                     final Map<LocationVariable, JavaDLTerm> remembranceHeaps,
-                     final Map<LocationVariable, JavaDLTerm> remembranceLocalVariables)
+        public Terms(final Term self,
+                     final Map<Label, Term> breakFlags,
+                     final Map<Label, Term> continueFlags,
+                     final Term returnFlag,
+                     final Term result,
+                     final Term exception,
+                     final Map<LocationVariable, Term> remembranceHeaps,
+                     final Map<LocationVariable, Term> remembranceLocalVariables)
         {
             this.self = self;
             this.breakFlags = breakFlags;

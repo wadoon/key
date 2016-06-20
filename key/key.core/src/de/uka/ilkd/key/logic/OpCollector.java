@@ -32,7 +32,7 @@ public class OpCollector extends DefaultVisitor {
 	ops = new LinkedHashSet<Operator>();
     }
 
-    public void visit(JavaDLTerm t) {	
+    public void visit(Term t) {	
         ops.add(t.op());
         if(t.op() instanceof ElementaryUpdate) {
             ops.add(((ElementaryUpdate)t.op()).lhs());

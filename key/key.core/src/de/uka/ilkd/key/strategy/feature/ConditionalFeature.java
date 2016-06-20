@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.feature;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -37,7 +37,7 @@ public class ConditionalFeature implements Feature {
         elseFeature = p_elseFeature;
     }
     
-    public RuleAppCost compute (RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public RuleAppCost compute (RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         if ( cond.filter ( app.rule() ) )
             return thenFeature.compute ( app, pos, goal );
         else

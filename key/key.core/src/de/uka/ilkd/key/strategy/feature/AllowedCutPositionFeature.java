@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.Quantifier;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
@@ -37,16 +37,16 @@ public class AllowedCutPositionFeature extends BinaryFeature {
 
     private AllowedCutPositionFeature () {}
     
-    public boolean filter (RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public boolean filter (RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         Debug.assertFalse ( pos == null,
                             "Feature is only applicable to rules with find" );
 
         return onlyBelowRightJunctors ( pos );
     }
 
-    private boolean onlyBelowRightJunctors (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+    private boolean onlyBelowRightJunctors (PosInOccurrence<Term, SequentFormula<Term>> pos) {
         boolean negated = pos.isInAntec ();        
-        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator ();
+        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
 
         while ( it.next () != -1 ) {
             final int child = it.getChild ();

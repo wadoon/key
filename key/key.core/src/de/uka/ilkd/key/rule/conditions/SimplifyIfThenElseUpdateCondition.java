@@ -22,7 +22,7 @@ import org.key_project.common.core.logic.op.*;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -53,31 +53,31 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     private static class ElementaryUpdateWrapper {
         private UpdateableOperator op;
 
-        private JavaDLTerm               rhs1;
-        private JavaDLTerm               rhs2;
+        private Term               rhs1;
+        private Term               rhs2;
         
         public ElementaryUpdateWrapper(UpdateableOperator op, JavaDLTermServices services) {
             super();
             this.op = op;
-            JavaDLTerm identity = services.getTermFactory().createTerm(op);
+            Term identity = services.getTermFactory().createTerm(op);
              
             rhs1 = identity;
             rhs2 = identity;
         }
         
-        public JavaDLTerm createIfElseTerm(JavaDLTerm phi, JavaDLTermServices services){
+        public Term createIfElseTerm(Term phi, JavaDLTermServices services){
             if(rhs1.equals(rhs2)){
                 return services.getTermBuilder().elementary(op, rhs1);
             }
-            JavaDLTerm ifThenElse = services.getTermBuilder().ife(phi, rhs1, rhs2);
+            Term ifThenElse = services.getTermBuilder().ife(phi, rhs1, rhs2);
             return services.getTermBuilder().elementary(op, ifThenElse);
             
         }
         
-        public void setRhs1(JavaDLTerm rhs1) {
+        public void setRhs1(Term rhs1) {
             this.rhs1 = rhs1;
         }
-        public void setRhs2(JavaDLTerm rhs2) {
+        public void setRhs2(Term rhs2) {
             this.rhs2 = rhs2;
         }
 
@@ -108,7 +108,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     }
     
     private void collectSingleTerm(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map, 
-            JavaDLTerm update,final boolean firstTerm, JavaDLTermServices services){
+            Term update,final boolean firstTerm, JavaDLTermServices services){
                 ElementaryUpdate eu = (ElementaryUpdate) update.op();
                 ElementaryUpdateWrapper euw= null;
                 if(!map.containsKey(eu.lhs())){
@@ -126,14 +126,14 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     
     private boolean collect(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map, 
-                         JavaDLTerm update,final boolean firstTerm, JavaDLTermServices services){
-        LinkedList<JavaDLTerm> updates = new LinkedList<JavaDLTerm>();
+                         Term update,final boolean firstTerm, JavaDLTermServices services){
+        LinkedList<Term> updates = new LinkedList<Term>();
         TreeSet<UpdateableOperator> collected = createTree();
         updates.add(update);
         // consider only parallel updates, where each variable occurs only once on 
         // the left hand side.
         while(!updates.isEmpty()){
-            JavaDLTerm next = updates.poll();
+            Term next = updates.poll();
             if(next.op() == UpdateJunctor.PARALLEL_UPDATE){
                  updates.add(next.sub(0));
                  updates.add(next.sub(1));
@@ -154,7 +154,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     }
 
-    private JavaDLTerm simplify(JavaDLTerm phi, JavaDLTerm u1, JavaDLTerm u2, JavaDLTerm t, JavaDLTermServices services){
+    private Term simplify(Term phi, Term u1, Term u2, Term t, JavaDLTermServices services){
 
         TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map = createMap();
         
@@ -165,7 +165,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         if(!collect(map,u2,false, services)){
             return null;
         }
-        JavaDLTerm result = services.getTermBuilder().skip();
+        Term result = services.getTermBuilder().skip();
         for(ElementaryUpdateWrapper euw : map.values()){
             result = services.getTermBuilder().parallel(result, euw.createIfElseTerm(phi, services));
         }
@@ -181,11 +181,11 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         
-        JavaDLTerm u1Inst      = (JavaDLTerm) svInst.getInstantiation(u1);
-        JavaDLTerm u2Inst      = (JavaDLTerm) svInst.getInstantiation(u2);
-        JavaDLTerm tInst      = (JavaDLTerm) svInst.getInstantiation(commonFormula);
-        JavaDLTerm phiInst    = (JavaDLTerm) svInst.getInstantiation(phi);
-        JavaDLTerm resultInst = (JavaDLTerm) svInst.getInstantiation(result);
+        Term u1Inst      = (Term) svInst.getInstantiation(u1);
+        Term u2Inst      = (Term) svInst.getInstantiation(u2);
+        Term tInst      = (Term) svInst.getInstantiation(commonFormula);
+        Term phiInst    = (Term) svInst.getInstantiation(phi);
+        Term resultInst = (Term) svInst.getInstantiation(result);
         
         if(tInst==null || phiInst==null) {
             return mc;
@@ -194,7 +194,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         u1Inst = u1Inst == null ? services.getTermBuilder().skip() : u1Inst;
         u2Inst = u2Inst == null ? services.getTermBuilder().skip() : u2Inst;
 
-        JavaDLTerm properResultInst = simplify(phiInst, u1Inst, u2Inst, tInst, services);
+        Term properResultInst = simplify(phiInst, u1Inst, u2Inst, tInst, services);
         if(properResultInst == null) {
             return null;
         } else if(resultInst == null) {

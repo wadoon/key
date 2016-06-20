@@ -28,7 +28,7 @@ import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -51,15 +51,15 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     private final Contract contract;
 
-    private JavaDLTerm globalDefs;
-    private JavaDLTerm axiom;
+    private Term globalDefs;
+    private Term axiom;
     private final boolean modelField;
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                   LocationVariable heap, OriginalVariables origVars,
-                                  Condition requires, JavaDLTerm assignable, JavaDLTerm accessible,
-                                  Condition ensures, JavaDLTerm mby, JavaDLTerm rep, Contract contract,
-                                  JavaDLTerm globalDefs, JavaDLTerm axiom, boolean model, TermBuilder tb) {
+                                  Condition requires, Term assignable, Term accessible,
+                                  Condition ensures, Term mby, Term rep, Contract contract,
+                                  Term globalDefs, Term axiom, boolean model, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, assignable, accessible,
               ensures, mby, rep, tb);
         this.contract = contract;
@@ -120,11 +120,11 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                                        rep.getTarget(),
                                                        rep.getTarget().getContainerType()),
               0, rep.getTarget(), rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
-        Map<LocationVariable,JavaDLTerm> pres = new LinkedHashMap<LocationVariable, JavaDLTerm>();
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
         pres.put(services.getTheories().getHeapLDT().getHeap(),
                  rep.getOrigVars().self == null ?
                          TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
-        Map<ProgramVariable,JavaDLTerm> deps = new LinkedHashMap<ProgramVariable, JavaDLTerm>();
+        Map<ProgramVariable,Term> deps = new LinkedHashMap<ProgramVariable, Term>();
         for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             deps.put(heap, TB.allLocs());
         }
@@ -166,10 +166,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @param params schema variables for the parameters
      * @return the term array of arguments used to construct the method term
      */
-    private JavaDLTerm[] getArgs(SchemaVariable sv, ParsableVariable heap,
+    private Term[] getArgs(SchemaVariable sv, ParsableVariable heap,
                            ParsableVariable heapAtPre, boolean isStatic, boolean twoState,
                            ImmutableList<ParsableVariable> params) {
-        JavaDLTerm[] args = new JavaDLTerm[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
+        Term[] args = new Term[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
         int i = 0;
         args[i++] = TB.var(heap);
         if (twoState) {
@@ -191,7 +191,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     * @param exc the exception variable
      * @return true if the term guarantees exc to be equal to null
      */
-    private boolean findExcNull(JavaDLTerm t, ProgramVariable exc) {
+    private boolean findExcNull(Term t, ProgramVariable exc) {
         assert t != null;
         if (t.op().equals(Junctor.AND)) {
             assert t.arity() == 2;
@@ -233,13 +233,13 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return the measured by at pre equation for the precondition
      */
-    JavaDLTerm generateMbyAtPreDef(ParsableVariable self,
+    Term generateMbyAtPreDef(ParsableVariable self,
                              ImmutableList<ParsableVariable> params,
                              Function mbyAtPreFunc,
                              Services services) {
-        final JavaDLTerm mbyAtPreDef;
+        final Term mbyAtPreDef;
         if (hasMby()) {
-            final JavaDLTerm mbyAtPre = TB.func(mbyAtPreFunc);
+            final Term mbyAtPre = TB.func(mbyAtPreFunc);
             assert params != null;
             final ProgramVariable selfVar =
                     self instanceof ProgramVariable ? (ProgramVariable)self : null;
@@ -248,7 +248,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                 assert pv instanceof ProgramVariable : pv.toString();
                 paramVars = paramVars.append((ProgramVariable)pv);
             }
-            final JavaDLTerm mby = contract.getMby(selfVar, paramVars, services);
+            final Term mby = contract.getMby(selfVar, paramVars, services);
             mbyAtPreDef = TB.equals(mbyAtPre, mby);
         } else {
             mbyAtPreDef = TB.tt();
@@ -257,13 +257,13 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    ImmutableList<JavaDLTerm> getRest() {
-        ImmutableList<JavaDLTerm> rest = super.getRest();
-        final JavaDLTerm globalDefs = getGlobalDefs();
+    ImmutableList<Term> getRest() {
+        ImmutableList<Term> rest = super.getRest();
+        final Term globalDefs = getGlobalDefs();
         if (globalDefs != null) {
             rest = rest.append(globalDefs);
         }
-        final JavaDLTerm axiom = getAxiom();
+        final Term axiom = getAxiom();
         if (axiom != null) {
             rest = rest.append(axiom);
         }
@@ -310,14 +310,14 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         for (ProgramVariable pv: getOrigVars().params) {
             ps = ps + " " + pv.getKeYJavaType().getFullName();
         }
-        final JavaDLTerm[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
+        final Term[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {
             prefix = WellDefinednessCheck.OP_TACLET;
             final boolean isConstructor =
                     target instanceof IProgramMethod && ((IProgramMethod)target).isConstructor();
-            final JavaDLTerm pre = getPre(replaceSV(getRequires(), selfSV, paramsSV),
+            final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV),
                                     selfSV, heapSV, paramsSV, true, services).term;
-            final JavaDLTerm wdArgs =
+            final Term wdArgs =
                     TB.and(TB.wd(getArgs(selfSV, heapSV, heapAtPreSV, isStatic || isConstructor,
                                          twoState, paramsSV)));
             return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
@@ -340,8 +340,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, JavaDLTermServices services) {
         assert t1.goalTemplates().size() == 1;
         assert t2.goalTemplates().size() == 1;
-        final JavaDLTerm rw1 = ((RewriteTacletGoalTemplate)t1.goalTemplates().head()).replaceWith();
-        final JavaDLTerm rw2 = ((RewriteTacletGoalTemplate)t2.goalTemplates().head()).replaceWith();
+        final Term rw1 = ((RewriteTacletGoalTemplate)t1.goalTemplates().head()).replaceWith();
+        final Term rw2 = ((RewriteTacletGoalTemplate)t2.goalTemplates().head()).replaceWith();
         final String n1 = t1.name().toString();
         final String n2 = t2.name().toString();
         final String n;
@@ -383,7 +383,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         if (modelField() || isModel()) {
             return true;
         }
-        final JavaDLTerm post = getEnsures().implicit.equals(TB.tt()) ?
+        final Term post = getEnsures().implicit.equals(TB.tt()) ?
                 getEnsures().explicit : getEnsures().implicit;
         final ProgramVariable exc = getOrigVars().exception;
         return findExcNull(post, exc);
@@ -434,29 +434,29 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
         super.combine(mwd, services);
         if (this.getGlobalDefs() != null && mwd.getGlobalDefs() != null) {
-            final JavaDLTerm defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
+            final Term defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
             this.globalDefs = TB.andSC(defs, this.getGlobalDefs());
         } else if (mwd.getGlobalDefs() != null) {
-            final JavaDLTerm defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
+            final Term defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
             this.globalDefs = defs;
         }
         if (this.getAxiom() != null && mwd.getAxiom() != null) {
-            final JavaDLTerm ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
+            final Term ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
             this.axiom = TB.andSC(ax, this.getAxiom());
         } else if (mwd.getGlobalDefs() != null) {
-            final JavaDLTerm ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
+            final Term ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
             this.axiom = ax;
         }
         return this;
     }
 
     @Override
-    public JavaDLTerm getGlobalDefs() {
+    public Term getGlobalDefs() {
         return this.globalDefs;
     }
 
     @Override
-    public JavaDLTerm getAxiom() {
+    public Term getAxiom() {
         return this.axiom;
     }
 

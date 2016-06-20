@@ -4,7 +4,7 @@
  */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
@@ -18,11 +18,11 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicParamsOkSnippet implements FactoryMethod {
 
     @Override
-    public JavaDLTerm produce(BasicSnippetData d,
+    public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        JavaDLTerm paramsOK = d.tb.tt();
-        for (JavaDLTerm param : poVars.pre.localVars) {
+        Term paramsOK = d.tb.tt();
+        for (Term param : poVars.pre.localVars) {
             if (!(param.op() instanceof ProgramVariable)) {
                 throw new UnsupportedOperationException("Tried to produce "
                         + "PARAMS_OK for a term "

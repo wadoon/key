@@ -40,7 +40,7 @@ import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -268,7 +268,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
     
     @Override    
-    public Expression convertToProgram(JavaDLTerm t, ExtList l) {
+    public Expression convertToProgram(Term t, ExtList l) {
 	if(isStatic()) {
 	    return new FieldReference(this, 
 				      new TypeRef(getContainerType()));

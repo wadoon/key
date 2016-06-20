@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -95,7 +95,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement> impleme
     * {@inheritDoc}
     */
    @Override
-   protected PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> lazyComputeModalityPIO() {
+   protected PosInOccurrence<Term, SequentFormula<Term>> lazyComputeModalityPIO() {
       return SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(getProofNode().sequent());
    }
 
@@ -104,7 +104,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement> impleme
     */
    @Override
    public SourceElement getActiveStatement() {
-      JavaDLTerm modalityTerm = getModalityPIO().subTerm();
+      Term modalityTerm = getModalityPIO().subTerm();
       SourceElement firstStatement = modalityTerm.modalContent().program().getFirstElement();
       return NodeInfo.computeActiveStatement(firstStatement);
    }

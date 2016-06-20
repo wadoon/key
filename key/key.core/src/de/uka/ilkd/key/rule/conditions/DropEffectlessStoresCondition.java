@@ -23,7 +23,7 @@ import org.key_project.util.collection.Pair;
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -50,18 +50,18 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }
     
     
-    private static JavaDLTerm dropEffectlessStoresHelper(
-	    		JavaDLTerm heapTerm, 
+    private static Term dropEffectlessStoresHelper(
+	    		Term heapTerm, 
 	    		JavaDLTermServices services,
-	    		ImmutableSet<Pair<JavaDLTerm,JavaDLTerm>> overwrittenLocs,
+	    		ImmutableSet<Pair<Term,Term>> overwrittenLocs,
 	    		Function store) {
 	if(heapTerm.op() == store) {
-	    final JavaDLTerm subHeapTerm  = heapTerm.sub(0);	    
-	    final JavaDLTerm objTerm      = heapTerm.sub(1);
-	    final JavaDLTerm fieldTerm    = heapTerm.sub(2);
-	    final JavaDLTerm valueTerm    = heapTerm.sub(3);
-	    final Pair<JavaDLTerm,JavaDLTerm> loc = new Pair<JavaDLTerm,JavaDLTerm>(objTerm, fieldTerm);
-	    final JavaDLTerm newSubHeapTerm 
+	    final Term subHeapTerm  = heapTerm.sub(0);	    
+	    final Term objTerm      = heapTerm.sub(1);
+	    final Term fieldTerm    = heapTerm.sub(2);
+	    final Term valueTerm    = heapTerm.sub(3);
+	    final Pair<Term,Term> loc = new Pair<Term,Term>(objTerm, fieldTerm);
+	    final Term newSubHeapTerm 
 	    	= dropEffectlessStoresHelper(subHeapTerm, 
 				             services, 
 		    			     overwrittenLocs.add(loc), 
@@ -82,13 +82,13 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }    
     
     
-    private static JavaDLTerm dropEffectlessStores(JavaDLTerm t, Services services) {
+    private static Term dropEffectlessStores(Term t, Services services) {
 	HeapLDT heapLDT = services.getTheories().getHeapLDT();
 	assert t.sort() == heapLDT.targetSort();
 	return dropEffectlessStoresHelper(
 				t, 
 				services, 
-				DefaultImmutableSet.<Pair<JavaDLTerm,JavaDLTerm>>nil(), 
+				DefaultImmutableSet.<Pair<Term,Term>>nil(), 
 				heapLDT.getStore());
     }
     
@@ -99,16 +99,16 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 	    		  	 MatchConditions mc, 
 	    		  	 Services services) {	
 	SVInstantiations svInst = mc.getInstantiations();
-	JavaDLTerm hInst      = (JavaDLTerm) svInst.getInstantiation(h);
-	JavaDLTerm oInst      = (JavaDLTerm) svInst.getInstantiation(o);
-	JavaDLTerm fInst      = (JavaDLTerm) svInst.getInstantiation(f);
-	JavaDLTerm xInst      = (JavaDLTerm) svInst.getInstantiation(x);
-	JavaDLTerm resultInst = (JavaDLTerm) svInst.getInstantiation(result);
+	Term hInst      = (Term) svInst.getInstantiation(h);
+	Term oInst      = (Term) svInst.getInstantiation(o);
+	Term fInst      = (Term) svInst.getInstantiation(f);
+	Term xInst      = (Term) svInst.getInstantiation(x);
+	Term resultInst = (Term) svInst.getInstantiation(result);
 	if(hInst == null || oInst == null || fInst == null || xInst == null) {
 	    return mc;
 	}
 	
-	final JavaDLTerm properResultInst 
+	final Term properResultInst 
 		= dropEffectlessStores(services.getTermBuilder().store(hInst, 
 						oInst,
 						fInst, 

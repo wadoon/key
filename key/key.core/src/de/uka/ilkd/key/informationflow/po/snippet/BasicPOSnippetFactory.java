@@ -4,7 +4,7 @@
  */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  *
@@ -93,7 +93,7 @@ public interface BasicPOSnippetFactory {
     };
 
 
-    public JavaDLTerm create(Snippet snippet)
+    public Term create(Snippet snippet)
             throws UnsupportedOperationException;
 
 }

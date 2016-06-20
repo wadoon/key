@@ -28,7 +28,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -92,12 +92,12 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
     
     
     /** 
-     * visits the JavaDLTerm in post order {@link JavaDLTerm#execPostOrder(CCTermVisitor)} and 
+     * visits the Term in post order {@link Term#execPostOrder(CCTermVisitor)} and 
      * collects all found schema variables 
-     * @param t the JavaDLTerm whose schema variables are collected 
+     * @param t the Term whose schema variables are collected 
      */  
     @Override
-    public void visit(JavaDLTerm t) {	
+    public void visit(Term t) {	
 	final Operator op = t.op();
         if (op instanceof Modality || 
                 op instanceof ModalOperatorSV) {
@@ -174,7 +174,7 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-        for (SequentFormula<JavaDLTerm> aSemiseq : semiseq) {
+        for (SequentFormula<Term> aSemiseq : semiseq) {
             aSemiseq.formula().execPostOrder(this);
         }
     }

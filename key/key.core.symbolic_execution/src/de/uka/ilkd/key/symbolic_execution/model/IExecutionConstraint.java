@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
 
 /**
@@ -19,8 +19,8 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
  */
 public interface IExecutionConstraint extends IExecutionElement {
    /**
-    * Returns the {@link JavaDLTerm} representing the constraint.
-    * @return The {@link JavaDLTerm} representing the constraint.
+    * Returns the {@link Term} representing the constraint.
+    * @return The {@link Term} representing the constraint.
     */
-   public JavaDLTerm getTerm();
+   public Term getTerm();
 }

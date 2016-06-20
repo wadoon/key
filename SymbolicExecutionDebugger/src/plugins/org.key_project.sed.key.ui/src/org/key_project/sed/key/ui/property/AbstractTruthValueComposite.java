@@ -63,7 +63,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
@@ -297,7 +297,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             // Get required information
             final IExecutionNode<?> executionNode = node.getExecutionNode();
             final Node keyNode = computeNodeToShow(node, executionNode);
-            final Triple<JavaDLTerm, PosInTerm<JavaDLTerm>, JavaDLTerm> triple = computeTermToShow(node, executionNode, keyNode);
+            final Triple<Term, PosInTerm<Term>, Term> triple = computeTermToShow(node, executionNode, keyNode);
             // Compute result
             ITreeSettings settings = node.getExecutionNode().getSettings();
             final TruthValueTracingResult result = TruthValueTracingUtil.evaluate(keyNode, 
@@ -348,8 +348,8 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * @param succedent The succedent.
     * @return The created {@link Sequent}.
     */
-   protected Sequent createSequentToShow(JavaDLTerm antecedent,
-                                         JavaDLTerm succedent) {
+   protected Sequent createSequentToShow(Term antecedent,
+                                         Term succedent) {
       Sequent sequent = Sequent.EMPTY_SEQUENT;
       sequent = sequent.addFormula(new SequentFormula<>(antecedent), true, false).sequent();
       sequent = sequent.addFormula(new SequentFormula<>(succedent), false, false).sequent();
@@ -357,28 +357,28 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    }
    
    /**
-    * Computes the {@link JavaDLTerm} to show.
+    * Computes the {@link Term} to show.
     * @param node The {@link IKeYSENode}.
     * @param executionNode The {@link IExecutionNode}.
     * @param keyNode The {@link Node}.
-    * @return The {@link JavaDLTerm} to show and optionally the {@link PosInTerm<JavaDLTerm>} of the uninterpreted predicate and the base of the {@link PosInTerm<JavaDLTerm>}.
+    * @return The {@link Term} to show and optionally the {@link PosInTerm<Term>} of the uninterpreted predicate and the base of the {@link PosInTerm<Term>}.
     */
-   protected abstract Triple<JavaDLTerm, PosInTerm<JavaDLTerm>, JavaDLTerm> computeTermToShow(IKeYSENode<?> node, 
+   protected abstract Triple<Term, PosInTerm<Term>, Term> computeTermToShow(IKeYSENode<?> node, 
                                                                       IExecutionNode<?> executionNode, 
                                                                       Node keyNode);
 
    /**
     * Shows the given content.
     * @param result The {@link TruthValueTracingResult} to consider.
-    * @param succedent The {@link JavaDLTerm} to show as succedent.
-    * @param uninterpretedPredicatePosition The optional {@link PosInTerm<JavaDLTerm>} with the uninterpreted predicate.
-    * @param uninterpretedPredicateGroundTerm The {@link JavaDLTerm} in which the {@link PosInTerm<JavaDLTerm>} is evaluated in.
+    * @param succedent The {@link Term} to show as succedent.
+    * @param uninterpretedPredicatePosition The optional {@link PosInTerm<Term>} with the uninterpreted predicate.
+    * @param uninterpretedPredicateGroundTerm The {@link Term} in which the {@link PosInTerm<Term>} is evaluated in.
     * @param node The {@link IKeYSENode} which provides the new content.
     */
    protected void addNewContent(TruthValueTracingResult result,
-                                JavaDLTerm succedent,
-                                PosInTerm<JavaDLTerm> uninterpretedPredicatePosition,
-                                JavaDLTerm uninterpretedPredicateGroundTerm,
+                                Term succedent,
+                                PosInTerm<Term> uninterpretedPredicatePosition,
+                                Term uninterpretedPredicateGroundTerm,
                                 IExecutionNode<?> executionNode) {
       removeOldContent();
       BranchResult[] branchResults = result.getBranchResults();
@@ -403,14 +403,14 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          if (shouldShowBranchResult(branchResult, uninterpretedPredicatePosition, uninterpretedPredicateGroundTerm)) {
             // Remove uninterpreted predicate from expressions. Currently, only the AND operator is supported and should be needed.
             if (uninterpretedPredicatePosition != null) {
-               PosInTerm<JavaDLTerm> currentPosition = uninterpretedPredicatePosition;
-               final JavaDLTerm uninterpretedPredicate = currentPosition.getSubTerm(uninterpretedPredicateGroundTerm);
+               PosInTerm<Term> currentPosition = uninterpretedPredicatePosition;
+               final Term uninterpretedPredicate = currentPosition.getSubTerm(uninterpretedPredicateGroundTerm);
                while (currentPosition != null) {
-                  JavaDLTerm currentTerm = currentPosition.getSubTerm(uninterpretedPredicateGroundTerm);
+                  Term currentTerm = currentPosition.getSubTerm(uninterpretedPredicateGroundTerm);
                   FormulaTermLabel label = (FormulaTermLabel)currentTerm.getLabel(FormulaTermLabel.NAME);
                   MultiEvaluationResult labelResult = branchResult.getResult(label);
                   if (labelResult != null) {
-                     JavaDLTerm instructionTerm = labelResult.getInstructionTerm();
+                     Term instructionTerm = labelResult.getInstructionTerm();
                      if (instructionTerm != null && instructionTerm.op() == Junctor.AND) {
                         if (instructionTerm.sub(0).op() == uninterpretedPredicate.op()) {
                            instructionTerm = instructionTerm.sub(1);
@@ -493,13 +493,13 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * Check is the given {@link BranchResult} should be shown.
     * @param branchResult The {@link BranchResult} to check.
     * @param uninterpretedPredicatePosition The uninterpreted predicate which provides the {@link FormulaTermLabel}.
-    * @param uninterpretedPredicateGroundTerm The {@link JavaDLTerm} in which the {@link PosInTerm<JavaDLTerm>} is evaluated in.
+    * @param uninterpretedPredicateGroundTerm The {@link Term} in which the {@link PosInTerm<Term>} is evaluated in.
     * @return {@code true} show branch result, {@code false} do not show branch result.
     */
-   protected boolean shouldShowBranchResult(BranchResult branchResult, PosInTerm<JavaDLTerm> uninterpretedPredicatePosition, JavaDLTerm uninterpretedPredicateGroundTerm) {
+   protected boolean shouldShowBranchResult(BranchResult branchResult, PosInTerm<Term> uninterpretedPredicatePosition, Term uninterpretedPredicateGroundTerm) {
       if (branchResult != null) {
          if (uninterpretedPredicatePosition != null) {
-            JavaDLTerm uninterpretedPredicate = uninterpretedPredicatePosition.getSubTerm(uninterpretedPredicateGroundTerm);
+            Term uninterpretedPredicate = uninterpretedPredicatePosition.getSubTerm(uninterpretedPredicateGroundTerm);
             TermLabel label = uninterpretedPredicate.getLabel(FormulaTermLabel.NAME);
             if (label instanceof FormulaTermLabel) {
                TruthValue result = branchResult.evaluate((FormulaTermLabel) label);
@@ -519,19 +519,19 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    }
    
    /**
-    * Searches the {@link JavaDLTerm} with the uninterpreted predicate.
+    * Searches the {@link Term} with the uninterpreted predicate.
     * @param node The {@link IKeYSENode} which provides the current {@link Sequent} to search the uninterpreted predicate in.
-    * @param term The {@link JavaDLTerm} to start search at.
-    * @param uninterpretedPredicate The {@link JavaDLTerm} of the proof obligation which specifies the uninterpreted predicate.
+    * @param term The {@link Term} to start search at.
+    * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
     * @param additionalPredicates The additional uninterpreted predicates.
-    * @return The {@link PosInTerm<JavaDLTerm>} of the uninterpreted predicate.
+    * @return The {@link PosInTerm<Term>} of the uninterpreted predicate.
     */
-   protected PosInTerm<JavaDLTerm> findUninterpretedPredicateTerm(IKeYSENode<?> node, 
-                                                      JavaDLTerm term, 
-                                                      JavaDLTerm uninterpretedPredicate,
-                                                      Set<JavaDLTerm> additionalPredicates) {
+   protected PosInTerm<Term> findUninterpretedPredicateTerm(IKeYSENode<?> node, 
+                                                      Term term, 
+                                                      Term uninterpretedPredicate,
+                                                      Set<Term> additionalPredicates) {
       // Skip updates
-      PosInTerm<JavaDLTerm> pit = PosInTerm.<JavaDLTerm>getTopLevel();
+      PosInTerm<Term> pit = PosInTerm.<Term>getTopLevel();
       while (term.op() == UpdateApplication.UPDATE_APPLICATION) {
          term = term.sub(1);
          pit = pit.down(1);
@@ -540,7 +540,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       if (node instanceof KeYBlockContractTermination || node instanceof KeYBlockContractExceptionalTermination) {
          Set<Operator> additionalPredicateOperators = new HashSet<Operator>();
          if (!CollectionUtil.isEmpty(additionalPredicates)) {
-            for (JavaDLTerm predicateTerm : additionalPredicates) {
+            for (Term predicateTerm : additionalPredicates) {
                additionalPredicateOperators.add(predicateTerm.op());
             }
          }
@@ -552,18 +552,18 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    }
 
    /**
-    * Searches the {@link JavaDLTerm} with the uninterpreted predicate.
-    * @param term The {@link JavaDLTerm} to start search at.
-    * @param uninterpretedPredicate The {@link JavaDLTerm} of the proof obligation which specifies the uninterpreted predicate.
-    * @return The {@link PosInTerm<JavaDLTerm>} of the uninterpreted predicate.
+    * Searches the {@link Term} with the uninterpreted predicate.
+    * @param term The {@link Term} to start search at.
+    * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
+    * @return The {@link PosInTerm<Term>} of the uninterpreted predicate.
     */
-   protected PosInTerm<JavaDLTerm> findMainUninterpretedPredicateTerm(JavaDLTerm term, JavaDLTerm uninterpretedPredicate, PosInTerm<JavaDLTerm> current) {
+   protected PosInTerm<Term> findMainUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate, PosInTerm<Term> current) {
       if (uninterpretedPredicate != null) {
          if (term.op() == uninterpretedPredicate.op()) {
             return current;
          }
          else if (term.op() == Junctor.AND) {
-            PosInTerm<JavaDLTerm> result = null;
+            PosInTerm<Term> result = null;
             int i = 0;
             while (result == null && i < term.arity()) {
                result = findMainUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate, current.down(i));
@@ -581,17 +581,17 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    }
 
    /**
-    * Searches the {@link JavaDLTerm} with the uninterpreted predicate.
-    * @param term The {@link JavaDLTerm} to start search at.
+    * Searches the {@link Term} with the uninterpreted predicate.
+    * @param term The {@link Term} to start search at.
     * @param additionalPredicateOperators The operators of the additional uninterpreted predicates.
-    * @return The {@link PosInTerm<JavaDLTerm>} of the uninterpreted predicate.
+    * @return The {@link PosInTerm<Term>} of the uninterpreted predicate.
     */
-   protected PosInTerm<JavaDLTerm> findAdditionalUninterpretedPredicateTerm(JavaDLTerm term, Set<Operator> additionalPredicateOperators, PosInTerm<JavaDLTerm> current) {
+   protected PosInTerm<Term> findAdditionalUninterpretedPredicateTerm(Term term, Set<Operator> additionalPredicateOperators, PosInTerm<Term> current) {
       if (additionalPredicateOperators.contains(term.op())) {
          return current;
       }
       else if (term.op() == Junctor.AND) {
-         PosInTerm<JavaDLTerm> result = null;
+         PosInTerm<Term> result = null;
          int i = 0;
          while (result == null && i < term.arity()) {
             result = findAdditionalUninterpretedPredicateTerm(term.sub(i), additionalPredicateOperators, current.down(i));
@@ -619,11 +619,11 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    /**
     * Removes the uninterpreted predicate if required.
     * @param node The {@link Node}.
-    * @param term The {@link JavaDLTerm}.
+    * @param term The {@link Term}.
     * @param predicate The uninterpreted predicate to remove.
-    * @return The {@link JavaDLTerm} without the uninterpreted predicate.
+    * @return The {@link Term} without the uninterpreted predicate.
     */
-   protected JavaDLTerm removeUninterpretedPredicate(Node node, JavaDLTerm term, JavaDLTerm predicate) {
+   protected Term removeUninterpretedPredicate(Node node, Term term, Term predicate) {
       Proof proof = node.proof();
       if (predicate != null) {
          term = removeUninterpretedPredicate(proof.getServices().getTermBuilder(), 
@@ -636,29 +636,29 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    /**
     * Removes the uninterpreted predicate recursively in the {@code and} structure.
     * @param tb The {@link TermBuilder} to use.
-    * @param term The current {@link JavaDLTerm}.
+    * @param term The current {@link Term}.
     * @param uninterpretedPredicate The uninterpreted predicate to remove.
-    * @return The {@link JavaDLTerm} without the uninterpreted predicate. 
+    * @return The {@link Term} without the uninterpreted predicate. 
     */
-   protected JavaDLTerm removeUninterpretedPredicate(TermBuilder tb, 
-                                               JavaDLTerm term, 
-                                               JavaDLTerm uninterpretedPredicate) {
+   protected Term removeUninterpretedPredicate(TermBuilder tb, 
+                                               Term term, 
+                                               Term uninterpretedPredicate) {
       if (uninterpretedPredicate.op() == term.op()) {
          return tb.tt();
       }
       else if (term.op() == Junctor.AND) { // Only and is supported to ensure correct results
          boolean subsChanged = false;
-         JavaDLTerm[] newSubs = new JavaDLTerm[term.arity()];
+         Term[] newSubs = new Term[term.arity()];
          for (int i = 0; i < newSubs.length; i++) {
-            JavaDLTerm sub = term.sub(i);
+            Term sub = term.sub(i);
             newSubs[i] = removeUninterpretedPredicate(tb, sub, uninterpretedPredicate);
             if (sub != newSubs[i]) {
                subsChanged = true;
             }
          }
          if (subsChanged) {
-            JavaDLTerm newTerm = tb.and(newSubs);
-            if (term.hasLabels() && newSubs[0] != newTerm && newSubs[1] != newTerm) { // Label new JavaDLTerm only if all children are still important.
+            Term newTerm = tb.and(newSubs);
+            if (term.hasLabels() && newSubs[0] != newTerm && newSubs[1] != newTerm) { // Label new Term only if all children are still important.
                newTerm = tb.label(newTerm, term.getLabels());
             }
             return newTerm;
@@ -668,10 +668,10 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          }
       }
       else if (term.op() == UpdateApplication.UPDATE_APPLICATION) {
-         Pair<ImmutableList<JavaDLTerm>, JavaDLTerm> pair = TermBuilder.goBelowUpdates2(term);
-         JavaDLTerm newTarget = removeUninterpretedPredicate(tb, pair.second, uninterpretedPredicate);
+         Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(term);
+         Term newTarget = removeUninterpretedPredicate(tb, pair.second, uninterpretedPredicate);
          if (pair.second != newTarget) {
-            JavaDLTerm newTerm = tb.applyParallel(pair.first, newTarget);
+            Term newTerm = tb.applyParallel(pair.first, newTarget);
             if (term.hasLabels()) {
                newTerm = tb.label(newTerm, term.getLabels());
             }

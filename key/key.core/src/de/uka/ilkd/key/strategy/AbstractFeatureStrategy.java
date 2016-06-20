@@ -25,7 +25,7 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
@@ -316,12 +316,12 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return SVInstantiationProjection.create ( new Name ( schemaVar ), false );
     }
     
-    protected ProjectionToTerm subAt(ProjectionToTerm t, PosInTerm<JavaDLTerm> pit) {
+    protected ProjectionToTerm subAt(ProjectionToTerm t, PosInTerm<Term> pit) {
         return SubtermProjection.create ( t, pit );
     }
     
     protected ProjectionToTerm sub(ProjectionToTerm t, int index) {
-        return SubtermProjection.create ( t, PosInTerm.<JavaDLTerm>getTopLevel().down ( index ) );
+        return SubtermProjection.create ( t, PosInTerm.<Term>getTopLevel().down ( index ) );
     }
     
     protected ProjectionToTerm opTerm(Operator op, ProjectionToTerm[] subTerms) {
@@ -442,7 +442,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     }
 
     public final void instantiateApp ( RuleApp              app,
-                                       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>      pio,
+                                       PosInOccurrence<Term, SequentFormula<Term>>      pio,
                                        Goal                 goal,
                                        RuleAppCostCollector collector ) {
         getBtManager ().setup ( app );
@@ -456,7 +456,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     }
  
     protected abstract RuleAppCost instantiateApp (RuleApp              app,
-                                                   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>      pio,
+                                                   PosInOccurrence<Term, SequentFormula<Term>>      pio,
                                                    Goal                 goal);
     
     protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {

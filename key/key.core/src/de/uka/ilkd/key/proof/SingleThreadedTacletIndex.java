@@ -9,14 +9,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
  * The default taclet index implementation. It executes method 
- * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Services)}
+ * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence<Term, SequentFormula<Term>>, Services)}
  * in a single thread (the thread invoking the method).
  *
  * Do not create this index directly. Use the {@link TacletIndexKit#createTacletIndex()} resp.
@@ -62,7 +62,7 @@ final class SingleThreadedTacletIndex extends TacletIndex {
     @Override
     protected ImmutableList<NoPosTacletApp> matchTaclets(
             ImmutableList<NoPosTacletApp> tacletApps, RuleFilter p_filter,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Services services) {
+            PosInOccurrence<Term, SequentFormula<Term>> pos, Services services) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
         if (tacletApps == null) {
             return result;

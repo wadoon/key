@@ -5,7 +5,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Proof;
@@ -41,7 +41,7 @@ public class InfFlowProof extends Proof {
         super(name, sequent, header, rules, builtInRules, initConfig);
     }
 
-    public InfFlowProof(String name, JavaDLTerm problem, String header,
+    public InfFlowProof(String name, Term problem, String header,
             InitConfig initConfig) {
         super(name, problem, header, initConfig);
     }
@@ -63,8 +63,8 @@ public class InfFlowProof extends Proof {
 
     public void addIFSymbol(Object s) {
         assert s != null;
-        if (s instanceof JavaDLTerm) {
-            infFlowSymbols.add((JavaDLTerm)s);
+        if (s instanceof Term) {
+            infFlowSymbols.add((Term)s);
         } else if (s instanceof Named) {
             infFlowSymbols.add((Named)s);
         } else {
@@ -74,8 +74,8 @@ public class InfFlowProof extends Proof {
 
     public void addLabeledIFSymbol(Object s) {
         assert s != null;
-        if (s instanceof JavaDLTerm) {
-            infFlowSymbols.addLabeled((JavaDLTerm)s);
+        if (s instanceof Term) {
+            infFlowSymbols.addLabeled((Term)s);
         } else if (s instanceof Named) {
             infFlowSymbols.addLabeled((Named)s);
         } else {
@@ -83,12 +83,12 @@ public class InfFlowProof extends Proof {
         }
     }
 
-    public void addTotalTerm(JavaDLTerm p) {
+    public void addTotalTerm(Term p) {
         assert p != null;
         infFlowSymbols.addTotalTerm(p);
     }
 
-    public void addLabeledTotalTerm(JavaDLTerm p) {
+    public void addLabeledTotalTerm(Term p) {
         assert p != null;
         infFlowSymbols.addLabeledTotalTerm(p);
     }
@@ -98,10 +98,10 @@ public class InfFlowProof extends Proof {
         ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
         assert temps != null;
         for (TacletGoalTemplate tgt: temps) {
-            for (SequentFormula<JavaDLTerm> sf: tgt.sequent().antecedent().asList()) {
+            for (SequentFormula<Term> sf: tgt.sequent().antecedent().asList()) {
                 addLabeledTotalTerm(sf.formula());
             }
-            for (SequentFormula<JavaDLTerm> sf: tgt.sequent().succedent().asList()) {
+            for (SequentFormula<Term> sf: tgt.sequent().succedent().asList()) {
                 addLabeledTotalTerm(sf.formula());
             }
         }

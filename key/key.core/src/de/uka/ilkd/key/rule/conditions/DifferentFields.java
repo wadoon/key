@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -54,9 +54,9 @@ public final class DifferentFields extends VariableConditionAdapter {
     }
 
     public boolean checkHelp(Object o1, Object o2) {
-	if (o1 instanceof JavaDLTerm && o2 instanceof JavaDLTerm) {
-	    final JavaDLTerm t1 = (JavaDLTerm) o1;
-	    final JavaDLTerm t2 = (JavaDLTerm) o2;
+	if (o1 instanceof Term && o2 instanceof Term) {
+	    final Term t1 = (Term) o1;
+	    final Term t2 = (Term) o2;
 
 	    if (t1.op() == t2.op()) {
 		return false;

@@ -8,7 +8,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.parser.ParserException;
@@ -29,7 +29,7 @@ public class SelectCommand extends AbstractCommand {
         }
 
         try {
-            JavaDLTerm t = toTerm(proof, stateMap, formulaString, Sort.FORMULA);
+            Term t = toTerm(proof, stateMap, formulaString, Sort.FORMULA);
 
             Goal g = findGoalWith(t, proof);
 
@@ -41,7 +41,7 @@ public class SelectCommand extends AbstractCommand {
 
     }
 
-    private Goal findGoalWith(JavaDLTerm formula, Proof proof) throws ScriptException {
+    private Goal findGoalWith(Term formula, Proof proof) throws ScriptException {
 
         Goal g;
         Deque<Node> choices = new LinkedList<Node>();
@@ -88,12 +88,12 @@ public class SelectCommand extends AbstractCommand {
         throw new ScriptException("There is no such goal");
     }
 
-    private boolean contains(Sequent seq, JavaDLTerm formula) {
+    private boolean contains(Sequent seq, Term formula) {
         return contains(seq.antecedent(), formula) || contains(seq.succedent(), formula);
     }
 
-    private boolean contains(Semisequent semiseq, JavaDLTerm formula) {
-        for(SequentFormula<JavaDLTerm> sf : semiseq.asList()) {
+    private boolean contains(Semisequent semiseq, Term formula) {
+        for(SequentFormula<Term> sf : semiseq.asList()) {
             if(sf.formula().equalsModRenaming(formula)) {
                 return true;
             }

@@ -26,7 +26,7 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 
@@ -97,7 +97,7 @@ public class SWTBotTermPropertySectionTest extends AbstractSWTBotKeYEditorProper
          assertEquals(StringUtil.EMPTY_STRING, propertiesView.bot().text(0).getText());
       }
       if (pis != null && pis.getPosInOccurrence() != null) {
-         JavaDLTerm term = pis.getPosInOccurrence().subTerm();
+         Term term = pis.getPosInOccurrence().subTerm();
          assertEquals(validate(ObjectUtil.toString(term.sort())), propertiesView.bot().text(1).getText());
          assertEquals(validate(TermPropertySection.operatorToString(term.op())), propertiesView.bot().text(2).getText());
          assertList(term.subs(), propertiesView.bot().list(0));

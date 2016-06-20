@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.util.Debug;
@@ -34,19 +34,19 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class Monomial {
     
-    private final ImmutableList<JavaDLTerm> parts;
+    private final ImmutableList<Term> parts;
     private final BigInteger coefficient;
     
-    private Monomial(final ImmutableList<JavaDLTerm> parts, final BigInteger coefficient) {
+    private Monomial(final ImmutableList<Term> parts, final BigInteger coefficient) {
         this.parts = parts;
         this.coefficient = coefficient;
     }
     
-    public static final Monomial ONE = new Monomial ( ImmutableSLList.<JavaDLTerm>nil(),
+    public static final Monomial ONE = new Monomial ( ImmutableSLList.<Term>nil(),
                                                       BigInteger.ONE );
     
-    public static Monomial create(JavaDLTerm monoTerm, Services services) {
-        final LRUCache<JavaDLTerm, Monomial> monomialCache = services.getCaches().getMonomialCache();
+    public static Monomial create(Term monoTerm, Services services) {
+        final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
         Monomial res;
         synchronized (monomialCache) {            
             res = monomialCache.get ( monoTerm );
@@ -61,7 +61,7 @@ public class Monomial {
         return res;
     }
 
-    private static Monomial createHelp(JavaDLTerm monomial, Services services) {
+    private static Monomial createHelp(Term monomial, Services services) {
         final Analyser a = new Analyser ( services );
         a.analyse ( monomial );
         return new Monomial ( a.parts, a.coeff );
@@ -141,7 +141,7 @@ public class Monomial {
         final BigInteger c = this.coefficient;
 
         if ( a.signum () == 0 || c.signum () == 0 )
-            return new Monomial ( ImmutableSLList.<JavaDLTerm>nil(), BigInteger.ZERO );
+            return new Monomial ( ImmutableSLList.<Term>nil(), BigInteger.ZERO );
         
         return new Monomial ( difference ( m.parts, this.parts ),
                               LexPathOrdering.divide ( a, c ) );
@@ -156,7 +156,7 @@ public class Monomial {
         Debug.assertFalse ( coefficient.signum () == 0 );
         Debug.assertFalse ( m.coefficient.signum () == 0 );
         
-        final ImmutableList<JavaDLTerm> newParts = difference ( m.parts, this.parts );
+        final ImmutableList<Term> newParts = difference ( m.parts, this.parts );
 
         final BigInteger gcd = coefficient.abs ().gcd ( m.coefficient.abs () );
         return new Monomial ( newParts, m.coefficient.divide ( gcd ) );
@@ -208,12 +208,12 @@ public class Monomial {
     }
     
     
-    public JavaDLTerm toTerm (Services services) {
+    public Term toTerm (Services services) {
         final Operator mul = 
 	    services.getTheories().getIntegerLDT().getMul();
-        JavaDLTerm res = null;
+        Term res = null;
         
-        final Iterator<JavaDLTerm> it = parts.iterator ();
+        final Iterator<Term> it = parts.iterator ();
         if ( it.hasNext () ) {
             res = it.next ();
             while ( it.hasNext () )
@@ -222,7 +222,7 @@ public class Monomial {
         }
         
         final IntLiteral lit = new IntLiteral ( coefficient.toString () );
-        final JavaDLTerm cTerm = services.getProgramServices().getTypeConverter().convertToLogicElement ( lit );
+        final Term cTerm = services.getProgramServices().getTypeConverter().convertToLogicElement ( lit );
 
         if ( res == null )
             res = cTerm;
@@ -236,14 +236,14 @@ public class Monomial {
         final StringBuffer res = new StringBuffer ();
         res.append ( coefficient );
 
-        for (JavaDLTerm part : parts) res.append(" * ").append(part);
+        for (Term part : parts) res.append(" * ").append(part);
 
         return res.toString ();
     }
     
     private static class Analyser {
         public BigInteger coeff = BigInteger.ONE;
-        public ImmutableList<JavaDLTerm> parts = ImmutableSLList.<JavaDLTerm>nil();
+        public ImmutableList<Term> parts = ImmutableSLList.<Term>nil();
         private final Services services;
         private final Operator numbers, mul;
         	
@@ -254,7 +254,7 @@ public class Monomial {
             mul     = integerLDT.getMul();
         }
         
-        public void analyse(JavaDLTerm monomial) {
+        public void analyse(Term monomial) {
             if ( monomial.op () == mul ) {
                 analyse ( monomial.sub ( 0 ) );
                 analyse ( monomial.sub ( 1 ) );
@@ -284,7 +284,7 @@ public class Monomial {
     
     public int hashCode() {
         int res = coefficient.hashCode ();
-        for (JavaDLTerm part : parts) res += part.hashCode();
+        for (Term part : parts) res += part.hashCode();
         return res;
     }
     
@@ -293,9 +293,9 @@ public class Monomial {
      *         <code>b</code>. multiplicity is treated as well here, so this
      *         is really difference of multisets
      */
-    private static ImmutableList<JavaDLTerm> difference(ImmutableList<JavaDLTerm> a, ImmutableList<JavaDLTerm> b) {
-        ImmutableList<JavaDLTerm> res = a;
-        final Iterator<JavaDLTerm> it = b.iterator ();
+    private static ImmutableList<Term> difference(ImmutableList<Term> a, ImmutableList<Term> b) {
+        ImmutableList<Term> res = a;
+        final Iterator<Term> it = b.iterator ();
         while ( it.hasNext () && !res.isEmpty () )
             res = res.removeFirst ( it.next () );
         return res;
@@ -305,7 +305,7 @@ public class Monomial {
         return coefficient;
     }
 
-    public ImmutableList<JavaDLTerm> getParts() {
+    public ImmutableList<Term> getParts() {
         return parts;
     }
 

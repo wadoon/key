@@ -4,7 +4,7 @@ import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -22,7 +22,7 @@ public class MatchTermLabelInstruction implements MatchInstruction {
         this.labels = labels;
     }
     
-    private MatchConditions match(TermLabelSV sv, JavaDLTerm instantiationCandidate, 
+    private MatchConditions match(TermLabelSV sv, Term instantiationCandidate, 
                                   MatchConditions matchCond, Services services) {
 
         final SVInstantiations svInsts = matchCond.getInstantiations();
@@ -46,7 +46,7 @@ public class MatchTermLabelInstruction implements MatchInstruction {
      */
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions, Services services) {
-        final JavaDLTerm term = termPosition.getCurrentSubterm();
+        final Term term = termPosition.getCurrentSubterm();
         MatchConditions result = matchConditions;
         // TODO: Define a sane version of taclet matching for term labels
         // at the moment any termlabbel SV matches on all labels (or no label) (i.e., t<l1,l2> will match l1 and l2 against all labels and both will have

@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableList;
  * other simplifications. A sequent and so a semisequent has to be immutable.
  */
 public class Semisequent extends
-        CCSemisequentImpl<SequentFormula<JavaDLTerm>, Semisequent> {
+        CCSemisequentImpl<SequentFormula<Term>, Semisequent> {
 
     private static final Semisequent EMPTY = new Semisequent();
 
@@ -34,7 +34,7 @@ public class Semisequent extends
      *
      * @param seqList
      */
-    Semisequent(ImmutableList<SequentFormula<JavaDLTerm>> seqList) {
+    Semisequent(ImmutableList<SequentFormula<Term>> seqList) {
         super(seqList);
     }
 
@@ -43,7 +43,7 @@ public class Semisequent extends
      *
      * @param seqList
      */
-    public Semisequent(SequentFormula<JavaDLTerm> seqList) {
+    public Semisequent(SequentFormula<Term> seqList) {
         super(seqList);
     }
 
@@ -63,8 +63,8 @@ public class Semisequent extends
      * org.key_project.util.collection.ImmutableList)
      */
     @Override
-    protected CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> createSemisequentChangeInfo(
-            ImmutableList<SequentFormula<JavaDLTerm>> formulas) {
+    protected CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> createSemisequentChangeInfo(
+            ImmutableList<SequentFormula<Term>> formulas) {
         return new SemisequentChangeInfo(formulas);
     }
 

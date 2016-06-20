@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * Two kind of matching algorithm are coded in two nested classes BaseMatching
@@ -33,13 +33,13 @@ class Matching {
      * @return all substitution found from this matching
      */
     public static ImmutableSet<Substitution> basicMatching(Trigger trigger,
-                                                  JavaDLTerm targetTerm) {
+                                                  Term targetTerm) {
         return BasicMatching.getSubstitutions ( trigger.getTriggerTerm (),
                                                 targetTerm );
     }
 
     public static ImmutableSet<Substitution> twoSidedMatching(UniTrigger trigger,
-                                                     JavaDLTerm targetTerm, 
+                                                     Term targetTerm, 
                                                      JavaDLTermServices services) {
         TwoSidedMatching tsm = new TwoSidedMatching ( trigger, targetTerm, services );
         return tsm.getSubstitutions (services);

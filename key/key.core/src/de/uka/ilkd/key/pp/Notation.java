@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -58,15 +58,15 @@ public abstract class Notation {
      * this to call one of the <code>printXYZTerm</code> of
      * {@link LogicPrinter}, which do the layout.
      */
-    public abstract void print(JavaDLTerm t, LogicPrinter sp) throws IOException;
+    public abstract void print(Term t, LogicPrinter sp) throws IOException;
 
     /**
      * Print a term without beginning a new block. See
-     * {@link LogicPrinter#printTermContinuingBlock(JavaDLTerm)}for the idea
+     * {@link LogicPrinter#printTermContinuingBlock(Term)}for the idea
      * behind this. The standard implementation just delegates to
-     * {@link #print(JavaDLTerm,LogicPrinter)}
+     * {@link #print(Term,LogicPrinter)}
      */
-    public void printContinuingBlock(JavaDLTerm t, LogicPrinter sp)
+    public void printContinuingBlock(Term t, LogicPrinter sp)
 	    throws IOException {
 	print(t, sp);
     }
@@ -84,7 +84,7 @@ public abstract class Notation {
 	    this.name = name;
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printConstant(t, name);
 	}
     }
@@ -102,7 +102,7 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printPrefixTerm(name, t, t.sub(0), ass);
 	}
 
@@ -122,15 +122,15 @@ public abstract class Notation {
 	    this.assRight = assRight;
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printInfixTerm(t.sub(0), assLeft, name, t, t.sub(1), assRight);
 	}
 
 	/**
          * Print a term without beginning a new block. This calls the
-         * {@link LogicPrinter#printTermContinuingBlock(JavaDLTerm)} method.
+         * {@link LogicPrinter#printTermContinuingBlock(Term)} method.
          */
-	public void printContinuingBlock(JavaDLTerm t, LogicPrinter sp)
+	public void printContinuingBlock(Term t, LogicPrinter sp)
 		throws IOException {
 	    sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t, t.sub(1), assRight);
 	}
@@ -149,7 +149,7 @@ public abstract class Notation {
             right = endLabel;
         }
         
-        public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+        public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printLabels(t, left, right);
         }
     }
@@ -167,7 +167,7 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
 	}
 
@@ -189,7 +189,7 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    assert t.op() instanceof Modality;
 	    assert t.modalContent() != null;
 	    sp.printModalityTerm(left, t.modalContent(), right, t, ass);
@@ -209,7 +209,7 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printModalityTerm("\\modality{" + t.op().name().toString()
 			+ "}", t.modalContent(), "\\endmodality", t, ass);
 	}
@@ -225,7 +225,7 @@ public abstract class Notation {
 	    super(115);
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    assert t.op() == UpdateApplication.UPDATE_APPLICATION;
 	    final Operator targetOp = UpdateApplication.getTarget(t).op();
 	    final int assTarget 
@@ -247,7 +247,7 @@ public abstract class Notation {
 	    super(150);
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printElementaryUpdate(":=", t, 0);
 	}
     }    
@@ -262,7 +262,7 @@ public abstract class Notation {
 	    super(100);
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    assert t.op() == UpdateJunctor.PARALLEL_UPDATE;
 	    
 	    sp.printParallelUpdate("||", t, 10);
@@ -278,7 +278,7 @@ public abstract class Notation {
 	    super(120);
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    QuantifiableVariable v = instQV(t, sp, 1);
 	    final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1)
 		    .op() == Equality.EQUALS ? 75 : 60) : 110);
@@ -286,17 +286,17 @@ public abstract class Notation {
 		    assTarget);
 	}
 	
-	private QuantifiableVariable instQV(JavaDLTerm t, LogicPrinter sp, int subTerm) {
+	private QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
 	    QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
 
 	    if (v instanceof SchemaVariable) {
 		Object object = (sp.getInstantiations()
 			.getInstantiation((SchemaVariable) v));
 		if (object != null) {
-		    Debug.assertTrue(object instanceof JavaDLTerm);
+		    Debug.assertTrue(object instanceof Term);
 		    Debug
-		    .assertTrue(((JavaDLTerm) object).op() instanceof QuantifiableVariable);
-		    v = (QuantifiableVariable) (((JavaDLTerm) object).op());
+		    .assertTrue(((Term) object).op() instanceof QuantifiableVariable);
+		    v = (QuantifiableVariable) (((Term) object).op());
 		}
 	    }
 	    return v;
@@ -313,7 +313,7 @@ public abstract class Notation {
 	    super(130);
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printFunctionTerm(t);
 	}
     }
@@ -335,7 +335,7 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printCast(pre, post, t, ass);
 	}
     }
@@ -355,11 +355,11 @@ public abstract class Notation {
         }
 
         @Override
-        public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+        public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printObserver(t, null);
         }
 
-        public void printWithHeap(JavaDLTerm t, LogicPrinter sp, JavaDLTerm heapTerm) throws IOException {
+        public void printWithHeap(Term t, LogicPrinter sp, Term heapTerm) throws IOException {
             sp.printObserver(t, heapTerm);
         }
     }
@@ -373,12 +373,12 @@ public abstract class Notation {
         }
 
         @Override
-        public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+        public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printSelect(t, null);
         }
 
         @Override
-        public void printWithHeap(JavaDLTerm t, LogicPrinter sp, JavaDLTerm heapTerm) throws IOException {
+        public void printWithHeap(Term t, LogicPrinter sp, Term heapTerm) throws IOException {
             sp.printSelect(t, heapTerm);
         }
     }
@@ -391,11 +391,11 @@ public abstract class Notation {
             super(140);
         }
 
-        public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+        public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printHeapConstructor(t, true);
         }
 
-        public void printEmbeddedHeap(JavaDLTerm t, LogicPrinter sp) throws IOException {
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
             sp.printHeapConstructor(t, false);
         }
     }
@@ -405,11 +405,11 @@ public abstract class Notation {
      */
     public static final class StoreNotation extends HeapConstructorNotation {
 
-        public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+        public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printStore(t, true);
         }
 
-        public void printEmbeddedHeap(JavaDLTerm t, LogicPrinter sp) throws IOException {
+        public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
             sp.printStore(t, false);
         }
     }
@@ -427,7 +427,7 @@ public abstract class Notation {
 	    this.postfix = postfix;
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printPostfix(t,postfix);
 	}
     }       
@@ -442,7 +442,7 @@ public abstract class Notation {
 	    super(130);
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printSingleton(t);
 	}
     }
@@ -462,7 +462,7 @@ public abstract class Notation {
 	        this.symbol = symbol;
 	    }
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printElementOf(t, symbol);
 	}
     }      
@@ -487,7 +487,7 @@ public abstract class Notation {
 	    keyword = keyw;
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printIfThenElseTerm(t, keyword);
 	}
     }
@@ -501,7 +501,7 @@ public abstract class Notation {
 	    super(1000);
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    if (t.op() instanceof ProgramVariable) {
 		sp
 			.printConstant(t.op().name().toString().replaceAll(
@@ -517,7 +517,7 @@ public abstract class Notation {
     public static final class SchemaVariableNotation extends VariableNotation {
 
 	@SuppressWarnings("unchecked")
-    public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    // logger.debug("SSV: " + t+ " [" + t.op() + "]");
 	    Debug.assertTrue(t.op() instanceof SchemaVariable);
 	    Object o = sp.getInstantiations().getInstantiation(
@@ -540,8 +540,8 @@ public abstract class Notation {
 			sp.getLayouter().print("{");
 			while (it.hasNext()) {
 			    final Object next = it.next();
-			    if (next instanceof JavaDLTerm) {
-				sp.printTerm((JavaDLTerm) o);
+			    if (next instanceof Term) {
+				sp.printTerm((Term) o);
 			    } else {
 				sp.printConstant(o.toString());
 			    }
@@ -551,8 +551,8 @@ public abstract class Notation {
 			}
 			sp.getLayouter().print("}");
 		    } else {
-			Debug.assertTrue(o instanceof JavaDLTerm);
-			sp.printTerm((JavaDLTerm) o);
+			Debug.assertTrue(o instanceof Term);
+			sp.printTerm((Term) o);
 		    }
 		}
 	    }
@@ -569,8 +569,8 @@ public abstract class Notation {
 	    super(120);
 	}
 
-	public static String printNumberTerm(JavaDLTerm numberTerm) {
-	    JavaDLTerm t = numberTerm;
+	public static String printNumberTerm(Term numberTerm) {
+	    Term t = numberTerm;
 
 	    // skip number symbol /as this method may be called
 	    // e.g. by char literal we do not fail if the first is
@@ -605,7 +605,7 @@ public abstract class Notation {
 	    return number.toString();
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    final String number = printNumberTerm(t);
 	    if (number != null) {
 		sp.printConstant(number);
@@ -624,7 +624,7 @@ public abstract class Notation {
 	    super(1000);
 	}
 
-	private static String printCharTerm(JavaDLTerm t) {
+	private static String printCharTerm(Term t) {
 
 	    char charVal = 0;
 	    int intVal = 0;
@@ -649,7 +649,7 @@ public abstract class Notation {
 	    return ("'" + Character.valueOf(charVal)) + "'";
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    final String charString = printCharTerm(t);
 	    if (charString != null) {
 		sp.printConstant(charString);
@@ -674,7 +674,7 @@ public abstract class Notation {
             this.rDelimiter = rDelimiter;
 	}
 
-	public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printSeqSingleton(t, lDelimiter, rDelimiter);
 	}
     }
@@ -694,9 +694,9 @@ public abstract class Notation {
         }
 
         
-        private String printStringTerm(JavaDLTerm t) {
+        private String printStringTerm(Term t) {
             String result = "\"";
-            JavaDLTerm term = t;
+            Term term = t;
             while (term.op().arity() == 2) {
               result = result
                 + CharLiteral.printCharTerm(term.sub(0).sub(0)).charAt(1);
@@ -708,7 +708,7 @@ public abstract class Notation {
         }
         
         @Override
-        public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+        public void print(Term t, LogicPrinter sp) throws IOException {
             if (isCharLiteralSequence(t)) {
                 final String sLit;
                 try {
@@ -724,7 +724,7 @@ public abstract class Notation {
         }
 
 
-        private boolean isCharLiteralSequence(JavaDLTerm t) {            
+        private boolean isCharLiteralSequence(Term t) {            
             if (t.op() == seqConcat && isCharLiteralSequenceHelp(t.sub(0))) {
                 return isCharLiteralSequenceHelp(t.sub(1)) || isCharLiteralSequence(t.sub(1));
             } 
@@ -732,7 +732,7 @@ public abstract class Notation {
         }
 
 
-        private boolean isCharLiteralSequenceHelp(JavaDLTerm t) {
+        private boolean isCharLiteralSequenceHelp(Term t) {
             return (t.op() == seqSingleton && t.sub(0).op() == charLiteral);
         }
 
@@ -749,7 +749,7 @@ public abstract class Notation {
         }
 
         @Override
-        public void print(JavaDLTerm t, LogicPrinter sp) throws IOException {
+        public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printSeqGet(t);
         }
 

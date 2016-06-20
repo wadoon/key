@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -34,7 +34,7 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
     private NoSelfApplicationFeature() {}
 
     @Override
-    protected boolean filter ( TacletApp p_app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal ) {
+    protected boolean filter ( TacletApp p_app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal ) {
         Debug.assertTrue ( pos != null,
                 "NoSelfApplicationFeature: Need to know the position of the application of the taclet" );
 

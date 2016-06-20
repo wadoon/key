@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -37,15 +37,15 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
 
     private NotInScopeOfModalityFeature () {}
     
-    protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         Debug.assertFalse ( pos == null,
                             "Feature is only applicable to rules with find" );
 
         return !inScopeOfModality ( pos );
     }
 
-    private boolean inScopeOfModality (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
-        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator ();
+    private boolean inScopeOfModality (PosInOccurrence<Term, SequentFormula<Term>> pos) {
+        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
 
         while ( it.next () != -1 ) {
             final Operator op = it.getSubTerm ().op();

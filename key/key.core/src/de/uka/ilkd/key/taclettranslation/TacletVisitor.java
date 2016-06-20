@@ -26,7 +26,7 @@ package de.uka.ilkd.key.taclettranslation;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -40,7 +40,7 @@ public abstract class TacletVisitor extends DefaultVisitor {
         private String failureDescription = null;
 
         private void visit(Semisequent semiseq) {
-                for (SequentFormula<JavaDLTerm> aSemiseq : semiseq) {
+                for (SequentFormula<Term> aSemiseq : semiseq) {
                         aSemiseq.formula().execPostOrder(this);
                 }
         }

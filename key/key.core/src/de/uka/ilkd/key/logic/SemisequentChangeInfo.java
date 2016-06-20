@@ -22,13 +22,13 @@ import org.key_project.util.collection.ImmutableSLList;
  * Records the changes made to a semisequent. Keeps track of added and
  * removed formula to the semisequents. 
  */
-public class SemisequentChangeInfo extends CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> {
+public class SemisequentChangeInfo extends CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> {
    
     public SemisequentChangeInfo() {
-        super(ImmutableSLList.<SequentFormula<JavaDLTerm>> nil());
+        super(ImmutableSLList.<SequentFormula<Term>> nil());
     }
     
-    public SemisequentChangeInfo(ImmutableList<SequentFormula<JavaDLTerm>> formulas) {
+    public SemisequentChangeInfo(ImmutableList<SequentFormula<Term>> formulas) {
         super(formulas);
     }
 
@@ -37,7 +37,7 @@ public class SemisequentChangeInfo extends CCSemisequentChangeInfo<SequentFormul
      */
     @Override
     protected Semisequent createSemisequent(
-            ImmutableList<SequentFormula<JavaDLTerm>> modifiedFormulas) {
+            ImmutableList<SequentFormula<Term>> modifiedFormulas) {
         if (modifiedFormulas.isEmpty()) {
             return Semisequent.nil();
         }

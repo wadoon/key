@@ -25,7 +25,7 @@ import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -55,9 +55,9 @@ public abstract class AbstractUpdateExtractor {
    protected final Node node;
    
    /**
-    * The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality or its updates.
+    * The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality or its updates.
     */
-   protected final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPio;
+   protected final PosInOccurrence<Term, SequentFormula<Term>> modalityPio;
    
    /**
     * An incremented number used to give each pre value an unique name.
@@ -67,10 +67,10 @@ public abstract class AbstractUpdateExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
-    * @param modalityPio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality or its updates.
+    * @param modalityPio The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality or its updates.
     */
    public AbstractUpdateExtractor(Node node, 
-                                  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPio) {
+                                  PosInOccurrence<Term, SequentFormula<Term>> modalityPio) {
       assert node != null;
       assert modalityPio != null;
       this.node = node;
@@ -83,11 +83,11 @@ public abstract class AbstractUpdateExtractor {
     * @param pathCondition The path condition to check.
     * @return The new path condition without conditions which uses implicit {@link IProgramVariable}s.
     */
-   protected JavaDLTerm removeImplicitSubTermsFromPathCondition(JavaDLTerm pathCondition) {
+   protected Term removeImplicitSubTermsFromPathCondition(Term pathCondition) {
       if (Junctor.AND == pathCondition.op()) {
          // Path condition with multiple terms combined via AND
-         List<JavaDLTerm> newTerms = new LinkedList<JavaDLTerm>();
-         for (JavaDLTerm sub : pathCondition.subs()) {
+         List<Term> newTerms = new LinkedList<Term>();
+         for (Term sub : pathCondition.subs()) {
             if (!containsImplicitProgramVariable(sub)) {
                newTerms.add(sub);
             }
@@ -106,11 +106,11 @@ public abstract class AbstractUpdateExtractor {
    }
 
    /**
-    * Checks if the given {@link JavaDLTerm} contains an implicit {@link IProgramVariable}.
-    * @param term The {@link JavaDLTerm} to check.
-    * @return {@code true} {@link JavaDLTerm} contains implicit {@link IProgramVariable}, {@code false} {@link JavaDLTerm} contains no implicit {@link IProgramVariable}.
+    * Checks if the given {@link Term} contains an implicit {@link IProgramVariable}.
+    * @param term The {@link Term} to check.
+    * @return {@code true} {@link Term} contains implicit {@link IProgramVariable}, {@code false} {@link Term} contains no implicit {@link IProgramVariable}.
     */
-   protected boolean containsImplicitProgramVariable(JavaDLTerm term) {
+   protected boolean containsImplicitProgramVariable(Term term) {
       if (term.op() instanceof ProgramVariable && isImplicitProgramVariable((ProgramVariable)term.op())) {
          return true;
       }
@@ -144,9 +144,9 @@ public abstract class AbstractUpdateExtractor {
     * @param ignoreOldStateVariables Ignore old state variables?
     * @return The objects to ignore.
     */
-   protected Set<JavaDLTerm> computeInitialObjectsToIgnore(boolean ignoreExceptionVariable, 
+   protected Set<Term> computeInitialObjectsToIgnore(boolean ignoreExceptionVariable, 
                                                      boolean ignoreOldStateVariables) {
-      Set<JavaDLTerm> result = new LinkedHashSet<JavaDLTerm>();
+      Set<Term> result = new LinkedHashSet<Term>();
       if (ignoreExceptionVariable) {
          // Add exception variable to the ignore list because it is not part of the source code.
          IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(getProof());
@@ -157,8 +157,8 @@ public abstract class AbstractUpdateExtractor {
       if (ignoreOldStateVariables) {
          // Add initial updates which are used as backup of the heap and method arguments. They are not part of the source code and should be ignored.
          Sequent sequent = getRoot().sequent();
-         for (SequentFormula<JavaDLTerm> sf : sequent.succedent()) {
-            JavaDLTerm term = sf.formula();
+         for (SequentFormula<Term> sf : sequent.succedent()) {
+            Term term = sf.formula();
             if (Junctor.IMP.equals(term.op())) {
                fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
             }
@@ -170,12 +170,12 @@ public abstract class AbstractUpdateExtractor {
    /**
     * Utility method of {@link #computeInitialObjectsToIgnore()} which
     * computes the objects to ignore recursively.
-    * @param term The current {@link JavaDLTerm}.
-    * @param toFill The {@link Set} with {@link JavaDLTerm}s to ignore to fill.
+    * @param term The current {@link Term}.
+    * @param toFill The {@link Set} with {@link Term}s to ignore to fill.
     */
-   protected void fillInitialObjectsToIgnoreRecursively(JavaDLTerm term, Set<JavaDLTerm> toFill) {
+   protected void fillInitialObjectsToIgnoreRecursively(Term term, Set<Term> toFill) {
       if (term.op() instanceof UpdateApplication) {
-         JavaDLTerm updateTerm = UpdateApplication.getUpdate(term);
+         Term updateTerm = UpdateApplication.getUpdate(term);
          fillInitialObjectsToIgnoreRecursively(updateTerm, toFill);
       }
       else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
@@ -194,9 +194,9 @@ public abstract class AbstractUpdateExtractor {
    /**
     * <p>
     * Computes for each location (value/association of an object) used in the 
-    * updates of the given {@link Sequent} the {@link JavaDLTerm}s which allows to compute the object 
+    * updates of the given {@link Sequent} the {@link Term}s which allows to compute the object 
     * itself and the value of the value/association. The result is a {@link Set}  
-    * of {@link ExtractLocationParameter} which contains the computed {@link JavaDLTerm}s.
+    * of {@link ExtractLocationParameter} which contains the computed {@link Term}s.
     * </p>
     * <p>
     * Objects which are created in the heap during symbolic execution and
@@ -213,15 +213,15 @@ public abstract class AbstractUpdateExtractor {
     */
    protected void collectLocationsFromUpdates(Sequent sequent, 
                                               Set<ExtractLocationParameter> locationsToFill, 
-                                              Set<JavaDLTerm> updateCreatedObjectsToFill, 
-                                              Set<JavaDLTerm> updateValueObjectsToFill, 
-                                              Set<JavaDLTerm> objectsToIgnore) throws ProofInputException {
+                                              Set<Term> updateCreatedObjectsToFill, 
+                                              Set<Term> updateValueObjectsToFill, 
+                                              Set<Term> objectsToIgnore) throws ProofInputException {
       // Go up in parent hierarchy and collect updates on all update applications
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = modalityPio;
+      PosInOccurrence<Term, SequentFormula<Term>> pio = modalityPio;
       while (pio != null) {
-         JavaDLTerm updateApplication = pio.subTerm();
+         Term updateApplication = pio.subTerm();
          if (updateApplication.op() == UpdateApplication.UPDATE_APPLICATION) {
-            JavaDLTerm topUpdate = UpdateApplication.getUpdate(updateApplication);
+            Term topUpdate = UpdateApplication.getUpdate(updateApplication);
             collectLocationsFromTerm(topUpdate, locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill, objectsToIgnore);
          }
          if (!pio.isTopLevel()) {
@@ -236,9 +236,9 @@ public abstract class AbstractUpdateExtractor {
    /**
     * <p>
     * Computes for each location (value/association of an object) used in the 
-    * the given {@link JavaDLTerm} the {@link JavaDLTerm}s which allows to compute the object 
+    * the given {@link Term} the {@link Term}s which allows to compute the object 
     * itself and the value of the value/association. The result is a {@link Set}  
-    * of {@link ExtractLocationParameter} which contains the computed {@link JavaDLTerm}s.
+    * of {@link ExtractLocationParameter} which contains the computed {@link Term}s.
     * </p>
     * <p>
     * Objects which are created in the heap during symbolic execution and
@@ -246,20 +246,20 @@ public abstract class AbstractUpdateExtractor {
     * collected and stored in the {@link Set}s {@code updateCreatedObjectsToFill}/
     * {@code updateValueObjectsToFill}.
     * </p>
-    * @param updateTerm The {@link JavaDLTerm} which provides the update to extract locations from.
+    * @param updateTerm The {@link Term} which provides the update to extract locations from.
     * @param locationsToFill The location {@link Set} to fill.
     * @param updateCreatedObjectsToFill The new created object {@link Set} to fill.
     * @param updateValueObjectsToFill The {@link Set} with objects used on right side of updates to fill.
     * @param objectsToIgnore The objects to ignore.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void collectLocationsFromTerm(JavaDLTerm updateTerm, 
+   protected void collectLocationsFromTerm(Term updateTerm, 
                                            Set<ExtractLocationParameter> locationsToFill, 
-                                           Set<JavaDLTerm> updateCreatedObjectsToFill, 
-                                           Set<JavaDLTerm> updateValueObjectsToFill,
-                                           Set<JavaDLTerm> objectsToIgnore) throws ProofInputException {
+                                           Set<Term> updateCreatedObjectsToFill, 
+                                           Set<Term> updateValueObjectsToFill,
+                                           Set<Term> objectsToIgnore) throws ProofInputException {
       if (updateTerm.op() instanceof UpdateJunctor) {
-         for (JavaDLTerm sub : updateTerm.subs()) {
+         for (Term sub : updateTerm.subs()) {
             collectLocationsFromTerm(sub, locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill, objectsToIgnore);
          }
       }
@@ -278,7 +278,7 @@ public abstract class AbstractUpdateExtractor {
                   locationsToFill.add(new ExtractLocationParameter(var, true));
                }
                if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
-                  JavaDLTerm objectTerm = updateTerm.sub(0);
+                  Term objectTerm = updateTerm.sub(0);
                   objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm, getServices());
                   updateValueObjectsToFill.add(objectTerm);
                }
@@ -296,9 +296,9 @@ public abstract class AbstractUpdateExtractor {
    /**
     * <p>
     * Computes for each location (value/association of an object) used in the 
-    * the given heap update {@link JavaDLTerm} the {@link JavaDLTerm}s which allows to compute the object 
+    * the given heap update {@link Term} the {@link Term}s which allows to compute the object 
     * itself and the value of the value/association. The result is a {@link Set}  
-    * of {@link ExtractLocationParameter} which contains the computed {@link JavaDLTerm}s.
+    * of {@link ExtractLocationParameter} which contains the computed {@link Term}s.
     * </p>
     * <p>
     * Objects which are created in the heap during symbolic execution and
@@ -306,20 +306,20 @@ public abstract class AbstractUpdateExtractor {
     * collected and stored in the {@link Set}s {@code updateCreatedObjectsToFill}/
     * {@code updateValueObjectsToFill}.
     * </p>
-    * @param term The {@link JavaDLTerm} which provides the heap update to extract locations from.
+    * @param term The {@link Term} which provides the heap update to extract locations from.
     * @param locationsToFill The location {@link Set} to fill.
     * @param updateCreatedObjectsToFill The new created object {@link Set} to fill.
     * @param updateValueObjectsToFill The {@link Set} with objects used on right side of updates to fill.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void collectLocationsFromHeapUpdate(JavaDLTerm term,
+   protected void collectLocationsFromHeapUpdate(Term term,
                                                  Set<ExtractLocationParameter> locationsToFill, 
-                                                 Set<JavaDLTerm> updateCreatedObjectsToFill, 
-                                                 Set<JavaDLTerm> updateValueObjectsToFill) throws ProofInputException {
+                                                 Set<Term> updateCreatedObjectsToFill, 
+                                                 Set<Term> updateValueObjectsToFill) throws ProofInputException {
       final HeapLDT heapLDT = getServices().getTheories().getHeapLDT();
       if (term.op() == heapLDT.getStore()) {
          // Add select object term to result
-         JavaDLTerm selectArgument = term.sub(1);
+         Term selectArgument = term.sub(1);
          if (heapLDT.getSortOfSelect(selectArgument.op()) != null) {
             ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, selectArgument.sub(2));
             if (var != null) {
@@ -329,7 +329,7 @@ public abstract class AbstractUpdateExtractor {
                }
             }
             else {
-               JavaDLTerm arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, selectArgument.sub(2));
+               Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, selectArgument.sub(2));
                if (arrayIndex != null) {
                   if (!hasFreeVariables(arrayIndex)) {
                      locationsToFill.add(new ExtractLocationParameter(arrayIndex, selectArgument.sub(1)));
@@ -368,7 +368,7 @@ public abstract class AbstractUpdateExtractor {
             }
          }
          else {
-            JavaDLTerm arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
+            Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
             if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
                locationsToFill.add(new ExtractLocationParameter(arrayIndex, term.sub(1)));
             }
@@ -377,7 +377,7 @@ public abstract class AbstractUpdateExtractor {
             }
          }
          if (SymbolicExecutionUtil.hasReferenceSort(getServices(), term.sub(3)) && term.sub(3).op() instanceof ProgramVariable) {
-            JavaDLTerm objectTerm = term.sub(3);
+            Term objectTerm = term.sub(3);
             objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm, getServices());
             updateValueObjectsToFill.add(objectTerm);
          }
@@ -385,7 +385,7 @@ public abstract class AbstractUpdateExtractor {
          collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
       }
       else if (term.op() == heapLDT.getCreate()) {
-         JavaDLTerm newObject = term.sub(1);
+         Term newObject = term.sub(1);
          newObject = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), newObject, getServices());
          updateCreatedObjectsToFill.add(newObject);
          // Iterate over child heap modifications
@@ -407,28 +407,28 @@ public abstract class AbstractUpdateExtractor {
    }
 
    /**
-    * Checks if the given {@link JavaDLTerm} has free variables.
-    * @param term The {@link JavaDLTerm} to check.
+    * Checks if the given {@link Term} has free variables.
+    * @param term The {@link Term} to check.
     * @return {@code true} has free variables, {@code false} does not have free variables.
     */
-   protected boolean hasFreeVariables(JavaDLTerm term) {
+   protected boolean hasFreeVariables(Term term) {
       return term != null && !term.freeVars().isEmpty();
    }
 
    /**
     * Computes for each location (value/association of an object) used in the 
-    * given {@link Sequent} the {@link JavaDLTerm}s which allows to compute the object 
+    * given {@link Sequent} the {@link Term}s which allows to compute the object 
     * itself and the value of the value/association. The result is a {@link Set}  
-    * of {@link ExtractLocationParameter} which contains the computed {@link JavaDLTerm}s.
+    * of {@link ExtractLocationParameter} which contains the computed {@link Term}s.
     * @param sequent The {@link Sequent} to extract locations from.
     * @param objectsToIgnore The objects to ignore.
     * @return The found locations.
     * @throws ProofInputException Occurred Exception.
     */
    protected Set<ExtractLocationParameter> extractLocationsFromSequent(Sequent sequent, 
-                                                                       Set<JavaDLTerm> objectsToIgnore) throws ProofInputException {
+                                                                       Set<Term> objectsToIgnore) throws ProofInputException {
       Set<ExtractLocationParameter> result = new LinkedHashSet<ExtractLocationParameter>();
-      for (SequentFormula<JavaDLTerm> sf : sequent) {
+      for (SequentFormula<Term> sf : sequent) {
          result.addAll(extractLocationsFromTerm(sf.formula(), objectsToIgnore));
       }
       return result;
@@ -436,32 +436,32 @@ public abstract class AbstractUpdateExtractor {
    
    /**
     * Computes for each location (value/association of an object) used in the 
-    * given {@link JavaDLTerm} the {@link JavaDLTerm}s which allows to compute the object 
+    * given {@link Term} the {@link Term}s which allows to compute the object 
     * itself and the value of the value/association. The result is a {@link Set}  
-    * of {@link ExtractLocationParameter} which contains the computed {@link JavaDLTerm}s.
-    * @param term The {@link JavaDLTerm} to extract locations from.
+    * of {@link ExtractLocationParameter} which contains the computed {@link Term}s.
+    * @param term The {@link Term} to extract locations from.
     * @param objectsToIgnore The objects to ignore.
     * @return The found locations.
     * @throws ProofInputException Occurred Exception.
     */
-   protected Set<ExtractLocationParameter> extractLocationsFromTerm(JavaDLTerm term, 
-                                                                    Set<JavaDLTerm> objectsToIgnore) throws ProofInputException {
+   protected Set<ExtractLocationParameter> extractLocationsFromTerm(Term term, 
+                                                                    Set<Term> objectsToIgnore) throws ProofInputException {
       Set<ExtractLocationParameter> result = new LinkedHashSet<ExtractLocationParameter>();
       collectLocationsFromTerm(result, term, objectsToIgnore);
       return result;
    }
    
    /**
-    * Utility method of {@link #extractLocationsFromTerm(JavaDLTerm, Set)} which
+    * Utility method of {@link #extractLocationsFromTerm(Term, Set)} which
     * recursively extracts the locations.
     * @param toFill The result {@link Set} to fill.
-    * @param term The current {@link JavaDLTerm}.
+    * @param term The current {@link Term}.
     * @param objectsToIgnore The objects to ignore.
     * @throws ProofInputException Occurred Exception.
     */
    protected void collectLocationsFromTerm(Set<ExtractLocationParameter> toFill, 
-                                           JavaDLTerm term, 
-                                           Set<JavaDLTerm> objectsToIgnore) throws ProofInputException {
+                                           Term term, 
+                                           Set<Term> objectsToIgnore) throws ProofInputException {
       final HeapLDT heapLDT = getServices().getTheories().getHeapLDT();
       if (term.op() instanceof ProgramVariable) {
          ProgramVariable var = (ProgramVariable)term.op();
@@ -488,7 +488,7 @@ public abstract class AbstractUpdateExtractor {
             }
          }
          else {
-            for (JavaDLTerm sub : term.subs()) {
+            for (Term sub : term.subs()) {
                collectLocationsFromTerm(toFill, sub, objectsToIgnore);
             }
          }
@@ -496,19 +496,19 @@ public abstract class AbstractUpdateExtractor {
    }
    
    /**
-    * Collects the {@link ExtractLocationParameter} location from the heap {@link JavaDLTerm}s.
-    * @param selectTerm The parent {@link JavaDLTerm}.
-    * @param variableTerm The {@link JavaDLTerm} with the {@link ProgramVariable}.
+    * Collects the {@link ExtractLocationParameter} location from the heap {@link Term}s.
+    * @param selectTerm The parent {@link Term}.
+    * @param variableTerm The {@link Term} with the {@link ProgramVariable}.
     * @param heapLDT The {@link HeapLDT} to use.
     * @param toFill The result {@link Set} to fill.
     * @param objectsToIgnore The objects to ignore.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void collectLocationsFromHeapTerms(JavaDLTerm selectTerm, 
-                                                JavaDLTerm variableTerm,
+   protected void collectLocationsFromHeapTerms(Term selectTerm, 
+                                                Term variableTerm,
                                                 HeapLDT heapLDT,
                                                 Set<ExtractLocationParameter> toFill, 
-                                                Set<JavaDLTerm> objectsToIgnore) throws ProofInputException {
+                                                Set<Term> objectsToIgnore) throws ProofInputException {
       if (!objectsToIgnore.contains(selectTerm) &&
             !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
            ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, variableTerm);
@@ -527,7 +527,7 @@ public abstract class AbstractUpdateExtractor {
               }
            }
            else {
-              JavaDLTerm arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, variableTerm);
+              Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, variableTerm);
               if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
                  if (selectTerm.op() instanceof ProgramVariable) {
                     toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
@@ -542,13 +542,13 @@ public abstract class AbstractUpdateExtractor {
    }
 
    /**
-    * Creates a predicate and a {@link JavaDLTerm} which can be used to compute the 
+    * Creates a predicate and a {@link Term} which can be used to compute the 
     * values defined by the given {@link ExtractLocationParameter}s.
-    * @param valueSelectParameter The {@link ExtractLocationParameter}s to compute in the created {@link JavaDLTerm}.
-    * @return The created {@link JavaDLTerm} which computes the values of the given {@link ExtractLocationParameter}s.
+    * @param valueSelectParameter The {@link ExtractLocationParameter}s to compute in the created {@link Term}.
+    * @return The created {@link Term} which computes the values of the given {@link ExtractLocationParameter}s.
     */
-   protected JavaDLTerm createLocationPredicateAndTerm(Set<ExtractLocationParameter> valueSelectParameter) {
-      List<JavaDLTerm> argumentsList = new LinkedList<JavaDLTerm>();
+   protected Term createLocationPredicateAndTerm(Set<ExtractLocationParameter> valueSelectParameter) {
+      List<Term> argumentsList = new LinkedList<Term>();
       int argumentIndex = -1;
       for (ExtractLocationParameter param : valueSelectParameter) {
          argumentsList.add(param.createPreParentTerm());
@@ -556,7 +556,7 @@ public abstract class AbstractUpdateExtractor {
          argumentsList.add(param.createPreValueTerm());
          param.setValueTermIndexInStatePredicate(++argumentIndex);
       }
-      JavaDLTerm[] arguments = argumentsList.toArray(new JavaDLTerm[argumentsList.size()]);
+      Term[] arguments = argumentsList.toArray(new Term[argumentsList.size()]);
       Sort[] sorts = new Sort[arguments.length];
       for (int i = 0; i < sorts.length; i++) {
          sorts[i] = arguments[i].sort();
@@ -564,7 +564,7 @@ public abstract class AbstractUpdateExtractor {
       // Create predicate which will be used in formulas to store the value interested in.
       Function newPredicate = new Function(new Name(getServices().getTermBuilder().newName("LayoutPredicate")), Sort.FORMULA, sorts);
       // Create formula which contains the value interested in.
-      JavaDLTerm newTerm = getServices().getTermBuilder().func(newPredicate, arguments);
+      Term newTerm = getServices().getTermBuilder().func(newPredicate, arguments);
       return newTerm;
    }
 
@@ -594,7 +594,7 @@ public abstract class AbstractUpdateExtractor {
 
    /**
     * <p>
-    * Instances of this class provides the {@link JavaDLTerm} which are required
+    * Instances of this class provides the {@link Term} which are required
     * to compute a location (value or association of a given object/state).
     * </p>
     * <p>
@@ -613,12 +613,12 @@ public abstract class AbstractUpdateExtractor {
       /**
        * The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      private final JavaDLTerm arrayIndex;
+      private final Term arrayIndex;
       
       /**
-       * An optional parent object represented as {@link JavaDLTerm}. If it is {@code null} an {@link IProgramVariable} of the state is represented.
+       * An optional parent object represented as {@link Term}. If it is {@code null} an {@link IProgramVariable} of the state is represented.
        */
-      private final JavaDLTerm parentTerm;
+      private final Term parentTerm;
       
       /**
        * The index of the parent argument in the predicate used in side proof to compute the values.
@@ -645,9 +645,9 @@ public abstract class AbstractUpdateExtractor {
       /**
        * Constructor for cloning purpose.
        * @param original The original {@link ExtractLocationParameter} to clone.
-       * @param newParent The new parent {@link JavaDLTerm} to be used instead of the original one.
+       * @param newParent The new parent {@link Term} to be used instead of the original one.
        */
-      public ExtractLocationParameter(ExtractLocationParameter original, JavaDLTerm newParent) {
+      public ExtractLocationParameter(ExtractLocationParameter original, Term newParent) {
          this.programVariable = original.programVariable;
          this.arrayIndex = original.arrayIndex;
          this.parentTerm = newParent;
@@ -671,23 +671,23 @@ public abstract class AbstractUpdateExtractor {
       /**
        * Constructor.
        * @param programVariable The {@link ProgramVariable}.
-       * @param parentTerm The parent object represented as {@link JavaDLTerm}.
+       * @param parentTerm The parent object represented as {@link Term}.
        * @throws ProofInputException Occurred Exception.
        */
       public ExtractLocationParameter(ProgramVariable programVariable, 
-                                      JavaDLTerm parentTerm) throws ProofInputException {
+                                      Term parentTerm) throws ProofInputException {
          this(programVariable, parentTerm, false);
       }
       
       /**
        * Constructor.
        * @param programVariable The {@link ProgramVariable}.
-       * @param parentTerm The parent object represented as {@link JavaDLTerm}.
+       * @param parentTerm The parent object represented as {@link Term}.
        * @param stateMember Defines if this location should explicitly be shown on the state.
        * @throws ProofInputException Occurred Exception.
        */
       protected ExtractLocationParameter(ProgramVariable programVariable, 
-                                         JavaDLTerm parentTerm,
+                                         Term parentTerm,
                                          boolean stateMember) throws ProofInputException {
          assert programVariable != null;
          this.programVariable = programVariable;
@@ -700,11 +700,11 @@ public abstract class AbstractUpdateExtractor {
       /**
        * Constructor.
        * @param arrayIndex The array index.
-       * @param parentTerm The parent object represented as {@link JavaDLTerm}.
+       * @param parentTerm The parent object represented as {@link Term}.
        * @throws ProofInputException Occurred Exception.
        */
-      public ExtractLocationParameter(JavaDLTerm arrayIndex, 
-                                      JavaDLTerm parentTerm) throws ProofInputException {
+      public ExtractLocationParameter(Term arrayIndex, 
+                                      Term parentTerm) throws ProofInputException {
          assert parentTerm != null;
          this.programVariable = null;
          this.arrayIndex = arrayIndex;
@@ -744,7 +744,7 @@ public abstract class AbstractUpdateExtractor {
        * Returns the array index.
        * @return The array index.
        */
-      public JavaDLTerm getArrayIndex() {
+      public Term getArrayIndex() {
          return arrayIndex;
       }
       
@@ -760,7 +760,7 @@ public abstract class AbstractUpdateExtractor {
        * Returns the right side of the update created by {@link #createPreUpdate()}.
        * @return The right side of the update created by {@link #createPreUpdate()}.
        */
-      public JavaDLTerm getPreUpdateTarget() {
+      public Term getPreUpdateTarget() {
          return parentTerm != null ? parentTerm : getServices().getTermBuilder().var(programVariable);
       }
 
@@ -768,26 +768,26 @@ public abstract class AbstractUpdateExtractor {
        * Creates the pre update to make sure that the parent object defined
        * by the expression is evaluated on the initial state because it might
        * be changed in the current state due to updates.
-       * @return The created {@link JavaDLTerm} with the pre update.
+       * @return The created {@link Term} with the pre update.
        */
-      public JavaDLTerm createPreUpdate() {
-         JavaDLTerm originalTerm = getPreUpdateTarget();
+      public Term createPreUpdate() {
+         Term originalTerm = getPreUpdateTarget();
          return getServices().getTermBuilder().elementary(preVariable, originalTerm);
       }
       
       /**
-       * Creates the {@link JavaDLTerm} to compute the parent object with help of the pre update.
-       * @return The {@link JavaDLTerm} to compute the parent object with help of the pre update.
+       * Creates the {@link Term} to compute the parent object with help of the pre update.
+       * @return The {@link Term} to compute the parent object with help of the pre update.
        */
-      public JavaDLTerm createPreParentTerm() {
+      public Term createPreParentTerm() {
          return getServices().getTermBuilder().var(preVariable);
       }
       
       /**
-       * Computes the {@link JavaDLTerm} to compute the value with help of the pre update.
-       * @return The {@link JavaDLTerm} to compute the value with help of the pre update.
+       * Computes the {@link Term} to compute the value with help of the pre update.
+       * @return The {@link Term} to compute the value with help of the pre update.
        */
-      public JavaDLTerm createPreValueTerm() {
+      public Term createPreValueTerm() {
          if (parentTerm != null) {
             if (isArrayIndex()) {
                return getServices().getTermBuilder().dotArr(parentTerm, arrayIndex);
@@ -824,10 +824,10 @@ public abstract class AbstractUpdateExtractor {
       }
 
       /**
-       * Returns the optional parent object represented as {@link JavaDLTerm}. If it is {@code null} an {@link IProgramVariable} of the state is represented.
-       * @return The optional parent object represented as {@link JavaDLTerm}. If it is {@code null} an {@link IProgramVariable} of the state is represented.
+       * Returns the optional parent object represented as {@link Term}. If it is {@code null} an {@link IProgramVariable} of the state is represented.
+       * @return The optional parent object represented as {@link Term}. If it is {@code null} an {@link IProgramVariable} of the state is represented.
        */
-      public JavaDLTerm getParentTerm() {
+      public Term getParentTerm() {
          return parentTerm;
       }
 
@@ -927,25 +927,25 @@ public abstract class AbstractUpdateExtractor {
     * @return The computed {@link ExecutionVariableValuePair}s.
     * @throws ProofInputException Occurred Exception.
     */
-   protected Set<ExecutionVariableValuePair> computeVariableValuePairs(JavaDLTerm layoutCondition,
-                                                                       JavaDLTerm layoutTerm, 
+   protected Set<ExecutionVariableValuePair> computeVariableValuePairs(Term layoutCondition,
+                                                                       Term layoutTerm, 
                                                                        Set<ExtractLocationParameter> locations,
                                                                        boolean currentLayout,
                                                                        boolean simplifyConditions) throws ProofInputException {
       // Get original updates
-      ImmutableList<JavaDLTerm> originalUpdates = computeOriginalUpdates(modalityPio, currentLayout);
+      ImmutableList<Term> originalUpdates = computeOriginalUpdates(modalityPio, currentLayout);
       // Combine memory layout with original updates
-      Map<LocationVariable, JavaDLTerm> preUpdateMap = new HashMap<LocationVariable, JavaDLTerm>();
-      ImmutableList<JavaDLTerm> additionalUpdates = ImmutableSLList.nil();
+      Map<LocationVariable, Term> preUpdateMap = new HashMap<LocationVariable, Term>();
+      ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
       for (ExtractLocationParameter evp : locations) {
          additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
          preUpdateMap.put(evp.getPreVariable(), evp.getPreUpdateTarget());
       }
       // Apply updates
       TermBuilder tb = getServices().getTermBuilder();
-      JavaDLTerm updateLayoutTerm = tb.applyParallel(originalUpdates, layoutTerm);
+      Term updateLayoutTerm = tb.applyParallel(originalUpdates, layoutTerm);
       updateLayoutTerm = tb.applyParallel(additionalUpdates, updateLayoutTerm);
-      for (JavaDLTerm additionalUpdate : collectAdditionalUpdates()) {
+      for (Term additionalUpdate : collectAdditionalUpdates()) {
          updateLayoutTerm = tb.apply(additionalUpdate, updateLayoutTerm);
       }      
       final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
@@ -960,30 +960,30 @@ public abstract class AbstractUpdateExtractor {
                                                                           StrategyProperties.SPLITTING_NORMAL);
       try {
          @SuppressWarnings("unchecked")
-         Map<JavaDLTerm, Set<Goal>>[] paramValueMap = new Map[locations.size()];
+         Map<Term, Set<Goal>>[] paramValueMap = new Map[locations.size()];
          // Group equal values as precondition of computeValueConditions(...)
          for (Goal goal : info.getProof().openGoals()) {
-            JavaDLTerm resultTerm = SymbolicExecutionSideProofUtil.extractOperatorTerm(goal, layoutTerm.op());
+            Term resultTerm = SymbolicExecutionSideProofUtil.extractOperatorTerm(goal, layoutTerm.op());
             int i = 0;
             for (ExtractLocationParameter param : locations) {
-               Map<JavaDLTerm, Set<Goal>> valueMap = paramValueMap[i];
+               Map<Term, Set<Goal>> valueMap = paramValueMap[i];
                if (valueMap == null) {
-                  valueMap = new LinkedHashMap<JavaDLTerm, Set<Goal>>();
+                  valueMap = new LinkedHashMap<Term, Set<Goal>>();
                   paramValueMap[i] = valueMap;
                }
-               JavaDLTerm value = resultTerm.sub(param.getValueTermIndexInStatePredicate());
+               Term value = resultTerm.sub(param.getValueTermIndexInStatePredicate());
                value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, getServices());
                // Replace pre variable with original target
                if (value.op() instanceof LocationVariable) {
-                  JavaDLTerm originalTarget = preUpdateMap.get(value.op());
+                  Term originalTarget = preUpdateMap.get(value.op());
                   if (originalTarget != null) {
                      value = originalTarget;
                   }
                }
                else if (SymbolicExecutionUtil.isSelect(goal.proof().getServices(), value)) {
-                  JavaDLTerm object = value.sub(1);
+                  Term object = value.sub(1);
                   if (object.op() instanceof LocationVariable) {
-                     JavaDLTerm originalTarget = preUpdateMap.get(object.op());
+                     Term originalTarget = preUpdateMap.get(object.op());
                      if (originalTarget != null) {
                         value = goal.proof().getServices().getTermBuilder().select(value.sort(), value.sub(0), originalTarget, value.sub(2));
                      }
@@ -1000,12 +1000,12 @@ public abstract class AbstractUpdateExtractor {
             }
          }
          // Compute values including conditions
-         Map<Node, JavaDLTerm> branchConditionCache = new HashMap<Node, JavaDLTerm>();
+         Map<Node, Term> branchConditionCache = new HashMap<Node, Term>();
          Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
          int i = 0;
          for (ExtractLocationParameter param : locations) {
-            for (Entry<JavaDLTerm, Set<Goal>> valueEntry : paramValueMap[i].entrySet()) {
-               Map<Goal, JavaDLTerm> conditionsMap = computeValueConditions(valueEntry.getValue(), branchConditionCache, simplifyConditions);
+            for (Entry<Term, Set<Goal>> valueEntry : paramValueMap[i].entrySet()) {
+               Map<Goal, Term> conditionsMap = computeValueConditions(valueEntry.getValue(), branchConditionCache, simplifyConditions);
                if (param.isArrayIndex()) {
                   for (Goal goal : valueEntry.getValue()) {
                      ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), valueEntry.getKey(), conditionsMap.get(goal), param.isStateMember(), goal.node());
@@ -1032,18 +1032,18 @@ public abstract class AbstractUpdateExtractor {
     * Collects additional updates.
     * @return The additional updates.
     */
-   protected List<JavaDLTerm> collectAdditionalUpdates() {
+   protected List<Term> collectAdditionalUpdates() {
       return Collections.emptyList();
    }
    
    /**
     * Computes the original updates.
-    * @param pio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>}.
+    * @param pio The {@link PosInOccurrence<Term, SequentFormula<Term>>}.
     * @param currentLayout Is current layout?
     * @return The original updates.
     */
-   protected ImmutableList<JavaDLTerm> computeOriginalUpdates(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, boolean currentLayout) {
-      ImmutableList<JavaDLTerm> originalUpdates;
+   protected ImmutableList<Term> computeOriginalUpdates(PosInOccurrence<Term, SequentFormula<Term>> pio, boolean currentLayout) {
+      ImmutableList<Term> originalUpdates;
       if (!currentLayout) {
          originalUpdates = ImmutableSLList.nil();
       }
@@ -1052,7 +1052,7 @@ public abstract class AbstractUpdateExtractor {
             originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
          }
          else {
-            JavaDLTerm originalModifiedFormula = pio.subTerm();
+            Term originalModifiedFormula = pio.subTerm();
             originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
          }
       }
@@ -1103,8 +1103,8 @@ public abstract class AbstractUpdateExtractor {
     * @return A {@link Map} which contains for each {@link Goal} the computed path condition consisting of only required splits.
     * @throws ProofInputException Occurred Exception
     */
-   protected Map<Goal, JavaDLTerm> computeValueConditions(Set<Goal> valueGoals, 
-                                                    Map<Node, JavaDLTerm> branchConditionCache,
+   protected Map<Goal, Term> computeValueConditions(Set<Goal> valueGoals, 
+                                                    Map<Node, Term> branchConditionCache,
                                                     boolean simplifyConditions) throws ProofInputException {
       Comparator<NodeGoal> comparator = new Comparator<NodeGoal>() {
          @Override
@@ -1114,11 +1114,11 @@ public abstract class AbstractUpdateExtractor {
       };
       // Initialize condition for each goal with true
       Set<Node> untriedRealGoals = new HashSet<Node>();
-      Map<Goal, Set<JavaDLTerm>> goalConditions = new HashMap<Goal, Set<JavaDLTerm>>();
+      Map<Goal, Set<Term>> goalConditions = new HashMap<Goal, Set<Term>>();
       List<NodeGoal> sortedBranchLeafs = new LinkedList<NodeGoal>();
       for (Goal goal : valueGoals) {
          CollectionUtil.binaryInsert(sortedBranchLeafs, new NodeGoal(goal), comparator);
-         goalConditions.put(goal, new LinkedHashSet<JavaDLTerm>());
+         goalConditions.put(goal, new LinkedHashSet<Term>());
          untriedRealGoals.add(goal.node());
       }
       // Compute branch conditions
@@ -1142,9 +1142,9 @@ public abstract class AbstractUpdateExtractor {
                if (childGoals.size() != childGoal.getParent().childrenCount()) {
                   // Add branch condition to conditions of all child goals
                   for (NodeGoal nodeGoal : childGoals) {
-                     JavaDLTerm branchCondition = computeBranchCondition(nodeGoal.getCurrentNode(), branchConditionCache, simplifyConditions);
+                     Term branchCondition = computeBranchCondition(nodeGoal.getCurrentNode(), branchConditionCache, simplifyConditions);
                      for (Goal goal : nodeGoal.getStartingGoals()) {
-                        Set<JavaDLTerm> conditions = goalConditions.get(goal);
+                        Set<Term> conditions = goalConditions.get(goal);
                         conditions.add(branchCondition);
                      }
                   }
@@ -1158,9 +1158,9 @@ public abstract class AbstractUpdateExtractor {
          }
       }
       // Compute final condition (redundant path conditions are avoided)
-      Map<Goal, JavaDLTerm> pathConditionsMap = new LinkedHashMap<Goal, JavaDLTerm>();
-      for (Entry<Goal, Set<JavaDLTerm>> entry : goalConditions.entrySet()) {
-         JavaDLTerm pathCondition = getServices().getTermBuilder().and(entry.getValue());
+      Map<Goal, Term> pathConditionsMap = new LinkedHashMap<Goal, Term>();
+      for (Entry<Goal, Set<Term>> entry : goalConditions.entrySet()) {
+         Term pathCondition = getServices().getTermBuilder().and(entry.getValue());
          pathConditionsMap.put(entry.getKey(), pathCondition);
       }
       return pathConditionsMap;
@@ -1321,10 +1321,10 @@ public abstract class AbstractUpdateExtractor {
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   protected JavaDLTerm computeBranchCondition(Node node, 
-                                         Map<Node, JavaDLTerm> branchConditionCache,
+   protected Term computeBranchCondition(Node node, 
+                                         Map<Node, Term> branchConditionCache,
                                          boolean simplifyConditions) throws ProofInputException {
-      JavaDLTerm result = branchConditionCache.get(node);
+      Term result = branchConditionCache.get(node);
       if (result == null) {
          result = SymbolicExecutionUtil.computeBranchCondition(node, simplifyConditions, true);
          branchConditionCache.put(node, result);
@@ -1340,7 +1340,7 @@ public abstract class AbstractUpdateExtractor {
     * <p>
     * They are instantiated lazily when a concrete memory layout is requested
     * the first during lazily computation 
-    * {@link SymbolicLayoutExtractor#lazyComputeLayout(Node, ImmutableSet, JavaDLTerm, Set, ImmutableList, JavaDLTerm, String)}.
+    * {@link SymbolicLayoutExtractor#lazyComputeLayout(Node, ImmutableSet, Term, Set, ImmutableList, Term, String)}.
     * The instances exists only temporary until the concrete {@link ISymbolicLayout} was created from them.
     * </p>
     * @author Martin Hentschel
@@ -1354,17 +1354,17 @@ public abstract class AbstractUpdateExtractor {
       /**
        * The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      private final JavaDLTerm arrayIndex;
+      private final Term arrayIndex;
       
       /**
        * An optional parent object or {@code null} if it is a value/association of the state.
        */
-      private final JavaDLTerm parent;
+      private final Term parent;
       
       /**
        * The value or association target.
        */
-      private final JavaDLTerm value;
+      private final Term value;
       
       /**
        * Defines if this location should explicitly be shown on the state.
@@ -1374,7 +1374,7 @@ public abstract class AbstractUpdateExtractor {
       /**
        * An optional condition under which the value is valid.
        */
-      private final JavaDLTerm condition;
+      private final Term condition;
       
       /**
        * The {@link Node} on which this result is based on.
@@ -1390,9 +1390,9 @@ public abstract class AbstractUpdateExtractor {
        * @param stateMember Defines if this location should explicitly be shown on the state.
        */
       public ExecutionVariableValuePair(ProgramVariable programVariable, 
-                                        JavaDLTerm parent, 
-                                        JavaDLTerm value, 
-                                        JavaDLTerm condition,
+                                        Term parent, 
+                                        Term value, 
+                                        Term condition,
                                         boolean stateMember,
                                         Node goalNode) {
          assert programVariable != null;
@@ -1414,10 +1414,10 @@ public abstract class AbstractUpdateExtractor {
        * @param condition An optional condition under which the value is valid.
        * @param stateMember Defines if this location should explicitly be shown on the state.
        */
-      public ExecutionVariableValuePair(JavaDLTerm arrayIndex, 
-                                        JavaDLTerm parent, 
-                                        JavaDLTerm value, 
-                                        JavaDLTerm condition,
+      public ExecutionVariableValuePair(Term arrayIndex, 
+                                        Term parent, 
+                                        Term value, 
+                                        Term condition,
                                         boolean stateMember,
                                         Node goalNode) {
          assert parent != null;
@@ -1443,7 +1443,7 @@ public abstract class AbstractUpdateExtractor {
        * Returns the optional parent object or {@code null} if it is a value/association of the state.
        * @return The optional parent object or {@code null} if it is a value/association of the state.
        */
-      public JavaDLTerm getParent() {
+      public Term getParent() {
          return parent;
       }
 
@@ -1451,7 +1451,7 @@ public abstract class AbstractUpdateExtractor {
        * Returns the value or association target.
        * @return The value or association target.
        */
-      public JavaDLTerm getValue() {
+      public Term getValue() {
          return value;
       }
       
@@ -1467,7 +1467,7 @@ public abstract class AbstractUpdateExtractor {
        * Returns the array index.
        * @return The array index.
        */
-      public JavaDLTerm getArrayIndex() {
+      public Term getArrayIndex() {
          return arrayIndex;
       }
 
@@ -1483,7 +1483,7 @@ public abstract class AbstractUpdateExtractor {
        * Returns the optional condition under which the value is valid.
        * @return The optional condition under which the value is valid.
        */
-      public JavaDLTerm getCondition() {
+      public Term getCondition() {
          return condition;
       }
 

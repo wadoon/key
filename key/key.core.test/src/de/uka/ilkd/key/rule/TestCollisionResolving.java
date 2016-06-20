@@ -31,7 +31,7 @@ import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -93,15 +93,15 @@ public class TestCollisionResolving extends TestCase {
 	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
 	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
 
-	JavaDLTerm t_x = services.getTermFactory().createTerm(x);	
-	JavaDLTerm t_p_x = services.getTermFactory().createTerm(p, new JavaDLTerm[]{t_x}, null, null);
-	JavaDLTerm t_q_x = services.getTermFactory().createTerm(q, new JavaDLTerm[]{t_x}, null, null);
+	Term t_x = services.getTermFactory().createTerm(x);	
+	Term t_p_x = services.getTermFactory().createTerm(p, new Term[]{t_x}, null, null);
+	Term t_q_x = services.getTermFactory().createTerm(q, new Term[]{t_x}, null, null);
    TermBuilder tb = services.getTermBuilder();
-	JavaDLTerm t_all_p_x =
+	Term t_all_p_x =
 	    tb.all(x, t_p_x);
-	JavaDLTerm t_ex_q_x =
+	Term t_ex_q_x =
 	    tb.ex(x, t_q_x);
-	JavaDLTerm term = 
+	Term term = 
 	        services.getTermFactory().createTerm(Junctor.AND, t_all_p_x,
 						  t_ex_q_x);
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
@@ -125,12 +125,12 @@ public class TestCollisionResolving extends TestCase {
 
 	SVInstantiations insts=result.instantiations();
 	assertTrue("Same object for different conceptual variables",
-		   ((JavaDLTerm)insts.getInstantiation(b)).sub(0).op() !=
-		   ((JavaDLTerm)insts.getInstantiation(c)).sub(0).op());
-	assertSame(((JavaDLTerm)insts.getInstantiation(u)).op(),
-		   ((JavaDLTerm)insts.getInstantiation(b)).sub(0).op());
-	assertSame(((JavaDLTerm)insts.getInstantiation(v)).op(),
-		   ((JavaDLTerm)insts.getInstantiation(c)).sub(0).op());
+		   ((Term)insts.getInstantiation(b)).sub(0).op() !=
+		   ((Term)insts.getInstantiation(c)).sub(0).op());
+	assertSame(((Term)insts.getInstantiation(u)).op(),
+		   ((Term)insts.getInstantiation(b)).sub(0).op());
+	assertSame(((Term)insts.getInstantiation(v)).op(),
+		   ((Term)insts.getInstantiation(c)).sub(0).op());
     }
     
     public void testCollisionResolvingWithContext() {
@@ -144,25 +144,25 @@ public class TestCollisionResolving extends TestCase {
 
 	final TermFactory tf = services.getTermFactory();
     
-	JavaDLTerm t_x = tf.createTerm(x);	
-	JavaDLTerm t_p_x = tf.createTerm(p, new JavaDLTerm[]{t_x}, null, null);
-	JavaDLTerm t_q_x = tf.createTerm(q, new JavaDLTerm[]{t_x}, null, null);
+	Term t_x = tf.createTerm(x);	
+	Term t_p_x = tf.createTerm(p, new Term[]{t_x}, null, null);
+	Term t_q_x = tf.createTerm(q, new Term[]{t_x}, null, null);
 	
 
-	JavaDLTerm t_ex_q_x =
+	Term t_ex_q_x =
 	    tb.ex(x, t_q_x);
 
-	JavaDLTerm t_px_and_exxqx = 
+	Term t_px_and_exxqx = 
 	    tf.createTerm(Junctor.AND, t_p_x,
 						  t_ex_q_x);
-	JavaDLTerm term =
+	Term term =
 	    tb.all(x, t_px_and_exxqx);
 
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_coll_context").taclet();
 
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos=new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(term),
-						PosInTerm.<JavaDLTerm>getTopLevel().down(0),
+	PosInOccurrence<Term, SequentFormula<Term>> pos=new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term),
+						PosInTerm.<Term>getTopLevel().down(0),
 						true);
 
 	TacletApp result 
@@ -180,19 +180,19 @@ public class TestCollisionResolving extends TestCase {
 
 	SVInstantiations insts=result.instantiations();
 	assertTrue("Same object for different conceptual variables",
-		   ((JavaDLTerm)insts.getInstantiation(b)).sub(0).op() !=
-		   ((JavaDLTerm)insts.getInstantiation(c)).sub(0).op());
-	assertSame(((JavaDLTerm)insts.getInstantiation(u)).op(),
-		   ((JavaDLTerm)insts.getInstantiation(c)).sub(0).op());
+		   ((Term)insts.getInstantiation(b)).sub(0).op() !=
+		   ((Term)insts.getInstantiation(c)).sub(0).op());
+	assertSame(((Term)insts.getInstantiation(u)).op(),
+		   ((Term)insts.getInstantiation(c)).sub(0).op());
     }
     
     public void testVarNamespaceCreationWithContext() {
-	JavaDLTerm term = TacletForTests.parseTerm("\\forall s x; p(x)");
+	Term term = TacletForTests.parseTerm("\\forall s x; p(x)");
 		
 	FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_ns1").taclet();
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos=new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(term),
-						PosInTerm.<JavaDLTerm>getTopLevel().down(0),
+	PosInOccurrence<Term, SequentFormula<Term>> pos=new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term),
+						PosInTerm.<Term>getTopLevel().down(0),
 						true);
 	TacletApp app 
 	    = PosTacletApp.createPosTacletApp(taclet, 
@@ -286,8 +286,8 @@ public class TestCollisionResolving extends TestCase {
 	    .insert(1, new SequentFormula<>(TacletForTests.parseTerm
 					      ("\\exists s x; p(x)"))).semisequent();
 	Sequent seq=Sequent.createSuccSequent(semiseq);
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos=new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(semiseq.get(0),
-						PosInTerm.<JavaDLTerm>getTopLevel(), false);
+	PosInOccurrence<Term, SequentFormula<Term>> pos=new PosInOccurrence<Term, SequentFormula<Term>>(semiseq.get(0),
+						PosInTerm.<Term>getTopLevel(), false);
 
 	NoPosTacletApp app0 = NoPosTacletApp.createNoPosTacletApp ( taclet );
 	app0 = app0.matchFind ( pos,
@@ -308,8 +308,8 @@ public class TestCollisionResolving extends TestCase {
 		   +" name conflicts", app!=app1);
 	
 	assertTrue("The names of the instantiations of u and v should be different",
-		   !(((JavaDLTerm)app1.instantiations().getInstantiation(u)).op().name().equals
-		     (((JavaDLTerm)app1.instantiations().getInstantiation(v)).op().name())));
+		   !(((Term)app1.instantiations().getInstantiation(u)).op().name().equals
+		     (((Term)app1.instantiations().getInstantiation(v)).op().name())));
     }
 
     public void testNameConflictAfterInput() {
@@ -395,8 +395,8 @@ public class TestCollisionResolving extends TestCase {
 	    .insert(1, new SequentFormula<>(TacletForTests.parseTerm("all x:s"
 								    +".p(x)")));
 	Sequent seq=Sequent.createSuccSequent(semiseq);
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos=new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(semiseq.get(1),
-						PosInTerm<JavaDLTerm>.TOP_LEVEL.down(0),
+	PosInOccurrence<Term, SequentFormula<Term>> pos=new PosInOccurrence<Term, SequentFormula<Term>>(semiseq.get(1),
+						PosInTerm<Term>.TOP_LEVEL.down(0),
 						seq);
 	IList<SVInstantiations> sviList=taclet.matchIf
 	    (seq, taclet.match(semiseq.get(1).formula().sub(0), taclet.find(),
@@ -408,7 +408,7 @@ public class TestCollisionResolving extends TestCase {
 	          +" name conflicts", app!=app1);
 	assertTrue("The names of x and the instantiations of v should be different",
 	           !(new Name("x")).equals
-	           (((JavaDLTerm)app1.instantiations().getInstantiation(v)).op().name()));
+	           (((Term)app1.instantiations().getInstantiation(v)).op().name()));
 
     }
 
@@ -418,9 +418,9 @@ public class TestCollisionResolving extends TestCase {
 
 	FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict_with_context2").taclet();
-	JavaDLTerm term=TacletForTests.parseTerm("\\forall s x; p(x)");
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos=new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(term),
-						PosInTerm.<JavaDLTerm>getTopLevel().down(0),
+	Term term=TacletForTests.parseTerm("\\forall s x; p(x)");
+	PosInOccurrence<Term, SequentFormula<Term>> pos=new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term),
+						PosInTerm.<Term>getTopLevel().down(0),
 						true);
 	MatchConditions mc=taclet.getMatcher().matchFind(term.sub(0),
 					MatchConditions.EMPTY_MATCHCONDITIONS,

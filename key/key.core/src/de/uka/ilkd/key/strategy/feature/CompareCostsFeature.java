@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.feature;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -31,7 +31,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
 
     public static Feature less (Feature a, Feature b) {
         return new CompareCostsFeature(a,b) {
-            protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+            protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
                 return a.compute ( app, pos, goal ).compareTo (
                        b.compute ( app, pos, goal ) ) < 0;
             }            
@@ -40,7 +40,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
     
     public static Feature leq (Feature a, Feature b) {
         return new CompareCostsFeature(a,b) {
-            protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+            protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
                 return a.compute ( app, pos, goal ).compareTo (
                        b.compute ( app, pos, goal ) ) <= 0;
             }            
@@ -49,7 +49,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
     
     public static Feature eq (Feature a, Feature b) {
         return new CompareCostsFeature(a,b) {
-            protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+            protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
                 return a.compute ( app, pos, goal ).equals (
                        b.compute ( app, pos, goal ) );
             }            

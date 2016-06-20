@@ -147,12 +147,12 @@ public abstract class VariableNamer implements InstantiationProposer {
      * returns the subterm containing a java block, or null
      * (helper for getProgramFromPIO())
      */
-    private JavaDLTerm findProgramInTerm(JavaDLTerm term) {
+    private Term findProgramInTerm(Term term) {
         if(!term.modalContent().isEmpty()) {
     	    return term;
     	}
     	for(int i = 0; i < term.arity(); i++) {
-    	    JavaDLTerm subterm = findProgramInTerm(term.sub(i));
+    	    Term subterm = findProgramInTerm(term.sub(i));
     	    if(subterm != null) {
     	    	return subterm;
     	    }
@@ -162,10 +162,10 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     /**
-     * returns the program contained in a PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
+     * returns the program contained in a PosInOccurrence<Term, SequentFormula<Term>>
      */
-    protected ProgramElement getProgramFromPIO(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
-    	JavaDLTerm progTerm;
+    protected ProgramElement getProgramFromPIO(PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    	Term progTerm;
     	if(pio != null
     	   && (progTerm = findProgramInTerm(pio.subTerm())) != null) {
     	    return progTerm.modalContent().program();
@@ -336,12 +336,12 @@ public abstract class VariableNamer implements InstantiationProposer {
      * variables by renaming the new variable and / or other variables
      * @param var the new program variable
      * @param goal the goal
-     * @param posOfFind the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the currently executed program
+     * @param posOfFind the PosInOccurrence<Term, SequentFormula<Term>> of the currently executed program
      * @return the renamed version of the var parameter
      */
     public abstract ProgramVariable rename(ProgramVariable var,
                                            Goal goal,
-                                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind);
+                                           PosInOccurrence<Term, SequentFormula<Term>> posOfFind);
 
     
     
@@ -378,7 +378,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * (like getProposal(), but somewhat less nicely)
      * @param basename desired base name, or null to use default
      * @param sv the schema variable
-     * @param posOfFind the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> containing the name's target program
+     * @param posOfFind the PosInOccurrence<Term, SequentFormula<Term>> containing the name's target program
      * @param posOfDeclaration the PosInProgram where the name will be declared
      *                         (or null to just be pessimistic about the scope)
      * @param previousProposals list of names which should be considered taken,
@@ -388,7 +388,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected ProgramElementName getNameProposalForSchemaVariable(
                            String basename,
                            SchemaVariable sv,
-                           PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+                           PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
                            PosInProgram posOfDeclaration,
                            ImmutableList<String> previousProposals) {
         ProgramElementName result = null;
@@ -522,14 +522,14 @@ public abstract class VariableNamer implements InstantiationProposer {
      * within its scope
      * @param name the name to be checked
      * @param sv the schema variable
-     * @param posOfFind the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the name's target program
+     * @param posOfFind the PosInOccurrence<Term, SequentFormula<Term>> of the name's target program
      * @param posOfDeclaration the PosInProgram where the name will be declared
      * @return true if the name is unique or if its uniqueness cannot be
      *         checked, else false
      */
     public boolean isUniqueNameForSchemaVariable(String name,
     					       SchemaVariable sv,
-					       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+					       PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
 					       PosInProgram posOfDeclaration) {
 	boolean result = true;
 
@@ -641,7 +641,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 	    String name = "";
 	    while (templs.hasNext()) {
                 rwgt = (RewriteTacletGoalTemplate) templs.next();
-	        JavaDLTerm t = findProgramInTerm(rwgt.replaceWith());
+	        Term t = findProgramInTerm(rwgt.replaceWith());
 	        ContextStatementBlock c =
                     (ContextStatementBlock) t.modalContent().program();
 		if (c.getStatementAt(0) instanceof LocalVariableDeclaration) {

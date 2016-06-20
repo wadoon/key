@@ -17,7 +17,7 @@ package de.uka.ilkd.key.rule.inst;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableMap;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.Taclet;
 
 /** 
@@ -29,10 +29,10 @@ public class TacletInstantiations {
     /** the rule */
     private Taclet rule;
     /** the instantations */
-    private ImmutableMap<SchemaVariable,JavaDLTerm> instantiations;
+    private ImmutableMap<SchemaVariable,Term> instantiations;
 
     public TacletInstantiations(Taclet rule,
-			      ImmutableMap<SchemaVariable,JavaDLTerm> instantiations) 
+			      ImmutableMap<SchemaVariable,Term> instantiations) 
     {
 	this.rule=rule;
 	this.instantiations=instantiations;
@@ -42,7 +42,7 @@ public class TacletInstantiations {
 	return rule;
     }
 
-    public ImmutableMap<SchemaVariable,JavaDLTerm> instantiations()
+    public ImmutableMap<SchemaVariable,Term> instantiations()
     {
 	return instantiations;
     }

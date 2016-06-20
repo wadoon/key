@@ -26,7 +26,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
 
@@ -59,7 +59,7 @@ public class MacroKeyBinding extends AbstractAction {
             return;
         }
 
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc = mousePos.getPosInOccurrence();
+        PosInOccurrence<Term, SequentFormula<Term>> posInOcc = mousePos.getPosInOccurrence();
         mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
     }
 

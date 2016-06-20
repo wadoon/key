@@ -11,7 +11,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -34,30 +34,30 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
 public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private Node joinNode = null;
-    private ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = null;
+    private ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = null;
     private JoinProcedure concreteRule = null;
     
     private SymbolicExecutionStateWithProgCnt thisSEState = null;
     private ImmutableList<SymbolicExecutionState> joinPartnerStates = null;
-    private JavaDLTerm distForm = null;
+    private Term distForm = null;
 
 	public JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+            PosInOccurrence<Term, SequentFormula<Term>> pio) {
         super(builtInRule, pio);
     }
 
-    protected JoinRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
-            ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
+    protected JoinRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pio,
+            ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
         super(rule, pio, ifInsts);
     }
 
     @Override
-    public AbstractBuiltInRuleApp replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos) {
+    public AbstractBuiltInRuleApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos) {
         return null;
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
+    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -113,18 +113,18 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     // GETTERS AND SETTERS //
 
-    public ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> getJoinPartners() {
+    public ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> getJoinPartners() {
         return joinPartners;
     }
     
-    public void setJoinPartners(ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners) {
+    public void setJoinPartners(ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners) {
         this.joinPartners = joinPartners;
         
         joinPartnerStates = ImmutableSLList.nil();
-        for (Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
+        for (Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
             final Services services = joinPartner.first.proof().getServices();
             
-            Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> partnerSEState =
+            Triple<Term, Term, Term> partnerSEState =
                   sequentToSETriple(joinPartner.first.node(), joinPartner.second, services);
             
             joinPartnerStates = joinPartnerStates.prepend(
@@ -149,7 +149,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		this.thisSEState = JoinRuleUtils.sequentToSETriple(joinNode, super.pio, joinNode.proof().getServices());
 	}
 	
-	public void setDistinguishingFormula(JavaDLTerm distForm) {
+	public void setDistinguishingFormula(Term distForm) {
 	    // null is OK: In this case, we generate the distinguishing
 	    // formula automatically. Otherwise, the term must indeed be
 	    // a formula.
@@ -158,7 +158,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 	    this.distForm  = distForm;
 	}
     
-    public JavaDLTerm getDistinguishingFormula() {
+    public Term getDistinguishingFormula() {
         return distForm;
     }
 	

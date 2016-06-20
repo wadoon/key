@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -67,7 +67,7 @@ public class TestSchemaModalOperators extends TestCase {
 	if ("".equals(t)) { 
 	    return Semisequent.nil();
 	}
-	SequentFormula<JavaDLTerm> cf0
+	SequentFormula<Term> cf0
 	    = new SequentFormula<>(TacletForTests.parseTerm(t));
 	return Semisequent.nil().insert(0, cf0).semisequent();
     }
@@ -104,20 +104,20 @@ public class TestSchemaModalOperators extends TestCase {
 	Metavariable mv_y = new Metavariable(new Name("Y"), s);
 	Metavariable mv = new Metavariable(new Name("mv"), s);
 
- 	JavaDLTerm t_mv = tf.createFunctionTerm(mv, new JavaDLTerm[]{});
- 	JavaDLTerm t_mv_x = tf.createFunctionTerm(mv_x, new JavaDLTerm[]{});
- 	JavaDLTerm t_mv_y = tf.createFunctionTerm(mv_y, new JavaDLTerm[]{});
+ 	Term t_mv = tf.createFunctionTerm(mv, new Term[]{});
+ 	Term t_mv_x = tf.createFunctionTerm(mv_x, new Term[]{});
+ 	Term t_mv_y = tf.createFunctionTerm(mv_y, new Term[]{});
 		
- 	JavaDLTerm t_c = tf.createFunctionTerm(c, new JavaDLTerm[]{});
- 	JavaDLTerm t_f_X_c = tf.createFunctionTerm(f, new JavaDLTerm[]{t_mv_x, t_c});
- 	JavaDLTerm t_f_c_X = tf.createFunctionTerm(f, new JavaDLTerm[]{t_c, t_mv_x});
+ 	Term t_c = tf.createFunctionTerm(c, new Term[]{});
+ 	Term t_f_X_c = tf.createFunctionTerm(f, new Term[]{t_mv_x, t_c});
+ 	Term t_f_c_X = tf.createFunctionTerm(f, new Term[]{t_c, t_mv_x});
 
 	consMV_f_c_X = Constraint.BOTTOM.unify(t_mv, t_f_c_X);
 	consMV_f_X_c = Constraint.BOTTOM.unify(t_mv, t_f_X_c);
 
-	SequentFormula<JavaDLTerm> cf1 = 
+	SequentFormula<Term> cf1 = 
 	    new SequentFormula<>(TacletForTests.parseTerm("A & B"), consMV_f_c_X);
-	SequentFormula<JavaDLTerm> cf2 = 
+	SequentFormula<Term> cf2 = 
 	    new SequentFormula<>(TacletForTests.parseTerm("!(A | B)"), consMV_f_X_c);
 
 	Sequent seq = Sequent.createSequent
@@ -147,17 +147,17 @@ public class TestSchemaModalOperators extends TestCase {
 	modalities = modalities.add(Modality.DIA).add(Modality.BOX);
 	SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(
 	      new Name("diabox"), Sort.FORMULA, modalities);
-	JavaDLTerm tpost = TB.tf().createTerm(fsv, new JavaDLTerm[0]);
+	Term tpost = TB.tf().createTerm(fsv, new Term[0]);
 
-	JavaDLTerm find = TB.tf().createTerm(
+	Term find = TB.tf().createTerm(
 	    osv,
-	    new JavaDLTerm[]{tpost},
+	    new Term[]{tpost},
 	    null,
             JavaBlock.EMPTY_JAVABLOCK);
 
-	JavaDLTerm replace = TB.tf().createTerm(
+	Term replace = TB.tf().createTerm(
 	    osv,
-	    new JavaDLTerm[]{TB.tt()},
+	    new Term[]{TB.tt()},
 	    null,
             JavaBlock.EMPTY_JAVABLOCK);
 
@@ -170,7 +170,7 @@ public class TestSchemaModalOperators extends TestCase {
 
 	RewriteTaclet t = rtb.getRewriteTaclet();
 
-	JavaDLTerm goal = TB.prog(
+	Term goal = TB.prog(
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
             TB.ff());
@@ -183,9 +183,9 @@ public class TestSchemaModalOperators extends TestCase {
 	         mc.getInstantiations().isInstantiated(osv));
 	 assertTrue(mc.getInstantiations().getInstantiation(osv) == Modality.DIA);
 
-	 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(goal), PosInTerm.<JavaDLTerm>getTopLevel(), true);
+	 PosInOccurrence<Term, SequentFormula<Term>> pos = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(goal), PosInTerm.<Term>getTopLevel(), true);
 	 PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
-	 JavaDLTerm instReplace = 
+	 Term instReplace = 
 	         t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();
 	 assertNotNull(instReplace);
 	 assertTrue(instReplace.op() == Modality.DIA);
@@ -197,9 +197,9 @@ public class TestSchemaModalOperators extends TestCase {
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( testmodal1 );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applyPos= new 
-			PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-					PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> applyPos= new 
+			PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+					PosInTerm.<Term>getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
@@ -231,9 +231,9 @@ public class TestSchemaModalOperators extends TestCase {
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( testmodal2 );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applyPos= new 
-			PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-					PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> applyPos= new 
+			PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+					PosInTerm.<Term>getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
@@ -261,9 +261,9 @@ public class TestSchemaModalOperators extends TestCase {
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( testmodal3 );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applyPos= new 
-			PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-					PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> applyPos= new 
+			PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+					PosInTerm.<Term>getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	

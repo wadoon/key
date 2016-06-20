@@ -15,7 +15,7 @@ package de.uka.ilkd.key.pp;
 
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 /**
@@ -27,11 +27,11 @@ public interface SequentPrintFilterEntry {
     /**
      * Formula to display
      */
-    SequentFormula<JavaDLTerm> getFilteredFormula   ();
+    SequentFormula<Term> getFilteredFormula   ();
 
     /**
      * Original formula from sequent
      */
-    SequentFormula<JavaDLTerm> getOriginalFormula   ();
+    SequentFormula<Term> getOriginalFormula   ();
 
 }

@@ -41,7 +41,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -230,7 +230,7 @@ public class Proof implements Named {
             fireProofClosed();
     }
 
-    public Proof(String name, JavaDLTerm problem, String header, InitConfig initConfig ) {
+    public Proof(String name, Term problem, String header, InitConfig initConfig ) {
         this ( name, Sequent.createSuccSequent
                         (Semisequent.nil().insert(0,
                                         new SequentFormula<>(problem)).semisequent()),
@@ -638,7 +638,7 @@ public class Proof implements Named {
                         final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) visitedNode
                                 .getAppliedRuleApp();
 
-                        for (Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinApp
+                        for (Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinApp
                                 .getJoinPartners()) {
                             final Goal linkedGoal = joinPartner.first;
 

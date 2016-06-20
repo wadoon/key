@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
@@ -52,12 +52,12 @@ public class ConstantCondition extends VariableConditionAdapter {
             return true;
         }
         if (var instanceof TermSV) {
-            JavaDLTerm tInst = (JavaDLTerm) instMap.getInstantiation((TermSV)t);
+            Term tInst = (Term) instMap.getInstantiation((TermSV)t);
             boolean atomic = (tInst.arity() == 0);
             return negated ? !atomic : atomic;
         }
         if (var instanceof FormulaSV) {
-            JavaDLTerm tInst = (JavaDLTerm) instMap.getInstantiation((FormulaSV)t);
+            Term tInst = (Term) instMap.getInstantiation((FormulaSV)t);
             boolean atomic = (tInst.arity() == 0);
             return negated ? !atomic : atomic;
         }

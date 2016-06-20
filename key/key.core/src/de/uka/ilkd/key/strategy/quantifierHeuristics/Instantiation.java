@@ -31,7 +31,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -43,22 +43,22 @@ class Instantiation {
    /** universally quantifiable variable bound in<code>allTerm</code> */
    private final QuantifiableVariable firstVar;
 
-   private final JavaDLTerm matrix;
+   private final Term matrix;
 
    /**
     * Literals occurring in the sequent at hand. This is used for branch
     * prediction
     */
-   private ImmutableSet<JavaDLTerm> assumedLiterals = DefaultImmutableSet
-         .<JavaDLTerm> nil();
+   private ImmutableSet<Term> assumedLiterals = DefaultImmutableSet
+         .<Term> nil();
 
-   /** HashMap from instance(<code>JavaDLTerm</code>) to cost <code>Long</code> */
-   private final Map<JavaDLTerm, Long> instancesWithCosts = new LinkedHashMap<JavaDLTerm, Long>();
+   /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
+   private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<Term, Long>();
 
    /** the <code>TriggersSet</code> of this <code>allTerm</code> */
    private final TriggersSet triggersSet;
 
-   private Instantiation(JavaDLTerm allterm, Sequent seq, Services services) {
+   private Instantiation(Term allterm, Sequent seq, Services services) {
       firstVar = allterm.varsBoundHere(0).get(0);
       matrix = TriggerUtils.discardQuantifiers(allterm);
       /* Terms bound in every formula on <code>goal</code> */
@@ -67,11 +67,11 @@ class Instantiation {
       addInstances(sequentToTerms(seq), services);
    }
 
-   private static JavaDLTerm lastQuantifiedFormula = null;
+   private static Term lastQuantifiedFormula = null;
    private static Sequent lastSequent = null;
    private static Instantiation lastResult = null;
 
-   static Instantiation create(JavaDLTerm qf, Sequent seq, Services services) {	
+   static Instantiation create(Term qf, Sequent seq, Services services) {	
       synchronized(Instantiation.class) {
          if (qf == lastQuantifiedFormula && seq == lastSequent)
             return lastResult;
@@ -85,9 +85,9 @@ class Instantiation {
       return result;
    }
 
-   private static ImmutableSet<JavaDLTerm> sequentToTerms(Sequent seq) {
-      ImmutableList<JavaDLTerm> res = ImmutableSLList.<JavaDLTerm> nil();
-      for (final SequentFormula<JavaDLTerm> cf : seq) {
+   private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
+      ImmutableList<Term> res = ImmutableSLList.<Term> nil();
+      for (final SequentFormula<Term> cf : seq) {
          res = res.prepend(cf.formula());
       }
       return DefaultImmutableSet.fromImmutableList(res);
@@ -98,10 +98,10 @@ class Instantiation {
     *            on which trigger are doning matching search every
     *            <code>Substitution</code> s by matching <code>triggers</code>
     *            from <code>triggersSet</code> to <code>terms</code> compute
-    *            their cost and store the pair of instance (JavaDLTerm) and
+    *            their cost and store the pair of instance (Term) and
     *            cost(Long) in <code>instancesCostCache</code>
     */
-   private void addInstances(ImmutableSet<JavaDLTerm> terms, Services services) {
+   private void addInstances(ImmutableSet<Term> terms, Services services) {
       for (final Trigger t : triggersSet.getAllTriggers()) {
          for (final Substitution sub : t.getSubstitutionsFromTerms(terms,
                services)) {
@@ -114,20 +114,20 @@ class Instantiation {
    }
 
    private void addArbitraryInstance(Services services) {
-      ImmutableMap<QuantifiableVariable, JavaDLTerm> varMap = DefaultImmutableMap
-            .<QuantifiableVariable, JavaDLTerm> nilMap();
+      ImmutableMap<QuantifiableVariable, Term> varMap = DefaultImmutableMap
+            .<QuantifiableVariable, Term> nilMap();
 
       for (QuantifiableVariable quantifiableVariable : triggersSet
             .getUniQuantifiedVariables()) {
          final QuantifiableVariable v = quantifiableVariable;
-         final JavaDLTerm inst = createArbitraryInstantiation(v, services);
+         final Term inst = createArbitraryInstantiation(v, services);
          varMap = varMap.put(v, inst);
       }
 
       addInstance(new Substitution(varMap), services);
    }
 
-   private JavaDLTerm createArbitraryInstantiation(QuantifiableVariable var,
+   private Term createArbitraryInstantiation(QuantifiableVariable var,
          JavaDLTermServices services) {
       return services.getTermBuilder().func (var.sort().getCastSymbol (services),
             services.getTermBuilder().zero());
@@ -149,7 +149,7 @@ class Instantiation {
     * @param cost
     */
    private void addInstance(Substitution sub, long cost) {
-      final JavaDLTerm inst = sub.getSubstitutedTerm(firstVar);
+      final Term inst = sub.getSubstitutedTerm(firstVar);
       final Long oldCost = instancesWithCosts.get(inst);
       if (oldCost == null || oldCost.longValue() >= cost)
          instancesWithCosts.put ( inst, Long.valueOf ( cost ) );
@@ -161,16 +161,16 @@ class Instantiation {
     * @return all literals in antesequent, and all negation of literal in
     *         succedent
     */
-   private ImmutableSet<JavaDLTerm> initAssertLiterals(Sequent seq, JavaDLTermServices services) {
-      ImmutableSet<JavaDLTerm> assertLits = DefaultImmutableSet.<JavaDLTerm> nil();
-      for (final SequentFormula<JavaDLTerm> cf : seq.antecedent()) {
-         final JavaDLTerm atom = cf.formula();
+   private ImmutableSet<Term> initAssertLiterals(Sequent seq, JavaDLTermServices services) {
+      ImmutableSet<Term> assertLits = DefaultImmutableSet.<Term> nil();
+      for (final SequentFormula<Term> cf : seq.antecedent()) {
+         final Term atom = cf.formula();
          final Operator op = atom.op();
          if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
             assertLits = assertLits.add(atom);
       }
-      for (final SequentFormula<JavaDLTerm> cf : seq.succedent()) {
-         final JavaDLTerm atom = cf.formula();
+      for (final SequentFormula<Term> cf : seq.succedent()) {
+         final Term atom = cf.formula();
          final Operator op = atom.op();
          if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
             assertLits = assertLits.add(services.getTermBuilder().not(atom));
@@ -182,12 +182,12 @@ class Instantiation {
     * Try to find the cost of an instance(inst) according its quantified
     * formula and current goal.
     */
-   static RuleAppCost computeCost(JavaDLTerm inst, JavaDLTerm form, Sequent seq,
+   static RuleAppCost computeCost(Term inst, Term form, Sequent seq,
          Services services) {
       return Instantiation.create(form, seq, services).computeCostHelp(inst);
    }
 
-   private RuleAppCost computeCostHelp(JavaDLTerm inst) {
+   private RuleAppCost computeCostHelp(Term inst) {
       Long cost = instancesWithCosts.get(inst);
       if ( cost == null && ( inst.op () instanceof SortDependingFunction
             && ((SortDependingFunction)inst.op()).getKind().equals(Sort.CAST_NAME)) )
@@ -204,15 +204,15 @@ class Instantiation {
    }
 
    /** get all instances from instancesCostCache subsCache */
-   ImmutableSet<JavaDLTerm> getSubstitution() {
-      ImmutableSet<JavaDLTerm> res = DefaultImmutableSet.<JavaDLTerm> nil();
-      for (final JavaDLTerm inst : instancesWithCosts.keySet()) {
+   ImmutableSet<Term> getSubstitution() {
+      ImmutableSet<Term> res = DefaultImmutableSet.<Term> nil();
+      for (final Term inst : instancesWithCosts.keySet()) {
          res = res.add(inst);
       }
       return res;
    }
 
-   private JavaDLTerm getMatrix() {
+   private Term getMatrix() {
       return matrix;
    }
 

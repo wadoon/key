@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -66,55 +66,55 @@ public class TestProofTree extends TestCase {
 
 	TermFactory tf = TacletForTests.services().getTermFactory();
 	
-	JavaDLTerm t_b1=tf.createTerm(Equality.EQUALS,
+	Term t_b1=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b1),
 		                tf.createTerm(b1));
-	JavaDLTerm t_b2=tf.createTerm(Equality.EQUALS,
+	Term t_b2=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b2),
 		                tf.createTerm(b2));
-	JavaDLTerm t_b3=tf.createTerm(Equality.EQUALS,
+	Term t_b3=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b3),
 		                tf.createTerm(b3));
-	JavaDLTerm t_b4=tf.createTerm(Equality.EQUALS,
+	Term t_b4=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b4),
 		                tf.createTerm(b4));
-	JavaDLTerm t_b5=tf.createTerm(Equality.EQUALS,
+	Term t_b5=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b5),
 		                tf.createTerm(b5));
-	JavaDLTerm t_b6=tf.createTerm(Equality.EQUALS,
+	Term t_b6=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b6),
 		                tf.createTerm(b6));
-	JavaDLTerm t_b7=tf.createTerm(Equality.EQUALS,
+	Term t_b7=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b7),
 		                tf.createTerm(b7));
 
 	Sequent s1=Sequent.createSequent
 	    (Semisequent.nil().insert(0, new
-	    SequentFormula<JavaDLTerm>(t_b1)).semisequent(),
+	    SequentFormula<Term>(t_b1)).semisequent(),
 	     Semisequent.nil()); 
 	Sequent s2=Sequent.createSequent
 	    (Semisequent.nil().insert(0, new
-		SequentFormula<JavaDLTerm>(t_b2)).semisequent(),
+		SequentFormula<Term>(t_b2)).semisequent(),
 	     Semisequent.nil()); 
 	Sequent s3=Sequent.createSequent
 	    (Semisequent.nil().insert(0, new
-		SequentFormula<JavaDLTerm>(t_b3)).semisequent(),
+		SequentFormula<Term>(t_b3)).semisequent(),
 	     Semisequent.nil()); 
 	Sequent s4=Sequent.createSequent
 	    (Semisequent.nil().insert(0, new
-		SequentFormula<JavaDLTerm>(t_b4)).semisequent(),
+		SequentFormula<Term>(t_b4)).semisequent(),
 	     Semisequent.nil()); 
 	Sequent s5=Sequent.createSequent
 	    (Semisequent.nil().insert(0, new
-		SequentFormula<JavaDLTerm>(t_b5)).semisequent(),
+		SequentFormula<Term>(t_b5)).semisequent(),
 	     Semisequent.nil()); 
 	Sequent s6=Sequent.createSequent
 	    (Semisequent.nil().insert(0, new
-		SequentFormula<JavaDLTerm>(t_b6)).semisequent(),
+		SequentFormula<Term>(t_b6)).semisequent(),
 	     Semisequent.nil()); 
 	Sequent s7=Sequent.createSequent
 	    (Semisequent.nil().insert(0, new
-		SequentFormula<JavaDLTerm>(t_b7)).semisequent(),
+		SequentFormula<Term>(t_b7)).semisequent(),
 	     Semisequent.nil()); 
 
 	p=new Proof("TestProofTree", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));

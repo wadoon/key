@@ -5,7 +5,7 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -74,9 +74,9 @@ public class BindVariablesInstruction implements MatchInstruction {
         public MatchConditions match(LogicVariable instantiationCandidate, MatchConditions matchCond, Services services) {
             final Object foundMapping = matchCond.getInstantiations().getInstantiation(op);
             if(foundMapping == null) {
-                final JavaDLTerm substTerm = services.getTermBuilder().var(instantiationCandidate);
+                final Term substTerm = services.getTermBuilder().var(instantiationCandidate);
                 matchCond = addInstantiation(substTerm, matchCond, services);
-            } else if (((JavaDLTerm)foundMapping).op() != instantiationCandidate) {
+            } else if (((Term)foundMapping).op() != instantiationCandidate) {
                 matchCond = null;        
             }
             return matchCond;
@@ -89,7 +89,7 @@ public class BindVariablesInstruction implements MatchInstruction {
         }
 
         @Override
-        public MatchConditions match(JavaDLTerm instantiationCandidate,
+        public MatchConditions match(Term instantiationCandidate,
                 MatchConditions matchCond, Services services) {
             throw new UnsupportedOperationException();
         } 

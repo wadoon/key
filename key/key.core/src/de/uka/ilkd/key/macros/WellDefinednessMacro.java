@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -64,12 +64,12 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof,
-                                      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+                                      PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         return new WellDefinednessStrategy();
     }
 
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         if (proof == null
                 || proof.isDisposed()
                 || !WellDefinednessCheck.isOn()) {
@@ -113,7 +113,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if(name.startsWith(WD_PREFIX)) {
                 return NumberRuleAppCost.getZeroCost();
@@ -123,12 +123,12 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
             return true;
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal,
+        public void instantiateApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal,
                 RuleAppCostCollector collector) {
         }
 

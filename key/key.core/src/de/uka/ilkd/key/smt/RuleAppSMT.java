@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
@@ -37,12 +37,12 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     private final String title;
 
 
-    RuleAppSMT( SMTRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio ) {
+    RuleAppSMT( SMTRule rule, PosInOccurrence<Term, SequentFormula<Term>> pio ) {
     	this(rule, pio,  null, "SMT Rule App");
     }
 
-    private RuleAppSMT(SMTRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
-                       ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts, String title) {
+    private RuleAppSMT(SMTRule rule, PosInOccurrence<Term, SequentFormula<Term>> pio,
+                       ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts, String title) {
         super(rule, pio, ifInsts);
         this.title = title;
     }
@@ -53,7 +53,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     	this.title = title;
     }
     
-	public RuleAppSMT replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos) {
+	public RuleAppSMT replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos) {
 	    return this;
     }
 
@@ -67,7 +67,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 	}
 
     @Override
-    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence() {
+    public PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence() {
 	return null;
     }
 
@@ -80,18 +80,18 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     public static class SMTRule implements BuiltInRule {
 	public static final Name name = new Name("SMTRule");
 
-	  public RuleAppSMT createApp( PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+	  public RuleAppSMT createApp( PosInOccurrence<Term, SequentFormula<Term>> pos) {
 	     return createApp(pos, null);
 	  }
 
 	@Override
-	public RuleAppSMT createApp( PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, JavaDLTermServices services ) {
+	public RuleAppSMT createApp( PosInOccurrence<Term, SequentFormula<Term>> pos, JavaDLTermServices services ) {
 		return new RuleAppSMT( this, pos );
 	}
 
 	
 	@Override
-	public boolean isApplicable(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+	public boolean isApplicable(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio) {
 	    return false;
 	}
 
@@ -146,7 +146,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public RuleAppSMT setIfInsts(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
+    public RuleAppSMT setIfInsts(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
         setMutable(ifInsts);
         return this;
     }

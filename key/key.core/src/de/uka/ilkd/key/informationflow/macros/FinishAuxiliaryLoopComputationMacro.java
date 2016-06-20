@@ -10,7 +10,7 @@ import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.LoopInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -28,7 +28,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                     proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -49,7 +49,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           final Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
+                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
                                           ProverTaskListener listener) {
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -67,7 +67,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
 
         // create and register resulting taclets
-        final JavaDLTerm result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final LoopInfFlowUnfoldTacletBuilder tacletBuilder =
                 new LoopInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setLoopInv(loopInv);

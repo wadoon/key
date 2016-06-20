@@ -16,7 +16,7 @@ package de.uka.ilkd.key.proof.proofevent;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /** 
  * An instance of this class informs the listerns if a formula has been
@@ -24,22 +24,22 @@ import de.uka.ilkd.key.logic.JavaDLTerm;
  */
 public class NodeRedundantAddChange implements NodeChange {
 
-    /** the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the formula that has been tried to add */
-    private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio;
+    /** the PosInOccurrence<Term, SequentFormula<Term>> of the formula that has been tried to add */
+    private final PosInOccurrence<Term, SequentFormula<Term>> pio;
     
     /**
      *  creates an instance 
-     *  @param pio the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the formula that has been tried to add
+     *  @param pio the PosInOccurrence<Term, SequentFormula<Term>> of the formula that has been tried to add
      */
-    public NodeRedundantAddChange(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+    public NodeRedundantAddChange(PosInOccurrence<Term, SequentFormula<Term>> pio) {
         this.pio = pio;
     }         
 
     /**
-     * returns the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the formula that has been tried to add
+     * returns the PosInOccurrence<Term, SequentFormula<Term>> of the formula that has been tried to add
      * @return the PosInOccurrrence 
      */
-    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getPos() {
+    public PosInOccurrence<Term, SequentFormula<Term>> getPos() {
         return pio;
     }
     

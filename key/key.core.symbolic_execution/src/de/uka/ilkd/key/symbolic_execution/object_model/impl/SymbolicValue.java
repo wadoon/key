@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
@@ -36,7 +36,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
    /**
     * The array index.
     */
-   private final JavaDLTerm arrayIndex;
+   private final Term arrayIndex;
    
    /**
     * The {@link IProgramVariable}.
@@ -44,27 +44,27 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
    private final IProgramVariable programVariable;
    
    /**
-    * The value {@link JavaDLTerm}.
+    * The value {@link Term}.
     */
-   private final JavaDLTerm value;
+   private final Term value;
    
    /**
     * The optional condition under which this value is valid.
     */
-   private final JavaDLTerm condition;
+   private final Term condition;
 
    /**
     * Constructor.
     * @param services The {@link Services} to use.
     * @param arrayIndex The array index.
-    * @param value The value {@link JavaDLTerm}.
+    * @param value The value {@link Term}.
     * @param condition The optional condition under which this value is valid.
     * @param settings The {@link IModelSettings} to use.
     */
    public SymbolicValue(Services services, 
-                        JavaDLTerm arrayIndex, 
-                        JavaDLTerm value, 
-                        JavaDLTerm condition, 
+                        Term arrayIndex, 
+                        Term value, 
+                        Term condition, 
                         IModelSettings settings) {
       super(settings);
       assert services != null;
@@ -80,14 +80,14 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     * Constructor.
     * @param services The {@link Services} to use.
     * @param programVariable The {@link IProgramVariable}.
-    * @param value The value {@link JavaDLTerm}.
+    * @param value The value {@link Term}.
     * @param condition The optional condition under which this value is valid.
     * @param settings The {@link IModelSettings} to use.
     */
    public SymbolicValue(Services services, 
                         IProgramVariable programVariable, 
-                        JavaDLTerm value, 
-                        JavaDLTerm condition, 
+                        Term value, 
+                        Term condition, 
                         IModelSettings settings) {
       super(settings);
       assert services != null;
@@ -133,7 +133,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getArrayIndex() {
+   public Term getArrayIndex() {
       return arrayIndex;
    }
 
@@ -157,7 +157,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getValue() {
+   public Term getValue() {
       return value;
    }
 
@@ -198,7 +198,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getCondition() {
+   public Term getCondition() {
       return condition;
    }
 

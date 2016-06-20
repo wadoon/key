@@ -19,7 +19,7 @@ import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -52,16 +52,16 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
    @Override
    public void updateLabels(TermLabelState state,
                             Services services, 
-                            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, 
-                            JavaDLTerm applicationTerm, 
-                            JavaDLTerm modalityTerm, 
+                            PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, 
+                            Term applicationTerm, 
+                            Term modalityTerm, 
                             Rule rule, 
                             RuleApp ruleApp,
                             Goal goal, 
                             Object hint, 
-                            JavaDLTerm tacletTerm, 
+                            Term tacletTerm, 
                             Operator newTermOp, 
-                            ImmutableArray<JavaDLTerm> newTermSubs, 
+                            ImmutableArray<Term> newTermSubs, 
                             ImmutableArray<QuantifiableVariable> newTermBoundVars, 
                             JavaBlock newTermJavaBlock, 
                             Set<TermLabel> labels) {

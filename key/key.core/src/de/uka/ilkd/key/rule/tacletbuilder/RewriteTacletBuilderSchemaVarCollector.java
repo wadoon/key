@@ -10,7 +10,7 @@ import java.util.Set;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.JavaDLVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -51,17 +51,17 @@ public class RewriteTacletBuilderSchemaVarCollector {
     }
 
 
-    private Set<SchemaVariable> collectSchemaVariables(JavaDLTerm t) {
+    private Set<SchemaVariable> collectSchemaVariables(Term t) {
         final Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 
         t.execPreOrder(new JavaDLVisitor() {
             @Override
-            public boolean visitSubtree(JavaDLTerm visited) {
+            public boolean visitSubtree(Term visited) {
                 return true;
             }
 
             @Override
-            public void visit(JavaDLTerm visited) {
+            public void visit(Term visited) {
                 if (visited.op() instanceof SchemaVariable) {
                     result.add((SchemaVariable) visited.op());
                 }
@@ -69,13 +69,13 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
             @Override
-            public void subtreeEntered(JavaDLTerm subtreeRoot) {
+            public void subtreeEntered(Term subtreeRoot) {
                 // nothing to do
             }
 
 
             @Override
-            public void subtreeLeft(JavaDLTerm subtreeRoot) {
+            public void subtreeLeft(Term subtreeRoot) {
                 // nothing to do
             }
         });
@@ -87,7 +87,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
     private Set<SchemaVariable> collectSchemaVariables(Sequent s) {
         Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 
-        for (final SequentFormula<JavaDLTerm> cf : s) {
+        for (final SequentFormula<Term> cf : s) {
             result.addAll(collectSchemaVariables(cf.formula()));
         }
 

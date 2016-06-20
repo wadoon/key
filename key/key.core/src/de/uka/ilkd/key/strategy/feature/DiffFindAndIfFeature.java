@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
@@ -36,11 +36,11 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
 
     private DiffFindAndIfFeature () {}
     
-    protected boolean filter ( TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal ) {
+    protected boolean filter ( TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal ) {
         assert pos != null : "Feature is only applicable to rules with find";
         
         ImmutableList<IfFormulaInstantiation> list = app.ifFormulaInstantiations();
-        final SequentFormula<JavaDLTerm> findFormula = pos.sequentFormula();
+        final SequentFormula<Term> findFormula = pos.sequentFormula();
         final boolean findIsInAntec = pos.isInAntec();
         
         assert list != null;
@@ -48,7 +48,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
         for (final IfFormulaInstantiation aList : list) {
             final IfFormulaInstSeq iffi = (IfFormulaInstSeq) aList;
             assert iffi != null;
-            final SequentFormula<JavaDLTerm> ifFormula = iffi.getConstrainedFormula();
+            final SequentFormula<Term> ifFormula = iffi.getConstrainedFormula();
 
             final boolean result = findIsInAntec != iffi.inAntec()
                     || !findFormula.equals(ifFormula);

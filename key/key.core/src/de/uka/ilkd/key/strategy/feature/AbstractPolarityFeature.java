@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.op.IfThenElse;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 
 
@@ -39,13 +39,13 @@ public abstract class AbstractPolarityFeature {
      *         <code>Boolean.TRUE</code>,<code>Boolean.FALSE</code> or
      *         <code>null</code>
      */
-    protected Boolean polarity (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Boolean formulaPol) {
+    protected Boolean polarity (PosInOccurrence<Term, SequentFormula<Term>> pos, Boolean formulaPol) {
         if ( formulaPol == null ) return null;
 
-        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator ();
+        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
 
         while ( it.next () != -1 ) {
-            final JavaDLTerm t = it.getSubTerm ();
+            final Term t = it.getSubTerm ();
             final Operator op = t.op ();
 
             if ( op == Junctor.NOT || op == Junctor.IMP && it.getChild () == 0 )

@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
@@ -41,8 +41,8 @@ public enum LateApplicationCheck {
     private List<String> check(ApplicationCheck check, Sequent sequent,
             Node cutNode) {
         List<String> conflicts = new LinkedList<String>();
-        for (Iterator<SequentFormula<JavaDLTerm>> it = sequent.iterator(); it.hasNext();) {
-            SequentFormula<JavaDLTerm> sf = it.next();
+        for (Iterator<SequentFormula<Term>> it = sequent.iterator(); it.hasNext();) {
+            SequentFormula<Term> sf = it.next();
             String result = check.check(cutNode, sf.formula());
             if (result != null) {
                 conflicts.add(result);

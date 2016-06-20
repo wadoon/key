@@ -68,7 +68,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -97,9 +97,9 @@ public final class TypeConverter {
                 .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
     
-    private JavaDLTerm translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
+    private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
 
-        final JavaDLTerm[] subs = new JavaDLTerm[op.getArity()];
+        final Term[] subs = new Term[op.getArity()];
         for (int i = 0, n = op.getArity(); i < n; i++) {
             subs[i] = convertToLogicElement(op.getExpressionAt(i), ec);
         }
@@ -137,7 +137,7 @@ public final class TypeConverter {
     }
 
 
-    private JavaDLTerm convertReferencePrefix(ReferencePrefix prefix,
+    private Term convertReferencePrefix(ReferencePrefix prefix,
 					ExecutionContext ec) {
 	Debug.out("typeconverter: (prefix, class)", prefix,
 		  (prefix != null ? prefix.getClass() : null));
@@ -173,27 +173,27 @@ public final class TypeConverter {
     }
 
 
-    public JavaDLTerm findThisForSortExact(Sort s, ExecutionContext ec){
+    public Term findThisForSortExact(Sort s, ExecutionContext ec){
         ProgramElement pe = ec.getRuntimeInstance();
         if(pe == null) return null;
-        JavaDLTerm inst = convertToLogicElement(pe, ec);
+        Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
 
     }
 
-    public JavaDLTerm findThisForSort(Sort s, ExecutionContext ec){
+    public Term findThisForSort(Sort s, ExecutionContext ec){
         ProgramElement pe = ec.getRuntimeInstance();
         if(pe == null) return null;
-        JavaDLTerm inst = convertToLogicElement(pe, ec);
+        Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
     }
 
 
-    public JavaDLTerm findThisForSort(Sort s,
-	    			JavaDLTerm self,
+    public Term findThisForSort(Sort s,
+	    			Term self,
 	    			KeYJavaType context,
 	    			boolean exact) {
-        JavaDLTerm result = self;
+        Term result = self;
         LocationVariable inst;
         while(!exact && !context.getSort().extendsTrans(s)
               || exact && !context.getSort().equals(s)){
@@ -208,15 +208,15 @@ public final class TypeConverter {
         return result;
     }
 
-    public JavaDLTerm convertMethodReference(MethodReference mr, ExecutionContext ec) {
+    public Term convertMethodReference(MethodReference mr, ExecutionContext ec) {
         Debug.out("TypeConverter: MethodReference: ", mr);
     	// FIXME this needs to handle two state?
     	final ReferencePrefix prefix = mr.getReferencePrefix();
-    	JavaDLTerm p = convertReferencePrefix(prefix, ec);
+    	Term p = convertReferencePrefix(prefix, ec);
     	IProgramMethod pm = mr.method(services, services.getProgramServices().getTypeConverter().getKeYJavaType(p), ec);
     	if(pm.isModel()) {
     	  ImmutableArray<? extends Expression> args = mr.getArguments();
-    	  JavaDLTerm[] argTerms = new JavaDLTerm[args.size()+2]; // heap, self, 
+    	  Term[] argTerms = new Term[args.size()+2]; // heap, self, 
     	  int index = 0;
     	  for(LocationVariable h : services.getTheories().getHeapLDT().getAllHeaps()) {
     		  if(h == services.getTheories().getHeapLDT().getSavedHeap()) {
@@ -233,7 +233,7 @@ public final class TypeConverter {
     	throw new IllegalArgumentException ("TypeConverter could not handle this");
     }
  
-    public JavaDLTerm convertVariableReference(VariableReference fr,
+    public Term convertVariableReference(VariableReference fr,
 					 ExecutionContext ec) {
 	Debug.out("TypeConverter: FieldReference: ", fr);
 	final ReferencePrefix prefix = fr.getReferencePrefix();
@@ -270,10 +270,10 @@ public final class TypeConverter {
     }
 
 
-    public JavaDLTerm convertArrayReference(ArrayReference ar,
+    public Term convertArrayReference(ArrayReference ar,
 				      ExecutionContext ec){
-        final JavaDLTerm[] index = new JavaDLTerm[ar.getDimensionExpressions().size()];
-        final JavaDLTerm t = convertToLogicElement(ar.getReferencePrefix(), ec);
+        final Term[] index = new Term[ar.getDimensionExpressions().size()];
+        final Term t = convertToLogicElement(ar.getReferencePrefix(), ec);
         for (int i=0; i<index.length; i++) {
             index[i] =
                 convertToLogicElement(ar.getDimensionExpressions().get(i), ec);
@@ -282,11 +282,11 @@ public final class TypeConverter {
         return tb.dotArr(t, index[0]);
     }
 
-    private JavaDLTerm convertToInstanceofTerm(Instanceof io,
+    private Term convertToInstanceofTerm(Instanceof io,
 					 ExecutionContext ec) {
 	final KeYJavaType type = ((TypeReference)io.getChildAt(1)).
 	    getKeYJavaType();
-	final JavaDLTerm obj = convertToLogicElement(io.getChildAt(0), ec);
+	final Term obj = convertToLogicElement(io.getChildAt(0), ec);
 	final Sort s = type.getSort();
 	final SortDependingFunction instanceOfSymbol = s.getInstanceofSymbol(services);
 
@@ -298,12 +298,12 @@ public final class TypeConverter {
     }
 
 
-    public JavaDLTerm convertToLogicElement(ProgramElement pe) {
+    public Term convertToLogicElement(ProgramElement pe) {
 	return convertToLogicElement(pe, null);
     }
 
 
-    public JavaDLTerm convertToLogicElement(ProgramElement pe,
+    public Term convertToLogicElement(ProgramElement pe,
 				      ExecutionContext ec) {
 	Debug.out("typeconverter: called for:", pe, pe.getClass());
 	if (pe instanceof ProgramVariable) {
@@ -364,9 +364,9 @@ public final class TypeConverter {
     /**
      * dispatches the given literal and converts it
      * @param lit the Literal to be converted
-     * @return the JavaDLTerm representing <tt>lit</tt> in the logic
+     * @return the Term representing <tt>lit</tt> in the logic
      */
-    private JavaDLTerm convertLiteralExpression(Literal lit) {
+    private Term convertLiteralExpression(Literal lit) {
         if (lit instanceof NullLiteral) {
             return tb.NULL();
         } else {
@@ -522,11 +522,11 @@ public final class TypeConverter {
     /**
      * converts a logical term to an AST node if possible. If this fails
      * it throws a runtime exception.
-     * @param term the JavaDLTerm to be converted
-     * @return the JavaDLTerm as an program AST node of type expression
+     * @param term the Term to be converted
+     * @return the Term as an program AST node of type expression
      * @throws RuntimeException iff a conversion is not possible
      */
-    public Expression convertToProgramElement(JavaDLTerm term) {
+    public Expression convertToProgramElement(Term term) {
         assert term != null;
         if (term.op() == getTheories().getHeapLDT().getNull()) {
             return NullLiteral.NULL;
@@ -563,7 +563,7 @@ public final class TypeConverter {
     }
 
 
-    private Expression translateJavaCast(JavaDLTerm term, ExtList children) {
+    private Expression translateJavaCast(Term term, ExtList children) {
         if (term.op() instanceof Function) {
             Function function = (Function)term.op();
             if (function instanceof SortDependingFunction) {
@@ -584,7 +584,7 @@ public final class TypeConverter {
     }
 
 
-    public KeYJavaType getKeYJavaType(JavaDLTerm t) {
+    public KeYJavaType getKeYJavaType(Term t) {
 	KeYJavaType result = null;
 	if(t.sort().extendsTrans(services.getProgramServices().getJavaInfo().objectSort())) {
 	    result = services.getProgramServices().getJavaInfo().getKeYJavaType(t.sort());
@@ -965,7 +965,7 @@ public final class TypeConverter {
         return new TypeConverter(services);
     }
 
-    private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, JavaDLTerm[] subs, Services services, ExecutionContext ec) {
+    private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, Services services, ExecutionContext ec) {
         for (LDT ldt : getTheories().getModels()) {
             if (ldt.isResponsible(op, subs, services, ec)) {
                 return ldt;

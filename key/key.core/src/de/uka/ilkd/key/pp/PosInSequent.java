@@ -16,16 +16,16 @@ package de.uka.ilkd.key.pp;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * describes a position in a sequent including the bounds within a string
- * representation of the sequent. In contrast to PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> and
- * PosInTerm<JavaDLTerm> of package de.uka.ilkd.key.logic, this class is mutable,
+ * representation of the sequent. In contrast to PosInOccurrence<Term, SequentFormula<Term>> and
+ * PosInTerm<Term> of package de.uka.ilkd.key.logic, this class is mutable,
  * i.e the bounds may be set later in an already existing PosInSequent
  * instance. Apart from the bounds, PosInSequent has the following kind
  * of states: It marks the whole sequent, the whole antecedent, the whole
- * succedent or includes a PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> if a position within a
+ * succedent or includes a PosInOccurrence<Term, SequentFormula<Term>> if a position within a
  * constrained formula of the sequent is referred to. In the latter case
  * it contains also information whether the whole constrained formula
  * is referred to or the formula or the constraint.
@@ -34,7 +34,7 @@ public class PosInSequent {
 
     private Range bounds;
     private boolean sequent;
-    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc=null;
+    private PosInOccurrence<Term, SequentFormula<Term>> posInOcc=null;
 
     private Range firstJavaStatementRange = null;
     /**
@@ -45,19 +45,19 @@ public class PosInSequent {
     }
 
     /**
-     * creates a PosInSequent that points to a SequentFormula<JavaDLTerm> described by
-     * a PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>. Additionally a boolean indicates whether the
-     * the whole SequentFormula<JavaDLTerm> or just the formula is meant.
+     * creates a PosInSequent that points to a SequentFormula<Term> described by
+     * a PosInOccurrence<Term, SequentFormula<Term>>. Additionally a boolean indicates whether the
+     * the whole SequentFormula<Term> or just the formula is meant.
      * @param posInOcc the PositionInOccurrence describing the
-     * SequentFormula<JavaDLTerm> and maybe a subterm of its formula.
+     * SequentFormula<Term> and maybe a subterm of its formula.
      */
-    public static PosInSequent createCfmaPos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+    public static PosInSequent createCfmaPos(PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
 	return new PosInSequent(posInOcc, false);
     }
 
 
     // use the create... above for getting instances of PosInSequent
-    private PosInSequent(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc, 
+    private PosInSequent(PosInOccurrence<Term, SequentFormula<Term>> posInOcc, 
 			 boolean sequent  ){
 	this.posInOcc=posInOcc;
 	this.sequent=sequent;
@@ -104,10 +104,10 @@ public class PosInSequent {
     
 
     /**
-     * returns the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> if the PosInSequent marks a
-     * SequentFormula<JavaDLTerm> or parts of it, null otherwise.
+     * returns the PosInOccurrence<Term, SequentFormula<Term>> if the PosInSequent marks a
+     * SequentFormula<Term> or parts of it, null otherwise.
      */	
-    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getPosInOccurrence() {
+    public PosInOccurrence<Term, SequentFormula<Term>> getPosInOccurrence() {
 	return posInOcc;
     }
 		

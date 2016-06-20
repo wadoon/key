@@ -24,7 +24,7 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level
@@ -90,17 +90,17 @@ public class Transformer extends Function {
      * @param pio A position in an occurrence of a term
      * @return true if inside a term transformer, false otherwise
      */
-    public static boolean inTransformer(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+    public static boolean inTransformer(PosInOccurrence<Term, SequentFormula<Term>> pio) {
         boolean trans = false;
         if (pio == null) {
             return false;
         }
         if ( pio.posInTerm () != null ) {
-            PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pio.iterator ();
+            PIOPathIterator<Term, SequentFormula<Term>> it = pio.iterator ();
             Operator        op;
 
             while ( it.next () != -1 && !trans) {
-                final JavaDLTerm t = it.getSubTerm ();
+                final Term t = it.getSubTerm ();
                 op = t.op ();
                 trans = op instanceof Transformer;
             }
@@ -114,13 +114,13 @@ public class Transformer extends Function {
      * @param pio A position in an occurrence of a term
      * @return the term transformer the position is in, null otherwise
      */
-    public static Transformer getTransformer(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+    public static Transformer getTransformer(PosInOccurrence<Term, SequentFormula<Term>> pio) {
         if ( pio.posInTerm () != null ) {
-            PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pio.iterator ();
+            PIOPathIterator<Term, SequentFormula<Term>> it = pio.iterator ();
             Operator        op;
 
             while ( it.next () != -1) {
-                final JavaDLTerm t = it.getSubTerm ();
+                final Term t = it.getSubTerm ();
                 op = t.op ();
                 if (op instanceof Transformer)
                     return (Transformer)op;

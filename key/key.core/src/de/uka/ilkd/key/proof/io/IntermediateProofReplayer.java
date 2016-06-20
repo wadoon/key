@@ -39,7 +39,7 @@ import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -120,7 +120,7 @@ public class IntermediateProofReplayer {
     private LinkedList<Pair<Node, NodeIntermediate>> queue = new LinkedList<Pair<Node, NodeIntermediate>>();
 
     /** Maps join node IDs to previously seen join partners */
-    private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, NodeIntermediate>>>();
+    private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>>>();
 
     /** The current open goal */
     private Goal currGoal = null;
@@ -220,7 +220,7 @@ public class IntermediateProofReplayer {
     
                         if (appInterm instanceof JoinAppIntermediate) {
                             JoinAppIntermediate joinAppInterm = (JoinAppIntermediate) appInterm;
-                            HashSet<Triple<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, NodeIntermediate>> partnerNodesInfo = joinPartnerNodes
+                            HashSet<Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>> partnerNodesInfo = joinPartnerNodes
                                     .get(((JoinAppIntermediate) appInterm).getId());
     
                             if (partnerNodesInfo == null
@@ -255,14 +255,14 @@ public class IntermediateProofReplayer {
                                             proof.getServices(), joinAppInterm
                                                     .getDistinguishingFormula()));
     
-                                    ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
+                                    ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
                                             ImmutableSLList.nil();
-                                    for (Triple<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    for (Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
                                         final Services services = currGoal.proof().getServices();
                                         
-                                        Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> ownSEState = sequentToSETriple(
+                                        Triple<Term, Term, Term> ownSEState = sequentToSETriple(
                                                 currNode, joinApp.posInOccurrence(), services);
-                                        Triple<JavaDLTerm, JavaDLTerm, JavaDLTerm> partnerSEState = sequentToSETriple(
+                                        Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
                                                 partnerNodeInfo.first, partnerNodeInfo.second, services);
                                         ProgramVariablesMatchVisitor matchVisitor = new ProgramVariablesMatchVisitor(
                                                 partnerSEState.third.modalContent().program(), ownSEState.third.modalContent().program(), services);
@@ -271,7 +271,7 @@ public class IntermediateProofReplayer {
                                         assert !matchVisitor.isIncompatible() : "Cannot join incompatible program counters";
                                         
                                         joinPartners = joinPartners
-                                                .append(new Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>(
+                                                .append(new Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>(
                                                         proof.getGoal(partnerNodeInfo.first),
                                                         partnerNodeInfo.second,
                                                         matchVisitor.getMatches().getValue()));
@@ -293,7 +293,7 @@ public class IntermediateProofReplayer {
                                     }
     
                                     // Now add children of partner nodes
-                                    for (Triple<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    for (Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
                                         Iterator<Node> children = partnerNodeInfo.first
                                                 .childrenIterator();
                                         LinkedList<NodeIntermediate> intermChildren = partnerNodeInfo.third
@@ -321,18 +321,18 @@ public class IntermediateProofReplayer {
                         else if (appInterm instanceof JoinPartnerAppIntermediate) {
                             // Register this partner node
                             JoinPartnerAppIntermediate joinPartnerApp = (JoinPartnerAppIntermediate) appInterm;
-                            HashSet<Triple<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, NodeIntermediate>> partnerNodeInfo = joinPartnerNodes
+                            HashSet<Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>> partnerNodeInfo = joinPartnerNodes
                                     .get(joinPartnerApp.getJoinNodeId());
     
                             if (partnerNodeInfo == null) {
-                                partnerNodeInfo = new HashSet<Triple<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, NodeIntermediate>>();
+                                partnerNodeInfo = new HashSet<Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>>();
                                 joinPartnerNodes.put(
                                         joinPartnerApp.getJoinNodeId(),
                                         partnerNodeInfo);
                             }
     
                             partnerNodeInfo
-                                    .add(new Triple<Node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, NodeIntermediate>(
+                                    .add(new Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>(
                                             currNode,
                                             PosInOccurrence.findInSequent(
                                                     currGoal.sequent(),
@@ -460,11 +460,11 @@ public class IntermediateProofReplayer {
 
         final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
-        final PosInTerm<JavaDLTerm> currPosInTerm = currInterm.getPosInfo().second;
+        final PosInTerm<Term> currPosInTerm = currInterm.getPosInfo().second;
         final Sequent seq = currGoal.sequent();
         
         TacletApp ourApp = null;
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = null;
+        PosInOccurrence<Term, SequentFormula<Term>> pos = null;
 
         Taclet t = proof.getInitConfig().lookupActiveTaclet(
                 new Name(tacletName));
@@ -536,10 +536,10 @@ public class IntermediateProofReplayer {
 
         final String ruleName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
-        final PosInTerm<JavaDLTerm> currPosInTerm = currInterm.getPosInfo().second;
+        final PosInTerm<Term> currPosInTerm = currInterm.getPosInfo().second;
 
         Contract currContract = null;
-        ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> builtinIfInsts = null;
+        ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> builtinIfInsts = null;
 
         // Load contracts, if applicable
         if (currInterm.getContract() != null) {
@@ -558,12 +558,12 @@ public class IntermediateProofReplayer {
         // Load ifInsts, if applicable
         if (currInterm.getBuiltInIfInsts() != null) {
             builtinIfInsts = ImmutableSLList.nil();
-            for (final Pair<Integer, PosInTerm<JavaDLTerm>> ifInstP : currInterm.getBuiltInIfInsts()) {
+            for (final Pair<Integer, PosInTerm<Term>> ifInstP : currInterm.getBuiltInIfInsts()) {
                 final int currIfInstFormula         = ifInstP.first;
-                final PosInTerm<JavaDLTerm> currIfInstPosInTerm = ifInstP.second;
+                final PosInTerm<Term> currIfInstPosInTerm = ifInstP.second;
 
                 try {
-                    final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
+                    final PosInOccurrence<Term, SequentFormula<Term>> ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
                                     currIfInstFormula, currIfInstPosInTerm);
                     builtinIfInsts = builtinIfInsts.append(ifInst);
                 }
@@ -615,7 +615,7 @@ public class IntermediateProofReplayer {
         }
 
         IBuiltInRuleApp ourApp = null;
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = null;
+        PosInOccurrence<Term, SequentFormula<Term>> pos = null;
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
@@ -708,7 +708,7 @@ public class IntermediateProofReplayer {
      * @return All matching rule applications at pos in g.
      */
     private static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(
-            String ruleName, Goal g, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+            String ruleName, Goal g, PosInOccurrence<Term, SequentFormula<Term>> pos) {
         
         ImmutableSet<IBuiltInRuleApp> result = 
                 DefaultImmutableSet.<IBuiltInRuleApp> nil();
@@ -811,7 +811,7 @@ public class IntermediateProofReplayer {
      * @throws ParserException
      *             In case of an error.
      */
-    public static JavaDLTerm parseTerm(String value, Proof proof, Namespace varNS,
+    public static Term parseTerm(String value, Proof proof, Namespace varNS,
             Namespace progVar_ns) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null,
@@ -834,7 +834,7 @@ public class IntermediateProofReplayer {
      *            Proof object (for namespaces and Services object).
      * @return The parsed term.
      */
-    public static JavaDLTerm parseTerm(String value, Proof proof) {
+    public static Term parseTerm(String value, Proof proof) {
         return parseTerm(value, proof, proof.getNamespaces().variables(), proof
                 .getNamespaces().programVariables());
     }
@@ -858,7 +858,7 @@ public class IntermediateProofReplayer {
             String value, Services services) {
         LogicVariable lv = new LogicVariable(new Name(value), app.getRealSort(
                 sv, services));
-        JavaDLTerm instance = services.getTermFactory().createTerm(lv);
+        Term instance = services.getTermFactory().createTerm(lv);
         return app.addCheckedInstantiation(sv, instance, services, true);
     }
 
@@ -900,7 +900,7 @@ public class IntermediateProofReplayer {
         else {
             Namespace varNS = p.getNamespaces().variables();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
-            JavaDLTerm instance = parseTerm(value, p, varNS,
+            Term instance = parseTerm(value, p, varNS,
                    varNS.extended(targetGoal.getGlobalProgVars()));
             result = app.addCheckedInstantiation(sv, instance, services, true);
         }

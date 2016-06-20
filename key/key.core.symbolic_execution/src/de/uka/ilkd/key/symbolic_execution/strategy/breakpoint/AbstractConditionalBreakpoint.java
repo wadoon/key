@@ -54,7 +54,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
    /**
     * The condition  for this Breakpoint (set by user).
     */
-   private JavaDLTerm condition;
+   private Term condition;
    
    /**
     * The flag if the the condition for the associated Breakpoint is enabled
@@ -267,12 +267,12 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
    }
    
    /**
-    * Computes the JavaDLTerm that can be evaluated, from the user given condition
+    * Computes the Term that can be evaluated, from the user given condition
     * @param condition the condition given by the user
-    * @return the {@link JavaDLTerm} that represents the condition
-    * @throws SLTranslationException if the JavaDLTerm could not be parsed
+    * @return the {@link Term} that represents the condition
+    * @throws SLTranslationException if the Term could not be parsed
     */
-   private JavaDLTerm computeTermForCondition(String condition) throws SLTranslationException {
+   private Term computeTermForCondition(String condition) throws SLTranslationException {
       if(condition==null){
          return getProof().getServices().getTermBuilder().tt();
       }
@@ -336,8 +336,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
       ApplyStrategyInfo info = null;
       try {
          //initialize values
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = ruleApp.posInOccurrence();
-         JavaDLTerm term = pio.subTerm();
+         PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
+         Term term = pio.subTerm();
          getProof().getServices().getTermBuilder();
          term = TermBuilder.goBelowUpdates(term);
          IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.modalContent(), proof.getServices());
@@ -347,9 +347,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
          }
          //replace renamings etc.
          OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
-         JavaDLTerm termForSideProof = replacer.replace(condition);
+         Term termForSideProof = replacer.replace(condition);
          //start side proof
-         JavaDLTerm toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+         Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
          final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
          Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
          info = SymbolicExecutionSideProofUtil.startSideProof(proof, 
@@ -428,7 +428,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * Returns the condition of the associated Breakpoint.
     * @return the condition of the associated Breakpoint
     */
-   public JavaDLTerm getCondition() {
+   public Term getCondition() {
       return condition;
    }
 
@@ -441,7 +441,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
    }
    
    /**
-    * Sets the condition to the JavaDLTerm that is parsed from the given String.
+    * Sets the condition to the Term that is parsed from the given String.
     * @param condition the String to be parsed
     * @throws SLTranslationException if the parsing failed
     */

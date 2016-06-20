@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.key_project.common.core.logic.op.Function;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * This class is used by LogicPrinter.java to print out store-terms, i.e. terms
@@ -23,7 +23,7 @@ class StorePrinter extends FieldPrinter {
      * Common code for all pretty-printed store variants.
      * This section is executed at the beginning of pretty-printing.
      */
-    private void initPrettyPrint(final JavaDLTerm heapTerm) throws IOException {
+    private void initPrettyPrint(final Term heapTerm) throws IOException {
         lp.startTerm(4);
 
         lp.markStartSub();
@@ -43,7 +43,7 @@ class StorePrinter extends FieldPrinter {
      * Common code for all pretty-printed store variants.
      * This section is executed at the end of pretty-printing.
      */
-    private void finishPrettyPrint(final JavaDLTerm valueTerm, boolean closingBrace) throws IOException {
+    private void finishPrettyPrint(final Term valueTerm, boolean closingBrace) throws IOException {
         lp.layouter.print(" := ");
         lp.markStartSub();
         lp.printTerm(valueTerm);
@@ -56,7 +56,7 @@ class StorePrinter extends FieldPrinter {
         }
     }
 
-    void printStore(JavaDLTerm t, boolean closingBrace) throws IOException {
+    void printStore(Term t, boolean closingBrace) throws IOException {
         assert t.boundVars().isEmpty();
         assert t.arity() == 4;
 
@@ -64,10 +64,10 @@ class StorePrinter extends FieldPrinter {
 
         if (lp.notationInfo.isPrettySyntax() && heapLDT != null) {
 
-            final JavaDLTerm heapTerm = t.sub(0);
-            final JavaDLTerm objectTerm = t.sub(1);
-            final JavaDLTerm fieldTerm = t.sub(2);
-            final JavaDLTerm valueTerm = t.sub(3);
+            final Term heapTerm = t.sub(0);
+            final Term objectTerm = t.sub(1);
+            final Term fieldTerm = t.sub(2);
+            final Term valueTerm = t.sub(3);
 
             if (isStaticFieldConstant(objectTerm, fieldTerm)) {
                 printStoreOnStaticField(heapTerm, fieldTerm, valueTerm, closingBrace);
@@ -88,7 +88,7 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents an array element.
      */
-    private void printStoreOnArrayElement(final JavaDLTerm heapTerm, final JavaDLTerm objectTerm, final JavaDLTerm fieldTerm, final JavaDLTerm valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnArrayElement(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         lp.markStartSub();
@@ -112,7 +112,7 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents a non-static field.
      */
-    private void printStoreOnJavaFieldConstant(final JavaDLTerm heapTerm, final JavaDLTerm objectTerm, final JavaDLTerm fieldTerm, final JavaDLTerm valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnJavaFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         lp.markStartSub();
@@ -129,7 +129,7 @@ class StorePrinter extends FieldPrinter {
         finishPrettyPrint(valueTerm, closingBrace);
     }
 
-    private void printStoreOnGenericFieldConstant(final JavaDLTerm heapTerm, final JavaDLTerm objectTerm, final JavaDLTerm fieldTerm, final JavaDLTerm valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnGenericFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         lp.markStartSub();
@@ -149,7 +149,7 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents a static field.
      */
-    private void printStoreOnStaticField(final JavaDLTerm heapTerm, final JavaDLTerm fieldTerm, final JavaDLTerm valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnStaticField(final Term heapTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         String className = HeapLDT.getClassName((Function) fieldTerm.op());

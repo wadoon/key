@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -35,32 +35,32 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public class StateVars {
 
-    public final ImmutableList<JavaDLTerm> termList;
+    public final ImmutableList<Term> termList;
 
-    public final ImmutableList<JavaDLTerm> paddedTermList;
+    public final ImmutableList<Term> paddedTermList;
 
-    public final JavaDLTerm self;
+    public final Term self;
 
-    public final JavaDLTerm guard;
+    public final Term guard;
 
-    public final ImmutableList<JavaDLTerm> localVars;
+    public final ImmutableList<Term> localVars;
 
-    public final JavaDLTerm result;
+    public final Term result;
 
-    public final JavaDLTerm exception;
+    public final Term exception;
 
-    public final JavaDLTerm heap;
+    public final Term heap;
 
-    public final JavaDLTerm mbyAtPre;
+    public final Term mbyAtPre;
 
 
-    public StateVars(JavaDLTerm self,
-                     JavaDLTerm guard,
-                     ImmutableList<JavaDLTerm> localVars,
-                     JavaDLTerm result,
-                     JavaDLTerm exception,
-                     JavaDLTerm heap,
-                     JavaDLTerm mbyAtPre) {
+    public StateVars(Term self,
+                     Term guard,
+                     ImmutableList<Term> localVars,
+                     Term result,
+                     Term exception,
+                     Term heap,
+                     Term mbyAtPre) {
         this.self = self;
         this.guard = guard;
         this.localVars = localVars;
@@ -69,8 +69,8 @@ public class StateVars {
         this.heap = heap;
         this.mbyAtPre = mbyAtPre;
 
-        ImmutableList<JavaDLTerm> terms =
-                ImmutableSLList.<JavaDLTerm>nil();
+        ImmutableList<Term> terms =
+                ImmutableSLList.<Term>nil();
         terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, self);
         terms = appendIfNotNull(terms, guard);
@@ -80,8 +80,8 @@ public class StateVars {
         terms = appendIfNotNull(terms, mbyAtPre);
         termList = terms;
 
-        ImmutableList<JavaDLTerm> allTerms =
-                ImmutableSLList.<JavaDLTerm>nil();
+        ImmutableList<Term> allTerms =
+                ImmutableSLList.<Term>nil();
         allTerms = allTerms.append(heap);
         allTerms = allTerms.append(self);
         allTerms = allTerms.append(guard);
@@ -93,18 +93,18 @@ public class StateVars {
     }
 
 
-    public StateVars(JavaDLTerm self,
-                     ImmutableList<JavaDLTerm> localVars,
-                     JavaDLTerm result,
-                     JavaDLTerm exception,
-                     JavaDLTerm heap,
-                     JavaDLTerm mbyAtPre) {
+    public StateVars(Term self,
+                     ImmutableList<Term> localVars,
+                     Term result,
+                     Term exception,
+                     Term heap,
+                     Term mbyAtPre) {
         this(self, null, localVars, result, exception, heap, mbyAtPre);
     }
 
 
-    private ImmutableList<JavaDLTerm> appendIfNotNull(ImmutableList<JavaDLTerm> list,
-                                                JavaDLTerm t) {
+    private ImmutableList<Term> appendIfNotNull(ImmutableList<Term> list,
+                                                Term t) {
         if (t != null) {
             return list.append(t);
         } else {
@@ -113,46 +113,46 @@ public class StateVars {
     }
 
 
-    private ImmutableList<JavaDLTerm> appendIfNotNull(ImmutableList<JavaDLTerm> list,
-                                                ImmutableList<JavaDLTerm> list2) {
-        ImmutableList<JavaDLTerm> result = list;
-        for (JavaDLTerm t : list2) {
+    private ImmutableList<Term> appendIfNotNull(ImmutableList<Term> list,
+                                                ImmutableList<Term> list2) {
+        ImmutableList<Term> result = list;
+        for (Term t : list2) {
             result = appendIfNotNull(result, t);
         }
         return result;
     }
 
 
-    public StateVars(JavaDLTerm self,
-                     JavaDLTerm guard,
-                     ImmutableList<JavaDLTerm> localVars,
-                     JavaDLTerm heap) {
+    public StateVars(Term self,
+                     Term guard,
+                     ImmutableList<Term> localVars,
+                     Term heap) {
         this(self, guard, localVars, null, null, heap, null);
     }
 
 
-    public StateVars(JavaDLTerm self,
-                     JavaDLTerm guard,
-                     ImmutableList<JavaDLTerm> localVars,
-                     JavaDLTerm result,
-                     JavaDLTerm exception,
-                     JavaDLTerm heap) {
+    public StateVars(Term self,
+                     Term guard,
+                     ImmutableList<Term> localVars,
+                     Term result,
+                     Term exception,
+                     Term heap) {
         this(self, guard, localVars, result, exception, heap, null);
     }
 
 
-    public StateVars(JavaDLTerm self,
-                     ImmutableList<JavaDLTerm> localVars,
-                     JavaDLTerm result,
-                     JavaDLTerm exception,
-                     JavaDLTerm heap) {
+    public StateVars(Term self,
+                     ImmutableList<Term> localVars,
+                     Term result,
+                     Term exception,
+                     Term heap) {
         this(self, localVars, result, exception, heap, null);
     }
 
 
-    public StateVars(JavaDLTerm self,
-                     ImmutableList<JavaDLTerm> localVars,
-                     JavaDLTerm heap) {
+    public StateVars(Term self,
+                     ImmutableList<Term> localVars,
+                     Term heap) {
         this(self, localVars, null, null, heap);
     }
 
@@ -170,24 +170,24 @@ public class StateVars {
     }
 
 
-    private static ImmutableList<JavaDLTerm> copyVariables(ImmutableList<JavaDLTerm> ts,
+    private static ImmutableList<Term> copyVariables(ImmutableList<Term> ts,
                                                      String postfix,
                                                      Services services) {
-        ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
-        for (JavaDLTerm t : ts) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term t : ts) {
             result = result.append(copyVariable(t, postfix, services));
         }
         return result;
     }
 
 
-    private static JavaDLTerm copyVariable(JavaDLTerm t,
+    private static Term copyVariable(Term t,
                                      String postfix,
                                      Services services) {
         if (t != null) {
             final TermBuilder tb = services.getTermBuilder();
-            JavaDLTerm tWithoutLables = tb.unlabel(t);
-            JavaDLTerm result =
+            Term tWithoutLables = tb.unlabel(t);
+            Term result =
                    newVariable(tWithoutLables, tWithoutLables.toString() + postfix, services);
             return tb.label(result, t.getLabels());
         } else {
@@ -196,7 +196,7 @@ public class StateVars {
     }
 
 
-    private static JavaDLTerm newVariable(JavaDLTerm t,
+    private static Term newVariable(Term t,
                                     String name,
                                     Services services) {
         if (t == null) {
@@ -218,13 +218,13 @@ public class StateVars {
     }
 
 
-    private static JavaDLTerm copyHeapSymbol(JavaDLTerm t,
+    private static Term copyHeapSymbol(Term t,
                                        String postfix,
                                        Services services) {
         if (t != null) {
             final TermBuilder tb = services.getTermBuilder();
-            JavaDLTerm tWithoutLables = tb.unlabel(t);
-            JavaDLTerm result =
+            Term tWithoutLables = tb.unlabel(t);
+            Term result =
                    newHeapSymbol(tWithoutLables, tWithoutLables.toString() + postfix, services);
             return tb.label(result, t.getLabels());
         } else {
@@ -233,7 +233,7 @@ public class StateVars {
     }
 
 
-    private static JavaDLTerm newHeapSymbol(JavaDLTerm t,
+    private static Term newHeapSymbol(Term t,
                                       String name,
                                       Services services) {
         if (t == null) {
@@ -253,7 +253,7 @@ public class StateVars {
     }
 
 
-    private static JavaDLTerm newFunction(JavaDLTerm t,
+    private static Term newFunction(Term t,
                                     String name,
                                     Services services) {
         if (t == null) {
@@ -266,13 +266,13 @@ public class StateVars {
     }
 
 
-    private static JavaDLTerm copyFunction(JavaDLTerm t,
+    private static Term copyFunction(Term t,
                                      String postfix,
                                      Services services) {
         if (t != null) {
             final TermBuilder tb = services.getTermBuilder();
-            JavaDLTerm tWithoutLables = tb.unlabel(t);
-            JavaDLTerm result =
+            Term tWithoutLables = tb.unlabel(t);
+            Term result =
                    newFunction(tWithoutLables, tWithoutLables.toString() + postfix, services);
             return tb.label(result, t.getLabels());
         } else {
@@ -325,32 +325,32 @@ public class StateVars {
                                                  Services services) {
         // create new post vars if original pre and original post var differ;
         // else use pre var
-        JavaDLTerm self = (origPreVars.self == origPostVars.self) ?
+        Term self = (origPreVars.self == origPostVars.self) ?
                     preVars.self :
                     copyVariable(origPostVars.self, postfix, services);
-        JavaDLTerm guard = (origPreVars.guard == origPostVars.guard) ?
+        Term guard = (origPreVars.guard == origPostVars.guard) ?
                      preVars.guard :
                      copyVariable(origPostVars.guard, postfix, services);
-        JavaDLTerm result = (origPreVars.result == origPostVars.result) ?
+        Term result = (origPreVars.result == origPostVars.result) ?
                     preVars.result :
                     copyVariable(origPostVars.result, postfix, services);
-        JavaDLTerm exception = (origPreVars.exception == origPostVars.exception) ?
+        Term exception = (origPreVars.exception == origPostVars.exception) ?
                     preVars.exception :
                     copyVariable(origPostVars.exception, postfix, services);
-        JavaDLTerm heap = (origPreVars.heap == origPostVars.heap) ?
+        Term heap = (origPreVars.heap == origPostVars.heap) ?
                     preVars.heap :
                     copyHeapSymbol(origPostVars.heap, postfix, services);
-        JavaDLTerm mbyAtPre = (origPreVars.mbyAtPre == origPostVars.mbyAtPre) ?
+        Term mbyAtPre = (origPreVars.mbyAtPre == origPostVars.mbyAtPre) ?
                     preVars.mbyAtPre :
                     copyVariable(origPostVars.mbyAtPre, postfix, services);
 
-        ImmutableList<JavaDLTerm> localPostVars = ImmutableSLList.<JavaDLTerm>nil();
-        Iterator<JavaDLTerm> origPreVarsIt = origPreVars.localVars.iterator();
-        Iterator<JavaDLTerm> localPreVarsIt = preVars.localVars.iterator();
-        for (JavaDLTerm origPostVar : origPostVars.localVars) {
-            JavaDLTerm origPreVar = origPreVarsIt.next();
-            JavaDLTerm localPreVar = localPreVarsIt.next();
-            JavaDLTerm localPostVar = (origPreVar == origPostVar) ?
+        ImmutableList<Term> localPostVars = ImmutableSLList.<Term>nil();
+        Iterator<Term> origPreVarsIt = origPreVars.localVars.iterator();
+        Iterator<Term> localPreVarsIt = preVars.localVars.iterator();
+        for (Term origPostVar : origPostVars.localVars) {
+            Term origPreVar = origPreVarsIt.next();
+            Term localPreVar = localPreVarsIt.next();
+            Term localPostVar = (origPreVar == origPostVar) ?
                     localPreVar :
                     copyVariable(origPostVar, postfix, services);
             localPostVars = localPostVars.append(localPostVar);
@@ -365,7 +365,7 @@ public class StateVars {
     }
 
 
-    private static JavaDLTerm buildSelfVar(Services services,
+    private static Term buildSelfVar(Services services,
                                      IProgramMethod pm,
                                      KeYJavaType kjt,
                                      String postfix) {
@@ -373,38 +373,38 @@ public class StateVars {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        JavaDLTerm selfVar = tb.var(tb.selfVar(pm, kjt, true, postfix));
+        Term selfVar = tb.var(tb.selfVar(pm, kjt, true, postfix));
         register(selfVar.op(ProgramVariable.class), services);
         return selfVar;
     }
 
 
-    private static ImmutableList<JavaDLTerm> buildParamVars(Services services,
+    private static ImmutableList<Term> buildParamVars(Services services,
                                                       String postfix,
                                                       IProgramMethod pm) {
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<JavaDLTerm> paramVars =
+        ImmutableList<Term> paramVars =
                 tb.var(tb.paramVars(postfix, pm, true));
         register(ops(paramVars, ProgramVariable.class), services);
         return paramVars;
     }
 
 
-    private static JavaDLTerm buildResultVar(IProgramMethod pm,
+    private static Term buildResultVar(IProgramMethod pm,
                                        Services services,
                                        String postfix) {
         if (pm.isVoid() || pm.isConstructor()) {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        JavaDLTerm resultVar =
+        Term resultVar =
                 tb.var(tb.resultVar("result" + postfix, pm, true));
         register(resultVar.op(ProgramVariable.class), services);
         return resultVar;
     }
 
 
-    private static JavaDLTerm buildHeapFunc(String postfix,
+    private static Term buildHeapFunc(String postfix,
                                       ImmutableArray<TermLabel> labels,
                                       Services services) {
         HeapLDT heapLDT = services.getTheories().getHeapLDT();
@@ -415,24 +415,24 @@ public class StateVars {
             Name heapName = new Name("heap" + postfix);
             Function heap =
                      new Function(heapName, heapLDT.getHeap().sort());
-            JavaDLTerm heapFunc = tb.func(heap);
+            Term heapFunc = tb.func(heap);
             register(heap, services);
             return tb.label(heapFunc, labels);
         }
     }
 
 
-    private static JavaDLTerm buildExceptionVar(Services services,
+    private static Term buildExceptionVar(Services services,
                                           String postfix,
                                           IProgramMethod pm) {
         final TermBuilder tb = services.getTermBuilder();
-        JavaDLTerm excVar = tb.var(tb.excVar("exc" + postfix, pm, true));
+        Term excVar = tb.var(tb.excVar("exc" + postfix, pm, true));
         register(excVar.op(ProgramVariable.class), services);
         return excVar;
     }
 
 
-    private static JavaDLTerm buildMbyVar(String postfix,
+    private static Term buildMbyVar(String postfix,
                                     Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Sort intSort =
@@ -476,11 +476,11 @@ public class StateVars {
     }
 
 
-    static <T> ImmutableList<T> ops(ImmutableList<JavaDLTerm> terms,
+    static <T> ImmutableList<T> ops(ImmutableList<Term> terms,
                                     Class<T> opClass)
             throws IllegalArgumentException {
         ImmutableList<T> ops = ImmutableSLList.<T>nil();
-        for (JavaDLTerm t : terms) {
+        for (Term t : terms) {
             ops = ops.append(t.op(opClass));
         }
         return ops;

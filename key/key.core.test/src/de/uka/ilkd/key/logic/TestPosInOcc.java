@@ -48,14 +48,14 @@ public class TestPosInOcc extends TestCase {
 	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});
 
 	
-	JavaDLTerm terms[] = new JavaDLTerm [ 3 ];
+	Term terms[] = new Term [ 3 ];
 	terms[0]     = TB.var ( x );
-	terms[1]     = TB.func ( f, new JavaDLTerm[] { terms[0] } );
-	terms[2]     = TB.func ( p, new JavaDLTerm[] { terms[1] } );
+	terms[1]     = TB.func ( f, new Term[] { terms[0] } );
+	terms[2]     = TB.func ( p, new Term[] { terms[1] } );
 
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
-	    ( new SequentFormula<JavaDLTerm> ( terms[2] ),
-	      PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>
+	    ( new SequentFormula<Term> ( terms[2] ),
+	      PosInTerm.<Term>getTopLevel(),
 	    true);
 
 	PIOPathIterator it = pio.iterator ();
@@ -106,28 +106,28 @@ public class TestPosInOcc extends TestCase {
                                     Sort.FORMULA,
                                     new Sort[] { sort1 } );
 
-        JavaDLTerm terms[] = new JavaDLTerm[3];
+        Term terms[] = new Term[3];
         terms[0] = TB.var( x );
-        terms[1] = TB.func ( f, new JavaDLTerm[] { terms[0] } );
-        terms[2] = TB.func ( p, new JavaDLTerm[] { terms[1] } );
-        SequentFormula<JavaDLTerm> cfma = new SequentFormula<JavaDLTerm> ( terms[2] );
+        terms[1] = TB.func ( f, new Term[] { terms[0] } );
+        terms[2] = TB.func ( p, new Term[] { terms[1] } );
+        SequentFormula<Term> cfma = new SequentFormula<Term> ( terms[2] );
 
-        JavaDLTerm terms2[] = new JavaDLTerm[4];
+        Term terms2[] = new Term[4];
         terms2[0] = TB.func ( c );
-        terms2[1] = TB.func ( f, new JavaDLTerm[] { terms2[0] } );
-        terms2[2] = TB.func ( f, new JavaDLTerm[] { terms2[1] } );
-        terms2[3] = TB.func ( p, new JavaDLTerm[] { terms2[2] } );
-        SequentFormula<JavaDLTerm> cfma2 = new SequentFormula<JavaDLTerm> ( terms2[3] );
+        terms2[1] = TB.func ( f, new Term[] { terms2[0] } );
+        terms2[2] = TB.func ( f, new Term[] { terms2[1] } );
+        terms2[3] = TB.func ( p, new Term[] { terms2[2] } );
+        SequentFormula<Term> cfma2 = new SequentFormula<Term> ( terms2[3] );
 
-        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> topPIO = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( cfma,
-                                                             PosInTerm.<JavaDLTerm>getTopLevel(),
+        final PosInOccurrence<Term, SequentFormula<Term>> topPIO = new PosInOccurrence<Term, SequentFormula<Term>> ( cfma,
+                                                             PosInTerm.<Term>getTopLevel(),
                                                              true );
 
 
         // Test without metavariables involved
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = topPIO.down ( 0 );
+        PosInOccurrence<Term, SequentFormula<Term>> pio = topPIO.down ( 0 );
         assertTrue ( pio.subTerm () == terms[1] );
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio2 = pio.replaceConstrainedFormula ( cfma );
+        PosInOccurrence<Term, SequentFormula<Term>> pio2 = pio.replaceConstrainedFormula ( cfma );
         assertEquals ( pio, pio2 );
         pio = pio.replaceConstrainedFormula ( cfma2 );
         assertTrue ( pio.subTerm () == terms2[2] );

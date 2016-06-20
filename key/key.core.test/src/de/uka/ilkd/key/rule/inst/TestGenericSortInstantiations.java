@@ -129,28 +129,28 @@ public class TestGenericSortInstantiations extends TestCase {
 
     /*
     Function fa1 = new Function ( new Name ( "fa1" ), A1, new Sort [0] );
-    JavaDLTerm     a1  = tf.createFunctionTerm ( fa1 );
+    Term     a1  = tf.createFunctionTerm ( fa1 );
     Function fa2 = new Function ( new Name ( "fa2" ), A2, new Sort [0] );
-    JavaDLTerm     a2  = tf.createFunctionTerm ( fa2 );
+    Term     a2  = tf.createFunctionTerm ( fa2 );
     Function fa3 = new Function ( new Name ( "fa3" ), A3, new Sort [0] );
-    JavaDLTerm     a3  = tf.createFunctionTerm ( fa3 );
+    Term     a3  = tf.createFunctionTerm ( fa3 );
     Function fa4 = new Function ( new Name ( "fa4" ), A4, new Sort [0] );
-    JavaDLTerm     a4  = tf.createFunctionTerm ( fa4 );
+    Term     a4  = tf.createFunctionTerm ( fa4 );
     Function fa5 = new Function ( new Name ( "fa5" ), A5, new Sort [0] );
-    JavaDLTerm     a5  = tf.createFunctionTerm ( fa5 );
+    Term     a5  = tf.createFunctionTerm ( fa5 );
     Function fa6 = new Function ( new Name ( "fa6" ), A6, new Sort [0] );
-    JavaDLTerm     a6  = tf.createFunctionTerm ( fa6 );
+    Term     a6  = tf.createFunctionTerm ( fa6 );
 
     Function fb1 = new Function ( new Name ( "fb1" ), B1, new Sort [0] );
-    JavaDLTerm     b1  = tf.createFunctionTerm ( fb1 );
+    Term     b1  = tf.createFunctionTerm ( fb1 );
     Function fb2 = new Function ( new Name ( "fb2" ), B2, new Sort [0] );
-    JavaDLTerm     b2  = tf.createFunctionTerm ( fb2 );
+    Term     b2  = tf.createFunctionTerm ( fb2 );
     Function fb3 = new Function ( new Name ( "fb3" ), B3, new Sort [0] );
-    JavaDLTerm     b3  = tf.createFunctionTerm ( fb3 );
+    Term     b3  = tf.createFunctionTerm ( fb3 );
     Function fb4 = new Function ( new Name ( "fb4" ), B4, new Sort [0] );
-    JavaDLTerm     b4  = tf.createFunctionTerm ( fb4 );
+    Term     b4  = tf.createFunctionTerm ( fb4 );
     Function fb5 = new Function ( new Name ( "fb5" ), B5, new Sort [0] );
-    JavaDLTerm     b5  = tf.createFunctionTerm ( fb5 );
+    Term     b5  = tf.createFunctionTerm ( fb5 );
 
 
     SchemaVariable svg1 = SchemaVariableFactory.createTermSV ( new Name ( "svg1" ), G1 );

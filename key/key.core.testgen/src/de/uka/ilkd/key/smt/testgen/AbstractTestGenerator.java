@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -300,9 +300,9 @@ public abstract class AbstractTestGenerator {
       final Sequent oldSequent = node.sequent();
       Sequent newSequent = Sequent.createSequent(
             Semisequent.nil(), Semisequent.nil());
-      Iterator<SequentFormula<JavaDLTerm>> it = oldSequent.antecedent().iterator();
+      Iterator<SequentFormula<Term>> it = oldSequent.antecedent().iterator();
       while (it.hasNext()) {
-         final SequentFormula<JavaDLTerm> sf = it.next();
+         final SequentFormula<Term> sf = it.next();
          // Allow updates modailities in the antecedent
          if (hasModalities(sf.formula(), false)) {
             continue;
@@ -311,7 +311,7 @@ public abstract class AbstractTestGenerator {
       }
       it = oldSequent.succedent().iterator();
       while (it.hasNext()) {
-         final SequentFormula<JavaDLTerm> sf = it.next();
+         final SequentFormula<Term> sf = it.next();
          if (hasModalities(sf.formula(), removePostCondition)) {
             continue;
          }
@@ -339,7 +339,7 @@ public abstract class AbstractTestGenerator {
       return proof;
    }
 
-   private boolean hasModalities(JavaDLTerm t, boolean checkUpdates) {
+   private boolean hasModalities(Term t, boolean checkUpdates) {
       final JavaBlock jb = t.modalContent();
       if (jb != null && !jb.isEmpty()) {
          // System.out.println("Excluded javablock");

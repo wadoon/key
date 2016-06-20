@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -45,7 +45,7 @@ public class FindRightishFeature implements Feature {
         add = numbers.getAdd();
     }
     
-    public RuleAppCost compute ( RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal ) {
+    public RuleAppCost compute ( RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal ) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();

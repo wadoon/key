@@ -27,7 +27,7 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -50,7 +50,7 @@ public class TestLegacyTacletMatch extends TestCase {
     FindTaclet all_left;
     FindTaclet assign_n;
     TacletApp close_rule;
-    JavaDLTerm matchExc;
+    Term matchExc;
     Taclet[] conflict;
     Services services;
 
@@ -120,7 +120,7 @@ public class TestLegacyTacletMatch extends TestCase {
     }
 
     public void testStatementListMatch() {
-        JavaDLTerm match = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {break; "
+        Term match = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {break; "
                 +"int k=1; {int j = 1; j++;} int c = 56;}}} }\\> true");
 
         FindTaclet break_while =  (FindTaclet)TacletForTests
@@ -141,7 +141,7 @@ public class TestLegacyTacletMatch extends TestCase {
     }
 
     public void testProgramMatch0() {
-        JavaDLTerm match = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {break;} "
+        Term match = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {break;} "
                 +"int k=1;}} }\\> true");
         FindTaclet taclet=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_whileright").taclet();   
@@ -157,7 +157,7 @@ public class TestLegacyTacletMatch extends TestCase {
                 svi.getInstantiations().isInstantiated(TacletForTests
                         .svLookup("#p1")));
 
-        JavaDLTerm matchTwo = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {boolean b=true; break;} "
+        Term matchTwo = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {boolean b=true; break;} "
                 +"}int k=1;} }\\> true");
         FindTaclet tacletTwo=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_whileright_labeled").taclet(); 
@@ -174,7 +174,7 @@ public class TestLegacyTacletMatch extends TestCase {
         assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
                 .svLookup("#lab")));
 
-        JavaDLTerm match3 = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {boolean b=false; break;} "
+        Term match3 = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {boolean b=false; break;} "
                 +"int k=1;}} }\\> true");
         FindTaclet taclet3=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_whileright_labeled").taclet(); 
@@ -184,7 +184,7 @@ public class TestLegacyTacletMatch extends TestCase {
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertNull(svi);
 
-        JavaDLTerm emptyBlock = 
+        Term emptyBlock = 
                 TacletForTests.parseTerm("\\<{ { {} int i = 0; } }\\> true");
         FindTaclet empty_block_taclet=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_empty_block").taclet(); 
@@ -194,7 +194,7 @@ public class TestLegacyTacletMatch extends TestCase {
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertTrue(svi != null);
 
-        JavaDLTerm emptyBlock2 = 
+        Term emptyBlock2 = 
                 TacletForTests.parseTerm("\\<{ { {} } }\\> true");
 
         svi = new LegacyTacletMatcher(empty_block_taclet).matchJavaBlock
@@ -204,7 +204,7 @@ public class TestLegacyTacletMatch extends TestCase {
         assertNotNull(svi);
 
         Debug.out("%%%%%%%%%%%%");
-        JavaDLTerm emptyBlock3 = 
+        Term emptyBlock3 = 
                 TacletForTests.parseTerm("\\<{ { {} l1:{} } }\\> true");
         svi = new LegacyTacletMatcher(empty_block_taclet).matchJavaBlock
                 (emptyBlock3, empty_block_taclet.find(),
@@ -220,7 +220,7 @@ public class TestLegacyTacletMatch extends TestCase {
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertNull(svi);    
 
-        JavaDLTerm emptyLabel = 
+        Term emptyLabel = 
                 TacletForTests.parseTerm("\\<{ { l1:{} } }\\> true");
         FindTaclet empty_label_taclet=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_empty_label").taclet(); 
@@ -230,7 +230,7 @@ public class TestLegacyTacletMatch extends TestCase {
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertNotNull(svi);
 
-        JavaDLTerm emptyLabel2 = 
+        Term emptyLabel2 = 
                 TacletForTests.parseTerm("\\<{ l2:{ l1:{} } }\\> true");
         svi = new LegacyTacletMatcher(empty_label_taclet).matchJavaBlock
                 (emptyLabel2, 
@@ -238,7 +238,7 @@ public class TestLegacyTacletMatch extends TestCase {
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertNotNull(svi);
 
-        JavaDLTerm emptyLabel3 = 
+        Term emptyLabel3 = 
                 TacletForTests.parseTerm("\\<{ {l3:{{l2:{l1:{}}}} int i = 0;} }\\> true");
         svi = new LegacyTacletMatcher(empty_label_taclet).matchJavaBlock
                 (emptyLabel3, 
@@ -269,7 +269,7 @@ public class TestLegacyTacletMatch extends TestCase {
                         })));
 
 
-        JavaDLTerm match = TB.dia(javaBlock, TB.tt());
+        Term match = TB.dia(javaBlock, TB.tt());
 
         FindTaclet taclet=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_preincrement").taclet();   
@@ -287,7 +287,7 @@ public class TestLegacyTacletMatch extends TestCase {
     }
 
     public void testProgramMatch2() {
-        JavaDLTerm match = TacletForTests.parseTerm("\\<{int i; int k;}\\>(\\<{for (int i=0;"
+        Term match = TacletForTests.parseTerm("\\<{int i; int k;}\\>(\\<{for (int i=0;"
                 +" i<2; i++) {break;} "
                 +"int k=1; }\\> true)");
         FindTaclet taclet

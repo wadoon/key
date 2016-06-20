@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.op.Operator;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.Feature;
@@ -41,7 +41,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         new QuanEliminationAnalyser ();
     
     // ugly
-    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>        focus = null;
+    private PosInOccurrence<Term, SequentFormula<Term>>        focus = null;
     private Services               services = null;
 
     private final LiteralsSmallerThanFeature litComparator;
@@ -60,9 +60,9 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         return new ClausesSmallerThanFeature ( left, right, numbers );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
-        final JavaDLTerm leftTerm = left.toTerm ( app, pos, goal );
-        final JavaDLTerm rightTerm = right.toTerm ( app, pos, goal );
+    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+        final Term leftTerm = left.toTerm ( app, pos, goal );
+        final Term rightTerm = right.toTerm ( app, pos, goal );
 
         focus = pos;
         services = goal.proof ().getServices ();
@@ -84,7 +84,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(JavaDLTerm t1, JavaDLTerm t2, ServiceCaches caches) {
+    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
 
         final int t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
         final int t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
@@ -108,7 +108,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
     }
 
     private class ClauseCollector extends Collector {
-        protected void collect(JavaDLTerm te) {
+        protected void collect(Term te) {
             final Operator op = te.op ();
             if ( op == Junctor.AND ) {
                 collect ( te.sub ( 0 ) );

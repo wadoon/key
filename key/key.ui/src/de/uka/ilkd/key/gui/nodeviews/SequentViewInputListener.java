@@ -24,7 +24,7 @@ import java.awt.event.MouseMotionListener;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -50,8 +50,8 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
             if ((mousePos != null)
                     && !("".equals(sequentView.getHighlightedText(mousePos)))) {
 
-                JavaDLTerm t;
-                final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc = mousePos.getPosInOccurrence();
+                Term t;
+                final PosInOccurrence<Term, SequentFormula<Term>> posInOcc = mousePos.getPosInOccurrence();
                 if (posInOcc != null) {
                     t = posInOcc.subTerm();
                     String tOpClassString = t.op().getClass().toString();

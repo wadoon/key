@@ -23,7 +23,7 @@ import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -83,7 +83,7 @@ public class TestTacletTranslator extends TestCase {
         }
     }
 
-    private JavaDLTerm parseTerm(String s) {
+    private Term parseTerm(String s) {
         try {
             KeYParserF p = stringTacletParser(s);
             return p.term();
@@ -95,7 +95,7 @@ public class TestTacletTranslator extends TestCase {
         }
     }
 
-    private JavaDLTerm parseFma(String s) {
+    private Term parseFma(String s) {
         try {
             KeYParserF p = stringTacletParser(s);
 
@@ -124,8 +124,8 @@ public class TestTacletTranslator extends TestCase {
     private void testTaclet(String tacletString, String termString) throws Exception {
 
         Taclet taclet = parseTaclet(tacletString);
-        JavaDLTerm expected = parseTerm(termString);
-        JavaDLTerm translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
+        Term expected = parseTerm(termString);
+        Term translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
 
         assertEquals("Taclet " + taclet.name() + " not translated as expected", expected,
                 translation);

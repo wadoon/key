@@ -48,7 +48,7 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -219,7 +219,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
     * @param sequent The {@link Sequent}.
     * @param inAntecedent In Antecedent?
     * @param index The index of the {@link SequentFormula}.
-    * @param pit The {@link PosInTerm<JavaDLTerm>}.
+    * @param pit The {@link PosInTerm<Term>}.
     * @param tacletName The name of the {@link Taclet} to apply.
     */
    protected void applyTaclet(UserInterfaceControl ui, 
@@ -227,9 +227,9 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
                               Sequent sequent, 
                               boolean inAntecedent, 
                               int index, 
-                              PosInTerm<JavaDLTerm> pit, 
+                              PosInTerm<Term> pit, 
                               final String tacletName) {
-      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>((inAntecedent ? sequent.antecedent() : sequent.succedent()).get(index), pit, inAntecedent);
+      PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>((inAntecedent ? sequent.antecedent() : sequent.succedent()).get(index), pit, inAntecedent);
       ImmutableList<TacletApp> rules = KeYIDEUtil.findTaclets(ui, goal, PosInSequent.createCfmaPos(pio));
       TacletApp tacletApp = CollectionUtil.search(rules, new IFilter<TacletApp>() {
          @Override

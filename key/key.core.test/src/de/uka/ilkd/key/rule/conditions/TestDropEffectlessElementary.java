@@ -18,7 +18,7 @@ import junit.framework.TestCase;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.SchemaVariable;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.UpdateSV;
@@ -31,13 +31,13 @@ public class TestDropEffectlessElementary extends TestCase {
 
     public void testSelfAssignments() throws Exception {
 
-        JavaDLTerm term = TacletForTests.parseTerm("{ i := i }(i=0)");
-        JavaDLTerm result = applyDrop(term);
+        Term term = TacletForTests.parseTerm("{ i := i }(i=0)");
+        Term result = applyDrop(term);
         assertEquals(term, result);
 
         term = TacletForTests.parseTerm("{ i := i || i := 0 }(i=0)");
         result = applyDrop(term);
-        JavaDLTerm expected = TacletForTests.parseTerm("{i:=0}(i=0)");
+        Term expected = TacletForTests.parseTerm("{i:=0}(i=0)");
         assertEquals(expected, result);
 
         term = TacletForTests.parseTerm("{ i := 0 || i := i }(i=0)");
@@ -48,9 +48,9 @@ public class TestDropEffectlessElementary extends TestCase {
 
     public void testDoubleAssignment() throws Exception {
 
-        JavaDLTerm term = TacletForTests.parseTerm("{ i := j || j := i }(i=0)");
-        JavaDLTerm result = applyDrop(term);
-        JavaDLTerm expected = TacletForTests.parseTerm("{i := j}(i=0)");
+        Term term = TacletForTests.parseTerm("{ i := j || j := i }(i=0)");
+        Term result = applyDrop(term);
+        Term expected = TacletForTests.parseTerm("{i := j}(i=0)");
         assertEquals(expected, result);
 
         term = TacletForTests.parseTerm("{ j := 5 || j := j }(i=0)");
@@ -69,29 +69,29 @@ public class TestDropEffectlessElementary extends TestCase {
         // The parser cannot parse this but this can appear as 
         // result of the sequential to parallel of {i:=i+1}{i:=i}
 
-        JavaDLTerm term;
-        // JavaDLTerm term = TacletForTests.parseTerm("{ {i := i+1}i:=i }(i=0)");
+        Term term;
+        // Term term = TacletForTests.parseTerm("{ {i := i+1}i:=i }(i=0)");
         {
-            JavaDLTerm t0 = TacletForTests.parseTerm("{i := i+1}0").sub(0);
-            JavaDLTerm t1 = TacletForTests.parseTerm("{i := i}0").sub(0);
-            JavaDLTerm t2 = TacletForTests.parseTerm("i=0");
+            Term t0 = TacletForTests.parseTerm("{i := i+1}0").sub(0);
+            Term t1 = TacletForTests.parseTerm("{i := i}0").sub(0);
+            Term t2 = TacletForTests.parseTerm("i=0");
             TermBuilder tb = TacletForTests.services().getTermBuilder();
 
-            JavaDLTerm t3 = tb.apply(t0, t1, null);
+            Term t3 = tb.apply(t0, t1, null);
             term = tb.apply(t3, t2, null);
         }
         assertEquals("{{i:=i + 1}i:=i}(i = 0)", 
                 LogicPrinter.quickPrintTerm(term, TacletForTests.services).trim());
 
-        JavaDLTerm result = applyDrop(term);
+        Term result = applyDrop(term);
         assertEquals(term, result);
     }
 
     //    the following cannot be parsed apparently.
     //    public void testUpdatedUpdate() throws Exception {
-    //        JavaDLTerm term = TacletForTests.parseTerm("({i:=i}{i := i})(i=0)");
-    //        JavaDLTerm result = applyDrop(term);
-    //        JavaDLTerm expected = TacletForTests.parseTerm("i=0");
+    //        Term term = TacletForTests.parseTerm("({i:=i}{i := i})(i=0)");
+    //        Term result = applyDrop(term);
+    //        Term expected = TacletForTests.parseTerm("i=0");
     //        assertEquals(expected, result);
     //        
     //        term = TacletForTests.parseTerm("({i:=i}{j:=5})(i=0)");
@@ -100,10 +100,10 @@ public class TestDropEffectlessElementary extends TestCase {
     //        assertEquals(expected, result);
     //    }
 
-    private JavaDLTerm applyDrop(JavaDLTerm term) {
+    private Term applyDrop(Term term) {
 
-        JavaDLTerm update = term.sub(0);
-        JavaDLTerm arg = term.sub(1);
+        Term update = term.sub(0);
+        Term arg = term.sub(1);
 
         UpdateSV u = SchemaVariableFactory.createUpdateSV(new Name("u"));
         SchemaVariable x = SchemaVariableFactory.createFormulaSV(new Name("x"));

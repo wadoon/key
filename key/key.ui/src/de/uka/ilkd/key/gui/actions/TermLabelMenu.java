@@ -49,7 +49,7 @@ public class TermLabelMenu extends JMenu {
 
     public TermLabelMenu(final MainWindow mainWindow) {
 
-        setText("JavaDLTerm Labels");
+        setText("Term Labels");
         setToolTipText("Configure term label visibility.");
         checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
         this.mainWindow = mainWindow;
@@ -202,7 +202,7 @@ public class TermLabelMenu extends JMenu {
 
         private void setItalicFont() {
             setFont(getFont().deriveFont(Font.ITALIC));
-            setEnabledToolTipText("JavaDLTerm label " + labelName + " does not occur in the current sequent.");
+            setEnabledToolTipText("Term label " + labelName + " does not occur in the current sequent.");
         }
 
         private void setBoldFont() {

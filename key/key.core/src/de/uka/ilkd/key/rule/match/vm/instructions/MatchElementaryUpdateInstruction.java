@@ -4,7 +4,7 @@ import org.key_project.common.core.logic.op.ElementaryUpdate;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -26,7 +26,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
     }
 
     @Override
-    public MatchConditions match(JavaDLTerm instantiationCandidate,
+    public MatchConditions match(Term instantiationCandidate,
             MatchConditions matchCond, Services services) {
         final Operator instantiationCandidateOp = instantiationCandidate.op();
         if (instantiationCandidateOp != op) {

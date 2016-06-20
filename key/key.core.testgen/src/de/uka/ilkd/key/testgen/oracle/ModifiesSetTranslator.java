@@ -2,7 +2,7 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 public class ModifiesSetTranslator {
 	
@@ -10,27 +10,27 @@ public class ModifiesSetTranslator {
 	private OracleGenerator gen;
 	
 	
-	public boolean isSingleTon(JavaDLTerm t){		
+	public boolean isSingleTon(Term t){		
 		return t.op().equals(getLocSetLDT().getSingleton());		
 	}
 	
-	public boolean isUnion(JavaDLTerm t){
+	public boolean isUnion(Term t){
 		return t.op().equals(getLocSetLDT().getUnion());
 	}
 	
-	public boolean isIntersection(JavaDLTerm t){
+	public boolean isIntersection(Term t){
 		return t.op().equals(getLocSetLDT().getIntersect());
 	}
 	
-	public boolean isAllFields(JavaDLTerm t){
+	public boolean isAllFields(Term t){
 		return t.op().equals(getLocSetLDT().getAllFields());
 	}
 	
-	public boolean isAllLocs(JavaDLTerm t){
+	public boolean isAllLocs(Term t){
 		return t.op().equals(getLocSetLDT().getAllLocs());
 	}
 	
-	public boolean isEmpty(JavaDLTerm t){
+	public boolean isEmpty(Term t){
 		return t.op().equals(getLocSetLDT().getEmpty());
 	}	
 	
@@ -44,11 +44,11 @@ public class ModifiesSetTranslator {
 	}
 	
 	
-	public OracleLocationSet translate(JavaDLTerm t){
+	public OracleLocationSet translate(Term t){
 		
 		if(isSingleTon(t)){
-			JavaDLTerm obj = t.sub(0);
-			JavaDLTerm field = t.sub(1);			
+			Term obj = t.sub(0);
+			Term field = t.sub(1);			
 			String objString = gen.generateOracle(obj, false).toString();
 			String fieldString = gen.generateOracle(field, false).toString();			
 			OracleLocation loc = new OracleLocation(objString, fieldString);
@@ -68,7 +68,7 @@ public class ModifiesSetTranslator {
 		}
 		
 		else if(isAllFields(t)){
-			JavaDLTerm obj = t.sub(0);
+			Term obj = t.sub(0);
 			String objString = gen.generateOracle(obj, false).toString();
 			OracleLocation loc = new OracleLocation(objString);
 			return OracleLocationSet.singleton(loc);

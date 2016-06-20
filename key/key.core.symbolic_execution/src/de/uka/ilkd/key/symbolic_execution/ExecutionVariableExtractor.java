@@ -17,7 +17,7 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -43,12 +43,12 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
    /**
     * An optional additional condition.
     */
-   private final JavaDLTerm additionalCondition;
+   private final Term additionalCondition;
    
    /**
     * The layout term.
     */
-   private final JavaDLTerm layoutTerm;
+   private final Term layoutTerm;
    
    /**
     * The current locations.
@@ -58,7 +58,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
    /**
     * The objects to ignore.
     */
-   private final Set<JavaDLTerm> objectsToIgnore;
+   private final Set<Term> objectsToIgnore;
    
    /**
     * The found {@link IExecutionVariable}s available via {@link #analyse()}.
@@ -73,29 +73,29 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} which provides the state.
-    * @param modalityPio The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the {@link Node}.
+    * @param modalityPio The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the {@link Node}.
     * @param executionNode The current {@link IExecutionNode}.
     * @param condition An optional additional condition.
     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     * @throws ProofInputException Occurred Exception
     */
    public ExecutionVariableExtractor(Node node, 
-                                     PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPio, 
+                                     PosInOccurrence<Term, SequentFormula<Term>> modalityPio, 
                                      IExecutionNode<?> executionNode, 
-                                     JavaDLTerm condition,
+                                     Term condition,
                                      boolean simplifyConditions) throws ProofInputException {
       super(node, modalityPio);
       this.executionNode = executionNode;
       this.additionalCondition = condition;
       this.simplifyConditions = simplifyConditions;
       // Get path condition
-      JavaDLTerm pathCondition = SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), simplifyConditions, false);
+      Term pathCondition = SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), simplifyConditions, false);
       pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
       // Extract locations from updates
       Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
       objectsToIgnore = computeInitialObjectsToIgnore(false, false); // Contains all objects which should be ignored, like exc of the proof obligation.
-      Set<JavaDLTerm> updateCreatedObjects = new LinkedHashSet<JavaDLTerm>(); // Contains all objects which are created during symbolic execution
-      Set<JavaDLTerm> updateValueObjects = new LinkedHashSet<JavaDLTerm>(); // Contains all objects which are the value of an update
+      Set<Term> updateCreatedObjects = new LinkedHashSet<Term>(); // Contains all objects which are created during symbolic execution
+      Set<Term> updateValueObjects = new LinkedHashSet<Term>(); // Contains all objects which are the value of an update
       collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations, updateCreatedObjects, updateValueObjects, objectsToIgnore);
       objectsToIgnore.addAll(updateCreatedObjects);
       Set<ExtractLocationParameter> initialLocations = extractLocationsFromTerm(pathCondition, objectsToIgnore);
@@ -174,14 +174,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     * @param pairs The {@link ExecutionVariableValuePair}s to represent.
     * @param contentMap The {@link Map} providing child content information.
     * @param parentValue The optional parent {@link IExecutionValue}.
-    * @param alreadyVisitedObjects The value {@link JavaDLTerm}s of already visited objects on the current path in the variable-value-hierarchy.
+    * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the current path in the variable-value-hierarchy.
     * @return The created {@link IExecutionVariable}.
     * @throws ProofInputException Occurred Exception.
     */
    protected IExecutionVariable createVariablesValueStructure(final List<ExecutionVariableValuePair> pairs, 
                                                               final Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap,
                                                               final ExtractedExecutionValue parentValue,
-                                                              final ImmutableList<JavaDLTerm> alreadyVisitedObjects) throws ProofInputException {
+                                                              final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
       assert !pairs.isEmpty();
       // Create variable
       ExecutionVariableValuePair firstPair = pairs.get(0);
@@ -209,7 +209,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     * @param firstPair The first entry in the {@link ExecutionVariableValuePair}s.
     * @param contentMap The content {@link Map}.
     * @param valueListToFill The result {@link List} to fill.
-    * @param alreadyVisitedObjects The value {@link JavaDLTerm}s of already visited objects on the current path in the variable-value-hierarchy.
+    * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the current path in the variable-value-hierarchy.
     * @throws ProofInputException Occurred Exception.
     */
    protected void createValues(final IExecutionVariable variable, 
@@ -217,9 +217,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                final ExecutionVariableValuePair firstPair, 
                                final Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap,
                                final List<IExecutionValue> valueListToFill,
-                               final ImmutableList<JavaDLTerm> alreadyVisitedObjects) throws ProofInputException {
+                               final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
       // Group pairs with same value but with different conditions
-      Map<JavaDLTerm, List<ExecutionVariableValuePair>> groupedPairs = new LinkedHashMap<JavaDLTerm, List<ExecutionVariableValuePair>>();
+      Map<Term, List<ExecutionVariableValuePair>> groupedPairs = new LinkedHashMap<Term, List<ExecutionVariableValuePair>>();
       for (ExecutionVariableValuePair pair : pairs) {
          assert firstPair.getProgramVariable() == pair.getProgramVariable();
          assert firstPair.getArrayIndex() == pair.getArrayIndex();
@@ -241,7 +241,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                                                         pair.getCondition(), 
                                                                         pair.getValue());
             valueListToFill.add(value);
-            Pair<Boolean, ImmutableList<JavaDLTerm>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, pair.getValue());
+            Pair<Boolean, ImmutableList<Term>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, pair.getValue());
             if (!cycleCheckResult.first) { // No cycle detected
                ParentDefinition parentDef = new ParentDefinition(pair.getValue(), pair.getGoalNode());
                Map<LocationDefinition, List<ExecutionVariableValuePair>> content = contentMap.get(parentDef);
@@ -253,7 +253,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             }
          }
          else {
-            List<JavaDLTerm> conditions = new LinkedList<JavaDLTerm>();
+            List<Term> conditions = new LinkedList<Term>();
             Map<LocationDefinition, List<ExecutionVariableValuePair>> childContentMap = new LinkedHashMap<ExecutionVariableExtractor.LocationDefinition, List<ExecutionVariableValuePair>>();
             for (ExecutionVariableValuePair pair : group) {
                conditions.add(pair.getCondition());
@@ -271,7 +271,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                }
             }
             final Services services = getServices();
-            JavaDLTerm comboundPathCondition = services.getTermBuilder().or(conditions);
+            Term comboundPathCondition = services.getTermBuilder().or(conditions);
             if (simplifyConditions) {
                comboundPathCondition = SymbolicExecutionUtil.simplify(getProof().getInitConfig(), getProof(), comboundPathCondition);
             }
@@ -282,7 +282,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                                                         comboundPathCondition, 
                                                                         group.get(0).getValue());
             valueListToFill.add(value);
-            Pair<Boolean, ImmutableList<JavaDLTerm>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, group.get(0).getValue());
+            Pair<Boolean, ImmutableList<Term>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, group.get(0).getValue());
             if (!cycleCheckResult.first) { // No cycle detected
                if (!childContentMap.isEmpty()) {
                   for (List<ExecutionVariableValuePair> child : childContentMap.values()) {
@@ -296,12 +296,12 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
    
    /**
     * Updates the already visited objects list if required.
-    * @param alreadyVisitedObjects The value {@link JavaDLTerm}s of already visited objects on the current path in the variable-value-hierarchy.
+    * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the current path in the variable-value-hierarchy.
     * @param value The current value.
     * @return The new already visited objects list or the original one if the current value is not an object.
     */
-   protected Pair<Boolean, ImmutableList<JavaDLTerm>> updateAlreadyVisitedObjects(final ImmutableList<JavaDLTerm> alreadyVisitedObjects, JavaDLTerm value) {
-      ImmutableList<JavaDLTerm> alreadyVisitedObjectsForChildren = alreadyVisitedObjects;
+   protected Pair<Boolean, ImmutableList<Term>> updateAlreadyVisitedObjects(final ImmutableList<Term> alreadyVisitedObjects, Term value) {
+      ImmutableList<Term> alreadyVisitedObjectsForChildren = alreadyVisitedObjects;
       boolean cycleDetected = false;
       if (value != null &&
           SymbolicExecutionUtil.hasReferenceSort(getServices(), value) &&
@@ -313,7 +313,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             cycleDetected = true;
          }
       }
-      return new Pair<Boolean, ImmutableList<JavaDLTerm>>(cycleDetected, alreadyVisitedObjectsForChildren);
+      return new Pair<Boolean, ImmutableList<Term>>(cycleDetected, alreadyVisitedObjectsForChildren);
    }
    
    /**
@@ -324,7 +324,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       /**
        * The parent.
        */
-      private final JavaDLTerm parent;
+      private final Term parent;
       
       /**
        * The {@link Node} on which this result is based on.
@@ -336,7 +336,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        * @param parent The parent.
        * @param goalNode The {@link Node} on which this result is based on.
        */
-      public ParentDefinition(JavaDLTerm parent, Node goalNode) {
+      public ParentDefinition(Term parent, Node goalNode) {
          this.parent = parent;
          this.goalNode = goalNode;
       }
@@ -381,14 +381,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       /**
        * The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      private final JavaDLTerm arrayIndex;
+      private final Term arrayIndex;
 
       /**
        * Constructor.
        * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is used instead.
        * @param arrayIndex The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      public LocationDefinition(ProgramVariable programVariable, JavaDLTerm arrayIndex) {
+      public LocationDefinition(ProgramVariable programVariable, Term arrayIndex) {
          this.programVariable = programVariable;
          this.arrayIndex = arrayIndex;
       }
@@ -434,17 +434,17 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        * Constructor.
        * @param parentNode The {@link IExecutionNode} providing relevant information.
        * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
-       * @param modalityPIO The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
+       * @param modalityPIO The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
        * @param programVariable The represented {@link IProgramVariable} which value is shown.
        * @param arrayIndex The index in the parent array.
        * @param additionalCondition An optional additional condition to consider.
        */
       public StateExecutionVariable(IExecutionNode<?> parentNode, 
                                     Node proofNode, 
-                                    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO,
+                                    PosInOccurrence<Term, SequentFormula<Term>> modalityPIO,
                                     IProgramVariable programVariable,
-                                    JavaDLTerm arrayIndex,
-                                    JavaDLTerm additionalCondition) {
+                                    Term arrayIndex,
+                                    Term additionalCondition) {
          super(parentNode.getSettings(),
                proofNode, 
                programVariable, 
@@ -474,7 +474,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                      List<IExecutionValue> values = new LinkedList<IExecutionValue>();
                      StateExecutionVariable variable = allStateVariables.get(new LocationDefinition(firstPair.getProgramVariable(), firstPair.getArrayIndex()));
                      assert variable != null;
-                     createValues(variable, pairsList, firstPair, contentMap, values, ImmutableSLList.<JavaDLTerm>nil());
+                     createValues(variable, pairsList, firstPair, contentMap, values, ImmutableSLList.<Term>nil());
                      variable.values = values.toArray(new IExecutionValue[values.size()]);
                   }
                }
@@ -487,7 +487,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm createSelectTerm() {
+      public Term createSelectTerm() {
          return SymbolicExecutionUtil.createSelectTerm(this);
       }
    }
@@ -506,7 +506,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        * Constructor.
        * @param parentNode The {@link IExecutionNode} providing relevant information.
        * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
-       * @param modalityPIO The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
+       * @param modalityPIO The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
        * @param programVariable The represented {@link IProgramVariable} which value is shown.
        * @param arrayIndex The index in the parent array.
        * @param additionalCondition An optional additional condition to consider.
@@ -514,10 +514,10 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        */
       public ExtractedExecutionVariable(IExecutionNode<?> parentNode, 
                                         Node proofNode, 
-                                        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO,
+                                        PosInOccurrence<Term, SequentFormula<Term>> modalityPIO,
                                         IProgramVariable programVariable,
-                                        JavaDLTerm arrayIndex,
-                                        JavaDLTerm additionalCondition,
+                                        Term arrayIndex,
+                                        Term additionalCondition,
                                         ExtractedExecutionValue parentValue) {
          super(parentNode.getSettings(),
                proofNode, 
@@ -548,7 +548,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm createSelectTerm() {
+      public Term createSelectTerm() {
          return SymbolicExecutionUtil.createSelectTerm(this);
       }
    }
@@ -579,8 +579,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       public ExtractedExecutionValue(IExecutionNode<?> parentNode, 
                                      Node proofNode, 
                                      IExecutionVariable variable, 
-                                     JavaDLTerm condition, 
-                                     JavaDLTerm value) {
+                                     Term condition, 
+                                     Term value) {
          super(parentNode.getSettings(), proofNode, variable, condition, value);
          this.parentNode = parentNode;
       }

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -31,7 +31,7 @@ public class POSnippetFactory {
             LoopInvariant invariant,
             ProofObligationVars vars,
             ExecutionContext context,
-            JavaDLTerm guardTerm,
+            Term guardTerm,
             Services services) {
         return new BasicPOSnippetFactoryImpl(invariant, vars, context,
                                              guardTerm, services);
@@ -63,7 +63,7 @@ public class POSnippetFactory {
             ProofObligationVars vars1,
             ProofObligationVars vars2,
             ExecutionContext context,
-            JavaDLTerm guardTerm,
+            Term guardTerm,
             Services services) {
         return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, context,
                                                guardTerm, services);

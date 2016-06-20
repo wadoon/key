@@ -2,7 +2,7 @@ package de.uka.ilkd.key.parser;
 
 import org.antlr.runtime.RecognitionException;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * Testing pretty-printing and parsing of seqGet terms in this class.
@@ -37,8 +37,8 @@ public class TestTermParserSorts extends AbstractTestTermParser {
          * Test any::seqGet(s,i)
          */
         String pp = "s[i]";
-        JavaDLTerm expected = parseTerm("any::seqGet(s,i)");
-        JavaDLTerm actual = parseTerm(pp);
+        Term expected = parseTerm("any::seqGet(s,i)");
+        Term actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
         assertEqualsIgnoreWhitespaces(printTerm(expected), pp); // test pretty-printing
 
@@ -75,7 +75,7 @@ public class TestTermParserSorts extends AbstractTestTermParser {
      */
     public void testParseIntegerArgs() throws Exception {
         String s = "testTermParserSorts.IntegerMethods::queryByte(heap,a,Z(0(#)))";
-        JavaDLTerm t = parseTerm("a.queryByte(0)");
+        Term t = parseTerm("a.queryByte(0)");
         assertEquals(s, t.toString());
 
         s = "testTermParserSorts.IntegerMethods::queryByteArray(heap,a,ba)";

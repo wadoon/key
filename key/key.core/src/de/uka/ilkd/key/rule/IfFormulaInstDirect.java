@@ -16,7 +16,7 @@ package de.uka.ilkd.key.rule;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 
@@ -30,16 +30,16 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     /**
      * Simply the formula
      */ 
-    private SequentFormula<JavaDLTerm> cf;
+    private SequentFormula<Term> cf;
 
-    public IfFormulaInstDirect ( SequentFormula<JavaDLTerm> p_cf ) {
+    public IfFormulaInstDirect ( SequentFormula<Term> p_cf ) {
 	cf = p_cf;
     }
 
     /**
      * @return the cf this is pointing to
      */
-    public SequentFormula<JavaDLTerm> getConstrainedFormula () {
+    public SequentFormula<Term> getConstrainedFormula () {
 	return cf;
     }    
 

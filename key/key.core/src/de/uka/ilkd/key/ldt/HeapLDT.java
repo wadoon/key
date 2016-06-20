@@ -35,7 +35,7 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -426,7 +426,7 @@ public final class HeapLDT extends LDT {
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                                 JavaDLTerm[] subs, 
+                                 Term[] subs, 
                                  Services services, 
                                  ExecutionContext ec) {
 	return false;
@@ -435,8 +435,8 @@ public final class HeapLDT extends LDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                		 JavaDLTerm left, 
-                		 JavaDLTerm right, 
+                		 Term left, 
+                		 Term right, 
                 		 Services services, 
                 		 ExecutionContext ec) {
 	return false;
@@ -445,7 +445,7 @@ public final class HeapLDT extends LDT {
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	    			 JavaDLTerm sub, 
+	    			 Term sub, 
 	    			 JavaDLTermServices services, 
 	    			 ExecutionContext ec) {
 	return false;
@@ -453,7 +453,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public JavaDLTerm translateLiteral(Literal lit, Services services) {
+    public Term translateLiteral(Literal lit, Services services) {
 	assert false;
 	return null;
     }
@@ -475,7 +475,7 @@ public final class HeapLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
+    public Expression translateTerm(Term t, ExtList children, Services services) {
     	if (t.op() instanceof SortDependingFunction && 
     			((SortDependingFunction)t.op()).isSimilar(select)) {
     		ProgramVariable heap = (ProgramVariable) children.remove(0);
@@ -497,7 +497,7 @@ public final class HeapLDT extends LDT {
     
     
     @Override
-    public final Type getType(JavaDLTerm t) {
+    public final Type getType(Term t) {
 	assert false;
 	return null;
     }

@@ -142,17 +142,17 @@ public class CreateTacletForTests extends TestCase {
 	SchemaVariable var_rn = SchemaVariableFactory.createTermSV(new Name("rn"),nat);
 	SchemaVariable var_rm = SchemaVariableFactory.createTermSV(new Name("rm"),nat);
 
-	JavaDLTerm t_rn = tf.createTerm(var_rn,new JavaDLTerm[]{});
-	JavaDLTerm t_rm = tf.createTerm(var_rm,new JavaDLTerm[]{});
-	JavaDLTerm t_0 = tf.createTerm(func_0,new JavaDLTerm[]{});	
-	JavaDLTerm t_rnminus1=tf.createTerm(func_min1,new JavaDLTerm[]{t_rn});
-	JavaDLTerm t_rnminus1plus1=tf.createTerm(func_plus1,
-						   new JavaDLTerm[]{t_rnminus1});
-	JavaDLTerm t_rneq0=tf.createTerm(func_eq,new JavaDLTerm[]{t_rn,t_0});
-	//	JavaDLTerm t_0minus1=tf.createTerm(func_min1,
-	//		     new JavaDLTerm[]{t_0});
-	JavaDLTerm t_0plus1=tf.createTerm(func_plus1,
-						new JavaDLTerm[]{t_0});
+	Term t_rn = tf.createTerm(var_rn,new Term[]{});
+	Term t_rm = tf.createTerm(var_rm,new Term[]{});
+	Term t_0 = tf.createTerm(func_0,new Term[]{});	
+	Term t_rnminus1=tf.createTerm(func_min1,new Term[]{t_rn});
+	Term t_rnminus1plus1=tf.createTerm(func_plus1,
+						   new Term[]{t_rnminus1});
+	Term t_rneq0=tf.createTerm(func_eq,new Term[]{t_rn,t_0});
+	//	Term t_0minus1=tf.createTerm(func_min1,
+	//		     new Term[]{t_0});
+	Term t_0plus1=tf.createTerm(func_plus1,
+						new Term[]{t_0});
 
 	// help rule r1: find(rn) replacewith(0) replacewith(0)
 	RewriteTacletBuilder<RewriteTaclet> rwb1=new RewriteTacletBuilder<RewriteTaclet>();	
@@ -185,7 +185,7 @@ public class CreateTacletForTests extends TestCase {
 	// find(rn + 0) replacewith(rn)
 	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(tf.createTerm(func_plus,
-						new JavaDLTerm[]{t_rn, t_0}));
+						new Term[]{t_rn, t_0}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 				    ImmutableSLList.<Taclet>nil(),
@@ -197,7 +197,7 @@ public class CreateTacletForTests extends TestCase {
 	// find(0 + rn) replacewith(rn)
 	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(tf.createTerm(func_plus,
-						new JavaDLTerm[]{t_0, t_rn}));
+						new Term[]{t_0, t_rn}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 				    ImmutableSLList.<Taclet>nil(),
@@ -209,8 +209,8 @@ public class CreateTacletForTests extends TestCase {
 	//closewitheq
 	// find(=> rn=rn)
 	SuccTacletBuilder sbuilder=new SuccTacletBuilder();
-	JavaDLTerm t_rneqrn=tf.createTerm(func_eq,
-					    new JavaDLTerm[]{t_rn, t_rn});
+	Term t_rneqrn=tf.createTerm(func_eq,
+					    new Term[]{t_rn, t_rn});
 	sbuilder.setFind( t_rneqrn);
 	sbuilder.setName(new Name("close-with-eq"));
        	closewitheq=sbuilder.getSuccTaclet();
@@ -218,15 +218,15 @@ public class CreateTacletForTests extends TestCase {
 
 	//switch first succ
 	// find((rn +1) + rm) replacewith((rn + rm) +1)
-	JavaDLTerm t_rnplus1=tf.createTerm(func_plus1, 
-					   new JavaDLTerm[]{t_rn});
-	JavaDLTerm t_rnplus1plusrm=tf.createTerm(func_plus, 
-					   new JavaDLTerm[]{t_rnplus1, t_rm});
+	Term t_rnplus1=tf.createTerm(func_plus1, 
+					   new Term[]{t_rn});
+	Term t_rnplus1plusrm=tf.createTerm(func_plus, 
+					   new Term[]{t_rnplus1, t_rm});
 
-	JavaDLTerm t_rnplusrm=tf.createTerm(func_plus, 
-					   new JavaDLTerm[]{t_rn, t_rm});
-	JavaDLTerm t_rnplusrmplus1=tf.createTerm(func_plus1, 
-					   new JavaDLTerm[]{t_rnplusrm});
+	Term t_rnplusrm=tf.createTerm(func_plus, 
+					   new Term[]{t_rn, t_rm});
+	Term t_rnplusrmplus1=tf.createTerm(func_plus1, 
+					   new Term[]{t_rnplusrm});
 
 	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(t_rnplus1plusrm);
@@ -241,10 +241,10 @@ public class CreateTacletForTests extends TestCase {
 
 	//switch second succ
 	// find(rn + (rm +1)) replacewith((rn + rm) +1)
-	JavaDLTerm t_rmplus1=tf.createTerm(func_plus1, 
-					   new JavaDLTerm[]{t_rm});
-	JavaDLTerm t_rnplus_rmplus1=tf.createTerm(func_plus, 
-					   new JavaDLTerm[]{t_rn, t_rmplus1});
+	Term t_rmplus1=tf.createTerm(func_plus1, 
+					   new Term[]{t_rm});
+	Term t_rnplus_rmplus1=tf.createTerm(func_plus, 
+					   new Term[]{t_rn, t_rmplus1});
 	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(t_rnplus_rmplus1);
 	rwbuilder.addTacletGoalTemplate(new
@@ -256,11 +256,11 @@ public class CreateTacletForTests extends TestCase {
 
 	//elim-succ
 	// find(rn +1 = rm +1) replacewith(rn=rm)
-	JavaDLTerm t_rneqrm=tf.createTerm(func_eq,
-					    new JavaDLTerm[]{t_rn, t_rm});
+	Term t_rneqrm=tf.createTerm(func_eq,
+					    new Term[]{t_rn, t_rm});
 	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(tf.createTerm(func_eq,
-						new JavaDLTerm[]{t_rnplus1,
+						new Term[]{t_rnplus1,
 							   t_rmplus1}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -294,7 +294,7 @@ public class CreateTacletForTests extends TestCase {
 	// problem
 
 	String test1="\\predicates {A; B; } (A -> B) -> (!(!(A -> B)))";
-	JavaDLTerm t_test1=null;
+	Term t_test1=null;
 	try{
 	    KeYParserF parser=
 		new KeYParserF(ParserMode.PROBLEM,new KeYLexerF(test1,
@@ -304,8 +304,8 @@ public class CreateTacletForTests extends TestCase {
 	    System.err.println("Parser Error or Input Error");
 	    fail("Parser Error");
 	}	
-	SequentFormula<JavaDLTerm> cf=new SequentFormula<>(t_test1);
-	SequentFormula<JavaDLTerm> cf2=new SequentFormula<>(t_test1);
+	SequentFormula<Term> cf=new SequentFormula<>(t_test1);
+	SequentFormula<Term> cf2=new SequentFormula<>(t_test1);
 	seq_test1 = Sequent.createSequent(Semisequent.nil(),
 		    Semisequent.nil().insert(0,cf).semisequent()); 
 	seq_test2 = Sequent.createSequent(Semisequent.nil()
@@ -326,27 +326,27 @@ public class CreateTacletForTests extends TestCase {
 	Function const_d=new Function(new Name("d"),nat,new SortImpl[0]);
 	nss.functions().add(const_d);
 
-	JavaDLTerm t_c=tf.createTerm(const_c,new JavaDLTerm[]{});
-	JavaDLTerm t_d=tf.createTerm(const_d,new JavaDLTerm[]{});
-	JavaDLTerm t_cplusd=tf.createTerm(func_plus,new JavaDLTerm[]{t_c,t_d});	
-	JavaDLTerm t_dminus1=tf.createTerm(func_min1,new JavaDLTerm[]{t_d});
-	JavaDLTerm t_dminus1plus1=tf.createTerm(func_plus1,
-						  new JavaDLTerm[]{t_dminus1});	
-	JavaDLTerm t_dminus1plus1plusc=tf.createTerm
-	    (func_plus,new JavaDLTerm[]{t_dminus1plus1,t_c});
-	JavaDLTerm t_eq1=tf.createTerm
-	    (func_eq,new JavaDLTerm[]{t_cplusd, t_dminus1plus1plusc});
+	Term t_c=tf.createTerm(const_c,new Term[]{});
+	Term t_d=tf.createTerm(const_d,new Term[]{});
+	Term t_cplusd=tf.createTerm(func_plus,new Term[]{t_c,t_d});	
+	Term t_dminus1=tf.createTerm(func_min1,new Term[]{t_d});
+	Term t_dminus1plus1=tf.createTerm(func_plus1,
+						  new Term[]{t_dminus1});	
+	Term t_dminus1plus1plusc=tf.createTerm
+	    (func_plus,new Term[]{t_dminus1plus1,t_c});
+	Term t_eq1=tf.createTerm
+	    (func_eq,new Term[]{t_cplusd, t_dminus1plus1plusc});
 	
 
-	JavaDLTerm t_cplus1=tf.createTerm(func_plus1,new JavaDLTerm[]{t_c});
-	JavaDLTerm t_cplus1plusd=tf.createTerm(func_plus,
-						 new JavaDLTerm[]{t_cplus1,
+	Term t_cplus1=tf.createTerm(func_plus1,new Term[]{t_c});
+	Term t_cplus1plusd=tf.createTerm(func_plus,
+						 new Term[]{t_cplus1,
 							    t_d});
-	JavaDLTerm t_dpluscplus1=tf.createTerm(func_plus,
-						 new JavaDLTerm[]{t_d,t_cplus1});
-	JavaDLTerm t_eq2=tf.createTerm
-	    (func_eq,new JavaDLTerm[]{ t_cplus1plusd, t_dpluscplus1});
-	JavaDLTerm tnat=tf.createTerm(Junctor.IMP, t_eq1, t_eq2);
+	Term t_dpluscplus1=tf.createTerm(func_plus,
+						 new Term[]{t_d,t_cplus1});
+	Term t_eq2=tf.createTerm
+	    (func_eq,new Term[]{ t_cplus1plusd, t_dpluscplus1});
+	Term tnat=tf.createTerm(Junctor.IMP, t_eq1, t_eq2);
 
 	// => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
 	seq_testNat=Sequent.createSequent
@@ -356,9 +356,9 @@ public class CreateTacletForTests extends TestCase {
 
 
 	z = new LogicVariable(new Name("z"),sort1);
-       	JavaDLTerm t_z=tf.createTerm(z,new JavaDLTerm[0]);
-	JavaDLTerm t_allzpz=services.getTermBuilder().all(z, tf.createTerm(func_p,new JavaDLTerm[]{t_z}));
- 	SequentFormula<JavaDLTerm> cf3=new SequentFormula<>(t_allzpz);
+       	Term t_z=tf.createTerm(z,new Term[0]);
+	Term t_allzpz=services.getTermBuilder().all(z, tf.createTerm(func_p,new Term[]{t_z}));
+ 	SequentFormula<Term> cf3=new SequentFormula<>(t_allzpz);
  	seq_testAll=Sequent.createSequent(Semisequent.nil(), 
  					  Semisequent.nil()
 					  .insert(0,cf3).semisequent()); 

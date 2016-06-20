@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 /**
@@ -23,12 +23,12 @@ import de.uka.ilkd.key.logic.JavaDLTerm;
  */
 public final class SLExpression {
 
-    private final JavaDLTerm term;
+    private final Term term;
     private final KeYJavaType type;
     private final boolean isTerm;
 
 
-    public SLExpression(JavaDLTerm term,
+    public SLExpression(Term term,
 	                KeYJavaType type,
 	                boolean isTerm) {
 	assert term != null;
@@ -42,16 +42,16 @@ public final class SLExpression {
     }
 
 
-    public SLExpression(JavaDLTerm term,
+    public SLExpression(Term term,
 	                KeYJavaType type) {
 	this(term, type, true);
     }
 
 
     /**
-     * USE WITH CARE! JavaDLTerm-SLExpressions should have a type!
+     * USE WITH CARE! Term-SLExpressions should have a type!
      */
-    public SLExpression(JavaDLTerm term) {
+    public SLExpression(Term term) {
 	assert term != null;
 	this.term = term;
 	this.type = null;
@@ -77,7 +77,7 @@ public final class SLExpression {
     }
 
 
-    public JavaDLTerm getTerm() {
+    public Term getTerm() {
 	return term;
     }
 

@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.FormulaTag;
@@ -86,7 +86,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     protected static TacletAppContainer createContainer(RuleApp p_app,
-                                                        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pio,
+                                                        PosInOccurrence<Term, SequentFormula<Term>> p_pio,
                                                         Goal p_goal,
                                                         Strategy p_strategy,
                                                         boolean p_initial) {
@@ -96,7 +96,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     private static TacletAppContainer createContainer(RuleApp p_app,
-                                                      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pio,
+                                                      PosInOccurrence<Term, SequentFormula<Term>> p_pio,
                                                       Goal p_goal,
                                                       RuleAppCost p_cost,
                                                       boolean p_initial) {
@@ -251,7 +251,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
     
     protected static ImmutableList<RuleAppContainer> createInitialAppContainers(ImmutableList<NoPosTacletApp> p_app, 
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pio, Goal p_goal, Strategy p_strategy) {
+            PosInOccurrence<Term, SequentFormula<Term>> p_pio, Goal p_goal, Strategy p_strategy) {
         
         List<RuleAppCost> costs = new LinkedList<>();
         
@@ -279,7 +279,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     static RuleAppContainer createAppContainers
         ( NoPosTacletApp  p_app,
-          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pio,
+          PosInOccurrence<Term, SequentFormula<Term>> p_pio,
           Goal            p_goal,
           Strategy        p_strategy ) {
         if ( !( p_pio == null
@@ -331,7 +331,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     protected abstract boolean isStillApplicable ( Goal p_goal );
 
 
-    protected PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getPosInOccurrence ( Goal p_goal ) {
+    protected PosInOccurrence<Term, SequentFormula<Term>> getPosInOccurrence ( Goal p_goal ) {
     	return null;
     }
 
@@ -349,7 +349,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         TacletApp app = getTacletApp ();
 
-        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = getPosInOccurrence ( p_goal );
+        final PosInOccurrence<Term, SequentFormula<Term>> pio = getPosInOccurrence ( p_goal );
         if ( !strategy.isApprovedApp(app, pio, p_goal) ) return null;
 
         Services services = p_goal.proof().getServices();
@@ -500,9 +500,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         private boolean isNewFormulaDirect (IfFormulaInstantiation p_ifInstantiation) {
             final boolean antec = ( (IfFormulaInstSeq)p_ifInstantiation ).inAntec ();
 
-            final SequentFormula<JavaDLTerm> cfma = p_ifInstantiation.getConstrainedFormula ();
-            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( cfma,
-                                                              PosInTerm.<JavaDLTerm>getTopLevel(),
+            final SequentFormula<Term> cfma = p_ifInstantiation.getConstrainedFormula ();
+            final PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>> ( cfma,
+                                                              PosInTerm.<Term>getTopLevel(),
                                                               antec );
 
             final FormulaTagManager tagManager = goal.getFormulaTagManager ();
@@ -561,8 +561,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
          *            formula that has been modified recently
          */
         private void findIfFormulaInstantiationsHelp
-            ( ImmutableList<SequentFormula<JavaDLTerm>>      p_ifSeqTail,
-              ImmutableList<SequentFormula<JavaDLTerm>>      p_ifSeqTail2nd,
+            ( ImmutableList<SequentFormula<Term>>      p_ifSeqTail,
+              ImmutableList<SequentFormula<Term>>      p_ifSeqTail2nd,
               ImmutableList<IfFormulaInstantiation>  p_alreadyMatched,
               MatchConditions               p_matchCond,
               boolean                       p_alreadyMatchedNewFor ) {
@@ -624,10 +624,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                     getServices());
         }
 
-        private ImmutableList<SequentFormula<JavaDLTerm>> createSemisequentList ( Semisequent p_ss ) {
-            ImmutableList<SequentFormula<JavaDLTerm>> res = ImmutableSLList.<SequentFormula<JavaDLTerm>>nil();
+        private ImmutableList<SequentFormula<Term>> createSemisequentList ( Semisequent p_ss ) {
+            ImmutableList<SequentFormula<Term>> res = ImmutableSLList.<SequentFormula<Term>>nil();
 
-            for (final SequentFormula<JavaDLTerm> cf : p_ss) {
+            for (final SequentFormula<Term> cf : p_ss) {
                 res = res.prepend ( cf );
             }
             return res;

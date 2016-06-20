@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
@@ -46,11 +46,11 @@ public class CoeffGcdProjection implements ProjectionToTerm {
         return new CoeffGcdProjection ( monomialLeft, polynomialRight );
     }
 
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
 
-        final JavaDLTerm monoT = monomialLeft.toTerm ( app, pos, goal );
-        final JavaDLTerm polyT = polynomialRight.toTerm ( app, pos, goal );
+        final Term monoT = monomialLeft.toTerm ( app, pos, goal );
+        final Term polyT = polynomialRight.toTerm ( app, pos, goal );
 
         final Monomial mono = Monomial.create ( monoT, services );
         final Polynomial poly = Polynomial.create ( polyT, services );

@@ -31,7 +31,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -188,7 +188,7 @@ public class TacletForTests {
 	return (Sort)getSorts().lookup(new Name(name));
     }
 
-    public static JavaDLTerm parseTerm(String termstr, Services services) {
+    public static Term parseTerm(String termstr, Services services) {
 	if (termstr.equals("")) return null;
 	
 	StringReader br = null;
@@ -213,7 +213,7 @@ public class TacletForTests {
 	
     }
 
-    public static JavaDLTerm parseTerm(String termstr, NamespaceSet set) {
+    public static Term parseTerm(String termstr, NamespaceSet set) {
 	if (termstr.equals("")) return null;
 	StringReader br = null;
 	try {	    
@@ -236,7 +236,7 @@ public class TacletForTests {
 	
     }
 
-    public static JavaDLTerm parseTerm(String termstr) {
+    public static Term parseTerm(String termstr) {
 	return parseTerm(termstr, services());
     }
 

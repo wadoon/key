@@ -17,7 +17,7 @@ import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.SubstOp;
@@ -38,19 +38,19 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
    @Override
    public TermLabel keepLabel(TermLabelState state,
                               Services services,
-                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, 
-                              JavaDLTerm applicationTerm, 
+                              PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, 
+                              Term applicationTerm, 
                               Rule rule, 
                               Goal goal, 
                               Object hint, 
-                              JavaDLTerm tacletTerm, 
+                              Term tacletTerm, 
                               Operator newTermOp, 
-                              ImmutableArray<JavaDLTerm> newTermSubs, 
+                              ImmutableArray<Term> newTermSubs, 
                               ImmutableArray<QuantifiableVariable> newTermBoundVars, 
                               JavaBlock newTermJavaBlock, 
                               ImmutableArray<TermLabel> newTermOriginalLabels,
                               TermLabel label) {
-      // Maintain label if new JavaDLTerm is a predicate
+      // Maintain label if new Term is a predicate
       if (TruthValueTracingUtil.isPredicate(newTermOp) || 
           TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs)) {
          assert label instanceof FormulaTermLabel;
@@ -114,11 +114,11 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
          }
       }
       else if (UpdateApplication.UPDATE_APPLICATION.equals(newTermOp)) {
-         JavaDLTerm target = newTermSubs.get(UpdateApplication.targetPos());
+         Term target = newTermSubs.get(UpdateApplication.targetPos());
          TermLabel targetLabel = target.getLabel(FormulaTermLabel.NAME);
          if (targetLabel instanceof FormulaTermLabel) {
             if (applicationPosInOccurrence != null) {
-               JavaDLTerm appliationTerm = applicationPosInOccurrence.subTerm();
+               Term appliationTerm = applicationPosInOccurrence.subTerm();
                TermLabel applicationLabel = appliationTerm.getLabel(FormulaTermLabel.NAME);
                if (applicationLabel instanceof FormulaTermLabel) {
                   // Let the PredicateTermLabelRefactoring perform the refactoring, see also PredicateTermLabelRefactoring#UPDATE_REFACTORING_REQUIRED
@@ -137,16 +137,16 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
    }
 
    /**
-    * Checks if the currently treated taclet {@link JavaDLTerm} is a child
+    * Checks if the currently treated taclet {@link Term} is a child
     * of an if-then-else operation.
-    * @param visitStack The taclet {@link JavaDLTerm} stack.
+    * @param visitStack The taclet {@link Term} stack.
     * @return {@code true} is below if-then-else, {@code false} otherwise.
     */
-   protected boolean isBelowIfThenElse(Deque<JavaDLTerm> visitStack) {
+   protected boolean isBelowIfThenElse(Deque<Term> visitStack) {
       if (visitStack != null) {
-         return CollectionUtil.search(visitStack, new IFilter<JavaDLTerm>() {
+         return CollectionUtil.search(visitStack, new IFilter<Term>() {
             @Override
-            public boolean select(JavaDLTerm element) {
+            public boolean select(Term element) {
                return element.op() == IfThenElse.IF_THEN_ELSE;
             }
          }) != null;
@@ -172,12 +172,12 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
    }
 
    /**
-    * Checks if the given taclet {@link JavaDLTerm} is top level.
+    * Checks if the given taclet {@link Term} is top level.
     * @param tacletHint The {@link TacletLabelHint} to use.
-    * @param tacletTerm The taclet {@link JavaDLTerm} to check.
+    * @param tacletTerm The taclet {@link Term} to check.
     * @return {@code true} is top level, {@code false} is not top level.
     */
-   protected boolean isTopLevel(TacletLabelHint tacletHint, JavaDLTerm tacletTerm) {
+   protected boolean isTopLevel(TacletLabelHint tacletHint, Term tacletTerm) {
       if (TacletOperation.REPLACE_TERM.equals(tacletHint.getTacletOperation())) {
          return tacletHint.getTerm() == tacletTerm;
       }

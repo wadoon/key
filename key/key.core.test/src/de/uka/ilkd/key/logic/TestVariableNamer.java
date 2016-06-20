@@ -66,9 +66,9 @@ public class TestVariableNamer extends TestCase {
     private final ProgramVariable x_2   = constructProgramVariable("x_2");
     private final ProgramVariable var_1 = constructProgramVariable("var_1");
     private final ProgramVariable var_2 = constructProgramVariable("var_2");
-    private final SequentFormula<JavaDLTerm> formulaWithX    = constructFormula(x);
-    private final SequentFormula<JavaDLTerm> formulaWithX_1  = constructFormula(x_1);
-    private final SequentFormula<JavaDLTerm> formulaWithVar_1= constructFormula(var_1);
+    private final SequentFormula<Term> formulaWithX    = constructFormula(x);
+    private final SequentFormula<Term> formulaWithX_1  = constructFormula(x_1);
+    private final SequentFormula<Term> formulaWithVar_1= constructFormula(var_1);
     private final SchemaVariable variableSV =
     	  SchemaVariableFactory.createProgramSV(new ProgramElementName("sv"),
 						ProgramSVSort.VARIABLE,
@@ -92,23 +92,23 @@ public class TestVariableNamer extends TestCase {
     	return constructProgramVariable(pen);
     }
 
-    private SequentFormula<JavaDLTerm> constructFormula(ProgramVariable containedVar) {
+    private SequentFormula<Term> constructFormula(ProgramVariable containedVar) {
     	Statement statement = new PostIncrement(containedVar);
     	StatementBlock statementBlock = new StatementBlock(statement);
     	JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
-	JavaDLTerm term = services.getTermBuilder().dia(javaBlock, services.getTermBuilder().tt());
+	Term term = services.getTermBuilder().dia(javaBlock, services.getTermBuilder().tt());
 
 	return new SequentFormula<>(term);
     }
 
     
-    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> constructPIO(SequentFormula<JavaDLTerm> formula) {
-    	return new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(formula, PosInTerm.<JavaDLTerm>getTopLevel(), true);
+    private PosInOccurrence<Term, SequentFormula<Term>> constructPIO(SequentFormula<Term> formula) {
+    	return new PosInOccurrence<Term, SequentFormula<Term>>(formula, PosInTerm.<Term>getTopLevel(), true);
     }
 
 
-    private Goal constructGoal(SequentFormula<JavaDLTerm> containedFormula) {
+    private Goal constructGoal(SequentFormula<Term> containedFormula) {
     	Semisequent empty = Semisequent.nil();
     	Semisequent ante = empty.insert(0, containedFormula).semisequent();
 	Semisequent succ = empty;
@@ -141,7 +141,7 @@ public class TestVariableNamer extends TestCase {
     }
     
     private void addTacletApp(Goal goal, ProgramVariable containedVar) {
-	JavaDLTerm findTerm = services.getTermBuilder().tt();
+	Term findTerm = services.getTermBuilder().tt();
    	AntecTacletBuilder builder = new AntecTacletBuilder();
 	builder.setFind(findTerm);
     	AntecTaclet taclet = builder.getAntecTaclet();
@@ -188,9 +188,9 @@ public class TestVariableNamer extends TestCase {
 	assertFalse(name.getProgramName().equals("x"));
 
 	ProgramVariable v = constructProgramVariable(name);
-	SequentFormula<JavaDLTerm> formula = constructFormula(v);
+	SequentFormula<Term> formula = constructFormula(v);
 	Goal goal = constructGoal(formula);
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = constructPIO(formula);
+	PosInOccurrence<Term, SequentFormula<Term>> pio = constructPIO(formula);
 	v = vn.rename(v, goal, pio);
 	assertTrue(v.getProgramElementName().getProgramName().equals("x"));
     }
@@ -200,7 +200,7 @@ public class TestVariableNamer extends TestCase {
     	VariableNamer vn = services.getProgramServices().getInnerVarNamer();
 	ProgramVariable v, w;
 
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = constructPIO(formulaWithX);
+	PosInOccurrence<Term, SequentFormula<Term>> pio = constructPIO(formulaWithX);
  	Goal goal = constructGoal(formulaWithX);
 
 	v = vn.rename(y, goal, pio);
@@ -227,7 +227,7 @@ public class TestVariableNamer extends TestCase {
 //     	VariableNamer vn = services.getVariableNamer();
 //	ProgramVariable v;
 //	
-//	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = constructPIO(formulaWithX);
+//	PosInOccurrence<Term, SequentFormula<Term>> pio = constructPIO(formulaWithX);
 //	Goal goal = constructGoal(formulaWithX);
 //        proof.getNamespaces().programVariables().addSafely(xx);
 //	addGlobal(goal, xx);
@@ -242,7 +242,7 @@ public class TestVariableNamer extends TestCase {
     	VariableNamer vn = services.getProgramServices().getInnerVarNamer();
 	ProgramElementName proposal;
 
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = constructPIO(formulaWithVar_1);
+	PosInOccurrence<Term, SequentFormula<Term>> pio = constructPIO(formulaWithVar_1);
 	Goal goal = constructGoal(formulaWithVar_1);
 	
 	proposal = vn.getNameProposalForSchemaVariable(null,
@@ -268,7 +268,7 @@ public class TestVariableNamer extends TestCase {
     	VariableNamer vn = services.getProgramServices().getInnerVarNamer();
 	ProgramVariable v;
 	
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = constructPIO(formulaWithX_1);
+	PosInOccurrence<Term, SequentFormula<Term>> pio = constructPIO(formulaWithX_1);
 	Goal goal = constructGoal(formulaWithX_1);
         proof.getNamespaces().programVariables().addSafely(xx);
 	addGlobal(goal, xx);

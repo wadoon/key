@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -30,10 +30,10 @@ public final class AddCast extends AbstractTermTransformer {
     
 
     @Override
-    public JavaDLTerm transform(JavaDLTerm term, 
+    public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
 	    		  Services services ) {
-	JavaDLTerm sub = term.sub(0);
+	Term sub = term.sub(0);
 	Sort sort = term.sub(1).sort();
 	
 	return sub.sort().extendsTrans(sort) 

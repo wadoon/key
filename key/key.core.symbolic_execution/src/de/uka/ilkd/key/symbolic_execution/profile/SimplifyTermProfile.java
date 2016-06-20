@@ -27,7 +27,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -42,14 +42,14 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * An extended {@link JavaProfile} used in side proofs to simplify a {@link JavaDLTerm}.
+ * An extended {@link JavaProfile} used in side proofs to simplify a {@link Term}.
  * @author Martin Hentschel
  */
 public class SimplifyTermProfile extends JavaProfile {
    /**
     * The {@link Name} of this {@link Profile}.
     */
-   public static final String NAME = "Java Profile for JavaDLTerm Simplification";
+   public static final String NAME = "Java Profile for Term Simplification";
    
    /**
     * The used {@link StrategyFactory} of the {@link SymbolicExecutionStrategy}.
@@ -83,10 +83,10 @@ public class SimplifyTermProfile extends JavaProfile {
       ImmutableList<TermLabelPolicy> symExcPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new TermLabelPolicy() {
          @Override
          public TermLabel keepLabel(TermLabelState state, Services services,
-               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
-               JavaDLTerm applicationTerm, Rule rule, Goal goal, Object hint,
-               JavaDLTerm tacletTerm, Operator newTermOp,
-               ImmutableArray<JavaDLTerm> newTermSubs,
+               PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+               Term applicationTerm, Rule rule, Goal goal, Object hint,
+               Term tacletTerm, Operator newTermOp,
+               ImmutableArray<Term> newTermSubs,
                ImmutableArray<QuantifiableVariable> newTermBoundVars,
                JavaBlock newTermJavaBlock, ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
             return label;

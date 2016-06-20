@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -48,7 +48,7 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     }
     
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
 	final Node root = goal.proof().root();
 	
 	Node n = goal.node();
@@ -58,8 +58,8 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
 		final TacletApp ta = (TacletApp) ra;
 		if (ta.taclet().getRuleSets().contains(new RuleSet(ruleSetName))) {
 		    final Object svInstValue = ta.instantiations().lookupValue(schemaVar);
-		    if ( svInstValue instanceof JavaDLTerm ) {
-			return term.toTerm(app, pos, goal).op() == ((JavaDLTerm)svInstValue).op();
+		    if ( svInstValue instanceof Term ) {
+			return term.toTerm(app, pos, goal).op() == ((Term)svInstValue).op();
 		    }
 		}
 	    }	    	    

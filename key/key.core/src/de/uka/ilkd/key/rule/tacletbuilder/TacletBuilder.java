@@ -28,7 +28,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -65,7 +65,7 @@ public abstract class TacletBuilder<T extends Taclet> {
        this.tacletAnnotations = tacletAnnotations;
     }
 
-    private static boolean containsFreeVarSV(JavaDLTerm t) {
+    private static boolean containsFreeVarSV(Term t) {
 	for (final QuantifiableVariable var : t.freeVars()) {
 	    if (var instanceof VariableSV) {
 		return true;
@@ -75,7 +75,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     private static boolean containsFreeVarSV(Sequent sequent) {
-	for (final SequentFormula<JavaDLTerm> cf : sequent) {
+	for (final SequentFormula<Term> cf : sequent) {
 	    if (containsFreeVarSV(cf.formula())) {
 		return true;
 	    }
@@ -92,11 +92,11 @@ public abstract class TacletBuilder<T extends Taclet> {
 	}
     }
 
-    static void checkContainsFreeVarSV(JavaDLTerm t, Name tacletName, String str) {
+    static void checkContainsFreeVarSV(Term t, Name tacletName, String str) {
 	if (containsFreeVarSV(t)) {
 	    throw new TacletBuilderException(tacletName, 
                     "Free Variable found in "
-	            +str+" in Taclet / JavaDLTerm: "+t);
+	            +str+" in Taclet / Term: "+t);
 	}
     }
 

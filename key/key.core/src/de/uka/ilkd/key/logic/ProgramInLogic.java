@@ -23,6 +23,6 @@ import de.uka.ilkd.key.java.Expression;
  */
 public interface ProgramInLogic {
 
-    Expression convertToProgram(JavaDLTerm t, ExtList list);
+    Expression convertToProgram(Term t, ExtList list);
 
 }

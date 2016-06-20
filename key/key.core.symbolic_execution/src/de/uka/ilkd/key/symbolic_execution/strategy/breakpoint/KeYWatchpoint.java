@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -63,7 +63,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
     * @param conditionEnabled flag if the condition is enabled
     * @param containerType the type of the element containing the breakpoint
     * @param suspendOnTrue the flag if the condition needs to evaluate to true or just be satisfiable
-    * @throws SLTranslationException if the condition could not be parsed to a valid JavaDLTerm
+    * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
    public KeYWatchpoint(int hitCount, Proof proof, String condition, boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
       super(hitCount, null, proof, enabled, conditionEnabled, -1, -1, containerType);
@@ -94,10 +94,10 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
       }else{
          ApplyStrategyInfo info = null;
          try {
-            JavaDLTerm negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
+            Term negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
             //initialize values
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = ruleApp.posInOccurrence();
-            JavaDLTerm term = pio.subTerm();
+            PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
+            Term term = pio.subTerm();
             term = TermBuilder.goBelowUpdates(term);
             IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.modalContent(), proof.getServices());
             //put values into map which have to be replaced
@@ -106,9 +106,9 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
             }
             //replace renamings etc.
             OpReplacer replacer = new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
-            JavaDLTerm termForSideProof = replacer.replace(negatedCondition);
+            Term termForSideProof = replacer.replace(negatedCondition);
             //start side proof
-            JavaDLTerm toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+            Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
             Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
             info = SymbolicExecutionSideProofUtil.startSideProof(proof, 

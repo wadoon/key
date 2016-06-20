@@ -15,7 +15,7 @@ import org.key_project.util.java.ObjectUtil;
 import de.uka.ilkd.key.gui.DependencyContractCompletion.TermStringWrapper;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -60,7 +60,7 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
        */
       private final Services services;
       
-      private final List<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> steps;
+      private final List<PosInOccurrence<Term, SequentFormula<Term>>> steps;
       
       private final TermStringWrapper[] heaps;
       
@@ -162,9 +162,9 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
        */
       @Override
       public IBuiltInRuleApp finish() {
-         final JavaDLTerm[] resultHeaps = selectedHeap.terms;
+         final Term[] resultHeaps = selectedHeap.terms;
           
-         PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> step = de.uka.ilkd.key.gui.DependencyContractCompletion.findCorrespondingStep(steps, resultHeaps);
+         PosInOccurrence<Term, SequentFormula<Term>> step = de.uka.ilkd.key.gui.DependencyContractCompletion.findCorrespondingStep(steps, resultHeaps);
          if (step == null) {
             return null;
         }

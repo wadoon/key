@@ -16,7 +16,7 @@ import org.key_project.common.core.logic.op.Function;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 public final class IsHeapFunctionTermFeature extends BinaryTermFeature {
@@ -32,7 +32,7 @@ public final class IsHeapFunctionTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter(JavaDLTerm t, Services services) {
+    protected boolean filter(Term t, Services services) {
         if (t.op() instanceof Function) {
             Function op = t.op(Function.class);
             return op.arity() == 0 &&

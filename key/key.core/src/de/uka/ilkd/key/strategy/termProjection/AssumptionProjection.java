@@ -16,14 +16,14 @@ package de.uka.ilkd.key.strategy.termProjection;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 
 /**
- * JavaDLTerm projection that delivers the assumptions of a taclet application
+ * Term projection that delivers the assumptions of a taclet application
  * (the formulas that the \assumes clause of the taclet refers to).
  */
 public class AssumptionProjection implements ProjectionToTerm {
@@ -38,7 +38,7 @@ public class AssumptionProjection implements ProjectionToTerm {
         return new AssumptionProjection ( no );
     }
 
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         assert app instanceof TacletApp :
             "Projection is only applicable to taclet apps," +
             " but got " + app;

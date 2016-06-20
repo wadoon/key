@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.feature;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.JavaDLVisitor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -67,10 +67,10 @@ public class ContainsTermFeature implements Feature {
 
     @Override
     public RuleAppCost compute(RuleApp app,
-                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+                               PosInOccurrence<Term, SequentFormula<Term>> pos,
                                Goal goal) {
-        final JavaDLTerm t1 = proj1.toTerm(app, pos, goal);
-        final JavaDLTerm t2 = proj2.toTerm(app, pos, goal);
+        final Term t1 = proj1.toTerm(app, pos, goal);
+        final Term t2 = proj2.toTerm(app, pos, goal);
         ContainsTermVisitor visitor = new ContainsTermVisitor(t2);
         t1.execPreOrder(visitor);
         if (visitor.found) {
@@ -83,30 +83,30 @@ public class ContainsTermFeature implements Feature {
 
     private class ContainsTermVisitor implements JavaDLVisitor {
         boolean found = false;
-        JavaDLTerm term;
+        Term term;
 
 
-        public ContainsTermVisitor(JavaDLTerm term) {
+        public ContainsTermVisitor(Term term) {
             this.term = term;
         }
 
         @Override
-        public boolean visitSubtree(JavaDLTerm visited) {
+        public boolean visitSubtree(Term visited) {
             return true;
         }
 
         @Override
-        public void visit(JavaDLTerm visited) {
+        public void visit(Term visited) {
             found = found || visited.equalsModRenaming(term);
         }
 
         @Override
-        public void subtreeEntered(JavaDLTerm subtreeRoot) {
+        public void subtreeEntered(Term subtreeRoot) {
             // nothing to do
         }
 
         @Override
-        public void subtreeLeft(JavaDLTerm subtreeRoot) {
+        public void subtreeLeft(Term subtreeRoot) {
             // nothing to do
         }
     }

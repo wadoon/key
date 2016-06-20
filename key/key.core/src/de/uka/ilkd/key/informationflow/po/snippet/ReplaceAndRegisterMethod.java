@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.JavaDLVisitor;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -37,30 +37,30 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  */
 abstract class ReplaceAndRegisterMethod {
 
-    final JavaDLTerm replace(JavaDLTerm term,
+    final Term replace(Term term,
                        ProofObligationVars origVars,
                        ProofObligationVars poVars,
                        TermBuilder tb) {
-        JavaDLTerm intermediateResult = replace(term, origVars.pre, poVars.pre, tb);
+        Term intermediateResult = replace(term, origVars.pre, poVars.pre, tb);
         return replace(intermediateResult, origVars.post, poVars.post, tb);
     }
 
 
-    final JavaDLTerm replace(JavaDLTerm term,
+    final Term replace(Term term,
                        StateVars origVars,
                        StateVars poVars,
                        TermBuilder tb) {
-        LinkedHashMap<JavaDLTerm, JavaDLTerm> map = new LinkedHashMap<JavaDLTerm, JavaDLTerm>();
+        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
 
-        Iterator<JavaDLTerm> origVarsIt;
-        Iterator<JavaDLTerm> poVarsIt;
+        Iterator<Term> origVarsIt;
+        Iterator<Term> poVarsIt;
         assert origVars.paddedTermList.size() ==
                poVars.paddedTermList.size();
         origVarsIt = origVars.paddedTermList.iterator();
         poVarsIt = poVars.paddedTermList.iterator();
         while (origVarsIt.hasNext()) {
-            JavaDLTerm origTerm = origVarsIt.next();
-            JavaDLTerm poTerm = poVarsIt.next();
+            Term origTerm = origVarsIt.next();
+            Term poTerm = poVarsIt.next();
             if (origTerm != null && poTerm != null) {
                 assert poTerm.sort().equals(origTerm.sort()) ||
                        poTerm.sort().extendsSorts().contains(origTerm.sort()) :
@@ -72,17 +72,17 @@ abstract class ReplaceAndRegisterMethod {
             }
         }
         OpReplacer or = new OpReplacer(map, tb.tf());
-        JavaDLTerm result = or.replace(term);
+        Term result = or.replace(term);
 
         return result;
     }
 
 
-    final JavaDLTerm[] replace(JavaDLTerm[] terms,
+    final Term[] replace(Term[] terms,
                          StateVars origVars,
                          StateVars poVars,
                          TermBuilder tb) {
-        final JavaDLTerm[] result = new JavaDLTerm[terms.length];
+        final Term[] result = new Term[terms.length];
         for (int i = 0; i < terms.length; i++) {
             result[i] = replace(terms[i], origVars, poVars, tb);
 
@@ -95,16 +95,16 @@ abstract class ReplaceAndRegisterMethod {
                               StateVars origVars,
                               StateVars poVars,
                               TermBuilder tb) {
-        ImmutableList<JavaDLTerm> resultPreExps = ImmutableSLList.<JavaDLTerm>nil();
-        for (JavaDLTerm t : terms.preExpressions) {
+        ImmutableList<Term> resultPreExps = ImmutableSLList.<Term>nil();
+        for (Term t : terms.preExpressions) {
             resultPreExps = resultPreExps.append(replace(t, origVars, poVars, tb));
         }
-        ImmutableList<JavaDLTerm> resultPostExps = ImmutableSLList.<JavaDLTerm>nil();
-        for (JavaDLTerm t : terms.postExpressions) {
+        ImmutableList<Term> resultPostExps = ImmutableSLList.<Term>nil();
+        for (Term t : terms.postExpressions) {
             resultPostExps = resultPostExps.append(replace(t, origVars, poVars, tb));
         }
-        ImmutableList<JavaDLTerm> resultNewObjecs = ImmutableSLList.<JavaDLTerm>nil();
-        for (JavaDLTerm t : terms.newObjects) {
+        ImmutableList<Term> resultNewObjecs = ImmutableSLList.<Term>nil();
+        for (Term t : terms.newObjects) {
             resultNewObjecs = resultNewObjecs.append(replace(t, origVars, poVars, tb));
         }
         return new InfFlowSpec(resultPreExps, resultPostExps, resultNewObjecs);
@@ -124,16 +124,16 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final JavaDLTerm replace(JavaDLTerm term,
-                       JavaDLTerm[] origVars,
-                       JavaDLTerm[] poVars,
+    final Term replace(Term term,
+                       Term[] origVars,
+                       Term[] poVars,
                        TermBuilder tb) {
-        LinkedHashMap<JavaDLTerm, JavaDLTerm> map = new LinkedHashMap<JavaDLTerm, JavaDLTerm>();
+        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
 
         assert origVars.length == poVars.length;
         for (int i = 0; i < origVars.length; i++) {
-            JavaDLTerm origTerm = origVars[i];
-            JavaDLTerm poTerm = poVars[i];
+            Term origTerm = origVars[i];
+            Term poTerm = poVars[i];
             if (origTerm != null && poTerm != null) {
                 assert origTerm.sort().equals(poTerm.sort());
                 map.put(origTerm, poTerm);
@@ -141,7 +141,7 @@ abstract class ReplaceAndRegisterMethod {
         }
 
         OpReplacer or = new OpReplacer(map, tb.tf());
-        JavaDLTerm result = or.replace(term);
+        Term result = or.replace(term);
 
         return result;
     }
@@ -173,7 +173,7 @@ abstract class ReplaceAndRegisterMethod {
         }
     }
 
-    final static JavaDLTerm replaceQuantifiableVariables(JavaDLTerm term,
+    final static Term replaceQuantifiableVariables(Term term,
                                              HashSet<QuantifiableVariable> qvs,
                                              Services services) {
         Map<QuantifiableVariable, QuantifiableVariable> replaceMap =
@@ -185,7 +185,7 @@ abstract class ReplaceAndRegisterMethod {
         return op.replace(term);
     }
 
-    final static HashSet<QuantifiableVariable> collectQuantifiableVariables(JavaDLTerm term) {
+    final static HashSet<QuantifiableVariable> collectQuantifiableVariables(Term term) {
         QuantifiableVariableVisitor qvVisitor = new QuantifiableVariableVisitor();
         term.execPreOrder(qvVisitor);
         return qvVisitor.getResult();
@@ -195,21 +195,21 @@ abstract class ReplaceAndRegisterMethod {
         private HashSet<QuantifiableVariable> vars = new LinkedHashSet<QuantifiableVariable>();
 
         @Override
-        public boolean visitSubtree(JavaDLTerm visited) {
+        public boolean visitSubtree(Term visited) {
             return true;
         }
 
         @Override
-        public void visit(JavaDLTerm visited) {
+        public void visit(Term visited) {
             final ImmutableArray<QuantifiableVariable> boundVars = visited.boundVars();
             for (QuantifiableVariable var : boundVars) vars.add(var);
         }
 
         @Override
-        public void subtreeEntered(JavaDLTerm subtreeRoot) { /* nothing to do */ }
+        public void subtreeEntered(Term subtreeRoot) { /* nothing to do */ }
 
         @Override
-        public void subtreeLeft(JavaDLTerm subtreeRoot) { /* nothing to do */ }
+        public void subtreeLeft(Term subtreeRoot) { /* nothing to do */ }
 
         public HashSet<QuantifiableVariable> getResult() { return vars; }
     }

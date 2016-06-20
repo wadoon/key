@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.op.IfThenElse;
 import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -38,13 +38,13 @@ public class IfThenElseMalusFeature implements Feature {
     
     private IfThenElseMalusFeature () {}
     
-    public RuleAppCost compute(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public RuleAppCost compute(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         if ( pos == null ) return NumberRuleAppCost.getZeroCost();
 
         final ServiceCaches caches = goal.proof().getServices().getCaches();
         
         RuleAppCost resInt;
-        final LRUCache<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, RuleAppCost> ifThenElseMalusCache = caches.getIfThenElseMalusCache();
+        final LRUCache<PosInOccurrence<Term, SequentFormula<Term>>, RuleAppCost> ifThenElseMalusCache = caches.getIfThenElseMalusCache();
         synchronized(ifThenElseMalusCache) {
             resInt = ifThenElseMalusCache.get ( pos );
         }
@@ -55,12 +55,12 @@ public class IfThenElseMalusFeature implements Feature {
 
         int res = 0;
 
-        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator ();
+        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
         while ( true ) {
             final int ind = it.next ();
             if ( ind == -1 ) break;
 
-            final JavaDLTerm t = it.getSubTerm ();
+            final Term t = it.getSubTerm ();
             if ( t.op () instanceof IfThenElse) res = ind != 0 ? res + 1 : res - 1;           
         }
 

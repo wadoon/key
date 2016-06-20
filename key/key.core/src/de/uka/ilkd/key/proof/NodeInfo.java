@@ -22,7 +22,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
@@ -133,7 +133,7 @@ public class NodeInfo {
        if (ruleApp instanceof PosTacletApp) {
            PosTacletApp pta = (PosTacletApp) ruleApp;
            if (!isSymbolicExecution(pta.taclet())) return null;
-           JavaDLTerm t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
+           Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
            final ProgramElement pe = t.modalContent().program();
            if (pe != null) {
                firstStatement = pe.getFirstElement();

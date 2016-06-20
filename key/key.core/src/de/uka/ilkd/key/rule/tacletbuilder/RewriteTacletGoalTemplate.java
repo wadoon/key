@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -32,18 +32,18 @@ import de.uka.ilkd.key.rule.Taclet;
 public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     /** term that replaces another one */
-    private JavaDLTerm replacewith;
+    private Term replacewith;
 
     /** creates new Goaldescription 
      *@param addedSeq new Sequent to be added
      *@param addedRules IList<Taclet> contains the new allowed rules
      * at this branch 
-     *@param replacewith the JavaDLTerm that replaces another one
+     *@param replacewith the Term that replaces another one
      *@param pvs the set of schema variables
      */
     public RewriteTacletGoalTemplate(Sequent             addedSeq,
 				     ImmutableList<Taclet>        addedRules,				     
-				     JavaDLTerm                replacewith,
+				     Term                replacewith,
 				     ImmutableSet<SchemaVariable> pvs) {
 	super(addedSeq, addedRules, pvs);
 	TacletBuilder.checkContainsFreeVarSV(replacewith, null, "replacewith term");
@@ -52,22 +52,22 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     public RewriteTacletGoalTemplate(Sequent addedSeq,
 			   ImmutableList<Taclet> addedRules,
-			   JavaDLTerm replacewith) {
+			   Term replacewith) {
 	this(addedSeq, addedRules, replacewith,
 	     DefaultImmutableSet.<SchemaVariable>nil());
     }
 
 
-    public RewriteTacletGoalTemplate(JavaDLTerm replacewith) {
+    public RewriteTacletGoalTemplate(Term replacewith) {
 	this(Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet>nil(),
              replacewith);
     }
 
 
-    /** a Taclet may replace a JavaDLTerm by another. The new JavaDLTerm is returned.     
-     * @return JavaDLTerm being paramter in the rule goal replacewith(Seq)
+    /** a Taclet may replace a Term by another. The new Term is returned.     
+     * @return Term being paramter in the rule goal replacewith(Seq)
      */
-    public JavaDLTerm replaceWith() {
+    public Term replaceWith() {
 	return replacewith;
     }
     
@@ -78,13 +78,13 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      */
     @Override
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
-        final BoundVarsVisitor<JavaDLTerm> bvv = new BoundVarsVisitor<JavaDLTerm>();
+        final BoundVarsVisitor<Term> bvv = new BoundVarsVisitor<Term>();
         bvv.visit(replaceWith());
         return bvv.getBoundVariables().union(super.getBoundVariables());
     }
     
     /**
-     * @return JavaDLTerm being paramter in the rule goal replacewith(term)
+     * @return Term being paramter in the rule goal replacewith(term)
      */
     @Override
     public Object replaceWithExpressionAsObject() {

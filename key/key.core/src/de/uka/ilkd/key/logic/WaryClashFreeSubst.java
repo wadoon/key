@@ -33,13 +33,13 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     /** variable with which the original variable should be
      * substituted below modalities */
     private QuantifiableVariable      newVar           = null;
-    private JavaDLTerm                      newVarTerm       = null;
+    private Term                      newVarTerm       = null;
 
     /** variables occurring within the original term and within the
      * term to be substituted */
     private ImmutableSet<QuantifiableVariable> warysvars            = null;
 
-    public WaryClashFreeSubst ( QuantifiableVariable v, JavaDLTerm s, JavaDLTermServices services ) {
+    public WaryClashFreeSubst ( QuantifiableVariable v, Term s, JavaDLTermServices services ) {
 	super ( v, s, services );
 	warysvars = null;
     }
@@ -49,8 +49,8 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * avoiding collisions by replacing bound variables in
      * <code>t</code> if necessary.
      */
-    public JavaDLTerm apply(JavaDLTerm t) {
-	JavaDLTerm res;
+    public Term apply(Term t) {
+	Term res;
 
 	if ( depth == 0 ) {
 	    if ( !getSubstitutedTerm ().isRigid () )
@@ -72,7 +72,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * <code>t</code> or the substituted term, and whose names should
      * not be used for free variables
      */
-    private void findUsedVariables ( JavaDLTerm t ) {
+    private void findUsedVariables ( Term t ) {
 	VariableCollectVisitor vcv;
 
 	vcv   = new VariableCollectVisitor ();
@@ -110,7 +110,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * assumed, that <code>t</code> contains a free occurrence of
      * <code>v</code>.
      */
-    protected JavaDLTerm apply1(JavaDLTerm t) {
+    protected Term apply1(Term t) {
 	// don't move to a different modality level
 	if ( !getSubstitutedTerm ().isRigid () ) {
 	    if ( t.op () instanceof Modality )
@@ -132,7 +132,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      *
      * PRECONDITION: <code>warysvars != null</code>
      */
-    private JavaDLTerm applyOnModality ( JavaDLTerm t ) {
+    private Term applyOnModality ( Term t ) {
 	return applyBelowModality ( t );
     }
 
@@ -145,7 +145,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      *
      * PRECONDITION: <code>warysvars != null</code>
      */
-    private JavaDLTerm applyOnTransformer ( JavaDLTerm t ) {
+    private Term applyOnTransformer ( Term t ) {
         return applyBelowTransformer ( t );
     }
 
@@ -158,14 +158,14 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      *
      * PRECONDITION: <code>warysvars != null</code>
      */
-    private JavaDLTerm applyOnUpdate ( JavaDLTerm t ) {
+    private Term applyOnUpdate ( Term t ) {
 
 	// only the last child is below the update
-	final JavaDLTerm target = UpdateApplication.getTarget ( t );
+	final Term target = UpdateApplication.getTarget ( t );
 	if ( !target.freeVars ().contains ( getVariable () ) )
 	    return super.apply1 ( t );
 
-	final JavaDLTerm[] newSubterms = new JavaDLTerm[t.arity()];
+	final Term[] newSubterms = new Term[t.arity()];
 	@SuppressWarnings("unchecked")
 	final ImmutableArray<QuantifiableVariable>[] newBoundVars =
 	    new ImmutableArray[t.arity()];
@@ -190,14 +190,14 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     /**
      * Apply the substitution to a term/formula below a modality or update
      */
-    private JavaDLTerm applyBelowModality (JavaDLTerm t) {
+    private Term applyBelowModality (Term t) {
         return substWithNewVar ( t );
     }
 
     /**
      * Apply the substitution to a term/formula below a transformer procedure
      */
-    private JavaDLTerm applyBelowTransformer (JavaDLTerm t) {
+    private Term applyBelowTransformer (Term t) {
         return substWithNewVar ( t );
     }
 
@@ -205,7 +205,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * Prepend the given term with a wary substitution (substituting
      * <code>newVar</code> with <code>getSubstitutedTerm()</code>)
      */
-    private JavaDLTerm addWarySubst (JavaDLTerm t) {
+    private Term addWarySubst (Term t) {
         createVariable ();
         return services.getTermBuilder().subst(WarySubstOp.SUBST,
         	        newVar,
@@ -216,7 +216,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     /**
      * Rename the original variable to be substituted to <code>newVar</code>
      */
-    private JavaDLTerm substWithNewVar (JavaDLTerm t) {
+    private Term substWithNewVar (Term t) {
         createVariable ();
         final ClashFreeSubst cfs = new ClashFreeSubst ( getVariable (),
                                                         newVarTerm, services );

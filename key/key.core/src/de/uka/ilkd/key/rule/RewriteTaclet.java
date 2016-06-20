@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -111,7 +111,7 @@ public class RewriteTaclet extends FindTaclet {
 			 ImmutableList<TacletGoalTemplate>  goalTemplates, 
 			 ImmutableList<RuleSet>             ruleSets,
 			 TacletAttributes          attrs,
-			 JavaDLTerm                      find,
+			 Term                      find,
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_applicationRestriction,
 			 ImmutableSet<TacletOption> choices,
@@ -125,7 +125,7 @@ public class RewriteTaclet extends FindTaclet {
 			 ImmutableList<TacletGoalTemplate>  goalTemplates, 
 			 ImmutableList<RuleSet>             ruleSets,
 			 TacletAttributes          attrs,
-			 JavaDLTerm                      find,
+			 Term                      find,
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_applicationRestriction,
 			 ImmutableSet<TacletOption> choices,
@@ -168,10 +168,10 @@ public class RewriteTaclet extends FindTaclet {
      * the top level operator has to be a simultaneous update. This method 
      * checks if the assignment pairs of the update contain free logic
      * variables and gives a veto if positive
-     * @param t the JavaDLTerm to check
+     * @param t the Term to check
      * @return false if vetoing 
      */
-    private boolean veto (JavaDLTerm t) {
+    private boolean veto (Term t) {
         return t.freeVars ().size () > 0;
     }
 
@@ -183,17 +183,17 @@ public class RewriteTaclet extends FindTaclet {
      * <code>null</code>, if program modalities appear above
      * <code>p_pos</code>
      */
-    public MatchConditions checkPrefix(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos,
+    public MatchConditions checkPrefix(PosInOccurrence<Term, SequentFormula<Term>> p_pos,
                                        MatchConditions p_mc) {
 	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
 	// this is assumed to hold
 	assert p_pos.posInTerm () != null;
 
-	PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = p_pos.iterator ();
+	PIOPathIterator<Term, SequentFormula<Term>> it = p_pos.iterator ();
 	Operator        op;
 	while ( it.next () != -1 ) {
-	    final JavaDLTerm t = it.getSubTerm ();
+	    final Term t = it.getSubTerm ();
 	    op = t.op ();
 	    if (op instanceof Transformer) {
 	        return null;
@@ -203,7 +203,7 @@ public class RewriteTaclet extends FindTaclet {
 	        if ( (getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t) ) {
 	            return null;
 	        } else {
-	            JavaDLTerm update = UpdateApplication.getUpdate(t);
+	            Term update = UpdateApplication.getUpdate(t);
 	            svi = svi.addUpdate(update, t.getLabels());
 	        }
 	    } else if (getApplicationRestriction() != NONE &&
@@ -229,7 +229,7 @@ public class RewriteTaclet extends FindTaclet {
      * Compute polarity
      * @see AntecSuccPrefixChecker seems to reimplement this.
      */
-    private int polarity(final Operator op, final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it, int polarity) {
+    private int polarity(final Operator op, final PIOPathIterator<Term, SequentFormula<Term>> it, int polarity) {
                                                                 // toggle polarity if find term is
                                                                 // subterm of
         if ((op == Junctor.NOT) ||                              //   not
@@ -275,7 +275,7 @@ public class RewriteTaclet extends FindTaclet {
         return (RewriteTacletExecutor<? extends RewriteTaclet>) executor;
     }
 
-    public SequentFormula<JavaDLTerm> getRewriteResult(Goal goal,
+    public SequentFormula<Term> getRewriteResult(Goal goal,
             TermLabelState termLabelState, Services services, TacletApp app) {
         return getExecutor().getRewriteResult(goal, termLabelState, services, app);
     }

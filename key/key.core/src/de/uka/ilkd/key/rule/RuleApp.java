@@ -22,7 +22,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 
 public interface RuleApp {
@@ -33,10 +33,10 @@ public interface RuleApp {
     Rule rule();
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula<JavaDLTerm> and
+     * returns the PositionInOccurrence (representing a SequentFormula<Term> and
      * a position in the corresponding formula) of this rule application
      */
-    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence();
+    PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence();
 
     /** applies the specified rule at the specified position
      * if all schema variables have been instantiated

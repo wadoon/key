@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.WaryClashFreeSubst;
 
 public final class WarySubstOp extends SubstOp {
@@ -34,7 +34,7 @@ public final class WarySubstOp extends SubstOp {
     }
 
     @Override
-    public JavaDLTerm apply(JavaDLTerm term, JavaDLTermServices services) {
+    public Term apply(Term term, JavaDLTermServices services) {
         QuantifiableVariable v = term.varsBoundHere(1).get(0);
         WaryClashFreeSubst cfSubst =
                 new WaryClashFreeSubst(v, term.sub(0), services);

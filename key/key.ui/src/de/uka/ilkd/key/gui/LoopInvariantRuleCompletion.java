@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -45,7 +45,7 @@ public class LoopInvariantRuleCompletion implements
                 ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
 
         // leading update?
-        JavaDLTerm progPost = loopApp.programTerm();
+        Term progPost = loopApp.programTerm();
         final While loop = loopApp.getLoopStatement();
 
         LoopInvariant inv = loopApp.getInvariant();

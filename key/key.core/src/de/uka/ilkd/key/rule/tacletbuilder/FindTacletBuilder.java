@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.BoundUniquenessChecker;
 import de.uka.ilkd.key.rule.FindTaclet;
 /** Superclass of TacletBuilder objects that have a non-empty find clause.
@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.FindTaclet;
 
 public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuilder<T> {
 
-    protected JavaDLTerm find=null;
+    protected Term find=null;
 
     /**
      * checks that a SchemaVariable that is used to match pure variables
@@ -42,7 +42,7 @@ public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuil
     /* Get the `find' term.  This could be a term or a formula for a
      * RewriteTaclet, but only a formula for an Antec/Succ Taclet.
      */
-    public JavaDLTerm getFind() {
+    public Term getFind() {
 	return find;
     }
 

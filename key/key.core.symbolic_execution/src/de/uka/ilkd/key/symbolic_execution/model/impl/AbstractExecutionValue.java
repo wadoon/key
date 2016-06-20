@@ -9,7 +9,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -33,7 +33,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
    /**
     * The condition under which the variable has this value.
     */
-   private final JavaDLTerm condition;
+   private final Term condition;
    
    /**
     * The {@link IExecutionConstraint}s.
@@ -43,7 +43,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
    /**
     * The value.
     */
-   private final JavaDLTerm value;
+   private final Term value;
    
    /**
     * Constructor.
@@ -56,8 +56,8 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
    public AbstractExecutionValue(ITreeSettings settings, 
                                  Node proofNode, 
                                  IExecutionVariable variable, 
-                                 JavaDLTerm condition,
-                                 JavaDLTerm value) {
+                                 Term condition,
+                                 Term value) {
       super(settings, proofNode);
       this.variable = variable;
       this.condition = condition;
@@ -86,7 +86,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
       if (!isDisposed() && !isValueUnknown()) {
          List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
          IExecutionConstraint[] allConstraints = getNodeConstraints();
-         Set<JavaDLTerm> relevantTerms = collectRelevantTerms(getServices(), getValue());
+         Set<Term> relevantTerms = collectRelevantTerms(getServices(), getValue());
          for (IExecutionConstraint constraint : allConstraints) {
             if (containsTerm(constraint.getTerm(), relevantTerms)) {
                constraints.add(constraint);
@@ -106,24 +106,24 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
    protected abstract IExecutionConstraint[] getNodeConstraints();
    
    /**
-    * Collects all {@link JavaDLTerm}s contained in relevant constraints.
+    * Collects all {@link Term}s contained in relevant constraints.
     * @param services The {@link Services} to use.
-    * @param term The initial {@link JavaDLTerm}.
-    * @return The relevant {@link JavaDLTerm}s.
+    * @param term The initial {@link Term}.
+    * @return The relevant {@link Term}s.
     */
-   protected Set<JavaDLTerm> collectRelevantTerms(Services services, JavaDLTerm term) {
-      final Set<JavaDLTerm> terms = new HashSet<JavaDLTerm>();
+   protected Set<Term> collectRelevantTerms(Services services, Term term) {
+      final Set<Term> terms = new HashSet<Term>();
       fillRelevantTerms(services, term, terms);
       return terms;
    }
    
    /**
-    * Utility method used by {@link #collectRelevantTerms(Services, JavaDLTerm)}.
+    * Utility method used by {@link #collectRelevantTerms(Services, Term)}.
     * @param services The {@link Services} to use.
-    * @param term The initial {@link JavaDLTerm}.
-    * @param toFill The {@link Set} of relevant {@link JavaDLTerm}s to fill.
+    * @param term The initial {@link Term}.
+    * @param toFill The {@link Set} of relevant {@link Term}s to fill.
     */
-   protected void fillRelevantTerms(Services services, JavaDLTerm term, Set<JavaDLTerm> toFill) {
+   protected void fillRelevantTerms(Services services, Term term, Set<Term> toFill) {
       if (term != null) {
          if (term.op() instanceof ProgramVariable ||
              SymbolicExecutionUtil.isSelect(services, term)) {
@@ -138,12 +138,12 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
    }
 
    /**
-    * Checks if the given {@link JavaDLTerm} contains at least one of the given once.
-    * @param term The {@link JavaDLTerm} to search in.
-    * @param toSearch The {@link JavaDLTerm}s to search.
-    * @return {@code true} at least one {@link JavaDLTerm} is contained, {@code false} none of the {@link JavaDLTerm}s is contained.
+    * Checks if the given {@link Term} contains at least one of the given once.
+    * @param term The {@link Term} to search in.
+    * @param toSearch The {@link Term}s to search.
+    * @return {@code true} at least one {@link Term} is contained, {@code false} none of the {@link Term}s is contained.
     */
-   protected boolean containsTerm(JavaDLTerm term, Set<JavaDLTerm> toSearch) {
+   protected boolean containsTerm(Term term, Set<Term> toSearch) {
       if (toSearch.contains(term)) {
          return true;
       }
@@ -170,7 +170,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
+   public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
       return getVariable().getModalityPIO();
    }
 
@@ -200,7 +200,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getCondition() throws ProofInputException {
+   public Term getCondition() throws ProofInputException {
       return condition;
    }
 
@@ -208,7 +208,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getValue() throws ProofInputException {
+   public Term getValue() throws ProofInputException {
       return value;
    }
 
@@ -221,7 +221,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
          return false;
       }
       else {
-         JavaDLTerm value = getValue();
+         Term value = getValue();
          return SymbolicExecutionUtil.hasReferenceSort(getServices(), value);
       }
    }

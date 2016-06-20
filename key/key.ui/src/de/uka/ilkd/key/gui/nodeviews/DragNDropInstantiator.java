@@ -39,7 +39,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -168,7 +168,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                
         
         if (applicableApps.isEmpty() && !targetPos.isSequent() &&
-                targetPos.getPosInOccurrence().posInTerm() != PosInTerm.<JavaDLTerm>getTopLevel()) {
+                targetPos.getPosInOccurrence().posInTerm() != PosInTerm.<Term>getTopLevel()) {
             // if no applicable taclet is found we relax the target position a bit
             applicableApps = 
                 getAllApplicableApps(sourcePos, 
@@ -365,14 +365,14 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      *            the IList<TacletApp> with taclet applications to be enriched by
      *            position information
      * @param findPos
-     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> against which the find part has been
+     *            the PosInOccurrence<Term, SequentFormula<Term>> against which the find part has been
      *            matched
      * @return the taclet apps as given in <tt>tacletApps</tt> but with
      *         position information
      */
     private ImmutableList<PosTacletApp>  addPositionInformation(
             ImmutableList<TacletApp>  tacletApps, 
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> findPos,
+            PosInOccurrence<Term, SequentFormula<Term>> findPos,
             Services services) {
 
         ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
@@ -402,13 +402,13 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @param seq
      *            the Sequent to which the position information in <tt>ifPIO<tt>
      * is relative to
-     * @param ifPIO the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the position of the term to 
+     * @param ifPIO the PosInOccurrence<Term, SequentFormula<Term>> describing the position of the term to 
      * be matched against the if sequent of the taclets
      * @param services the Services 
      * @return the IList<PosTacletApp> that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeIfInstantiations(ImmutableList<PosTacletApp> apps,
-            Sequent seq, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ifPIO, Services services) {
+            Sequent seq, PosInOccurrence<Term, SequentFormula<Term>> ifPIO, Services services) {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
 
@@ -467,13 +467,13 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      *            be matched against the formula specified by the pair
      *            <tt>seq</tt> and <tt>ifPIO</tt>
      * is relative to
-     * @param missingSVPIO the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing the position of the term an 
+     * @param missingSVPIO the PosInOccurrence<Term, SequentFormula<Term>> describing the position of the term an 
      * uninstantiated SV will be matched against 
      * @param services the Services 
      * @return the IList<PosTacletApp> that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeInstantiations(ImmutableList<PosTacletApp> apps,
-             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> missingSVPIO, Services services) {
+             PosInOccurrence<Term, SequentFormula<Term>> missingSVPIO, Services services) {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
         if (missingSVPIO == null) {        

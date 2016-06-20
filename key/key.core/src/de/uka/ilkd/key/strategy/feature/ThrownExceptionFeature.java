@@ -27,7 +27,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.Throw;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
@@ -76,13 +76,13 @@ public class ThrownExceptionFeature extends BinaryFeature {
         return false;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         return app instanceof TacletApp && filter(pos.subTerm(), goal.proof()
                 .getServices(), ((TacletApp) app).instantiations()
                 .getExecutionContext());
     }
 
-    protected boolean filter(JavaDLTerm term, Services services, ExecutionContext ec) {
+    protected boolean filter(Term term, Services services, ExecutionContext ec) {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw
@@ -97,10 +97,10 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * active statement)
      * 
      * @param term
-     *            the JavaDLTerm with the program at top level
+     *            the Term with the program at top level
      * @return the first executable statement
      */
-    private ProgramElement getFirstExecutableStatement(JavaDLTerm term) {
+    private ProgramElement getFirstExecutableStatement(Term term) {
         if (term.modalContent().isEmpty())
             return null;
 

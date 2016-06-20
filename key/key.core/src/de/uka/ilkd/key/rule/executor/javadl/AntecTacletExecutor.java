@@ -29,7 +29,7 @@ extends FindTacletExecutor<TacletKind> {
      * {@inheritDoc}
      */
     @Override
-    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
             MatchConditions matchCond,
             Goal goal, 
             RuleApp ruleApp,
@@ -55,15 +55,15 @@ extends FindTacletExecutor<TacletKind> {
      * @param add the Sequent to be added
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describes the place where to add
+     * @param posOfFind the PosInOccurrence<Term, SequentFormula<Term>> describes the place where to add
      * the semisequent 
      * @param matchCond the MatchConditions with all required instantiations 
      * @param services the Services encapsulating all java information
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState, 
-            CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posOfFind,
+            CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent,
+            PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
             MatchConditions matchCond,
             Goal goal,
             RuleApp ruleApp,

@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.feature;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -35,7 +35,7 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     private EqNonDuplicateAppFeature () {}
     
-    public boolean filter (TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public boolean filter (TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         if ( !app.ifInstsComplete () ) return true;
@@ -44,13 +44,13 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
     }
 
     protected boolean semiSequentContains(Semisequent semisequent,
-                                          SequentFormula<JavaDLTerm> cfma) {
+                                          SequentFormula<Term> cfma) {
         return semisequent.containsEqual ( cfma );
     }
 
     protected boolean comparePio(TacletApp newApp,
                                  TacletApp oldApp,
-                                 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPio, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPio) {
+                                 PosInOccurrence<Term, SequentFormula<Term>> newPio, PosInOccurrence<Term, SequentFormula<Term>> oldPio) {
         return oldPio.eqEquals ( newPio );
     }
 }

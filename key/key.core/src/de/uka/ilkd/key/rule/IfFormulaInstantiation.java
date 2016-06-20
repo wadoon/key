@@ -16,7 +16,7 @@ package de.uka.ilkd.key.rule;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 /*
@@ -29,7 +29,7 @@ public interface IfFormulaInstantiation {
     /**
      * @return the cf this is pointing to
      */
-    SequentFormula<JavaDLTerm> getConstrainedFormula ();
+    SequentFormula<Term> getConstrainedFormula ();
 
     String             toString              (Services services);
 }

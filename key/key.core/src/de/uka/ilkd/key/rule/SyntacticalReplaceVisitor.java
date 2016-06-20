@@ -13,7 +13,7 @@
 
 /**
  * visitor for <t> execPostOrder </t> of
- * {@link de.uka.ilkd.key.logic.JavaDLTerm}. Called with that method
+ * {@link de.uka.ilkd.key.logic.Term}. Called with that method
  * on a term, the visitor builds a new term replacing SchemaVariables with their
  * instantiations that are given as a SVInstantiations object.
  */
@@ -45,7 +45,7 @@ import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -63,8 +63,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     public static final String SUBSTITUTION_WITH_LABELS_HINT = "SUBSTITUTION_WITH_LABELS";
     protected final SVInstantiations svInst;
     protected final Services services;
-    private JavaDLTerm computedResult = null;
-    protected final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence;
+    private Term computedResult = null;
+    protected final PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
     protected final RuleApp ruleApp;
@@ -74,20 +74,20 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 
     /**
      * the stack contains the subterms that will be added in the next step of
-     * execPostOrder in JavaDLTerm in order to build the new term. A boolean value
+     * execPostOrder in Term in order to build the new term. A boolean value
      * between or under the subterms on the stack indicate that a term using
      * these subterms should build a new term instead of using the old one,
      * because one of its subterms has been built, too.
      */
-    private final Stack<Object> subStack; //of JavaDLTerm (and Boolean)
+    private final Stack<Object> subStack; //of Term (and Boolean)
     private final Boolean newMarker = new Boolean(true);
-    private final Deque<JavaDLTerm> tacletTermStack = new ArrayDeque<JavaDLTerm>();
+    private final Deque<Term> tacletTermStack = new ArrayDeque<Term>();
 
     /**
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
+            PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
             SVInstantiations svInst,
             Goal goal,                                     
             Rule rule,
@@ -101,7 +101,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         this.ruleApp = ruleApp;
         this.labelHint = labelHint;
         this.goal = goal;
-        subStack = new Stack<Object>(); // of JavaDLTerm
+        subStack = new Stack<Object>(); // of Term
         if (labelHint instanceof TacletLabelHint) {
            ((TacletLabelHint) labelHint).setTacletTermStack(tacletTermStack);
         }
@@ -109,7 +109,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
             Services services,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
+            PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
             Rule rule,
             RuleApp ruleApp,
             TacletLabelHint labelHint, 
@@ -167,16 +167,16 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 jb : JavaBlock.createJavaBlock((StatementBlock)result);
     }
 
-    private JavaDLTerm[] neededSubs(int n) {
+    private Term[] neededSubs(int n) {
         boolean newTerm = false;
-        JavaDLTerm[] result   = new JavaDLTerm[n];
+        Term[] result   = new Term[n];
         for (int i = n-1; i >= 0; i--) {
             Object top = subStack.pop();
             if (top == newMarker){
                 newTerm = true;
                 top     = subStack.pop();
             }
-            result[i] = (JavaDLTerm) top;
+            result[i] = (Term) top;
         }
         if (newTerm && (subStack.empty() ||
                 subStack.peek() != newMarker) ) {
@@ -196,7 +196,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     /** the method is only still invoked to allow the {@link ConstraintAwareSyntacticalReplaceVisitor}
      * to recursively replace meta variables
      */
-    protected JavaDLTerm toTerm(JavaDLTerm o) {
+    protected Term toTerm(Term o) {
         return o;
     }
 
@@ -205,8 +205,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         final UpdateableOperator originalLhs = op.lhs();
         if (originalLhs instanceof SchemaVariable) {
             Object lhsInst = svInst.getInstantiation((SchemaVariable) originalLhs);        
-            if (lhsInst instanceof JavaDLTerm) {
-                lhsInst = ((JavaDLTerm)lhsInst).op();
+            if (lhsInst instanceof Term) {
+                lhsInst = ((Term)lhsInst).op();
             }
 
             final UpdateableOperator newLhs;
@@ -248,7 +248,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         return instantiatedOp;
     }
 
-    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(JavaDLTerm visited) {
+    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(Term visited) {
         ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
         if (!vBoundVars.isEmpty()) {
             final QuantifiableVariable[] newVars = 
@@ -259,7 +259,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable) {
                     final SchemaVariable boundSchemaVariable = (SchemaVariable) boundVar;
-                    final JavaDLTerm instantiationForBoundSchemaVariable = (JavaDLTerm) svInst
+                    final Term instantiationForBoundSchemaVariable = (Term) svInst
                             .getInstantiation(boundSchemaVariable);
                     if (instantiationForBoundSchemaVariable != null) {
                         boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
@@ -283,14 +283,14 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      * performs the syntactic replacement of schemavariables with their
      * instantiations
      */
-    public void visit(final JavaDLTerm visited) {
+    public void visit(final Term visited) {
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable
                 && visitedOp.arity() == 0
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {
-            final JavaDLTerm newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp, svInst.getExecutionContext(), services));
+            final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp, svInst.getExecutionContext(), services));
             pushNew(services.getTermBuilder().label(
                     newTerm, instantiateLabels(visited, newTerm.op(), newTerm.subs(),
                             newTerm.boundVars(), newTerm.modalContent(), newTerm.getLabels())));
@@ -311,17 +311,17 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             final ImmutableArray<QuantifiableVariable> boundVars = instantiateBoundVariables(visited);
 
             // instantiate sub terms
-            final JavaDLTerm[] neededsubs = neededSubs(newOp.arity());
+            final Term[] neededsubs = neededSubs(newOp.arity());
             if (boundVars != visited.boundVars() || jblockChanged
                     || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final ImmutableArray<TermLabel> labels =
-                        instantiateLabels(visited, newOp, new ImmutableArray<JavaDLTerm>(neededsubs),
+                        instantiateLabels(visited, newOp, new ImmutableArray<Term>(neededsubs),
                                 boundVars, jb, visited.getLabels());
-                final JavaDLTerm newTerm = services.getTermFactory().createTerm(newOp, neededsubs, boundVars, jb, labels);
+                final Term newTerm = services.getTermFactory().createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
-                JavaDLTerm t;
+                Term t;
                 final ImmutableArray<TermLabel> labels =
                         instantiateLabels(visited, visitedOp, visited.subs(), visited.boundVars(),
                                 visited.modalContent(), visited.getLabels());
@@ -342,9 +342,9 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         }
     }
 
-    private ImmutableArray<TermLabel> instantiateLabels(JavaDLTerm tacletTerm,
+    private ImmutableArray<TermLabel> instantiateLabels(Term tacletTerm,
             Operator newTermOp,
-            ImmutableArray<JavaDLTerm> newTermSubs,
+            ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable>
     newTermBoundVars,
     JavaBlock newTermJavaBlock,
@@ -367,9 +367,9 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         return res;
     }
 
-    private JavaDLTerm resolveSubst(JavaDLTerm t) {
+    private Term resolveSubst(Term t) {
         if (t.op() instanceof SubstOp) {
-           JavaDLTerm resolved = (JavaDLTerm) ((SubstOp)t.op ()).apply ( t, services );
+           Term resolved = (Term) ((SubstOp)t.op ()).apply ( t, services );
            resolved = services.getTermBuilder().label(resolved, t.sub(1).getLabels());
            if (t.hasLabels()) {
               resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved, rule, goal, SUBSTITUTION_WITH_LABELS_HINT, t);
@@ -384,13 +384,13 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     /**
      * delivers the new built term
      */
-    public JavaDLTerm getTerm() {
+    public Term getTerm() {
         if (computedResult==null) {
             Object o=null;
             do {
                 o=subStack.pop();
             } while (o==newMarker);
-            JavaDLTerm t = (JavaDLTerm) o;
+            Term t = (Term) o;
             // 	    CollisionDeletingSubstitutionTermApplier substVisit
             // 		= new CollisionDeletingSubstitutionTermApplier();
             // 	    t.execPostOrder(substVisit);
@@ -409,24 +409,24 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      * {@inheritDoc}
      */
     @Override
-    public void subtreeEntered(JavaDLTerm subtreeRoot) {
+    public void subtreeEntered(Term subtreeRoot) {
        tacletTermStack.push(subtreeRoot);
        super.subtreeEntered(subtreeRoot);
     }
     
     /**
-     * this method is called in execPreOrder and execPostOrder in class JavaDLTerm
+     * this method is called in execPreOrder and execPostOrder in class Term
      * when leaving the subtree rooted in the term subtreeRoot.
      * Default implementation is to do nothing. Subclasses can
      * override this method
      * when the visitor behaviour depends on informations bound to subtrees.
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
-    public void subtreeLeft(JavaDLTerm subtreeRoot){
+    public void subtreeLeft(Term subtreeRoot){
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer) {
             final TermTransformer mop = (TermTransformer) subtreeRoot.op();
-            final JavaDLTerm newTerm = mop.transform((JavaDLTerm)subStack.pop(),svInst, services);
+            final Term newTerm = mop.transform((Term)subStack.pop(),svInst, services);
             pushNew(services.getTermBuilder().label(newTerm,
                     instantiateLabels(subtreeRoot, newTerm.op(),
                             newTerm.subs(), newTerm.boundVars(),

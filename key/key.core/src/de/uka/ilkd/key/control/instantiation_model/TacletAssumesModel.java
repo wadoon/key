@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -52,13 +52,13 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         }
         
         @Override
-        public SequentFormula<JavaDLTerm> getConstrainedFormula() {
+        public SequentFormula<Term> getConstrainedFormula() {
             return null;
         }
     };
     
     private String manualInput;
-    private final JavaDLTerm ifFma;
+    private final Term ifFma;
 
 
    /** namespaces (variables, functions, sorts, etc.) */
@@ -67,7 +67,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
     private final Services services;
 
 
-    public TacletAssumesModel ( JavaDLTerm                         p_ifFma,
+    public TacletAssumesModel ( Term                         p_ifFma,
 			   ImmutableList<IfFormulaInstantiation> p_candidates,
 			   Services                     p_services,
 			   NamespaceSet                 nss,
@@ -88,7 +88,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
 	manualInput = s;
     }
 
-    public JavaDLTerm ifFma() {
+    public Term ifFma() {
 	return ifFma;
     }
     
@@ -122,7 +122,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
      * @return the term encoded in 's' 
      * @throws org.antlr.runtime.RecognitionException In case an exceptions occurs during parse.
      */
-    public JavaDLTerm parseFormula(String s) throws RecognitionException {
+    public Term parseFormula(String s) throws RecognitionException {
 	KeYParserF p = stringParser(s);
 	return p.formula();
     }

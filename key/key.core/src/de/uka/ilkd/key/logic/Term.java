@@ -24,13 +24,13 @@ import de.uka.ilkd.key.java.SourceElement;
  *
  * @author Dominic Scheurer
  */
-public interface JavaDLTerm extends CCTerm<SourceElement, JavaDLVisitor, JavaDLTerm> {
+public interface Term extends CCTerm<SourceElement, JavaDLVisitor, Term> {
 
     @Override
-    public ImmutableArray<JavaDLTerm> subs();
+    public ImmutableArray<Term> subs();
 
     @Override
-    public JavaDLTerm sub(int nr);
+    public Term sub(int nr);
 
     /**
      * The Java block at top level.

@@ -25,7 +25,7 @@ import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -40,13 +40,13 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private IFProofObligationVars infFlowVars;
     private ExecutionContext context;
 
-    public BlockContractBuiltInRuleApp(final BuiltInRule rule, final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occurrence) {
+    public BlockContractBuiltInRuleApp(final BuiltInRule rule, final PosInOccurrence<Term, SequentFormula<Term>> occurrence) {
         this(rule, occurrence, null, null, null, null);
     }
 
     public BlockContractBuiltInRuleApp(final BuiltInRule rule,
-                                       final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occurrence,
-                                       final ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInstantiations,
+                                       final PosInOccurrence<Term, SequentFormula<Term>> occurrence,
+                                       final ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInstantiations,
                                        final StatementBlock block,
                                        final BlockContract contract,
                                        final List<LocationVariable> heaps) {
@@ -73,12 +73,12 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public BlockContractBuiltInRuleApp replacePos(final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newOccurrence) {
+    public BlockContractBuiltInRuleApp replacePos(final PosInOccurrence<Term, SequentFormula<Term>> newOccurrence) {
         return new BlockContractBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,block, contract, heaps);
     }
 
     @Override
-    public BlockContractBuiltInRuleApp setIfInsts(final ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInstantiations) {
+    public BlockContractBuiltInRuleApp setIfInsts(final ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;
     }

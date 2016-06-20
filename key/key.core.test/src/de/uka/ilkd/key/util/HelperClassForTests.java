@@ -35,7 +35,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -127,7 +127,7 @@ public class HelperClassForTests {
         return pi.startProver(po, po);
     }
        
-    public JavaDLTerm extractProblemTerm(Proof p) {
+    public Term extractProblemTerm(Proof p) {
         return p.root().sequent().succedent().iterator().next().formula();
     }
 

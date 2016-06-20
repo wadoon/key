@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.common.core.logic.op.Operator;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * Parser tests for heap terms.
@@ -29,9 +29,9 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parseDecls("\\programVariables {testTermParserHeap.A[] array;}");
     }
 
-    private JavaDLTerm getSelectTerm(String sort, JavaDLTerm heap, JavaDLTerm object, JavaDLTerm field) {
+    private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
         Operator op = lookup_func(sort + "::select");
-        JavaDLTerm[] params = new JavaDLTerm[]{heap, object, field};
+        Term[] params = new Term[]{heap, object, field};
         return tf.createTerm(op, params);
     }
 
@@ -47,7 +47,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax("{}", "empty");
 
         pp = "{(a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f)}";
-        JavaDLTerm expected = parseTerm("union(union(singleton(a,testTermParserHeap.A::$f),singleton(a,testTermParserHeap.A::$f)),singleton(a,testTermParserHeap.A::$f))");
+        Term expected = parseTerm("union(union(singleton(a,testTermParserHeap.A::$f),singleton(a,testTermParserHeap.A::$f)),singleton(a,testTermParserHeap.A::$f))");
         verifyParsing(expected, pp);
     }
 
@@ -95,7 +95,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * field access. That operator is tested in the method below.
      */
     public void testAtOperator() throws Exception {
-        JavaDLTerm expectedParseResult;
+        Term expectedParseResult;
         String prettySyntax, verboseSyntax;
 
         prettySyntax = "a.f@h";
@@ -110,10 +110,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         verboseSyntax = "int::select(h, a1, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
-        JavaDLTerm h = parseTerm("h");
-        JavaDLTerm a = parseTerm("a");
-        JavaDLTerm next = parseTerm("testTermParserHeap.A::$next");
-        JavaDLTerm f = parseTerm("testTermParserHeap.A::$f");
+        Term h = parseTerm("h");
+        Term a = parseTerm("a");
+        Term next = parseTerm("testTermParserHeap.A::$next");
+        Term f = parseTerm("testTermParserHeap.A::$f");
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
@@ -124,15 +124,15 @@ public class TestTermParserHeap extends AbstractTestTermParser {
                 "(a.next.next).next.f@h",
                 "(a.next.next.next).f@h");
 
-        JavaDLTerm h2 = parseTerm("h2");
+        Term h2 = parseTerm("h2");
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, expectedParseResult, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
         compareStringRepresentationAgainstTermRepresentation("(a.next.next@h2).next.f@h", expectedParseResult);
 
-        JavaDLTerm aDotF = getSelectTerm("int", tb.getBaseHeap(), a, f); // a.f
-        JavaDLTerm aDotArray = getSelectTerm("int[]", h, a, parseTerm("testTermParserHeap.A::$array")); // a.array
+        Term aDotF = getSelectTerm("int", tb.getBaseHeap(), a, f); // a.f
+        Term aDotArray = getSelectTerm("int[]", h, a, parseTerm("testTermParserHeap.A::$array")); // a.array
         expectedParseResult = getSelectTerm("int", h, aDotArray, tb.arr(aDotF));
         compareStringRepresentationAgainstTermRepresentation("a.array[a.f]@h", expectedParseResult);
 
@@ -183,7 +183,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     private void comparePrettyPrintAgainstToString(String quantification, String expectedToString) throws Exception {
-        JavaDLTerm t = parseTerm(quantification);
+        Term t = parseTerm(quantification);
         assertEquals(expectedToString, t.toString());
         assertEqualsIgnoreWhitespaces(quantification, printTerm(t));
     }
@@ -332,7 +332,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * @throws IOException
      */
     private void parseAndPrint(String s) throws Exception {
-        JavaDLTerm t = parseTerm(s);
+        Term t = parseTerm(s);
         String printedSyntax = printTerm(t);
         assertEqualsIgnoreWhitespaces(s, printedSyntax);
     }

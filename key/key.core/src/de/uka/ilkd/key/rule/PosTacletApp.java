@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -44,7 +44,7 @@ public class PosTacletApp extends TacletApp {
     /** stores the information where the Taclet is to be applied. This means where
      * the find section of the taclet matches
      */
-    private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos;
+    private final PosInOccurrence<Term, SequentFormula<Term>> pos;
 
     /** creates a PosTacletApp for the given taclet with some known instantiations
      * and a position information
@@ -55,14 +55,14 @@ public class PosTacletApp extends TacletApp {
      * use the method "setIfFormulaInstantiations".
      * @param taclet the FindTaclet
      * @param instantiations the SVInstantiations
-     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> storing the position where to apply the
+     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> storing the position where to apply the
      * Taclet
      * @return new PosTacletApp or null if conditions (assertions) have been hurted
      */
     public static PosTacletApp
 	createPosTacletApp(FindTaclet       taclet,
 			   SVInstantiations instantiations,
-			   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>  pos,
+			   PosInOccurrence<Term, SequentFormula<Term>>  pos,
 			   Services services) {
 	return createPosTacletApp ( taclet,
 				    instantiations,
@@ -75,7 +75,7 @@ public class PosTacletApp extends TacletApp {
 	createPosTacletApp(FindTaclet                   taclet,
 			   SVInstantiations             instantiations,
 			   ImmutableList<IfFormulaInstantiation> ifInstantiations,
-			   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>              pos,
+			   PosInOccurrence<Term, SequentFormula<Term>>              pos,
 			   Services                     services) {
 	Debug.assertTrue ( ifInstsCorrectSize ( taclet, ifInstantiations ),
 			   "If instantiations list has wrong size" );
@@ -97,7 +97,7 @@ public class PosTacletApp extends TacletApp {
 
     public static PosTacletApp createPosTacletApp(FindTaclet         taclet,
 						  MatchConditions    matchCond,
-						  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>    pos,
+						  PosInOccurrence<Term, SequentFormula<Term>>    pos,
 						  Services           services) {
 	return createPosTacletApp ( taclet,
 				    matchCond.getInstantiations   (),
@@ -110,10 +110,10 @@ public class PosTacletApp extends TacletApp {
     /** creates a PosTacletApp for the given taclet
      * and a position information
      * @param taclet the FindTaclet
-     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> storing the position where to apply the
+     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> storing the position where to apply the
      * Taclet
      */
-    private PosTacletApp(FindTaclet taclet, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+    private PosTacletApp(FindTaclet taclet, PosInOccurrence<Term, SequentFormula<Term>> pos) {
 	super(taclet);
 	this.pos = pos;
     }
@@ -122,13 +122,13 @@ public class PosTacletApp extends TacletApp {
      * and a position information
      * @param taclet the FindTaclet
      * @param instantiations the SVInstantiations
-     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> storing the position where to apply the
+     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> storing the position where to apply the
      * Taclet
      */
     private PosTacletApp(FindTaclet                   taclet,
 			 SVInstantiations             instantiations,
 			 ImmutableList<IfFormulaInstantiation> ifInstantiations,
-			 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>              pos) {
+			 PosInOccurrence<Term, SequentFormula<Term>>              pos) {
 	super(taclet,
 	      instantiations,
 	      ifInstantiations);
@@ -146,7 +146,7 @@ public class PosTacletApp extends TacletApp {
      * indicated application position of the TacletApp.
      */
     private static ImmutableSet<QuantifiableVariable> varsBoundAboveFindPos
-	(Taclet taclet, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+	(Taclet taclet, PosInOccurrence<Term, SequentFormula<Term>> pos) {
 
 	if (!(taclet instanceof RewriteTaclet)) {
 	    return DefaultImmutableSet.<QuantifiableVariable>nil();
@@ -180,7 +180,7 @@ public class PosTacletApp extends TacletApp {
     private static SVInstantiations resolveCollisionWithContext(
 	    Taclet taclet,
 	    SVInstantiations insts,
-	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+	    PosInOccurrence<Term, SequentFormula<Term>> pos,
 	    Services services){
 
 	if (taclet.isContextInPrefix()) {
@@ -188,7 +188,7 @@ public class PosTacletApp extends TacletApp {
 	    Iterator<SchemaVariable> it=allVariableSV(taclet);
 	    while (it.hasNext()) {
 		SchemaVariable varSV=it.next();
-		JavaDLTerm inst=(JavaDLTerm) insts.getInstantiation(varSV);
+		Term inst=(Term) insts.getInstantiation(varSV);
 		if (inst!=null && k.contains((QuantifiableVariable)inst.op())) {
 		    insts = replaceInstantiation(taclet,
 			    			 insts,
@@ -203,11 +203,11 @@ public class PosTacletApp extends TacletApp {
 
     /** adds a new instantiation to this TacletApp
      * @param sv the SchemaVariable to be instantiated
-     * @param term the JavaDLTerm the SchemaVariable is instantiated with
+     * @param term the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
     public TacletApp addInstantiation(SchemaVariable sv,
-	    			      JavaDLTerm term,
+	    			      Term term,
                                       boolean interesting,
                                       Services services) {
 
@@ -352,11 +352,11 @@ public class PosTacletApp extends TacletApp {
     }
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula<JavaDLTerm> and
+     * returns the PositionInOccurrence (representing a SequentFormula<Term> and
      * a position in the corresponding formula)
-     * @return the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
+     * @return the PosInOccurrence<Term, SequentFormula<Term>>
      */
-    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence() {
+    public PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence() {
 	return pos;
     }
 

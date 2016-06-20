@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.termProjection;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -27,17 +27,17 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public class TermBuffer implements ProjectionToTerm {
 
-    private JavaDLTerm t = null;
+    private Term t = null;
     
-    public JavaDLTerm getContent() {
+    public Term getContent() {
         return t;
     }
 
-    public void setContent(JavaDLTerm t) {
+    public void setContent(Term t) {
         this.t = t;
     }
 
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         return t;
     }
 

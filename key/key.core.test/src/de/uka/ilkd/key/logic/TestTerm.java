@@ -73,55 +73,55 @@ public class TestTerm extends TestCase {
        tf = tb.tf();
     }
     
-    private JavaDLTerm t1(){
-	JavaDLTerm t_x=tf.createTerm(x);
-	JavaDLTerm t_px=tf.createTerm(p, new JavaDLTerm[]{t_x}, null, null);
+    private Term t1(){
+	Term t_x=tf.createTerm(x);
+	Term t_px=tf.createTerm(p, new Term[]{t_x}, null, null);
 	return t_px;
     }
   
-    private JavaDLTerm t2(){
-	JavaDLTerm t_x=tf.createTerm(x);
-	JavaDLTerm t_w=tf.createTerm(w);
-	return tf.createTerm(r, new JavaDLTerm[]{t_x,t_w}, null, null);
+    private Term t2(){
+	Term t_x=tf.createTerm(x);
+	Term t_w=tf.createTerm(w);
+	return tf.createTerm(r, new Term[]{t_x,t_w}, null, null);
     }
 
-    private JavaDLTerm t3() {
-	JavaDLTerm t_y=tf.createTerm(y);
-	return tf.createTerm(f, new JavaDLTerm[]{t_y}, null, null);
+    private Term t3() {
+	Term t_y=tf.createTerm(y);
+	return tf.createTerm(f, new Term[]{t_y}, null, null);
     }
 
-    private JavaDLTerm t4(){
-	JavaDLTerm t_pv0=tf.createTerm(pv0);
-	JavaDLTerm t_ppv0=tf.createTerm(p, new JavaDLTerm[]{t_pv0}, null, null);
+    private Term t4(){
+	Term t_pv0=tf.createTerm(pv0);
+	Term t_ppv0=tf.createTerm(p, new Term[]{t_pv0}, null, null);
 	return t_ppv0;
     }
   
     public void testFreeVars1() {
-	JavaDLTerm t_allxt2=tb.all(x,t2());
-	JavaDLTerm t_allxt2_andt1=tf.createTerm(Junctor.AND,t_allxt2,t1());
+	Term t_allxt2=tb.all(x,t2());
+	Term t_allxt2_andt1=tf.createTerm(Junctor.AND,t_allxt2,t1());
 	assertTrue(t_allxt2_andt1.freeVars().contains(w) 
 		   && t_allxt2_andt1.freeVars().contains(x));
     }
 
    public void testFreeVars2() {
-	JavaDLTerm t_allxt2=tb.all(w ,t2());
-	JavaDLTerm t_allxt2_andt1=tf.createTerm(Junctor.AND,t_allxt2,t1());
+	Term t_allxt2=tb.all(w ,t2());
+	Term t_allxt2_andt1=tf.createTerm(Junctor.AND,t_allxt2,t1());
 	assertTrue(!t_allxt2_andt1.freeVars().contains(w) 
 		   && t_allxt2_andt1.freeVars().contains(x));
     }
     
     public void testFreeVars3() {
-	JavaDLTerm t_allxt1=tb.all(x, t2());
-	JavaDLTerm t_allxt1_andt2=tf.createTerm(Junctor.AND,t_allxt1,t1());
-	JavaDLTerm t_exw_allxt1_andt2=tb.ex(w, t_allxt1_andt2); 
+	Term t_allxt1=tb.all(x, t2());
+	Term t_allxt1_andt2=tf.createTerm(Junctor.AND,t_allxt1,t1());
+	Term t_exw_allxt1_andt2=tb.ex(w, t_allxt1_andt2); 
 	assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w) 
 		   && t_exw_allxt1_andt2.freeVars().contains(x));
     }
 
    public void testFreeVars4() {
-	JavaDLTerm t_allxt1=tb.all(x, t2());
-	JavaDLTerm t_allxt1_andt2=tf.createTerm(Junctor.AND,t_allxt1,t1());
-	JavaDLTerm t_exw_allxt1_andt2 =
+	Term t_allxt1=tb.all(x, t2());
+	Term t_allxt1_andt2=tf.createTerm(Junctor.AND,t_allxt1,t1());
+	Term t_exw_allxt1_andt2 =
                 tb.ex(ImmutableSLList.<QuantifiableVariable>nil().append(w, x),
                      t_allxt1_andt2);
 	assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w)
@@ -130,34 +130,34 @@ public class TestTerm extends TestCase {
 
     public void testProgramElementEqualsModRenaming() {
 
-	JavaDLTerm match1 = TacletForTests.parseTerm("\\<{ int i; }\\>true & \\<{ int i; }\\>true");
-	JavaDLTerm match2 = TacletForTests.parseTerm("\\<{ int i; }\\>true ");
+	Term match1 = TacletForTests.parseTerm("\\<{ int i; }\\>true & \\<{ int i; }\\>true");
+	Term match2 = TacletForTests.parseTerm("\\<{ int i; }\\>true ");
 	assertTrue("Terms should be equalModRenaming (0).", match1.sub(0).equalsModRenaming(match2));
 	assertTrue("Terms should be equalModRenaming (1).", match1.sub(0).equalsModRenaming(match1.sub(1)));
-	JavaDLTerm match3 = TacletForTests.parseTerm("\\<{ int j = 0; }\\>true ");
+	Term match3 = TacletForTests.parseTerm("\\<{ int j = 0; }\\>true ");
 	assertTrue("Terms should not be equal.", !match1.equals(match3));
 
     }
     
     public void testEqualsModRenamingWithLabels() {
-        JavaDLTerm match1 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
-	JavaDLTerm match2 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");	
+        Term match1 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");
+	Term match2 = TacletForTests.parseTerm("\\<{ label0:{ label1:{  } } }\\>true");	
 	assertTrue("Terms should be equalModRenaming.", match1.equalsModRenaming(match2));
-	JavaDLTerm match3 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
-	JavaDLTerm match4 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int j = 0; } } }\\>true");	
+	Term match3 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
+	Term match4 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int j = 0; } } }\\>true");	
 	assertTrue("Terms should be equalModRenaming.", match3.equalsModRenaming(match4));
-	JavaDLTerm match5 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
-	JavaDLTerm match6 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");	
+	Term match5 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");
+	Term match6 = TacletForTests.parseTerm("\\<{ label0:{ label1:{ int i = 0; } } }\\>true");	
 	assertTrue("Terms should be equalModRenaming.", match5.equalsModRenaming(match6));
     }
 
     public void testEqualsModRenaming() {
         
-        final JavaDLTerm px = tf.createTerm ( p, new JavaDLTerm[]{tf.createTerm(x)}, null, null );
-        final JavaDLTerm quant1 = tb.all(z, tb.all( zz, tb.all( x, px ) ) );
+        final Term px = tf.createTerm ( p, new Term[]{tf.createTerm(x)}, null, null );
+        final Term quant1 = tb.all(z, tb.all( zz, tb.all( x, px ) ) );
         
-        final JavaDLTerm pz = tf.createTerm ( p, new JavaDLTerm[]{tf.createTerm(z)}, null, null );
-        final JavaDLTerm quant2 = tb.all(z,
+        final Term pz = tf.createTerm ( p, new Term[]{tf.createTerm(z)}, null, null );
+        final Term quant2 = tb.all(z,
                                tb.all( z,
                                   tb.all( z, pz ) ) );
         
@@ -169,25 +169,25 @@ public class TestTerm extends TestCase {
     
 /*   public void testProgramElementEquals() {
 
-	JavaDLTerm match1 = TacletForTests.parseTerm("<{ int i = 0; }>true ");
-	JavaDLTerm match2 = TacletForTests.parseTerm("<{ int i = 0; }>true ");
+	Term match1 = TacletForTests.parseTerm("<{ int i = 0; }>true ");
+	Term match2 = TacletForTests.parseTerm("<{ int i = 0; }>true ");
 	assertEquals("Terms should be equal.", match1, match2);
 
-	JavaDLTerm match3 = TacletForTests.parseTerm("<{ int j = 0; }>true ");
+	Term match3 = TacletForTests.parseTerm("<{ int j = 0; }>true ");
 	assertTrue("Terms should not be equal.", !match1.equals(match3));
 
     }
 */
 //     public void testsimpleUpdate() {
-// 	  JavaDLTerm t1 = TacletForTests.parseTerm("<{int j,k,l;}>{k:=l}"
+// 	  Term t1 = TacletForTests.parseTerm("<{int j,k,l;}>{k:=l}"
 //                                     +"{l:=l}{j:=j}<{ int i = 0;k=0; }>true ");
-// 	  JavaDLTerm t2 = TacletForTests.parseTerm("<{int j,l,k;}>{j:=j}"
+// 	  Term t2 = TacletForTests.parseTerm("<{int j,l,k;}>{j:=j}"
 //                 +"{l:=k}{j:=k}{j:=j}{j:=j}<{ int i = 0;l=0; }>true ");
 // 	  assertTrue("Terms should be equalModRenaming and mod \"simple\" updates.",
 // 		     t1.equalsModRenamingModsU(t2));
-// 	  JavaDLTerm t3 = TacletForTests.parseTerm("<{int j,k,l;}>{k:=k}"
+// 	  Term t3 = TacletForTests.parseTerm("<{int j,k,l;}>{k:=k}"
 //                                     +"{j:=Z(3(#))}<{ int i = 0; }>true ");
-// 	  JavaDLTerm t4 = TacletForTests.parseTerm("<{int j,l,k;}>{j:=j}"
+// 	  Term t4 = TacletForTests.parseTerm("<{int j,l,k;}>{j:=j}"
 //                               +"{l:=Z(3(#))}{j:=l}<{ int i = 0;l=0; }>true ");
 // 	  assertTrue("Terms should not be equalModRenaming and mod \"simple\" updates.",
 // 		     !t1.equalsModRenamingModsU(t3));
@@ -198,13 +198,13 @@ public class TestTerm extends TestCase {
 
 
     public void testRigidness0 () {
-	assertTrue ( "JavaDLTerm t1 should be rigid",
+	assertTrue ( "Term t1 should be rigid",
 		     t1 ().isRigid () );
-	assertTrue ( "JavaDLTerm t2 should be rigid",
+	assertTrue ( "Term t2 should be rigid",
 		     t2 ().isRigid () );
-	assertTrue ( "JavaDLTerm t3 should be rigid",
+	assertTrue ( "Term t3 should be rigid",
 		     t3 ().isRigid () );
-	assertFalse ( "JavaDLTerm t4 should not be rigid",
+	assertFalse ( "Term t4 should not be rigid",
 		      t4 ().isRigid () );
     }
 
@@ -212,12 +212,12 @@ public class TestTerm extends TestCase {
     * Tests {@link TermImpl#containsModalContentRecursive()}.
     */
    public void testIsContainsJavaBlockRecursive() {
-      JavaDLTerm noJB = tf.createTerm(Junctor.TRUE);
-      JavaDLTerm noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
+      Term noJB = tf.createTerm(Junctor.TRUE);
+      Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
       JavaBlock javaBlock = JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-      JavaDLTerm withJB = tf.createTerm(Modality.DIA, new ImmutableArray<JavaDLTerm>(noJB), null, javaBlock);
-      JavaDLTerm withJBChild = tf.createTerm(Junctor.NOT, withJB);
-      JavaDLTerm withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
+      Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<Term>(noJB), null, javaBlock);
+      Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
+      Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
       assertFalse(noJB.containsModalContentRecursive());
       assertFalse(noJBWithChild.containsModalContentRecursive());
       assertTrue(withJB.containsModalContentRecursive());

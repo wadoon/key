@@ -33,7 +33,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -58,8 +58,8 @@ public class TriggeredInstantiations implements TermGenerator {
     }
     
     private Sequent last = Sequent.EMPTY_SEQUENT;
-    private Set<JavaDLTerm> lastCandidates = new HashSet<JavaDLTerm>();
-    private ImmutableSet<JavaDLTerm> lastAxioms = DefaultImmutableSet.<JavaDLTerm>nil();
+    private Set<Term> lastCandidates = new HashSet<Term>();
+    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.<Term>nil();
     
     private boolean checkConditions;
 
@@ -75,24 +75,24 @@ public class TriggeredInstantiations implements TermGenerator {
     /**
      * Generates all instances 
      */
-    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         if (app instanceof TacletApp) {
 
             final Services services = goal.proof().getServices();
             final TacletApp tapp = (TacletApp) app;
             final Taclet taclet = tapp.taclet();
 
-            final Set<JavaDLTerm> terms;
-            final Set<JavaDLTerm> axiomSet;
-            ImmutableSet<JavaDLTerm> axioms = DefaultImmutableSet.<JavaDLTerm>nil();
+            final Set<Term> terms;
+            final Set<Term> axiomSet;
+            ImmutableSet<Term> axioms = DefaultImmutableSet.<Term>nil();
  
             
             final Sequent seq = goal.sequent();
             if (seq != last) {
-                terms = new HashSet<JavaDLTerm>();
-                axiomSet = new HashSet<JavaDLTerm>();
+                terms = new HashSet<Term>();
+                axiomSet = new HashSet<Term>();
                 computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
-                for (JavaDLTerm axiom : axiomSet) {
+                for (Term axiom : axiomSet) {
                     axioms = axioms.add(axiom);
                 }
 
@@ -110,7 +110,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
             if (taclet.hasTrigger()) {
 
-                final JavaDLTerm comprehension = pos.subTerm();
+                final Term comprehension = pos.subTerm();
 
                 if (tapp.uninstantiatedVars().size() <= 1) {
                     SVInstantiations svInst = tapp.instantiations();
@@ -128,21 +128,21 @@ public class TriggeredInstantiations implements TermGenerator {
                     final Metavariable mv = new Metavariable(new Name("$MV$"
                             + sv.name()), svSort);
 
-                    final JavaDLTerm trigger = instantiateTerm(
+                    final Term trigger = instantiateTerm(
                             taclet.getTrigger().getTerm(), services,
                             svInst.replace(sv, services.getTermBuilder().var(mv), services));
 
-                    final Set<JavaDLTerm> instances = computeInstances(services,
+                    final Set<Term> instances = computeInstances(services,
                             comprehension, mv, trigger, terms, axioms, tapp);
 
                     return instances.iterator();
                 } else {
                     // at the moment instantiations with more than one
                     // missing taclet variable not supported
-                    return ImmutableSLList.<JavaDLTerm> nil().iterator();
+                    return ImmutableSLList.<Term> nil().iterator();
                 }
             } else {
-                return ImmutableSLList.<JavaDLTerm> nil().iterator();
+                return ImmutableSLList.<Term> nil().iterator();
             }
 
         } else {
@@ -152,7 +152,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
     }
 
-    private JavaDLTerm instantiateTerm(final JavaDLTerm term, final Services services,
+    private Term instantiateTerm(final Term term, final Services services,
             SVInstantiations svInst) {
         final SyntacticalReplaceVisitor syn = new SyntacticalReplaceVisitor(
               new TermLabelState(), null, null, svInst, null, null, null, services);
@@ -161,17 +161,17 @@ public class TriggeredInstantiations implements TermGenerator {
     }
 
     private void computeAxiomAndCandidateSets(final Sequent seq,
-            final Set<JavaDLTerm> terms, final Set<JavaDLTerm> axioms, Services services) {        
+            final Set<Term> terms, final Set<Term> axioms, Services services) {        
         final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.antecedent(), true, services);
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.succedent(), false, services);
     }
 
-    private void collectAxiomsAndCandidateTerms(final Set<JavaDLTerm> terms,
-            final Set<JavaDLTerm> axioms, final IntegerLDT integerLDT,
+    private void collectAxiomsAndCandidateTerms(final Set<Term> terms,
+            final Set<Term> axioms, final IntegerLDT integerLDT,
             Semisequent antecedent, boolean inAntecedent, JavaDLTermServices services) {
         
-        for (SequentFormula<JavaDLTerm> sf : antecedent) {
+        for (SequentFormula<Term> sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);
             if (sf.formula().op() instanceof Function || 
                     sf.formula().op() == Equality.EQUALS) {
@@ -180,32 +180,32 @@ public class TriggeredInstantiations implements TermGenerator {
         }
     }
 
-    private boolean isAvoidConditionProvable(JavaDLTerm cond, ImmutableSet<JavaDLTerm> axioms,
+    private boolean isAvoidConditionProvable(Term cond, ImmutableSet<Term> axioms,
             Services services) {
         
         long cost = PredictCostProver.computerInstanceCost(
-                new Substitution(DefaultImmutableMap.<QuantifiableVariable, JavaDLTerm>nilMap()), 
+                new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), 
                 cond, axioms, services);
         return cost == -1;
     }
 
-    private HashSet<JavaDLTerm> computeInstances(Services services,
-            final JavaDLTerm comprehension, final Metavariable mv,
-            final JavaDLTerm trigger, Set<JavaDLTerm> terms, ImmutableSet<JavaDLTerm> axioms, TacletApp app) {
+    private HashSet<Term> computeInstances(Services services,
+            final Term comprehension, final Metavariable mv,
+            final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms, TacletApp app) {
 
-        final HashSet<JavaDLTerm> instances = new HashSet<JavaDLTerm>();
-        final HashSet<JavaDLTerm> alreadyChecked = new HashSet<JavaDLTerm>();
+        final HashSet<Term> instances = new HashSet<Term>();
+        final HashSet<Term> alreadyChecked = new HashSet<Term>();
 
-        for (final JavaDLTerm t : terms) {
+        for (final Term t : terms) {
             boolean addToInstances = true;
             Constraint c = EqualityConstraint.BOTTOM.unify(trigger, t, services);
             if (c.isSatisfiable()) {
-                final JavaDLTerm middle = c.getInstantiation(mv, services);
+                final Term middle = c.getInstantiation(mv, services);
                 if (middle != null && !alreadyChecked.contains(middle)) {
                     alreadyChecked.add(middle);
                     if (!checkConditions && app.taclet().getTrigger().hasAvoidConditions()) {
-                        ImmutableList<JavaDLTerm> conditions = instantiateConditions(services, app, middle);
-                        for (JavaDLTerm condition : conditions) {
+                        ImmutableList<Term> conditions = instantiateConditions(services, app, middle);
+                        for (Term condition : conditions) {
                             if (isAvoidConditionProvable(condition, axioms, services)) {
                                 addToInstances = false;
                                 break;
@@ -221,11 +221,11 @@ public class TriggeredInstantiations implements TermGenerator {
         return instances;
     }
 
-    private ImmutableList<JavaDLTerm> instantiateConditions(Services services,
-            TacletApp app, final JavaDLTerm middle) {
-        ImmutableList<JavaDLTerm> conditions;
-        conditions = ImmutableSLList.<JavaDLTerm> nil();
-        for (JavaDLTerm singleAvoidCond : app.taclet().getTrigger().getAvoidConditions()) {
+    private ImmutableList<Term> instantiateConditions(Services services,
+            TacletApp app, final Term middle) {
+        ImmutableList<Term> conditions;
+        conditions = ImmutableSLList.<Term> nil();
+        for (Term singleAvoidCond : app.taclet().getTrigger().getAvoidConditions()) {
             conditions = conditions.append(instantiateTerm(
                     singleAvoidCond,
                     services,                    
@@ -236,7 +236,7 @@ public class TriggeredInstantiations implements TermGenerator {
         return conditions;
     }
 
-    private void collectTerms(JavaDLTerm instanceCandidate, Set<JavaDLTerm> terms,
+    private void collectTerms(Term instanceCandidate, Set<Term> terms,
             IntegerLDT intLDT) {
         if (instanceCandidate.freeVars().isEmpty()
                 && !instanceCandidate.containsModalContentRecursive()) {

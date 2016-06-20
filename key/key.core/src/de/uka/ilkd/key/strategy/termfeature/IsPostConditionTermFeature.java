@@ -13,12 +13,12 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 
 
 /**
- * JavaDLTerm has the post condition term label.
+ * Term has the post condition term label.
  */
 public final class IsPostConditionTermFeature extends BinaryTermFeature {
 
@@ -31,7 +31,7 @@ public final class IsPostConditionTermFeature extends BinaryTermFeature {
 
 
     @Override
-    protected boolean filter(JavaDLTerm t, Services services) {
+    protected boolean filter(Term t, Services services) {
         return t.hasLabels() &&
                t.containsLabel(ParameterlessTermLabel.POST_CONDITION_LABEL);
     }

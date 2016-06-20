@@ -21,14 +21,14 @@ public class TestPosInTerm extends TestCase {
     
     
     public void testUpDownWithoutCopyExceptForTopLevelChange() {
-        PosInTerm<JavaDLTerm> pit = PosInTerm.<JavaDLTerm>getTopLevel();
+        PosInTerm<Term> pit = PosInTerm.<Term>getTopLevel();
                 
         pit = pit.down(8);
         assertTrue(pit.getIndex() == 8);
         assertTrue(pit.depth() == 1);
         
         
-        PosInTerm<JavaDLTerm> copy = pit;
+        PosInTerm<Term> copy = pit;
         
         pit = pit.down(20);
         assertTrue(pit.depth() == 2);
@@ -49,10 +49,10 @@ public class TestPosInTerm extends TestCase {
     }
 
     public void testCopyFlag() {
-        PosInTerm<JavaDLTerm> pit = PosInTerm.<JavaDLTerm>getTopLevel();        
+        PosInTerm<Term> pit = PosInTerm.<Term>getTopLevel();        
         pit = pit.down(10);
         
-        PosInTerm<JavaDLTerm> copy = pit;        
+        PosInTerm<Term> copy = pit;        
         pit = pit.down(20);
         copy = copy.down(30);
         
@@ -63,9 +63,9 @@ public class TestPosInTerm extends TestCase {
     public void testUpDownWithCopy() {
         int[] pos = new int[]{10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1};
 
-        PosInTerm<JavaDLTerm> pit = toPosInTerm(pos);
+        PosInTerm<Term> pit = toPosInTerm(pos);
                 
-        PosInTerm<JavaDLTerm> copy = pit;
+        PosInTerm<Term> copy = pit;
         
         assertEquals(pos.length, pit.depth());
         
@@ -86,8 +86,8 @@ public class TestPosInTerm extends TestCase {
         assertEquals(10000, pit.up().getIndex());        
     }
 
-    private PosInTerm<JavaDLTerm> toPosInTerm(int[] pos) {
-        PosInTerm<JavaDLTerm> pit = PosInTerm.<JavaDLTerm>getTopLevel();
+    private PosInTerm<Term> toPosInTerm(int[] pos) {
+        PosInTerm<Term> pit = PosInTerm.<Term>getTopLevel();
 
         for (int i : pos) {
             pit = pit.down(i);
@@ -102,8 +102,8 @@ public class TestPosInTerm extends TestCase {
         int[] pos4 = new int[]{10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1, 67, 68, 69};
 
 
-        PosInTerm<JavaDLTerm> pit1 = toPosInTerm(pos);
-        PosInTerm<JavaDLTerm> pit2 = toPosInTerm(pos);
+        PosInTerm<Term> pit1 = toPosInTerm(pos);
+        PosInTerm<Term> pit2 = toPosInTerm(pos);
         assertEquals(pit1, pit2);
         assertEquals(pit1.hashCode(), pit2.hashCode());
             
@@ -117,11 +117,11 @@ public class TestPosInTerm extends TestCase {
         int[] posN4 = new int[]{10, 2, 5, 20};
         int[] posN7 = new int[]{10, 2, 5, 20, 4, 100, 25};
         
-        PosInTerm<JavaDLTerm> pit = toPosInTerm(pos);
+        PosInTerm<Term> pit = toPosInTerm(pos);
 
-        PosInTerm<JavaDLTerm> pitN1 = PosInTerm.<JavaDLTerm>getTopLevel().down(10);
-        PosInTerm<JavaDLTerm> pitN4 = toPosInTerm(posN4);
-        PosInTerm<JavaDLTerm> pitN7 = toPosInTerm(posN7);
+        PosInTerm<Term> pitN1 = PosInTerm.<Term>getTopLevel().down(10);
+        PosInTerm<Term> pitN4 = toPosInTerm(posN4);
+        PosInTerm<Term> pitN7 = toPosInTerm(posN7);
 
         assertTrue(pit.firstN(0).isTopLevel());
         assertEquals(pitN1, pit.firstN(1));
@@ -133,7 +133,7 @@ public class TestPosInTerm extends TestCase {
     public void testIntegerList() {
         int[] pos = new int[]{10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1};
         
-        PosInTerm<JavaDLTerm> pit = toPosInTerm(pos);
+        PosInTerm<Term> pit = toPosInTerm(pos);
         
         assertEquals("[10,2,5,20,4,100,25,65,23,40,2,0,1,0,1]", pit.integerList(pit.iterator()));
         assertEquals("[1,0,1,0,2,40,23,65,25,100,4,20,5,2,10]", pit.integerList(pit.reverseIterator()));
@@ -142,10 +142,10 @@ public class TestPosInTerm extends TestCase {
     public void testParseReverseString() {
         int[] pos = new int[]{10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1};
         
-        PosInTerm<JavaDLTerm> pit = toPosInTerm(pos);
+        PosInTerm<Term> pit = toPosInTerm(pos);
         
         assertEquals(pit, 
-                PosInTerm.<JavaDLTerm>parseReverseString("1,0,1,0,2,40,23,65,25,100,4,20,5,2,10"));
+                PosInTerm.<Term>parseReverseString("1,0,1,0,2,40,23,65,25,100,4,20,5,2,10"));
         
     }
     

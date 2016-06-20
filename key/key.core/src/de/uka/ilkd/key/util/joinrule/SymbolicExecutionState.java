@@ -3,7 +3,7 @@ package de.uka.ilkd.key.util.joinrule;
 import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 
@@ -13,7 +13,7 @@ import de.uka.ilkd.key.proof.Node;
  * 
  * @author Dominic Scheurer
  */
-public class SymbolicExecutionState extends Pair<JavaDLTerm, JavaDLTerm> {
+public class SymbolicExecutionState extends Pair<Term, Term> {
 
     private Node correspondingNode = null;
 
@@ -23,7 +23,7 @@ public class SymbolicExecutionState extends Pair<JavaDLTerm, JavaDLTerm> {
      * @param pathCondition
      *            The path condition (formula).
      */
-    public SymbolicExecutionState(JavaDLTerm symbolicState, JavaDLTerm pathCondition) {
+    public SymbolicExecutionState(Term symbolicState, Term pathCondition) {
         super(symbolicState, pathCondition);
     }
 
@@ -35,7 +35,7 @@ public class SymbolicExecutionState extends Pair<JavaDLTerm, JavaDLTerm> {
      * @param correspondingNode
      *            The node corresponding to this SE state.
      */
-    public SymbolicExecutionState(JavaDLTerm symbolicState, JavaDLTerm pathCondition,
+    public SymbolicExecutionState(Term symbolicState, Term pathCondition,
             Node correspondingNode) {
         this(symbolicState, pathCondition);
         this.correspondingNode = correspondingNode;
@@ -44,14 +44,14 @@ public class SymbolicExecutionState extends Pair<JavaDLTerm, JavaDLTerm> {
     /**
      * @return The symbolic state.
      */
-    public JavaDLTerm getSymbolicState() {
+    public Term getSymbolicState() {
         return first;
     }
 
     /**
      * @return The path condition.
      */
-    public JavaDLTerm getPathCondition() {
+    public Term getPathCondition() {
         return second;
     }
 

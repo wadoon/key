@@ -26,7 +26,7 @@ import org.key_project.common.core.services.ProgramServices;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -326,8 +326,8 @@ public class Services implements JavaDLTermServices, ProofServices {
     }
     
     /**
-     * Returns the {@link CCTermBuilder} used to create {@link JavaDLTerm}s.
-     * @return The {@link CCTermBuilder} used to create {@link JavaDLTerm}s.
+     * Returns the {@link CCTermBuilder} used to create {@link Term}s.
+     * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -336,8 +336,8 @@ public class Services implements JavaDLTermServices, ProofServices {
     }
 
     /**
-     * Returns the {@link CCTermFactory} used to create {@link JavaDLTerm}s.
-     * @return The {@link CCTermFactory} used to create {@link JavaDLTerm}s.
+     * Returns the {@link CCTermFactory} used to create {@link Term}s.
+     * @return The {@link CCTermFactory} used to create {@link Term}s.
      */
     @SuppressWarnings("unchecked")
     @Override

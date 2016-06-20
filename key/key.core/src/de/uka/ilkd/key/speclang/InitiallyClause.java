@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.op.ParsableVariable;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 public interface InitiallyClause extends SpecificationElement {
@@ -29,7 +29,7 @@ public interface InitiallyClause extends SpecificationElement {
      * Returns the formula without implicit all-quantification over
      * the receiver object.
      */
-    public JavaDLTerm getClause(ParsableVariable selfVar, JavaDLTermServices services);
+    public Term getClause(ParsableVariable selfVar, JavaDLTermServices services);
     
     public PositionedString getOriginalSpec();
     

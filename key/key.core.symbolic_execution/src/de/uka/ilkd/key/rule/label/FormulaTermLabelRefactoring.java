@@ -16,7 +16,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -48,7 +48,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * to indicate that a refactoring below an update 
     * ({@link RefactoringScope#APPLICATION_BELOW_UPDATES})
     * is required performed by
-    * {@link #refactorBewlowUpdates(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, JavaDLTerm, List)}.
+    * {@link #refactorBewlowUpdates(PosInOccurrence<Term, SequentFormula<Term>>, Term, List)}.
     * <p>
     * This is for instance required for the following rules:
     * <ul>
@@ -79,7 +79,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * to indicate that a refactoring of parents
     * ({@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS})
     * is required performed by
-    * {@link #refactorInCaseOfNewIdRequired(TermLabelState, Goal, JavaDLTerm, Services, List)}.
+    * {@link #refactorInCaseOfNewIdRequired(TermLabelState, Goal, Term, Services, List)}.
     * <p>
     * This is for instance required if a rule is applied on a sub term without 
     * a {@link FormulaTermLabel} of a parent which has a {@link FormulaTermLabel}.
@@ -96,7 +96,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * to indicate that a refactoring of specified {@link SequentFormula}s
     * ({@link RefactoringScope#SEQUENT})
     * is required performed by
-    * {@link #refactorSequentFormulas(TermLabelState, Services, JavaDLTerm, List)}.
+    * {@link #refactorSequentFormulas(TermLabelState, Services, Term, List)}.
     * <p>
     * This is for instance required if the assumes clause of a rule has
     * a {@link FormulaTermLabel} but the application does not have it.
@@ -121,12 +121,12 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    @Override
    public RefactoringScope defineRefactoringScope(TermLabelState state,
                                                   Services services, 
-                                                  PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, 
-                                                  JavaDLTerm applicationTerm, 
+                                                  PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, 
+                                                  Term applicationTerm, 
                                                   Rule rule, 
                                                   Goal goal, 
                                                   Object hint, 
-                                                  JavaDLTerm tacletTerm) {
+                                                  Term tacletTerm) {
       if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
          return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
       }
@@ -185,13 +185,13 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    @Override
    public void refactoreLabels(TermLabelState state,
                                Services services, 
-                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, 
-                               JavaDLTerm applicationTerm, 
+                               PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, 
+                               Term applicationTerm, 
                                Rule rule, 
                                Goal goal, 
                                Object hint, 
-                               JavaDLTerm tacletTerm, 
-                               JavaDLTerm term, 
+                               Term tacletTerm, 
+                               Term term, 
                                List<TermLabel> labels) {
       if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
          refactorSpecificationApplication(term, goal ,services, labels);
@@ -212,12 +212,12 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
 
    /**
     * Refactors a specification application.
-    * @param term The {@link JavaDLTerm} which is now refactored.
-    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
+    * @param term The {@link Term} which is now refactored.
+    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param labels The new labels the {@link JavaDLTerm} will have after the refactoring.
+    * @param labels The new labels the {@link Term} will have after the refactoring.
     */
-   protected void refactorSpecificationApplication(JavaDLTerm term, 
+   protected void refactorSpecificationApplication(Term term, 
                                                    Goal goal,
                                                    Services services, 
                                                    List<TermLabel> labels) {
@@ -234,14 +234,14 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    /**
     * Refactors in case that the inner most label needs a new ID.
     * @param state The {@link TermLabelState} of the current rule application.
-    * @param goal The optional {@link Goal} on which the {@link JavaDLTerm} to create will be used.
-    * @param term The {@link JavaDLTerm} which is now refactored.
+    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param term The {@link Term} which is now refactored.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param labels The new labels the {@link JavaDLTerm} will have after the refactoring.
+    * @param labels The new labels the {@link Term} will have after the refactoring.
     */
    protected void refactorInCaseOfNewIdRequired(TermLabelState state, 
                                                 Goal goal, 
-                                                JavaDLTerm term, 
+                                                Term term, 
                                                 Services services, 
                                                 List<TermLabel> labels) {
       if (goal != null && !isInnerMostParentRefactored(state, goal)) {
@@ -258,13 +258,13 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    }
    
    /**
-    * Refactors the {@link JavaDLTerm} below its update.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} in the previous {@link Sequent} which defines the {@link JavaDLTerm} that is rewritten.
-    * @param term The {@link JavaDLTerm} which is now refactored.
-    * @param labels The new labels the {@link JavaDLTerm} will have after the refactoring.
+    * Refactors the {@link Term} below its update.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param term The {@link Term} which is now refactored.
+    * @param labels The new labels the {@link Term} will have after the refactoring.
     */
-   protected void refactorBewlowUpdates(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, 
-                                        JavaDLTerm term, 
+   protected void refactorBewlowUpdates(PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, 
+                                        Term term, 
                                         List<TermLabel> labels) {
       FormulaTermLabel applicationLabel = (FormulaTermLabel)applicationPosInOccurrence.subTerm().getLabel(FormulaTermLabel.NAME);
       if (applicationLabel != null) {
@@ -286,17 +286,17 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * Refactors the specified {@link SequentFormula}s.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param term The {@link JavaDLTerm} which is now refactored.
-    * @param labels The new labels the {@link JavaDLTerm} will have after the refactoring.
+    * @param term The {@link Term} which is now refactored.
+    * @param labels The new labels the {@link Term} will have after the refactoring.
     */
    protected void refactorSequentFormulas(TermLabelState state,
                                           Services services, 
-                                          final JavaDLTerm term, 
+                                          final Term term, 
                                           List<TermLabel> labels) {
-      Set<SequentFormula<JavaDLTerm>> sequentFormulas = getSequentFormulasToRefactor(state);
-      if (CollectionUtil.search(sequentFormulas, new IFilter<SequentFormula<JavaDLTerm>>() {
+      Set<SequentFormula<Term>> sequentFormulas = getSequentFormulasToRefactor(state);
+      if (CollectionUtil.search(sequentFormulas, new IFilter<SequentFormula<Term>>() {
          @Override
-         public boolean select(SequentFormula<JavaDLTerm> element) {
+         public boolean select(SequentFormula<Term> element) {
             return element.formula() == term;
          }
       }) != null) {
@@ -312,13 +312,13 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    }
    
    /**
-    * Refactors the given {@link JavaDLTerm} after a substitiution.
-    * @param term The {@link JavaDLTerm} to refactor.
-    * @param tacletTerm The taclet {@link JavaDLTerm} which provides additional labels to be merged with the other {@link JavaDLTerm}.
-    * @param labels The new labels the {@link JavaDLTerm} will have after the refactoring.
+    * Refactors the given {@link Term} after a substitiution.
+    * @param term The {@link Term} to refactor.
+    * @param tacletTerm The taclet {@link Term} which provides additional labels to be merged with the other {@link Term}.
+    * @param labels The new labels the {@link Term} will have after the refactoring.
     */
-   protected void refactorSubstitution(JavaDLTerm term, 
-                                       JavaDLTerm tacletTerm,
+   protected void refactorSubstitution(Term term, 
+                                       Term tacletTerm,
                                        List<TermLabel> labels) {
       FormulaTermLabel tacletLabel = (FormulaTermLabel) tacletTerm.getLabel(FormulaTermLabel.NAME);
       if (tacletLabel != null) {
@@ -420,7 +420,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    public static boolean containsSequentFormulasToRefactor(TermLabelState state) {
       Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       @SuppressWarnings("unchecked")
-      Set<SequentFormula<JavaDLTerm>> sfSet = (Set<SequentFormula<JavaDLTerm>>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+      Set<SequentFormula<Term>> sfSet = (Set<SequentFormula<Term>>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
       return !CollectionUtil.isEmpty(sfSet);
    }
    
@@ -429,10 +429,10 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * @param state The {@link TermLabelState} to read from.
     * @return The {@link SequentFormula}s to refactor.
     */
-   public static Set<SequentFormula<JavaDLTerm>> getSequentFormulasToRefactor(TermLabelState state) {
+   public static Set<SequentFormula<Term>> getSequentFormulasToRefactor(TermLabelState state) {
       Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       @SuppressWarnings("unchecked")
-      Set<SequentFormula<JavaDLTerm>> sfSet = (Set<SequentFormula<JavaDLTerm>>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+      Set<SequentFormula<Term>> sfSet = (Set<SequentFormula<Term>>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
       return sfSet;
    }
    
@@ -441,12 +441,12 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * @param state The {@link TermLabelState} to modify.
     * @param sf The {@link SequentFormula} to add.
     */
-   public static void addSequentFormulaToRefactor(TermLabelState state, SequentFormula<JavaDLTerm> sf) {
+   public static void addSequentFormulaToRefactor(TermLabelState state, SequentFormula<Term> sf) {
       Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       @SuppressWarnings("unchecked")
-      Set<SequentFormula<JavaDLTerm>> sfSet = (Set<SequentFormula<JavaDLTerm>>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+      Set<SequentFormula<Term>> sfSet = (Set<SequentFormula<Term>>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
       if (sfSet == null) {
-         sfSet = new LinkedHashSet<SequentFormula<JavaDLTerm>>();
+         sfSet = new LinkedHashSet<SequentFormula<Term>>();
          labelState.put(SEQUENT_FORMULA_REFACTORING_REQUIRED, sfSet);
       }
       sfSet.add(sf);

@@ -21,7 +21,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -47,20 +47,20 @@ public interface LoopInvariant extends SpecificationElement {
     public IProgramMethod getTarget();
 
     /** Returns the invariant formula. */
-    public JavaDLTerm getInvariant(LocationVariable heap, JavaDLTerm selfTerm,
-                             Map<LocationVariable,JavaDLTerm> atPres, Services services);
+    public Term getInvariant(LocationVariable heap, Term selfTerm,
+                             Map<LocationVariable,Term> atPres, Services services);
 
-    public JavaDLTerm getInvariant(JavaDLTerm selfTerm, Map<LocationVariable,JavaDLTerm> atPres, Services services);
+    public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
 
-    public JavaDLTerm getInvariant(Services services);
+    public Term getInvariant(Services services);
 
     /**
      * Returns the modifies clause.
      */
-    public JavaDLTerm getModifies(LocationVariable heap, JavaDLTerm selfTerm,
-                            Map<LocationVariable,JavaDLTerm> atPres, Services services);
+    public Term getModifies(LocationVariable heap, Term selfTerm,
+                            Map<LocationVariable,Term> atPres, Services services);
 
-    public JavaDLTerm getModifies(JavaDLTerm selfTerm, Map<LocationVariable,JavaDLTerm> atPres, Services services);
+    public Term getModifies(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
 
     /**
      * Returns the information flow specification clause.
@@ -70,8 +70,8 @@ public interface LoopInvariant extends SpecificationElement {
     public ImmutableList<InfFlowSpec> getInfFlowSpecs(Services services);
 
     public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap,
-                                                      JavaDLTerm selfTerm,
-                                                      Map<LocationVariable, JavaDLTerm> atPres,
+                                                      Term selfTerm,
+                                                      Map<LocationVariable, Term> atPres,
                                                       Services services);
 
     public boolean hasInfFlowSpec(Services services);
@@ -79,36 +79,36 @@ public interface LoopInvariant extends SpecificationElement {
     /**
      * Returns the variant term. 
      */
-    public JavaDLTerm getVariant(JavaDLTerm selfTerm, 
-            		   Map<LocationVariable,JavaDLTerm> atPres,
+    public Term getVariant(Term selfTerm, 
+            		   Map<LocationVariable,Term> atPres,
             		   Services services);
 
     /**
      * Returns the term internally used for self.
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
-    public JavaDLTerm getInternalSelfTerm();
+    public Term getInternalSelfTerm();
 
-    public JavaDLTerm getModifies();
+    public Term getModifies();
 
     /**
      * Returns operators internally used for the pre-heap.
      */
-    public Map<LocationVariable,JavaDLTerm> getInternalAtPres();
+    public Map<LocationVariable,Term> getInternalAtPres();
 
     /**
      * Returns the term internally used for the invariant. 
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
-    public Map<LocationVariable,JavaDLTerm> getInternalInvariants();
+    public Map<LocationVariable,Term> getInternalInvariants();
 
     /**
      * Returns the term internally used for the variant. 
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
-    public JavaDLTerm getInternalVariant();
+    public Term getInternalVariant();
 
-    public Map<LocationVariable,JavaDLTerm> getInternalModifies();
+    public Map<LocationVariable,Term> getInternalModifies();
 
     public Map<LocationVariable,
                ImmutableList<InfFlowSpec>> getInternalInfFlowSpec();
@@ -116,34 +116,34 @@ public interface LoopInvariant extends SpecificationElement {
     public LoopInvariant create(LoopStatement loop,
                                 IProgramMethod pm,
                                 KeYJavaType kjt,
-                                Map<LocationVariable,JavaDLTerm> invariants,
-                                Map<LocationVariable,JavaDLTerm> modifies,
+                                Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
                                     ImmutableList<InfFlowSpec>> infFlowSpecs,
-                                JavaDLTerm variant,
-                                JavaDLTerm selfTerm,
-                                ImmutableList<JavaDLTerm> localIns,
-                                ImmutableList<JavaDLTerm> localOuts,
-                                Map<LocationVariable,JavaDLTerm> atPres);
+                                Term variant,
+                                Term selfTerm,
+                                ImmutableList<Term> localIns,
+                                ImmutableList<Term> localOuts,
+                                Map<LocationVariable,Term> atPres);
 
     public LoopInvariant create(LoopStatement loop,
-                                Map<LocationVariable,JavaDLTerm> invariants,
-                                Map<LocationVariable,JavaDLTerm> modifies,
+                                Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> modifies,
                                 Map<LocationVariable,
                                     ImmutableList<InfFlowSpec>> infFlowSpecs,
-                                JavaDLTerm variant,
-                                JavaDLTerm selfTerm,
-                                ImmutableList<JavaDLTerm> localIns,
-                                ImmutableList<JavaDLTerm> localOuts,
-                                Map<LocationVariable,JavaDLTerm> atPres);
+                                Term variant,
+                                Term selfTerm,
+                                ImmutableList<Term> localIns,
+                                ImmutableList<Term> localOuts,
+                                Map<LocationVariable,Term> atPres);
 
-    public LoopInvariant instantiate(Map<LocationVariable,JavaDLTerm> invariants, JavaDLTerm variant);
+    public LoopInvariant instantiate(Map<LocationVariable,Term> invariants, Term variant);
 
-    public LoopInvariant configurate(Map<LocationVariable,JavaDLTerm> invariants,
-                                     Map<LocationVariable,JavaDLTerm> modifies,
+    public LoopInvariant configurate(Map<LocationVariable,Term> invariants,
+                                     Map<LocationVariable,Term> modifies,
                                      Map<LocationVariable,
                                          ImmutableList<InfFlowSpec>> infFlowSpecs,
-                                     JavaDLTerm variant);
+                                     Term variant);
 
     /**
      * Returns a new loop invariant where the loop reference has been
@@ -158,9 +158,9 @@ public interface LoopInvariant extends SpecificationElement {
      * replaced with the passed one. Take care: the variables used for
      * the receiver, parameters, and local variables must stay the same!
      */
-    public LoopInvariant setInvariant(Map<LocationVariable,JavaDLTerm> invariants, 
-            			      JavaDLTerm selfTerm,
-            			      Map<LocationVariable,JavaDLTerm> atPres,
+    public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
+            			      Term selfTerm,
+            			      Map<LocationVariable,Term> atPres,
             			      Services services); 
 
     /** 

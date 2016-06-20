@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 
 
@@ -41,7 +41,7 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
 	if ( antec != null )
 	    return;
 
-	Iterator<SequentFormula<JavaDLTerm>> it;
+	Iterator<SequentFormula<Term>> it;
 
 	antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
 	it    = originalSequent.antecedent ().iterator ();
@@ -54,7 +54,7 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
 	    succ  = succ .append ( filterFormula ( it.next () ) );
     }
 
-    protected SequentPrintFilterEntry filterFormula ( SequentFormula<JavaDLTerm> p_cfma ) {
+    protected SequentPrintFilterEntry filterFormula ( SequentFormula<Term> p_cfma ) {
 	return new IdentityFilterEntry ( p_cfma );
     }
 
@@ -82,24 +82,24 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
 
 
     private static class IdentityFilterEntry implements SequentPrintFilterEntry {
-	final SequentFormula<JavaDLTerm> originalFormula;
+	final SequentFormula<Term> originalFormula;
 
 
-	public IdentityFilterEntry ( SequentFormula<JavaDLTerm> p_originalFormula) {
+	public IdentityFilterEntry ( SequentFormula<Term> p_originalFormula) {
 	    originalFormula   = p_originalFormula;
 	}
 
 	/**
 	 * Formula to display
 	 */
-	public SequentFormula<JavaDLTerm> getFilteredFormula   () {
+	public SequentFormula<Term> getFilteredFormula   () {
 	    return originalFormula;
 	}
 
 	/**
 	 * Original formula from sequent
 	 */
-	public SequentFormula<JavaDLTerm> getOriginalFormula   () {
+	public SequentFormula<Term> getOriginalFormula   () {
 	    return originalFormula;
 	}
 

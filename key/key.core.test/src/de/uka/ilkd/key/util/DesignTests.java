@@ -27,7 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 /** 
@@ -39,7 +39,7 @@ public class DesignTests extends TestCase {
     private static final File binaryPath;
           
     static {
-       File projectRoot = IOUtil.getClassLocation(JavaDLTerm.class);
+       File projectRoot = IOUtil.getClassLocation(Term.class);
        if ("org.key_project.core".equals(projectRoot.getName())) {
           projectRoot = new File(projectRoot, "bin");
        } else if (projectRoot.isFile()) {
@@ -92,7 +92,7 @@ public class DesignTests extends TestCase {
 	    className = className.substring(0, className.indexOf(".class"));
 	    
 	    try {
-		    classes[i] = JavaDLTerm.class.getClassLoader().loadClass(className);
+		    classes[i] = Term.class.getClassLoader().loadClass(className);
 	    } catch (ClassNotFoundException cnfe) {
 		System.err.println("That's weiry. Cannot find class " + 
 				   className+"\n"+cnfe);
@@ -160,13 +160,13 @@ public class DesignTests extends TestCase {
    }
 
     /**
-     * subclass of JavaDLTerm must be private or package private
+     * subclass of Term must be private or package private
      */
     public void testTermSubclassVisibility() {
 	LinkedList<Class<?>> badClasses = new LinkedList<Class<?>>();
 	for (int i = 0; i<allClasses.length; i++) {
- 	    if (allClasses[i] != de.uka.ilkd.key.logic.JavaDLTerm.class &&
-		(de.uka.ilkd.key.logic.JavaDLTerm.class).
+ 	    if (allClasses[i] != de.uka.ilkd.key.logic.Term.class &&
+		(de.uka.ilkd.key.logic.Term.class).
 		isAssignableFrom(allClasses[i])) {
 		int mods = allClasses[i].getModifiers();
 		if (Modifier.isProtected(mods) ||
@@ -176,7 +176,7 @@ public class DesignTests extends TestCase {
  	    }
 	}
 	if ( badClasses.size() > 0 ) {
-	    message = "Visibility of subclasses of JavaDLTerm  ";
+	    message = "Visibility of subclasses of Term  ";
 	    message += "must be package private or private.\n";
 	    message += printBadClasses(badClasses);
 	}

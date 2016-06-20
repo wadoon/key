@@ -213,7 +213,7 @@ public final class Goal  {
      * to reduce unnecessary object creation the necessary information is passed
      * to the listener as parameters and not through an event object.
      */
-    protected void fireSequentChanged(CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci) {
+    protected void fireSequentChanged(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci) {
 	getFormulaTagManager().sequentChanged(this, sci);
 	ruleAppIndex()        .sequentChanged(this, sci);
 	for (GoalListener listener : listeners) {
@@ -355,7 +355,7 @@ public final class Goal  {
      * @param sci SequentChangeInfo containing the sequent to be set and
      * desribing the applied changes to the sequent of the parent node
      */
-    public void setSequent(CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci) {
+    public void setSequent(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci) {
         node().setSequent(sci.sequent());
 //VK reminder: now update the index
        	fireSequentChanged(sci);
@@ -364,10 +364,10 @@ public final class Goal  {
 
     /** adds a formula to the sequent before the given position
      * and informs the rule application index about this change
-     * @param cf the SequentFormula<JavaDLTerm> to be added
-     * @param p PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> encodes the position
+     * @param cf the SequentFormula<Term> to be added
+     * @param p PosInOccurrence<Term, SequentFormula<Term>> encodes the position
      */
-    public void addFormula(SequentFormula<JavaDLTerm> cf, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
+    public void addFormula(SequentFormula<Term> cf, PosInOccurrence<Term, SequentFormula<Term>> p) {
        setSequent(sequent().addFormula(cf, p));
     }
 
@@ -375,13 +375,13 @@ public final class Goal  {
     /** adds a formula to the antecedent or succedent of a
      * sequent. Either at its front or back
      * and informs the rule application index about this change
-     * @param cf the SequentFormula<JavaDLTerm> to be added
-     * @param inAntec boolean true(false) if SequentFormula<JavaDLTerm> has to be
+     * @param cf the SequentFormula<Term> to be added
+     * @param inAntec boolean true(false) if SequentFormula<Term> has to be
      * added to antecedent (succedent)
      * @param first boolean true if at the front, if false then cf is
      * added at the back
      */
-    public void addFormula ( SequentFormula<JavaDLTerm> cf, boolean inAntec,
+    public void addFormula ( SequentFormula<Term> cf, boolean inAntec,
           boolean first ) {
        setSequent(sequent().addFormula(cf, inAntec, first));
     }
@@ -389,19 +389,19 @@ public final class Goal  {
     /**
      * replaces a formula at the given position
      * and informs the rule application index about this change
-     * @param cf the SequentFormula<JavaDLTerm> replacing the old one
-     * @param p the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> encoding the position
+     * @param cf the SequentFormula<Term> replacing the old one
+     * @param p the PosInOccurrence<Term, SequentFormula<Term>> encoding the position
      */
-    public void changeFormula(SequentFormula<JavaDLTerm> cf, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
+    public void changeFormula(SequentFormula<Term> cf, PosInOccurrence<Term, SequentFormula<Term>> p) {
        setSequent(sequent().changeFormula(cf, p));
     }
 
 
     /** removes a formula at the given position from the sequent
      * and informs the rule appliccation index about this change
-     * @param p PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> encodes the position
+     * @param p PosInOccurrence<Term, SequentFormula<Term>> encodes the position
      */
-    public void removeFormula(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p) {
+    public void removeFormula(PosInOccurrence<Term, SequentFormula<Term>> p) {
        setSequent(sequent().removeFormula(p));
     }
 

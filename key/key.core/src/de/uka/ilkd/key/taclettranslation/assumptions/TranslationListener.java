@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -60,6 +60,6 @@ public interface TranslationListener {
      * @return return <code>true</code> if you want to terminate the translation
      * of the taclet, otherwise <code>false<code>.
      */
-    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, JavaDLTerm term);
+    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, Term term);
 
 }

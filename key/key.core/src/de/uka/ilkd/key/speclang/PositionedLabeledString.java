@@ -34,7 +34,7 @@ public class PositionedLabeledString extends PositionedString {
     public PositionedLabeledString(String text, String fileName, Position pos,
                                    ImmutableArray<TermLabel> labels) {
         super(text, fileName, pos);        
-        assert labels != null : "JavaDLTerm labels must not be null";
+        assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
         

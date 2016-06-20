@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.IntIterator;
 
 /**
  * This class describes a position in an occurrence of a term. A
- * SequentFormula<JavaDLTerm> and a PosInTerm<JavaDLTerm> determine an object of this 
+ * SequentFormula<Term> and a PosInTerm<Term> determine an object of this 
  * class exactly. 
  */
 public final class PosInOccurrence<T extends CCTerm<?, ?,T>, SeqFor extends SequentFormula<T>> {
@@ -65,7 +65,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?,T>, SeqFor extends Sequ
     }
            
     /**
-     * returns the SequentFormula<JavaDLTerm> that determines the occurrence of
+     * returns the SequentFormula<Term> that determines the occurrence of
      * this PosInOccurrence 
      */
     public SeqFor sequentFormula() {
@@ -82,9 +82,9 @@ public final class PosInOccurrence<T extends CCTerm<?, ?,T>, SeqFor extends Sequ
 
     /**
      * creates a new PosInOccurrence that has exactly the same state as this
-     * object except the PosInTerm<JavaDLTerm> is new and walked down the specified
+     * object except the PosInTerm<Term> is new and walked down the specified
      * subterm, as specified in method down of 
-     * {@link de.uka.ilkd.key.logic.PosInTerm<JavaDLTerm>}.
+     * {@link de.uka.ilkd.key.logic.PosInTerm<Term>}.
      */
     public PosInOccurrence<T, SeqFor> down(int i) {
 	return new PosInOccurrence<>(sequentFormula, posInTerm.down(i), inAntec);
@@ -179,7 +179,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?,T>, SeqFor extends Sequ
      * {@link PosInOccurrence#iterator} instead.     
      * describes the exact occurrence of the referred term inside
      * {@link SequentFormula#formula()} 
-     * @returns the position in the formula of the SequentFormula<JavaDLTerm> of
+     * @returns the position in the formula of the SequentFormula<Term> of
      * this PosInOccurrence. 
      */
     public PosInTerm<T> posInTerm() {

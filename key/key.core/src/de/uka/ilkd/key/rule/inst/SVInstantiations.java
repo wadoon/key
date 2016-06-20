@@ -30,7 +30,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -140,12 +140,12 @@ public class SVInstantiations {
      * @param sv
      *            the SchemaVariable to be instantiated
      * @param subst
-     *            the JavaDLTerm the SchemaVariable is instantiated with
+     *            the Term the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given
      *         pair
      */
     public SVInstantiations add(SchemaVariable sv,
-								JavaDLTerm subst,
+								Term subst,
 								Services services) {
         return add(sv, new TermInstantiation(sv, subst), services);
     }
@@ -159,7 +159,7 @@ public class SVInstantiations {
 
 
     public SVInstantiations addInteresting(SchemaVariable sv,
-	    				   JavaDLTerm subst,
+	    				   Term subst,
 	    				   Services services) {
         return addInteresting(sv,
         		      new TermInstantiation(sv, subst),
@@ -412,10 +412,10 @@ public class SVInstantiations {
      * @param sv
      *            the SchemaVariable to be instantiated
      * @param term
-     *            the JavaDLTerm the SchemaVariable is instantiated with
+     *            the Term the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, 
-	    			    JavaDLTerm term, 
+	    			    Term term, 
 	    			    Services services) {
         return replace(sv, new TermInstantiation(sv, term), services);
     }
@@ -513,21 +513,21 @@ public class SVInstantiations {
     }
 
     /**
-     * returns the instantiation of the given SchemaVariable as JavaDLTerm. If the
+     * returns the instantiation of the given SchemaVariable as Term. If the
      * instantiation is a program element it is tried to convert it to a term
      * otherwise an exception is thrown
      * 
      * @return the Object the SchemaVariable will be instantiated with, null if
      *         no instantiation is stored
      */
-    public JavaDLTerm getTermInstantiation(SchemaVariable sv, 
+    public Term getTermInstantiation(SchemaVariable sv, 
 	    			     ExecutionContext ec,
 	    			     Services services) {
         final Object inst = getInstantiation(sv);
         if (inst == null) {
             return null;
-        } else if (inst instanceof JavaDLTerm) {
-            return (JavaDLTerm) inst;
+        } else if (inst instanceof Term) {
+            return (Term) inst;
         } else if (inst instanceof ProgramElement) {
             return services.getProgramServices().getTypeConverter().convertToLogicElement(
                     (ProgramElement) inst, ec);
@@ -539,7 +539,7 @@ public class SVInstantiations {
     /** adds an update to the update context 
     * @param updateApplicationlabels the TermLabels attached to the application operator term 
     */
-    public SVInstantiations addUpdate(JavaDLTerm update, ImmutableArray<TermLabel> updateApplicationlabels) {
+    public SVInstantiations addUpdate(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
 	assert update.sort() == Sort.UPDATE;
         return new SVInstantiations(map, interesting(), updateContext
                 .append(new UpdateLabelPair(update, updateApplicationlabels)),
@@ -547,16 +547,16 @@ public class SVInstantiations {
     }
     
     public static class UpdateLabelPair {
-       private JavaDLTerm update;
+       private Term update;
        
        private ImmutableArray<TermLabel> updateApplicationlabels;
 
-      public UpdateLabelPair(JavaDLTerm update, ImmutableArray<TermLabel> updateApplicationlabels) {
+      public UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
          this.update = update;
          this.updateApplicationlabels = updateApplicationlabels;
       }
 
-      public JavaDLTerm getUpdate() {
+      public Term getUpdate() {
          return update;
       }
 

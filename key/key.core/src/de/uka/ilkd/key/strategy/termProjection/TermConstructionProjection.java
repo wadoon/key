@@ -17,13 +17,13 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * JavaDLTerm projection for constructing a bigger term from a sequence of direct
+ * Term projection for constructing a bigger term from a sequence of direct
  * subterms and an operator.
  * 
  * NB: this is a rather restricted version of term construction, one can think
@@ -47,8 +47,8 @@ public class TermConstructionProjection implements ProjectionToTerm {
         return new TermConstructionProjection ( op, subTerms );
     }
 
-    public JavaDLTerm toTerm(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
-        final JavaDLTerm[] subs = new JavaDLTerm[subTerms.length];
+    public Term toTerm(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+        final Term[] subs = new Term[subTerms.length];
         for ( int i = 0; i != subTerms.length; ++i ) {
             subs[i] = subTerms[i].toTerm ( app, pos, goal );           
         }

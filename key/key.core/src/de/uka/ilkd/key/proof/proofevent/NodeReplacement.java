@@ -31,7 +31,7 @@ public class NodeReplacement {
 
     Node                    node;
     Node                    parent;
-    ImmutableList<CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> rawChanges;
+    ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>> rawChanges;
     ImmutableList<NodeChange>        changes    = null;
 
     /**
@@ -43,7 +43,7 @@ public class NodeReplacement {
      */
     public NodeReplacement ( Node                    p_node,
 			     Node                    p_parent,
-			     ImmutableList<CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent>> p_changes ) {
+			     ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>> p_changes ) {
 	node       = p_node;
 	parent     = p_parent;
 	rawChanges = p_changes;
@@ -51,7 +51,7 @@ public class NodeReplacement {
 
     private void addNodeChanges () {
 	if ( !rawChanges.isEmpty() ) {
-	    CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> sci = rawChanges.head ();
+	    CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci = rawChanges.head ();
 	    rawChanges            = rawChanges.tail ();
 
 	    addNodeChanges ();
@@ -61,9 +61,9 @@ public class NodeReplacement {
 	}
     }
 
-    private void addNodeChange ( CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> p_sci ) {
-        Iterator<SequentFormula<JavaDLTerm>> it;
-        Iterator<FormulaChangeInfo<SequentFormula<JavaDLTerm>>>  it2;
+    private void addNodeChange ( CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> p_sci ) {
+        Iterator<SequentFormula<Term>> it;
+        Iterator<FormulaChangeInfo<SequentFormula<Term>>>  it2;
      
         //---
         it = p_sci.removedFormulas ( true ).iterator ();
@@ -120,7 +120,7 @@ public class NodeReplacement {
     
     }
 
-    private void addAddedChange   ( SequentFormula<JavaDLTerm> p_cf,
+    private void addAddedChange   ( SequentFormula<Term> p_cf,
 				    boolean            p_inAntec ) {
 	Sequent     oldS  = parent.sequent ();
 	Semisequent oldSS = ( p_inAntec          ?
@@ -135,8 +135,8 @@ public class NodeReplacement {
 	
 	if ( !oldSS.contains ( p_cf ) &&
 	     newSS.contains ( p_cf ) ) {
-	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( p_cf,
-							PosInTerm.<JavaDLTerm>getTopLevel(),
+	    PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>> ( p_cf,
+							PosInTerm.<Term>getTopLevel(),
 							p_inAntec );
 	    addNodeChange ( new NodeChangeAddFormula ( pio ) );
 	}
@@ -148,10 +148,10 @@ public class NodeReplacement {
      * @param p_cf
      * @param p_inAntec
      */
-    private void addAddedRedundantChange(SequentFormula<JavaDLTerm> p_cf,
+    private void addAddedRedundantChange(SequentFormula<Term> p_cf,
             boolean p_inAntec) {
 
-        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(p_cf, PosInTerm.<JavaDLTerm>getTopLevel(),
+        final PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(p_cf, PosInTerm.<Term>getTopLevel(),
                 p_inAntec);
         addNodeChange(new NodeRedundantAddChange(pio));
 
@@ -160,7 +160,7 @@ public class NodeReplacement {
     
     
 
-    private void addRemovedChange ( SequentFormula<JavaDLTerm> p_cf,
+    private void addRemovedChange ( SequentFormula<Term> p_cf,
 				    boolean            p_inAntec ) {
 	Sequent     oldS  = parent.sequent ();
 	Semisequent oldSS = ( p_inAntec          ?
@@ -170,8 +170,8 @@ public class NodeReplacement {
 	removeNodeChanges ( p_cf, p_inAntec );
 	
 	if ( oldSS.contains ( p_cf ) ) {
-	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( p_cf,
-							PosInTerm.<JavaDLTerm>getTopLevel(),
+	    PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>> ( p_cf,
+							PosInTerm.<Term>getTopLevel(),
 							p_inAntec );
 	    addNodeChange ( new NodeChangeRemoveFormula ( pio ) );
 	}
@@ -181,12 +181,12 @@ public class NodeReplacement {
 	changes = changes.prepend ( p_nc );
     }
 
-    private void removeNodeChanges ( SequentFormula<JavaDLTerm> p_cf,
+    private void removeNodeChanges ( SequentFormula<Term> p_cf,
 				     boolean            p_inAntec ) {
 	Iterator<NodeChange> it     = changes.iterator ();
 	changes                     = ImmutableSLList.<NodeChange>nil();
 	NodeChange           oldNC;
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>      oldPio;
+	PosInOccurrence<Term, SequentFormula<Term>>      oldPio;
 
 	while ( it.hasNext () ) {
 	    oldNC = it.next ();

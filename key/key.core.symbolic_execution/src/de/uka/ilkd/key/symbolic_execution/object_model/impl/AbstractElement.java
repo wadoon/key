@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicElement;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -46,12 +46,12 @@ public abstract class AbstractElement implements ISymbolicElement {
    }
 
    /**
-    * Converts the given {@link JavaDLTerm} into a {@link String} respecting {@link #isUsePretty()}.
-    * @param term The {@link JavaDLTerm} to convert.
+    * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
+    * @param term The {@link Term} to convert.
     * @param services The {@link Services} to use.
-    * @return The {@link String} representation of the given {@link JavaDLTerm}.
+    * @return The {@link String} representation of the given {@link Term}.
     */
-   protected String formatTerm(JavaDLTerm term, Services services) {
+   protected String formatTerm(Term term, Services services) {
       return SymbolicExecutionUtil.formatTerm(term, 
                                               services, 
                                               settings.isUseUnicode(),

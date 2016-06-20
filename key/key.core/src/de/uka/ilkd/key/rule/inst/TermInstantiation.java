@@ -15,12 +15,12 @@ package de.uka.ilkd.key.rule.inst;
 
 import org.key_project.common.core.logic.op.SchemaVariable;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /** This class is used to store the instantiation of a schemavarible
  * if it is a term.
  */
-public class TermInstantiation extends InstantiationEntry<JavaDLTerm> {
+public class TermInstantiation extends InstantiationEntry<Term> {
 
     private static final RigidnessException RIGIDNESS_EXCEPTION 
     	= new RigidnessException( 
@@ -30,9 +30,9 @@ public class TermInstantiation extends InstantiationEntry<JavaDLTerm> {
     
     /** creates a new ContextInstantiationEntry 
      * @param sv the SchemaVariable that is instantiated
-     * @param term the JavaDLTerm the SchemaVariable is instantiated with
+     * @param term the Term the SchemaVariable is instantiated with
      */
-    TermInstantiation(SchemaVariable sv, JavaDLTerm term) {
+    TermInstantiation(SchemaVariable sv, Term term) {
 	super(term);
 	//TODO: Remove the check below and move it to the matching logic
 	//Done for VM based matching

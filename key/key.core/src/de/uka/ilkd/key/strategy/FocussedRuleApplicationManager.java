@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -37,7 +37,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     private final AutomatedRuleApplicationManager delegate;
 
     private final FormulaTag              focussedFormula;
-    private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>         focussedSubterm;
+    private final PosInOccurrence<Term, SequentFormula<Term>>         focussedSubterm;
 
     private Goal                          goal;
     
@@ -52,7 +52,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     private FocussedRuleApplicationManager (AutomatedRuleApplicationManager delegate,
                                     Goal goal,
                                     FormulaTag focussedFormula,
-                                    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> focussedSubterm,
+                                    PosInOccurrence<Term, SequentFormula<Term>> focussedSubterm,
                                     boolean onlyModifyFocussedFormula) {
         this.delegate = delegate;
         this.focussedFormula = focussedFormula;
@@ -63,7 +63,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     
     public FocussedRuleApplicationManager (AutomatedRuleApplicationManager delegate,
                                    Goal goal,
-                                   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> focussedSubterm) {
+                                   PosInOccurrence<Term, SequentFormula<Term>> focussedSubterm) {
         this ( delegate,
                goal,
                goal.getFormulaTagManager ()
@@ -105,20 +105,20 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
         delegate.setGoal ( p_goal );
     }
 
-    public void ruleAdded (RuleApp rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+    public void ruleAdded (RuleApp rule, PosInOccurrence<Term, SequentFormula<Term>> pos) {
         if ( isRuleApplicationForFocussedFormula(rule, pos) ) {            
             delegate.ruleAdded ( rule, pos );
         }         
     }
 
     protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+            PosInOccurrence<Term, SequentFormula<Term>> pos) {
         // filter the rule applications, only allow applications within the
         // focussed subterm or to other formulas that have been added after creation
         // of the manager (we rely on the fact that the caching rule indexes only
         // report rules for modified/added formulas anyway)
         
-        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> focFormula = getPIOForFocussedSubterm ();
+        final PosInOccurrence<Term, SequentFormula<Term>> focFormula = getPIOForFocussedSubterm ();
 
         if ( focFormula != null && pos != null ) {
             if ( isSameFormula ( pos, focFormula ) ) {
@@ -138,7 +138,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     }
 
     
-    public void rulesAdded (ImmutableList<? extends RuleApp> rules, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+    public void rulesAdded (ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term, SequentFormula<Term>> pos) {
         ImmutableList<RuleApp> applicableRules = ImmutableSLList.<RuleApp>nil();
         for (RuleApp r : rules) {
             if (isRuleApplicationForFocussedFormula(r, pos)) {
@@ -150,14 +150,14 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     }
 
     
-    private boolean isSameFormula (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio1,
-                                   PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio2) {
+    private boolean isSameFormula (PosInOccurrence<Term, SequentFormula<Term>> pio1,
+                                   PosInOccurrence<Term, SequentFormula<Term>> pio2) {
         return pio2.isInAntec () == pio1.isInAntec ()
                && pio2.sequentFormula ().equals ( pio1.sequentFormula () );
     }
 
-    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getPIOForFocussedSubterm () {
-        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> formula =
+    private PosInOccurrence<Term, SequentFormula<Term>> getPIOForFocussedSubterm () {
+        final PosInOccurrence<Term, SequentFormula<Term>> formula =
             goal.getFormulaTagManager ().getPosForTag ( focussedFormula );
 
         if ( formula == null ) return null;
@@ -167,9 +167,9 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
             .replaceConstrainedFormula ( formula.sequentFormula () );
     }
     
-    private boolean isBelow (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> over, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> under) {
-        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> overIt = over.iterator ();
-        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> underIt = under.iterator ();
+    private boolean isBelow (PosInOccurrence<Term, SequentFormula<Term>> over, PosInOccurrence<Term, SequentFormula<Term>> under) {
+        final PIOPathIterator<Term, SequentFormula<Term>> overIt = over.iterator ();
+        final PIOPathIterator<Term, SequentFormula<Term>> underIt = under.iterator ();
 
         while ( true ) {
             final int overChild = overIt.next ();

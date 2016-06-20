@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -120,11 +120,11 @@ public class TestTacletIndex extends TestCase{
      * test disabled. Since 0.632 "noninteractive" is disabled
      */
     public void disabled_testNonInteractiveIsShownOnlyIfHeuristicIsMissed() {
-	JavaDLTerm term_p1 = TacletForTests.parseTerm("p(one, zero)");	
+	Term term_p1 = TacletForTests.parseTerm("p(one, zero)");	
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
         listofHeuristic=listofHeuristic.prepend(h3);
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(term_p1),
-                PosInTerm.<JavaDLTerm>getTopLevel(), true);
+        PosInOccurrence<Term, SequentFormula<Term>> pos = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term_p1),
+                PosInTerm.<Term>getTopLevel(), true);
   	assertTrue("Noninteractive antecrule is not in list, but none of its"+
 		   "heuristics is active.",
 		   isRuleIn(variante_one.getAntecedentTaclet(pos,
@@ -154,11 +154,11 @@ public class TestTacletIndex extends TestCase{
         ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
 	listofHeuristic=listofHeuristic.prepend(h3).prepend(h2);
 
-	JavaDLTerm term_p1 = TacletForTests.parseTerm("p(one, zero)");	
+	Term term_p1 = TacletForTests.parseTerm("p(one, zero)");	
 
-        SequentFormula<JavaDLTerm> cfma = new SequentFormula<>(term_p1);
+        SequentFormula<Term> cfma = new SequentFormula<>(term_p1);
         
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posSucc  = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(cfma, PosInTerm.<JavaDLTerm>getTopLevel(), false);
+        PosInOccurrence<Term, SequentFormula<Term>> posSucc  = new PosInOccurrence<Term, SequentFormula<Term>>(cfma, PosInTerm.<Term>getTopLevel(), false);
         
   	assertTrue("ruleSucc has no heuristics, but is"+
 		   " not in succ list.",
@@ -188,12 +188,12 @@ public class TestTacletIndex extends TestCase{
         Services services = new Services(AbstractProfile.getDefaultProfile());
         ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
 
-	JavaDLTerm term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
+	Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 	
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posAntec = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(term_p2),
-                PosInTerm.<JavaDLTerm>getTopLevel(), true);
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posSucc = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(term_p2),
-                PosInTerm.<JavaDLTerm>getTopLevel(), true);
+        PosInOccurrence<Term, SequentFormula<Term>> posAntec = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term_p2),
+                PosInTerm.<Term>getTopLevel(), true);
+        PosInOccurrence<Term, SequentFormula<Term>> posSucc = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term_p2),
+                PosInTerm.<Term>getTopLevel(), true);
 
         
  	assertTrue("rule matched, but no match possible",
@@ -220,11 +220,11 @@ public class TestTacletIndex extends TestCase{
 	ruleIdx.add(ruleSucc);
 	ruleIdx.add(ruleMisMatch);
 
-	JavaDLTerm term_p4 = TacletForTests.parseTerm("p(zero, one)");
+	Term term_p4 = TacletForTests.parseTerm("p(zero, one)");
 
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posAntec = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(new SequentFormula<>(term_p4),
-                PosInTerm.<JavaDLTerm>getTopLevel(), true);
+        PosInOccurrence<Term, SequentFormula<Term>> posAntec = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term_p4),
+                PosInTerm.<Term>getTopLevel(), true);
 	
  	assertTrue("rule matched, but no match possible",
 		   !isRuleIn(ruleIdx.getAntecedentTaclet(posAntec,
@@ -237,12 +237,12 @@ public class TestTacletIndex extends TestCase{
 	TacletIndex ruleIdx=TacletIndexKit.getKit().createTacletIndex();
 	ruleIdx.add(notfreeconflict);
 
-	JavaDLTerm term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
-	SequentFormula<JavaDLTerm> cfma_p5 = new SequentFormula<>(term_p5);
+	Term term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
+	SequentFormula<Term> cfma_p5 = new SequentFormula<>(term_p5);
 	Sequent seq_p5 = Sequent.createAnteSequent
 	    (Semisequent.nil().insertFirst(cfma_p5).semisequent());
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio_p5 = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
-	    (cfma_p5, PosInTerm.<JavaDLTerm>getTopLevel(), true);
+	PosInOccurrence<Term, SequentFormula<Term>> pio_p5 = new PosInOccurrence<Term, SequentFormula<Term>>
+	    (cfma_p5, PosInTerm.<Term>getTopLevel(), true);
         RuleAppIndex appIdx = createGoalFor(seq_p5, ruleIdx);
 		  
 	assertTrue("No rule should match",
@@ -251,14 +251,14 @@ public class TestTacletIndex extends TestCase{
 			     null),
 			     notfreeconflict));
 
-	JavaDLTerm term_p6 = TacletForTests.
+	Term term_p6 = TacletForTests.
 	    parseTerm("\\forall nat z; p(zero, z)");
 
-	SequentFormula<JavaDLTerm> cfma_p6 = new SequentFormula<>(term_p6);
+	SequentFormula<Term> cfma_p6 = new SequentFormula<>(term_p6);
 	Sequent seq_p6 = Sequent.createAnteSequent
 	    (Semisequent.nil().insertFirst(cfma_p6).semisequent());
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio_p6 = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
-	    (cfma_p6, PosInTerm.<JavaDLTerm>getTopLevel(), true);
+	PosInOccurrence<Term, SequentFormula<Term>> pio_p6 = new PosInOccurrence<Term, SequentFormula<Term>>
+	    (cfma_p6, PosInTerm.<Term>getTopLevel(), true);
 	appIdx = createGoalFor(seq_p6, ruleIdx);
 
 	assertTrue("One rule should match", isRuleIn

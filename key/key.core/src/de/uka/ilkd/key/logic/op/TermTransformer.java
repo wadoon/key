@@ -16,7 +16,7 @@ package de.uka.ilkd.key.logic.op;
 import org.key_project.common.core.logic.op.SortedOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -29,5 +29,5 @@ public interface TermTransformer extends SortedOperator {
      * initiates term transformation of <tt>term</tt>. Note the top level operator of
      * of parameter <tt>term</tt> has to be <em>this</em> term transformer.
      */
-    JavaDLTerm transform(JavaDLTerm term, SVInstantiations svInst, Services services);
+    Term transform(Term term, SVInstantiations svInst, Services services);
 }

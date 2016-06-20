@@ -15,7 +15,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -43,7 +43,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
     @Override
     public RuleAppCost compute(RuleApp ruleApp,
-                               PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+                               PosInOccurrence<Term, SequentFormula<Term>> pos,
                                Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " +
@@ -54,14 +54,14 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
             return NumberRuleAppCost.getZeroCost();
         }
 
-        final JavaDLTerm focusFor = pos.sequentFormula().formula();
-        ImmutableList<JavaDLTerm> contractAppls =
+        final Term focusFor = pos.sequentFormula().formula();
+        ImmutableList<Term> contractAppls =
                 goal.getStrategyInfo(InfFlowContractAppTacletExecutor.INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (contractAppls == null) {
             return TopRuleAppCost.INSTANCE;
         }
 
-        for (JavaDLTerm appl : contractAppls) {
+        for (Term appl : contractAppls) {
             if (isSubFormula(focusFor, appl)) {
                 return NumberRuleAppCost.getZeroCost();
             }
@@ -71,8 +71,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     }
 
 
-    private boolean isSubFormula(JavaDLTerm f1,
-                                 JavaDLTerm f2) {
+    private boolean isSubFormula(Term f1,
+                                 Term f2) {
         SubFormulaVisitor v = new SubFormulaVisitor(f1);
         f2.execPreOrder(v);
         return v.getIsSubFormula();
@@ -81,18 +81,18 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
     private class SubFormulaVisitor extends DefaultVisitor {
 
-        final JavaDLTerm potentialSub;
+        final Term potentialSub;
 
         boolean isSubFormula = false;
 
 
-        public SubFormulaVisitor(JavaDLTerm potentialSub) {
+        public SubFormulaVisitor(Term potentialSub) {
             this.potentialSub = potentialSub;
         }
 
 
         @Override
-        public void visit(JavaDLTerm visited) {
+        public void visit(Term visited) {
             isSubFormula |= visited.equalsModRenaming(potentialSub);
         }
 

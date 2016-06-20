@@ -49,7 +49,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -173,7 +173,7 @@ public abstract class TacletApp implements RuleApp {
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(
 	    TacletPrefix prefix, 
 	    SVInstantiations instantiations,
-	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+	    PosInOccurrence<Term, SequentFormula<Term>> pos) {
 
 	ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix,
 		instantiations);
@@ -204,7 +204,7 @@ public abstract class TacletApp implements RuleApp {
 
 	for (final SchemaVariable var : pre.prefix()) {
 	    instanceSet = instanceSet
-		    .add((LogicVariable) ((JavaDLTerm) instantiations
+		    .add((LogicVariable) ((Term) instantiations
 			    .getInstantiation(var)).op());
 	}
 	return instanceSet;
@@ -269,7 +269,7 @@ public abstract class TacletApp implements RuleApp {
 	    ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> pair = it.next();
 	    if (pair.key() instanceof VariableSV) {
 		SchemaVariable varSV = pair.key();
-		JavaDLTerm value = (JavaDLTerm) pair.value().getInstantiation();
+		Term value = (Term) pair.value().getInstantiation();
 		if (!collMap.containsKey(value.op())) {
 		    collMap.put((LogicVariable) value.op(), varSV);
 		} else {
@@ -293,14 +293,14 @@ public abstract class TacletApp implements RuleApp {
      *            the term to be searched in
      * @return the term below the given quantifier in the given term
      */
-    private static JavaDLTerm getTermBelowQuantifier(SchemaVariable varSV, JavaDLTerm term) {
+    private static Term getTermBelowQuantifier(SchemaVariable varSV, Term term) {
 	for (int i = 0; i < term.arity(); i++) {
 	    for (int j = 0; j < term.varsBoundHere(i).size(); j++) {
 		if (term.varsBoundHere(i).get(j) == varSV) {
 		    return term.sub(i);
 		}
 	    }
-	    JavaDLTerm rec = getTermBelowQuantifier(varSV, term.sub(i));
+	    Term rec = getTermBelowQuantifier(varSV, term.sub(i));
 	    if (rec != null) {
 		return rec;
 	    }
@@ -317,11 +317,11 @@ public abstract class TacletApp implements RuleApp {
      * @return the term below the given quantifier in the find and if-parts of
      *         the Taclet
      */
-    private static JavaDLTerm getTermBelowQuantifier(Taclet taclet,
+    private static Term getTermBelowQuantifier(Taclet taclet,
 	    				       SchemaVariable varSV) {
-	Iterator<SequentFormula<JavaDLTerm>> it = taclet.ifSequent().iterator();
+	Iterator<SequentFormula<Term>> it = taclet.ifSequent().iterator();
 	while (it.hasNext()) {
-	    JavaDLTerm result = getTermBelowQuantifier(varSV, it.next().formula());
+	    Term result = getTermBelowQuantifier(varSV, it.next().formula());
 	    if (result != null) {
 		return result;
 	    }
@@ -350,7 +350,7 @@ public abstract class TacletApp implements RuleApp {
     private static boolean contains(ImmutableArray<QuantifiableVariable> boundVars,
 	    LogicVariable x, SVInstantiations insts) {
 	for (int i = 0; i < boundVars.size(); i++) {
-	    JavaDLTerm instance = (JavaDLTerm) insts
+	    Term instance = (Term) insts
 		    .getInstantiation((SchemaVariable) boundVars.get(i));
 	    if (instance.op() == x) {
 		return true;
@@ -368,13 +368,13 @@ public abstract class TacletApp implements RuleApp {
                                                            SVInstantiations insts, 
                                                            SchemaVariable varSV,
                                                            Services services) {
-	JavaDLTerm term = getTermBelowQuantifier(taclet, varSV);
+	Term term = getTermBelowQuantifier(taclet, varSV);
 	LogicVariable newVariable =
-	        new LogicVariable(new Name(((JavaDLTerm) insts.getInstantiation(varSV))
+	        new LogicVariable(new Name(((Term) insts.getInstantiation(varSV))
 	                                    .op().name().toString() + "0"),
-	                          ((JavaDLTerm) insts.getInstantiation(varSV)).sort());
+	                          ((Term) insts.getInstantiation(varSV)).sort());
 	// __CHANGE__ How to name the new variable? TODO
-	JavaDLTerm newVariableTerm = services.getTermBuilder().var(newVariable);
+	Term newVariableTerm = services.getTermBuilder().var(newVariable);
 	return replaceInstantiation(insts, 
 				    term, 
 				    varSV, 
@@ -384,25 +384,25 @@ public abstract class TacletApp implements RuleApp {
 
     /**
      * returns a new SVInstantiations that modifies the given SVInstantiations
-     * insts at the bound SchemaVariable u to the JavaDLTerm (that is a LogicVariable)
+     * insts at the bound SchemaVariable u to the Term (that is a LogicVariable)
      * y.
      */
     private static SVInstantiations replaceInstantiation(
 	    SVInstantiations insts, 
-	    JavaDLTerm t, 
+	    Term t, 
 	    SchemaVariable u, 
-	    JavaDLTerm y,
+	    Term y,
 	    Services services) {
 
 	SVInstantiations result = insts;
-	LogicVariable x = (LogicVariable) ((JavaDLTerm) insts.getInstantiation(u))
+	LogicVariable x = (LogicVariable) ((Term) insts.getInstantiation(u))
 		.op();
 	if (t.op() instanceof SchemaVariable) {
 	    if (!(t.op() instanceof VariableSV)) {
 		SchemaVariable sv = (SchemaVariable) t.op();
 		ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services);
 		result = result.replace(sv, 
-					cfSubst.apply((JavaDLTerm) insts.getInstantiation(sv)),
+					cfSubst.apply((Term) insts.getInstantiation(sv)),
 					services);
 	    }
 	} else {
@@ -518,17 +518,17 @@ public abstract class TacletApp implements RuleApp {
 
     /**
      * creates a new Tacletapp where the SchemaVariable sv is instantiated with
-     * the the given JavaDLTerm term. Sort equality is checked. If the check fails an
+     * the the given Term term. Sort equality is checked. If the check fails an
      * IllegalArgumentException is thrown
      * 
      * @param sv
      *            the SchemaVariable to be instantiated
      * @param term
-     *            the JavaDLTerm the SchemaVariable is instantiated with
+     *            the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
     public TacletApp addCheckedInstantiation(SchemaVariable sv, 
-	    				     JavaDLTerm term,
+	    				     Term term,
 	    				     Services services, 
 	    				     boolean interesting) {
 
@@ -695,7 +695,7 @@ public abstract class TacletApp implements RuleApp {
         VariableCollectVisitor vcv = new VariableCollectVisitor();
         for (final NotFreeIn nv: taclet().varsNotFreeIn()) {
             if(nv.first() == sv) {
-                JavaDLTerm term = (JavaDLTerm) instantiations.getInstantiation(nv.second());
+                Term term = (Term) instantiations.getInstantiation(nv.second());
                 if (term != null) {
                     term.execPostOrder(vcv);
                 }
@@ -813,7 +813,7 @@ public abstract class TacletApp implements RuleApp {
 	while(svIt.hasNext()) {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
-		final JavaDLTerm inst = (JavaDLTerm) insts.getInstantiation(sv);
+		final Term inst = (Term) insts.getInstantiation(sv);
 		final Namespace functions =
                         services.getNamespaces().functions();
 
@@ -833,11 +833,11 @@ public abstract class TacletApp implements RuleApp {
      * @param sv
      *            the SchemaVariable to be instantiated
      * @param term
-     *            the JavaDLTerm the SchemaVariable is instantiated with
+     *            the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
     public abstract TacletApp addInstantiation(SchemaVariable sv, 
-	    				       JavaDLTerm term,
+	    				       Term term,
 	    				       boolean interesting,
 	    				       Services services);
 
@@ -1032,8 +1032,8 @@ public abstract class TacletApp implements RuleApp {
      *            formulas of the if sequent
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
-	    ImmutableList<SequentFormula<JavaDLTerm>> p_ifSeqTail,
-	    ImmutableList<SequentFormula<JavaDLTerm>> p_ifSeqTail2nd,
+	    ImmutableList<SequentFormula<Term>> p_ifSeqTail,
+	    ImmutableList<SequentFormula<Term>> p_ifSeqTail2nd,
 	    ImmutableList<IfFormulaInstantiation> p_toMatch,
 	    ImmutableList<IfFormulaInstantiation> p_toMatch2nd,
 	    ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
@@ -1075,11 +1075,11 @@ public abstract class TacletApp implements RuleApp {
     }
 
     @SuppressWarnings("unchecked")
-    private ImmutableList<SequentFormula<JavaDLTerm>> createSemisequentList(Semisequent p_ss) {
-	ImmutableList<SequentFormula<JavaDLTerm>> res = ImmutableSLList.<SequentFormula<JavaDLTerm>>nil();
+    private ImmutableList<SequentFormula<Term>> createSemisequentList(Semisequent p_ss) {
+	ImmutableList<SequentFormula<Term>> res = ImmutableSLList.<SequentFormula<Term>>nil();
 
         for (Object p_s : p_ss) { 
-            res = res.prepend((SequentFormula<JavaDLTerm>) p_s);
+            res = res.prepend((SequentFormula<Term>) p_s);
         }
 
 	return res;
@@ -1087,18 +1087,18 @@ public abstract class TacletApp implements RuleApp {
 
     /**
      * returns a new PosTacletApp that is equal to this TacletApp except that
-     * the position is set to the given PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>.
+     * the position is set to the given PosInOccurrence<Term, SequentFormula<Term>>.
      * 
      * <p><b>CAUTION:</b> If you call this method, consider to call 
-     * {@link NoPosTacletApp#matchFind(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Services)} first (if
+     * {@link NoPosTacletApp#matchFind(PosInOccurrence<Term, SequentFormula<Term>>, Services)} first (if
      * applicable) as otherwise the TacletApp may become invalid. 
      * (This happened sometimes during interactive proofs).
      * 
      * @param pos
-     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> of the newl created PosTacletApp
+     *            the PosInOccurrence<Term, SequentFormula<Term>> of the newl created PosTacletApp
      * @return the new TacletApp
      */
-    public PosTacletApp setPosInOccurrence(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, 
+    public PosTacletApp setPosInOccurrence(PosInOccurrence<Term, SequentFormula<Term>> pos, 
 	    			           Services services) {
 	if (taclet() instanceof NoFindTaclet) {
 	    throw new IllegalStateException("Cannot add position to an taclet"
@@ -1131,12 +1131,12 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * returns the PositionInOccurrence (representing a SequentFormula<JavaDLTerm> and a
+     * returns the PositionInOccurrence (representing a SequentFormula<Term> and a
      * position in the corresponding formula)
      * 
-     * @return the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
+     * @return the PosInOccurrence<Term, SequentFormula<Term>>
      */
-    public abstract PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOccurrence();
+    public abstract PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence();
 
     /**
      * compares the given Object with this one and returns true iff both are
@@ -1211,7 +1211,7 @@ public abstract class TacletApp implements RuleApp {
 	Iterator<SchemaVariable> it = taclet().getPrefix(sv).prefix()
 		.iterator();
 	while (it.hasNext()) {
-	    LogicVariable var = (LogicVariable) ((JavaDLTerm) instantiations()
+	    LogicVariable var = (LogicVariable) ((Term) instantiations()
 		    .getInstantiation(it.next())).op();
 	    ns.add(var);
 	}
@@ -1239,7 +1239,7 @@ public abstract class TacletApp implements RuleApp {
 	while (it.hasNext()) {
 	    SchemaVariable sv = it.next();
 	    if (sv instanceof SkolemTermSV) {
-		JavaDLTerm inst = (JavaDLTerm) instantiations.getInstantiation(sv);
+		Term inst = (Term) instantiations.getInstantiation(sv);
 		ns.addSafely(inst.op());
 	    }
 	}
@@ -1269,7 +1269,7 @@ public abstract class TacletApp implements RuleApp {
                 Iterator<SchemaVariable> varSVIt = prefix.iterator();
                 while (varSVIt.hasNext()) {
                     SchemaVariable varSV = varSVIt.next();
-                    JavaDLTerm inst = (JavaDLTerm)
+                    Term inst = (Term)
                             instantiations().getInstantiation(varSV);
                     if (inst != null) {
                         Name name = inst.op().name();
@@ -1324,8 +1324,8 @@ public abstract class TacletApp implements RuleApp {
                         kjt = ((TypeReference) peerInst).getKeYJavaType();
                     } else {
                         Expression peerInstExpr;
-                        if(peerInst instanceof JavaDLTerm) {
-                            peerInstExpr = tc.convertToProgramElement((JavaDLTerm)peerInst);
+                        if(peerInst instanceof Term) {
+                            peerInstExpr = tc.convertToProgramElement((Term)peerInst);
                         } else {
                             peerInstExpr = (Expression)peerInst;
                         }
@@ -1354,17 +1354,17 @@ public abstract class TacletApp implements RuleApp {
      * @param instantiations
      *            the SVInstantiations so that the find(if) expression matches
      * @param pos
-     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> where the Taclet is applied
+     *            the PosInOccurrence<Term, SequentFormula<Term>> where the Taclet is applied
      * @return true iff all variable conditions x not free in y are hold
      */
     public static boolean checkVarCondNotFreeIn(Taclet taclet,
-	    SVInstantiations instantiations, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+	    SVInstantiations instantiations, PosInOccurrence<Term, SequentFormula<Term>> pos) {
 
 	Iterator<SchemaVariable> it = instantiations.svIterator();
 	while (it.hasNext()) {
 	    SchemaVariable sv = it.next();
 	    if (sv instanceof TermSV || sv instanceof FormulaSV) {
-		if (!((JavaDLTerm) instantiations.getInstantiation(sv)).freeVars()
+		if (!((Term) instantiations.getInstantiation(sv)).freeVars()
 			.subset(
 				boundAtOccurrenceSet(taclet.getPrefix(sv),
 					instantiations, pos))) {
@@ -1381,15 +1381,15 @@ public abstract class TacletApp implements RuleApp {
      * given term position information
      * 
      * @param pos
-     *            the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> describing a subterm in JavaDLTerm
+     *            the PosInOccurrence<Term, SequentFormula<Term>> describing a subterm in Term
      * @return a set of logic variables that are bound above the specified
      *         subterm
      */
     protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(
-	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+	    PosInOccurrence<Term, SequentFormula<Term>> pos) {
 	ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.<QuantifiableVariable>nil();
 
-	PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator();
+	PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator();
 	int i;
 	ImmutableArray<QuantifiableVariable> vars;
 

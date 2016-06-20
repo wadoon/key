@@ -4,7 +4,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.ApplyStrategy;
@@ -126,7 +126,7 @@ public class DefaultProofControl extends AbstractProofControl {
     * {@inheritDoc}
     */
    @Override
-   public void runMacro(Node node, ProofMacro macro, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+   public void runMacro(Node node, ProofMacro macro, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
       if (!isInAutoMode()) {
          autoModeThread = new MacroThread(node, macro, posInOcc);
          autoModeThread.start();
@@ -138,9 +138,9 @@ public class DefaultProofControl extends AbstractProofControl {
       
       private final ProofMacro macro; 
       
-      private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc;
+      private final PosInOccurrence<Term, SequentFormula<Term>> posInOcc;
 
-      public MacroThread(Node node, ProofMacro macro, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+      public MacroThread(Node node, ProofMacro macro, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
          this.node = node;
          this.macro = macro;
          this.posInOcc = posInOcc;

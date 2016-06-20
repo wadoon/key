@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
@@ -53,13 +53,13 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.checker = checker;
         }
 
-        public void initPrefixCheck(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos) {
+        public void initPrefixCheck(PosInOccurrence<Term, SequentFormula<Term>> p_pos) {
             checker.initPrefixCheck(p_pos);
         }
 
 
         public void checkOperator(Operator op,
-                                  PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it) {
+                                  PIOPathIterator<Term, SequentFormula<Term>> it) {
             checker.checkOperator(op, it);
         }
 
@@ -84,7 +84,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.modifier = modifier;
         }
 
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modifyPosistion(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+        PosInOccurrence<Term, SequentFormula<Term>> modifyPosistion(PosInOccurrence<Term, SequentFormula<Term>> pos) {
             return modifier.modifyPosistion(pos);
         }
     }
@@ -138,12 +138,12 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
     @Override
     protected boolean filter(TacletApp app,
-                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+                             PosInOccurrence<Term, SequentFormula<Term>> pos,
                              Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         // apply the position modifiers
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos = pos;
+        PosInOccurrence<Term, SequentFormula<Term>> newPos = pos;
         for (PositionModifier positionModifier : positionModifiers) {
             newPos = positionModifier.modifyPosistion(pos);
         }
@@ -156,10 +156,10 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     /**
      * Applies the PrefixCheckers.
      *
-     * @param pos the PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> to be checked.
+     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> to be checked.
      * @return true, if all PrefixCheckers return true
      */
-    private boolean checkPrefix(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+    private boolean checkPrefix(PosInOccurrence<Term, SequentFormula<Term>> pos) {
         // init prefix checkers
         for (PrefixChecker prefixChecker : prefixCheckers) {
             prefixChecker.initPrefixCheck(pos);
@@ -167,11 +167,11 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
         // iterate through the prefix and let the prefix checkers do their work
         if (pos.posInTerm() != null) {
-            PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator();
+            PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator();
             Operator op;
 
             while (it.next() != -1) {
-                final JavaDLTerm t = it.getSubTerm();
+                final Term t = it.getSubTerm();
                 op = t.op();
 
                 for (PrefixChecker prefixChecker : prefixCheckers) {

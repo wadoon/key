@@ -18,12 +18,12 @@ import java.util.Iterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * JavaDLTerm generator that enumerates the formulas of the current
+ * Term generator that enumerates the formulas of the current
  * sequent/antecedent/succedent.
  */
 public abstract class SequentFormulasGenerator implements TermGenerator {
@@ -32,7 +32,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     
     public static SequentFormulasGenerator antecedent() {
         return new SequentFormulasGenerator () {
-            protected Iterator<SequentFormula<JavaDLTerm>> generateForIt(Goal goal) {
+            protected Iterator<SequentFormula<Term>> generateForIt(Goal goal) {
                 return goal.sequent ().antecedent ().iterator ();
             }
         };
@@ -40,7 +40,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     
     public static SequentFormulasGenerator succedent() {
         return new SequentFormulasGenerator () {
-            protected Iterator<SequentFormula<JavaDLTerm>> generateForIt(Goal goal) {
+            protected Iterator<SequentFormula<Term>> generateForIt(Goal goal) {
                 return goal.sequent ().succedent ().iterator ();
             }
         };
@@ -48,30 +48,30 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     
     public static SequentFormulasGenerator sequent() {
         return new SequentFormulasGenerator () {
-            protected Iterator<SequentFormula<JavaDLTerm>> generateForIt(Goal goal) {
+            protected Iterator<SequentFormula<Term>> generateForIt(Goal goal) {
                 return goal.sequent ().iterator ();
             }
         };
     }
     
-    protected abstract Iterator<SequentFormula<JavaDLTerm>> generateForIt(Goal goal);
+    protected abstract Iterator<SequentFormula<Term>> generateForIt(Goal goal);
 
-    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         return new SFIterator ( generateForIt ( goal ) );
     }
 
-    private static class SFIterator implements Iterator<JavaDLTerm> {
-        private final Iterator<SequentFormula<JavaDLTerm>> forIt;
+    private static class SFIterator implements Iterator<Term> {
+        private final Iterator<SequentFormula<Term>> forIt;
 
         public boolean hasNext() {
             return forIt.hasNext ();
         }
 
-        public JavaDLTerm next() {
+        public Term next() {
             return forIt.next ().formula ();
         }
 
-        public SFIterator(Iterator<SequentFormula<JavaDLTerm>> forIt) {
+        public SFIterator(Iterator<SequentFormula<Term>> forIt) {
             this.forIt = forIt;
         }
         

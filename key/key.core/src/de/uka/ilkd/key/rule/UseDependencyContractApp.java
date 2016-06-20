@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -35,27 +35,27 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 public class UseDependencyContractApp extends AbstractContractRuleApp {
 
-    private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> step;
+    private final PosInOccurrence<Term, SequentFormula<Term>> step;
     private List<LocationVariable> heapContext;
 	
-	public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+	public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence<Term, SequentFormula<Term>> pio) {
 	    this(builtInRule, pio, null, null);
     }
 
-	public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
-			Contract instantiation, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> step) {
-	    this(builtInRule, pio, ImmutableSLList.<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>>nil(), instantiation, step);
+	public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence<Term, SequentFormula<Term>> pio,
+			Contract instantiation, PosInOccurrence<Term, SequentFormula<Term>> step) {
+	    this(builtInRule, pio, ImmutableSLList.<PosInOccurrence<Term, SequentFormula<Term>>>nil(), instantiation, step);
     }
 	
     public UseDependencyContractApp(BuiltInRule rule,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts,
-            Contract contract, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> step) {
+            PosInOccurrence<Term, SequentFormula<Term>> pio, ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts,
+            Contract contract, PosInOccurrence<Term, SequentFormula<Term>> step) {
 	    super(rule, pio, ifInsts, contract);
 	    this.step = step;
 
     }
 
-    public UseDependencyContractApp replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos) {
+    public UseDependencyContractApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos) {
 	    return new UseDependencyContractApp(rule(), newPos, ifInsts, instantiation, step);
     }
 
@@ -69,10 +69,10 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     private UseDependencyContractApp computeStep(Sequent seq, Services services) {
         assert this.step == null;
-        final List<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> steps = 
+        final List<PosInOccurrence<Term, SequentFormula<Term>>> steps = 
             UseDependencyContractRule.
             getSteps(this.getHeapContext(), this.posInOccurrence(), seq, services);                
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> l_step = 
+        PosInOccurrence<Term, SequentFormula<Term>> l_step = 
             UseDependencyContractRule.findStepInIfInsts(steps, this, services);
         assert l_step != null;/* 
 				: "The strategy failed to properly "
@@ -84,11 +84,11 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
 
-    public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> step(Sequent seq, JavaDLTermServices services) {
+    public PosInOccurrence<Term, SequentFormula<Term>> step(Sequent seq, JavaDLTermServices services) {
         return step;
     }
 
-    public UseDependencyContractApp setStep(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_step) {
+    public UseDependencyContractApp setStep(PosInOccurrence<Term, SequentFormula<Term>> p_step) {
         assert this.step == null;
         return new UseDependencyContractApp(rule(), 
                 posInOccurrence(), ifInsts(), instantiation, p_step);
@@ -124,13 +124,13 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
     
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
-        final JavaDLTerm focus = posInOccurrence().subTerm();
+        final Term focus = posInOccurrence().subTerm();
         if (! (focus.op() instanceof IObserverFunction))
             // TODO: find more appropriate exception
             throw new RuntimeException("Dependency contract rule is not applicable to term "+focus);
         final IObserverFunction target = (IObserverFunction) focus.op();
 
-        final JavaDLTerm selfTerm;
+        final Term selfTerm;
         final KeYJavaType kjt;
 
         if (target.isStatic()) {
@@ -171,7 +171,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     
     
     @Override
-    public UseDependencyContractApp setIfInsts(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
+    public UseDependencyContractApp setIfInsts(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
         setMutable(ifInsts);
         return this;
         //return new UseDependencyContractApp(builtInRule, pio, ifInsts, instantiation, step);

@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -54,19 +54,19 @@ public class OpReplacer {
     }
     
     
-    public static JavaDLTerm replace(JavaDLTerm toReplace, JavaDLTerm with, JavaDLTerm in, TermFactory tf) {
-	Map<JavaDLTerm,JavaDLTerm> map = new LinkedHashMap<JavaDLTerm,JavaDLTerm>();
+    public static Term replace(Term toReplace, Term with, Term in, TermFactory tf) {
+	Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	map.put(toReplace, with);
 	OpReplacer or = new OpReplacer(map, tf);
 	return or.replace(in);
     }
     
     
-    public static ImmutableList<JavaDLTerm> replace(JavaDLTerm toReplace, 
-	                                      JavaDLTerm with, 
-	                                      ImmutableList<JavaDLTerm> in, 
+    public static ImmutableList<Term> replace(Term toReplace, 
+	                                      Term with, 
+	                                      ImmutableList<Term> in, 
 	                                      TermFactory tf) {
-	Map<JavaDLTerm,JavaDLTerm> map = new LinkedHashMap<JavaDLTerm,JavaDLTerm>();
+	Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	map.put(toReplace, with);
 	OpReplacer or = new OpReplacer(map, tf);
 	return or.replace(in);
@@ -74,7 +74,7 @@ public class OpReplacer {
     
     
     
-    public static JavaDLTerm replace(Operator toReplace, Operator with, JavaDLTerm in, TermFactory tf) {
+    public static Term replace(Operator toReplace, Operator with, Term in, TermFactory tf) {
 	Map<Operator,Operator> map = new LinkedHashMap<Operator,Operator>();
 	map.put(toReplace, with);
 	OpReplacer or = new OpReplacer(map, tf);
@@ -98,11 +98,11 @@ public class OpReplacer {
     /**
      * Replaces in a term.
      */
-    public JavaDLTerm replace(JavaDLTerm term) {
+    public Term replace(Term term) {
         if(term == null) {
             return null;
         }
-        final JavaDLTerm newTerm = (JavaDLTerm) map.get(term); 
+        final Term newTerm = (Term) map.get(term); 
         if(newTerm != null) {
             return newTerm;
         }
@@ -110,10 +110,10 @@ public class OpReplacer {
         final Operator newOp = replace(term.op());
         
         final int arity = term.arity();
-        final JavaDLTerm newSubTerms[] = new JavaDLTerm[arity];    
+        final Term newSubTerms[] = new Term[arity];    
         boolean changedSubTerm = false;
         for(int i = 0; i < arity; i++) {
-            JavaDLTerm subTerm = term.sub(i);
+            Term subTerm = term.sub(i);
             newSubTerms[i] = replace(subTerm);
     
             if(newSubTerms[i] != subTerm) {
@@ -123,7 +123,7 @@ public class OpReplacer {
         final ImmutableArray<QuantifiableVariable> newBoundVars 
         	= replace(term.boundVars());
         
-        final JavaDLTerm result;
+        final Term result;
         if(newOp != term.op()  
            || changedSubTerm
            || newBoundVars != term.boundVars()) {
@@ -142,9 +142,9 @@ public class OpReplacer {
     /**
      * Replaces in a list of terms.
      */
-    public ImmutableList<JavaDLTerm> replace(ImmutableList<JavaDLTerm> terms) {
-        ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil();
-        for(final JavaDLTerm term : terms) {
+    public ImmutableList<Term> replace(ImmutableList<Term> terms) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for(final Term term : terms) {
             result = result.append(replace(term));
         }
         return result;
@@ -161,9 +161,9 @@ public class OpReplacer {
         }
         
         for(final InfFlowSpec infFlowSpec : terms) {
-            final ImmutableList<JavaDLTerm> preExpressions = replace(infFlowSpec.preExpressions);
-            final ImmutableList<JavaDLTerm> postExpressions = replace(infFlowSpec.postExpressions);
-            final ImmutableList<JavaDLTerm> newObjects = replace(infFlowSpec.newObjects);
+            final ImmutableList<Term> preExpressions = replace(infFlowSpec.preExpressions);
+            final ImmutableList<Term> postExpressions = replace(infFlowSpec.postExpressions);
+            final ImmutableList<Term> newObjects = replace(infFlowSpec.newObjects);
             result = result.append(new InfFlowSpec(preExpressions, postExpressions, newObjects));
         }
         return result;
@@ -173,9 +173,9 @@ public class OpReplacer {
     /**
      * Replaces in a set of terms.
      */
-    public ImmutableSet<JavaDLTerm> replace(ImmutableSet<JavaDLTerm> terms) {
-        ImmutableSet<JavaDLTerm> result = DefaultImmutableSet.<JavaDLTerm>nil();
-        for (final JavaDLTerm term : terms) {
+    public ImmutableSet<Term> replace(ImmutableSet<Term> terms) {
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        for (final Term term : terms) {
             result = result.add(replace(term));
         }
         return result;
@@ -183,15 +183,15 @@ public class OpReplacer {
 
     
     /**
-     * Replaces in a map from Operator to JavaDLTerm.
+     * Replaces in a map from Operator to Term.
      */
-    public Map<Operator, JavaDLTerm> replace(/*in*/ Map<Operator, JavaDLTerm> myMap) {
+    public Map<Operator, Term> replace(/*in*/ Map<Operator, Term> myMap) {
         
-        Map<Operator,JavaDLTerm> result = new LinkedHashMap<Operator, JavaDLTerm>();
+        Map<Operator,Term> result = new LinkedHashMap<Operator, Term>();
         
-        final Iterator<Map.Entry<Operator, JavaDLTerm>> it = myMap.entrySet().iterator();
+        final Iterator<Map.Entry<Operator, Term>> it = myMap.entrySet().iterator();
         while(it.hasNext()) {
-            final Map.Entry<Operator, JavaDLTerm> entry = it.next();
+            final Map.Entry<Operator, Term> entry = it.next();
             result.put(replace(entry.getKey()), replace(entry.getValue()));
         }        
         return result;

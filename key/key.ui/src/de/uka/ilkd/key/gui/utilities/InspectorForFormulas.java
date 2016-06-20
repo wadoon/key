@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -46,7 +46,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector{
         if(toBeChecked.isEmpty()){
             return CheckedUserInputInspector.NO_USER_INPUT;
         }
-        JavaDLTerm term = translate(services,toBeChecked);
+        Term term = translate(services,toBeChecked);
          
        if(term == null){
            return NO_USER_INPUT;
@@ -59,7 +59,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector{
 
     }
     
-    public static JavaDLTerm translate(Services services, String toBeChecked){
+    public static Term translate(Services services, String toBeChecked){
         try {
             KeYParserF parser =
                     new KeYParserF (ParserMode.TERM, new KeYLexerF (

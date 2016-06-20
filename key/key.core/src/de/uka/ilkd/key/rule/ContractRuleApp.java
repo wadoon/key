@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -41,16 +41,16 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     private List<LocationVariable> heapContext;
 
-    ContractRuleApp(BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+    ContractRuleApp(BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pio) {
     	this(rule,	pio, null);
     }   
 
     private ContractRuleApp(BuiltInRule rule, 
-    		PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Contract instantiation) {
+    		PosInOccurrence<Term, SequentFormula<Term>> pio, Contract instantiation) {
     	super(rule, pio, instantiation);
     }
     
-    public ContractRuleApp replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos) {
+    public ContractRuleApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos) {
 	    return new ContractRuleApp(rule(), newPos, instantiation);
     }
     
@@ -104,7 +104,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     }
 
     @Override
-    public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
+    public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
         super.setMutable(ifInsts);
         return this;
     }
@@ -114,7 +114,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
       return heapContext;
     }
 
-    public JavaDLTerm programTerm() {
+    public Term programTerm() {
         if (posInOccurrence() != null) {
             return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
         }

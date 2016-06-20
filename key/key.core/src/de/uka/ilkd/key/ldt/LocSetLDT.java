@@ -29,7 +29,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
 import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 public final class LocSetLDT extends LDT {
@@ -150,17 +150,17 @@ public final class LocSetLDT extends LDT {
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                                 JavaDLTerm[] subs, 
+                                 Term[] subs, 
                                  Services services, 
                                  ExecutionContext ec) {
-	return isResponsible(op, (JavaDLTerm)null, services, ec);
+	return isResponsible(op, (Term)null, services, ec);
     }
     
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                		 JavaDLTerm left, 
-                		 JavaDLTerm right, 
+                		 Term left, 
+                		 Term right, 
                 		 Services services, 
                 		 ExecutionContext ec) {
 	return false;
@@ -169,7 +169,7 @@ public final class LocSetLDT extends LDT {
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	    			 JavaDLTerm sub, 
+	    			 Term sub, 
 	    			 JavaDLTermServices services, 
 	    			 ExecutionContext ec) {
 	return op instanceof Singleton
@@ -181,7 +181,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public JavaDLTerm translateLiteral(Literal lit, Services services) {
+    public Term translateLiteral(Literal lit, Services services) {
 	assert lit instanceof EmptySetLiteral;
 	return services.getTermBuilder().func(empty);
     }
@@ -214,7 +214,7 @@ public final class LocSetLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(JavaDLTerm t, ExtList children, Services services) {
+    public Expression translateTerm(Term t, ExtList children, Services services) {
 	if(t.op().equals(empty)) {
 	    return EmptySetLiteral.LOCSET;
 	}
@@ -224,7 +224,7 @@ public final class LocSetLDT extends LDT {
     
     
     @Override
-    public final Type getType(JavaDLTerm t) {
+    public final Type getType(Term t) {
 	assert false;
 	return null;
     }    

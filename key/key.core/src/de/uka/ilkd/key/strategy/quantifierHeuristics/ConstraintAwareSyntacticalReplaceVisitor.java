@@ -4,7 +4,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
@@ -28,14 +28,14 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
     public ConstraintAwareSyntacticalReplaceVisitor(
             TermLabelState termLabelState, Services services,
             Constraint metavariableInst,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
+            PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal) {
         super(termLabelState, services,
                 applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
         this.metavariableInst = metavariableInst;
     }
     
-    protected JavaDLTerm toTerm(JavaDLTerm t) {
+    protected Term toTerm(Term t) {
         if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
             // use the visitor recursively for replacing metavariables that
             // might occur in the term (if possible)
@@ -49,7 +49,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
         }
     }
 
-    public void visited(JavaDLTerm visited) {
+    public void visited(Term visited) {
         if (visited.op() instanceof Metavariable
                 && metavariableInst.getInstantiation((Metavariable) visited.op(), services)
                         .op() != visited.op()) {

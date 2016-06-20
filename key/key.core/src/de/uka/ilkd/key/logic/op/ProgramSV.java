@@ -45,7 +45,7 @@ import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramConstruct;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -420,8 +420,8 @@ public final class ProgramSV extends AbstractSV
  
         final Object instant = instantiations.getInstantiation(this);
         if ( instant == null || instant.equals(src) ||
-                ( instant instanceof JavaDLTerm && 
-                        ((JavaDLTerm)instant).op().equals(src))) {
+                ( instant instanceof Term && 
+                        ((Term)instant).op().equals(src))) {
             
             matchCond = addProgramInstantiation(src, matchCond, services);
                      

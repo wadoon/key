@@ -4,7 +4,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -56,7 +56,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof,
-                                      PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+                                      PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         return new RemovePostStrategy(proof);
     }
 
@@ -83,7 +83,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp,
-                                       PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+                                       PosInOccurrence<Term, SequentFormula<Term>> pio,
                                        Goal goal) {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
@@ -100,7 +100,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app,
-                                     PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+                                     PosInOccurrence<Term, SequentFormula<Term>> pio,
                                      Goal goal) {
             String name = app.rule().name().toString();
             if (!name.equals("hide_right")) {
@@ -137,7 +137,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
         @Override
         protected RuleAppCost instantiateApp(RuleApp app,
-                                             PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+                                             PosInOccurrence<Term, SequentFormula<Term>> pio,
                                              Goal goal) {
             return computeCost(app, pio, goal);
         }

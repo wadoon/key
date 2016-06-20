@@ -22,7 +22,7 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
@@ -213,7 +213,7 @@ public class TestTriggersSet extends TestCase {
 
 	}
 
-	private JavaDLTerm parseTerm(String termstr) {
+	private Term parseTerm(String termstr) {
 		return TacletForTests.parseTerm(termstr, new NamespaceSet(
 				variables, functions, sorts, new Namespace(),
 				new Namespace(), new Namespace()));
@@ -221,23 +221,23 @@ public class TestTriggersSet extends TestCase {
 
 	public void testTrigger1(){
 		String term1 = "\\forall s x;(ps(x))";
-		JavaDLTerm allterm = parseTerm(term1);
-		JavaDLTerm trigger1= allterm.sub(0);
+		Term allterm = parseTerm(term1);
+		Term trigger1= allterm.sub(0);
 		TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
 		int triggerNum = ts.getAllTriggers().size();
 		assertEquals (1,triggerNum);
-		JavaDLTerm trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
+		Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
 		assertEquals (trigger1,trigger2);
 	}
 	 
 	public void testTrigger2(){
 		String term1 = "\\forall r x;(frr(x)=frr(frr(x)))";
-		JavaDLTerm allterm = parseTerm(term1);
-		JavaDLTerm trigger1= allterm.sub(0).sub(1);
+		Term allterm = parseTerm(term1);
+		Term trigger1= allterm.sub(0).sub(1);
 		TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
 		int triggerNum = ts.getAllTriggers().size();
 		assertEquals (1,triggerNum);
-		JavaDLTerm trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
+		Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
 		assertEquals (trigger1,trigger2);
 	}
 }

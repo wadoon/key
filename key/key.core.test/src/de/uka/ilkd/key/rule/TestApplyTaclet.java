@@ -31,7 +31,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
@@ -114,7 +114,7 @@ public class TestApplyTaclet extends TestCase{
 	if ("".equals(t)) { 
 	    return Semisequent.nil();
 	}
-	SequentFormula<JavaDLTerm> cf0
+	SequentFormula<Term> cf0
 	    = new SequentFormula<>(TacletForTests.parseTerm(t));
 	return Semisequent.nil().insert(0, cf0).semisequent();
     }
@@ -143,14 +143,14 @@ public class TestApplyTaclet extends TestCase{
     
     
     public void testSuccTacletWithoutIf() {
-	JavaDLTerm fma = proof[0].root().sequent().succedent().getFirst().formula();
+	Term fma = proof[0].root().sequent().succedent().getFirst().formula();
 	NoPosTacletApp impright=TacletForTests.getRules().lookup("imp_right");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( impright );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applyPos= new 
-			PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(),
-					PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> applyPos= new 
+			PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(),
+					PosInTerm.<Term>getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
@@ -168,15 +168,15 @@ public class TestApplyTaclet extends TestCase{
     
 
     public void testAddingRule() {
-	JavaDLTerm fma=proof[0].root().sequent().succedent().getFirst().formula();
+	Term fma=proof[0].root().sequent().succedent().getFirst().formula();
 	NoPosTacletApp imprightadd 
 	    = TacletForTests.getRules().lookup("TestApplyTaclet_imp_right_add");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( imprightadd );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applyPos= new 
-	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-			    PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> applyPos= new 
+	    PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+			    PosInTerm.<Term>getTopLevel(),
 			    false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 	    getTacletAppAt(TacletFilter.TRUE, applyPos,
@@ -196,7 +196,7 @@ public class TestApplyTaclet extends TestCase{
 	ImmutableList<NoPosTacletApp> nfapp=goals.head().indexOfTaclets().getNoFindTaclet
 	    (new IHTacletFilter ( true, ImmutableSLList.<RuleSet>nil() ), 
 	     null);
-	JavaDLTerm aimpb=TacletForTests.parseTerm("A -> B");
+	Term aimpb=TacletForTests.parseTerm("A -> B");
 	assertTrue("Cut Rule should be inserted to TacletIndex.", nfapp.size()==1);
 	assertTrue("Inserted cut rule's b should be instantiated to A -> B.",
 		   nfapp.head().instantiations().getInstantiation
@@ -223,9 +223,9 @@ public class TestApplyTaclet extends TestCase{
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( allright );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applyPos
-	    = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-				  PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> applyPos
+	    = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+				  PosInTerm.<Term>getTopLevel(),
 				  false);	
 	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);
@@ -248,9 +248,9 @@ public class TestApplyTaclet extends TestCase{
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( close );
 	Goal goal = createGoal ( proof[2].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applyPos=new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
+	PosInOccurrence<Term, SequentFormula<Term>> applyPos=new PosInOccurrence<Term, SequentFormula<Term>>
 	    (goal.sequent().succedent().getFirst(), 
-	     PosInTerm.<JavaDLTerm>getTopLevel(),
+	     PosInTerm.<Term>getTopLevel(),
 	     false);
  	ImmutableList<TacletApp> rApplist
 	    = goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE,
@@ -283,14 +283,14 @@ public class TestApplyTaclet extends TestCase{
 
     
     public void testAntecTacletWithoutIf() {
-	JavaDLTerm fma=proof[3].root().sequent().antecedent().getFirst().formula();
+	Term fma=proof[3].root().sequent().antecedent().getFirst().formula();
 	NoPosTacletApp impleft = TacletForTests.getRules().lookup("imp_left");
  	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( impleft );
  	Goal goal = createGoal ( proof[3].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applyPos= new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>
+	PosInOccurrence<Term, SequentFormula<Term>> applyPos= new PosInOccurrence<Term, SequentFormula<Term>>
 	    (goal.sequent().antecedent().getFirst(), 
-	     PosInTerm.<JavaDLTerm>getTopLevel(),
+	     PosInTerm.<Term>getTopLevel(),
 	     true);
  	ImmutableList<TacletApp> rApplist
 	    = goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE,
@@ -331,9 +331,9 @@ public class TestApplyTaclet extends TestCase{
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( contradiction );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
-	    = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-				  PosInTerm.<JavaDLTerm>getTopLevel().down(1).down(0).down(0),
+	PosInOccurrence<Term, SequentFormula<Term>> pos
+	    = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+				  PosInTerm.<Term>getTopLevel().down(1).down(0).down(0),
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 	    getTacletAppAt(TacletFilter.TRUE, pos, null);	
@@ -344,7 +344,7 @@ public class TestApplyTaclet extends TestCase{
 	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
 	assertTrue("Too many or zero goals for contradiction.",goals.size()==1);	
 	Sequent seq=goals.head().sequent();
-	JavaDLTerm term=seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
+	Term term=seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
 	assertTrue(term.equals(TacletForTests.parseTerm("!B -> !A")));
     }
 
@@ -352,12 +352,12 @@ public class TestApplyTaclet extends TestCase{
     public void testNoFindTacletWithoutIf() {
 	NoPosTacletApp cut = TacletForTests.getRules().lookup("TestApplyTaclet_cut");
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
-	JavaDLTerm t_c=TacletForTests.parseTerm("D");
+	Term t_c=TacletForTests.parseTerm("D");
  	tacletIndex.add ( cut );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
-	    = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-				  PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pos
+	    = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+				  PosInTerm.<Term>getTopLevel(),
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
  		    getTacletAppAt(TacletFilter.TRUE, pos, null);	
@@ -401,19 +401,19 @@ public class TestApplyTaclet extends TestCase{
 	Goal goal=new Goal(proof.root(),new RuleAppIndex(index));
 	goals=goals.prepend(goal);
 	while (goals.size()!=0) {
-	    SequentFormula<JavaDLTerm> cfma=null;
-	    SequentFormula<JavaDLTerm> userCfma=null;   // in the real system the 
+	    SequentFormula<Term> cfma=null;
+	    SequentFormula<Term> userCfma=null;   // in the real system the 
 		                              //user would select this
 	    IList<TacletApp> rapplist=ImmSLList.<TacletApp>nil();
 	    out="\n"+out+("Goals: "+goals+"\n");
 	    goal=goals.head();
-	    Iterator<SequentFormula<JavaDLTerm>>
+	    Iterator<SequentFormula<Term>>
 		it=goal.node().sequent().antecedent().iterator();
 	    while (it.hasNext()) {
 		userCfma=it.next();
 		rapplist=rapplist.prepend(goal.ruleAppIndex().
 		    getTacletAppAtAndBelow(TacletFilter.TRUE, new 
-			PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(userCfma, PosInTerm<JavaDLTerm>.TOP_LEVEL,
+			PosInOccurrence<Term, SequentFormula<Term>>(userCfma, PosInTerm<Term>.TOP_LEVEL,
 					goal.node().sequent())));
 	    }
        	    if (rapplist.isEmpty()) {
@@ -422,7 +422,7 @@ public class TestApplyTaclet extends TestCase{
 		    userCfma=it.next();	
 		    rapplist=rapplist.prepend(goal.ruleAppIndex()
 			.getTacletAppAtAndBelow(TacletFilter.TRUE, new 
-			    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(userCfma, PosInTerm<JavaDLTerm>.TOP_LEVEL,
+			    PosInOccurrence<Term, SequentFormula<Term>>(userCfma, PosInTerm<Term>.TOP_LEVEL,
 					    goal.node().sequent()))) ;
 		}
 	    }
@@ -432,7 +432,7 @@ public class TestApplyTaclet extends TestCase{
 	    goals=goals.tail();
 	    boolean executed=false;
 	    while (!executed && !rapplist.isEmpty()) {
-		IList<ImmMap<SchemaVariable,JavaDLTerm>>
+		IList<ImmMap<SchemaVariable,Term>>
 		    mrlist=((Taclet)(rapplist.head().rule())).matchIf(goal.node().sequent(), 
 								    rapplist.head().instantiations());
 		out="\n"+out+("List of if-seq matches:"+mrlist);
@@ -506,8 +506,8 @@ public class TestApplyTaclet extends TestCase{
 		   !orright.complete());
 	Sequent seq=proof[0].root().sequent();
 	orright=orright.setPosInOccurrence
-	    (new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(seq.succedent().get(0),
-				 PosInTerm.<JavaDLTerm>getTopLevel(),
+	    (new PosInOccurrence<Term, SequentFormula<Term>>(seq.succedent().get(0),
+				 PosInTerm.<Term>getTopLevel(),
 				 false),
 				 services);
 	assertTrue("TacletApp should now be complete with Position set and SVs "
@@ -527,8 +527,8 @@ public class TestApplyTaclet extends TestCase{
 	//	wh0=wh0.addInstantiation(e2,TacletForTests.parseExpr("boolean", "false"));
 	//	wh0=wh0.addInstantiation(p1,TacletForTests.parsePrg("{if (false){}}"));
 	Sequent seq=proof[4].root().sequent();
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio=new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(seq.succedent().get(0),
-						       PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pio=new PosInOccurrence<Term, SequentFormula<Term>>(seq.succedent().get(0),
+						       PosInTerm.<Term>getTopLevel(),
 						false);
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( wh0 );
@@ -557,8 +557,8 @@ public class TestApplyTaclet extends TestCase{
 	    TacletForTests.getRules().lookup("TestApplyTaclet_cut_direct_r");
 
 	Sequent seq = proof[1].root().sequent();
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(seq.succedent().get(0),
-						  PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(seq.succedent().get(0),
+						  PosInTerm.<Term>getTopLevel(),
 						  false);
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( cdr );
@@ -594,8 +594,8 @@ public class TestApplyTaclet extends TestCase{
 	    TacletForTests.getRules().lookup("TestApplyTaclet_hide_r");
 
 	Sequent seq = proof[1].root().sequent();
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(seq.succedent().get(0),
-						  PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(seq.succedent().get(0),
+						  PosInTerm.<Term>getTopLevel(),
 						  false);
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( hide_r );
@@ -620,8 +620,8 @@ public class TestApplyTaclet extends TestCase{
 	    TacletForTests.getRules().lookup("and_left");
 
 	Sequent seq = proof[5].root().sequent();
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(seq.antecedent().get(0),
-				  PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(seq.antecedent().get(0),
+				  PosInTerm.<Term>getTopLevel(),
 				  true);
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( al );
@@ -635,7 +635,7 @@ public class TestApplyTaclet extends TestCase{
 
 
 	assertTrue("Expected one goal", goals.size()==1);
-	Iterator<SequentFormula<JavaDLTerm>> it = goals.head().sequent().
+	Iterator<SequentFormula<Term>> it = goals.head().sequent().
 	    antecedent().iterator();
 	assertTrue("Expected 'A, B ==>', but is "+
 		   goals.head().sequent(), 
@@ -649,8 +649,8 @@ public class TestApplyTaclet extends TestCase{
 	
 	NoPosTacletApp al = TacletForTests.getRules().lookup("and_left");
 	Sequent seq = proof[7].root().sequent();
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( seq.antecedent().get(0),
-				    PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>> ( seq.antecedent().get(0),
+				    PosInTerm.<Term>getTopLevel(),
 				    true);
 
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
@@ -666,8 +666,8 @@ public class TestApplyTaclet extends TestCase{
 	
 
        	seq = goals.head ().sequent ();
-	pio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> ( seq.antecedent().get(1),
-				    PosInTerm.<JavaDLTerm>getTopLevel(),
+	pio = new PosInOccurrence<Term, SequentFormula<Term>> ( seq.antecedent().get(1),
+				    PosInTerm.<Term>getTopLevel(),
 				    true);
 	tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( al );
@@ -683,7 +683,7 @@ public class TestApplyTaclet extends TestCase{
 
 	assertTrue("Expected one goal", goals.size()==1);
 
-	Iterator<SequentFormula<JavaDLTerm>> it = 
+	Iterator<SequentFormula<Term>> it = 
 	    goals.head().sequent().antecedent().iterator();
 
 	assertTrue("Expected 'A, B ==>', but is "+
@@ -702,9 +702,9 @@ public class TestApplyTaclet extends TestCase{
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( apply_eq_nonrigid );
 	Goal goal = createGoal ( proof[8].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
-	    = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-				  PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pos
+	    = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+				  PosInTerm.<Term>getTopLevel(),
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, services);	
@@ -735,9 +735,9 @@ public class TestApplyTaclet extends TestCase{
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( apply_eq_nonrigid );
 	Goal goal = createGoal ( proof[10].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
-	    = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-				  PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pos
+	    = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+				  PosInTerm.<Term>getTopLevel(),
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, 
@@ -754,9 +754,9 @@ public class TestApplyTaclet extends TestCase{
 
 	assertTrue("Did not expect a match.", appList.size()==0);
 
-	JavaDLTerm ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
-	SequentFormula<JavaDLTerm> ifformula =
-	    new SequentFormula<JavaDLTerm> ( ifterm );
+	Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
+	SequentFormula<Term> ifformula =
+	    new SequentFormula<Term> ( ifterm );
 	ImmutableList<IfFormulaInstantiation> ifInsts =
 	    ImmutableSLList.<IfFormulaInstantiation>nil().prepend
 	    ( new IfFormulaInstDirect ( ifformula ) );
@@ -802,9 +802,9 @@ public class TestApplyTaclet extends TestCase{
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( make_insert_eq_nonrigid );
 	Goal goal = createGoal ( proof[12].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
-	    = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().antecedent().getFirst(), 
-				  PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pos
+	    = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().antecedent().getFirst(), 
+				  PosInTerm.<Term>getTopLevel(),
 				 true);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, services);	
@@ -817,8 +817,8 @@ public class TestApplyTaclet extends TestCase{
 
 	goal = goals.head ();
 
-	pos = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-				  PosInTerm.<JavaDLTerm>getTopLevel(),
+	pos = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+				  PosInTerm.<Term>getTopLevel(),
 				  false);
  	rApplist=goal.ruleAppIndex().
 	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, 
@@ -842,9 +842,9 @@ public class TestApplyTaclet extends TestCase{
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( testApplyTaclet_wrap_blocks_two_empty_lists );
 	Goal goal = createGoal ( proof[14].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
-	    = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-				  PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pos
+	    = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+				  PosInTerm.<Term>getTopLevel(),
 				  false);
 
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
@@ -879,9 +879,9 @@ public class TestApplyTaclet extends TestCase{
  	tacletIndex.add ( test_catch_list0 );
  	tacletIndex.add ( test_catch_list1 );
 	Goal goal = createGoal ( proof[p_proof].root(), tacletIndex );
-	PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
-	    = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-				  PosInTerm.<JavaDLTerm>getTopLevel(),
+	PosInOccurrence<Term, SequentFormula<Term>> pos
+	    = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+				  PosInTerm.<Term>getTopLevel(),
 				  false);
 
  	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
@@ -896,8 +896,8 @@ public class TestApplyTaclet extends TestCase{
 	
 	Sequent correctSeq = proof[p_proof+1].root ().sequent ();
 
-	JavaDLTerm resultFormula  = goals.head().sequent().getFormulabyNr ( 1 ).formula ();
-	JavaDLTerm correctFormula = correctSeq.getFormulabyNr ( 1 ).formula ();
+	Term resultFormula  = goals.head().sequent().getFormulabyNr ( 1 ).formula ();
+	Term correctFormula = correctSeq.getFormulabyNr ( 1 ).formula ();
 
 	assertTrue("Wrong result. Expected:" + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + 
 	        " But was:"+ 
@@ -957,9 +957,9 @@ public class TestApplyTaclet extends TestCase{
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add ( app );
         Goal goal = createGoal ( proof[22].root(), tacletIndex );
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
-            = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-                                  PosInTerm.<JavaDLTerm>getTopLevel(),
+        PosInOccurrence<Term, SequentFormula<Term>> pos
+            = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+                                  PosInTerm.<Term>getTopLevel(),
                                   false);
 
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
@@ -988,9 +988,9 @@ public class TestApplyTaclet extends TestCase{
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add ( app );
         Goal goal = createGoal ( proof[22].root(), tacletIndex );
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
-            = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-                                  PosInTerm.<JavaDLTerm>getTopLevel(),
+        PosInOccurrence<Term, SequentFormula<Term>> pos
+            = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+                                  PosInTerm.<Term>getTopLevel(),
                                   false);
 
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
@@ -1020,9 +1020,9 @@ public class TestApplyTaclet extends TestCase{
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add ( app );
         Goal goal = createGoal ( proof[23].root(), tacletIndex );
-        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos
-            = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(goal.sequent().succedent().getFirst(), 
-                                  PosInTerm.<JavaDLTerm>getTopLevel(),
+        PosInOccurrence<Term, SequentFormula<Term>> pos
+            = new PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+                                  PosInTerm.<Term>getTopLevel(),
                                   false);
 
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().

@@ -22,7 +22,7 @@ import org.key_project.util.java.StringUtil;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -58,7 +58,7 @@ public final class KeyHacks {
          // An alternative possible solution will be to convert the HTML text back to plain text.
          // This realization is implemented, because it is easier and more performant. 
          Assert.isNotNull(classInvariant);
-         JavaDLTerm originalInv = classInvariant.getOriginalInv();
+         Term originalInv = classInvariant.getOriginalInv();
          String inv = LogicPrinter.quickPrintTerm(originalInv, services);
          return StringUtil.trim(inv); // Trim the text to remove line breaks in the end
       }
@@ -84,7 +84,7 @@ public final class KeyHacks {
          if (contract instanceof FunctionalOperationContractImpl) {
             final HeapLDT heapLDT = services.getTheories().getHeapLDT();
             final LocationVariable baseHeap = heapLDT.getHeap();
-            Map<LocationVariable,JavaDLTerm> originalPres = ObjectUtil.get(contract, "originalPres");
+            Map<LocationVariable,Term> originalPres = ObjectUtil.get(contract, "originalPres");
             String pres = "";
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                if(originalPres.get(h) != null) {
@@ -95,10 +95,10 @@ public final class KeyHacks {
             return StringUtil.trim(pres); // Trim the text to remove line breaks in the end
          }
          else {
-            Map<LocationVariable, JavaDLTerm> originalPres = ObjectUtil.get(contract, "originalPres");
+            Map<LocationVariable, Term> originalPres = ObjectUtil.get(contract, "originalPres");
             String pres = "";
             for(LocationVariable h : originalPres.keySet()) {
-               JavaDLTerm originalPre = originalPres.get(h);
+               Term originalPre = originalPres.get(h);
                if(originalPre != null) {
                     pres = pres + "["+h+"] "+LogicPrinter.quickPrintTerm(originalPre, services);
                }
@@ -127,7 +127,7 @@ public final class KeyHacks {
          Assert.isNotNull(operationContract);
          final HeapLDT heapLDT = services.getTheories().getHeapLDT();
          final LocationVariable baseHeap = heapLDT.getHeap();
-         Map<LocationVariable,JavaDLTerm> originalPosts = ObjectUtil.get(operationContract, "originalPosts");
+         Map<LocationVariable,Term> originalPosts = ObjectUtil.get(operationContract, "originalPosts");
          String posts = "";
          for(LocationVariable h : heapLDT.getAllHeaps()) {
             if(originalPosts.get(h) != null) {
@@ -155,13 +155,13 @@ public final class KeyHacks {
          // An alternative possible solution will be to convert the HTML text back to plain text.
          // This realization is implemented, because it is easier and more performant. 
          Assert.isNotNull(dependencyContract);
-         Map<ProgramVariable,JavaDLTerm> originalDeps = ObjectUtil.get(dependencyContract, "originalDeps");
+         Map<ProgramVariable,Term> originalDeps = ObjectUtil.get(dependencyContract, "originalDeps");
          String deps = "";
          for(ProgramVariable h : originalDeps.keySet()) {
              if(h.name().toString().endsWith("AtPre") && dependencyContract.getTarget().getStateCount() == 1) {
                   continue;
              }
-             JavaDLTerm originalDep = originalDeps.get(h);
+             Term originalDep = originalDeps.get(h);
              if(originalDep != null) {
                  deps = deps + "["+h+"] "+LogicPrinter.quickPrintTerm(originalDep, services);
              }
@@ -187,7 +187,7 @@ public final class KeyHacks {
          // An alternative possible solution will be to convert the HTML text back to plain text.
          // This realization is implemented, because it is easier and more performant. 
          Assert.isNotNull(contract);
-         Map<LocationVariable,JavaDLTerm> originalMods = ObjectUtil.get(contract, "originalMods");
+         Map<LocationVariable,Term> originalMods = ObjectUtil.get(contract, "originalMods");
          final HeapLDT heapLDT = services.getTheories().getHeapLDT();
          final LocationVariable baseHeap = heapLDT.getHeap();
          String mods = "";

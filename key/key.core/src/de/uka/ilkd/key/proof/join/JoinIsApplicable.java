@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -47,7 +47,7 @@ public class JoinIsApplicable {
      * @return The list of possible join partner objects -- may be empty (then,
      *         the join is not applicable).
      */
-    public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+    public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return new LinkedList<ProspectivePartner>();
         }
@@ -65,7 +65,7 @@ public class JoinIsApplicable {
      * @return The list of possible join partners.
      */
     public List<ProspectivePartner> computeProspecitvePartner(Goal goal,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio) {
+            PosInOccurrence<Term, SequentFormula<Term>> pio) {
         assert !pio.isInAntec();
         List<ProspectivePartner> partners = new LinkedList<ProspectivePartner>();
 
@@ -97,21 +97,21 @@ public class JoinIsApplicable {
      *         null otherwise.
      */
     private ProspectivePartner areProspectivePartners(Goal g1,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal g2) {
-        JavaDLTerm referenceFormula = pio.subTerm();
+            PosInOccurrence<Term, SequentFormula<Term>> pio, Goal g2) {
+        Term referenceFormula = pio.subTerm();
 
         assert g1.proof().getServices() == g2.proof().getServices();
         TermBuilder tb = g1.proof().getServices().getTermBuilder();
 
-        JavaDLTerm update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula
+        Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula
                 .sub(0) : tb.skip();
 
         referenceFormula = referenceFormula.op() instanceof UpdateApplication ? referenceFormula
                 .sub(1) : referenceFormula;
 
-        for (SequentFormula<JavaDLTerm> sf : g2.sequent().succedent()) {
-            JavaDLTerm formula = sf.formula();
-            JavaDLTerm update2 = tb.skip();
+        for (SequentFormula<Term> sf : g2.sequent().succedent()) {
+            Term formula = sf.formula();
+            Term update2 = tb.skip();
             if (formula.op() instanceof UpdateApplication
                     && !formula.equalsModRenaming(referenceFormula)) {
                 update2 = formula.sub(0);// don't change the order of this and

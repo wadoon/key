@@ -36,7 +36,7 @@ import de.uka.ilkd.key.logic.sort.NullSort;
  */
 public class LexPathOrdering implements TermOrdering {
 
-    public int compare (JavaDLTerm p_a, JavaDLTerm p_b) {
+    public int compare (Term p_a, Term p_b) {
         final CompRes res = compareHelp ( p_a, p_b );
         if ( res.lt () )
             return -1;
@@ -75,10 +75,10 @@ public class LexPathOrdering implements TermOrdering {
     
     
     private final static class CacheKey {
-        public final JavaDLTerm left;
-        public final JavaDLTerm right;
+        public final Term left;
+        public final Term right;
         
-        public CacheKey (final JavaDLTerm left, final JavaDLTerm right) {
+        public CacheKey (final Term left, final Term right) {
             this.left = left;
             this.right = right;
         }
@@ -99,7 +99,7 @@ public class LexPathOrdering implements TermOrdering {
         new LinkedHashMap<CacheKey, CompRes> ();
     
     
-    private CompRes compareHelp (JavaDLTerm p_a, JavaDLTerm p_b) {
+    private CompRes compareHelp (Term p_a, Term p_b) {
         final CacheKey key = new CacheKey ( p_a, p_b );
         CompRes res = cache.get ( key );
         if ( res == null ) {
@@ -110,7 +110,7 @@ public class LexPathOrdering implements TermOrdering {
         return res;
     }
 
-    private CompRes compareHelp2 (JavaDLTerm p_a, JavaDLTerm p_b) {
+    private CompRes compareHelp2 (Term p_a, Term p_b) {
         
         if ( oneSubGeq ( p_a, p_b ) ) return GREATER;
         if ( oneSubGeq ( p_b, p_a ) ) return LESS;
@@ -137,7 +137,7 @@ public class LexPathOrdering implements TermOrdering {
         return UNCOMPARABLE;
     }
 
-    private CompRes compareSubsLex(JavaDLTerm p_a, JavaDLTerm p_b) {
+    private CompRes compareSubsLex(Term p_a, Term p_b) {
         int i = 0;
 
         while ( true ) {
@@ -157,14 +157,14 @@ public class LexPathOrdering implements TermOrdering {
         }
     }
     
-    private boolean greaterThanSubs (JavaDLTerm p_a, JavaDLTerm p_b, int firstSub) {
+    private boolean greaterThanSubs (Term p_a, Term p_b, int firstSub) {
         for ( int i = firstSub; i < p_b.arity (); ++i ) {
             if ( !compareHelp ( p_a, p_b.sub ( i ) ).gt () ) return false;
         }
         return true;
     }
 
-    private boolean oneSubGeq (JavaDLTerm p_a, JavaDLTerm p_b) {
+    private boolean oneSubGeq (Term p_a, Term p_b) {
         for ( int i = 0; i != p_a.arity (); ++i ) {
             if ( compareHelp ( p_a.sub ( i ), p_b ).geq () ) return true;
         }

@@ -16,7 +16,7 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 import java.util.Collection;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
@@ -24,7 +24,7 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 public class AssumptionFormula implements TacletFormula {
 
     Taclet taclet;
-    Collection<JavaDLTerm> formula;
+    Collection<Term> formula;
     String status;
     TacletConditions conditions;
 
@@ -32,7 +32,7 @@ public class AssumptionFormula implements TacletFormula {
 	return conditions;
     }
 
-    public AssumptionFormula(Taclet taclet, Collection<JavaDLTerm> formula,
+    public AssumptionFormula(Taclet taclet, Collection<Term> formula,
 	    String status)  {
 	this.taclet = taclet;
 	this.formula = formula;
@@ -41,7 +41,7 @@ public class AssumptionFormula implements TacletFormula {
     
     
 
-    public AssumptionFormula(Taclet taclet, Collection<JavaDLTerm> formula,
+    public AssumptionFormula(Taclet taclet, Collection<Term> formula,
 	    String status, TacletConditions conditions) throws IllegalTacletException {
 	super();
 	this.taclet = taclet;
@@ -52,8 +52,8 @@ public class AssumptionFormula implements TacletFormula {
 
     }
 
-    public JavaDLTerm getFormula(JavaDLTermServices services) {
-	return services.getTermBuilder().and(formula.toArray(new JavaDLTerm[formula.size()]));
+    public Term getFormula(JavaDLTermServices services) {
+	return services.getTermBuilder().and(formula.toArray(new Term[formula.size()]));
 	// return formula;
     }
 
@@ -65,7 +65,7 @@ public class AssumptionFormula implements TacletFormula {
 	return status;
     }
 
-    public Collection<JavaDLTerm> getInstantiations() {
+    public Collection<Term> getInstantiations() {
 
 	return formula;
     }

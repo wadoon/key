@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
@@ -31,7 +31,7 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature ();
 
-    public boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         if ( !app.ifInstsComplete () ) {
             return true;
         }
@@ -41,9 +41,9 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
     protected boolean comparePio(TacletApp newApp,
                                  TacletApp oldApp,
-                                 PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPio, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> oldPio) {
-        final JavaDLTerm newFocus = newPio.subTerm ();
-        final JavaDLTerm oldFocus = oldPio.subTerm ();
+                                 PosInOccurrence<Term, SequentFormula<Term>> newPio, PosInOccurrence<Term, SequentFormula<Term>> oldPio) {
+        final Term newFocus = newPio.subTerm ();
+        final Term oldFocus = oldPio.subTerm ();
         if ( !newFocus.equals ( oldFocus ) ) return false;
         if ( newFocus.isRigid () ) return true;
         final ImmutableList<UpdateLabelPair> oldUpdateContext =

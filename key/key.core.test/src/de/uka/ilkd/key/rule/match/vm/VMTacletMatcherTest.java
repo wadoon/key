@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.key_project.common.core.logic.Name;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -46,14 +46,14 @@ public class VMTacletMatcherTest extends TestCase {
     
     @Test
     public void testMatchPropositionalFormula() throws ParserException {
-        JavaDLTerm findTerm = ((FindTaclet)taclet[0]).find();
+        Term findTerm = ((FindTaclet)taclet[0]).find();
         
         final String[] matchingFormulas = {"A & B", "(!A | (A<->B)) & B",
                 "A & (B & A)", "(\\forall int x; x>=0) & A"
         };
          
         for (String fml : matchingFormulas) {
-            JavaDLTerm toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml);
 
             MatchConditions mc = matcher[0].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
         
@@ -67,7 +67,7 @@ public class VMTacletMatcherTest extends TestCase {
                 "\\forall int x;(x>=0 & A)"
         };
         for (String fml : notMatchingFormulas) {
-            JavaDLTerm toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml);
             MatchConditions mc = matcher[0].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
 
             assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);
@@ -77,12 +77,12 @@ public class VMTacletMatcherTest extends TestCase {
     @Test
     public void testMatchFunctionTerm() throws ParserException {
         
-        JavaDLTerm findTerm = ((FindTaclet)taclet[1]).find();
+        Term findTerm = ((FindTaclet)taclet[1]).find();
                 
         final String[] matchingFormulas = {"f(1, 1, 2)", "f(c, c, d)"};
          
         for (String fml : matchingFormulas) {
-            JavaDLTerm toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml);
 
             MatchConditions mc = matcher[1].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
         
@@ -93,7 +93,7 @@ public class VMTacletMatcherTest extends TestCase {
                 "h(1,1)", "h(1,2)", "c", "z(1,1,1,1)", "f(c,d,c)"
         };
         for (String fml : notMatchingFormulas) {
-            JavaDLTerm toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml);
             MatchConditions mc = matcher[1].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
 
             assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);
@@ -104,9 +104,9 @@ public class VMTacletMatcherTest extends TestCase {
     
     @Test
     public void matchVarBindingTermSingle() throws ParserException {
-        JavaDLTerm findTerm = ((FindTaclet)taclet[2]).find();
+        Term findTerm = ((FindTaclet)taclet[2]).find();
                 
-        JavaDLTerm toMatch = services.getTermBuilder().parseTerm("\\forall int x; x + 1 > 0");
+        Term toMatch = services.getTermBuilder().parseTerm("\\forall int x; x + 1 > 0");
 
         MatchConditions mc = matcher[2].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
         assertNotNull("Expected that " + findTerm + " matches " + toMatch + " but did not.", mc);
@@ -120,12 +120,12 @@ public class VMTacletMatcherTest extends TestCase {
 
     @Test
     public void testMatchVarBindingTermNested() throws ParserException {
-        JavaDLTerm findTerm = ((FindTaclet)taclet[3]).find();
+        Term findTerm = ((FindTaclet)taclet[3]).find();
         
         final String[] matchingFormulas = {"\\forall int x; \\forall int y; x + y > 0"};
         
         for (String fml : matchingFormulas) {
-            JavaDLTerm toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml);
 
             MatchConditions mc = matcher[3].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
         
@@ -136,7 +136,7 @@ public class VMTacletMatcherTest extends TestCase {
                 "\\forall int x; \\forall int x; x + x > 0"
         };
         for (String fml : notMatchingFormulas) {
-            JavaDLTerm toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml);
             MatchConditions mc = matcher[3].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
 
             assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);
@@ -146,7 +146,7 @@ public class VMTacletMatcherTest extends TestCase {
 
     @Test
     public void testMatchVarBindingTermHiding() throws ParserException {
-        JavaDLTerm findTerm = ((FindTaclet)taclet[4]).find();
+        Term findTerm = ((FindTaclet)taclet[4]).find();
         
         final String[] matchingFormulas = {
                 "\\forall int x; (x > 0  & \\forall int y; x + y > 0)",
@@ -154,7 +154,7 @@ public class VMTacletMatcherTest extends TestCase {
                 };
         
         for (String fml : matchingFormulas) {
-            JavaDLTerm toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml);
 
             MatchConditions mc = matcher[4].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
         
@@ -165,7 +165,7 @@ public class VMTacletMatcherTest extends TestCase {
                 "\\forall int x; (x > 0  & \\forall int y; y + x > 0)",
         };
         for (String fml : notMatchingFormulas) {
-            JavaDLTerm toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml);
             MatchConditions mc = matcher[4].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
 
             assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);
@@ -175,14 +175,14 @@ public class VMTacletMatcherTest extends TestCase {
 
     @Test
     public void testMatchVarBindingTermMoreHiding() throws ParserException {
-        JavaDLTerm findTerm = ((FindTaclet)taclet[5]).find();
+        Term findTerm = ((FindTaclet)taclet[5]).find();
         
         final String[] matchingFormulas = {
                 "\\forall int x; (x > 0  & \\forall int y; x + y > 0)"
                 };
         
         for (String fml : matchingFormulas) {
-            JavaDLTerm toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml);
 
             MatchConditions mc = matcher[5].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
         
@@ -194,7 +194,7 @@ public class VMTacletMatcherTest extends TestCase {
                 "\\forall int x; (x > 0  & \\forall int y; y + x > 0)",
         };
         for (String fml : notMatchingFormulas) {
-            JavaDLTerm toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml);
             MatchConditions mc = matcher[5].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, services);
 
             assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);

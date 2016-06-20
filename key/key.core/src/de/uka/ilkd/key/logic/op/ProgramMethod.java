@@ -40,7 +40,7 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -320,7 +320,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public Expression convertToProgram(JavaDLTerm t, ExtList l) {
+    public Expression convertToProgram(Term t, ExtList l) {
         ProgramElement called;
     if (isStatic()) {
 	    called = new TypeRef(getContainerType());

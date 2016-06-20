@@ -27,9 +27,9 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
      * formulas resulting from information flow contract applications.
      */
     @SuppressWarnings("unchecked")
-    public static final Properties.Property<ImmutableList<JavaDLTerm>> INF_FLOW_CONTRACT_APPL_PROPERTY =
-            new Properties.Property<ImmutableList<JavaDLTerm>>(
-                    (Class<ImmutableList<JavaDLTerm>>) (Class<?>) ImmutableList.class,
+    public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
+            new Properties.Property<ImmutableList<Term>>(
+                    (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
                      "information flow contract applicaton property");
 
     
@@ -42,14 +42,14 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
     protected void addToAntec(Semisequent semi,
             TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            CCSequentChangeInfo<JavaDLTerm, SequentFormula<JavaDLTerm>, Semisequent, Sequent> currentSequent,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> applicationPosInOccurrence,
+            CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent,
+            PosInOccurrence<Term, SequentFormula<Term>> pos,
+            PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
             MatchConditions matchCond,
             Goal goal,
             RuleApp tacletApp,
             Services services) {
-        final ImmutableList<SequentFormula<JavaDLTerm>> replacements =
+        final ImmutableList<SequentFormula<Term>> replacements =
                 instantiateSemisequent(semi, termLabelState, labelHint, pos, matchCond, goal, tacletApp, services);
         assert replacements.size() == 1 : "information flow taclets must have " +
                 "exactly one add!";
@@ -65,18 +65,18 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
      * @param applFormula   the information contract application formula added
      *                      by this taclet
      */
-    private void updateStrategyInfo(Goal goal, final JavaDLTerm applFormula) {
-        ImmutableList<JavaDLTerm> applFormulas =
+    private void updateStrategyInfo(Goal goal, final Term applFormula) {
+        ImmutableList<Term> applFormulas =
                 goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (applFormulas == null) {
-            applFormulas = ImmutableSLList.<JavaDLTerm>nil();
+            applFormulas = ImmutableSLList.<Term>nil();
         }
         applFormulas = applFormulas.append(applFormula);
         StrategyInfoUndoMethod undo = new StrategyInfoUndoMethod() {
 
             @Override
             public void undo(Properties strategyInfos) {
-                ImmutableList<JavaDLTerm> applFormulas =
+                ImmutableList<Term> applFormulas =
                         strategyInfos.get(INF_FLOW_CONTRACT_APPL_PROPERTY);
                 strategyInfos.put(INF_FLOW_CONTRACT_APPL_PROPERTY, applFormulas.removeAll(applFormula));
             }

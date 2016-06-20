@@ -30,7 +30,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
@@ -1799,7 +1799,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature biggerLeftSide =
                 MonomialsSmallerThanFeature
                         .create(instOf("newSymLeft"),
-                                subAt(antecFor, PosInTerm.<JavaDLTerm>getTopLevel().down(0)
+                                subAt(antecFor, PosInTerm.<Term>getTopLevel().down(0)
                                         .down(0)), numbers);
         bindRuleSet(
                 d,
@@ -2898,7 +2898,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
      *         shall not be applied at all (it is discarded by the strategy).
      */
-    public final RuleAppCost computeCost(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+    public final RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio,
             Goal goal) {
         return costComputationF.compute(app, pio, goal);
     }
@@ -2909,13 +2909,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * 
      * @return true iff the rule should be applied, false otherwise
      */
-    public final boolean isApprovedApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+    public final boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio,
             Goal goal) {
         return !(approvalF.compute(app, pio, goal) instanceof TopRuleAppCost);
     }
 
     protected final RuleAppCost instantiateApp(RuleApp app,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
+            PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
         return instantiationF.compute(app, pio, goal);
     }
 

@@ -123,13 +123,13 @@ public class JoinRuleUtils {
      * @param toTranslate The formula to be translated.
      * @return The formula represented by the input or null if not applicable.
      */
-    public static JavaDLTerm translateToFormula(final Services services, final String toTranslate) {
+    public static Term translateToFormula(final Services services, final String toTranslate) {
         try {
             final KeYParserF parser =
                     new KeYParserF(ParserMode.TERM, new KeYLexerF(
                             new StringReader(toTranslate), ""), services,
                             services.getNamespaces());
-            final JavaDLTerm result = parser.term();
+            final Term result = parser.term();
             return result.sort() == Sort.FORMULA ? result : null;
         }
         catch (Throwable e) {
@@ -143,7 +143,7 @@ public class JoinRuleUtils {
      * @return All program locations (left sides) in the given update.
      */
     public static ImmutableSet<LocationVariable> getUpdateLeftSideLocations(
-            JavaDLTerm u) {
+            Term u) {
         if (u.op() instanceof ElementaryUpdate) {
 
             ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
@@ -155,7 +155,7 @@ public class JoinRuleUtils {
         else if (u.op() instanceof UpdateJunctor) {
 
             ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
-            for (JavaDLTerm sub : u.subs()) {
+            for (Term sub : u.subs()) {
                 result = result.union(getUpdateLeftSideLocations(sub));
             }
             return result;
@@ -175,14 +175,14 @@ public class JoinRuleUtils {
      *            Parallel update to get elementary updates from.
      * @return Elementary updates of the supplied parallel update.
      */
-    public static LinkedList<JavaDLTerm> getElementaryUpdates(JavaDLTerm u) {
-        LinkedList<JavaDLTerm> result = new LinkedList<JavaDLTerm>();
+    public static LinkedList<Term> getElementaryUpdates(Term u) {
+        LinkedList<Term> result = new LinkedList<Term>();
 
         if (u.op() instanceof ElementaryUpdate) {
             result.add(u);
         }
         else if (u.op() instanceof UpdateJunctor) {
-            for (JavaDLTerm sub : u.subs()) {
+            for (Term sub : u.subs()) {
                 result.addAll(getElementaryUpdates(sub));
             }
         }
@@ -201,7 +201,7 @@ public class JoinRuleUtils {
      * @return All program variables of the given term.
      */
     public static ImmutableSet<LocationVariable> getLocationVariables(
-            JavaDLTerm term, Services services) {
+            Term term, Services services) {
         ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
 
         if (term.op() instanceof LocationVariable) {
@@ -212,7 +212,7 @@ public class JoinRuleUtils {
                 result = result.union(getProgramLocations(term, services));
             }
 
-            for (JavaDLTerm sub : term.subs()) {
+            for (Term sub : term.subs()) {
                 result = result.union(getLocationVariables(sub, services));
             }
         }
@@ -231,7 +231,7 @@ public class JoinRuleUtils {
             Sequent sequent, Services services) {
         HashSet<LocationVariable> result = new HashSet<LocationVariable>();
 
-        for (SequentFormula<JavaDLTerm> f : sequent) {
+        for (SequentFormula<Term> f : sequent) {
             result.addAll(getLocationVariablesHashSet(f.formula(), services));
         }
 
@@ -246,7 +246,7 @@ public class JoinRuleUtils {
      * @return All program variables of the given term.
      */
     public static HashSet<LocationVariable> getLocationVariablesHashSet(
-            JavaDLTerm term, Services services) {
+            Term term, Services services) {
         HashSet<LocationVariable> result = new HashSet<LocationVariable>();
 
         if (term.op() instanceof LocationVariable) {
@@ -257,7 +257,7 @@ public class JoinRuleUtils {
                 result.addAll(getProgramLocationsHashSet(term, services));
             }
 
-            for (JavaDLTerm sub : term.subs()) {
+            for (Term sub : term.subs()) {
                 result.addAll(getLocationVariablesHashSet(sub, services));
             }
         }
@@ -272,7 +272,7 @@ public class JoinRuleUtils {
      *            The term to extract Skolem constants from.
      * @return All SkolemConstants of the given term.
      */
-    public static HashSet<Function> getSkolemConstants(JavaDLTerm term) {
+    public static HashSet<Function> getSkolemConstants(Term term) {
         HashSet<Function> result = new HashSet<Function>();
 
         if (term.op() instanceof Function
@@ -280,7 +280,7 @@ public class JoinRuleUtils {
             result.add((Function) term.op());
         }
         else {
-            for (JavaDLTerm sub : term.subs()) {
+            for (Term sub : term.subs()) {
                 result.addAll(getSkolemConstants(sub));
             }
         }
@@ -298,7 +298,7 @@ public class JoinRuleUtils {
      *            Left side to find the right side for.
      * @return The right side in the update for the given left side.
      */
-    public static JavaDLTerm getUpdateRightSideFor(JavaDLTerm update,
+    public static Term getUpdateRightSideFor(Term update,
             LocationVariable leftSide) {
         if (update.op() instanceof ElementaryUpdate
                 && ((ElementaryUpdate) update.op()).lhs().equals(leftSide)) {
@@ -309,8 +309,8 @@ public class JoinRuleUtils {
         else if (update.op() instanceof UpdateJunctor
                 && update.op().equals(UpdateJunctor.PARALLEL_UPDATE)) {
 
-            for (JavaDLTerm sub : update.subs()) {
-                JavaDLTerm rightSide = getUpdateRightSideFor(sub, leftSide);
+            for (Term sub : update.subs()) {
+                Term rightSide = getUpdateRightSideFor(sub, leftSide);
                 if (rightSide != null) {
                     return rightSide;
                 }
@@ -333,11 +333,11 @@ public class JoinRuleUtils {
      * @throws IllegalArgumentException
      *             if the supplied term is not a formula
      */
-    public static int countAtoms(JavaDLTerm term) {
+    public static int countAtoms(Term term) {
         if (term.sort().equals(Sort.FORMULA)) {
             if (term.op() instanceof Junctor) {
                 int result = 0;
-                for (JavaDLTerm sub : term.subs()) {
+                for (Term sub : term.subs()) {
                     result += countAtoms(sub);
                 }
                 return result;
@@ -365,7 +365,7 @@ public class JoinRuleUtils {
      * @throws IllegalArgumentException
      *             if the supplied term is not a formula
      */
-    public static int countDisjunctions(JavaDLTerm term, boolean negated) {
+    public static int countDisjunctions(Term term, boolean negated) {
         if (term.sort().equals(Sort.FORMULA)) {
             if (term.op() instanceof Junctor) {
                 int result = 0;
@@ -380,7 +380,7 @@ public class JoinRuleUtils {
                     negated = !negated;
                 }
 
-                for (JavaDLTerm sub : term.subs()) {
+                for (Term sub : term.subs()) {
                     result += countDisjunctions(sub, negated);
                 }
 
@@ -457,14 +457,14 @@ public class JoinRuleUtils {
      * occurrences of a constant are substituted by the same variable.
      * 
      * @param term
-     *            JavaDLTerm in which to substitute constants by variables.
+     *            Term in which to substitute constants by variables.
      * @param replMap
      *            Map from constants to variables in order to remember
      *            substitutions of one constant.
      * @return A term equal to the input, but with constants substituted by
      *         fresh variables.
      */
-    public static JavaDLTerm substConstantsByFreshVars(JavaDLTerm term,
+    public static Term substConstantsByFreshVars(Term term,
             HashMap<Function, LogicVariable> replMap, Services services) {
         return substConstantsByFreshVars(term, null, replMap, services);
     }
@@ -476,7 +476,7 @@ public class JoinRuleUtils {
      * substituted by the same variable.
      * 
      * @param term
-     *            JavaDLTerm in which to substitute constants by variables.
+     *            Term in which to substitute constants by variables.
      * @param restrictTo
      *            Set of constants to replace. If null, all constants are
      *            replaced.
@@ -486,7 +486,7 @@ public class JoinRuleUtils {
      * @return A term equal to the input, but with constants substituted by
      *         fresh variables.
      */
-    public static JavaDLTerm substConstantsByFreshVars(JavaDLTerm term,
+    public static Term substConstantsByFreshVars(Term term,
             HashSet<Function> restrictTo,
             HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
@@ -510,14 +510,14 @@ public class JoinRuleUtils {
         }
         else {
 
-            LinkedList<JavaDLTerm> transfSubs = new LinkedList<JavaDLTerm>();
-            for (JavaDLTerm sub : term.subs()) {
+            LinkedList<Term> transfSubs = new LinkedList<Term>();
+            for (Term sub : term.subs()) {
                 transfSubs
                         .add(substConstantsByFreshVars(sub, replMap, services));
             }
 
             return services.getTermFactory().createTerm(term.op(),
-                    new ImmutableArray<JavaDLTerm>(transfSubs), term.boundVars(),
+                    new ImmutableArray<Term>(transfSubs), term.boundVars(),
                     term.modalContent(), term.getLabels());
 
         }
@@ -528,15 +528,15 @@ public class JoinRuleUtils {
      * term.
      * 
      * @param term
-     *            JavaDLTerm to existentially close.
+     *            Term to existentially close.
      * @param services
      *            The services object.
      * @return A new term which is equivalent to the existential closure of the
      *         argument term.
      */
-    public static JavaDLTerm exClosure(final JavaDLTerm term, final Services services) {
+    public static Term exClosure(final Term term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Pair<JavaDLTerm, ImmutableSet<QuantifiableVariable>> anonymized = anonymizeProgramVariables(
+        Pair<Term, ImmutableSet<QuantifiableVariable>> anonymized = anonymizeProgramVariables(
                 term, services);
 
         return tb.ex(anonymized.second, anonymized.first);
@@ -546,15 +546,15 @@ public class JoinRuleUtils {
      * Universally closes all logical and location variables in the given term.
      * 
      * @param term
-     *            JavaDLTerm to universally close.
+     *            Term to universally close.
      * @param services
      *            The services object.
      * @return A new term which is equivalent to the universal closure of the
      *         argument term.
      */
-    public static JavaDLTerm allClosure(final JavaDLTerm term, final Services services) {
+    public static Term allClosure(final Term term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Pair<JavaDLTerm, ImmutableSet<QuantifiableVariable>> anonymized = anonymizeProgramVariables(
+        Pair<Term, ImmutableSet<QuantifiableVariable>> anonymized = anonymizeProgramVariables(
                 term, services);
 
         return tb.all(anonymized.second, anonymized.first);
@@ -567,13 +567,13 @@ public class JoinRuleUtils {
      *            Update to check.
      * @return true iff u is in normal form.
      */
-    public static boolean isUpdateNormalForm(JavaDLTerm u) {
+    public static boolean isUpdateNormalForm(Term u) {
         if (u.op() instanceof ElementaryUpdate) {
             return true;
         }
         else if (u.op() instanceof UpdateJunctor) {
             boolean result = true;
-            for (JavaDLTerm sub : u.subs()) {
+            for (Term sub : u.subs()) {
                 result = result && isUpdateNormalForm(sub);
             }
             return result;
@@ -592,8 +592,8 @@ public class JoinRuleUtils {
      *            resulting list will contain exactly the supplied formula.
      * @return The conjunctive elements of the supplied formula.
      */
-    public static ArrayList<JavaDLTerm> getConjunctiveElementsFor(final JavaDLTerm term) {
-        ArrayList<JavaDLTerm> result = new ArrayList<JavaDLTerm>();
+    public static ArrayList<Term> getConjunctiveElementsFor(final Term term) {
+        ArrayList<Term> result = new ArrayList<Term>();
 
         if (term.op().equals(Junctor.AND)) {
             result.addAll(getConjunctiveElementsFor(term.sub(0)));
@@ -676,7 +676,7 @@ public class JoinRuleUtils {
      * @return The first Java block in the given term or the empty block if
      *         there is no non-empty Java block.
      */
-    public static JavaBlock getJavaBlockRecursive(JavaDLTerm term) {
+    public static JavaBlock getJavaBlockRecursive(Term term) {
         if (!term.containsModalContentRecursive()) {
             return JavaBlock.EMPTY_JAVABLOCK;
         }
@@ -685,7 +685,7 @@ public class JoinRuleUtils {
             return term.modalContent();
         }
         else {
-            for (JavaDLTerm sub : term.subs()) {
+            for (Term sub : term.subs()) {
                 JavaBlock subJavaBlock = getJavaBlockRecursive(sub);
                 if (!subJavaBlock.isEmpty()) {
                     return subJavaBlock;
@@ -713,7 +713,7 @@ public class JoinRuleUtils {
      *            is aborted.
      * @return True iff the given formula has been successfully proven.
      */
-    public static boolean isProvable(JavaDLTerm toProve, Services services, int timeout) {
+    public static boolean isProvable(Term toProve, Services services, int timeout) {
         return isProvable(toProve, services, false, timeout);
     }
 
@@ -730,7 +730,7 @@ public class JoinRuleUtils {
      *            is aborted.
      * @return True iff the given formula has been successfully proven.
      */
-    public static boolean isProvableWithSplitting(JavaDLTerm toProve,
+    public static boolean isProvableWithSplitting(Term toProve,
             Services services, int timeout) {
         return isProvable(toProve, services, true, timeout);
     }
@@ -787,11 +787,11 @@ public class JoinRuleUtils {
      * @throws RuntimeException
      *             iff proving the equivalence of term1 and term2 fails.
      */
-    public static void assertEquivalent(JavaDLTerm term1, JavaDLTerm term2,
+    public static void assertEquivalent(Term term1, Term term2,
             Services services, int timeout) {
         TermBuilder tb = services.getTermBuilder();
 
-        JavaDLTerm assertionForm = tb.and(tb.imp(term1, term2), tb.imp(term2, term1));
+        Term assertionForm = tb.and(tb.imp(term1, term2), tb.imp(term2, term1));
         if (!isProvableWithSplitting(assertionForm, services, timeout)) {
             throw new RuntimeException("Could not prove expected equivalence.");
         }
@@ -803,7 +803,7 @@ public class JoinRuleUtils {
     // /////////////////////////////////////////////////
 
     /**
-     * Tries to simplifies the given {@link JavaDLTerm} in a side proof with splits.
+     * Tries to simplifies the given {@link Term} in a side proof with splits.
      * If this attempt is successful, i.e. the number of atoms in the simplified
      * formula is lower (and, if requested, also the number of disjunctions),
      * the simplified formula is returned; otherwise, the original formula is
@@ -814,7 +814,7 @@ public class JoinRuleUtils {
      * @param parentProof
      *            The parent {@link Proof}.
      * @param term
-     *            The {@link JavaDLTerm} to simplify.
+     *            The {@link Term} to simplify.
      * @param countDisjunctions
      *            If set to true, the method also takes the number of
      *            disjunctions (in addition to the number of atoms) into account
@@ -822,17 +822,17 @@ public class JoinRuleUtils {
      * @param timeout
      *            Time in milliseconds after which the side proof
      *            is aborted.
-     * @return The simplified {@link JavaDLTerm} or the original term, if
+     * @return The simplified {@link Term} or the original term, if
      *         simplification was not successful.
      * 
-     * @see #simplify(Proof, JavaDLTerm)
-     * @see SymbolicExecutionUtil#simplify(Proof, JavaDLTerm)
+     * @see #simplify(Proof, Term)
+     * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
-    public static JavaDLTerm trySimplify(final Proof parentProof, final JavaDLTerm term,
+    public static Term trySimplify(final Proof parentProof, final Term term,
             boolean countDisjunctions, int timeout) {
 
         try {
-            JavaDLTerm simplified = simplify(parentProof, term, timeout);
+            Term simplified = simplify(parentProof, term, timeout);
 
             if (countAtoms(simplified) < countAtoms(term)
                     && (!countDisjunctions || countDisjunctions(simplified,
@@ -865,9 +865,9 @@ public class JoinRuleUtils {
     public static void clearSemisequent(Goal goal, boolean antec) {
         final Semisequent semiseq = antec ? goal.sequent().antecedent() : goal
                 .sequent().succedent();
-        for (final SequentFormula<JavaDLTerm> f : semiseq) {
-            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> gPio = new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(f,
-                    PosInTerm.<JavaDLTerm>getTopLevel(), antec);
+        for (final SequentFormula<Term> f : semiseq) {
+            final PosInOccurrence<Term, SequentFormula<Term>> gPio = new PosInOccurrence<Term, SequentFormula<Term>>(f,
+                    PosInTerm.<Term>getTopLevel(), antec);
             goal.removeFormula(gPio);
         }
     }
@@ -949,23 +949,23 @@ public class JoinRuleUtils {
      * @return A path condition that is equivalent to the disjunction of the two
      *         supplied formulae, but possibly simpler.
      */
-    public static JavaDLTerm createSimplifiedDisjunctivePathCondition(
-            final JavaDLTerm cond1, final JavaDLTerm cond2, Services services, int simplificationTimeout) {
+    public static Term createSimplifiedDisjunctivePathCondition(
+            final Term cond1, final Term cond2, Services services, int simplificationTimeout) {
 
         TermBuilder tb = services.getTermBuilder();
 
-        ArrayList<JavaDLTerm> cond1ConjElems = getConjunctiveElementsFor(cond1);
-        ArrayList<JavaDLTerm> cond2ConjElems = getConjunctiveElementsFor(cond2);
+        ArrayList<Term> cond1ConjElems = getConjunctiveElementsFor(cond1);
+        ArrayList<Term> cond2ConjElems = getConjunctiveElementsFor(cond2);
 
-        final ArrayList<JavaDLTerm> fCond1ConjElems = new ArrayList<JavaDLTerm>(
+        final ArrayList<Term> fCond1ConjElems = new ArrayList<Term>(
                 cond1ConjElems);
-        final ArrayList<JavaDLTerm> fCond2ConjElems = new ArrayList<JavaDLTerm>(
+        final ArrayList<Term> fCond2ConjElems = new ArrayList<Term>(
                 cond2ConjElems);
 
         if (cond1ConjElems.size() == cond2ConjElems.size()) {
             for (int i = 0; i < fCond1ConjElems.size(); i++) {
-                JavaDLTerm elem1 = fCond1ConjElems.get(i);
-                JavaDLTerm elem2 = fCond2ConjElems.get(i);
+                Term elem1 = fCond1ConjElems.get(i);
+                Term elem2 = fCond2ConjElems.get(i);
 
                 if (!elem1.equals(elem2)) {
                     // Try to show that the different elements can be left
@@ -986,16 +986,16 @@ public class JoinRuleUtils {
             }
         }
 
-        JavaDLTerm result1 = joinConjuctiveElements(cond1ConjElems, services);
-        JavaDLTerm result2 = joinConjuctiveElements(cond2ConjElems, services);
+        Term result1 = joinConjuctiveElements(cond1ConjElems, services);
+        Term result2 = joinConjuctiveElements(cond2ConjElems, services);
 
-        JavaDLTerm result;
+        Term result;
 
         if (result1.equals(result2)) {
             result = result1;
         }
         else {
-            Option<Pair<JavaDLTerm, JavaDLTerm>> distinguishingAndEqual = getDistinguishingFormula(
+            Option<Pair<Term, Term>> distinguishingAndEqual = getDistinguishingFormula(
                     result1, result2, services);
             
             if (!distinguishingAndEqual.isSome()) {
@@ -1005,7 +1005,7 @@ public class JoinRuleUtils {
             
             assert distinguishingAndEqual instanceof Option.Some : "Possibly, this join is not sound!";
             
-            ArrayList<JavaDLTerm> equalConjunctiveElems = getConjunctiveElementsFor(distinguishingAndEqual.getValue().second);
+            ArrayList<Term> equalConjunctiveElems = getConjunctiveElementsFor(distinguishingAndEqual.getValue().second);
 
             // Apply distributivity to simplify the formula
             cond1ConjElems.removeAll(equalConjunctiveElems);
@@ -1013,14 +1013,14 @@ public class JoinRuleUtils {
 
             result1 = joinConjuctiveElements(cond1ConjElems, services);
             result2 = joinConjuctiveElements(cond2ConjElems, services);
-            JavaDLTerm commonElemsTerm = joinConjuctiveElements(
+            Term commonElemsTerm = joinConjuctiveElements(
                     equalConjunctiveElems, services);
 
             result = tb.and(tb.or(result1, result2), commonElemsTerm);
 
             // Last try: Check if the formula is equivalent to only the
             // common elements...
-            JavaDLTerm equivalentToCommon = tb.and(tb.imp(result, commonElemsTerm),
+            Term equivalentToCommon = tb.and(tb.imp(result, commonElemsTerm),
                     tb.imp(commonElemsTerm, result));
             if (isProvableWithSplitting(equivalentToCommon, services, simplificationTimeout)) {
                 result = commonElemsTerm;
@@ -1050,19 +1050,19 @@ public class JoinRuleUtils {
      *         pathCondition2, and (2) the "rest" of pathCondition1 that is
      *         common with pathCondition2.
      */
-    public static Option<Pair<JavaDLTerm, JavaDLTerm>> getDistinguishingFormula(
-            JavaDLTerm pathCondition1, JavaDLTerm pathCondition2, Services services) {
+    public static Option<Pair<Term, Term>> getDistinguishingFormula(
+            Term pathCondition1, Term pathCondition2, Services services) {
 
         final TermWrapperFactory factory = new TermWrapperFactory();
 
         final LinkedHashSet<TermWrapper> cond1ConjElems = new LinkedHashSet<JoinRuleUtils.TermWrapper>();
         final LinkedHashSet<TermWrapper> cond2ConjElems = new LinkedHashSet<JoinRuleUtils.TermWrapper>();
 
-        for (final JavaDLTerm term : getConjunctiveElementsFor(pathCondition1)) {
+        for (final Term term : getConjunctiveElementsFor(pathCondition1)) {
             cond1ConjElems.add(factory.wrapTerm(term));
         }
 
-        for (final JavaDLTerm term : getConjunctiveElementsFor(pathCondition2)) {
+        for (final Term term : getConjunctiveElementsFor(pathCondition2)) {
             cond2ConjElems.add(factory.wrapTerm(term));
         }
 
@@ -1077,16 +1077,16 @@ public class JoinRuleUtils {
         distinguishingElements.removeAll(commonElements);
 
         if (distinguishingElements.isEmpty() && !cond1ConjElems.isEmpty()) {
-            return new Option.None<Pair<JavaDLTerm, JavaDLTerm>>();
+            return new Option.None<Pair<Term, Term>>();
         }
 
-        return new Option.Some<Pair<JavaDLTerm, JavaDLTerm>>(
-                new Pair<JavaDLTerm, JavaDLTerm>(
+        return new Option.Some<Pair<Term, Term>>(
+                new Pair<Term, Term>(
                         joinConjuctiveElements(TermWrapper.toTermList(
-                                new ArrayList<JavaDLTerm>(), distinguishingElements),
+                                new ArrayList<Term>(), distinguishingElements),
                                 services),
                         joinConjuctiveElements( TermWrapper.toTermList(
-                                new ArrayList<JavaDLTerm>(), commonElements),
+                                new ArrayList<Term>(), commonElements),
                                 services)));
 
     }
@@ -1099,11 +1099,11 @@ public class JoinRuleUtils {
      * @param services The services object.
      * @return True iff the two given path conditions are distinguishable.
      */
-    public static boolean pathConditionsAreDistinguishable(JavaDLTerm pathCondition1,
-            JavaDLTerm pathCondition2, Services services) {
-        Option<Pair<JavaDLTerm, JavaDLTerm>> distinguishingAndEqualFormula1 = getDistinguishingFormula(
+    public static boolean pathConditionsAreDistinguishable(Term pathCondition1,
+            Term pathCondition2, Services services) {
+        Option<Pair<Term, Term>> distinguishingAndEqualFormula1 = getDistinguishingFormula(
                 pathCondition1, pathCondition2, services);
-        Option<Pair<JavaDLTerm, JavaDLTerm>> distinguishingAndEqualFormula2 = getDistinguishingFormula(
+        Option<Pair<Term, Term>> distinguishingAndEqualFormula2 = getDistinguishingFormula(
                 pathCondition2, pathCondition1, services);
 
         return distinguishingAndEqualFormula1.isSome()
@@ -1119,9 +1119,9 @@ public class JoinRuleUtils {
      *            Partner goal to close.
      */
     public static void closeJoinPartnerGoal(Node joinNodeParent,
-            Goal joinPartner, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+            Goal joinPartner, PosInOccurrence<Term, SequentFormula<Term>> pio,
             SymbolicExecutionState joinState,
-            SymbolicExecutionState joinPartnerState, JavaDLTerm pc) {
+            SymbolicExecutionState joinPartnerState, Term pc) {
 
         InitConfig initConfig = joinNodeParent.proof().getInitConfig();
 
@@ -1154,10 +1154,10 @@ public class JoinRuleUtils {
      * @param services
      *            The services object.
      * @return An SE state (U,C).
-     * @see #sequentToSETriple(Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Services)
+     * @see #sequentToSETriple(Goal, PosInOccurrence<Term, SequentFormula<Term>>, Services)
      */
     public static SymbolicExecutionState sequentToSEPair(Node node,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Services services) {
+            PosInOccurrence<Term, SequentFormula<Term>> pio, Services services) {
 
         SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio,
                 services);
@@ -1190,23 +1190,23 @@ public class JoinRuleUtils {
      * @return An SE state (U,C,p).
      */
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(
-            Node node, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Services services) {
+            Node node, PosInOccurrence<Term, SequentFormula<Term>> pio, Services services) {
 
-        ImmutableList<SequentFormula<JavaDLTerm>> pathConditionSet = ImmutableSLList.nil();
+        ImmutableList<SequentFormula<Term>> pathConditionSet = ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent()
                 .asList());
 
-        JavaDLTerm selected = pio.subTerm();
+        Term selected = pio.subTerm();
 
-        for (SequentFormula<JavaDLTerm> sf : node.sequent().succedent()) {
+        for (SequentFormula<Term> sf : node.sequent().succedent()) {
             if (!sf.formula().equals(selected)) {
                 pathConditionSet = pathConditionSet.prepend(new SequentFormula<>(
                         services.getTermBuilder().not(sf.formula())));
             }
         }
 
-        JavaDLTerm updateTerm = null;
-        JavaDLTerm programCounter = null;
+        Term updateTerm = null;
+        Term programCounter = null;
 
         if (selected.op() instanceof UpdateApplication) {
             updateTerm = selected.sub(0);
@@ -1231,18 +1231,18 @@ public class JoinRuleUtils {
      * pair.
      * 
      * @param term
-     *            JavaDLTerm to anonymize.
+     *            Term to anonymize.
      * @param services
      *            The services object.
      * @return A term of the form <code>{ ... || x := vx || ...} term</code> for
      *         every PV x occurring in the term, where vx is a fresh variable.
      */
-    private static Pair<JavaDLTerm, ImmutableSet<QuantifiableVariable>> anonymizeProgramVariables(
-            final JavaDLTerm term, final Services services) {
+    private static Pair<Term, ImmutableSet<QuantifiableVariable>> anonymizeProgramVariables(
+            final Term term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
-        ImmutableList<JavaDLTerm> elementaries = ImmutableSLList.nil();
+        ImmutableList<Term> elementaries = ImmutableSLList.nil();
 
         for (LocationVariable loc : getLocationVariables(term, services)) {
             final String newName = tb
@@ -1257,7 +1257,7 @@ public class JoinRuleUtils {
                     tb.var(newVar)));
         }
 
-        return new Pair<JavaDLTerm, ImmutableSet<QuantifiableVariable>>(tb.apply(
+        return new Pair<Term, ImmutableSet<QuantifiableVariable>>(tb.apply(
                 tb.parallel(elementaries), term), freeVars);
     }
 
@@ -1270,8 +1270,8 @@ public class JoinRuleUtils {
      *            The services object.
      * @return And-formula connecting the given terms.
      */
-    private static JavaDLTerm joinListToAndTerm(
-            ImmutableList<SequentFormula<JavaDLTerm>> formulae, Services services) {
+    private static Term joinListToAndTerm(
+            ImmutableList<SequentFormula<Term>> formulae, Services services) {
         if (formulae.size() == 0) {
             return services.getTermBuilder().tt();
         }
@@ -1295,7 +1295,7 @@ public class JoinRuleUtils {
      * @return The set of contained program locations.
      */
     private static ImmutableSet<LocationVariable> getProgramLocations(
-            JavaDLTerm programCounterTerm, Services services) {
+            Term programCounterTerm, Services services) {
         CollectLocationVariablesVisitor visitor = new CollectLocationVariablesVisitor(
                 programCounterTerm.modalContent().program(), true, services);
 
@@ -1319,7 +1319,7 @@ public class JoinRuleUtils {
      * @return The set of contained program locations.
      */
     private static HashSet<LocationVariable> getProgramLocationsHashSet(
-            JavaDLTerm programCounterTerm, Services services) {
+            Term programCounterTerm, Services services) {
         final JavaProgramElement program = programCounterTerm.modalContent().program();
         if (program instanceof StatementBlock &&
                 (((StatementBlock) program).isEmpty() ||
@@ -1345,7 +1345,7 @@ public class JoinRuleUtils {
      *            The services object.
      * @return A conjunction of the supplied formulae.
      */
-    private static JavaDLTerm joinConjuctiveElements(final List<JavaDLTerm> elems,
+    private static Term joinConjuctiveElements(final List<Term> elems,
             Services services) {
         TermBuilder tb = services.getTermBuilder();
 
@@ -1353,9 +1353,9 @@ public class JoinRuleUtils {
             return tb.tt();
         }
 
-        JavaDLTerm result = elems.get(0);
+        Term result = elems.get(0);
         for (int i = 1; i < elems.size(); i++) {
-            JavaDLTerm term = elems.get(i);
+            Term term = elems.get(i);
             result = tb.and(result, term);
         }
 
@@ -1377,7 +1377,7 @@ public class JoinRuleUtils {
      *            A timeout for the proof in milliseconds.
      * @return The proof result.
      */
-    private static ApplyStrategyInfo tryToProve(JavaDLTerm toProve,
+    private static ApplyStrategyInfo tryToProve(Term toProve,
             Services services, boolean doSplit, String sideProofName, int timeout) {
         return tryToProve(Sequent.createSequent(
                                     // Sequent to prove
@@ -1441,7 +1441,7 @@ public class JoinRuleUtils {
      *            is aborted.
      * @return True iff the given formula has been successfully proven.
      */
-    private static boolean isProvable(JavaDLTerm toProve, Services services,
+    private static boolean isProvable(Term toProve, Services services,
             boolean doSplit, int timeout) {
 
         ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check", timeout);
@@ -1477,29 +1477,29 @@ public class JoinRuleUtils {
     }
 
     /**
-     * Simplifies the given {@link JavaDLTerm} in a side proof with splits. This code
+     * Simplifies the given {@link Term} in a side proof with splits. This code
      * has been copied from {@link SymbolicExecutionUtil} and only been slightly
      * modified (to allow for splitting the proof).
      * 
      * @param parentProof
      *            The parent {@link Proof}.
      * @param term
-     *            The {@link JavaDLTerm} to simplify.
+     *            The {@link Term} to simplify.
      * @param timeout
      *            Time in milliseconds after which the side proof
      *            is aborted.
-     * @return The simplified {@link JavaDLTerm}.
+     * @return The simplified {@link Term}.
      * @throws ProofInputException
      *             Occurred Exception.
      * 
-     * @see SymbolicExecutionUtil#simplify(Proof, JavaDLTerm)
+     * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
-    private static JavaDLTerm simplify(Proof parentProof, JavaDLTerm term, int timeout)
+    private static Term simplify(Proof parentProof, Term term, int timeout)
             throws ProofInputException {
 
         final Services services = parentProof.getServices();
 
-        final ApplyStrategyInfo info = tryToProve(term, services, true, "JavaDLTerm simplification", timeout);
+        final ApplyStrategyInfo info = tryToProve(term, services, true, "Term simplification", timeout);
 
         // The simplified formula is the conjunction of all open goals
         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
@@ -1508,9 +1508,9 @@ public class JoinRuleUtils {
             return tb.tt();
         }
         else {
-            ImmutableList<JavaDLTerm> goalImplications = ImmutableSLList.nil();
+            ImmutableList<Term> goalImplications = ImmutableSLList.nil();
             for (Goal goal : openGoals) {
-                JavaDLTerm goalImplication = sequentToFormula(goal.sequent(),
+                Term goalImplication = sequentToFormula(goal.sequent(),
                         services);
                 goalImplications = goalImplications.append(goalImplication);
             }
@@ -1531,19 +1531,19 @@ public class JoinRuleUtils {
      *            The services object.
      * @return A formula equivalent to the given sequent.
      */
-    private static JavaDLTerm sequentToFormula(Sequent sequent, Services services) {
+    private static Term sequentToFormula(Sequent sequent, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        ImmutableList<JavaDLTerm> negAntecedentForms = ImmutableSLList.nil();
-        ImmutableList<JavaDLTerm> succedentForms = ImmutableSLList.nil();
+        ImmutableList<Term> negAntecedentForms = ImmutableSLList.nil();
+        ImmutableList<Term> succedentForms = ImmutableSLList.nil();
 
         // Shift antecedent formulae to the succedent by negation
-        for (SequentFormula<JavaDLTerm> sf : sequent.antecedent().asList()) {
+        for (SequentFormula<Term> sf : sequent.antecedent().asList()) {
             negAntecedentForms = negAntecedentForms
                     .prepend(tb.not(sf.formula()));
         }
 
-        for (SequentFormula<JavaDLTerm> sf : sequent.succedent().asList()) {
+        for (SequentFormula<Term> sf : sequent.succedent().asList()) {
             succedentForms = succedentForms.prepend(sf.formula());
         }
 
@@ -1589,10 +1589,10 @@ public class JoinRuleUtils {
      * @author Dominic Scheurer
      */
     static class TermWrapperFactory {
-        private ArrayList<JavaDLTerm> wrappedTerms = new ArrayList<JavaDLTerm>();
+        private ArrayList<Term> wrappedTerms = new ArrayList<Term>();
         
-        public TermWrapper wrapTerm(JavaDLTerm term) {
-            for (JavaDLTerm existingTerm : wrappedTerms) {
+        public TermWrapper wrapTerm(Term term) {
+            for (Term existingTerm : wrappedTerms) {
                 if (existingTerm.equalsModRenaming(term)) {
                     return new TermWrapper(term, existingTerm.hashCode());
                 }
@@ -1610,15 +1610,15 @@ public class JoinRuleUtils {
      * @see TermWrapperFactory
      */
     static class TermWrapper {
-        private JavaDLTerm term;
+        private Term term;
         private int hashcode;
         
-        public TermWrapper(JavaDLTerm term, int hashcode) {
+        public TermWrapper(Term term, int hashcode) {
             this.term = term;
             this.hashcode = hashcode;
         }
         
-        public JavaDLTerm getTerm() {
+        public Term getTerm() {
             return term;
         }
         
@@ -1648,7 +1648,7 @@ public class JoinRuleUtils {
          *            Iterable to transform.
          * @return The target collection with inserted terms.
          */
-        public static <T extends Collection<JavaDLTerm>> T toTermList(T target,
+        public static <T extends Collection<Term>> T toTermList(T target,
                 Iterable<TermWrapper> wrappedCollection) {
             Iterator<TermWrapper> it = wrappedCollection.iterator();
 

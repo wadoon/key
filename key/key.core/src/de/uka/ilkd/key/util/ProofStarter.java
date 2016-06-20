@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.ApplyStrategy;
@@ -70,7 +70,7 @@ public class ProofStarter {
             this.proofName = proofName;
         }
 
-        public UserProvidedInput(JavaDLTerm formula, ProofEnvironment env) {
+        public UserProvidedInput(Term formula, ProofEnvironment env) {
             this(Sequent.createSuccSequent(Semisequent.nil().insertFirst(
                     new SequentFormula<>(formula)).semisequent()), env);
         }
@@ -158,7 +158,7 @@ public class ProofStarter {
      *
      * @throws ProofInputException
      */
-    public void init(JavaDLTerm formulaToProve, ProofEnvironment env) throws ProofInputException {
+    public void init(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
         proof = input.getPO().getFirstProof();
         proof.setEnv(env);

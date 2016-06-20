@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.op.IfThenElse;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 /**
@@ -56,7 +56,7 @@ class AntecSuccPrefixChecker implements Checker {
 
 
     @Override
-    public void initPrefixCheck(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos) {
+    public void initPrefixCheck(PosInOccurrence<Term, SequentFormula<Term>> p_pos) {
         pol = p_pos.isInAntec() ? -1 : 1;  // init polarity
     }
 

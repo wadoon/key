@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.op.*;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
@@ -43,8 +43,8 @@ public final class DropEffectlessElementariesCondition
     }
     
     
-    private static JavaDLTerm dropEffectlessElementariesHelper(
-	    				JavaDLTerm update, 
+    private static Term dropEffectlessElementariesHelper(
+	    				Term update, 
 	    				Set<LocationVariable> relevantVars, JavaDLTermServices services) {
 	if(update.op() instanceof ElementaryUpdate) {
 	    ElementaryUpdate eu = (ElementaryUpdate) update.op();
@@ -61,12 +61,12 @@ public final class DropEffectlessElementariesCondition
 		return services.getTermBuilder().skip();
 	    }
 	} else if(update.op() == UpdateJunctor.PARALLEL_UPDATE) {
-	    JavaDLTerm sub0 = update.sub(0);
-            JavaDLTerm sub1 = update.sub(1);
+	    Term sub0 = update.sub(0);
+            Term sub1 = update.sub(1);
             // first descend to the second sub-update to keep relevantVars in
             // good order
-	    JavaDLTerm newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
-	    JavaDLTerm newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars, services);
+	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
+	    Term newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars, services);
 	    if(newSub0 == null && newSub1 == null) {
 		return null;
 	    } else {
@@ -75,9 +75,9 @@ public final class DropEffectlessElementariesCondition
 		return services.getTermBuilder().parallel(newSub0, newSub1);
 	    }
 	} else if(update.op() == UpdateApplication.UPDATE_APPLICATION) {
-	    JavaDLTerm sub0 = update.sub(0);
-	    JavaDLTerm sub1 = update.sub(1);
-	    JavaDLTerm newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
+	    Term sub0 = update.sub(0);
+	    Term sub1 = update.sub(1);
+	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
 	    return newSub1 == null ? null : services.getTermBuilder().apply(sub0, newSub1, null);
 	} else {
 	    return null;
@@ -85,14 +85,14 @@ public final class DropEffectlessElementariesCondition
     }    
     
     
-    private static JavaDLTerm dropEffectlessElementaries(JavaDLTerm update, 
-	    					   JavaDLTerm target,
+    private static Term dropEffectlessElementaries(Term update, 
+	    					   Term target,
 	    					   Services services) {
 	TermProgramVariableCollector collector 
 		= services.getProgramServices().getFactory().create(services);
 	target.execPostOrder(collector);
 	Set<LocationVariable> varsInTarget = collector.result();
-	JavaDLTerm simplifiedUpdate = dropEffectlessElementariesHelper(update, 
+	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, 
 							         varsInTarget, services); 
 	return simplifiedUpdate == null 
 	       ? null 
@@ -108,14 +108,14 @@ public final class DropEffectlessElementariesCondition
 	    		  	 MatchConditions mc, 
 	    		  	 Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
-	JavaDLTerm uInst      = (JavaDLTerm) svInst.getInstantiation(u);
-	JavaDLTerm xInst      = (JavaDLTerm) svInst.getInstantiation(x);
-	JavaDLTerm resultInst = (JavaDLTerm) svInst.getInstantiation(result);
+	Term uInst      = (Term) svInst.getInstantiation(u);
+	Term xInst      = (Term) svInst.getInstantiation(x);
+	Term resultInst = (Term) svInst.getInstantiation(result);
 	if(uInst == null || xInst == null) {
 	    return mc;
 	}
 	
-	JavaDLTerm properResultInst = dropEffectlessElementaries(uInst, 
+	Term properResultInst = dropEffectlessElementaries(uInst, 
 						           xInst, 
 						           services);
 	if(properResultInst == null) {

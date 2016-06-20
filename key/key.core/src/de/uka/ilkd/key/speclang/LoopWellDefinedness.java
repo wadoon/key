@@ -20,7 +20,7 @@ import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -37,8 +37,8 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
 
     private LoopWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                 LocationVariable heap, OriginalVariables origVars,
-                                Condition requires, JavaDLTerm assignable, JavaDLTerm accessible,
-                                Condition ensures, JavaDLTerm mby, JavaDLTerm rep, LoopInvariant inv,
+                                Condition requires, Term assignable, Term accessible,
+                                Condition ensures, Term mby, Term rep, LoopInvariant inv,
                                 TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
               assignable, accessible, ensures, mby, rep, tb);
@@ -59,11 +59,11 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    SequentFormula<JavaDLTerm> generateSequent(SequentTerms seq, JavaDLTermServices services) {
+    SequentFormula<Term> generateSequent(SequentTerms seq, JavaDLTermServices services) {
         // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
-        final JavaDLTerm imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
+        final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
                                 TB.and(seq.wdMod, seq.wdRest, seq.anonWdPost));
-        final JavaDLTerm wdPre = TB.wd(seq.pre);
+        final Term wdPre = TB.wd(seq.pre);
         return new SequentFormula<>(TB.apply(seq.context,
                                            TB.and(wdPre, imp)));
     }

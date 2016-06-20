@@ -16,14 +16,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
  * A multi-threaded taclet index implementation. It executes method 
- * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, Services)}
+ * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence<Term, SequentFormula<Term>>, Services)}
  * using multiple threads (depending on the number of taclets being matched 
  * and number of available processors).
  *
@@ -71,7 +71,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
     @Override
     protected ImmutableList<NoPosTacletApp> matchTaclets(
             ImmutableList<NoPosTacletApp> tacletApps, RuleFilter p_filter,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Services services) { 
+            PosInOccurrence<Term, SequentFormula<Term>> pos, Services services) { 
 
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
         if (tacletApps == null) {
@@ -126,7 +126,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
         private final int lower;
         private final int upper;
         private Services services;
-        private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos;
+        private PosInOccurrence<Term, SequentFormula<Term>> pos;
         private RuleFilter ruleFilter;
 
         /**
@@ -137,12 +137,12 @@ final class MultiThreadedTacletIndex extends TacletIndex {
          * @param toMatch the list containing the taclets to be matched
          * @param lower the index (incl.) where to start         
          * @param upper the index (excl.) where to stop
-         * @param pos the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} refering to the term to match
+         * @param pos the {@link PosInOccurrence<Term, SequentFormula<Term>>} refering to the term to match
          * @param ruleFilter {@link RuleFilter} constraining the taclets to be matched
          * @param services the {@link Services}
          */
         public TacletSetMatchTask(NoPosTacletApp[] toMatch, int lower,
-                int upper, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, RuleFilter ruleFilter,
+                int upper, PosInOccurrence<Term, SequentFormula<Term>> pos, RuleFilter ruleFilter,
                 Services services) {
             this.toMatch = toMatch;
             this.lower = lower;

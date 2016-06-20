@@ -16,7 +16,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
@@ -31,12 +31,12 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    /**
     * The return value.
     */
-   private final JavaDLTerm returnValue;
+   private final Term returnValue;
    
    /**
-    * The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest.
+    * The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
     */
-   private final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO;
+   private final PosInOccurrence<Term, SequentFormula<Term>> modalityPIO;
 
    /**
     * The return value as human readable {@link String}.
@@ -46,7 +46,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    /**
     * The optional condition.
     */
-   private final JavaDLTerm condition;
+   private final Term condition;
 
    /**
     * The optional condition as human readable {@link String}.
@@ -62,9 +62,9 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     */
    public ExecutionMethodReturnValue(ITreeSettings settings,
                                      Node proofNode, 
-                                     PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> modalityPIO,
-                                     JavaDLTerm returnValue, 
-                                     JavaDLTerm condition) {
+                                     PosInOccurrence<Term, SequentFormula<Term>> modalityPIO,
+                                     Term returnValue, 
+                                     Term condition) {
       super(settings, proofNode);
       assert returnValue != null;
       assert modalityPIO != null;
@@ -98,7 +98,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getReturnValue() throws ProofInputException {
+   public Term getReturnValue() throws ProofInputException {
       return returnValue;
    }
 
@@ -134,7 +134,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     * {@inheritDoc}
     */
    @Override
-   public JavaDLTerm getCondition() throws ProofInputException {
+   public Term getCondition() throws ProofInputException {
       return condition;
    }
 
@@ -167,7 +167,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
+   public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
       return modalityPIO;
    }
 }

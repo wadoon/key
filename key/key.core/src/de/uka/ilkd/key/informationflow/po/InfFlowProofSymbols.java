@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -379,12 +379,12 @@ public class InfFlowProofSymbols {
         }
     }
 
-    public void add(JavaDLTerm t) {
+    public void add(Term t) {
         assert t != null;
         t = TermBuilder.goBelowUpdates(t);
         if (!isPredicate(t.op())) {
             if (t.arity() > 0) {
-                for (final JavaDLTerm s: t.subs()) {
+                for (final Term s: t.subs()) {
                     add(s);
                 }
             }
@@ -392,11 +392,11 @@ public class InfFlowProofSymbols {
         add(t.op());
     }
 
-    public void addLabeled(JavaDLTerm t) {
+    public void addLabeled(Term t) {
         assert t != null;
         t = TermBuilder.goBelowUpdates(t);
         if (t.arity() > 0) {
-            for (final JavaDLTerm s: t.subs()) {
+            for (final Term s: t.subs()) {
                 addLabeled(s);
             }
         }
@@ -434,7 +434,7 @@ public class InfFlowProofSymbols {
         return result;
     }
 
-    public void addTotalTerm(JavaDLTerm t) {
+    public void addTotalTerm(Term t) {
         assert t != null;
         if (t.op() instanceof UpdateApplication) {
             addTotalTerm(UpdateApplication.getUpdate(t));
@@ -445,14 +445,14 @@ public class InfFlowProofSymbols {
         }
         t = TermBuilder.goBelowUpdates(t);
         if (t.arity() > 0) {
-            for (final JavaDLTerm s: t.subs()) {
+            for (final Term s: t.subs()) {
                 addTotalTerm(s);
             }
         }
         add(t.op());
     }
 
-    public void addLabeledTotalTerm(JavaDLTerm t) {
+    public void addLabeledTotalTerm(Term t) {
         assert t != null;
         if (t.op() instanceof UpdateApplication) {
             addLabeledTotalTerm(UpdateApplication.getUpdate(t));
@@ -463,7 +463,7 @@ public class InfFlowProofSymbols {
         }
         t = TermBuilder.goBelowUpdates(t);
         if (t.arity() > 0) {
-            for (final JavaDLTerm s: t.subs()) {
+            for (final Term s: t.subs()) {
                 addLabeledTotalTerm(s);
             }
         }

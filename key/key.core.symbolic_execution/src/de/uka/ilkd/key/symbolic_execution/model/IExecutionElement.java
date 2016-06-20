@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
@@ -68,10 +68,10 @@ public interface IExecutionElement {
    public RuleApp getAppliedRuleApp();
    
    /**
-    * Returns the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest including updates.
-    * @return The {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} of the modality of interest including updates.
+    * Returns the {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest including updates.
+    * @return The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest including updates.
     */
-   public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO();
+   public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO();
    
    /**
     * Returns the {@link NodeInfo} of {@link #getProofNode()}.

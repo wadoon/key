@@ -8,7 +8,7 @@ import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * Encapsulates intermediate information for constructing a built-in rule application.
@@ -18,14 +18,14 @@ import de.uka.ilkd.key.logic.JavaDLTerm;
 public class BuiltInAppIntermediate extends AppIntermediate {
 
     private String ruleName = null;
-    private Pair<Integer, PosInTerm<JavaDLTerm>> posInfo = null;
+    private Pair<Integer, PosInTerm<Term>> posInfo = null;
     private String contract = null;
-    private ImmutableList<Pair<Integer, PosInTerm<JavaDLTerm>>> builtInIfInsts = null;
+    private ImmutableList<Pair<Integer, PosInTerm<Term>>> builtInIfInsts = null;
     private ImmutableList<Name> newNames = null;
 
     public BuiltInAppIntermediate(String ruleName,
-            Pair<Integer, PosInTerm<JavaDLTerm>> pos, String contract,
-            ImmutableList<Pair<Integer, PosInTerm<JavaDLTerm>>> builtInIfInsts,
+            Pair<Integer, PosInTerm<Term>> pos, String contract,
+            ImmutableList<Pair<Integer, PosInTerm<Term>>> builtInIfInsts,
             ImmutableList<Name> newNames) {
         this.ruleName = ruleName;
         this.posInfo = pos;
@@ -38,7 +38,7 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         return ruleName;
     }
 
-    public Pair<Integer, PosInTerm<JavaDLTerm>> getPosInfo() {
+    public Pair<Integer, PosInTerm<Term>> getPosInfo() {
         return posInfo;
     }
 
@@ -46,7 +46,7 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         return contract;
     }
 
-    public ImmutableList<Pair<Integer, PosInTerm<JavaDLTerm>>> getBuiltInIfInsts() {
+    public ImmutableList<Pair<Integer, PosInTerm<Term>>> getBuiltInIfInsts() {
         return builtInIfInsts;
     }
 

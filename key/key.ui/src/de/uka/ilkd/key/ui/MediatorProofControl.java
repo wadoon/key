@@ -15,7 +15,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
@@ -47,7 +47,7 @@ public class MediatorProofControl extends AbstractProofControl {
     * {@inheritDoc}
     */
    @Override
-   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
+   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pos) {
       boolean result = super.selectedTaclet(taclet, goal, pos);
       if (!result) {
          ui.notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));
@@ -206,7 +206,7 @@ public class MediatorProofControl extends AbstractProofControl {
     * {@inheritDoc}
     */
    @Override
-   public void runMacro(Node node, ProofMacro macro, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+   public void runMacro(Node node, ProofMacro macro, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
       KeYMediator mediator = ui.getMediator();
       final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
       mediator.stopInterface(true);

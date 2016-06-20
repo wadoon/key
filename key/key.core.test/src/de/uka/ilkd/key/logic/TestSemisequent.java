@@ -32,7 +32,7 @@ public class TestSemisequent extends TestCase {
 
     private TermBuilder TB;
 
-    private ArrayList<SequentFormula<JavaDLTerm>> con;
+    private ArrayList<SequentFormula<Term>> con;
 
     public TestSemisequent(String name) {
         super(name);
@@ -48,15 +48,15 @@ public class TestSemisequent extends TestCase {
         Function b = new Function(new Name("b"), Sort.FORMULA, new Sort[] {});
         Function c = new Function(new Name("c"), Sort.FORMULA, new Sort[] {});
 
-        JavaDLTerm t_p = TB.func(p, new JavaDLTerm[] {});
-        JavaDLTerm t_q = TB.func(q, new JavaDLTerm[] {});
-        JavaDLTerm t_r = TB.func(r, new JavaDLTerm[] {});
+        Term t_p = TB.func(p, new Term[] {});
+        Term t_q = TB.func(q, new Term[] {});
+        Term t_r = TB.func(r, new Term[] {});
 
-        JavaDLTerm t_a = TB.func(a, new JavaDLTerm[] {});
-        JavaDLTerm t_b = TB.func(b, new JavaDLTerm[] {});
-        JavaDLTerm t_c = TB.func(c, new JavaDLTerm[] {});
+        Term t_a = TB.func(a, new Term[] {});
+        Term t_b = TB.func(b, new Term[] {});
+        Term t_c = TB.func(c, new Term[] {});
 
-        con = new ArrayList<SequentFormula<JavaDLTerm>>();
+        con = new ArrayList<SequentFormula<Term>>();
         con.add(new SequentFormula<>(t_p));
         con.add(new SequentFormula<>(t_q));
         con.add(new SequentFormula<>(t_r));
@@ -67,14 +67,14 @@ public class TestSemisequent extends TestCase {
 
         Sort s = new SortImpl(new Name("test"));
         Function f = new Function(new Name("f"), s, new Sort[] {});
-        JavaDLTerm t_f = TB.func(f, new JavaDLTerm[] {});
+        Term t_f = TB.func(f, new Term[] {});
     }
 
     public void tearDown() {
         con = null;
     }
 
-    private Semisequent extract(CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> semiCI) {
+    private Semisequent extract(CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> semiCI) {
         return semiCI.semisequent();
     }
 
@@ -82,8 +82,8 @@ public class TestSemisequent extends TestCase {
         Semisequent seq = Semisequent.nil();
         seq = extract(seq.insert(0, con.get(0)));
         seq = extract(seq.insert(1, con.get(1)));
-        SequentFormula<JavaDLTerm> eq2con0 =
-                new SequentFormula<JavaDLTerm>(con.get(0).formula());
+        SequentFormula<Term> eq2con0 =
+                new SequentFormula<Term>(con.get(0).formula());
         assertTrue("Contains should test of identity and not equality.",
                 !seq.contains(eq2con0));
     }
@@ -92,7 +92,7 @@ public class TestSemisequent extends TestCase {
         Semisequent seq = Semisequent.nil();
         seq = extract(seq.insert(0, con.get(0)));
         seq = extract(seq.insert(1, con.get(1)));
-        SequentFormula<JavaDLTerm> eq2con0 =
+        SequentFormula<Term> eq2con0 =
                 new SequentFormula<>(con.get(0).formula());
         assertTrue("Contains tests of equality and should find the formula.",
                 seq.containsEqual(eq2con0));
@@ -228,8 +228,8 @@ public class TestSemisequent extends TestCase {
                         extract(origin.insertLast(con.get(4))).insertLast(
                                 con.get(5))).
                         insertLast(con.get(6)));
-        ImmutableList<SequentFormula<JavaDLTerm>> insertionList =
-                ImmutableSLList.<SequentFormula<JavaDLTerm>> nil().
+        ImmutableList<SequentFormula<Term>> insertionList =
+                ImmutableSLList.<SequentFormula<Term>> nil().
                         prepend(con.get(0)).prepend(con.get(1))
                         .prepend(con.get(6)).prepend(con.get(5))
                         .prepend(con.get(4));
@@ -248,8 +248,8 @@ public class TestSemisequent extends TestCase {
                 extract(extract(
                         extract(origin.insert(2, con.get(4))).insert(3,
                                 con.get(5))).insert(4, con.get(6)));
-        ImmutableList<SequentFormula<JavaDLTerm>> insertionList =
-                ImmutableSLList.<SequentFormula<JavaDLTerm>> nil()
+        ImmutableList<SequentFormula<Term>> insertionList =
+                ImmutableSLList.<SequentFormula<Term>> nil()
                         .prepend(con.get(0)).prepend(con.get(1))
                         .prepend(con.get(6)).prepend(con.get(5))
                         .prepend(con.get(4));
@@ -273,24 +273,24 @@ public class TestSemisequent extends TestCase {
                                         .insertLast(con.get(4))).
                                 insertLast(con.get(5))).insertLast(con.get(6)));
         // insert: [a,b,c,q,p]
-        ImmutableList<SequentFormula<JavaDLTerm>> insertionList =
-                ImmutableSLList.<SequentFormula<JavaDLTerm>> nil().
+        ImmutableList<SequentFormula<Term>> insertionList =
+                ImmutableSLList.<SequentFormula<Term>> nil().
                         prepend(con.get(0)).prepend(con.get(1))
                         .prepend(con.get(6)).prepend(con.get(5))
                         .prepend(con.get(4));
 
-        CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> result =
+        CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> result =
                 origin.replace(origin.size() - 1, insertionList);
 
         assertEquals(
                 "SemisequentChangeInfo is corrupt due to wrong added formula list:",
-                ImmutableSLList.<SequentFormula<JavaDLTerm>> nil()
+                ImmutableSLList.<SequentFormula<Term>> nil()
                         .prepend(con.get(4)).
                         prepend(con.get(5)).prepend(con.get(6)),
                 result.addedFormulas());
         assertEquals(
                 "SemisequentChangeInfo is corrupt due to wrong removed formula list:",
-                ImmutableSLList.<SequentFormula<JavaDLTerm>> nil().prepend(
+                ImmutableSLList.<SequentFormula<Term>> nil().prepend(
                         con.get(2)),
                 result.removedFormulas());
         assertEquals("Both semisequents should be equal.", expected,
@@ -310,24 +310,24 @@ public class TestSemisequent extends TestCase {
                         insertLast(con.get(5))).insertLast(con.get(6)))
                         .insertLast(con.get(2)));
         // insert:[a,b,c,r,r,q,p]
-        ImmutableList<SequentFormula<JavaDLTerm>> insertionList =
-                ImmutableSLList.<SequentFormula<JavaDLTerm>> nil().
+        ImmutableList<SequentFormula<Term>> insertionList =
+                ImmutableSLList.<SequentFormula<Term>> nil().
                         prepend(con.get(0)).prepend(con.get(1))
                         .prepend(con.get(2)).prepend(con.get(3))
                         .prepend(con.get(6)).prepend(con.get(5))
                         .prepend(con.get(4));
 
-        CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> sci =
+        CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> sci =
                 origin.replace(origin.size(), insertionList);
         assertEquals(
                 "SemisequentChangeInfo is corrupt due to wrong added formula list:",
-                ImmutableSLList.<SequentFormula<JavaDLTerm>> nil()
+                ImmutableSLList.<SequentFormula<Term>> nil()
                         .prepend(con.get(4)).prepend(con.get(5)).
                         prepend(con.get(6)).prepend(con.get(3)),
                 sci.addedFormulas());
         assertEquals(
                 "SemisequentChangeInfo is corrupt due to wrong removed formula list:",
-                ImmutableSLList.<SequentFormula<JavaDLTerm>> nil(),
+                ImmutableSLList.<SequentFormula<Term>> nil(),
                 sci.removedFormulas());
         assertEquals("Both semisequents should be equal.", expected,
                 extract(sci));

@@ -7,7 +7,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,7 +56,7 @@ public class TestGenMacro extends StrategyProofMacro {
 		}
 
 		@Override
-		public RuleAppCost computeCost(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio,
+		public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio,
 		        Goal goal) {
 			if (TestGenStrategy.isUnwindRule(app.rule())) {
 				return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);
@@ -81,7 +81,7 @@ public class TestGenMacro extends StrategyProofMacro {
 		}
 
 		@Override
-		public boolean isApprovedApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
+		public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
 			if (!TestGenMacro.hasModality(goal.node())) {
 				return false;
 			}
@@ -114,7 +114,7 @@ public class TestGenMacro extends StrategyProofMacro {
 	 */
 	private static boolean hasModality(Node node) {
 		final Sequent sequent = node.sequent();
-		for (final SequentFormula<JavaDLTerm> sequentFormula : sequent) {
+		for (final SequentFormula<Term> sequentFormula : sequent) {
 			if (TestGenMacro.hasModality(sequentFormula.formula())) {
 				return true;
 			}
@@ -125,11 +125,11 @@ public class TestGenMacro extends StrategyProofMacro {
 	/*
 	 * recursively descent into the term to detect a modality.
 	 */
-	private static boolean hasModality(JavaDLTerm term) {
+	private static boolean hasModality(Term term) {
 		if (term.op() instanceof Modality) {
 			return true;
 		}
-		for (final JavaDLTerm sub : term.subs()) {
+		for (final Term sub : term.subs()) {
 			if (TestGenMacro.hasModality(sub)) {
 				return true;
 			}
@@ -139,7 +139,7 @@ public class TestGenMacro extends StrategyProofMacro {
 
 	@Override
 	protected Strategy createStrategy(Proof proof,
-	        PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+	        PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
 		return new TestGenStrategy(proof
 		        .getActiveStrategy());
 	}

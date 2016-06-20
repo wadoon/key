@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.Quantifier;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
@@ -35,7 +35,7 @@ public class NotBelowQuantifierFeature extends BinaryFeature {
 
     private NotBelowQuantifierFeature () {}
     
-    public boolean filter (RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public boolean filter (RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         Debug.assertFalse ( pos == null,
                             "Feature is only applicable to rules with find" );
 
@@ -45,11 +45,11 @@ public class NotBelowQuantifierFeature extends BinaryFeature {
     /**
      * @return true iff the given position is in the scope of a quantifier
      */
-    private boolean belowQuantifier (PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos) {
-        final PIOPathIterator<JavaDLTerm, SequentFormula<JavaDLTerm>> it = pos.iterator ();
+    private boolean belowQuantifier (PosInOccurrence<Term, SequentFormula<Term>> pos) {
+        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
 
         while ( it.next () != -1 ) {
-            final JavaDLTerm t = it.getSubTerm ();
+            final Term t = it.getSubTerm ();
             final Operator op = t.op ();
 
             if ( op instanceof Quantifier )

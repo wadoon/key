@@ -12,7 +12,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -47,7 +47,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         if (goals == null || goals.head() == null
                 || goals.head().node() == null
                 || goals.head().node().parent() == null) {
@@ -73,13 +73,13 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
         }
         final ExecutionContext executionContext =
                 loopInvRuleApp.getExecutionContext();
-        final JavaDLTerm guardTerm = loopInvRuleApp.getGuard();
+        final Term guardTerm = loopInvRuleApp.getGuard();
 
         final InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
                                                    ifVars.c2, executionContext,
                                                    guardTerm, services);
-        final JavaDLTerm selfComposedExec =
+        final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
@@ -89,7 +89,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
+                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
                                           ProverTaskListener listener) throws Exception {
         final LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) 
                 goals.head().node().parent().getAppliedRuleApp();
@@ -101,7 +101,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
                 loopInvRuleApp.getInformationFlowProofObligationVars();
         final ExecutionContext executionContext =
                 loopInvRuleApp.getExecutionContext();
-        final JavaDLTerm guardTerm = loopInvRuleApp.getGuard();
+        final Term guardTerm = loopInvRuleApp.getGuard();
 
         final LoopInvExecutionPO loopInvExecPO =
                 new LoopInvExecutionPO(initConfig, loopInv,

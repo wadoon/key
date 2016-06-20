@@ -33,7 +33,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -83,13 +83,13 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+            PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-            Proof proof, ImmutableList<Goal> goals, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
+            Proof proof, ImmutableList<Goal> goals, PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
             ProverTaskListener listener) throws InterruptedException {
 
         if (goals == null || goals.isEmpty()) {
@@ -213,7 +213,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
      */
     private static boolean hasModality(Node node) {
         Sequent sequent = node.sequent();
-        for (SequentFormula<JavaDLTerm> sequentFormula : sequent) {
+        for (SequentFormula<Term> sequentFormula : sequent) {
             if (hasModality(sequentFormula.formula())) {
                 return true;
             }
@@ -229,7 +229,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
      *            The term to check.
      * @return True iff there is a modality in the sequent of the given term.
      */
-    private static boolean hasModality(JavaDLTerm term) {
+    private static boolean hasModality(Term term) {
         if (term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
             // ignore self composition terms
             return false;
@@ -239,7 +239,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             return true;
         }
 
-        for (JavaDLTerm sub : term.subs()) {
+        for (Term sub : term.subs()) {
             if (hasModality(sub)) {
                 return true;
             }
@@ -366,7 +366,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
             if (enforceJoin || stoppedGoals.contains(goal)
                     || !hasModality(goal.node())) {
                 return false;
@@ -420,7 +420,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                             final JoinRule joinRule = JoinRule.INSTANCE;
 
                             final Node joinNode = goal.node();
-                            final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> joinPio = getPioForBreakpoint(
+                            final PosInOccurrence<Term, SequentFormula<Term>> joinPio = getPioForBreakpoint(
                                     breakpoint, goal.sequent());
                             final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
                                     .createApp(joinPio, goal.proof()
@@ -430,7 +430,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                                 // Consider only the partners below the common
                                 // parent node. Otherwise, we obtain
                                 // behavior that may be hard to understand.
-                                ImmutableList<Triple<Goal, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
+                                ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                                         .findPotentialJoinPartners(goal,
                                                 joinPio,
                                                 commonParents.get(breakpoint));
@@ -486,9 +486,9 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
         /**
-         * Returns the {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} for the given breakpoint
+         * Returns the {@link PosInOccurrence<Term, SequentFormula<Term>>} for the given breakpoint
          * statement inside the given sequent, or null if the statement does not
-         * exist within the sequent. The returned {@link PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>} is the
+         * exist within the sequent. The returned {@link PosInOccurrence<Term, SequentFormula<Term>>} is the
          * top level formula inside the sequent containing the breakpoint
          * statement.
          *
@@ -499,19 +499,19 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          * @return The top level formula inside the sequent containing the
          *         breakpoint statement.
          */
-        private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getPioForBreakpoint(Statement breakpoint,
+        private PosInOccurrence<Term, SequentFormula<Term>> getPioForBreakpoint(Statement breakpoint,
                 Sequent sequent) {
             Semisequent succedent = sequent.succedent();
 
-            for (SequentFormula<JavaDLTerm> formula : succedent) {
+            for (SequentFormula<Term> formula : succedent) {
                 SourceElement activeStmt = JavaTools
                         .getActiveStatement(JoinRuleUtils.getJavaBlockRecursive(formula
                                 .formula()));
 
                 if (activeStmt != null
                         && ((Statement) activeStmt).equals(breakpoint)) {
-                    return new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(formula,
-                            PosInTerm.<JavaDLTerm>getTopLevel(), false);
+                    return new PosInOccurrence<Term, SequentFormula<Term>>(formula,
+                            PosInTerm.<Term>getTopLevel(), false);
                 }
             }
 
@@ -600,7 +600,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          *         statement, else null;
          */
         private Statement getBreakPoint(Semisequent succedent, Services services) {
-            for (SequentFormula<JavaDLTerm> formula : succedent.asList()) {
+            for (SequentFormula<Term> formula : succedent.asList()) {
                 JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
                         formula.formula());
 
@@ -646,7 +646,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          * @return True iff the given succedent has one formula for which pred holds.
          */
         private boolean hasStmtForWhichPredicateHolds(final Semisequent succedent, final Services services, final Predicate<Statement> pred) {
-            for (SequentFormula<JavaDLTerm> formula : succedent.asList()) {
+            for (SequentFormula<Term> formula : succedent.asList()) {
                 JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
                         formula.formula());
 

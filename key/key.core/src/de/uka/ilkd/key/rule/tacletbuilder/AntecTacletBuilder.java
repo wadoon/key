@@ -15,7 +15,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import org.key_project.common.core.logic.sort.Sort;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 
@@ -31,7 +31,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
      * nothing happens.
      * @return this AntecTacletBuilder
      */ 
-    public AntecTacletBuilder setFind(JavaDLTerm findTerm) {
+    public AntecTacletBuilder setFind(Term findTerm) {
 	if (findTerm.sort()==Sort.FORMULA) {
 	    find = findTerm;
 	}

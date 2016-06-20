@@ -200,7 +200,7 @@ public class SMTTermQuant extends SMTTerm {
 				return this;
 			}
 		}
-//		return new TermQuant(quant, bindVars,(JavaDLTerm) sub.substitute(a, b), pats);
+//		return new TermQuant(quant, bindVars,(Term) sub.substitute(a, b), pats);
 		return sub.substitute(a, b).quant(quant, bindVars, pats);
 	}
 	
@@ -208,7 +208,7 @@ public class SMTTermQuant extends SMTTerm {
 	@Override
 	public SMTTerm replace (SMTTermCall a, SMTTerm b) {
 		
-//		return new TermQuant(quant, bindVars,(JavaDLTerm) sub.replace(a, b), pats);
+//		return new TermQuant(quant, bindVars,(Term) sub.replace(a, b), pats);
 		return sub.replace(a, b).quant(quant, bindVars, pats);
 	}
 	
@@ -286,7 +286,7 @@ public class SMTTermQuant extends SMTTerm {
 		return this.sub.equals(qt.sub);
 	}
 
-//	public boolean equals (JavaDLTerm term) {
+//	public boolean equals (Term term) {
 //		if (term == null)
 //			return false;
 //		

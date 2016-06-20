@@ -35,7 +35,7 @@ import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -55,16 +55,16 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private final List<LocationVariable> heapContext;
     private IFProofObligationVars infFlowVars;
     private ExecutionContext executionContext;
-    private JavaDLTerm guard;
+    private Term guard;
 
    private final JavaDLTermServices services;
 
-    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, JavaDLTermServices services) {
+    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pos, JavaDLTermServices services) {
         this(rule, pos, null, null, null, services);
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts,
+            PosInOccurrence<Term, SequentFormula<Term>> pio, ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts,
             LoopInvariant inv, List<LocationVariable> heapContext, JavaDLTermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
@@ -89,8 +89,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      */
     private LoopInvariant instantiateIndexValues(LoopInvariant rawInv, JavaDLTermServices services){
     	if (rawInv == null) return null;
-    	Map<LocationVariable,JavaDLTerm> invs = rawInv.getInternalInvariants();
-    	JavaDLTerm var = rawInv.getInternalVariant();
+    	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
+    	Term var = rawInv.getInternalVariant();
         final TermBuilder tb = services.getTermBuilder();
     	boolean skipIndex = false;
     	boolean skipValues = false;
@@ -105,7 +105,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 	Expression loopIndex = skipIndex ? null :
 	    (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
     	skipIndex = skipIndex || !( loopIndex instanceof ProgramVariable);
-		final JavaDLTerm loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
+		final Term loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
     	
 		// try to retrieve a sequence of values
 		Statement body = loop.getBody();
@@ -117,34 +117,34 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		CopyAssignment assignment = skipValues? null: ((CopyAssignment) last);
 		ProgramElement lhs = skipValues? null: assignment.getChildAt(0);
 		skipValues = skipValues || !(lhs instanceof ProgramVariable);
-		final JavaDLTerm valuesVar = skipValues? null: tb.var((ProgramVariable)lhs);
+		final Term valuesVar = skipValues? null: tb.var((ProgramVariable)lhs);
     	
     	// set up replacement visitors
     	final class IndexTermReplacementVisitor extends DefaultVisitor {
     		
-    		private JavaDLTerm result;
+    		private Term result;
 
 			@Override
-			public void visit(JavaDLTerm visited) {
+			public void visit(Term visited) {
 				result = replace(visited);
 			}
 			
-			public JavaDLTerm getResult() {
+			public Term getResult() {
 				return result;
 			}
 			
-			private JavaDLTerm replace(JavaDLTerm visited) {
-			    ImmutableArray<JavaDLTerm> subs = visited.subs();
+			private Term replace(Term visited) {
+			    ImmutableArray<Term> subs = visited.subs();
 			    if (subs.isEmpty()) {
 			    	if (visited.op().name().toString().equals("index"))
 			    		return loopIdxVar;
 			    	else return visited;
 			    } else {
-			    	JavaDLTerm[] newSubs = new JavaDLTerm[subs.size()];
+			    	Term[] newSubs = new Term[subs.size()];
 			    	for (int i= 0; i < subs.size(); i++)
 			    		newSubs[i] = replace(subs.get(i));
 				return tb.tf().createTerm(visited.op(),
-				                          new ImmutableArray<JavaDLTerm>(newSubs),
+				                          new ImmutableArray<Term>(newSubs),
 				                          visited.boundVars(),
 				                          visited.modalContent(),
 				                          visited.getLabels());
@@ -153,39 +153,39 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		}
         final class ValuesTermReplacementVisitor extends DefaultVisitor {
             
-            private JavaDLTerm result;
+            private Term result;
 
             @Override
-            public void visit(JavaDLTerm visited) {
+            public void visit(Term visited) {
                 result = replace(visited);
             }
             
-            public JavaDLTerm getResult() {
+            public Term getResult() {
                 return result;
             }
             
-            private JavaDLTerm replace(JavaDLTerm visited) {
-                ImmutableArray<JavaDLTerm> subs = visited.subs();
+            private Term replace(Term visited) {
+                ImmutableArray<Term> subs = visited.subs();
                 if (subs.isEmpty()) {
                     if (visited.op().name().toString().equals("values"))
                         return valuesVar;
                     else return visited;
                 } else {
-                    JavaDLTerm[] newSubs = new JavaDLTerm[subs.size()];
+                    Term[] newSubs = new Term[subs.size()];
                     for (int i= 0; i < subs.size(); i++)
                         newSubs[i] = replace(subs.get(i));
-                    return tb.tf().createTerm(visited.op(), new ImmutableArray<JavaDLTerm>(newSubs),
+                    return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
                             visited.boundVars(), visited.modalContent(), visited.getLabels());
                 }
             }
         }
 
         // replace index
-        Map<LocationVariable,JavaDLTerm> newInvs = new LinkedHashMap<LocationVariable,JavaDLTerm>(invs);
+        Map<LocationVariable,Term> newInvs = new LinkedHashMap<LocationVariable,Term>(invs);
 		if (!skipIndex){
 		IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
                 for(LocationVariable heap : invs.keySet()) {
-                   JavaDLTerm inv = invs.get(heap);
+                   Term inv = invs.get(heap);
 		   if (inv != null) {
 		     v.visit(inv);
 		     inv = v.getResult();
@@ -201,7 +201,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         if (!skipValues){
         ValuesTermReplacementVisitor v = new ValuesTermReplacementVisitor();
                 for(LocationVariable heap : invs.keySet()) {
-                   JavaDLTerm inv = invs.get(heap);
+                   Term inv = invs.get(heap);
            if (inv != null) {
              v.visit(inv);
              inv = v.getResult();
@@ -216,7 +216,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, LoopInvariant inv, JavaDLTermServices services) {
+            PosInOccurrence<Term, SequentFormula<Term>> pio, LoopInvariant inv, JavaDLTermServices services) {
         this(rule, pio, null, inv, null, services);
     }
 
@@ -236,7 +236,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public boolean invariantAvailable() {
         boolean result = inv != null && inv.getInternalInvariants() != null;
         if(result) {
-          Map<LocationVariable,JavaDLTerm> invs = inv.getInternalInvariants();
+          Map<LocationVariable,Term> invs = inv.getInternalInvariants();
           result = false;
           for(LocationVariable heap : heapContext) {
             if(invs.get(heap) != null) {
@@ -252,7 +252,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return pio != null && loop != null;
     }
 
-    public JavaDLTerm programTerm() {
+    public Term programTerm() {
         if (posInOccurrence() != null) {
             return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
         }
@@ -260,7 +260,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> newPos) {
+    public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos) {
         return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext, services);
     }
 
@@ -271,7 +271,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp setIfInsts(
-            ImmutableList<PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>> ifInsts) {
+            ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
         setMutable(ifInsts);
         return this;
 
@@ -288,7 +288,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.infFlowVars = vars;
     }
 
-    public void setGuard(JavaDLTerm guard) {
+    public void setGuard(Term guard) {
         this.guard = guard;
     }
 
@@ -328,7 +328,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return infFlowVars;
     }
 
-    public JavaDLTerm getGuard() {
+    public Term getGuard() {
         return guard;
     }
 

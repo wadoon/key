@@ -51,7 +51,7 @@ import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.NameCreationInfo;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -232,9 +232,9 @@ public class TacletMenu extends JMenu {
 	addClipboardItem(control);
 
 	if (pos != null) {
-	    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occ = pos.getPosInOccurrence();
+	    PosInOccurrence<Term, SequentFormula<Term>> occ = pos.getPosInOccurrence();
 	    if (occ != null && occ.posInTerm() != null) {
-		JavaDLTerm t = occ.subTerm ();
+		Term t = occ.subTerm ();
 		createAbbrevSection(t, control);
 
 		if(t.op() instanceof ProgramVariable) {
@@ -399,7 +399,7 @@ public class TacletMenu extends JMenu {
     }
 
 
-    private void createAbbrevSection(JavaDLTerm t, MenuControl control){
+    private void createAbbrevSection(Term t, MenuControl control){
 	AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
 	JMenuItem sc = null;
 	if(scm.containsTerm(t)){
@@ -579,14 +579,14 @@ public class TacletMenu extends JMenu {
                     GuiUtilities.copyHighlightToClipboard(sequentView, pos);
 		} else if(((JMenuItem)e.getSource()).getText().
 			  startsWith(DISABLE_ABBREVIATION)){
-		    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occ = pos.getPosInOccurrence();
+		    PosInOccurrence<Term, SequentFormula<Term>> occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(),false);
 			sequentView.printSequent();
 		    }
 		}else if(((JMenuItem)e.getSource()).getText().
 			 startsWith(ENABLE_ABBREVIATION)){
-		    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occ = pos.getPosInOccurrence();
+		    PosInOccurrence<Term, SequentFormula<Term>> occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			mediator.getNotationInfo().
 			    getAbbrevMap().setEnabled(occ.subTerm(),true);
@@ -594,7 +594,7 @@ public class TacletMenu extends JMenu {
 		    }
 		}else if(((JMenuItem)e.getSource()).getText().
 			 startsWith(CREATE_ABBREVIATION)){
-		    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occ = pos.getPosInOccurrence();
+		    PosInOccurrence<Term, SequentFormula<Term>> occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 		        // trim string, otherwise window gets too large (bug #1430)
 		        final String oldTerm = occ.subTerm().toString();
@@ -629,7 +629,7 @@ public class TacletMenu extends JMenu {
 
 		}else if(((JMenuItem)e.getSource()).getText().
 			 startsWith(CHANGE_ABBREVIATION)){
-		    PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> occ = pos.getPosInOccurrence();
+		    PosInOccurrence<Term, SequentFormula<Term>> occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			String abbreviation = (String)JOptionPane.showInputDialog
 			    (new JFrame(),
@@ -660,7 +660,7 @@ public class TacletMenu extends JMenu {
 		    }
 		} else if(((JMenuItem)e.getSource()).getText().
 			 startsWith("View name creation info")) {
-		    JavaDLTerm t = pos.getPosInOccurrence().subTerm();
+		    Term t = pos.getPosInOccurrence().subTerm();
 		    ProgramVariable var = (ProgramVariable)t.op();
 		    ProgramElementName name = var.getProgramElementName();
 		    NameCreationInfo info = name.getCreationInfo();
@@ -810,7 +810,7 @@ public class TacletMenu extends JMenu {
 	    if (taclet1 instanceof FindTaclet) {
                 map.put("has_find", -1);
 
-	        final JavaDLTerm find1 = ((FindTaclet) taclet1).find();
+	        final Term find1 = ((FindTaclet) taclet1).find();
 	        int findComplexity1 = find1.depth();
 	        findComplexity1 += programComplexity(find1.modalContent());
                 map.put("find_complexity", -findComplexity1);

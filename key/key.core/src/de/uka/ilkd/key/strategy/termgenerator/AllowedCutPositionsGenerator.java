@@ -21,7 +21,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -36,19 +36,19 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
     
     public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator ();
     
-    public Iterator<JavaDLTerm> generate(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         return new ACPIterator ( pos.sequentFormula ().formula (),
                               pos.isInAntec () );
     }
 
-    private static class ACPIterator implements Iterator<JavaDLTerm> {
+    private static class ACPIterator implements Iterator<Term> {
         private final Stack<Object> termStack = new Stack<Object> (); 
 
-        public ACPIterator(JavaDLTerm t, boolean negated) {
+        public ACPIterator(Term t, boolean negated) {
             push ( t, negated );
         }
 
-        private void push(JavaDLTerm t, boolean negated) {
+        private void push(Term t, boolean negated) {
             termStack.push ( t );
             termStack.push ( Boolean.valueOf ( negated ) );
         }
@@ -57,9 +57,9 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
             return !termStack.isEmpty ();
         }
 
-        public JavaDLTerm next() {
+        public Term next() {
             final boolean negated = ( (Boolean)termStack.pop () ).booleanValue ();
-            final JavaDLTerm res = (JavaDLTerm)termStack.pop ();
+            final Term res = (Term)termStack.pop ();
             final Operator op = res.op ();
             
             if ( op == Junctor.NOT ) {

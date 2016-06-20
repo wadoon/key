@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -48,11 +48,11 @@ public class SubFormulaCondition extends VariableConditionAdapter {
         if (!(var instanceof FormulaSV) || var != this.a) {
             return false;
         }
-        JavaDLTerm tInst = (JavaDLTerm) instMap.getInstantiation(a);
+        Term tInst = (Term) instMap.getInstantiation(a);
         if (tInst.arity() == 0) {
             return negated;
         } else {
-            for (JavaDLTerm sub: tInst.subs()) {
+            for (Term sub: tInst.subs()) {
                 if (sub.sort() == Sort.FORMULA) {
                     return !negated;
                 }

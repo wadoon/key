@@ -45,7 +45,7 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -369,7 +369,7 @@ public final class ProblemInitializer {
     }
 
 
-    private void populateNamespaces(JavaDLTerm term, 
+    private void populateNamespaces(Term term, 
                                     NamespaceSet namespaces,
                                     Goal rootGoal) {
         for(int i = 0; i < term.arity(); i++) {
@@ -411,9 +411,9 @@ public final class ProblemInitializer {
     private void populateNamespaces(Proof proof) {
         final NamespaceSet namespaces = proof.getNamespaces();
         final Goal rootGoal = proof.openGoals().head();
-        Iterator<SequentFormula<JavaDLTerm>> it = proof.root().sequent().iterator();
+        Iterator<SequentFormula<Term>> it = proof.root().sequent().iterator();
         while(it.hasNext()) {
-            SequentFormula<JavaDLTerm> cf = it.next();
+            SequentFormula<Term> cf = it.next();
             populateNamespaces(cf.formula(), namespaces, rootGoal);
         }
     }

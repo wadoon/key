@@ -20,7 +20,7 @@ import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -69,13 +69,13 @@ public class TermTacletAppIndexCacheSet {
      */
     private final static ITermTacletAppIndexCache noCache =
         new ITermTacletAppIndexCache () {
-            public ITermTacletAppIndexCache descend(JavaDLTerm t, int subtermIndex) {
+            public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
                 return this;
             }
-            public TermTacletAppIndex getIndexForTerm(JavaDLTerm t) {
+            public TermTacletAppIndex getIndexForTerm(Term t) {
                 return null;
             }
-            public void putIndexForTerm(JavaDLTerm t, TermTacletAppIndex index) {}        
+            public void putIndexForTerm(Term t, TermTacletAppIndex index) {}        
         };
 
     /**
@@ -211,7 +211,7 @@ public class TermTacletAppIndexCacheSet {
      *         an update and <code>subtermIndex</code> is the number of the
      *         target subterm of the update
      */
-    private boolean isUpdateTargetPos(JavaDLTerm t, int subtermIndex) {
+    private boolean isUpdateTargetPos(Term t, int subtermIndex) {
         final Operator op = t.op ();
         if ( !( op instanceof UpdateApplication ) ) return false;
 
@@ -239,7 +239,7 @@ public class TermTacletAppIndexCacheSet {
             super ( prefix, cache );
         }
 
-        public ITermTacletAppIndexCache descend(JavaDLTerm t, int subtermIndex) {
+        public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             if ( isUpdateTargetPos ( t, subtermIndex ) )
                 return getBelowUpdateCache ( getExtendedPrefix ( t, subtermIndex ) );
             
@@ -265,7 +265,7 @@ public class TermTacletAppIndexCacheSet {
             super ( prefix );
         }
         
-        public ITermTacletAppIndexCache descend(JavaDLTerm t, int subtermIndex) {
+        public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             final Operator op = t.op ();
             if ( op instanceof Modality )
                 return getBelowProgCache ( getExtendedPrefix ( t, subtermIndex ) );
@@ -276,11 +276,11 @@ public class TermTacletAppIndexCacheSet {
             return noCache;            
         }
         
-        public TermTacletAppIndex getIndexForTerm(JavaDLTerm t) {
+        public TermTacletAppIndex getIndexForTerm(Term t) {
             return null;
         }
         
-        public void putIndexForTerm(JavaDLTerm t, TermTacletAppIndex index) {}        
+        public void putIndexForTerm(Term t, TermTacletAppIndex index) {}        
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -290,7 +290,7 @@ public class TermTacletAppIndexCacheSet {
             super ( prefix, cache );
         }
 
-        public ITermTacletAppIndexCache descend(JavaDLTerm t, int subtermIndex) {
+        public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             if ( isAcceptedOperator ( t.op () ) )
                 return getBelowProgCache ( getExtendedPrefix ( t, subtermIndex ) );            
 

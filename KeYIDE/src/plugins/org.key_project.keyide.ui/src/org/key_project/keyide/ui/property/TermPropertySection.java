@@ -33,7 +33,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 
@@ -166,7 +166,7 @@ public class TermPropertySection extends AbstractNodePropertySection {
       PosInSequent pis = pisProvider != null ? pisProvider.getSelectedPosInSequent() : null;
       pioText.setText(posInSequentToString(pis));
       // Show term information
-      JavaDLTerm term = pis != null && pis.getPosInOccurrence() != null ? pis.getPosInOccurrence().subTerm() : null;
+      Term term = pis != null && pis.getPosInOccurrence() != null ? pis.getPosInOccurrence().subTerm() : null;
       if (term != null) {
          SWTUtil.setText(sortText, ObjectUtil.toString(term.sort()));
          SWTUtil.setText(opText, operatorToString(term.op()));
@@ -210,7 +210,7 @@ public class TermPropertySection extends AbstractNodePropertySection {
             sb.append("Sequent");
          }
          else {
-            PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio = pis.getPosInOccurrence();
+            PosInOccurrence<Term, SequentFormula<Term>> pio = pis.getPosInOccurrence();
             if (pio != null) {
                if (pio.isInAntec()) {
                   sb.append("Antecedent at ");
@@ -223,7 +223,7 @@ public class TermPropertySection extends AbstractNodePropertySection {
                      sb.append("Top Level");
                   }
                   else {
-                     PosInTerm<JavaDLTerm> pit = pio.posInTerm();
+                     PosInTerm<Term> pit = pio.posInTerm();
                      if (pit != null) {
                         sb.append(pit.integerList(pit.iterator()));
                         ;

@@ -16,7 +16,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -42,11 +42,11 @@ public class InstantiationCost implements Feature {
 	/**
 	 * Compute the cost of a RuleApp.
 	 */
-	public RuleAppCost compute(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+	public RuleAppCost compute(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         assert pos != null : "Projection is only applicable to rules with find";
 
-        final JavaDLTerm formula = pos.sequentFormula ().formula ();
-        final JavaDLTerm instance = varInst.toTerm ( app, pos, goal );
+        final Term formula = pos.sequentFormula ().formula ();
+        final Term instance = varInst.toTerm ( app, pos, goal );
 
         return Instantiation.computeCost ( instance, formula, goal.sequent (), 
                 goal.proof().getServices() );

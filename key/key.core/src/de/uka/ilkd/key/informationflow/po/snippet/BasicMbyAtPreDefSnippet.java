@@ -4,7 +4,7 @@
  */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 /**
@@ -16,7 +16,7 @@ class BasicMbyAtPreDefSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
 
     @Override
-    public JavaDLTerm produce(BasicSnippetData d,
+    public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         if (!d.hasMby) {
@@ -28,10 +28,10 @@ class BasicMbyAtPreDefSnippet extends ReplaceAndRegisterMethod
                     + "measured_by for a contract without measured_by "
                     + "(though the contract pretends to have one).");
         }
-        assert JavaDLTerm.class.equals(BasicSnippetData.Key.MEASURED_BY.getType());
-        final JavaDLTerm origMby =
-                (JavaDLTerm) d.get(BasicSnippetData.Key.MEASURED_BY);
-        final JavaDLTerm mby = replace(origMby, d.origVars, poVars.pre, d.tb);
+        assert Term.class.equals(BasicSnippetData.Key.MEASURED_BY.getType());
+        final Term origMby =
+                (Term) d.get(BasicSnippetData.Key.MEASURED_BY);
+        final Term mby = replace(origMby, d.origVars, poVars.pre, d.tb);
 
         return d.tb.equals(poVars.pre.mbyAtPre, mby);
     }

@@ -45,7 +45,7 @@ import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -114,7 +114,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
      */
     private static boolean hasModality(Node node) {
         Sequent sequent = node.sequent();
-        for (SequentFormula<JavaDLTerm> sequentFormula : sequent) {
+        for (SequentFormula<Term> sequentFormula : sequent) {
             if (hasModality(sequentFormula.formula())) {
                 return true;
             }
@@ -130,7 +130,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
      *            The term to check.
      * @return True iff there is a modality in the sequent of the given term.
      */
-    private static boolean hasModality(JavaDLTerm term) {
+    private static boolean hasModality(Term term) {
         if (term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
             // ignore self composition terms
             return false;
@@ -140,7 +140,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
             return true;
         }
 
-        for (JavaDLTerm sub : term.subs()) {
+        for (Term sub : term.subs()) {
             if (hasModality(sub)) {
                 return true;
             }
@@ -151,14 +151,14 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-            Proof proof, ImmutableList<Goal> goals, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc,
+            Proof proof, ImmutableList<Goal> goals, PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
             ProverTaskListener listener) throws InterruptedException {
         this.uic = uic;
         return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.
@@ -237,7 +237,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
      *         statement.
      */
     private boolean hasBreakPoint(Semisequent succedent) {
-        for (SequentFormula<JavaDLTerm> formula : succedent.asList()) {
+        for (SequentFormula<Term> formula : succedent.asList()) {
             if (blockElems
                     .contains(JavaTools
                             .getActiveStatement(JoinRuleUtils.getJavaBlockRecursive(formula
@@ -269,7 +269,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
             if (!hasModality(goal.node())) {
                 return false;
             }

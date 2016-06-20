@@ -18,7 +18,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 
 
 /**
@@ -30,7 +30,7 @@ class SuccChecker implements Checker {
     private boolean isInAntec;
 
     @Override
-    public void initPrefixCheck(PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> p_pos) {
+    public void initPrefixCheck(PosInOccurrence<Term, SequentFormula<Term>> p_pos) {
         isInAntec = p_pos.isInAntec();
     }
 

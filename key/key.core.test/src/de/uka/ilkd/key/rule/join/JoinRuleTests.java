@@ -14,7 +14,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilJoinPointMacro;
@@ -174,7 +174,7 @@ public class JoinRuleTests extends TestCase {
 
         final Goal joinGoal = proof.openGoals().head();
         final Node joinNode = joinGoal.node();
-        final PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> joinPio = getPioFirstFormula(joinNode.sequent());
+        final PosInOccurrence<Term, SequentFormula<Term>> joinPio = getPioFirstFormula(joinNode.sequent());
         final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
                 .createApp(joinPio, services);
 
@@ -197,9 +197,9 @@ public class JoinRuleTests extends TestCase {
      *            Sequent to get the PIO of the first succedent formula for.
      * @return The PIO for the first succedent formula of the given sequent.
      */
-    private PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getPioFirstFormula(Sequent sequent) {
-        return new PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>>(sequent.succedent().getFirst(),
-                PosInTerm.<JavaDLTerm>getTopLevel(), false);
+    private PosInOccurrence<Term, SequentFormula<Term>> getPioFirstFormula(Sequent sequent) {
+        return new PosInOccurrence<Term, SequentFormula<Term>>(sequent.succedent().getFirst(),
+                PosInTerm.<Term>getTopLevel(), false);
     }
 
     /**

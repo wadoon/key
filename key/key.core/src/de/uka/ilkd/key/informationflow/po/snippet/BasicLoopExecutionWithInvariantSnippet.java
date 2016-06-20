@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 
@@ -12,7 +12,7 @@ class BasicLoopExecutionWithInvariantSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
 
     @Override
-    public JavaDLTerm produce(BasicSnippetData d,
+    public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         // generate snippet factory for symbolic execution
@@ -20,14 +20,14 @@ class BasicLoopExecutionWithInvariantSnippet extends ReplaceAndRegisterMethod
                 POSnippetFactory.getBasicFactory(d, poVars);
 
         // loop invariant
-        final JavaDLTerm freeInv =
+        final Term freeInv =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_INV);
-        final JavaDLTerm loopInv =
+        final Term loopInv =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_INV);
-        final JavaDLTerm inv = d.tb.and(freeInv, loopInv);
+        final Term inv = d.tb.and(freeInv, loopInv);
 
         // symbolic execution
-        JavaDLTerm symExec =
+        Term symExec =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC);
 
 

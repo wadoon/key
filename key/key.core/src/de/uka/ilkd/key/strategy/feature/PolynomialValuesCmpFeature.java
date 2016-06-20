@@ -19,7 +19,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -125,7 +125,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
         };
     }
     
-    protected boolean filter(TacletApp app, PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         return compare ( getPolynomial ( left, leftCoeff, app, pos, goal ),
                          getPolynomial ( right, rightCoeff, app, pos, goal ) );
     }
@@ -135,14 +135,14 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
     private Polynomial getPolynomial(ProjectionToTerm polyProj,
                                      ProjectionToTerm coeffProj,
                                      TacletApp app,
-                                     PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> pos,
+                                     PosInOccurrence<Term, SequentFormula<Term>> pos,
                                      Goal goal) {
         final Services services = goal.proof ().getServices ();
         final Polynomial poly =
             Polynomial.create ( polyProj.toTerm ( app, pos, goal ), services );
 
         if (coeffProj == null) return poly;
-        final JavaDLTerm coeffT = coeffProj.toTerm ( app, pos, goal );
+        final Term coeffT = coeffProj.toTerm ( app, pos, goal );
         if ( coeffT == null ) return poly;
         
         final BigInteger coeff =

@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
@@ -19,7 +19,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
     }
 
     @Override
-    public JavaDLTerm parseTerm(String s) throws Exception {
+    public Term parseTerm(String s) throws Exception {
         PositionedString p = new PositionedString(s);
         /*
          containerType and self variable are not relevant for the tests

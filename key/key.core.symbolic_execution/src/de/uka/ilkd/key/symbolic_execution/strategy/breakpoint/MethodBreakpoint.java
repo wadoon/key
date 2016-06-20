@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
@@ -78,7 +78,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     * @param containerType the type of the element containing the breakpoint
     * @param isEntry flag to tell whether to stop on method entry
     * @param isExit flag to tell whether to stop on method exit
-    * @throws SLTranslationException if the condition could not be parsed to a valid JavaDLTerm
+    * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
    public MethodBreakpoint(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
       super(hitCount, pm, proof, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
@@ -150,7 +150,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
    }
    
    private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp){
-      JavaDLTerm term = ruleApp.posInOccurrence().subTerm();
+      Term term = ruleApp.posInOccurrence().subTerm();
       term = TermBuilder.goBelowUpdates(term);
       MethodFrame mf = JavaTools.getInnermostMethodFrame(term.modalContent(), node.proof().getServices());
       return ObjectUtil.equals(getPm(), mf.getProgramMethod());

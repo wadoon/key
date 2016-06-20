@@ -15,7 +15,7 @@ package de.uka.ilkd.key.proof.join;
 
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
 
@@ -25,13 +25,13 @@ import de.uka.ilkd.key.proof.Node;
  * @author Benjamin Niedermann
  */
 public class ProspectivePartner {
-    private final JavaDLTerm[] updates = new JavaDLTerm[2];
-    private final JavaDLTerm commonFormula;
+    private final Term[] updates = new Term[2];
+    private final Term commonFormula;
     private final SequentFormula[] formula = new SequentFormula[2];
     private final Node[] nodes = new Node[2];
-    private JavaDLTerm commonPredicate = null;
+    private Term commonPredicate = null;
     private Node commonParent = null;
-    private SequentFormula<JavaDLTerm> formulaForHiding = null;
+    private SequentFormula<Term> formulaForHiding = null;
 
     /**
      * Constructs a new prospective partner object, i.e. a
@@ -47,9 +47,9 @@ public class ProspectivePartner {
      * @param formula2 The second join formula.
      * @param update2 The second symbolic state.
      */
-    public ProspectivePartner(JavaDLTerm commonFormula, Node node1,
-            SequentFormula<JavaDLTerm> formula1, JavaDLTerm update1, Node node2,
-            SequentFormula<JavaDLTerm> formula2, JavaDLTerm update2) {
+    public ProspectivePartner(Term commonFormula, Node node1,
+            SequentFormula<Term> formula1, Term update1, Node node2,
+            SequentFormula<Term> formula2, Term update2) {
         super();
         this.commonFormula = commonFormula;
         formula[0] = formula1;
@@ -60,7 +60,7 @@ public class ProspectivePartner {
         nodes[1] = node2;
     }
 
-    public JavaDLTerm getCommonFormula() {
+    public Term getCommonFormula() {
         return commonFormula;
     }
 
@@ -68,15 +68,15 @@ public class ProspectivePartner {
         return nodes[index];
     }
 
-    public JavaDLTerm getUpdate(int index) {
+    public Term getUpdate(int index) {
         return updates[index];
     }
 
-    public void setCommonPredicate(JavaDLTerm commonPredicate) {
+    public void setCommonPredicate(Term commonPredicate) {
         this.commonPredicate = commonPredicate;
     }
 
-    public JavaDLTerm getCommonPredicate() {
+    public Term getCommonPredicate() {
         return commonPredicate;
     }
 
@@ -89,11 +89,11 @@ public class ProspectivePartner {
         }
     }
 
-    private void setFormulaForHiding(SequentFormula<JavaDLTerm> formulaForHiding) {
+    private void setFormulaForHiding(SequentFormula<Term> formulaForHiding) {
         this.formulaForHiding = formulaForHiding;
     }
 
-    public SequentFormula<JavaDLTerm> getFormulaForHiding() {
+    public SequentFormula<Term> getFormulaForHiding() {
         return formulaForHiding;
     }
 
@@ -105,7 +105,7 @@ public class ProspectivePartner {
         return getNode(index).sequent();
     }
 
-    public SequentFormula<JavaDLTerm> getFormula(int i) {
+    public SequentFormula<Term> getFormula(int i) {
         return formula[i];
     }
 

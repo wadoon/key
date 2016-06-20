@@ -52,7 +52,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.logic.JavaDLTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -1213,7 +1213,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getPathCondition() throws ProofInputException {
+      public Term getPathCondition() throws ProofInputException {
          return null;
       }
 
@@ -1301,7 +1301,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public IExecutionVariable[] getVariables(JavaDLTerm condition) {
+      public IExecutionVariable[] getVariables(Term condition) {
          return null;
       }
 
@@ -1341,7 +1341,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
+      public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
          return null;
       }
       
@@ -1357,7 +1357,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException {
+      public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException {
          return null;
       }
 
@@ -1502,7 +1502,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getBranchCondition() {
+      public Term getBranchCondition() {
          return null;
       }
 
@@ -1534,7 +1534,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm[] getMergedBranchCondtions() throws ProofInputException {
+      public Term[] getMergedBranchCondtions() throws ProofInputException {
          return null;
       }
 
@@ -1966,7 +1966,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getMethodReturnCondition() throws ProofInputException {
+      public Term getMethodReturnCondition() throws ProofInputException {
          return null;
       }
 
@@ -2164,7 +2164,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getReturnValue() throws ProofInputException {
+      public Term getReturnValue() throws ProofInputException {
          return null;
       }
 
@@ -2188,7 +2188,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getCondition() throws ProofInputException {
+      public Term getCondition() throws ProofInputException {
          return null;
       }
 
@@ -2204,7 +2204,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
+      public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
          return null;
       }
    }
@@ -2366,7 +2366,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getResultTerm() throws ProofInputException {
+      public Term getResultTerm() throws ProofInputException {
          return null;
       }
 
@@ -2374,7 +2374,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getExceptionTerm() throws ProofInputException {
+      public Term getExceptionTerm() throws ProofInputException {
          return null;
       }
 
@@ -2398,7 +2398,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getSelfTerm() throws ProofInputException {
+      public Term getSelfTerm() throws ProofInputException {
          return null;
       }
 
@@ -2406,7 +2406,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public ImmutableList<JavaDLTerm> getContractParams() throws ProofInputException {
+      public ImmutableList<Term> getContractParams() throws ProofInputException {
          return null;
       }
 
@@ -2575,7 +2575,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getTerm() {
+      public Term getTerm() {
          return null;
       }
 
@@ -2583,7 +2583,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
+      public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
          return null;
       }
    }
@@ -2659,7 +2659,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getArrayIndex() {
+      public Term getArrayIndex() {
          return null;
       }
 
@@ -2699,7 +2699,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getAdditionalCondition() {
+      public Term getAdditionalCondition() {
          return null;
       }
 
@@ -2707,7 +2707,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
+      public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
          return null;
       }
 
@@ -2715,7 +2715,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm createSelectTerm() {
+      public Term createSelectTerm() {
          return null;
       }
    }
@@ -2860,7 +2860,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getValue() throws ProofInputException {
+      public Term getValue() throws ProofInputException {
          return null;
       }
       
@@ -2876,7 +2876,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public JavaDLTerm getCondition() throws ProofInputException {
+      public Term getCondition() throws ProofInputException {
          return null;
       }
       
@@ -2900,7 +2900,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence<JavaDLTerm, SequentFormula<JavaDLTerm>> getModalityPIO() {
+      public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
          return null;
       }
    }
