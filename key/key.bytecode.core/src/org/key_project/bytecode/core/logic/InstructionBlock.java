@@ -17,13 +17,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.bytecode.core.ast.Instruction;
+import org.key_project.common.core.logic.ModalContent;
 
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
  */
-public class InstructionBlock {
+public class InstructionBlock implements ModalContent {
     
     private int pc;
     private LinkedList<Instruction> insns;
@@ -54,6 +55,14 @@ public class InstructionBlock {
      */
     public Instruction insn() {
         return insns.get(pc);
+    }
+
+    /* (non-Javadoc)
+     * @see org.key_project.common.core.logic.ModalContent#isEmpty()
+     */
+    @Override
+    public boolean isEmpty() {
+        return insns.isEmpty();
     }
     
 }
