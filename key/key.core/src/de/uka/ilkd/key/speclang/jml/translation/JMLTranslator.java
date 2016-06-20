@@ -132,6 +132,11 @@ public final class JMLTranslator {
         SIGNALS_ONLY ("signals_only"),
         JOIN_PROC ("join_proc"),
 
+        //KEG
+        ESCAPEHATCH ("escapes"),
+        IF_ESC ("\\if"),
+        LEAK  ("\\leak"), 
+        
         // quantifiers and "generalized quantifiers"
         FORALL ("\\forall"),
         EXISTS ("\\exists"),
@@ -357,6 +362,33 @@ public final class JMLTranslator {
             }
         });
 
+        //KEG
+        translationMethods.put(JMLKeyWord.IF_ESC, new JMLTranslationMethod() {
+
+            @Override
+            public Term translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Term.class, Services.class);
+                Term ifesc = (Term) params[0];
+                return tb.convertToFormula(ifesc);
+            }
+        });
+         
+         translationMethods.put(JMLKeyWord.LEAK, new JMLTranslationMethod() {
+
+            @Override
+            public Term translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Term.class, Services.class);
+                Term leak = (Term) params[0];
+                return leak;
+            }
+        });
+
+///End KEG        
+        
         translationMethods.put(JMLKeyWord.SIGNALS, new JMLTranslationMethod() {
 
             @Override

@@ -29,7 +29,8 @@ options {
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
     import de.uka.ilkd.key.util.InfFlowSpec;
-
+	import de.uka.ilkd.key.speclang.DelimitedRelease;
+	
     import java.math.BigInteger;
     import java.util.List;
     import java.util.Map;
@@ -403,6 +404,8 @@ top returns [Object ret = null] throws  SLTranslationException
     |   signalsclause { ret = $signalsclause.ret; }
     |   signalsonlyclause { ret = $signalsonlyclause.result; }
     |   termexpression { ret = $termexpression.result; }
+    |   escapesclause { ret = $escapesclause.result; }  // KEG     	
+    
     )
     (SEMI)? EOF
     ;
@@ -594,6 +597,56 @@ infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil
         { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
     ;
 
+
+//KEG
+escapesclause returns  [DelimitedRelease result = DelimitedRelease.EMPTY_DelimitedRelease] throws SLTranslationException 
+@init{
+
+    //ImmutableList<Term> esc = ImmutableSLList.<Term>nil();  
+    ImmutableList<Term> conds = ImmutableSLList.<Term>nil();
+    //ImmutableList<Term> to = ImmutableSLList.<Term>nil(); 
+        
+    //ImmutableList<Term> tmp ;
+}
+:
+    ESCAPES (NOTHING | esc = leaklist)
+    (   (IF (NOTHING | tmp = ifesclist {conds = conds.append(tmp);})) |  
+        (TO (NOTHING | to = leaklist))       
+    )*
+    {
+     result = new DelimitedRelease(conds, esc, to);}
+    ;
+
+
+
+ifesclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException 
+@init{
+    //Term term = null;
+}
+:
+    term = termexpression {
+       term = translator.translate("\\if", Term.class, term, services);
+       result = result.append(term); 
+     }
+    (COMMA term = termexpression { 
+       term = translator.translate("\\if", Term.class, term, services);
+       result = result.append(term);  })*
+    ;
+
+leaklist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException 
+@init{
+
+    //Term term = null;
+}
+:
+    term = termexpression {
+       term = translator.translate("\\leak", Term.class, term, services);
+       result = result.append(term); 
+     }
+    (COMMA term = termexpression { 
+       term = translator.translate("\\leak", Term.class, term, services);
+       result = result.append(term);  })*
+    ;
 
 signalsclause returns [Term ret=null] throws SLTranslationException
 @init {

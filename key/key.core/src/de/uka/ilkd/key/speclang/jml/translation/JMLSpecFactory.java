@@ -59,6 +59,7 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.DelimitedRelease;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -213,6 +214,8 @@ public class JMLSpecFactory {
         public Map<LocationVariable,Boolean> hasMod  = new LinkedHashMap<LocationVariable,Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
         public JoinProcedure joinProcedure;
+        public ImmutableList<DelimitedRelease> escapeHatches = ImmutableSLList.<DelimitedRelease>nil();
+
     }
 
     //-------------------------------------------------------------------------
@@ -473,6 +476,9 @@ public class JMLSpecFactory {
                                             progVars.paramVars, progVars.resultVar, progVars.excVar,
                                             textualSpecCase.getInfFlowSpecs());
         clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
+        clauses.escapeHatches = translateEscapesHatchClauses(pm, progVars.selfVar, 
+        									progVars.paramVars, progVars.resultVar, 
+        									textualSpecCase.getEscapeHatches());
         return clauses;
     }
 
@@ -505,6 +511,29 @@ public class JMLSpecFactory {
         return clauses.abbreviations;
     }
 
+    
+    private ImmutableList<DelimitedRelease>
+    translateEscapesHatchClauses(IProgramMethod pm,
+                                ProgramVariable selfVar,
+                                ImmutableList<ProgramVariable> paramVars,
+                                ProgramVariable resultVar,
+                                ImmutableList<PositionedString> originalClauses)
+        throws SLTranslationException {
+    if (originalClauses.isEmpty()) {
+        return ImmutableSLList.<DelimitedRelease>nil();
+    } else {
+        ImmutableList<DelimitedRelease> result =
+                                 ImmutableSLList.<DelimitedRelease>nil();
+        for (PositionedString expr : originalClauses) {
+            DelimitedRelease translated =
+                        JMLTranslator.translate(expr, pm.getContainerType(),
+                                                selfVar, paramVars, resultVar,
+                                                null, null, DelimitedRelease.class, services);
+            result = result.append(translated);
+        }
+        return result;
+    }
+}
     
     private ImmutableList<InfFlowSpec>
         translateInfFlowSpecClauses(IProgramMethod pm,
@@ -938,7 +967,7 @@ public class JMLSpecFactory {
             FunctionalOperationContract contract =
                     cf.func(name, pm, true, pres, clauses.requiresFree, clauses.measuredBy, posts,
                             clauses.ensuresFree, axioms, clauses.assignables,
-                            clauses.accessibles, clauses.hasMod, progVars);
+                            clauses.accessibles, clauses.hasMod, progVars, clauses.escapeHatches);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
@@ -946,7 +975,7 @@ public class JMLSpecFactory {
             FunctionalOperationContract contract =
                     cf.func(name, pm, false, pres, clauses.requiresFree, clauses.measuredBy, posts,
                             clauses.ensuresFree, axioms, clauses.assignables,
-                            clauses.accessibles, clauses.hasMod, progVars);
+                            clauses.accessibles, clauses.hasMod, progVars, clauses.escapeHatches);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {

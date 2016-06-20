@@ -48,6 +48,7 @@ options {
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+    import de.uka.ilkd.key.speclang.DelimitedRelease;
 }
 
 @annotateclass{ @SuppressWarnings("all") } 
@@ -744,6 +745,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   duration_clause
 	|   ps=breaks_clause         { sc.addBreaks(ps); }
 	|   ps=continues_clause      { sc.addContinues(ps); }
+	|   ps=escapes_clause      { sc.addEscapeHatches(ps); }
 	|   ps=returns_clause        { sc.addReturns(ps); }
         |   ps=separates_clause      { sc.addInfFlowSpecs(ps); }
         |   ps=determines_clause      { sc.addInfFlowSpecs(ps); }
@@ -776,6 +778,15 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 //-----------------------------------------------------------------------------
 //simple specification body clauses
 //-----------------------------------------------------------------------------
+// decalssification of information flow annotations as delimited release clause (KEG)
+escapes_clause
+   returns [PositionedString r = null]
+   throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+ESCAPES result=expression { result = result.prepend("escapes "); }
+;
 
 
 // old information flow annotations

@@ -2,8 +2,9 @@ package com.csvanefalk.keytestgen;
 
 import com.csvanefalk.keytestgen.core.keyinterface.KeYInterfaceException;
 import com.csvanefalk.keytestgen.testutils.TestEnvironment;
-import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
+import de.uka.ilkd.key.settings.PathConfig;
+//import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
+import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -19,7 +20,8 @@ import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomUserInterface;
+//import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import org.junit.Assert;
 
 import java.io.File;
@@ -302,15 +304,15 @@ public abstract class KeYTestGenTest {
 
     protected void printJavaInfo(final IExecutionStart root) {
 
-        final JavaInfo info = root.getMediator().getJavaInfo();
-
+        //final JavaInfo info = root.getMediator().getJavaInfo();
+    	final JavaInfo info = root.getServices().getJavaInfo();
         for (final KeYJavaType type : info.getAllKeYJavaTypes()) {
             System.out.println(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
 
         }
     }
 
-    protected void printNamespaceProgramVariables(final SymbolicExecutionEnvironment<CustomUserInterface> environment) {
+    protected void printNamespaceProgramVariables(final SymbolicExecutionEnvironment<DefaultUserInterfaceControl> environment) {
 
         final int i = 0;
         Namespace namespace = environment.getInitConfig().progVarNS();
@@ -326,7 +328,7 @@ public abstract class KeYTestGenTest {
         }
     }
 
-    protected void printNamespaceVariables(final SymbolicExecutionEnvironment<CustomUserInterface> environment) {
+    protected void printNamespaceVariables(final SymbolicExecutionEnvironment<DefaultUserInterfaceControl> environment) {
 
         final int i = 0;
         Namespace namespace = environment.getInitConfig().varNS();

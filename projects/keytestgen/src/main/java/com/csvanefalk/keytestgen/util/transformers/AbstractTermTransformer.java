@@ -3,7 +3,7 @@ package com.csvanefalk.keytestgen.util.transformers;
 import com.csvanefalk.keytestgen.StringConstants;
 import com.csvanefalk.keytestgen.util.parsers.TermParserException;
 import com.csvanefalk.keytestgen.util.parsers.TermParserTools;
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;

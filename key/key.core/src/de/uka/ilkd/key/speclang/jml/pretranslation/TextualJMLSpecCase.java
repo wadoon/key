@@ -54,7 +54,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
             ImmutableSLList.<Triple<PositionedString,PositionedString,PositionedString>>nil();
-
+    
+    //KEG
+    private ImmutableList<PositionedString> escapeHatches =
+            ImmutableSLList.<PositionedString>nil();
+    
     private ImmutableList<PositionedString> infFlowSpecs =
             ImmutableSLList.<PositionedString>nil();
     
@@ -341,6 +345,25 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
+  //serve KEG
+    public ImmutableList<PositionedString> getEscapeHatches(){
+       //return escapeHatches.get(HeapLDT.BASE_HEAP_NAME.toString());
+       return escapeHatches;
+    } 
+  
+    public void addEscapeHatches(PositionedString ps) {
+       //addGeneric(escapeHatches, ps);
+       escapeHatches = escapeHatches.append(ps);
+   }
+
+
+   public void addEscapeHatches(ImmutableList<PositionedString> l) {
+      for (PositionedString ps : l) {
+         addEscapeHatches(ps);
+      }
+   }
+//------------
+    
     public void addInfFlowSpecs(PositionedString ps) {
         infFlowSpecs = infFlowSpecs.append(ps);
     }
@@ -566,6 +589,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("returns: ").append(it.next()).append("\n");
         }
+        //KEG
+        it = escapeHatches.iterator();
+        while (it.hasNext()) {
+            sb.append("escapeHatches: ").append(it.next()).append("\n");
+        }
+        
         it = infFlowSpecs.iterator();
         while (it.hasNext()) {
             sb.append("determines: ").append(it.next()).append("\n");
@@ -602,6 +631,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && continues.equals(sc.continues)
                && returns.equals(sc.returns)
                && joinProcs.equals(sc.joinProcs)
+                //KEG
+               && escapeHatches.equals(sc.escapeHatches)
+               
                && infFlowSpecs.equals(sc.infFlowSpecs);
     }
 
@@ -626,6 +658,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + continues.hashCode()
                + returns.hashCode()
                + joinProcs.hashCode()
+               + escapeHatches.hashCode() //KEG
                + infFlowSpecs.hashCode();
     }
 }

@@ -57,6 +57,7 @@ lexer grammar KeYJMLLexer;
     SEPARATES       : 'separates';  //KeY extension, not official JML
     SIGNALS         : 'signals';
     SIGNALS_ONLY    : 'signals_only';
+	ESCAPES			: 'escapes'; //KEG
 
     /* JML keywords prefixed with a backslash */
     ALLFIELDS            : '\\all_fields';  //KeY extension, not official JML
@@ -152,6 +153,11 @@ lexer grammar KeYJMLLexer;
     // ONLY_ASSIGNED     : '\\only_assigned';
     // ONLY_CALLED       : '\\only_called';
     // ONLY_CAPTURED     : '\\only_captured';
+//KEG
+FROM : '\\from';
+TO : '\\to';
+IF : '\\if';
+LEAK: '\\leak';
 
 AND : '&';
 BITWISENOT : '~';
@@ -191,6 +197,9 @@ XOR : '^';
 GT : '>';
 fragment LT : '<';
 
+
+
+/////
 LT_IMPLICIT_GT_DISPATCH
     :
       (LT (LETTER)+ GT) => LT (LETTER)+ GT {$type = IDENT;}

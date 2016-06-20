@@ -7,7 +7,7 @@ import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariabl
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariableFactory;
 import com.csvanefalk.keytestgen.util.parsers.TermParserTools;
 import com.csvanefalk.keytestgen.util.visitors.KeYTestGenTermVisitor;
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -478,4 +478,10 @@ public class ModelBuilderVisitor extends KeYTestGenTermVisitor {
             parseVariableTerm(visited);
         }
     }
+
+	@Override
+	public boolean visitSubtree(Term visited) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

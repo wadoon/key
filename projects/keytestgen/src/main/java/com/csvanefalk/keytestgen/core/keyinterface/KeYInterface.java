@@ -1,8 +1,12 @@
 package com.csvanefalk.keytestgen.core.keyinterface;
 
 import com.csvanefalk.keytestgen.core.classabstraction.KeYJavaMethod;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+//import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
+
+//import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -20,11 +24,14 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+//import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ArrayUtil;
+//import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
+//import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,7 +107,7 @@ public class KeYInterface {
      * @return the proof
      * @throws ProofInputException in the event that the proof cannot be created
      */
-    private Proof getProof(final KeYEnvironment<CustomUserInterface> environment,
+    private Proof getProof(final KeYEnvironment<DefaultUserInterfaceControl> environment,
                            final IProgramMethod method,
                            final String precondition) throws ProofInputException {
 
@@ -123,6 +130,7 @@ public class KeYInterface {
         //SymbolicExecutionUtil.configureProof(proof);
         SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof,
                                                                         ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
+                                                                        false,
                                                                         false,
                                                                         false,
                                                                         false,
@@ -149,7 +157,7 @@ public class KeYInterface {
             KeYInterface.lock.lock();
 
             //Prettyprinting can be left on for debugging. Probably not appropriate for production environments.
-            SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(method,
+            SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(method,
                                                                                                               false,
                                                                                                              true,
                                                                                                               true,
@@ -166,7 +174,8 @@ public class KeYInterface {
                 // Store the number of nodes before start of the auto mode
                 nodeCount = env.getProof().countNodes();
                 // Run proof
-                env.getUi().startAndWaitForAutoMode(env.getProof());
+                //env.getUi().startAndWaitForAutoMode(env.getProof());
+                env.getProofControl().startAndWaitForAutoMode(env.getProof());
                 // Update symbolic execution tree
                 env.getBuilder().analyse();
                 // Make sure that not to many set nodes are executed
@@ -198,7 +207,7 @@ public class KeYInterface {
      * @throws ProofInputException   in case the proof could not be initiated
      * @throws IOException           in case the File could not be found, or is not accessible
      */
-    public KeYEnvironment<CustomUserInterface> loadJavaFile(final File javaFile) throws KeYInterfaceException {
+    public KeYEnvironment<DefaultUserInterfaceControl> loadJavaFile(final File javaFile) throws KeYInterfaceException {
 
         try {
 
@@ -214,7 +223,7 @@ public class KeYInterface {
                 classpath.add(new File(path));
             }
             */
-            return KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
+            return KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, null, true);
             //return KeYEnvironment.load(javaFile, null, null);
 
         } catch (final ProblemLoaderException e) {
@@ -240,14 +249,14 @@ public class KeYInterface {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException    Occurred Exception.
      */
-    private SymbolicExecutionEnvironment<CustomUserInterface> createSymbolicExecutionEnvironment(KeYJavaMethod method,
+    private SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(KeYJavaMethod method,
                                                                                                         boolean mergeBranchConditions,
                                                                                                         boolean useOperationContracts,
                                                                                                         boolean useLoopInvarints,
                                                                                                         boolean nonExecutionBranchHidingSideProofs,
                                                                                                         boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
 
-        KeYEnvironment<CustomUserInterface> environment = method.getEnvironment();
+        KeYEnvironment<DefaultUserInterfaceControl> environment = method.getEnvironment();
 
         /*IProgramMethod pm = method.getProgramMethod();
         ImmutableSet<Contract> contracts = environment.getServices().getSpecificationRepository().getContracts(pm.getContainerType(), pm);
@@ -270,17 +279,18 @@ public class KeYInterface {
                                                                         maximalNumberOfExecutedSetNodes,
                                                                         useOperationContracts,
                                                                         useLoopInvarints,
+                                                                        false,
                                                                         nonExecutionBranchHidingSideProofs,
                                                                         aliasChecks);
 
         // Create symbolic execution tree which contains only the start node at beginning
-        SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(),
+        SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(/*environment.getMediator(),*/
                                                                                 proof,
                                                                                 mergeBranchConditions,
-                                                                                false,false,false);
+                                                                                false,false,false,false);
         //builder.analyse();
         //assert (builder.getStartNode() != null);
-        return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);
+        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
     }
 
     /**
@@ -300,7 +310,7 @@ public class KeYInterface {
         JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
         ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
-        IProgramMethod pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+        IProgramMethod pm = ArrayUtil.search(pms.toArray(IProgramMethod.class), new IFilter<IProgramMethod>() {
             @Override
             public boolean select(IProgramMethod element) {
                 return methodFullName.equals(element.getFullName());
@@ -308,7 +318,7 @@ public class KeYInterface {
         });
         if (pm == null) {
             pms = javaInfo.getConstructors(containerKJT);
-            pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+            pm = ArrayUtil.search(pms.toArray(IProgramMethod.class), new IFilter<IProgramMethod>() {
                 @Override
                 public boolean select(IProgramMethod element) {
                     return methodFullName.equals(element.getFullName());

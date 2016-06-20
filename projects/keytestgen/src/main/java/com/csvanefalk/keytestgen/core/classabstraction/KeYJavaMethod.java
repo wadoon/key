@@ -9,8 +9,11 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.ContractWrapper;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
+//import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.control.KeYEnvironment;
+//import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+
 
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +52,7 @@ public class KeYJavaMethod {
 
     public KeYJavaMethod(final KeYJavaClass declaringClass,
                   final IProgramMethod programMethod,
-                  final KeYEnvironment<CustomUserInterface> environment,
+                  final KeYEnvironment<DefaultUserInterfaceControl> environment,
                   final FunctionalOperationContract functionalContract) {
 
         this.declaringClass = declaringClass;
@@ -61,7 +64,7 @@ public class KeYJavaMethod {
         return declaringClass;
     }
 
-    public KeYEnvironment<CustomUserInterface> getEnvironment() {
+    public KeYEnvironment<DefaultUserInterfaceControl> getEnvironment() {
         return declaringClass.getEnvironment();
     }
 

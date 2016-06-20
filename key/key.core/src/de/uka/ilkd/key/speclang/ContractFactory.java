@@ -198,7 +198,8 @@ public class ContractFactory {
                                                    foci.originalSelfVar, foci.originalParamVars,
                                                    foci.originalResultVar, foci.originalExcVar,
                                                    foci.originalAtPreVars, globalDefs, foci.id,
-                                                   foci.toBeSaved,foci.transaction, services);
+                                                   foci.toBeSaved,foci.transaction, services,
+                                                   foci.escapeHatches);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -368,6 +369,52 @@ public class ContractFactory {
                                                    Contract.INVALID_ID, toBeSaved, transaction, services);
     }
 
+  //serves KEG
+    public FunctionalOperationContract func (String baseName,
+          IProgramMethod pm,
+          boolean terminates,
+          Map<LocationVariable, Term> pres,
+          Map<LocationVariable, Term> freePres,
+          Term mby,
+          Map<LocationVariable, Term> posts,
+          Map<LocationVariable, Term> freePosts,
+          Map<LocationVariable, Term> axioms,
+          Map<LocationVariable, Term> mods,
+          Map<ProgramVariable, Term> accessibles,
+          Map<LocationVariable, Boolean> hasMod,
+          ProgramVariableCollection pv,
+          ImmutableList<DelimitedRelease> escapeHatches) {
+            return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, freePres, mby, posts, freePosts, axioms,
+            mods, accessibles, hasMod, pv, false, mods.get(
+            services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,
+            escapeHatches);
+            }
+    
+  //serves KEG
+    public FunctionalOperationContract func (String baseName,
+          IProgramMethod pm,
+          Modality modality,
+          Map<LocationVariable, Term> pres,
+          Map<LocationVariable, Term> freePres,
+          Term mby,
+          Map<LocationVariable, Term> posts,
+          Map<LocationVariable, Term> freePosts,
+          Map<LocationVariable, Term> axioms,
+          Map<LocationVariable, Term> mods,
+          Map<ProgramVariable, Term> accessibles,
+          Map<LocationVariable, Boolean> hasMod,
+          ProgramVariableCollection progVars,
+          boolean toBeSaved, boolean transaction,
+          ImmutableList<DelimitedRelease> escapeHatches) {
+       return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
+                pm.getContainerType(), modality, pres,freePres, mby,
+                posts, freePosts, axioms, mods, accessibles, hasMod,
+                progVars.selfVar, progVars.paramVars,
+                progVars.resultVar, progVars.excVar,
+                progVars.atPreVars, null,
+                Contract.INVALID_ID, toBeSaved, transaction, services,
+                escapeHatches);}
+    
     /**
      * Returns the union of the passed contracts.
      * Probably you want to use SpecificationRepository.combineContracts()

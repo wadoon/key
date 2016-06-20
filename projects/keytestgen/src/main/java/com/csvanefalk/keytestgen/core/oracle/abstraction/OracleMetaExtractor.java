@@ -43,4 +43,10 @@ public class OracleMetaExtractor extends KeYTestGenTermVisitor {
             }
         }
     }
+
+	@Override
+	public boolean visitSubtree(Term visited) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

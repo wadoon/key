@@ -150,7 +150,12 @@ lexer grammar KeYJMLPreLexer;
     WORKING_SPACE 		: 'working_space';
     WORKING_SPACE_RED 		: 'working_space_redundantly';
     WRITABLE			: 'writable';
-
+	
+	//KEG
+	ESCAPES				: 'escapes';
+	IF				: '\\if' ;
+    LEAK				: '\\leak';
+    TO				: '\\to';
 fragment SL_COMMENT
 :
     '//'

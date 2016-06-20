@@ -3,8 +3,9 @@ package com.csvanefalk.keytestgen.core.classabstraction;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.control.KeYEnvironment;
+//import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -17,7 +18,7 @@ import java.util.Set;
  */
 public final class KeYJavaClass {
 
-    private final KeYEnvironment<CustomUserInterface> environment;
+    private final KeYEnvironment<DefaultUserInterfaceControl> environment;
 
     private final InitConfig initConfig;
 
@@ -38,7 +39,7 @@ public final class KeYJavaClass {
         this.initConfig = environment.getInitConfig();
     }
 
-    public KeYJavaClass(final KeYJavaType type, final KeYEnvironment<CustomUserInterface> environment) {
+    public KeYJavaClass(final KeYJavaType type, final KeYEnvironment<DefaultUserInterfaceControl> environment) {
         this.type = type;
         this.environment = environment;
         initConfig = environment.getInitConfig();
@@ -56,7 +57,7 @@ public final class KeYJavaClass {
         methods.put(methodName, method);
     }
 
-    public KeYEnvironment<CustomUserInterface> getEnvironment() {
+    public KeYEnvironment<DefaultUserInterfaceControl> getEnvironment() {
         return environment;
     }
 

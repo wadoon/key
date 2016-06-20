@@ -16,6 +16,7 @@ package org.key_project.util.java;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,6 +50,28 @@ public final class ArrayUtil {
       }
       return result;
    }
+   
+   /**
+    * Searches an element in the given {@link Iterable} instance.
+    * @param iterable The instance to search in.
+    * @param filter The filter to select an element.
+    * @return The found element or {@code null} if no element was found.
+    *//*
+   public static <T> T search(Iterable<T> iterable, IFilter<T> filter) {
+      T result = null;
+      if (iterable != null && filter != null) {
+         Iterator<T> iter = iterable.iterator();
+         if (iter != null) {
+            while (result == null && iter.hasNext()) {
+               T next = iter.next();
+               if (filter.select(next)) {
+                  result = next;
+               }
+            }
+         }
+      }
+      return result;
+   }*/
    
    /**
     * <p>

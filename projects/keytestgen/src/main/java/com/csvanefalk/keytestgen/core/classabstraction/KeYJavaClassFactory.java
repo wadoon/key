@@ -9,10 +9,16 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
+//import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import org.key_project.util.java.StringUtil;
+
+//import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.control.KeYEnvironment;
+
+//import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -47,7 +53,7 @@ public class KeYJavaClassFactory {
     }
 
     private KeYJavaClass constructClass(final KeYJavaType parent,
-                                        final KeYEnvironment<CustomUserInterface> environment) {
+                                        final KeYEnvironment<DefaultUserInterfaceControl> environment) {
 
         final Services services = environment.getServices();
         final JavaInfo javaInfo = services.getJavaInfo();
@@ -108,7 +114,7 @@ public class KeYJavaClassFactory {
         /*
          * Load the file into KeY and get the InitConfig instance for it.
          */
-        final KeYEnvironment<CustomUserInterface> environment = keyInterface.loadJavaFile(javaFile);
+        final KeYEnvironment<DefaultUserInterfaceControl> environment = keyInterface.loadJavaFile(javaFile);
         final JavaInfo javaInfo = environment.getServices().getJavaInfo();
 
         /*
@@ -118,7 +124,7 @@ public class KeYJavaClassFactory {
 
         final String fileName = getFileName(javaFile);
         final String packageName = getPackage(javaFile);
-        final String qualifiedName = JavaUtil.isTrimmedEmpty(packageName) ? fileName : packageName + "." + fileName;
+        final String qualifiedName = StringUtil.isTrimmedEmpty(packageName) ? fileName : packageName + "." + fileName;
         final KeYJavaType mainClass = javaInfo.getKeYJavaType(qualifiedName);
 
         if (mainClass == null) {
@@ -130,7 +136,7 @@ public class KeYJavaClassFactory {
 
     public KeYJavaClass createKeYJavaClass(final IExecutionMethodCall methodCall) {
 
-        methodCall.getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment();
+        //methodCall.getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment();
 
         /*
          * Get and process the method call node

@@ -167,4 +167,10 @@ class ModelAssignmentResolvingVisitor extends KeYTestGenTermVisitor {
             sawNot = false;
         }
     }
+
+	@Override
+	public boolean visitSubtree(Term visited) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

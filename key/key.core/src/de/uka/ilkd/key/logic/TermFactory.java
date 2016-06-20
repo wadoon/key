@@ -13,8 +13,10 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Collections;
 import java.util.Map;
 
+import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -46,6 +48,11 @@ public final class TermFactory {
     
     public TermFactory(Map<Term, Term> cache) {
         this.cache = cache;
+    }
+    
+    //added by Huy
+    public TermFactory(){
+    	cache  = Collections.synchronizedMap(new LRUCache<Term, Term>(20000));
     }
     
     //-------------------------------------------------------------------------
