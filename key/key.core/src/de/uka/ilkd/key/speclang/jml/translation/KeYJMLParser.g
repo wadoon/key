@@ -70,7 +70,7 @@ options {
     private ImmutableList<ProgramVariable> paramVars;
     private ProgramVariable resultVar;
     private ProgramVariable excVar;
-    private Map<LocationVariable,JavaDLTerm> atPres;
+    private Map<LocationVariable,Term> atPres;
 
     // Helper objects
     private JMLResolverManager resolverManager;
@@ -85,7 +85,7 @@ options {
 		ImmutableList<ProgramVariable> paramVars,
 		ProgramVariable result,
 		ProgramVariable exc,
-		Map<LocationVariable,JavaDLTerm> atPres) {
+		Map<LocationVariable,Term> atPres) {
 	this(new CommonTokenStream(lexer));
 
 	// save parameters
@@ -141,7 +141,7 @@ options {
 		ImmutableList<ProgramVariable> paramVars,
 		ProgramVariable result,
 		ProgramVariable exc,
-		Map<LocationVariable,JavaDLTerm> atPres) {
+		Map<LocationVariable,Term> atPres) {
 	this(new KeYJMLLexer(createANTLRStringStream(ps)),
 	     ps.fileName,
 	     services,
@@ -189,8 +189,8 @@ options {
     }
 
 
-    public JavaDLTerm parseExpression() throws SLTranslationException {
-	JavaDLTerm result = null;
+    public Term parseExpression() throws SLTranslationException {
+	Term result = null;
 
 	try {
 	    result = expression().getTerm();
@@ -227,8 +227,8 @@ options {
     /**
      * Extracts a term's subterms as an array.
      */
-    private JavaDLTerm[] getSubTerms(JavaDLTerm term) {
-	JavaDLTerm[] result = new JavaDLTerm[term.arity()];
+    private Term[] getSubTerms(Term term) {
+	Term[] result = new Term[term.arity()];
 	for(int i = 0; i < term.arity(); i++) {
 	    result[i] = term.sub(i);
 	    assert result[i] != null;
@@ -240,7 +240,7 @@ options {
     /**
      * Extracts the sorts from an array of terms as an array.
      */
-    private Sort[] getSorts(JavaDLTerm[] terms) {
+    private Sort[] getSorts(Term[] terms) {
 	Sort[] result = new Sort[terms.length];
 	for(int i = 0; i < terms.length; i++) {
 	    result[i] = terms[i].sort();
@@ -264,12 +264,12 @@ options {
      * Converts a term so that all of its non-rigid operators refer to the pre-state.
      */
     // TODO: remove when all clients have been moved to JMLTranslator
-    private JavaDLTerm convertToOld(final JavaDLTerm term) {
+    private Term convertToOld(final Term term) {
 	    assert atPres != null && atPres.get(getBaseHeap()) != null;
-	    Map<JavaDLTerm, JavaDLTerm> map = new LinkedHashMap<JavaDLTerm, JavaDLTerm>();
+	    Map<Term, Term> map = new LinkedHashMap<Term, Term>();
         for (LocationVariable var : atPres.keySet()) {
             // caution: That may now also be other variables than only heaps.
-            JavaDLTerm varAtPre = atPres.get(var);
+            Term varAtPre = atPres.get(var);
             if (varAtPre != null) {
                 map.put(tb.var(var), varAtPre);
             }
@@ -278,7 +278,7 @@ options {
 	    return or.replace(term);
     }
 
-    private JavaDLTerm convertToBackup(JavaDLTerm term) {
+    private Term convertToBackup(Term term) {
 	assert atPres != null && atPres.get(getSavedHeap()) != null;
 	Map map = new LinkedHashMap();
 	map.put(tb.var(getBaseHeap()), tb.var(getSavedHeap()));
@@ -289,7 +289,7 @@ options {
 	return or.replace(term);
     }
 
-    private JavaDLTerm convertToPermission(JavaDLTerm term) throws SLTranslationException {
+    private Term convertToPermission(Term term) throws SLTranslationException {
         LocationVariable permissionHeap = getPermissionHeap();
         if(permissionHeap == null) {
            raiseError("\\permission expression used in a non-permission context and permissions not enabled.");
@@ -420,27 +420,27 @@ top returns [Object ret = null] throws  SLTranslationException
     (SEMI)? EOF
     ;
 
-accessibleclause returns [JavaDLTerm ret = null] throws SLTranslationException
+accessibleclause returns [Term ret = null] throws SLTranslationException
 @after{ ret = result; }
 :
     acc=ACCESSIBLE result=storeRefUnion
-        { result = translator.translate(acc.getText(), JavaDLTerm.class, result, services); }
+        { result = translator.translate(acc.getText(), Term.class, result, services); }
     ;
 
 
-assignableclause returns [JavaDLTerm ret = null] throws SLTranslationException
+assignableclause returns [Term ret = null] throws SLTranslationException
 @after{ ret = result; }
 :
     ass=ASSIGNABLE
     ( result=storeRefUnion
-        { result = translator.translate(ass.getText(), JavaDLTerm.class, result, services); }
+        { result = translator.translate(ass.getText(), Term.class, result, services); }
     | STRICTLY_NOTHING
         { result = tb.strictlyNothing(); }
     )
     ;
 
 
-dependsclause returns [Triple<ObserverFunction,JavaDLTerm,JavaDLTerm> result=null] throws SLTranslationException
+dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SLTranslationException
 :
     dep=DEPENDS lhs=expression
     COLON rhs=storeRefUnion
@@ -449,50 +449,50 @@ dependsclause returns [Triple<ObserverFunction,JavaDLTerm,JavaDLTerm> result=nul
                 dep.getText(), Triple.class, lhs, rhs, mby, services); }
     ;
 
-decreasesclause returns [JavaDLTerm ret = null] throws SLTranslationException
+decreasesclause returns [Term ret = null] throws SLTranslationException
 @after{ret=result;}
 :
     dec=DECREASES result=termexpression
         (COMMA t=termexpression { result = tb.pair(result, t); } )*
     ;
 
-requiresclause returns [JavaDLTerm ret = null] throws SLTranslationException
+requiresclause returns [Term ret = null] throws SLTranslationException
 :
     req=REQUIRES result=predornot
-            { ret = translator.translate(req.getText(), JavaDLTerm.class, result, services); }
+            { ret = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
-requiresfreeclause returns [JavaDLTerm ret = null] throws SLTranslationException
+requiresfreeclause returns [Term ret = null] throws SLTranslationException
 :
     req=REQUIRES_FREE result=predornot
-            { ret = translator.translate(req.getText(), JavaDLTerm.class, result, services); }
+            { ret = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
-joinprocclause returns [JavaDLTerm ret = null] throws SLTranslationException
+joinprocclause returns [Term ret = null] throws SLTranslationException
 :
     jpr=JOIN_PROC result=predornot
-            { ret = translator.translate(jpr.getText(), JavaDLTerm.class, result, services); }
+            { ret = translator.translate(jpr.getText(), Term.class, result, services); }
     ;
 
-ensuresclause returns [JavaDLTerm ret = null] throws SLTranslationException
+ensuresclause returns [Term ret = null] throws SLTranslationException
 :
     ens=ENSURES result=predornot
-            { ret = translator.translate(ens.getText(), JavaDLTerm.class, result, services); }
+            { ret = translator.translate(ens.getText(), Term.class, result, services); }
     ;
 
-ensuresfreeclause returns [JavaDLTerm ret = null] throws SLTranslationException
+ensuresfreeclause returns [Term ret = null] throws SLTranslationException
 :
     ens=ENSURES_FREE result=predornot
-            { ret = translator.translate(ens.getText(), JavaDLTerm.class, result, services); }
+            { ret = translator.translate(ens.getText(), Term.class, result, services); }
     ;
 
-axiomsclause returns [JavaDLTerm ret = null] throws SLTranslationException
+axiomsclause returns [Term ret = null] throws SLTranslationException
 :
     axm=MODEL_METHOD_AXIOM result=termexpression
-            { ret = translator.translate(axm.getText(), JavaDLTerm.class, result, services); }
+            { ret = translator.translate(axm.getText(), Term.class, result, services); }
     ;
 
-representsclause returns [Pair<ObserverFunction,JavaDLTerm> result=null] throws SLTranslationException
+representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTranslationException
 :
     rep=REPRESENTS lhs=expression {representsClauseLhsIsLocSet = lhs.getTerm().sort().equals(locSetLDT.targetSort());}
     {
@@ -516,7 +516,7 @@ representsclause returns [Pair<ObserverFunction,JavaDLTerm> result=null] throws 
                 if(!rhs.isTerm()) {
                     raiseError("Represents clause with unexpected rhs: " + rhs);
                 }
-                JavaDLTerm rhsTerm = rhs.getTerm();
+                Term rhsTerm = rhs.getTerm();
                 if(rhsTerm.sort() == Sort.FORMULA) {
                     rhsTerm = tb.ife(rhsTerm, tb.TRUE(), tb.FALSE());
                 }
@@ -539,9 +539,9 @@ representsclause returns [Pair<ObserverFunction,JavaDLTerm> result=null] throws 
 
 separatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException
 @init {
-    ImmutableList<JavaDLTerm> decl = ImmutableSLList.<JavaDLTerm>nil();
-    ImmutableList<JavaDLTerm> erases = ImmutableSLList.<JavaDLTerm>nil();
-    ImmutableList<JavaDLTerm> newObs = ImmutableSLList.<JavaDLTerm>nil();
+    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
 }
 :
     SEPARATES (NOTHING | sep = infflowspeclist)
@@ -557,8 +557,8 @@ separatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] 
 
 loopseparatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException
 @init {
-    ImmutableList<JavaDLTerm> sep = ImmutableSLList.<JavaDLTerm>nil();
-    ImmutableList<JavaDLTerm> newObs = ImmutableSLList.<JavaDLTerm>nil();
+    ImmutableList<Term> sep = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
 }
 :
     LOOP_SEPARATES (NOTHING | tmp = infflowspeclist {sep=tmp;})
@@ -570,13 +570,13 @@ loopseparatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SP
 
 determinesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException
 @init {
-    ImmutableList<JavaDLTerm> decl = ImmutableSLList.<JavaDLTerm>nil();
-    ImmutableList<JavaDLTerm> erases = ImmutableSLList.<JavaDLTerm>nil();
-    ImmutableList<JavaDLTerm> newObs = ImmutableSLList.<JavaDLTerm>nil();
+    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
 }
 :
-    DETERMINES (NOTHING {det=ImmutableSLList.<JavaDLTerm>nil();} | det = infflowspeclist)
-    BY (NOTHING {by = ImmutableSLList.<JavaDLTerm>nil();} | (ITSELF {by = det;}) | by = infflowspeclist)
+    DETERMINES (NOTHING {det=ImmutableSLList.<Term>nil();} | det = infflowspeclist)
+    BY (NOTHING {by = ImmutableSLList.<Term>nil();} | (ITSELF {by = det;}) | by = infflowspeclist)
     (   (DECLASSIFIES (NOTHING | tmp = infflowspeclist {decl = decl.append(tmp);})) |
         (ERASES (NOTHING | tmp = infflowspeclist {erases = erases.append(tmp);})) |
         (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
@@ -589,7 +589,7 @@ determinesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC]
 
 loopdeterminesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException
 @init {
-    ImmutableList<JavaDLTerm> newObs = ImmutableSLList.<JavaDLTerm>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
 }
 :
     LOOP_DETERMINES (NOTHING | det = infflowspeclist)
@@ -600,7 +600,7 @@ loopdeterminesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_S
     ;
 
 
-infflowspeclist returns  [ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil()] throws SLTranslationException
+infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
 :
     term = termexpression { result = result.append(term); }
     (COMMA term = termexpression { result = result.append(term); })*
@@ -608,9 +608,9 @@ infflowspeclist returns  [ImmutableList<JavaDLTerm> result = ImmutableSLList.<Ja
     ;
 
 
-signalsclause returns [JavaDLTerm ret=null] throws SLTranslationException
+signalsclause returns [Term ret=null] throws SLTranslationException
 @init {
-    JavaDLTerm pred = null;
+    Term pred = null;
     String vName = null;
     LogicVariable eVar = null;
 }
@@ -629,12 +629,12 @@ signalsclause returns [JavaDLTerm ret=null] throws SLTranslationException
 	    if (vName != null) {
 		resolverManager.popLocalVariablesNamespace();
 	    }
-            result = translator.translate(sig.getText(), JavaDLTerm.class, result, eVar, excVar, excType, services);
+            result = translator.translate(sig.getText(), Term.class, result, eVar, excVar, excType, services);
 	}
     ;
 
 
-signalsonlyclause returns [JavaDLTerm result = null] throws SLTranslationException
+signalsonlyclause returns [Term result = null] throws SLTranslationException
 @init {
     ImmutableList<KeYJavaType> typeList = ImmutableSLList.<KeYJavaType>nil();
     KeYJavaType type = null;
@@ -645,13 +645,13 @@ signalsonlyclause returns [JavaDLTerm result = null] throws SLTranslationExcepti
       | rtype = referencetype { typeList = typeList.append(rtype); }
         (COMMA rtype = referencetype { typeList = typeList.append(rtype); })*
     )
-    { result = translator.translate(sigo.getText(), JavaDLTerm.class, typeList, this.excVar, services); }
+    { result = translator.translate(sigo.getText(), Term.class, typeList, this.excVar, services); }
     ;
 
 
-termexpression returns [JavaDLTerm result = null] throws SLTranslationException
+termexpression returns [Term result = null] throws SLTranslationException
 :
-    exp=expression { result = (JavaDLTerm) exp.getTerm(); }
+    exp=expression { result = (Term) exp.getTerm(); }
     ;
 
 
@@ -681,33 +681,33 @@ continuesclause returns [Pair result=null] throws SLTranslationException
 	;
 
 
-returnsclause returns [JavaDLTerm ret=null] throws SLTranslationException
+returnsclause returns [Term ret=null] throws SLTranslationException
 @after{ret=result;}
 :
 	rtrns=RETURNS
 	(result = predornot)?
 	{
-        result = translator.translate(rtrns.getText(), JavaDLTerm.class, result, services);
+        result = translator.translate(rtrns.getText(), Term.class, result, services);
 	}
     ;
 
 
-storeRefUnion returns [JavaDLTerm result = null] throws SLTranslationException
+storeRefUnion returns [Term result = null] throws SLTranslationException
 :   list = storeRefList
     { result = tb.union(list); };
 
 
-storeRefList returns [ImmutableList<JavaDLTerm> result = ImmutableSLList.<JavaDLTerm>nil()] throws SLTranslationException
+storeRefList returns [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
 :   t = storeref { result = result.append(t); }
 	(COMMA t = storeref { result = result.append(t); } )*;
 
 
 
-storeRefIntersect returns [JavaDLTerm result = null] throws SLTranslationException
+storeRefIntersect returns [Term result = null] throws SLTranslationException
 :   list = storeRefList { result = tb.intersect(list); };
 
 
-storeref returns [JavaDLTerm ret = null] throws SLTranslationException
+storeref returns [Term ret = null] throws SLTranslationException
 @after{ret=result;}
 :       NOTHING { result = tb.empty(); }
     |   EVERYTHING { result = tb.createdLocs(); }
@@ -715,11 +715,11 @@ storeref returns [JavaDLTerm ret = null] throws SLTranslationException
     |   result = storeRefExpr;
 
 
-createLocset returns [JavaDLTerm result = null] throws SLTranslationException
+createLocset returns [Term result = null] throws SLTranslationException
 :
     (LOCSET | SINGLETON) LPAREN list=exprList RPAREN
     {
-        result = translator.translate("create locset", JavaDLTerm.class, list, services);
+        result = translator.translate("create locset", Term.class, list, services);
     }
     ;
 
@@ -729,11 +729,11 @@ exprList returns [ImmutableList<SLExpression> result = ImmutableSLList.<SLExpres
 	(COMMA expr = expression { result = result.append(expr); } )*;
 
 
-storeRefExpr returns [JavaDLTerm result = null] throws SLTranslationException
+storeRefExpr returns [Term result = null] throws SLTranslationException
 :
     expr=expression
     {
-        result = translator.translate("store_ref_expr", JavaDLTerm.class, expr, services);
+        result = translator.translate("store_ref_expr", Term.class, expr, services);
     }
     ;
 
@@ -752,7 +752,7 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 ;
 
 
-predornot returns [JavaDLTerm ret=null] throws SLTranslationException
+predornot returns [Term ret=null] throws SLTranslationException
 @after{ ret = result; }
 :
 	result=predicate
@@ -761,7 +761,7 @@ predornot returns [JavaDLTerm ret=null] throws SLTranslationException
     |   SAME
     ;
 
-predicate returns [JavaDLTerm result=null] throws SLTranslationException
+predicate returns [Term result=null] throws SLTranslationException
 :
 	expr=expression
 	{
@@ -900,8 +900,8 @@ exclusiveorexpr returns [SLExpression ret=null] throws SLTranslationException
 	       if(intHelper.isIntegerTerm(result)) {
                    result = intHelper.buildPromotedXorExpression(result,expr);
                } else {
-                   JavaDLTerm resultFormula = tb.convertToFormula(result.getTerm());
-                   JavaDLTerm exprFormula = tb.convertToFormula(expr.getTerm());
+                   Term resultFormula = tb.convertToFormula(result.getTerm());
+                   Term exprFormula = tb.convertToFormula(expr.getTerm());
                    result = new SLExpression(tb.or(tb.and(resultFormula, tb.not(exprFormula)),
                                                    tb.and(tb.not(resultFormula), exprFormula)));
                }
@@ -1063,7 +1063,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 				right2.getType().getName() + ".", opToken);
 			    }
 			    assert right2.isTerm();
-			    final JavaDLTerm upperBound = tb.func(intLDT.getLessThan(),right.getTerm(),right2.getTerm());
+			    final Term upperBound = tb.func(intLDT.getLessThan(),right.getTerm(),right2.getTerm());
 			    result = new SLExpression(tb.and(result.getTerm(),upperBound));
 			}
 		} catch (TermCreationException e) {
@@ -1220,7 +1220,7 @@ unaryexprnotplusminus returns [SLExpression ret=null] throws SLTranslationExcept
 		raiseError("Cannot negate type " + e.getType().getName() + ".");
 	    }
 
-	    JavaDLTerm t = e.getTerm();
+	    Term t = e.getTerm();
 	    assert t != null;
 
 	    if (t.sort() == Sort.FORMULA) {
@@ -1281,7 +1281,7 @@ postfixexpr returns [SLExpression ret=null] throws SLTranslationException
 
 primaryexpr returns [SLExpression ret=null] throws SLTranslationException
 @init {
-    JavaDLTerm s1, s2;
+    Term s1, s2;
 }
 @after {ret = result;}
 :
@@ -1375,7 +1375,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 	{
             ImmutableList<SLExpression> preHeapParams = ImmutableSLList.<SLExpression>nil();
             for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-              JavaDLTerm p;
+              Term p;
               if(atPres == null || atPres.get(heap) == null) { p = tb.var(heap); } else { p = atPres.get(heap); }
               preHeapParams = preHeapParams.append(new SLExpression(p));
             }
@@ -1449,7 +1449,7 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
     |
 	l=STRING_LITERAL
 	{
-	    JavaDLTerm charListTerm
+	    Term charListTerm
 	       = services.getProgramServices().getTypeConverter()
 	                 .convertToLogicElement(
 	                 	new StringLiteral(l.getText()));
@@ -1461,14 +1461,14 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
 	        raiseError("string literals used in specification, "
 	                   + "but string pool function not found");
 	    }
-	    JavaDLTerm stringTerm = tb.func(strPool, charListTerm);
+	    Term stringTerm = tb.func(strPool, charListTerm);
 	    return new SLExpression(stringTerm,
 	                            javaInfo.getKeYJavaType("java.lang.String"));
 	}
     |
 	c=CHAR_LITERAL
 	{
-       JavaDLTerm charLit = 
+       Term charLit = 
          intLDT.translateLiteral(new CharLiteral(c.getText()), services);
         	   
 	    return new SLExpression(charLit, javaInfo.getKeYJavaType("char"));
@@ -1555,7 +1555,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 	NONNULLELEMENTS LPAREN result=expression RPAREN
 	{
 	    t = result.getTerm();
-	    JavaDLTerm resTerm = tb.not(tb.equals(t, tb.NULL()));
+	    Term resTerm = tb.not(tb.equals(t, tb.NULL()));
 
 	    if (t.sort() instanceof ArraySort) {
 		LogicVariable i = new LogicVariable(new Name("i"), javaInfo
@@ -1564,10 +1564,10 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 
 		// See JML reference manual
 		// http://www.cs.iastate.edu/~leavens/JML/jmlrefman/jmlrefman_11.html#SEC139
-		JavaDLTerm range = tb.and(
+		Term range = tb.and(
 		    tb.leq(tb.zero(), tb.var(i)),
 		    tb.lt(tb.var(i), tb.dotLength(t)));
-		JavaDLTerm body = tb.equals(tb.dotArr(t, tb.var(i)), tb.NULL());
+		Term body = tb.equals(tb.dotArr(t, tb.var(i)), tb.NULL());
 		body = tb.not(body);
 		body = tb.imp(range, body);
 
@@ -1602,7 +1602,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 
     |   NOT_MODIFIED LPAREN t=storeRefUnion RPAREN
         {
-        result = new SLExpression(translator.translate("\\not_modified", JavaDLTerm.class, services, atPres == null ? null : atPres.get(getBaseHeap()), t));
+        result = new SLExpression(translator.translate("\\not_modified", Term.class, services, atPres == null ? null : atPres.get(getBaseHeap()), t));
         }
     |   na=NOT_ASSIGNED LPAREN t=storeRefUnion RPAREN
         {
@@ -1669,7 +1669,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 
     |   IS_INITIALIZED LPAREN typ=referencetype RPAREN
 	{
-	    JavaDLTerm resTerm = tb.equals(
+	    Term resTerm = tb.equals(
 		tb.var(
 		    javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
 					  typ)),
@@ -1799,9 +1799,9 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 
 sequence returns [SLExpression ret = null] throws SLTranslationException
 @init {
-    ImmutableList<JavaDLTerm> tlist = null;
+    ImmutableList<Term> tlist = null;
     KeYJavaType typ;
-    JavaDLTerm t, t2;
+    Term t, t2;
     Token tk = null;
     Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
 }
@@ -1829,11 +1829,11 @@ sequence returns [SLExpression ret = null] throws SLTranslationException
     |   SEQREPLACE LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
         {
             // short for "e1[0..e2-1]+e3+e1[e2+1..e1.length-1]"
-            final JavaDLTerm minusOne = tb.zTerm("-1");
-            final JavaDLTerm ante = tb.seqSub(e1.getTerm(), tb.zero(), tb.add(e2.getTerm(), minusOne));
-            final JavaDLTerm insert = tb.seqSingleton(e3.getTerm());
-            final JavaDLTerm post = tb.seqSub(e1.getTerm(), tb.add(e2.getTerm(), tb.one()), tb.add(tb.seqLen(e1.getTerm()), minusOne));
-            final JavaDLTerm put = tb.seqConcat(ante, tb.seqConcat(insert, post));
+            final Term minusOne = tb.zTerm("-1");
+            final Term ante = tb.seqSub(e1.getTerm(), tb.zero(), tb.add(e2.getTerm(), minusOne));
+            final Term insert = tb.seqSingleton(e3.getTerm());
+            final Term post = tb.seqSub(e1.getTerm(), tb.add(e2.getTerm(), tb.one()), tb.add(tb.seqLen(e1.getTerm()), minusOne));
+            final Term put = tb.seqConcat(ante, tb.seqConcat(insert, post));
             result = new SLExpression(put);
         }
         

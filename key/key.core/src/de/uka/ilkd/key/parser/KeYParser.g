@@ -102,7 +102,7 @@ options {
 @members{
 
     private static final Sort[] AN_ARRAY_OF_SORTS = new Sort[0];
-    private static final JavaDLTerm[] AN_ARRAY_OF_TERMS = new JavaDLTerm[0];
+    private static final Term[] AN_ARRAY_OF_TERMS = new Term[0];
 
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
@@ -201,7 +201,7 @@ options {
    // the current active config
    private ParserConfig parserConfig;
 
-    private JavaDLTerm quantifiedArrayGuard = null;
+    private Term quantifiedArrayGuard = null;
     
     private String profileName;
     
@@ -235,7 +235,7 @@ options {
    }
 
    /**
-    * Used to construct JavaDLTerm parser - for first-order terms
+    * Used to construct Term parser - for first-order terms
     * and formulae.
     */
    public KeYParser(ParserMode mode,
@@ -251,7 +251,7 @@ options {
 
 
     /** ONLY FOR TEST CASES.
-     * Used to construct Global Declaration JavaDLTerm parser - for first-order 
+     * Used to construct Global Declaration Term parser - for first-order 
      * terms and formulae. Variables in quantifiers are expected to be
      * declared globally in the variable namespace.  This parser is used
      * for test cases, where you want to know in advance which objects
@@ -473,7 +473,7 @@ options {
 
     private boolean inSchemaMode() {
 	if(isTermParser() && schemaMode)
-	   Debug.fail("In JavaDLTerm parser mode schemaMode cannot be true.");
+	   Debug.fail("In Term parser mode schemaMode cannot be true.");
 	if(isTacletParser() && !schemaMode)
 	   Debug.fail("In Taclet parser mode schemaMode should always be true.");
         return schemaMode;
@@ -667,7 +667,7 @@ options {
       resetSkips();
     }  
 
-    public JavaDLTerm parseProblem() throws RecognitionException {
+    public Term parseProblem() throws RecognitionException {
         resetSkips();
         skipSorts();
         skipFuncs();
@@ -676,7 +676,7 @@ options {
         skipRuleSets();
         //skipVars();
         skipTaclets();
-        JavaDLTerm result = problem();
+        Term result = problem();
         // The parser may be ok if a totally unexpected token has turned up
         // We better check that either the file has ended or a "\proof" follows.
         if(input.LA(1) != EOF && input.LA(1) != PROOF && input.LA(1) != PROOFSCRIPT) {
@@ -749,7 +749,7 @@ options {
         }
     }
 
-    private JavaDLTerm toZNotation(String number, Namespace functions){    
+    private Term toZNotation(String number, Namespace functions){    
 	String s = number;
         final boolean negative = (s.charAt(0) == '-');
 	if (negative) {
@@ -763,7 +763,7 @@ options {
 	    Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
 	  }
 	}
-        JavaDLTerm result = getTermFactory().createTerm((Function)functions.lookup(new Name("#")));
+        Term result = getTermFactory().createTerm((Function)functions.lookup(new Name("#")));
 
         for(int i = 0; i<s.length(); i++){
             result = getTermFactory().createTerm((Function)functions.lookup(new Name(s.substring(i,i+1))), result);
@@ -852,9 +852,9 @@ options {
     }
 
    
-    public JavaDLTerm createAttributeTerm(JavaDLTerm prefix, 
+    public Term createAttributeTerm(Term prefix, 
     				    Operator attribute) throws RecognitionException/*SemanticException*/ {
-        JavaDLTerm result = prefix;
+        Term result = prefix;
 
         if (attribute instanceof SchemaVariable) {
             if (!inSchemaMode()) {
@@ -871,7 +871,7 @@ options {
                                            getTermFactory().createTerm(attribute));
         } else {
 	            if(attribute instanceof LogicVariable) {
-	                JavaDLTerm attrTerm = getTermFactory().createTerm(attribute);
+	                Term attrTerm = getTermFactory().createTerm(attribute);
 	                result = getServices().getTermBuilder().dot(SortImpl.ANY, result, attrTerm);
 	            } else if(attribute instanceof ProgramConstant) {
                 result = getTermFactory().createTerm(attribute);
@@ -896,7 +896,7 @@ options {
 
     private LogicVariable bindVar(String id, Sort s) {
         if(isGlobalDeclTermParser())
-  	  Debug.fail("bindVar was called in Global Declaration JavaDLTerm parser.");
+  	  Debug.fail("bindVar was called in Global Declaration Term parser.");
         LogicVariable v=new LogicVariable(new Name(id), s);
         namespaces().setVariables(variables().extended(v));
         return v;
@@ -904,13 +904,13 @@ options {
 
     private void bindVar(LogicVariable v) {
         if(isGlobalDeclTermParser())
-  	  Debug.fail("bindVar was called in Global Declaration JavaDLTerm parser.");
+  	  Debug.fail("bindVar was called in Global Declaration Term parser.");
         namespaces().setVariables(variables().extended(v));
     }
 
     private void bindVar() {
         if(isGlobalDeclTermParser())
-  	  Debug.fail("bindVar was called in Global Declaration JavaDLTerm parser.");
+  	  Debug.fail("bindVar was called in Global Declaration Term parser.");
         namespaces().setVariables ( new Namespace ( variables () ) );
     }
 
@@ -935,22 +935,22 @@ options {
         } 
     }
     
-    protected boolean isHeapTerm(JavaDLTerm term) {
+    protected boolean isHeapTerm(Term term) {
         return term != null && term.sort() == 
             getServices().getTheories().getHeapLDT().targetSort();
     }
 
-    private boolean isSequenceTerm(JavaDLTerm reference) {
+    private boolean isSequenceTerm(Term reference) {
         return reference != null && reference.sort().name().equals(SeqLDT.NAME);
     }
 
-    private boolean isIntTerm(JavaDLTerm reference) {
+    private boolean isIntTerm(Term reference) {
         return reference.sort().name().equals(IntegerLDT.NAME);
     }
     
     private void unbindVars(Namespace orig) {
         if(isGlobalDeclTermParser()) {
-            Debug.fail("unbindVars was called in Global Declaration JavaDLTerm parser.");
+            Debug.fail("unbindVars was called in Global Declaration Term parser.");
         }
         namespaces().setVariables(orig);
     }
@@ -976,7 +976,7 @@ options {
 	return null;
     }
 
-    private JavaDLTerm termForParsedVariable(ParsableVariable v) 
+    private Term termForParsedVariable(ParsableVariable v) 
         throws RecognitionException/*SemanticException*/ {
         if ( v instanceof LogicVariable || v instanceof ProgramVariable) {
             return getTermFactory().createTerm(v);
@@ -1095,7 +1095,7 @@ options {
      * and is an array of size zero, if an empty argument list was given,
      * for instance `f()'.
      */
-    private Operator lookupVarfuncId(String varfunc_name, JavaDLTerm[] args) 
+    private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws RecognitionException/*NotDeclException, SemanticException*/ {
 
         // case 1: variable
@@ -1251,7 +1251,7 @@ options {
         throws RecognitionException/*InvalidFindException*/ {
         if ( applicationRestriction != RewriteTaclet.NONE &&
              applicationRestriction != RewriteTaclet.IN_SEQUENT_STATE &&
-             !( find instanceof JavaDLTerm ) ) {
+             !( find instanceof Term ) ) {
             String mod = "";
             if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
                 mod = "\"\\sameUpdateLevel\"";
@@ -1274,8 +1274,8 @@ options {
         }
         if ( find == null ) {
             return new NoFindTacletBuilder();
-        } else if ( find instanceof JavaDLTerm ) {
-            return new RewriteTacletBuilder().setFind((JavaDLTerm)find)
+        } else if ( find instanceof Term ) {
+            return new RewriteTacletBuilder().setFind((Term)find)
                 .setApplicationRestriction(applicationRestriction);
         } else if ( find instanceof Sequent ) {
             Sequent findSeq = (Sequent) find;
@@ -1283,14 +1283,14 @@ options {
                 return new NoFindTacletBuilder();
             } else if (   findSeq.antecedent().size() == 1
                           && findSeq.succedent().size() == 0 ) {
-                JavaDLTerm findFma = findSeq.antecedent().get(0).formula();
+                Term findFma = findSeq.antecedent().get(0).formula();
                 AntecTacletBuilder b = new AntecTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) == 0);
                 return b;
             } else if (   findSeq.antecedent().size() == 0
                           && findSeq.succedent().size() == 1 ) {
-                JavaDLTerm findFma = findSeq.succedent().get(0).formula();
+                Term findFma = findSeq.succedent().get(0).formula();
                 SuccTacletBuilder b = new SuccTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) == 0);
@@ -1343,10 +1343,10 @@ options {
                              getSourceName(), getLine(), getColumn());
                     }
                 } else if ( b instanceof RewriteTacletBuilder ) {
-                    if ( rwObj instanceof JavaDLTerm ) {
+                    if ( rwObj instanceof Term ) {
                         gt = new RewriteTacletGoalTemplate(addSeq,
                                                            addRList,
-                                                           (JavaDLTerm)rwObj,
+                                                           (Term)rwObj,
                                                            pvs);  
                     } else {
                         throw new UnfittingReplacewithException
@@ -1374,7 +1374,7 @@ options {
      * explicitly.
      * the rule sets of the current problem file will be added 
      */ 
-    public JavaDLTerm parseTacletsAndProblem() 
+    public Term parseTacletsAndProblem() 
     throws RecognitionException/*, antlr.TokenStreamException*/{
         resetSkips();
         skipSorts(); skipFuncs(); skipPreds();    
@@ -1428,11 +1428,11 @@ options {
       JavaBlock javaBlock;
     }
     
-    private static boolean isSelectTerm(JavaDLTerm term) {
+    private static boolean isSelectTerm(Term term) {
         return term.op().name().toString().endsWith("::select") && term.arity() == 3;
     }
 
-    private boolean isImplicitHeap(JavaDLTerm t) {
+    private boolean isImplicitHeap(Term t) {
         return getServices().getTermBuilder().getBaseHeap().equals(t);
     }
 
@@ -1440,7 +1440,7 @@ options {
     public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE
             = "Expecting select term before '@', not: ";
 
-    private JavaDLTerm replaceHeap(JavaDLTerm term, JavaDLTerm heap, int depth) throws RecognitionException {
+    private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException {
         if (depth > 0) {
 
             if (isSelectTerm(term)) {
@@ -1449,7 +1449,7 @@ options {
                     semanticError("Expecting program variable heap as first argument of: " + term);
                 }
 
-                JavaDLTerm[] params = new JavaDLTerm[]{heap, replaceHeap(term.sub(1), heap, depth - 1), term.sub(2)};
+                Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1), term.sub(2)};
                 return (getServices().getTermFactory().createTerm(term.op(), params));
 
             } else if (term.op() instanceof ObserverFunction) {
@@ -1457,7 +1457,7 @@ options {
                     semanticError("Expecting program variable heap as first argument of: " + term);
                 }
 
-                JavaDLTerm[] params = new JavaDLTerm[term.arity()];
+                Term[] params = new Term[term.arity()];
                 params[0] = heap;
                 params[1] = replaceHeap(term.sub(1), heap, depth - 1);
                 for (int i = 2; i < params.length; i++) {
@@ -1479,14 +1479,14 @@ options {
     /*
      * Replace standard heap by another heap in an observer function.
      */
-    protected JavaDLTerm heapSelectionSuffix(JavaDLTerm term, JavaDLTerm heap) throws RecognitionException {
+    protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
 
         if (!isHeapTerm(heap)) {
             semanticError("Expecting term of type Heap but sort is " + heap.sort()
                     + " for term: " + term);
         }
 
-        JavaDLTerm result = replaceHeap(term, heap, globalSelectNestingDepth);
+        Term result = replaceHeap(term, heap, globalSelectNestingDepth);
 
         // reset globalSelectNestingDepth
         globalSelectNestingDepth = 0;
@@ -2475,18 +2475,18 @@ sort_name returns [String _sort_name = null]
  * reads a formula/term and throws an error if it wasn't a formula.
  * This gives a rather late error message. */
 
-formula returns [JavaDLTerm _formula = null] 
+formula returns [Term _formula = null] 
 @after { _formula = a; }
     :
         a = term 
         {
             if (a != null && a.sort() != Sort.FORMULA ) {
-                semanticError("Just Parsed a JavaDLTerm where a Formula was expected.");
+                semanticError("Just Parsed a Term where a Formula was expected.");
             }
         }
     ;
 
-term returns [JavaDLTerm _term = null]
+term returns [Term _term = null]
 @after { _term = result; }
     :
         result=elementary_update_term
@@ -2504,7 +2504,7 @@ term returns [JavaDLTerm _term = null]
         }
         
         
-elementary_update_term returns[JavaDLTerm _elementary_update_term=null]
+elementary_update_term returns[Term _elementary_update_term=null]
 @after { _elementary_update_term = result; }
 :
         result=equivalence_term 
@@ -2521,44 +2521,44 @@ elementary_update_term returns[JavaDLTerm _elementary_update_term=null]
         }
 
 
-equivalence_term returns [JavaDLTerm _equivalence_term = null] 
+equivalence_term returns [Term _equivalence_term = null] 
 @after{ _equivalence_term = a; }
     :   a=implication_term 
         (EQV a1=implication_term 
-            { a = getTermFactory().createTerm(Equality.EQV, new JavaDLTerm[]{a, a1});} )*
+            { a = getTermFactory().createTerm(Equality.EQV, new Term[]{a, a1});} )*
 ;
         catch [TermCreationException ex] {
               raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
-implication_term returns [JavaDLTerm _implication_term = null] 
+implication_term returns [Term _implication_term = null] 
 @after{ _implication_term = a; }
     :   a=disjunction_term 
         (IMP a1=implication_term 
-            { a = getTermFactory().createTerm(Junctor.IMP, new JavaDLTerm[]{a, a1});} )?
+            { a = getTermFactory().createTerm(Junctor.IMP, new Term[]{a, a1});} )?
 ;
         catch [TermCreationException ex] {
               raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
-disjunction_term returns [JavaDLTerm _disjunction_term = null] 
+disjunction_term returns [Term _disjunction_term = null] 
 @after { _disjunction_term = a; }
     :   a=conjunction_term 
         (OR a1=conjunction_term 
-            { a = getTermFactory().createTerm(Junctor.OR, new JavaDLTerm[]{a, a1});} )*
+            { a = getTermFactory().createTerm(Junctor.OR, new Term[]{a, a1});} )*
 ;
         catch [TermCreationException ex] {
               raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
-conjunction_term returns [JavaDLTerm _conjunction_term = null] 
+conjunction_term returns [Term _conjunction_term = null] 
 @after { _conjunction_term = a; }
     :   a=term60 
         (AND a1=term60
-            { a = getTermFactory().createTerm(Junctor.AND, new JavaDLTerm[]{a, a1});} )*
+            { a = getTermFactory().createTerm(Junctor.AND, new Term[]{a, a1});} )*
             
 ;
         catch [TermCreationException ex] {
@@ -2566,7 +2566,7 @@ conjunction_term returns [JavaDLTerm _conjunction_term = null]
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
-term60 returns [JavaDLTerm _term_60 = null] 
+term60 returns [Term _term_60 = null] 
 @after{ _term_60 = a; }
     :  
         a = unary_formula
@@ -2577,10 +2577,10 @@ term60 returns [JavaDLTerm _term_60 = null]
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
-unary_formula returns [JavaDLTerm _unary_formula = null] 
+unary_formula returns [Term _unary_formula = null] 
 @after{ _unary_formula = a; }
     :  
-        NOT a1  = term60 { a = getTermFactory().createTerm(Junctor.NOT,new JavaDLTerm[]{a1}); }
+        NOT a1  = term60 { a = getTermFactory().createTerm(Junctor.NOT,new Term[]{a1}); }
     |	a = quantifierterm 
     |   a = modality_dl_term
 ;
@@ -2590,7 +2590,7 @@ unary_formula returns [JavaDLTerm _unary_formula = null]
         }
 
 
-equality_term returns [JavaDLTerm _equality_term = null] 
+equality_term returns [Term _equality_term = null] 
 @init{
     boolean negated = false;
 }
@@ -2680,7 +2680,7 @@ strong_arith_op returns [Function op = null]
 ;
 
 // term80
-logicTermReEntry returns [JavaDLTerm _logic_term_re_entry = null]
+logicTermReEntry returns [Term _logic_term_re_entry = null]
 @after { _logic_term_re_entry = a; }
 :
    a = weak_arith_op_term ((relation_op) => op = relation_op a1=weak_arith_op_term {
@@ -2693,7 +2693,7 @@ logicTermReEntry returns [JavaDLTerm _logic_term_re_entry = null]
         }
 
 
-weak_arith_op_term returns [JavaDLTerm _weak_arith_op_term = null]
+weak_arith_op_term returns [Term _weak_arith_op_term = null]
 @after { _weak_arith_op_term = a; }
 :
    a = strong_arith_op_term ((weak_arith_op)=> op = weak_arith_op a1=strong_arith_op_term {
@@ -2705,7 +2705,7 @@ weak_arith_op_term returns [JavaDLTerm _weak_arith_op_term = null]
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
-strong_arith_op_term returns [JavaDLTerm _strong_arith_op_term = null]
+strong_arith_op_term returns [Term _strong_arith_op_term = null]
 @after { _strong_arith_op_term = a; }
 :
    a = term110 ( (strong_arith_op) => op = strong_arith_op a1=term110 {
@@ -2724,7 +2724,7 @@ strong_arith_op_term returns [JavaDLTerm _strong_arith_op_term = null]
  * WATCHOUT: Woj: the check for Sort.FORMULA had to be removed to allow
  * infix operators and the whole bunch of grammar rules above.
  */
-term110 returns [JavaDLTerm _term110 = null]
+term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
@@ -2813,7 +2813,7 @@ staticAttributeOrQueryReference returns [String attrReference = ""]
         }  
     ;
 
-static_attribute_suffix returns [JavaDLTerm result = null]
+static_attribute_suffix returns [Term result = null]
 @init{
     Operator v = null;
     attributeName = "";
@@ -2838,7 +2838,7 @@ static_attribute_suffix returns [JavaDLTerm result = null]
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
-attribute_or_query_suffix[JavaDLTerm prefix] returns [JavaDLTerm _attribute_or_query_suffix = null]
+attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix = null]
 @after { _attribute_or_query_suffix = result; }
     :
     DOT ( STAR { result = services.getTermBuilder().allFields(prefix); }
@@ -2874,7 +2874,7 @@ attrid returns [String attr = "";]
         { attr = clss + "::" + id2; }
     ;
     
-query_suffix [JavaDLTerm prefix, String memberName] returns [JavaDLTerm result = null] 
+query_suffix [Term prefix, String memberName] returns [Term result = null] 
 @init{
     String classRef, name;
     boolean brackets = false;
@@ -2906,7 +2906,7 @@ catch [TermCreationException ex] {
 }
 
 //term120
-accessterm returns [JavaDLTerm _accessterm = null]
+accessterm returns [Term _accessterm = null]
 @init{ int selectNestingDepth = globalSelectNestingDepth; }
 @after { _accessterm = result; }
     :
@@ -2962,13 +2962,13 @@ catch [TermCreationException ex] {
     raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
-heap_selection_suffix [JavaDLTerm term] returns [JavaDLTerm result]
+heap_selection_suffix [Term term] returns [Term result]
     :
     AT heap=accessterm
     { result = heapSelectionSuffix(term, heap); }
     ;
 
-accessterm_bracket_suffix[JavaDLTerm reference] returns [JavaDLTerm result, boolean increaseHeapSuffixCounter]
+accessterm_bracket_suffix[Term reference] returns [Term result, boolean increaseHeapSuffixCounter]
 @init{ $increaseHeapSuffixCounter = false; }
     :
     { isHeapTerm(reference) }? tmp = heap_update_suffix[reference] { $result = tmp; }
@@ -2976,7 +2976,7 @@ accessterm_bracket_suffix[JavaDLTerm reference] returns [JavaDLTerm result, bool
     | tmp = array_access_suffix[reference] { $result = tmp; $increaseHeapSuffixCounter = true; }
     ;
 
-seq_get_suffix[JavaDLTerm reference] returns [JavaDLTerm result]
+seq_get_suffix[Term reference] returns [Term result]
     :
     LBRACKET
 	indexTerm = logicTermReEntry
@@ -2987,7 +2987,7 @@ seq_get_suffix[JavaDLTerm reference] returns [JavaDLTerm result]
     RBRACKET
     ;
         
-static_query returns [JavaDLTerm result = null] 
+static_query returns [Term result = null] 
 @init{
     queryRef = "";
 }
@@ -3016,15 +3016,15 @@ catch [TermCreationException ex] {
     raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
-heap_update_suffix [JavaDLTerm heap] returns [JavaDLTerm result=heap]
+heap_update_suffix [Term heap] returns [Term result=heap]
     : // TODO find the right kind of non-terminal for "o.f" and "a[i]"
       // and do not resign to parsing an arbitrary term
     LBRACKET
     ( (equivalence_term ASSIGN) =>
        target=equivalence_term ASSIGN val=equivalence_term
         {  // TODO at least make some check that it is a select term after all ...
-           JavaDLTerm objectTerm = target.sub(1);
-           JavaDLTerm fieldTerm  = target.sub(2);
+           Term objectTerm = target.sub(1);
+           Term fieldTerm  = target.sub(2);
            result = getServices().getTermBuilder().store(heap, objectTerm, fieldTerm, val);
         }
     | id=simple_ident args=argument_list
@@ -3033,7 +3033,7 @@ heap_update_suffix [JavaDLTerm heap] returns [JavaDLTerm result=heap]
            if(f == null) {
              semanticError("Unknown heap constructor " + id);
            }
-           JavaDLTerm[] augmentedArgs = new JavaDLTerm[args.length+1];
+           Term[] augmentedArgs = new Term[args.length+1];
            System.arraycopy(args, 0, augmentedArgs, 1, args.length);
            augmentedArgs[0] = heap;
            result = getTermFactory().createTerm(f, augmentedArgs);
@@ -3048,18 +3048,18 @@ catch [TermCreationException ex] {
     raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
-array_access_suffix [JavaDLTerm arrayReference] returns [JavaDLTerm _array_access_suffix = null] 
+array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = null] 
 @init{
-    JavaDLTerm rangeFrom = null;
-    JavaDLTerm result = arrayReference;
+    Term rangeFrom = null;
+    Term result = arrayReference;
 }
 @after{ _array_access_suffix = result; }
 	:
   	LBRACKET 
 	(   STAR {
            	rangeFrom = toZNotation("0", functions());
-           	JavaDLTerm lt = getServices().getTermBuilder().dotLength(arrayReference);
-           	JavaDLTerm one = toZNotation("1", functions());
+           	Term lt = getServices().getTermBuilder().dotLength(arrayReference);
+           	Term one = toZNotation("1", functions());
   	   		rangeTo = getTermFactory().createTerm
            		((Function) functions().lookup(new Name("sub")), lt, one); 
         } 
@@ -3079,9 +3079,9 @@ array_access_suffix [JavaDLTerm arrayReference] returns [JavaDLTerm _array_acces
 		indexTerm = getTermFactory().createTerm(indexVar);
 		   	
 		Function leq = (Function) functions().lookup(new Name("leq"));
-		JavaDLTerm fromTerm = getTermFactory().createTerm(leq, rangeFrom, indexTerm);
-		JavaDLTerm toTerm = getTermFactory().createTerm(leq, indexTerm, rangeTo);
-		JavaDLTerm guardTerm = getTermFactory().createTerm(Junctor.AND, fromTerm, toTerm);
+		Term fromTerm = getTermFactory().createTerm(leq, rangeFrom, indexTerm);
+		Term toTerm = getTermFactory().createTerm(leq, indexTerm, rangeTo);
+		Term guardTerm = getTermFactory().createTerm(Junctor.AND, fromTerm, toTerm);
 		quantifiedArrayGuard = getTermFactory().createTerm(Junctor.AND, quantifiedArrayGuard, guardTerm);
 		}
             result = getServices().getTermBuilder().dotArr(result, indexTerm); 
@@ -3098,7 +3098,7 @@ accesstermlist returns [HashSet accessTerms = new LinkedHashSet()] :
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
 
 
-atom returns [JavaDLTerm _atom = null]
+atom returns [Term _atom = null]
 @after { _atom = a; }
     :
 (        {isTermTransformer()}? a = specialTerm
@@ -3160,8 +3160,8 @@ single_label returns [TermLabel label=null]
   ;
 
 
-abbreviation returns [JavaDLTerm _abbreviation=null]
-@init{ JavaDLTerm a = null; }
+abbreviation returns [Term _abbreviation=null]
+@init{ Term a = null; }
 @after{ _abbreviation = a; }
     :
         (   sc = simple_ident
@@ -3175,8 +3175,8 @@ abbreviation returns [JavaDLTerm _abbreviation=null]
     ;
 
 
-ifThenElseTerm returns [JavaDLTerm _if_then_else_term = null]
-@init{ JavaDLTerm result = null; }
+ifThenElseTerm returns [Term _if_then_else_term = null]
+@init{ Term result = null; }
 @after{ _if_then_else_term = result; }
     :
         IF LPAREN condF = term RPAREN
@@ -3189,7 +3189,7 @@ ifThenElseTerm returns [JavaDLTerm _if_then_else_term = null]
         THEN LPAREN thenT = term RPAREN
         ELSE LPAREN elseT = term RPAREN
         {
-            result = getTermFactory().createTerm ( IfThenElse.IF_THEN_ELSE, new JavaDLTerm[]{condF, thenT, elseT} );
+            result = getTermFactory().createTerm ( IfThenElse.IF_THEN_ELSE, new Term[]{condF, thenT, elseT} );
         }
  ;
         catch [TermCreationException ex] {
@@ -3198,12 +3198,12 @@ ifThenElseTerm returns [JavaDLTerm _if_then_else_term = null]
         }
         
         
-ifExThenElseTerm returns [JavaDLTerm _if_ex_then_else_term = null]
+ifExThenElseTerm returns [Term _if_ex_then_else_term = null]
 @init{
     exVars 
     	= ImmutableSLList.<QuantifiableVariable>nil();
     Namespace orig = variables();
-    JavaDLTerm result = null;
+    Term result = null;
 }
 @after{ _if_ex_then_else_term = result; }
     :
@@ -3222,7 +3222,7 @@ ifExThenElseTerm returns [JavaDLTerm _if_ex_then_else_term = null]
             	= new ImmutableArray<QuantifiableVariable>( 
             	     exVars.toArray(new QuantifiableVariable[exVars.size()]));
             result = getTermFactory().createTerm ( IfExThenElse.IF_EX_THEN_ELSE,  
-                                     new JavaDLTerm[]{condF, thenT, elseT}, 
+                                     new Term[]{condF, thenT, elseT}, 
                                      exVarsArray, 
                                      null );
             if(!isGlobalDeclTermParser()) {
@@ -3236,7 +3236,7 @@ ifExThenElseTerm returns [JavaDLTerm _if_ex_then_else_term = null]
         }        
 
 
-argument returns [JavaDLTerm _argument = null]
+argument returns [Term _argument = null]
 @init{
     ImmutableArray<QuantifiableVariable> vars = null;
 }
@@ -3252,11 +3252,11 @@ argument returns [JavaDLTerm _argument = null]
  ;
   
 
-quantifierterm returns [JavaDLTerm _quantifier_term = null]
+quantifierterm returns [Term _quantifier_term = null]
 @init{
     Operator op = null;
     Namespace orig = variables();  
-    JavaDLTerm a = null;
+    Term a = null;
 }
 @after{ _quantifier_term = a; }
 :
@@ -3265,7 +3265,7 @@ quantifierterm returns [JavaDLTerm _quantifier_term = null]
         vs = bound_variables a1 = term60
         {
             a = getTermFactory().createTerm((Quantifier)op,
-                              new ImmutableArray<JavaDLTerm>(a1),
+                              new ImmutableArray<Term>(a1),
 	       		      new ImmutableArray<QuantifiableVariable>(vs.toArray(new QuantifiableVariable[vs.size()])),
 	       		      null);
             if(!isGlobalDeclTermParser())
@@ -3276,7 +3276,7 @@ quantifierterm returns [JavaDLTerm _quantifier_term = null]
 /*
  * A term that is surrounded by braces: {}
  */
-braces_term returns [JavaDLTerm _update_or_substitution = null]
+braces_term returns [Term _update_or_substitution = null]
 @after{ _update_or_substitution = result; }
 :
       (LBRACE SUBST) => result = substitutionterm
@@ -3284,7 +3284,7 @@ braces_term returns [JavaDLTerm _update_or_substitution = null]
       |  result = updateterm
     ;
     
-locset_term returns [JavaDLTerm result = getServices().getTermBuilder().empty()]
+locset_term returns [Term result = getServices().getTermBuilder().empty()]
     :
     LBRACE
         ( l = location_term { $result = l; }
@@ -3292,17 +3292,17 @@ locset_term returns [JavaDLTerm result = getServices().getTermBuilder().empty()]
     RBRACE
     ;
     
-location_term returns[JavaDLTerm result]
+location_term returns[Term result]
     :
     LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
             { $result = getServices().getTermBuilder().singleton(obj, field); }
     ;
 
-substitutionterm returns [JavaDLTerm _substitution_term = null] 
+substitutionterm returns [Term _substitution_term = null] 
 @init{
   SubstOp op = WarySubstOp.SUBST;
    Namespace orig = variables();  
-  JavaDLTerm result = null;
+  Term result = null;
 }
 @after{ _substitution_term = result; }
 :
@@ -3333,8 +3333,8 @@ substitutionterm returns [JavaDLTerm _substitution_term = null]
         }
 
 
-updateterm returns [JavaDLTerm _update_term = null] 
-@init{ JavaDLTerm result = null; }
+updateterm returns [Term _update_term = null] 
+@init{ Term result = null; }
 @after{ _update_term = result; }
 :
         LBRACE u=term RBRACE 
@@ -3403,11 +3403,11 @@ one_logic_bound_variable_nosort returns[QuantifiableVariable v=null]
   }
 ;
 
-modality_dl_term returns [JavaDLTerm _modality_dl_term = null]
+modality_dl_term returns [Term _modality_dl_term = null]
 @init{
     Operator op = null;
     PairOfStringAndJavaBlock sjb = null;
-    JavaDLTerm a = null;
+    Term a = null;
 }
 @after{ _modality_dl_term = a; }
    :
@@ -3436,7 +3436,7 @@ modality_dl_term returns [JavaDLTerm _modality_dl_term = null]
      // so that it is consistent with pretty printer that prints (1).
      // A term "(post)" seems to be parsed as "post" anyway
       {
-            a = getTermFactory().createTerm(op, new JavaDLTerm[]{a1}, null, sjb.javaBlock);
+            a = getTermFactory().createTerm(op, new Term[]{a1}, null, sjb.javaBlock);
       }
    )
    ;
@@ -3446,10 +3446,10 @@ modality_dl_term returns [JavaDLTerm _modality_dl_term = null]
         }
 
 
-argument_list returns [JavaDLTerm[\] _argument_list = null]
+argument_list returns [Term[\] _argument_list = null]
 @init{
-    List<JavaDLTerm> args = new LinkedList<JavaDLTerm>();
-    JavaDLTerm[] result = null;
+    List<Term> args = new LinkedList<Term>();
+    Term[] result = null;
 }
 @after{ _argument_list = result; }
     :
@@ -3460,12 +3460,12 @@ argument_list returns [JavaDLTerm[\] _argument_list = null]
 
         RPAREN
         {
-            result = args.toArray(new JavaDLTerm[0]);
+            result = args.toArray(new Term[0]);
         }
 
     ;
 
-funcpredvarterm returns [JavaDLTerm _func_pred_var_term = null]
+funcpredvarterm returns [Term _func_pred_var_term = null]
 @init{
     String neg = "";
     boolean opSV = false;
@@ -3527,7 +3527,7 @@ funcpredvarterm returns [JavaDLTerm _func_pred_var_term = null]
 	                a = termForParsedVariable((ParsableVariable)op);
 	            } else {
 	                if (args==null) {
-	                    args = new JavaDLTerm[0];
+	                    args = new Term[0];
 	                }
 	
 	                if(boundVars == null) {
@@ -3562,7 +3562,7 @@ funcpredvarterm returns [JavaDLTerm _func_pred_var_term = null]
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
-specialTerm returns [JavaDLTerm _special_term = null] 
+specialTerm returns [Term _special_term = null] 
 @init{
     Operator vf = null;
 }
@@ -3620,7 +3620,7 @@ triggers[TacletBuilder b]
    t = null;
    Named triggerVar = null;
    avoidCond = null;
-   ImmutableList<JavaDLTerm> avoidConditions = ImmutableSLList.<JavaDLTerm>nil();
+   ImmutableList<Term> avoidConditions = ImmutableSLList.<Term>nil();
 } :
    TRIGGER
      LBRACE id = simple_ident 
@@ -3738,7 +3738,7 @@ termorseq returns [Object o]
                 } else {
                     // A sequent with only head in the antecedent.
                     Semisequent ant = Semisequent.nil();
-                    CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> ci =
+                    CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> ci =
                                  ant.insertFirst(new SequentFormula(head));
                     ant = ci.semisequent();
                     o = Sequent.createSequent(ant,ss);
@@ -3746,7 +3746,7 @@ termorseq returns [Object o]
             } else {
                 // A sequent.  Prepend head to the antecedent.
                 Semisequent newAnt = s.antecedent();
-                CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> ci =
+                CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> ci =
                             newAnt.insertFirst(new SequentFormula(head));
                 newAnt = ci.semisequent();
                 o = Sequent.createSequent(newAnt,s.succedent());
@@ -3768,7 +3768,7 @@ semisequent returns [Semisequent _semi_sequent]
         /* empty */ | 
         head=term ( COMMA ss=semisequent) ? 
         { 
-             CCSemisequentChangeInfo<SequentFormula<JavaDLTerm>, Semisequent> ci =
+             CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> ci =
                     ss.insertFirst(new SequentFormula(head));
              ss = ci.semisequent(); 
         }
@@ -4375,7 +4375,7 @@ metaId returns [TermTransformer v = null]
   }
 ;
 
-metaTerm returns [JavaDLTerm result = null]
+metaTerm returns [Term result = null]
 @init{
     LinkedList al = new LinkedList();
 } 
@@ -4393,7 +4393,7 @@ metaTerm returns [JavaDLTerm result = null]
                 }   
             )* RPAREN )?
             {   	      
-                result = getTermFactory().createTerm(vf, (JavaDLTerm[])al.toArray(AN_ARRAY_OF_TERMS));
+                result = getTermFactory().createTerm(vf, (Term[])al.toArray(AN_ARRAY_OF_TERMS));
             }         
         ) 
  ;
@@ -4477,7 +4477,7 @@ one_invariant[ParsableVariable selfVar]
      } RBRACE SEMI
 ;
 
-problem returns [ JavaDLTerm _problem = null ]
+problem returns [ Term _problem = null ]
 @init {
     boolean axiomMode = false;
     int beginPos = 0;
