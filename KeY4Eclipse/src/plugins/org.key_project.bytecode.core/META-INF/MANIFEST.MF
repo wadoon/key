@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Core
+Bundle-SymbolicName: org.key_project.bytecode.core;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.bytecode.core.Activator
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Import-Package: org.eclipse.jface.resource,
+ org.eclipse.ui.plugin
