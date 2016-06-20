@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.logic.sort.GenericSupersortException;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -30,7 +31,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.GenericSupersortException;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.rule.TacletForTests;
 
