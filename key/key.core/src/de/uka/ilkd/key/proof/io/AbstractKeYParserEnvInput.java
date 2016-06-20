@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.io;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -253,7 +254,7 @@ public abstract class AbstractKeYParserEnvInput implements EnvInput, ProofOblInp
             throw new ProofInputException(problemParser.getErrorMessage(e), e);
         }
         initConfig.addCategory2DefaultChoices(problemParser.getCategory2Default());
-        ImmutableSet<Taclet> st = problemParser.getTaclets();
+        ImmutableList<Taclet> st = problemParser.getTaclets();
         initConfig.setTaclets(st);
 
         SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
