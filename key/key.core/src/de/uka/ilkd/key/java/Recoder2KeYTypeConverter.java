@@ -19,6 +19,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
+import org.key_project.common.core.program.ModelElement;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;

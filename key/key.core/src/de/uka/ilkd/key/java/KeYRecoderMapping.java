@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+import org.key_project.common.core.program.ModelElement;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
 

@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,22 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java;
+package org.key_project.common.core.program.abstraction;
 
-import org.key_project.common.core.program.NamedModelElement;
-
+import org.key_project.common.core.logic.sort.Sort;
 
 /**
- *  Named program element.
- * taken from COMPOST and changed to achieve an immutable structure
+ * A program logic type with a logic sort.
+ *
+ * @author Dominic Scheurer
  */
+public interface SortedType extends CCType {
 
-public interface NamedProgramElement extends NamedModelElement, NonTerminalProgramElement {
-
-    /**
- *      Get identifier.
- *      @return the identifier.
-     */
-    de.uka.ilkd.key.logic.ProgramElementName getProgramElementName();
-
+    Sort getSort();
+    
 }

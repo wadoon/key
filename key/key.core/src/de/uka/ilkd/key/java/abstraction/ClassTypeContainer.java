@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.abstraction;
 
+import org.key_project.common.core.program.abstraction.ProgramModelElement;
+
 /**
    A program model element that may contain class types.
  */

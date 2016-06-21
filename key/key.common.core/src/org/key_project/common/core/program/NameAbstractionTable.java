@@ -22,11 +22,11 @@ import java.util.List;
  * SourceElement. The purpose of this class is to abstract from
  * names. Therefore it represents a mapping o1 x o2 -> abstractName
  * where o1, o2 are of the same type (Label or ProgramVariable). The
- * objectif is that the comparing method uses this new name for o1 and
- * o2 instead of their real name. For this comparision a method is
+ * objective is that the comparing method uses this new name for o1 and
+ * o2 instead of their real name. For this comparison a method is
  * offered so that the assigned name is not given outside.
  */
-public class NameAbstractionTable<S> implements CCNameAbstractionTable<S> {
+public class NameAbstractionTable<S /* SourceElement */> {
 
     /**
      * The order in which symbols are declared in the two terms or programs that
@@ -38,7 +38,6 @@ public class NameAbstractionTable<S> implements CCNameAbstractionTable<S> {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.java.GenericNameAbstractionTable#add(de.uka.ilkd.key.java.SourceElement, de.uka.ilkd.key.java.SourceElement)
      */
-    @Override
     public void add(S pe1, S pe2) {
         if ( declarations0 == null ) {
             declarations0 = new LinkedList<S> ();
@@ -52,7 +51,6 @@ public class NameAbstractionTable<S> implements CCNameAbstractionTable<S> {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.java.GenericNameAbstractionTable#sameAbstractName(de.uka.ilkd.key.java.SourceElement, de.uka.ilkd.key.java.SourceElement)
      */
-    @Override
     public boolean sameAbstractName(S pe0, S pe1) {
         if ( declarations0 != null ) {
             final Iterator<S> it0 = declarations0.iterator ();

@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,18 +11,14 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java;
+package org.key_project.common.core.program;
 
-/** 
- * A model element that carries a name.
+import org.key_project.common.core.logic.op.SVSubstitute;
+
+/**
+ * A source element is a piece of syntax. It does not necessarily have a
+ * semantics, at least none that is machinable, for instance a comment.
  */
-public interface NamedModelElement extends ModelElement {
-
-    /** 
-     * Return the name of the model element.
-     *
-     * @return the name of the model element.
-     */
-    String getName();
+public interface CCSourceElement extends SVSubstitute {
 
 }

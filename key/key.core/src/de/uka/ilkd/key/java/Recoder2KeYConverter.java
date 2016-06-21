@@ -27,6 +27,7 @@ import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
+import org.key_project.common.core.program.ModelElement;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;

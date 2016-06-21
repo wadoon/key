@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java;
 
+import org.key_project.common.core.program.ModelElement;
+
 import de.uka.ilkd.key.rule.MatchConditions;
 
 /**

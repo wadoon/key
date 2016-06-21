@@ -11,7 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java.abstraction;
+package org.key_project.common.core.program.abstraction;
+
+import org.key_project.common.core.program.NamedModelElement;
 
 /**
    An entity of the program meta model.
@@ -19,7 +21,7 @@ package de.uka.ilkd.key.java.abstraction;
    @author RN
  */
 public interface ProgramModelElement 
-    extends de.uka.ilkd.key.java.NamedModelElement {
+    extends NamedModelElement {
 
     /**
        Returns the maximal expanded name including all applicable

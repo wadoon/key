@@ -11,27 +11,13 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java.abstraction;
+package org.key_project.common.core.program;
 
-import org.key_project.common.core.program.abstraction.ProgramModelElement;
-
-/**
-   A program model element representing variables.
-   @author AL
-   @author RN
+/** 
+ * A semantical part of the software model. A source element is
+ * not necessarily connected to a piece of syntax.
+ *
  */
-public interface Variable extends ProgramModelElement {
-    
-    /**
-       Checks if this variable is final.
-       @return <CODE>true</CODE> if this variable is final,
-       <CODE>false</CODE> otherwise.
-     */
-    boolean isFinal();
+public interface ModelElement {
 
-    /**
-       Returns the type of this variable.
-       @return the type of this variable.
-    */
-    Type getType();
 }

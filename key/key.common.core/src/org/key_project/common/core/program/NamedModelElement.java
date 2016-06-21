@@ -11,26 +11,19 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java.abstraction;
+package org.key_project.common.core.program;
 
-import org.key_project.common.core.program.abstraction.CCType;
-import org.key_project.common.core.program.abstraction.ProgramModelElement;
 
-import de.uka.ilkd.key.java.expression.Literal;
-
-/**
-   A program model element representing types.
-   @author AL
-   @author RN
+/** 
+ * A model element that carries a name.
  */
-public interface Type extends ProgramModelElement, CCType {
+public interface NamedModelElement extends ModelElement {
 
     /** 
-     * returns the default value of the given type 
-     * according to JLS Sect. 4.5.5
-     * @return the default value of the given type 
-     * according to JLS Sect. 4.5.5
+     * Return the name of the model element.
+     *
+     * @return the name of the model element.
      */
-    Literal getDefaultValue();
+    String getName();
 
 }

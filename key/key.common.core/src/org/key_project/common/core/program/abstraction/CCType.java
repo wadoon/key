@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,13 +11,14 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java;
+package org.key_project.common.core.program.abstraction;
 
-/** 
- * A semantical part of the software model. A source element is
- * not necessarily connected to a piece of syntax.
+
+/**
+ * A program model element representing types.
  *
+ * @author Dominic Scheurer
  */
-public interface ModelElement {
+public interface CCType extends ProgramModelElement {
 
 }
