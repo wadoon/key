@@ -13,25 +13,20 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.SourceElement;
-
 import org.key_project.common.core.logic.CCTermImpl;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * The currently only class implementing the Term interface. TermFactory should
  * be the only class dealing directly with the TermImpl class.
  */
-class TermImpl extends CCTermImpl<SourceElement, JavaBlock, Visitor, Term> implements Term {
+class TermImpl extends CCTermImpl<JavaBlock, Visitor, Term>
+        implements Term {
 
     private static final ImmutableArray<Term> EMPTY_TERM_LIST =
             new ImmutableArray<Term>();
@@ -44,7 +39,7 @@ class TermImpl extends CCTermImpl<SourceElement, JavaBlock, Visitor, Term> imple
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
         super(op, sort, subs, boundVars, javaBlock);
     }
-    
+
     /**
      * returns a linearized textual representation of this term
      */
@@ -105,79 +100,6 @@ class TermImpl extends CCTermImpl<SourceElement, JavaBlock, Visitor, Term> imple
     @Override
     protected JavaBlock emptyModalContent() {
         return JavaBlock.EMPTY_JAVABLOCK;
-    }
-
-    @Override
-    protected NameAbstractionTable<SourceElement> unifyModalContent(Term t0, Term t1,
-                                                                    NameAbstractionTable<SourceElement> nat, NameAbstractionTable<SourceElement> failResult) {
-
-        if (!t0.modalContent().isEmpty() || !t1.modalContent().isEmpty()) {
-            nat = checkNat(nat);
-            if (!t0.modalContent().equalsModRenaming(t1.modalContent(), nat)) {
-                return failResult;
-            }
-        }
-
-        if (!(t0.op() instanceof SchemaVariable)
-                && t0.op() instanceof ProgramVariable) {
-            if (!(t1.op() instanceof ProgramVariable)) {
-                return failResult;
-            }
-            nat = checkNat(nat);
-            if (!((ProgramVariable) t0.op()).equalsModRenaming(
-                    (ProgramVariable) t1.op(), nat)) {
-                return failResult;
-            }
-        }
-
-        return nat;
-    }
-    
-    @Override
-    protected boolean unifyTermsModuloBoundRenaming(Term t0, Term t1,
-            ImmutableList<QuantifiableVariable> ownBoundVars,
-            ImmutableList<QuantifiableVariable> cmpBoundVars,
-            NameAbstractionTable<SourceElement> nat,
-            NameAbstractionTable<SourceElement> failResult){
-
-            if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
-                return true;
-            }
-
-            final Operator op0 = t0.op();
-
-            if (op0 instanceof QuantifiableVariable) {
-                return handleQuantifiableVariable(t0, t1, ownBoundVars,
-                        cmpBoundVars);
-            }
-
-            final Operator op1 = t1.op();
-
-            if (!(op0 instanceof ProgramVariable) && op0 != op1) {
-                return false;
-            }
-
-            if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
-                return false;
-            }
-
-            nat = unifyModalContent(t0, t1, nat, failResult);
-            if (nat == failResult) {
-                return false;
-            }
-
-            return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
-    }
-
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
-
-    private static NameAbstractionTable<SourceElement> checkNat(NameAbstractionTable<SourceElement> nat) {
-        if (nat == null) {
-            return new NameAbstractionTable<SourceElement>();
-        }
-        return nat;
     }
 
 }

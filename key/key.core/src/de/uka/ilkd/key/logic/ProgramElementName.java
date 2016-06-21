@@ -16,6 +16,7 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 
 import de.uka.ilkd.key.java.Comment;
@@ -163,19 +164,27 @@ public class ProgramElementName extends Name
     }
 	
 	
-    /** equals modulo renaming is described in the corresponding
-     * comment in class SourceElement. The ProgramElementName has to
-     * check if an abstract name has been assigned and if, if both
-     * elements are assigned to the same name, otherwise the names
-     * have to be equal
+    /**
+     * equals modulo renaming is described in the corresponding comment in class
+     * SourceElement. The ProgramElementName has to check if an abstract name
+     * has been assigned and if, if both elements are assigned to the same name,
+     * otherwise the names have to be equal
      */
     @Override
-    public boolean equalsModRenaming(SourceElement se, 
+    public boolean equalsModRenaming(SourceElement se,
             NameAbstractionTable<SourceElement> nat) {
-	if (!(se instanceof ProgramElementName)) {
-	    return false;
-	}
-	return nat.sameAbstractName(this, se);
+        if (!(se instanceof ProgramElementName)) {
+            return false;
+        }
+        return nat.sameAbstractName(this, se);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean equalsModRenaming(CCSourceElement se,
+            NameAbstractionTable<? extends CCSourceElement> nat) {
+        return equalsModRenaming((SourceElement) this,
+                (NameAbstractionTable<SourceElement>) nat);
     }
 	
    	    

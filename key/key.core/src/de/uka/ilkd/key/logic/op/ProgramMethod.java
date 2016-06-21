@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic.op;
 import java.io.IOException;
 
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -293,17 +294,24 @@ public final class ProgramMethod extends ObserverFunction
        return null;
     }
   
-    /** equals modulo renaming is described in class
-     * SourceElement.
+    /**
+     * equals modulo renaming is described in class SourceElement.
      */
     @Override
-    public boolean equalsModRenaming(SourceElement se, 
-	    NameAbstractionTable<SourceElement> nat) {
-	if (se == null || !(se instanceof IProgramMethod)) {
-	    return false;
-	}
+    public boolean equalsModRenaming(SourceElement se,
+            NameAbstractionTable<SourceElement> nat) {
+        if (se == null || !(se instanceof IProgramMethod)) {
+            return false;
+        }
 
-	return method==((IProgramMethod)se).getMethodDeclaration();
+        return method == ((IProgramMethod) se).getMethodDeclaration();
+    }
+
+    @Override
+    public boolean equalsModRenaming(CCSourceElement se,
+            NameAbstractionTable<? extends CCSourceElement> nat) {
+        return equalsModRenaming((SourceElement) se,
+                (NameAbstractionTable<SourceElement>) null);
     }
     
     @Deprecated

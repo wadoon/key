@@ -20,5 +20,23 @@ import org.key_project.common.core.logic.op.SVSubstitute;
  * semantics, at least none that is machinable, for instance a comment.
  */
 public interface CCSourceElement extends SVSubstitute {
-
+    
+    /**
+     * This method returns true if two program parts are equal modulo
+     * renaming. The equality is mainly a syntactical equality with
+     * some exceptions: if a variable is declared we abstract from the
+     * name of the variable, so the first declared variable gets
+     * e.g. the name decl_1, the second declared decl_2 and so on.
+     * Look at the following programs:
+     * {int i; i=0;} and { int j; j=0;} these would be seen like
+     * {int decl_1; decl_1=0;} and {int decl_1; decl_1=0;} which are
+     * syntactical equal and therefore true is returned (same thing for
+     * labels). But {int i; i=0;} and {int j; i=0;} (in the second
+     * block the variable i is declared somewhere outside)
+     * would be seen as {int decl_1; decl_1=0;} for the first one but 
+     * {int decl_1; i=0;} for the second one. These are not
+     * syntactical equal, therefore false is returned. 
+     */
+    boolean equalsModRenaming(CCSourceElement se, NameAbstractionTable<? extends CCSourceElement> nat);
+    
 }

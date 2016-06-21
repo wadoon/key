@@ -16,10 +16,11 @@ package de.uka.ilkd.key.logic;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.java.*;
-
 import org.key_project.common.core.logic.ModalContent;
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
+
+import de.uka.ilkd.key.java.*;
 
 public class JavaBlock implements ModalContent {
 
@@ -111,7 +112,7 @@ public class JavaBlock implements ModalContent {
      * returns true if the given ProgramElement is equal to the one of the
      * JavaBlock modulo renaming (see comment in SourceElement)
      */
-    public boolean equalsModRenaming(Object o, NameAbstractionTable<SourceElement> nat) {
+    public boolean equalsModRenaming(Object o, NameAbstractionTable<? extends CCSourceElement> nat) {
         if (!(o instanceof JavaBlock)) {
             return false;
         }
@@ -123,7 +124,7 @@ public class JavaBlock implements ModalContent {
      * JavaBlock modulo renaming (see comment in SourceElement)
      */
     private boolean equalsModRenaming(JavaProgramElement pe,
-            NameAbstractionTable<SourceElement> nat) {
+            NameAbstractionTable<? extends CCSourceElement> nat) {
         if (pe == null && program() == null) {
             return true;
         }

@@ -52,9 +52,10 @@ public class BoundVarsVisitor<T extends CCTerm<?, T>> extends CCDefaultVisitor<T
     /**
      * visits a sequent
      */
-    public void visit(CCSequent<T, ?, ?, ?> visited) {
-        for (SequentFormula<T> cf : visited) {
-            visit(cf.formula());
+    @SuppressWarnings("unchecked")
+    public void visit(CCSequent<?, ?, ?, ?> visited) {
+        for (SequentFormula<?> cf : visited) {
+            visit((T) cf.formula());
         }
     }
 

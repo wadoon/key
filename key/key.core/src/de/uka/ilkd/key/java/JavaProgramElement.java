@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.ExtList;
 
@@ -131,6 +132,13 @@ public abstract class JavaProgramElement extends JavaSourceElement
     public boolean equalsModRenaming(SourceElement se, 
             NameAbstractionTable<SourceElement> nat) {
     	return (this.getClass() == se.getClass());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean equalsModRenaming(CCSourceElement se,
+            NameAbstractionTable<? extends CCSourceElement> nat) {
+        return (this.getClass() == se.getClass());
     }
     
     

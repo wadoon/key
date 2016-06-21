@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java;
 
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -64,6 +65,15 @@ public class Comment extends JavaSourceElement {
              NameAbstractionTable<SourceElement> nat) {
      	return true;
      }
+     
+     /* (non-Javadoc)
+     * @see org.key_project.common.core.program.CCSourceElement#equalsModRenaming(org.key_project.common.core.program.CCSourceElement, org.key_project.common.core.program.NameAbstractionTable)
+     */
+    @Override
+    public boolean equalsModRenaming(CCSourceElement se,
+            NameAbstractionTable<? extends CCSourceElement> nat) {
+        return true;
+    }
      
      public int hashCode(){
      	int result = 17;

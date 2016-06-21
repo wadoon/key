@@ -16,10 +16,13 @@ package org.key_project.common.core.logic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.CCProgramVariable;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.visitors.CCTermVisitor;
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.collection.*;
 
@@ -29,7 +32,7 @@ import org.key_project.util.collection.*;
  * @author Dominic Scheurer
  *
  */
-public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
+public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
         implements CCTerm<V, T> {
 
     static enum ThreeValuedTruth {
@@ -47,6 +50,14 @@ public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisi
 
     static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST =
             new ImmutableArray<TermLabel>();
+
+    @SuppressWarnings("rawtypes")
+    private static NameAbstractionTable FAILED = new NameAbstractionTable();
+
+    @SuppressWarnings("unchecked")
+    private static <S> NameAbstractionTable<S> failed() {
+        return (NameAbstractionTable<S>) FAILED;
+    }
 
     // -------------------------------------------------------------------
     // instance variables
@@ -113,40 +124,12 @@ public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisi
      */
     protected abstract ImmutableArray<T> emptyTermList();
 
-    protected abstract P emptyModalContent();
-
     /**
-     * Computes the name abstracton for t0 and t1. If the process fails,
-     * failResult is returned. The method may not return null.
-     *
-     * TODO
-     *
-     * @param t0
-     * @param t1
-     * @param nat
-     * @param failResult
-     * @return
-     */
-    protected abstract NameAbstractionTable<S> unifyModalContent(T t0, T t1,
-                                                                             NameAbstractionTable<S> nat, NameAbstractionTable<S> failResult);
-
-    /**
-     * 
      * TODO: Document.
      *
-     * @param t0
-     * @param t1
-     * @param ownBoundVars
-     * @param cmpBoundVars
-     * @param nat
-     * @param failResult
      * @return
      */
-    protected abstract boolean unifyTermsModuloBoundRenaming(T t0, T t1,
-            ImmutableList<QuantifiableVariable> ownBoundVars,
-            ImmutableList<QuantifiableVariable> cmpBoundVars,
-            NameAbstractionTable<S> nat,
-            NameAbstractionTable<S> failResult);
+    protected abstract P emptyModalContent();
 
     // -------------------------------------------------------------------------
     // public interface
@@ -283,7 +266,7 @@ public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisi
 
         return unifyTermsModuloBoundRenaming(thisAsT(), (T) o,
                 ImmutableSLList.<QuantifiableVariable> nil(),
-                ImmutableSLList.<QuantifiableVariable> nil(), null, failed());
+                ImmutableSLList.<QuantifiableVariable> nil(), null);
     }
 
     /**
@@ -301,7 +284,7 @@ public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisi
         }
 
         @SuppressWarnings("unchecked")
-        final CCTermImpl<S, P, V, T> t = (CCTermImpl<S, P, V, T>) o;
+        final CCTermImpl<P, V, T> t = (CCTermImpl<P, V, T>) o;
 
         return op.equals(t.op) && t.hasLabels() == hasLabels()
                 && subs.equals(t.subs) && boundVars.equals(t.boundVars)
@@ -403,7 +386,7 @@ public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisi
         }
         return true;
     }
-    
+
     // Methods needed for equalsModRenaming
 
     /**
@@ -420,7 +403,7 @@ public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisi
     protected boolean descendRecursively(T t0, T t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
-            NameAbstractionTable<S> nat) {
+            NameAbstractionTable<CCSourceElement> nat) {
 
         for (int i = 0; i < t0.arity(); i++) {
             ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
@@ -443,7 +426,7 @@ public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisi
             boolean newConstraint =
                     unifyTermsModuloBoundRenaming(t0.sub(i), t1.sub(i),
                             subOwnBoundVars,
-                            subCmpBoundVars, nat, failed());
+                            subCmpBoundVars, nat);
 
             if (!newConstraint) {
                 return false;
@@ -480,19 +463,91 @@ public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisi
     }
 
     /**
-     * used to encode that <tt>unifyModalContent</tt> results in an
-     * unsatisfiable constraint (faster than using exceptions).
-     * <p>
-     * Note: This was previously a static field; was turned into this method for
-     * type safety in the course of refactoring KeY (removing the Java elements
-     * from the core). Now we definitely have more objects...
+     * TODO: Document.
+     *
+     * @param t0
+     * @param t1
+     * @param ownBoundVars
+     * @param cmpBoundVars
+     * @param nat
+     * @param failResult
+     * @return
      */
-    private NameAbstractionTable<S> failed() {
-        return new NameAbstractionTable<S>();
+    private boolean unifyTermsModuloBoundRenaming(T t0, T t1,
+            ImmutableList<QuantifiableVariable> ownBoundVars,
+            ImmutableList<QuantifiableVariable> cmpBoundVars,
+            NameAbstractionTable<CCSourceElement> nat) {
+
+        if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
+            return true;
+        }
+
+        final Operator op0 = t0.op();
+
+        if (op0 instanceof QuantifiableVariable) {
+            return handleQuantifiableVariable(t0, t1, ownBoundVars,
+                    cmpBoundVars);
+        }
+
+        final Operator op1 = t1.op();
+
+        if (!(op0 instanceof CCProgramVariable) && op0 != op1) {
+            return false;
+        }
+
+        if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
+            return false;
+        }
+
+        nat = unifyModalContent(t0, t1, nat);
+        if (nat == FAILED) {
+            return false;
+        }
+
+        return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
     }
-    
-//    @SuppressWarnings("rawtypes")
-//    private static NameAbstractionTable FAILED = new NameAbstractionTable();
+
+    /**
+     * Computes the name abstraction for t0 and t1. If the process fails,
+     * failResult is returned. The method may not return null.
+     *
+     * TODO
+     *
+     * @param t0
+     * @param t1
+     * @param nat
+     * @param failResult
+     * @return
+     */
+    private NameAbstractionTable<CCSourceElement> unifyModalContent(T t0,
+            T t1,
+            NameAbstractionTable<CCSourceElement> nat) {
+
+        if (!t0.modalContent().isEmpty() || !t1.modalContent().isEmpty()) {
+            nat = checkNat(nat);
+            if (!t0.modalContent().equalsModRenaming(t1.modalContent(), nat)) {
+                return failed();
+            }
+        }
+
+        if (!(t0.op() instanceof SchemaVariable)
+                && t0.op() instanceof CCProgramVariable) {
+            if (!(t1.op() instanceof CCProgramVariable)) {
+                return failed();
+            }
+            nat = checkNat(nat);
+
+            CCProgramVariable op0 = (CCProgramVariable) t0.op();
+            CCProgramVariable op1 = (CCProgramVariable) t1.op();
+
+            if (!op0.equalsModRenaming(
+                    op1, nat)) {
+                return failed();
+            }
+        }
+
+        return nat;
+    }
 
     // -------------------------------------------------------------------------
     // private static methods
@@ -547,6 +602,14 @@ public abstract class CCTermImpl<S, P extends ModalContent, V extends CCTermVisi
             list = list.tail();
         }
         return -1;
+    }
+
+    private static <S> NameAbstractionTable<S> checkNat(
+            NameAbstractionTable<S> nat) {
+        if (nat == null) {
+            return new NameAbstractionTable<S>();
+        }
+        return nat;
     }
 
 }

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 
 import org.key_project.common.core.logic.op.SVSubstitute;
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
  * taken from RECODER and changed to achieve an immutable structure
  */
 
-public interface SourceElement extends SVSubstitute {
+public interface SourceElement extends SVSubstitute, CCSourceElement {
 
 
     /**

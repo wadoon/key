@@ -1,5 +1,8 @@
 package org.key_project.common.core.logic;
 
+import org.key_project.common.core.program.CCSourceElement;
+import org.key_project.common.core.program.NameAbstractionTable;
+
 
 public interface ModalContent {
 
@@ -9,4 +12,12 @@ public interface ModalContent {
      */
     boolean isEmpty();
 
+    /**
+     * TODO: Document.
+     *
+     * @param se
+     * @param nat
+     * @return
+     */
+    boolean equalsModRenaming(Object se, NameAbstractionTable<? extends CCSourceElement> nat);
 }

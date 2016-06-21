@@ -51,11 +51,7 @@ import org.key_project.util.collection.ImmutableSet;
  * </ol>
  * Term supports the {@link CCTermVisitor} pattern. Two different visit strategies are
  * currently supported: {@link Term#execPostOrder(CCTermVisitor)} and
- * {@link Term#execPreOrder(CCTermVisitor)}.<br/>
- * 
- * <strong>TODO</strong>: Rename to "Term", and the previous {@link Term} to
- * "JavaTerm" or the like; from this class here, the java specific methods
- * have been removed.
+ * {@link Term#execPreOrder(CCTermVisitor)}.
  */
 public interface CCTerm<V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
         extends SVSubstitute, Sorted {

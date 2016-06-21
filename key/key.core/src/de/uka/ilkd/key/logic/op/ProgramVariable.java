@@ -18,6 +18,7 @@ import java.io.IOException;
 import org.key_project.common.core.logic.op.CCProgramVariable;
 import org.key_project.common.core.logic.op.ParsableVariable;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.ExtList;
 
@@ -209,6 +210,16 @@ public abstract class ProgramVariable extends CCProgramVariable
     public boolean equalsModRenaming(SourceElement se,
             NameAbstractionTable<SourceElement> nat) {
         return nat.sameAbstractName(this, se);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.key_project.common.core.program.CCSourceElement#equalsModRenaming(org.key_project.common.core.program.CCSourceElement, org.key_project.common.core.program.NameAbstractionTable)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean equalsModRenaming(CCSourceElement se,
+            NameAbstractionTable<? extends CCSourceElement> nat) {
+        return equalsModRenaming((SourceElement) se, (NameAbstractionTable<SourceElement>) nat);
     }
 
     // ---------------------------------------------------

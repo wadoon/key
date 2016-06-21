@@ -19,6 +19,7 @@ import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.AbstractSV;
 import org.key_project.common.core.logic.op.UpdateableOperator;
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -87,14 +88,21 @@ public final class ProgramSV extends AbstractSV
     }
     
     
-    /** 
+    /**
      * this method tests on object identity
      */
     @Override
-    public boolean equalsModRenaming(SourceElement se, 
+    public boolean equalsModRenaming(SourceElement se,
             NameAbstractionTable<SourceElement> nat) {
-	return se == this;
-    }    
+        return se == this;
+    }
+    
+    @Override
+    public boolean equalsModRenaming(CCSourceElement se,
+            NameAbstractionTable<? extends CCSourceElement> nat) {
+        return equalsModRenaming((SourceElement) se,
+                (NameAbstractionTable<SourceElement>) null);
+    }
         
     
     /** @return comments if the schemavariable stands for programm
