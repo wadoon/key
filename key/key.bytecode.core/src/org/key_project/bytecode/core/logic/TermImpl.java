@@ -45,22 +45,15 @@ public class TermImpl extends CCTermImpl<InstructionBlock, Visitor, Term> implem
             InstructionBlock javaBlock) {
         super(op, sort, subs, boundVars, javaBlock);
     }
-
-    /* (non-Javadoc)
-     * @see org.key_project.common.core.logic.CCTermImpl#emptyTermList()
-     */
+    
     @Override
     protected ImmutableArray<Term> emptyTermList() {
         return EMPTY_TERM_LIST;
     }
 
-    /* (non-Javadoc)
-     * @see org.key_project.common.core.logic.CCTermImpl#emptyModalContent()
-     */
     @Override
     protected InstructionBlock emptyModalContent() {
-        // TODO Auto-generated method stub
-        return null;
+        return InstructionBlock.emptyBlock();
     }
 
 }
