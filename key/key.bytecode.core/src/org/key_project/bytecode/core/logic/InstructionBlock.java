@@ -18,6 +18,8 @@ import java.util.List;
 
 import org.key_project.bytecode.core.ast.Instruction;
 import org.key_project.common.core.logic.ModalContent;
+import org.key_project.common.core.program.CCSourceElement;
+import org.key_project.common.core.program.NameAbstractionTable;
 
 /**
  * TODO: Document.
@@ -25,20 +27,23 @@ import org.key_project.common.core.logic.ModalContent;
  * @author Dominic Scheurer
  */
 public class InstructionBlock implements ModalContent {
-    
+
     private int pc;
     private LinkedList<Instruction> insns;
-    
+
+    private static InstructionBlock EMPTY_BLOCK = new InstructionBlock(
+            new LinkedList<Instruction>());
+
     /**
      * 
      * TODO: Document.
      *
      */
     public InstructionBlock(List<Instruction> insns) {
-       this.insns.addAll(insns);
-       this.pc = 0;
+        this.insns.addAll(insns);
+        this.pc = 0;
     }
-    
+
     /**
      * TODO: Document.
      *
@@ -47,7 +52,7 @@ public class InstructionBlock implements ModalContent {
     public int pc() {
         return pc;
     }
-    
+
     /**
      * TODO: Document.
      *
@@ -57,12 +62,20 @@ public class InstructionBlock implements ModalContent {
         return insns.get(pc);
     }
 
-    /* (non-Javadoc)
-     * @see org.key_project.common.core.logic.ModalContent#isEmpty()
-     */
     @Override
     public boolean isEmpty() {
         return insns.isEmpty();
     }
-    
+
+    @Override
+    public boolean equalsModRenaming(Object se,
+            NameAbstractionTable<? extends CCSourceElement> nat) {
+        // TODO implement
+        throw new RuntimeException("Method still waiting for implementation");
+    }
+
+    public static InstructionBlock emptyBlock() {
+        return EMPTY_BLOCK;
+    }
+
 }
