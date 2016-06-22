@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
