@@ -14,9 +14,8 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractOperator;
+import org.key_project.common.core.logic.op.CCSubstOp;
 
-import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.Term;
 
 /**
@@ -25,24 +24,10 @@ import de.uka.ilkd.key.logic.Term;
  * operators. Currently, only the subclass <code>WarySubstOp</code> is used and
  * accessible through the key parser.
  */
-public abstract class SubstOp extends AbstractOperator {
+public abstract class SubstOp extends CCSubstOp<Term> {
 
     protected SubstOp(Name name) {
-        super(name, 2, new Boolean[] { false, true }, true);
+        super(name);
     }
-
-    /**
-     * Apply this substitution operator to <code>term</code>, which has this
-     * operator as top-level operator
-     * 
-     * @param services
-     *            TODO
-     */
-    public abstract Term apply(Term term, JavaDLTermServices services);// {
-    // QuantifiableVariable v =
-    // term.varsBoundHere(1).getQuantifiableVariable(0);
-    // ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));
-    // Term res = cfSubst.apply(term.sub(1));
-    // return res;
-    // }
+    
 }

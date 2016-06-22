@@ -14,10 +14,7 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 

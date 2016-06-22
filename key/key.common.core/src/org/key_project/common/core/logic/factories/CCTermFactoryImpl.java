@@ -55,7 +55,10 @@ public abstract class CCTermFactoryImpl<P extends ModalContent, T extends CCTerm
             ImmutableArray<QuantifiableVariable> boundVars,
             P javaBlock, ImmutableArray<TermLabel> labels);
 
-    protected abstract T[] createTermArray(T sub1, T sub2);
+    public abstract T[] createTermArray(int size);
+    public abstract T[] createTermArray(T sub1);
+    public abstract T[] createTermArray(T sub1, T sub2);
+    public abstract T[] createTermArray(T sub1, T sub2, T sub3);
 
     protected abstract <O extends Operator> TypeCheckingAndInferenceService<O> getTypeCheckingAndInferenceService(
             O op);
@@ -98,8 +101,9 @@ public abstract class CCTermFactoryImpl<P extends ModalContent, T extends CCTerm
                 null);
     }
 
+    @SafeVarargs
     @Override
-    public T createTerm(Operator op, @SuppressWarnings("unchecked") T... subs) {
+    public final T createTerm(Operator op, T... subs) {
         return createTerm(op, subs, null, null);
     }
 

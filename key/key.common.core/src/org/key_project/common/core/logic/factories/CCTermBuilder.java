@@ -495,6 +495,6 @@ public interface CCTermBuilder<P extends ModalContent, T extends CCTerm<?, T>> {
 
 //    public abstract T parseTerm(String s) throws ParserException;
 
-    public abstract CCTermFactory<?, T> tf();
+    public abstract CCTermFactory<P, T> tf();
 
 }

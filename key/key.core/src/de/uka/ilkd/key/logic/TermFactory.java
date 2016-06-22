@@ -78,8 +78,23 @@ public final class TermFactory extends CCTermFactoryImpl<JavaBlock, Term>
     }
 
     @Override
-    protected Term[] createTermArray(Term sub1, Term sub2) {
+    public Term[] createTermArray(int size) {
+        return new Term[size];
+    }
+
+    @Override
+    public Term[] createTermArray(Term sub1) {
+        return new Term[] { sub1 };
+    }
+
+    @Override
+    public Term[] createTermArray(Term sub1, Term sub2) {
         return new Term[] { sub1, sub2 };
+    }
+
+    @Override
+    public Term[] createTermArray(Term sub1, Term sub2, Term sub3) {
+        return new Term[] { sub1, sub2, sub3 };
     }
 
     @Override

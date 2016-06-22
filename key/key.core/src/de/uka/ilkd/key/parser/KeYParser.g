@@ -59,6 +59,7 @@ options {
   import org.key_project.common.core.logic.Namespace;
   import org.key_project.common.core.logic.NamespaceSet;
   import org.key_project.common.core.logic.calculus.*;
+  import org.key_project.common.core.logic.factories.*;
   import org.key_project.common.core.logic.label.TermLabel;
   import org.key_project.common.core.logic.op.*;
   import org.key_project.common.core.logic.sort.*;
