@@ -1,7 +1,9 @@
-package org.key_project.common.core.logic;
+package org.key_project.common.core.logic.factories;
 
 import java.util.Map;
 
+import org.key_project.common.core.logic.CCTerm;
+import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.LogicVariable;

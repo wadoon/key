@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.java;
 
-import org.key_project.common.core.logic.CCTermBuilder;
 import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.factories.CCTermBuilder;
 import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.logic.TermBuilder;

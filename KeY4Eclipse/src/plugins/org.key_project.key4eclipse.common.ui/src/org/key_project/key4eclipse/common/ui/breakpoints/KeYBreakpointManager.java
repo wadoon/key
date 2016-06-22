@@ -25,6 +25,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.debug.core.breakpoints.*;
+import org.key_project.common.core.logic.factories.TermCreationException;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -32,7 +33,6 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;

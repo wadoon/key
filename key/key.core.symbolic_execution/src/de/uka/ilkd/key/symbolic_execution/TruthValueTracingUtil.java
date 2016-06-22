@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.key_project.common.core.logic.CCTerm;
-import org.key_project.common.core.logic.CCTermBuilder;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.factories.CCTermBuilder;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
+import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceServiceImpl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -159,7 +159,7 @@ public final class TruthValueTracingUtil {
     */
    public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<Term> subs) {
       if (operator == IfThenElse.IF_THEN_ELSE) {
-         Sort sort = TypeCheckingAndInferenceService.getTypeCheckerFor(operator).sort(subs, operator);
+         Sort sort = TypeCheckingAndInferenceServiceImpl.getTypeCheckerFor(operator).sort(subs, operator);
          return sort == Sort.FORMULA;
       }
       else {

@@ -17,10 +17,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-import org.key_project.common.core.logic.CCTermBuilder;
-import org.key_project.common.core.logic.CCTermFactory;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.factories.CCTermBuilder;
+import org.key_project.common.core.logic.factories.CCTermFactory;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.common.core.services.ProgramServices;

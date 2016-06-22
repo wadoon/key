@@ -17,10 +17,9 @@ package de.uka.ilkd.key.logic;
 import java.io.StringReader;
 import java.util.*;
 
-import org.key_project.common.core.logic.CCTermBuilder;
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Namespace;
-import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.logic.*;
+import org.key_project.common.core.logic.factories.CCTermBuilder;
+import org.key_project.common.core.logic.factories.TermCreationException;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;

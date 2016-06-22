@@ -14,9 +14,9 @@
 package org.key_project.common.core.services;
 
 import org.key_project.common.core.logic.NamespaceSet;
-import org.key_project.common.core.logic.CCTermBuilder;
-import org.key_project.common.core.logic.CCTermFactory;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.factories.CCTermBuilder;
+import org.key_project.common.core.logic.factories.CCTermFactory;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 
 /**

@@ -14,6 +14,7 @@ Export-Package:
  org.key_project.common.core.ldt,
  org.key_project.common.core.logic,
  org.key_project.common.core.logic.calculus,
+ org.key_project.common.core.logic.factories,
  org.key_project.common.core.logic.label,
  org.key_project.common.core.logic.op,
  org.key_project.common.core.logic.sort,

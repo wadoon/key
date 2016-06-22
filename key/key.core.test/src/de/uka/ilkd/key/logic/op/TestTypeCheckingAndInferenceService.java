@@ -48,20 +48,20 @@ public class TestTypeCheckingAndInferenceService extends TestCase {
     public void testFunction() {
         final Function op = new Function(new Name("f"), SortImpl.ANY);
 
-        final TypeCheckingAndInferenceService<Function> service =
-                TypeCheckingAndInferenceService.getTypeCheckerFor(op);
+        final TypeCheckingAndInferenceServiceImpl<Function> service =
+                TypeCheckingAndInferenceServiceImpl.getTypeCheckerFor(op);
 
         assertNotNull(service);
 
         assertSame(
-                TypeCheckingAndInferenceService.AbstractSortedOperatorTypeCheckingAndInferenceService.class,
+                TypeCheckingAndInferenceServiceImpl.AbstractSortedOperatorTypeCheckingAndInferenceService.class,
                 service.getClass());
 
         assertTrue(service.validTopLevel(
                 tb.var(new LogicVariable(new Name("v"), SortImpl.ANY)), op));
 
         assertSame(service.getClass(),
-                TypeCheckingAndInferenceService
+                TypeCheckingAndInferenceServiceImpl
                         .getTypeCheckerFor(new LogicVariable(new Name("v1"),
                                 SortImpl.ANY)).getClass());
     }

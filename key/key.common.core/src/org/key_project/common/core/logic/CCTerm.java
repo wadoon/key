@@ -13,6 +13,7 @@
 
 package org.key_project.common.core.logic;
 
+import org.key_project.common.core.logic.factories.CCTermFactory;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;

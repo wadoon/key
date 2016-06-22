@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.factories.TermCreationException;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
@@ -24,7 +25,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.util.Debug;
 
 /**

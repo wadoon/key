@@ -1,5 +1,7 @@
-package org.key_project.common.core.logic;
+package org.key_project.common.core.logic.factories;
 
+import org.key_project.common.core.logic.CCTerm;
+import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;

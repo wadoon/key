@@ -11,15 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic.factories;
 
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService;
-
+/**
+ * {@link RuntimeException} thrown when creating a term failed.
+ */
 public class TermCreationException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
@@ -27,20 +29,17 @@ public class TermCreationException extends RuntimeException {
         super(errorMessage);
     }
 
-    public TermCreationException(Operator op, Term failed) {
-        super(getErrorMessage(op, failed));
+    public <T extends CCTerm<?, T>> TermCreationException(Operator op, T failed, Sort s) {
+        super(getErrorMessage(op, failed, s));
     }
 
-    private static String getErrorMessage(Operator op, Term failed) {
-        ImmutableArray<Term> subs = failed.subs();
+    protected static <T extends CCTerm<?, T>> String getErrorMessage(
+            Operator op, T failed, Sort s) {
+        ImmutableArray<T> subs = failed.subs();
         for (int i = 0, n = subs.size(); i < n; i++) {
-            Term sub = subs.get(i);
+            T sub = subs.get(i);
             assert sub == failed.subs().get(i);
         }
-
-        final Sort s =
-                TypeCheckingAndInferenceService.getTypeCheckerFor(op).sort(
-                        subs, op);
 
         return "Building a term failed. Normally there is an arity mismatch "
                 + "or one of the subterms' sorts "
@@ -67,11 +66,12 @@ public class TermCreationException extends RuntimeException {
         return sb.toString();
     }
 
-    private static String subsToString(ImmutableArray<Term> subs) {
+    private static <T extends CCTerm<?, T>> String subsToString(
+            ImmutableArray<T> subs) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0, n = subs.size(); i < n; i++) {
             sb.append((i + 1) + ".) ");
-            Term subi = subs.get(i);
+            T subi = subs.get(i);
             if (subi != null) {
                 sb.append(subi);
                 Sort subiSort = subi.sort();
