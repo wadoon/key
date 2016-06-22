@@ -107,7 +107,7 @@ public class KeYInterface {
      * @return the proof
      * @throws ProofInputException in the event that the proof cannot be created
      */
-    private Proof getProof(final KeYEnvironment<DefaultUserInterfaceControl> environment,
+   /* private Proof getProof(final KeYEnvironment<DefaultUserInterfaceControl> environment,
                            final IProgramMethod method,
                            final String precondition) throws ProofInputException {
 
@@ -124,9 +124,9 @@ public class KeYInterface {
             throw new ProofInputException("Unable to load proof");
         }
 
-        /*
+        
          * Setup a strategy and goal chooser for the proof session
-         */
+         
         //SymbolicExecutionUtil.configureProof(proof);
         SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof,
                                                                         ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
@@ -138,7 +138,7 @@ public class KeYInterface {
 
         return proof;
     }
-
+*/
     /**
      * Symbolically execute a given method, and return the resulting symbolic
      * execution tree.
@@ -188,7 +188,7 @@ public class KeYInterface {
 
             return env.getBuilder().getStartNode();
 
-        } catch (final ProofInputException | ProblemLoaderException e) {
+        } catch (ProofInputException | ProblemLoaderException e) {
 
             throw new KeYInterfaceException("FATAL: could not create proof: " + e.getMessage());
 

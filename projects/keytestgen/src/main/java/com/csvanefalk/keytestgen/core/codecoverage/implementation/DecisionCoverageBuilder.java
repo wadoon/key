@@ -2,6 +2,7 @@ package com.csvanefalk.keytestgen.core.codecoverage.implementation;
 
 import com.csvanefalk.keytestgen.core.codecoverage.executionpath.ExecutionPath;
 import com.csvanefalk.keytestgen.core.codecoverage.executionpath.ExecutionPathContext;
+
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.BranchStatement;
@@ -10,6 +11,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
+@SuppressWarnings("restriction")
 public class DecisionCoverageBuilder implements ICoverageBuilder {
 
     private static class DescendingExecutionBranchComparator implements Comparator<ExecutionPath> {

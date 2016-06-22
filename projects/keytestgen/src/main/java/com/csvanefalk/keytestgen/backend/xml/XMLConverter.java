@@ -227,7 +227,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
          */
         writeStartTag(XMLHandler.INSTANCES_ROOT);
         for (final ModelVariable modelVariable : model.getVariables()) {
-            this.writeInstance(modelVariable.getValue());
+            this.writeInstanceObject(modelVariable.getValue());
         }
         writeEndTag(XMLHandler.INSTANCES_ROOT);
 
@@ -302,7 +302,7 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
      * @param instance the instance to write
      * @throws XMLStreamException in case the XML could not be generated
      */
-    private void writeInstance(final Object instance) throws XMLStreamException {
+    private void writeInstanceObject(final Object instance) throws XMLStreamException {
 
         writeStartTag(XMLHandler.INSTANCE_ROOT);
 
