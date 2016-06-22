@@ -5,7 +5,6 @@ import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.services.CCProofServices;
 
 import de.uka.ilkd.key.proof.Counter;
-import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -13,8 +12,6 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
 public interface ProofServices extends CCProofServices {
-
-    NameRecorder getNameRecorder();
 
     void saveNameRecorder(Node n);
 

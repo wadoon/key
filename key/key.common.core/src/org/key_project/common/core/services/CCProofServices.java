@@ -14,6 +14,7 @@
 package org.key_project.common.core.services;
 
 import org.key_project.common.core.logic.NamespaceSet;
+import org.key_project.common.core.proof.NameRecorder;
 
 /**
  * TODO: Document.
@@ -32,5 +33,7 @@ public interface CCProofServices {
      * @return the proof specific namespaces
      */
     NamespaceSet getNamespaces();
+
+    NameRecorder getNameRecorder();
 
 }

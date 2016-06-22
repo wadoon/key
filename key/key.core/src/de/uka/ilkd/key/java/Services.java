@@ -23,6 +23,7 @@ import org.key_project.common.core.logic.factories.CCTermBuilder;
 import org.key_project.common.core.logic.factories.CCTermFactory;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.SortImpl;
+import org.key_project.common.core.proof.NameRecorder;
 import org.key_project.common.core.services.ProgramServices;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;

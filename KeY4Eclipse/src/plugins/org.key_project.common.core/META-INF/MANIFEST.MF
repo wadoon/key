@@ -21,6 +21,7 @@ Export-Package:
  org.key_project.common.core.logic.visitors,
  org.key_project.common.core.program,
  org.key_project.common.core.program.abstraction,
+ org.key_project.common.core.proof,
  org.key_project.common.core.rule,
  org.key_project.common.core.services,
  org.key_project.common.core.util

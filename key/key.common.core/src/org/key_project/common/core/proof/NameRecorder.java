@@ -11,12 +11,15 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
+package org.key_project.common.core.proof;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+/**
+ * TODO: Document.
+ */
 public class NameRecorder {
 
     private ImmutableList<Name> pre = ImmutableSLList.<Name>nil();
