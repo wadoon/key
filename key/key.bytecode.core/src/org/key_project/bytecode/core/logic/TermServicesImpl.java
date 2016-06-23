@@ -15,12 +15,8 @@ package org.key_project.bytecode.core.logic;
 
 import org.key_project.bytecode.core.logic.factories.TermBuilder;
 import org.key_project.bytecode.core.logic.factories.TermFactory;
-import org.key_project.common.core.logic.CCTerm;
-import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.NamespaceSet;
-import org.key_project.common.core.logic.factories.CCTermBuilder;
-import org.key_project.common.core.logic.factories.CCTermFactory;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.services.TermServices;
 
