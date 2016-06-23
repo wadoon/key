@@ -69,7 +69,7 @@ public final class TermFactory extends CCTermFactoryImpl<JavaBlock, Term>
                         new LabeledTermImpl(op, sort, subs, boundVars,
                                 javaBlock, labels));
 
-        return cacheTerm(newTerm);
+        return newTerm;
     }
 
     @Override

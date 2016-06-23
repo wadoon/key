@@ -109,7 +109,7 @@ public abstract class CCTermFactoryImpl<P extends ModalContent, T extends CCTerm
             subs = emptyTermList();
         }
 
-        return doCreateTerm(op, subs, boundVars, javaBlock, labels);
+        return cacheTerm(doCreateTerm(op, subs, boundVars, javaBlock, labels));
     }
 
     @Override
@@ -202,7 +202,20 @@ public abstract class CCTermFactoryImpl<P extends ModalContent, T extends CCTerm
         }
     }
 
-    protected T cacheTerm(final T newTerm) {
+    // -------------------------------------------------------------------------
+    // private methods
+    // -------------------------------------------------------------------------
+
+    private ImmutableArray<T> createSubtermArray(T[] subs) {
+        return subs == null || subs.length == 0 ?
+                emptyTermList() : new ImmutableArray<T>(subs);
+    }
+
+    private ImmutableArray<T> emptyTermList() {
+        return new ImmutableArray<T>(createTermArray(0));
+    }
+
+    private T cacheTerm(final T newTerm) {
         // Check if caching is possible. It is not possible if a non empty
         // P is available in the term or in one of its children because
         // the meta information like PositionInfos may be different.
@@ -223,19 +236,6 @@ public abstract class CCTermFactoryImpl<P extends ModalContent, T extends CCTerm
         else {
             return checked(newTerm);
         }
-    }
-
-    // -------------------------------------------------------------------------
-    // private methods
-    // -------------------------------------------------------------------------
-
-    private ImmutableArray<T> createSubtermArray(T[] subs) {
-        return subs == null || subs.length == 0 ?
-                emptyTermList() : new ImmutableArray<T>(subs);
-    }
-
-    private ImmutableArray<T> emptyTermList() {
-        return new ImmutableArray<T>(createTermArray(0));
     }
 
 }
