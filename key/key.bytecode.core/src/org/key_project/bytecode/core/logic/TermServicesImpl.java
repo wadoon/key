@@ -30,13 +30,13 @@ import org.key_project.common.core.services.TermServices;
 public class TermServicesImpl implements TermServices {
 
     @Override
-    public <P extends ModalContent, T extends CCTerm<?, T>, TB extends CCTermBuilder<P, T>> TB getTermBuilder() {
+    public <P extends ModalContent, T extends CCTerm<P, ?, T>, TB extends CCTermBuilder<P, T>> TB getTermBuilder() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public <P extends ModalContent, T extends CCTerm<?, T>, TF extends CCTermFactory<P, T>> TF getTermFactory() {
+    public <P extends ModalContent, T extends CCTerm<?, ?, T>, TF extends CCTermFactory<P, T>> TF getTermFactory() {
         // TODO Auto-generated method stub
         return null;
     }

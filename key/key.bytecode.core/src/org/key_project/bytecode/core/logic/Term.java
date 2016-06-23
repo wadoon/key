@@ -22,6 +22,6 @@ import org.key_project.common.core.logic.CCTerm;
  * @author Dominic Scheurer
  *
  */
-public interface Term extends CCTerm<Visitor, Term> {
+public interface Term extends CCTerm<InstructionBlock, Visitor, Term> {
 
 }
