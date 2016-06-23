@@ -22,6 +22,7 @@ import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
@@ -35,7 +36,8 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
  *
  * @author Dominic Scheurer
  */
-public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator> implements TypeCheckingAndInferenceService<O> {
+public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator>
+        implements TypeCheckingAndInferenceService<O> {
 
     private static final HashMap<Class<?>, TypeCheckingAndInferenceServiceImpl<?>> CHECKERS =
             new HashMap<Class<?>, TypeCheckingAndInferenceServiceImpl<?>>();
@@ -47,7 +49,7 @@ public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator> im
                 new IfExThenElseTypeCheckingAndInferenceService());
         CHECKERS.put(IfThenElse.class,
                 new IfThenElseTypeCheckingAndInferenceService());
-        CHECKERS.put(SubstOp.class,
+        CHECKERS.put(CCSubstOp.class,
                 new SubstOpTypeCheckingAndInferenceService());
         CHECKERS.put(UpdateApplication.class,
                 new UpdateApplicationTypeCheckingAndInferenceService());
@@ -70,7 +72,9 @@ public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator> im
 
         for (Class<?> c : CHECKERS.keySet()) {
             if (c.isInstance(op)) {
-                result = (TypeCheckingAndInferenceServiceImpl<C>) CHECKERS.get(c);
+                result =
+                        (TypeCheckingAndInferenceServiceImpl<C>) CHECKERS
+                                .get(c);
                 CHECKERS.put(op.getClass(), result);
                 return result;
             }
@@ -86,7 +90,8 @@ public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator> im
         else {// ignore anonymous classes as these are hacks
             return new TypeCheckingAndInferenceServiceImpl<C>() {
                 @Override
-                public Sort sort(ImmutableArray<? extends CCTerm<?, ?, ?>> terms,
+                public Sort sort(
+                        ImmutableArray<? extends CCTerm<?, ?, ?>> terms,
                         C op) {
                     return ((SortedOperator) op).sort();
                 }
@@ -103,14 +108,23 @@ public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator> im
     // //////// PUBLIC__INTERFACE //////// //
     // /////////////////////////////////// //
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService#sort(org.key_project.util.collection.ImmutableArray, O)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService#sort(org.key_project
+     * .util.collection.ImmutableArray, O)
      */
     @Override
-    public abstract Sort sort(ImmutableArray<? extends CCTerm<?, ?, ?>> terms, O op);
+    public abstract Sort sort(ImmutableArray<? extends CCTerm<?, ?, ?>> terms,
+            O op);
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService#validTopLevel(org.key_project.common.core.logic.CCTerm, O)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.uka.ilkd.key.logic.op.TypeCheckingAndInferenceService#validTopLevel
+     * (org.key_project.common.core.logic.CCTerm, O)
      */
     @Override
     public abstract boolean validTopLevel(CCTerm<?, ?, ?> term, O op);
@@ -147,9 +161,11 @@ public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator> im
          *            The operator.
          * @return true iff the top level structure of the {@link CCTerm} is
          *         valid.
-         * @see TypeCheckingAndInferenceServiceImpl#validTopLevel(CCTerm, Operator)
+         * @see TypeCheckingAndInferenceServiceImpl#validTopLevel(CCTerm,
+         *      Operator)
          */
-        public abstract boolean additionalValidTopLevel(CCTerm<?, ?, ?> term, O op);
+        public abstract boolean additionalValidTopLevel(CCTerm<?, ?, ?> term,
+                O op);
     }
 
     // /////////////////////////////////// //
@@ -255,7 +271,8 @@ public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator> im
             }
         }
 
-        public boolean additionalValidTopLevel(CCTerm<?, ?, ?> term, IfThenElse op) {
+        public boolean additionalValidTopLevel(CCTerm<?, ?, ?> term,
+                IfThenElse op) {
             final Sort s0 = term.sub(0).sort();
             final Sort s1 = term.sub(1).sort();
             final Sort s2 = term.sub(2).sort();
@@ -305,14 +322,14 @@ public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator> im
     }
 
     static class SubstOpTypeCheckingAndInferenceService extends
-            DefaultTypeCheckingAndInferenceService<SubstOp> {
+            DefaultTypeCheckingAndInferenceService<CCSubstOp<Term>> {
 
         private SubstOpTypeCheckingAndInferenceService() {
             // This class should be a Singleton.
         }
 
         public Sort sort(ImmutableArray<? extends CCTerm<?, ?, ?>> terms,
-                SubstOp op) {
+                CCSubstOp<Term> op) {
             if (terms.size() == 2) {
                 return terms.get(1).sort();
             }
@@ -322,7 +339,8 @@ public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator> im
             }
         }
 
-        public boolean additionalValidTopLevel(CCTerm<?, ?, ?> term, SubstOp op) {
+        public boolean additionalValidTopLevel(CCTerm<?, ?, ?> term,
+                CCSubstOp<Term> op) {
             if (term.varsBoundHere(1).size() != 1) {
                 return false;
             }
