@@ -141,7 +141,7 @@ public interface CCTermBuilder<P extends ModalContent, T extends CCTerm<P, ?, T>
      * @param origTerm
      *            the T that is substituted
      */
-    T subst(CCSubstOp<T> op,
+    T subst(CCSubstOp<?, T> op,
             QuantifiableVariable substVar,
             T substTerm,
             T origTerm);

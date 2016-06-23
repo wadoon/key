@@ -18,7 +18,6 @@ import java.lang.reflect.Array;
 import org.key_project.common.core.logic.CCClashFreeSubst;
 import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.ModalContent;
-import org.key_project.common.core.logic.factories.CCTermBuilder;
 import org.key_project.common.core.logic.visitors.CCTermVisitor;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
@@ -49,7 +48,7 @@ public class WaryClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<
     protected ImmutableSet<QuantifiableVariable> warysvars = null;
 
     public WaryClashFreeSubst(QuantifiableVariable v, T s,
-            TermServices services, Class<T> clazz) {
+            TermServices<P, T, ?, ?> services, Class<T> clazz) {
         super(v, s, services, clazz);
         this.clazz = clazz;
         warysvars = null;
@@ -180,7 +179,7 @@ public class WaryClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<
                         : target;
 
         T result =
-                services.<P, T, CCTermBuilder<P, T>> getTermBuilder()
+                services.getTermBuilder()
                         .tf()
                         .createTerm(t.op(),
                                 newSubterms,
@@ -231,10 +230,10 @@ public class WaryClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<
             else {
                 newVar = getVariable();
             }
-            
+
             newVarTerm =
                     services
-                            .<P, T, CCTermBuilder<P, T>> getTermBuilder()
+                            .getTermBuilder()
                             .var(newVar);
         }
     }
@@ -245,7 +244,7 @@ public class WaryClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<
      */
     T addWarySubst(T t) {
         createVariable();
-        return services.<P, T, CCTermBuilder<P, T>> getTermBuilder()
+        return services.getTermBuilder()
                 .subst(
                         // WarySubstOp.SUBST, // WarySubstOp is the standard
                         newVar,

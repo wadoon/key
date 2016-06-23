@@ -45,7 +45,7 @@ public class TermHelper {
      * @param services the Services object
      * @return the maximal sort allowed at the i-th position
      */
-    public static Sort getMaxSort(Term term, int i, TermServices services) {     
+    public static Sort getMaxSort(Term term, int i, TermServices<?, ?, ?, ?> services) {
         if (term.sub(i).sort() == Sort.FORMULA) return Sort.FORMULA;
         
         if (term.op() instanceof IfThenElse && i > 0) {
@@ -64,7 +64,7 @@ public class TermHelper {
     private static Sort getMaxSortHelper(final Operator op, 
 	    				 int i, 
 	    				 Sort maxSortDefault,
-	    				 TermServices services) {
+	    				 TermServices<?, ?, ?, ?> services) {
         final Sort newMaxSort;
         if (op instanceof SortedOperator) {
             newMaxSort = ((SortedOperator)op).argSort(i);

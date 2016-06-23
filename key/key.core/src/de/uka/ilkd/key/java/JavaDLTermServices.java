@@ -17,6 +17,8 @@ import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.factories.CCTermBuilder;
 import org.key_project.common.core.services.TermServices;
 
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 
@@ -26,13 +28,12 @@ import de.uka.ilkd.key.logic.TermFactory;
  * @author Dominic Scheurer
  *
  */
-public interface JavaDLTermServices extends TermServices {
+public interface JavaDLTermServices extends TermServices<JavaBlock, Term, TermBuilder, TermFactory> {
 
     /**
      * Returns the {@link CCTermBuilder} used to create {@link Term}s.
      * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public abstract TermBuilder getTermBuilder();
 
@@ -40,7 +41,6 @@ public interface JavaDLTermServices extends TermServices {
      * Returns the {@link CCTermBuilder} used to create {@link Term}s.
      * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public abstract TermFactory getTermFactory();
  

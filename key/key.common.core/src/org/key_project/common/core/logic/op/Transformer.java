@@ -58,7 +58,7 @@ public class Transformer extends Function {
     public static <T extends CCTerm<?, ?, T>> Transformer getTransformer(Name name,
                                                                          Sort sort,
                                                                          ImmutableArray<Sort> argSorts,
-                                                                         TermServices services) {
+                                                                         TermServices<?, ?, ?, ?> services) {
         final Named f = services.getNamespaces().functions().lookup(name);
         if (f != null && f instanceof Transformer) {
             Transformer t = (Transformer)f;
@@ -78,7 +78,7 @@ public class Transformer extends Function {
      * @return the term transformer to be used
      */
     public static <T extends CCTerm<?, ?, T>> Transformer getTransformer(Transformer t,
-                                                                         TermServices services) {
+                                                                         TermServices<?, ?, ?, ?> services) {
         return getTransformer(t.name(), t.sort(), t.argSorts(), services);
     }
 

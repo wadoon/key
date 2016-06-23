@@ -14,6 +14,7 @@
 package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.CCTerm;
+import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.services.TermServices;
 
@@ -23,7 +24,7 @@ import org.key_project.common.core.services.TermServices;
  * @author Dominic Scheurer
  *
  */
-public abstract class CCSubstOp<T extends CCTerm<?, ?, T>> extends AbstractOperator {
+public abstract class CCSubstOp<P extends ModalContent, T extends CCTerm<P, ?, T>> extends AbstractOperator {
 
     /**
      * Constructs a new {@link CCSubstOp} for the given name.
@@ -41,6 +42,6 @@ public abstract class CCSubstOp<T extends CCTerm<?, ?, T>> extends AbstractOpera
      * @param services
      *            TODO
      */
-    public abstract T apply(T term, TermServices services);
+    public abstract T apply(T term, TermServices<P, T, ?, ?> services);
 
 }

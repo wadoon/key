@@ -58,19 +58,19 @@ public interface Sort extends Named {
         }
 
         @Override
-        public SortDependingFunction getCastSymbol(TermServices services) {
+        public SortDependingFunction getCastSymbol(TermServices<?, ?, ?, ?> services) {
             throw new UnsupportedOperationException("Cannot cast to " + name);
         }
 
         @Override
         public SortDependingFunction getInstanceofSymbol(
-                TermServices services) {
+                TermServices<?, ?, ?, ?> services) {
             throw new UnsupportedOperationException("Cannot check instanceof for " + name);
         }
 
         @Override
         public SortDependingFunction getExactInstanceofSymbol(
-                TermServices services) {
+                TermServices<?, ?, ?, ?> services) {
             throw new UnsupportedOperationException("Cannot check exactInstanceof for " + name);
         }
 
@@ -130,17 +130,17 @@ public interface Sort extends Named {
     /**
      * returns the cast symbol of this Sort
      */
-    SortDependingFunction getCastSymbol(TermServices services);
+    SortDependingFunction getCastSymbol(TermServices<?, ?, ?, ?> services);
     
     /**
      * returns the instanceof symbol of this Sort
      */
-    SortDependingFunction getInstanceofSymbol(TermServices services);
+    SortDependingFunction getInstanceofSymbol(TermServices<?, ?, ?, ?> services);
     
     /**
      * returns the exactinstanceof symbol of this Sort
      */
-    SortDependingFunction getExactInstanceofSymbol(TermServices services);
+    SortDependingFunction getExactInstanceofSymbol(TermServices<?, ?, ?, ?> services);
 
     String declarationString();
 }

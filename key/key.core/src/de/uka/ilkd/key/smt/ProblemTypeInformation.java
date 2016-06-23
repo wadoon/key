@@ -46,7 +46,7 @@ public class ProblemTypeInformation {
 
 	private Map<String, SMTSort> sorts;
 
-	public ProblemTypeInformation(TermServices services) {
+	public ProblemTypeInformation(TermServices<?, ?, ?, ?> services) {
 		super();
 		fieldTypes = new HashMap<String, SMTSort>();
 		constantsTypes = new HashMap<String, SMTSort>();
@@ -155,7 +155,7 @@ public class ProblemTypeInformation {
 		return result;
 	}
 
-	public TermServices getServices() {
+	public TermServices<?, ?, ?, ?> getServices() {
 		return services;
 	}
 

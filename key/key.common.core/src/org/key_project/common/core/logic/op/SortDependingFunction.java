@@ -82,7 +82,7 @@ public final class SortDependingFunction extends Function {
         return new SortDependingFunction(template, firstInstanceSort);
     }
 
-    public SortDependingFunction getInstanceFor(Sort sort, TermServices services) {
+    public SortDependingFunction getInstanceFor(Sort sort, TermServices<?, ?, ?, ?> services) {
         if (sort == this.sortDependingOn) {
             return this;
         }

@@ -27,25 +27,22 @@ import org.key_project.common.core.logic.op.SortDependingFunction;
  *
  * @author Richard Bubel
  *
- * @param <S> SourceElement type
- * @param <T> Term type
- * @param <V> Visitor type
- * @param <N> Name abstraction table type
- * @param <P> Program type
+ * @param <P>
+ * @param <T>
  */
-public interface TermServices {
+public interface TermServices<P extends ModalContent, T extends CCTerm<P, ?, T>, TB extends CCTermBuilder<P, T>, TF extends CCTermFactory<P, T>> {
 
     /**
      * Returns the {@link CCTermBuilder} used to create {@link Term}s.
      * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
-    public abstract <P extends ModalContent, T extends CCTerm<P, ?, T>, TB extends CCTermBuilder<P, T>> TB getTermBuilder();
+    public abstract TB getTermBuilder();
 
     /**
      * Returns the {@link CCTermBuilder} used to create {@link Term}s.
      * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
-    public abstract <P extends ModalContent, T extends CCTerm<?, ?, T>, TF extends CCTermFactory<P, T>> TF getTermFactory();
+    public abstract TF getTermFactory();
 
     /**
      * returns the namespaces for functions, predicates etc.

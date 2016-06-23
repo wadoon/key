@@ -16,6 +16,7 @@ package org.key_project.common.core.logic;
 import java.lang.reflect.Array;
 
 import org.key_project.common.core.logic.factories.CCTermBuilder;
+import org.key_project.common.core.logic.factories.CCTermFactory;
 import org.key_project.common.core.logic.op.LogicVariable;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.visitors.CCDefaultVisitor;
@@ -29,12 +30,12 @@ public class CCClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<T>
     protected QuantifiableVariable v;
     protected T s;
     protected ImmutableSet<QuantifiableVariable> svars;
-    protected final TermServices services;
+    protected final TermServices<P, T, ?, ?> services;
     
     private final Class<T> clazz;
 
-    public CCClashFreeSubst(QuantifiableVariable v, T s,
-            TermServices services, Class<T> clazz) {
+    public <TB extends CCTermBuilder<P, T>, TF extends CCTermFactory<P, T>> CCClashFreeSubst(QuantifiableVariable v, T s,
+                            TermServices<P, T, TB, TF> services, Class<T> clazz) {
         this.services = services;
         this.v = v;
         this.s = s;
@@ -116,7 +117,7 @@ public class CCClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<T>
             applyOnSubterm(t, i, newSubterms, newBoundVars);
         }
         return services
-                .<P, T, CCTermBuilder<P, T>> getTermBuilder()
+                .getTermBuilder()
                 .tf()
                 .createTerm(t.op(), newSubterms, getSingleArray(newBoundVars),
                         t.modalContent(), t.getLabels());
@@ -197,7 +198,7 @@ public class CCClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<T>
 
                 // Substitute that for the old one.
                 newBoundVars[varInd] = qv1;
-                new CCClashFreeSubst<P, V, T>(qv, services.<P, T, CCTermBuilder<P, T>> getTermBuilder().var(qv1),
+                new CCClashFreeSubst<P, V, T>(qv, services.getTermBuilder().var(qv1),
                         services, clazz)
                         .applyOnSubterm1(varInd + 1, boundVars, newBoundVars,
                                 subInd, subTerm, newSubterms);

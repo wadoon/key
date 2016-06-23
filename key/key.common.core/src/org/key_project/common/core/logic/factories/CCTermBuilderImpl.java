@@ -45,9 +45,9 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
     private final T tt;
     private final T ff;
     
-    private final TermServices services;
+    private final TermServices<?, ?, ?, ?> services;
 
-    public CCTermBuilderImpl(CCTermFactoryImpl<P, T> tf, TermServices services) {
+    public CCTermBuilderImpl(CCTermFactoryImpl<P, T> tf, TermServices<?, ?, ?, ?> services) {
         this.services = services;
         this.tf = tf;
         this.tt = tf.createTerm(Junctor.TRUE);
@@ -468,7 +468,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
     }
 
     @Override
-    public T subst(CCSubstOp<T> op,
+    public T subst(CCSubstOp<?, T> op,
             QuantifiableVariable substVar,
             T substTerm,
             T origTerm) {
@@ -491,7 +491,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
     /**
      * @return The standard substitution operator, currently WarySubstOp.
      */
-    protected abstract CCSubstOp<T> substOp();
+    protected abstract CCSubstOp<?, T> substOp();
 
     // Functions for wellfoundedness
     // ------------------------------

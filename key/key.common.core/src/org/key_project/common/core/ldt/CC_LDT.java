@@ -43,7 +43,7 @@ public abstract class CC_LDT<T extends CCTerm<?, ?, ?>> implements Named {
     // constructors
     // -------------------------------------------------------------------------
 
-    protected CC_LDT(Name name, TermServices services) {
+    protected CC_LDT(Name name, TermServices<?, ?, ?, ?> services) {
         sort = (Sort) services.getNamespaces().sorts().lookup(name);
         if (sort == null)
             throw new RuntimeException(
@@ -88,7 +88,7 @@ public abstract class CC_LDT<T extends CCTerm<?, ?, ?>> implements Named {
      *            the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final Function addFunction(TermServices services,
+    protected final Function addFunction(TermServices<?, ?, ?, ?> services,
             String funcName) {
         final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function) funcNS.lookup(new Name(funcName));
@@ -103,7 +103,7 @@ public abstract class CC_LDT<T extends CCTerm<?, ?, ?>> implements Named {
     }
 
     protected final SortDependingFunction addSortDependingFunction(
-            TermServices services,
+            TermServices<?, ?, ?, ?> services,
             String kind) {
         final SortDependingFunction f =
                 services.getFirstInstance(new Name(kind));

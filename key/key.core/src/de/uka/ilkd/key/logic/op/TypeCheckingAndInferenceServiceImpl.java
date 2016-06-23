@@ -322,14 +322,14 @@ public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator>
     }
 
     static class SubstOpTypeCheckingAndInferenceService extends
-            DefaultTypeCheckingAndInferenceService<CCSubstOp<Term>> {
+            DefaultTypeCheckingAndInferenceService<CCSubstOp<?, Term>> {
 
         private SubstOpTypeCheckingAndInferenceService() {
             // This class should be a Singleton.
         }
 
         public Sort sort(ImmutableArray<? extends CCTerm<?, ?, ?>> terms,
-                CCSubstOp<Term> op) {
+                CCSubstOp<?, Term> op) {
             if (terms.size() == 2) {
                 return terms.get(1).sort();
             }
@@ -340,7 +340,7 @@ public abstract class TypeCheckingAndInferenceServiceImpl<O extends Operator>
         }
 
         public boolean additionalValidTopLevel(CCTerm<?, ?, ?> term,
-                CCSubstOp<Term> op) {
+                CCSubstOp<?, Term> op) {
             if (term.varsBoundHere(1).size() != 1) {
                 return false;
             }

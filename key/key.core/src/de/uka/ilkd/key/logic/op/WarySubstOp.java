@@ -17,9 +17,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.CCWarySubstOp;
 import org.key_project.common.core.services.TermServices;
 
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.*;
 
 public final class WarySubstOp extends CCWarySubstOp<JavaBlock, Visitor, Term> {
 
@@ -35,7 +33,7 @@ public final class WarySubstOp extends CCWarySubstOp<JavaBlock, Visitor, Term> {
     }
 
     @Override
-    public Term apply(Term term, TermServices services) {
+    public Term apply(Term term, TermServices<JavaBlock, Term, ?, ?> services) {
         return super.apply(term, services, Term.class);
     }
 }

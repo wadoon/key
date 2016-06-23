@@ -330,7 +330,6 @@ public class Services implements JavaDLTermServices, ProofServices {
      * Returns the {@link CCTermBuilder} used to create {@link Term}s.
      * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public TermBuilder getTermBuilder() {
        return termBuilder;
@@ -340,7 +339,6 @@ public class Services implements JavaDLTermServices, ProofServices {
      * Returns the {@link CCTermFactory} used to create {@link Term}s.
      * @return The {@link CCTermFactory} used to create {@link Term}s.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public TermFactory getTermFactory() {
         return termBuilder.tf();

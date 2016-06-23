@@ -609,7 +609,7 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
             Term a,
             Term b,
             Term t,
-            TermServices services) {
+            TermServices<?, ?, ?, ?> services) {
         Function bprod = theories.getIntegerLDT().getBprod();
         return func(bprod,
                 new Term[] { a, b, t },
@@ -621,7 +621,7 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
             ImmutableList<QuantifiableVariable> qvs,
             Term range,
             Term t,
-            TermServices services) {
+            TermServices<?, ?, ?, ?> services) {
         final Function prod =
                 (Function) services.getNamespaces().functions().lookup("prod");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
@@ -641,7 +641,7 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
             ImmutableList<QuantifiableVariable> qvs,
             Term range,
             Term t,
-            TermServices services) {
+            TermServices<?, ?, ?, ?> services) {
         final Function min =
                 (Function) services.getNamespaces().functions().lookup("min");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
@@ -661,7 +661,7 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
             ImmutableList<QuantifiableVariable> qvs,
             Term range,
             Term t,
-            TermServices services) {
+            TermServices<?, ?, ?, ?> services) {
         final Function max =
                 (Function) services.getNamespaces().functions().lookup("max");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
@@ -893,7 +893,7 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
      *            the Term that is substituted
      */
     // @Override
-    public Term subst(CCSubstOp<Term> op,
+    public Term subst(CCSubstOp<?, Term> op,
             QuantifiableVariable substVar,
             Term substTerm,
             Term origTerm) {
@@ -2007,7 +2007,7 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
     }
 
     public Term fieldStore(
-            TermServices services,
+            TermServices<?, ?, ?, ?> services,
             Term o, Function f, Term v) {
         return store(getBaseHeap(), o, func(f), v);
     }
@@ -2158,7 +2158,7 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
         return elementary(heap, anon(var(heap), mod, anonHeap));
     }
 
-    public Term forallHeaps(TermServices services, Term t) {
+    public Term forallHeaps(TermServices<?, ?, ?, ?> services, Term t) {
         final HeapLDT heapLDT = theories.getHeapLDT();
         final LogicVariable heapLV =
                 new LogicVariable(new Name("h"), heapLDT.targetSort());
@@ -2475,7 +2475,7 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
     // information flow operators
     // -------------------------------------------------------------------------
 
-    public Term eqAtLocs(TermServices services,
+    public Term eqAtLocs(TermServices<?, ?, ?, ?> services,
             Term heap1,
             Term locset1,
             Term heap2,
@@ -2490,7 +2490,7 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
                         heap1, locset1, heap2, locset2);
     }
 
-    public Term eqAtLocsPost(TermServices services,
+    public Term eqAtLocsPost(TermServices<?, ?, ?, ?> services,
             Term heap1_pre,
             Term heap1_post,
             Term locset1,

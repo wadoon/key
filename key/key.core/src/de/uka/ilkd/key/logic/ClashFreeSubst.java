@@ -20,7 +20,7 @@ import org.key_project.common.core.services.TermServices;
 public class ClashFreeSubst extends CCClashFreeSubst<JavaBlock, Visitor, Term> {
 
     public ClashFreeSubst(QuantifiableVariable v, Term s,
-            TermServices services) {
+            TermServices<JavaBlock, Term, TermBuilder, TermFactory> services) {
         super(v, s, services, Term.class);
     }
 

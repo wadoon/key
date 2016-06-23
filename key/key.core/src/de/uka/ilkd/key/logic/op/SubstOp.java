@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic.op;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.CCSubstOp;
 
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 
 /**
@@ -24,7 +25,7 @@ import de.uka.ilkd.key.logic.Term;
  * operators. Currently, only the subclass <code>WarySubstOp</code> is used and
  * accessible through the key parser.
  */
-public abstract class SubstOp extends CCSubstOp<Term> {
+public abstract class SubstOp extends CCSubstOp<JavaBlock, Term> {
 
     protected SubstOp(Name name) {
         super(name);
