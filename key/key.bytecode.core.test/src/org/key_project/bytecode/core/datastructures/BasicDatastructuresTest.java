@@ -13,9 +13,13 @@
 
 package org.key_project.bytecode.core.datastructures;
 
+import java.util.LinkedList;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.key_project.bytecode.core.ast.Instruction;
+import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.calculus.*;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
@@ -33,6 +37,12 @@ public class BasicDatastructuresTest extends TestCase {
 
     @Test
     public void testSimpleBytecodeSequentCreation() {
+        LinkedList<Instruction> insns = new LinkedList<Instruction>();
+        
+        // insns.add(...)
+        
+        InstructionBlock program = new InstructionBlock(insns);
+        
         Semisequent ante =
                 new SemisequentImpl(ImmutableSLList.<SequentFormula> nil());
         Semisequent succ = new SemisequentImpl(null);
