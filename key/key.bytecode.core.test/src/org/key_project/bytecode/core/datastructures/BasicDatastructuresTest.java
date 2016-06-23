@@ -22,6 +22,7 @@ import org.key_project.bytecode.core.ast.Instruction;
 import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.calculus.*;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.factories.CCTermBuilder;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.util.collection.ImmutableSLList;
