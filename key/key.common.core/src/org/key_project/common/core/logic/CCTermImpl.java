@@ -32,8 +32,8 @@ import org.key_project.util.collection.*;
  * @author Dominic Scheurer
  *
  */
-public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
-        implements CCTerm<V, T> {
+public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P, V, T>>
+        implements CCTerm<P, V, T> {
 
     static enum ThreeValuedTruth {
         TRUE, FALSE, UNKNOWN

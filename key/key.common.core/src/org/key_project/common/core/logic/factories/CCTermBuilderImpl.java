@@ -38,7 +38,7 @@ import org.key_project.util.collection.Pair;
  * use the GenericTermFactory.
  * </p>
  */
-public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm<?, T>>
+public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm<P, ?, T>>
         implements CCTermBuilder<P, T> {
 
     private final CCTermFactoryImpl<P, T> tf;
@@ -744,7 +744,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
         }
         else if (!term.hasLabels()) {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                    term.<P> modalContent(), labels);
+                    term.modalContent(), labels);
         }
         else {
             ArrayList<TermLabel> newLabelList = new ArrayList<TermLabel>();
@@ -757,7 +757,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
                 }
             }
             return tf.createTerm(term.op(), term.subs(),
-                    term.boundVars(), term.<P> modalContent(),
+                    term.boundVars(), term.modalContent(),
                     new ImmutableArray<TermLabel>(newLabelList));
         }
     }
@@ -791,7 +791,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
         }
         else {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                    term.<P> modalContent(), labels);
+                    term.modalContent(), labels);
         }
     }
 
@@ -824,7 +824,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
     @Override
     public T unlabel(T term) {
         return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                term.<P> modalContent());
+                term.modalContent());
     }
 
     @Override
@@ -834,7 +834,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
             subs[i] = unlabelRecursive(term.sub(i));
         }
         return tf.createTerm(term.op(), subs, term.boundVars(),
-                term.<P> modalContent());
+                term.modalContent());
     }
 
     // -------------------------------------------------------------------------
@@ -852,7 +852,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
     /**
      * Removes leading updates from the passed term.
      */
-    public static <T extends CCTerm<?, T>> T goBelowUpdates(T term) {
+    public static <T extends CCTerm<?, ?, T>> T goBelowUpdates(T term) {
         while (term.op() instanceof UpdateApplication) {
             term = UpdateApplication.getTarget(term);
         }
@@ -862,7 +862,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
     /**
      * Removes leading updates from the passed term.
      */
-    public static <T extends CCTerm<?, T>> Pair<ImmutableList<T>, T> goBelowUpdates2(
+    public static <T extends CCTerm<?, ?, T>> Pair<ImmutableList<T>, T> goBelowUpdates2(
             T term) {
         ImmutableList<T> updates = ImmutableSLList.<T> nil();
         while (term.op() instanceof UpdateApplication) {

@@ -25,7 +25,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-public class CCClashFreeSubst<V extends CCTermVisitor<T>, T extends CCTerm<V, T>> {
+public class CCClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P, V, T>> {
     protected QuantifiableVariable v;
     protected T s;
     protected ImmutableSet<QuantifiableVariable> svars;
@@ -116,7 +116,7 @@ public class CCClashFreeSubst<V extends CCTermVisitor<T>, T extends CCTerm<V, T>
             applyOnSubterm(t, i, newSubterms, newBoundVars);
         }
         return services
-                .<ModalContent, T, CCTermBuilder<ModalContent, T>> getTermBuilder()
+                .<P, T, CCTermBuilder<P, T>> getTermBuilder()
                 .tf()
                 .createTerm(t.op(), newSubterms, getSingleArray(newBoundVars),
                         t.modalContent(), t.getLabels());
@@ -197,7 +197,7 @@ public class CCClashFreeSubst<V extends CCTermVisitor<T>, T extends CCTerm<V, T>
 
                 // Substitute that for the old one.
                 newBoundVars[varInd] = qv1;
-                new CCClashFreeSubst<V, T>(qv, services.<ModalContent, T, CCTermBuilder<ModalContent, T>> getTermBuilder().var(qv1),
+                new CCClashFreeSubst<P, V, T>(qv, services.<P, T, CCTermBuilder<P, T>> getTermBuilder().var(qv1),
                         services, clazz)
                         .applyOnSubterm1(varInd + 1, boundVars, newBoundVars,
                                 subInd, subTerm, newSubterms);
@@ -309,7 +309,7 @@ public class CCClashFreeSubst<V extends CCTermVisitor<T>, T extends CCTerm<V, T>
      * A Visitor class to collect all (not just the free) variables occurring in
      * a term.
      */
-    public static class VariableCollectVisitor <V extends CCTermVisitor<T>, T extends CCTerm<V, T>> extends CCDefaultVisitor<T> {
+    public static class VariableCollectVisitor <V extends CCTermVisitor<T>, T extends CCTerm<?, V, T>> extends CCDefaultVisitor<T> {
         /** the collected variables */
         private ImmutableSet<QuantifiableVariable> vars;
 

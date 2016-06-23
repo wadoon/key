@@ -30,7 +30,7 @@ import org.key_project.util.collection.ImmutableList;
  * @param <P>
  * @param <T>
  */
-public interface CCTermBuilder<P extends ModalContent, T extends CCTerm<?, T>> {
+public interface CCTermBuilder<P extends ModalContent, T extends CCTerm<P, ?, T>> {
 
     CCTermFactoryImpl<P, T> tf();
 

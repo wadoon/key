@@ -17,10 +17,11 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.CCWarySubstOp;
 import org.key_project.common.core.services.TermServices;
 
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 
-public final class WarySubstOp extends CCWarySubstOp<Visitor, Term> {
+public final class WarySubstOp extends CCWarySubstOp<JavaBlock, Visitor, Term> {
 
     /**
      * the wary substitution operator {var<-term}'. {x<-d}'A(x) means replace

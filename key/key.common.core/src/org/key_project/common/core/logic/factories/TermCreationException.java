@@ -29,11 +29,11 @@ public class TermCreationException extends RuntimeException {
         super(errorMessage);
     }
 
-    public <T extends CCTerm<?, T>> TermCreationException(Operator op, T failed, Sort s) {
+    public <T extends CCTerm<?, ?, T>> TermCreationException(Operator op, T failed, Sort s) {
         super(getErrorMessage(op, failed, s));
     }
 
-    protected static <T extends CCTerm<?, T>> String getErrorMessage(
+    protected static <T extends CCTerm<?, ?, T>> String getErrorMessage(
             Operator op, T failed, Sort s) {
         ImmutableArray<T> subs = failed.subs();
         for (int i = 0, n = subs.size(); i < n; i++) {
@@ -66,7 +66,7 @@ public class TermCreationException extends RuntimeException {
         return sb.toString();
     }
 
-    private static <T extends CCTerm<?, T>> String subsToString(
+    private static <T extends CCTerm<?, ?, T>> String subsToString(
             ImmutableArray<T> subs) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0, n = subs.size(); i < n; i++) {

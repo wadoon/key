@@ -24,8 +24,8 @@ import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-public class WaryClashFreeSubst<V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
-        extends CCClashFreeSubst<V, T> {
+public class WaryClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P, V, T>>
+        extends CCClashFreeSubst<P, V, T> {
 
     /** depth of recursion of the <code>apply</code> method */
     private int depth = 0;
@@ -180,7 +180,7 @@ public class WaryClashFreeSubst<V extends CCTermVisitor<T>, T extends CCTerm<V, 
                         : target;
 
         T result =
-                services.<ModalContent, T, CCTermBuilder<ModalContent, T>> getTermBuilder()
+                services.<P, T, CCTermBuilder<P, T>> getTermBuilder()
                         .tf()
                         .createTerm(t.op(),
                                 newSubterms,
@@ -209,8 +209,8 @@ public class WaryClashFreeSubst<V extends CCTermVisitor<T>, T extends CCTerm<V, 
      */
     private T substWithNewVar(T t) {
         createVariable();
-        final CCClashFreeSubst<V, T> cfs =
-                new CCClashFreeSubst<V, T>(getVariable(),
+        final CCClashFreeSubst<P, V, T> cfs =
+                new CCClashFreeSubst<P, V, T>(getVariable(),
                         newVarTerm, services, clazz);
         return cfs.apply(t);
     }
@@ -234,7 +234,7 @@ public class WaryClashFreeSubst<V extends CCTermVisitor<T>, T extends CCTerm<V, 
             
             newVarTerm =
                     services
-                            .<ModalContent, T, CCTermBuilder<ModalContent, T>> getTermBuilder()
+                            .<P, T, CCTermBuilder<P, T>> getTermBuilder()
                             .var(newVar);
         }
     }
@@ -245,7 +245,7 @@ public class WaryClashFreeSubst<V extends CCTermVisitor<T>, T extends CCTerm<V, 
      */
     T addWarySubst(T t) {
         createVariable();
-        return services.<ModalContent, T, CCTermBuilder<ModalContent, T>> getTermBuilder()
+        return services.<P, T, CCTermBuilder<P, T>> getTermBuilder()
                 .subst(
                         // WarySubstOp.SUBST, // WarySubstOp is the standard
                         newVar,

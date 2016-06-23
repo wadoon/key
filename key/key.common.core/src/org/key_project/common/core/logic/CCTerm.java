@@ -54,7 +54,7 @@ import org.key_project.util.collection.ImmutableSet;
  * currently supported: {@link Term#execPostOrder(CCTermVisitor)} and
  * {@link Term#execPreOrder(CCTermVisitor)}.
  */
-public interface CCTerm<V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
+public interface CCTerm<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P, V, T>>
         extends SVSubstitute, Sorted {
 
     /** 
@@ -72,7 +72,7 @@ public interface CCTerm<V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
     /**
      * The modal content 
      */
-    public <M extends ModalContent> M modalContent();
+    public P modalContent();
 
     /**
      * Checks if the {@link ModalContent} or one of its direct or indirect children

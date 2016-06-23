@@ -13,7 +13,7 @@ import org.key_project.common.core.logic.sort.Sort;
  * by providing a way to add additional annotations or to cache local information 
  * about the formula.
  */
-public class SequentFormula<T extends CCTerm<?, T>> {
+public class SequentFormula<T extends CCTerm<?, ?, T>> {
 
     protected final T term;
     protected final int hashCode;

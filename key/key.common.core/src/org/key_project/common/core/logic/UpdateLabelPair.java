@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Simple class encapsulating a pair of an update and a term label.
  */
-public class UpdateLabelPair<T extends CCTerm<?, T>> {
+public class UpdateLabelPair<T extends CCTerm<?, ?, T>> {
     private T update;
     private ImmutableArray<TermLabel> updateApplicationlabels;
 

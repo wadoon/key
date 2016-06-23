@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.CCTerm;
  *
  * @author Dominic Scheurer
  */
-public abstract class CCDefaultVisitor<T extends CCTerm<?, T>> implements CCTermVisitor<T> {
+public abstract class CCDefaultVisitor<T extends CCTerm<?, ?, T>> implements CCTermVisitor<T> {
 
     /* (non-Javadoc)
      * @see org.key_project.common.core.logic.CCVisitor#visitSubtree(org.key_project.common.core.logic.CCTerm)

@@ -55,10 +55,10 @@ public class Transformer extends Function {
      * @param services
      * @return the term transformer of interest
      */
-    public static <T extends CCTerm<?, T>> Transformer getTransformer(Name name,
-                                                                      Sort sort,
-                                                                      ImmutableArray<Sort> argSorts,
-                                                                      TermServices services) {
+    public static <T extends CCTerm<?, ?, T>> Transformer getTransformer(Name name,
+                                                                         Sort sort,
+                                                                         ImmutableArray<Sort> argSorts,
+                                                                         TermServices services) {
         final Named f = services.getNamespaces().functions().lookup(name);
         if (f != null && f instanceof Transformer) {
             Transformer t = (Transformer)f;
@@ -77,8 +77,8 @@ public class Transformer extends Function {
      * @param services
      * @return the term transformer to be used
      */
-    public static <T extends CCTerm<?, T>> Transformer getTransformer(Transformer t,
-                                                                      TermServices services) {
+    public static <T extends CCTerm<?, ?, T>> Transformer getTransformer(Transformer t,
+                                                                         TermServices services) {
         return getTransformer(t.name(), t.sort(), t.argSorts(), services);
     }
 
@@ -87,7 +87,7 @@ public class Transformer extends Function {
      * @param pio A position in an occurrence of a term
      * @return true if inside a term transformer, false otherwise
      */
-    public static <T extends CCTerm<?, T>> boolean inTransformer(PosInOccurrence<T, SequentFormula<T>> pio) {
+    public static <T extends CCTerm<?, ?, T>> boolean inTransformer(PosInOccurrence<T, SequentFormula<T>> pio) {
         boolean trans = false;
         if (pio == null) {
             return false;
@@ -111,7 +111,7 @@ public class Transformer extends Function {
      * @param pio A position in an occurrence of a term
      * @return the term transformer the position is in, null otherwise
      */
-    public static <T extends CCTerm<?, T>> Transformer getTransformer(PosInOccurrence<T, SequentFormula<T>> pio) {
+    public static <T extends CCTerm<?, ?, T>> Transformer getTransformer(PosInOccurrence<T, SequentFormula<T>> pio) {
         if ( pio.posInTerm () != null ) {
             PIOPathIterator<T, SequentFormula<T>> it = pio.iterator ();
             Operator        op;

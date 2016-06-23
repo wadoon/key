@@ -14,6 +14,7 @@
 package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.CCTerm;
+import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.visitors.CCTermVisitor;
 import org.key_project.common.core.services.TermServices;
@@ -24,7 +25,7 @@ import org.key_project.common.core.services.TermServices;
  *
  * @author Dominic Scheurer
  */
-public abstract class CCWarySubstOp<V extends CCTermVisitor<T>, T extends CCTerm<V, T>> extends CCSubstOp<T> {
+public abstract class CCWarySubstOp<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P, V, T>> extends CCSubstOp<T> {
 
     /**
      * TODO: Document.
@@ -37,8 +38,8 @@ public abstract class CCWarySubstOp<V extends CCTermVisitor<T>, T extends CCTerm
 
     public T apply(T term, TermServices services, Class<T> clazz) {
         QuantifiableVariable v = term.varsBoundHere(1).get(0);
-        WaryClashFreeSubst<V, T> cfSubst =
-                new WaryClashFreeSubst<V, T>(v, term.sub(0), services, clazz);
+        WaryClashFreeSubst<P, V, T> cfSubst =
+                new WaryClashFreeSubst<P, V, T>(v, term.sub(0), services, clazz);
         return cfSubst.apply(term.sub(1));
     }
 

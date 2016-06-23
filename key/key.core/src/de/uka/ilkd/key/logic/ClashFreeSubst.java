@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.CCClashFreeSubst;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.services.TermServices;
 
-public class ClashFreeSubst extends CCClashFreeSubst<Visitor, Term> {
+public class ClashFreeSubst extends CCClashFreeSubst<JavaBlock, Visitor, Term> {
 
     public ClashFreeSubst(QuantifiableVariable v, Term s,
             TermServices services) {

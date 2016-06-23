@@ -21,13 +21,6 @@ import org.key_project.common.core.logic.CCTerm;
  *
  * @author Dominic Scheurer
  */
-public interface Term extends CCTerm<Visitor, Term> {
-
-    /**
-     * The Java block at top level.
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public JavaBlock modalContent();
+public interface Term extends CCTerm<JavaBlock, Visitor, Term> {
 
 }

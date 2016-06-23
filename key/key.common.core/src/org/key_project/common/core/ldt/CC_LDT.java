@@ -29,7 +29,7 @@ import org.key_project.common.core.services.TermServices;
  * a number of operators. The LDT class provides a programming interface to
  * access these entities, and it assists the type converter in handling them.
  */
-public abstract class CC_LDT<T extends CCTerm<?, ?>> implements Named {
+public abstract class CC_LDT<T extends CCTerm<?, ?, ?>> implements Named {
 
     private final Name name;
 

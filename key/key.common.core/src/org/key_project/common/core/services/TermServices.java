@@ -39,13 +39,13 @@ public interface TermServices {
      * Returns the {@link CCTermBuilder} used to create {@link Term}s.
      * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
-    public abstract <P extends ModalContent, T extends CCTerm<?, T>, TB extends CCTermBuilder<P, T>> TB getTermBuilder();
+    public abstract <P extends ModalContent, T extends CCTerm<P, ?, T>, TB extends CCTermBuilder<P, T>> TB getTermBuilder();
 
     /**
      * Returns the {@link CCTermBuilder} used to create {@link Term}s.
      * @return The {@link CCTermBuilder} used to create {@link Term}s.
      */
-    public abstract <P extends ModalContent, T extends CCTerm<?, T>, TF extends CCTermFactory<P, T>> TF getTermFactory();
+    public abstract <P extends ModalContent, T extends CCTerm<?, ?, T>, TF extends CCTermFactory<P, T>> TF getTermFactory();
 
     /**
      * returns the namespaces for functions, predicates etc.
