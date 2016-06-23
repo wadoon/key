@@ -16,10 +16,7 @@ package org.key_project.common.core.logic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.common.core.logic.op.CCProgramVariable;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.visitors.CCTermVisitor;
 import org.key_project.common.core.program.CCSourceElement;
@@ -343,6 +340,54 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
             this.containsModalContentRecursive = result;
         }
         return containsModalContentRecursive == ThreeValuedTruth.TRUE;
+    }
+
+    /**
+     * returns a linearized textual representation of this term
+     */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        if (!modalContent.isEmpty()) {
+            if (op() == Modality.DIA) {
+                sb.append("\\<").append(modalContent).append("\\> ");
+            }
+            else if (op() == Modality.BOX) {
+                sb.append("\\[").append(modalContent).append("\\] ");
+            }
+            else {
+                sb.append(op()).append("\\[").append(modalContent)
+                        .append("\\] ");
+            }
+            sb.append("(").append(sub(0)).append(")");
+            return sb.toString();
+        }
+        else {
+            sb.append(op().name().toString());
+            if (!boundVars.isEmpty()) {
+                sb.append("{");
+                for (int i = 0, n = boundVars.size(); i < n; i++) {
+                    sb.append(boundVars.get(i));
+                    if (i < n - 1) {
+                        sb.append(", ");
+                    }
+                }
+                sb.append("}");
+            }
+            if (arity() == 0) {
+                return sb.toString();
+            }
+            sb.append("(");
+            for (int i = 0, ar = arity(); i < ar; i++) {
+                sb.append(sub(i));
+                if (i < ar - 1) {
+                    sb.append(",");
+                }
+            }
+            sb.append(")");
+        }
+
+        return sb.toString();
     }
 
     // -------------------------------------------------------------------------
