@@ -28,7 +28,7 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class TermImpl extends CCTermImpl<InstructionBlock, Visitor, Term> implements Term {
 
-    private static final ImmutableArray<Term> EMPTY_TERM_LIST =
+    static final ImmutableArray<Term> EMPTY_TERM_LIST =
             new ImmutableArray<Term>();
 
     /**
