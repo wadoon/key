@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Dominic Scheurer
  */
-public class LabeledTermImpl extends CCLabeledTermImpl<InstructionBlock, Visitor, Term> {
+public class LabeledTermImpl extends CCLabeledTermImpl<InstructionBlock, Visitor, Term> implements Term {
 
     /**
      * TODO: Document.

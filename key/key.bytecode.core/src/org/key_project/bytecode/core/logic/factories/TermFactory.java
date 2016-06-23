@@ -15,13 +15,13 @@ package org.key_project.bytecode.core.logic.factories;
 
 import java.util.Map;
 
-import org.key_project.bytecode.core.logic.InstructionBlock;
-import org.key_project.bytecode.core.logic.Term;
+import org.key_project.bytecode.core.logic.*;
 import org.key_project.common.core.logic.factories.CCTermFactoryImpl;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.TypeCheckingAndInferenceService;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -45,15 +45,23 @@ public class TermFactory extends CCTermFactoryImpl<InstructionBlock, Term> {
     protected Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             InstructionBlock javaBlock, ImmutableArray<TermLabel> labels) {
-        // TODO Auto-generated method stub
-        return null;
+        final Sort sort =
+                new TypeCheckingAndInferenceServiceImpl<Operator>().sort(
+                        subs, op);
+
+        final Term newTerm =
+                (labels == null || labels.isEmpty() ?
+                        new TermImpl(op, sort, subs, boundVars, javaBlock) :
+                        new LabeledTermImpl(op, sort, subs, boundVars,
+                                javaBlock, labels));
+
+        return newTerm;
     }
 
     @Override
     protected <O extends Operator> TypeCheckingAndInferenceService<O> getTypeCheckingAndInferenceService(
             O op) {
-        // TODO Auto-generated method stub
-        return null;
+        return new TypeCheckingAndInferenceServiceImpl<O>();
     }
 
 }

@@ -13,6 +13,8 @@
 
 package org.key_project.bytecode.core.logic;
 
+import org.key_project.bytecode.core.logic.factories.TermBuilder;
+import org.key_project.bytecode.core.logic.factories.TermFactory;
 import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.logic.Name;
@@ -30,13 +32,14 @@ import org.key_project.common.core.services.TermServices;
 public class TermServicesImpl implements TermServices {
 
     @Override
-    public <P extends ModalContent, T extends CCTerm<P, ?, T>, TB extends CCTermBuilder<P, T>> TB getTermBuilder() {
+    public TermBuilder getTermBuilder() {
         // TODO Auto-generated method stub
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <P extends ModalContent, T extends CCTerm<?, ?, T>, TF extends CCTermFactory<P, T>> TF getTermFactory() {
+    public TermFactory getTermFactory() {
         // TODO Auto-generated method stub
         return null;
     }
