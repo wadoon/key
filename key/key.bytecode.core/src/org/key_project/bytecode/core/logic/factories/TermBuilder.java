@@ -16,10 +16,10 @@ package org.key_project.bytecode.core.logic.factories;
 import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.logic.op.WarySubstOp;
+import org.key_project.bytecode.core.logic.services.BCTermServices;
 import org.key_project.common.core.logic.factories.CCTermBuilderImpl;
 import org.key_project.common.core.logic.factories.CCTermFactoryImpl;
 import org.key_project.common.core.logic.op.CCSubstOp;
-import org.key_project.common.core.services.TermServices;
 
 /**
  * TODO: Document.
@@ -36,12 +36,12 @@ public class TermBuilder extends CCTermBuilderImpl<InstructionBlock, Term> {
      * @param services
      */
     public TermBuilder(CCTermFactoryImpl<InstructionBlock, Term> tf,
-            TermServices services) {
+            BCTermServices services) {
         super(tf, services);
     }
 
     @Override
-    protected CCSubstOp<Term> substOp() {
+    protected CCSubstOp<InstructionBlock, Term> substOp() {
         return WarySubstOp.SUBST;
     }
 

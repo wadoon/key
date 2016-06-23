@@ -13,31 +13,44 @@
 
 package org.key_project.bytecode.core.logic;
 
+import java.util.HashMap;
+
 import org.key_project.bytecode.core.logic.factories.TermBuilder;
 import org.key_project.bytecode.core.logic.factories.TermFactory;
+import org.key_project.bytecode.core.logic.services.BCTermServices;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.op.SortDependingFunction;
-import org.key_project.common.core.services.TermServices;
 
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
  */
-public class TermServicesImpl implements TermServices {
+public class TermServicesImpl implements BCTermServices {
 
+    private static final BCTermServices INSTANCE = new TermServicesImpl();
+    
+    public static BCTermServices instance() {
+        return INSTANCE;
+    }
+    
+    private final TermBuilder tb;
+    private final TermFactory tf;
+    
+    private TermServicesImpl() {
+        tf = new TermFactory(new HashMap<Term, Term>());
+        tb = new TermBuilder(tf, this);
+    }
+    
     @Override
     public TermBuilder getTermBuilder() {
-        // TODO Auto-generated method stub
-        return null;
+        return tb;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public TermFactory getTermFactory() {
-        // TODO Auto-generated method stub
-        return null;
+        return tf;
     }
 
     @Override
