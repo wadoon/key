@@ -13,6 +13,7 @@
 
 package org.key_project.common.core.logic.factories;
 
+import java.lang.reflect.Array;
 import java.util.Map;
 
 import org.key_project.common.core.logic.CCTerm;
@@ -40,13 +41,16 @@ public abstract class CCTermFactoryImpl<P extends ModalContent, T extends CCTerm
         implements CCTermFactory<P, T> {
 
     protected final Map<T, T> cache;
+    
+    private final Class<T> clazz;
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
-    public CCTermFactoryImpl(Map<T, T> cache) {
+    public CCTermFactoryImpl(Map<T, T> cache, Class<T> clazz) {
         this.cache = cache;
+        this.clazz = clazz;
     }
 
     protected abstract ImmutableArray<T> emptyTermList();
@@ -55,10 +59,33 @@ public abstract class CCTermFactoryImpl<P extends ModalContent, T extends CCTerm
             ImmutableArray<QuantifiableVariable> boundVars,
             P javaBlock, ImmutableArray<TermLabel> labels);
 
-    public abstract T[] createTermArray(int size);
-    public abstract T[] createTermArray(T sub1);
-    public abstract T[] createTermArray(T sub1, T sub2);
-    public abstract T[] createTermArray(T sub1, T sub2, T sub3);
+    // Helper methods for generic array creation
+    
+    @SuppressWarnings("unchecked")
+    T[] createTermArray(int size) {
+        return (T[]) Array.newInstance(clazz, size);
+    }
+    
+    T[] createTermArray(T sub1) {
+        T[] arr = createTermArray(1);
+        arr[0] = sub1;
+        return arr;
+    }
+    
+    T[] createTermArray(T sub1, T sub2) {
+        T[] arr = createTermArray(2);
+        arr[0] = sub1;
+        arr[1] = sub2;
+        return arr;
+    }
+    
+    T[] createTermArray(T sub1, T sub2, T sub3) {
+        T[] arr = createTermArray(3);
+        arr[0] = sub1;
+        arr[1] = sub2;
+        arr[2] = sub3;
+        return arr;
+    }
 
     protected abstract <O extends Operator> TypeCheckingAndInferenceService<O> getTypeCheckingAndInferenceService(
             O op);
