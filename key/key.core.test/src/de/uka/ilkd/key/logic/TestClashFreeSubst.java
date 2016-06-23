@@ -22,11 +22,7 @@ import junit.framework.TestCase;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.NamespaceSet;
-import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.LogicVariable;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.Quantifier;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -259,7 +255,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testSubstWary() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("q(v,x)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
+	WaryClashFreeSubst<Visitor, Term> cfs = new WaryClashFreeSubst<Visitor, Term>(v,s, services, Term.class);
 	assertEquals("substitution",
 		     parseTerm("q(f(x),x)"),
 		     cfs.apply(t));
@@ -276,7 +272,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testShareWary() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("q(v,f(x))");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
+	WaryClashFreeSubst<Visitor, Term> cfs = new WaryClashFreeSubst<Visitor, Term>(v,s, services, Term.class);
 	assertSame("share unchanged subterms",
 		   t.sub(1), cfs.apply(t).sub(1));
     }
@@ -392,7 +388,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testWary0() {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
+	WaryClashFreeSubst<Visitor, Term> cfs = new WaryClashFreeSubst<Visitor, Term>(v,s, services, Term.class);
 	assertEquals("substitution",
 		     parseTerm("q(f(pv0),x)"),
 		     cfs.apply(t));
@@ -401,7 +397,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testWary1() {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,x)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
+	WaryClashFreeSubst<Visitor, Term> cfs = new WaryClashFreeSubst<Visitor, Term>(v,s, services, Term.class);
 	assertEquals("substitution",
 		     parseTerm("q(f(pv0),x) & {pv0:=f(pv0)}q(x,x)"),
 		     cfs.apply(t));
@@ -410,7 +406,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testWary2() {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,v)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
+	WaryClashFreeSubst<Visitor, Term> cfs = new WaryClashFreeSubst<Visitor, Term>(v,s, services, Term.class);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(1).get(0);

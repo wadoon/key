@@ -11,20 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.Term;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level
@@ -58,10 +55,10 @@ public class Transformer extends Function {
      * @param services
      * @return the term transformer of interest
      */
-    public static Transformer getTransformer(Name name,
-                                                      Sort sort,
-                                                      ImmutableArray<Sort> argSorts,
-                                                      TermServices services) {
+    public static <T extends CCTerm<?, T>> Transformer getTransformer(Name name,
+                                                                      Sort sort,
+                                                                      ImmutableArray<Sort> argSorts,
+                                                                      TermServices services) {
         final Named f = services.getNamespaces().functions().lookup(name);
         if (f != null && f instanceof Transformer) {
             Transformer t = (Transformer)f;
@@ -80,8 +77,8 @@ public class Transformer extends Function {
      * @param services
      * @return the term transformer to be used
      */
-    public static Transformer getTransformer(Transformer t,
-                                                      TermServices services) {
+    public static <T extends CCTerm<?, T>> Transformer getTransformer(Transformer t,
+                                                                      TermServices services) {
         return getTransformer(t.name(), t.sort(), t.argSorts(), services);
     }
 
@@ -90,17 +87,17 @@ public class Transformer extends Function {
      * @param pio A position in an occurrence of a term
      * @return true if inside a term transformer, false otherwise
      */
-    public static boolean inTransformer(PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    public static <T extends CCTerm<?, T>> boolean inTransformer(PosInOccurrence<T, SequentFormula<T>> pio) {
         boolean trans = false;
         if (pio == null) {
             return false;
         }
         if ( pio.posInTerm () != null ) {
-            PIOPathIterator<Term, SequentFormula<Term>> it = pio.iterator ();
+            PIOPathIterator<T, SequentFormula<T>> it = pio.iterator ();
             Operator        op;
 
             while ( it.next () != -1 && !trans) {
-                final Term t = it.getSubTerm ();
+                final T t = it.getSubTerm ();
                 op = t.op ();
                 trans = op instanceof Transformer;
             }
@@ -114,13 +111,13 @@ public class Transformer extends Function {
      * @param pio A position in an occurrence of a term
      * @return the term transformer the position is in, null otherwise
      */
-    public static Transformer getTransformer(PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    public static <T extends CCTerm<?, T>> Transformer getTransformer(PosInOccurrence<T, SequentFormula<T>> pio) {
         if ( pio.posInTerm () != null ) {
-            PIOPathIterator<Term, SequentFormula<Term>> it = pio.iterator ();
+            PIOPathIterator<T, SequentFormula<T>> it = pio.iterator ();
             Operator        op;
 
             while ( it.next () != -1) {
-                final Term t = it.getSubTerm ();
+                final T t = it.getSubTerm ();
                 op = t.op ();
                 if (op instanceof Transformer)
                     return (Transformer)op;

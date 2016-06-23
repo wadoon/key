@@ -18,12 +18,12 @@ import java.util.Set;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.common.core.logic.calculus.PosInTerm;
+import org.key_project.common.core.logic.op.Modality;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;

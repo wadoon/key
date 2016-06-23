@@ -14,30 +14,27 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
+import org.key_project.common.core.logic.op.CCWarySubstOp;
 import org.key_project.common.core.services.TermServices;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.WaryClashFreeSubst;
+import de.uka.ilkd.key.logic.Visitor;
 
-public final class WarySubstOp extends SubstOp {
+public final class WarySubstOp extends CCWarySubstOp<Visitor, Term> {
 
     /**
      * the wary substitution operator {var<-term}'. {x<-d}'A(x) means replace
      * all free occurrences of variable x in A with d, however without replacing
      * x with a non-rigid A below modalities
      */
-    public static final SubstOp SUBST = new WarySubstOp(new Name("subst"));
+    public static final WarySubstOp SUBST = new WarySubstOp(new Name("subst"));
 
     private WarySubstOp(Name name) {
         super(name);
     }
-    
+
     @Override
     public Term apply(Term term, TermServices services) {
-        QuantifiableVariable v = term.varsBoundHere(1).get(0);
-        WaryClashFreeSubst cfSubst =
-                new WaryClashFreeSubst(v, term.sub(0), services);
-        return cfSubst.apply(term.sub(1));
+        return super.apply(term, services, Term.class);
     }
 }

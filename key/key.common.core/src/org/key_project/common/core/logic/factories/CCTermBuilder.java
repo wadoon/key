@@ -1,500 +1,297 @@
-package org.key_project.common.core.logic.factories;
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
 
-import java.util.Map;
+package org.key_project.common.core.logic.factories;
 
 import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.ModalContent;
+import org.key_project.common.core.logic.UpdateLabelPair;
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.LogicVariable;
-import org.key_project.common.core.logic.op.ParsableVariable;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.logic.op.UpdateableOperator;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 /**
- * 
  * TODO: Document.
  *
  * @author Dominic Scheurer
  *
- * @param <S>
- * @param <T>
- * @param <V>
- * @param <N>
  * @param <P>
+ * @param <T>
  */
 public interface CCTermBuilder<P extends ModalContent, T extends CCTerm<?, T>> {
 
-    public abstract T eqAtLocsPost(TermServices services, T heap1_pre, T heap1_post,
-            T locset1, T heap2_pre, T heap2_post, T locset2);
+    CCTermFactoryImpl<P, T> tf();
 
-    public abstract T eqAtLocs(TermServices services, T heap1, T locset1,
-            T heap2, T locset2);
+    String shortBaseName(Sort s);
 
-    public abstract T orPreserveLabels(T t1, T t2);
+    T var(LogicVariable v);
 
-    public abstract T orPreserveLabels(Iterable<T> subTerms);
+    T var(CCProgramVariable v);
 
-    public abstract T andPreserveLabels(T t1, T t2);
+    ImmutableList<T> var(CCProgramVariable... vs);
 
-    public abstract T andPreserveLabels(Iterable<T> subTerms);
+    ImmutableList<T> var(Iterable<? extends CCProgramVariable> vs);
 
-    public abstract T notPreserveLabels(T t);
+    T var(SchemaVariable v);
 
-    public abstract T impPreserveLabels(T t1, T t2);
+    T var(ParsableVariable v);
 
-    public abstract ImmutableList<Sort> getSorts(Iterable<T> terms);
+    T func(Function f);
 
-    public abstract T values();
+    T func(Function f, T s);
 
-    public abstract T seqDef(QuantifiableVariable qv, T a, T b,
-            T t);
+    T func(Function f, T s1, T s2);
 
-//    public static abstract Pair<ImmutableList<T>,T> goBelowUpdates2(T term);
+    T func(Function f, @SuppressWarnings("unchecked") T... s);
 
-//    public static abstract T goBelowUpdates(T term);
+    T func(Function f,
+            T[] s,
+            ImmutableArray<QuantifiableVariable> boundVars);
 
-    public abstract ImmutableSet<T> unionToSet(T s);
+    T prog(Modality mod, P jb, T t);
 
-    public abstract T seqReverse(T s);
+    T prog(Modality mod, P jb, T t, ImmutableArray<TermLabel> labels);
 
-    public abstract T seqSub(T s, T from, T to);
+    T box(P jb, T t);
 
-    public abstract T seq(ImmutableList<T> terms);
+    T dia(P jb, T t);
 
-    public abstract T seq(@SuppressWarnings("unchecked") T... terms);
+    T ife(T cond, T _then, T _else);
 
-    public abstract T seqConcat(T s, T s2);
+    /** Construct a term with the \ifEx operator. */
+    T ifEx(QuantifiableVariable qv, T cond, T _then, T _else);
 
-    public abstract T seqSingleton(T x);
+    /** Construct a term with the \ifEx operator. */
+    T ifEx(ImmutableList<QuantifiableVariable> qvs, T cond, T _then,
+            T _else);
 
-    public abstract T seqEmpty();
+    T tt();
 
-    public abstract T indexOf(T s, T x);
+    T ff();
 
-    public abstract T seqLen(T s);
+    T all(QuantifiableVariable qv, T t);
 
-    public abstract T seqGet(Sort asSort, T s, T idx);
+    T all(Iterable<QuantifiableVariable> qvs, T t);
 
-    public abstract T reach(T h, T s, T o1,
-            T o2, T n);
+    T allClose(T t);
 
-    public abstract T acc(T h, T s, T o1,
-            T o2);
+    /**
+     * Removes universal quantifiers from a formula.
+     */
+    T open(T formula);
 
-    public abstract T forallHeaps(TermServices services, T t);
+    T ex(QuantifiableVariable qv, T t);
 
-//    public abstract T anonUpd(LocationVariable heap, T mod, T anonHeap);
+    T ex(Iterable<QuantifiableVariable> qvs, T t);
 
-    public abstract T frameStrictlyEmpty(T heapTerm, Map<T,T> normalToAtPre);
+    T not(T t);
 
-    public abstract T frame(T heapTerm, Map<T,T> normalToAtPre, T mod);
+    T and(T t1, T t2);
 
-//    public abstract T reachableValue(ProgramVariable pv);
+    T andSC(T t1, T t2);
 
-//    public abstract T reachableValue(T t, KeYJavaType kjt);
+    T and(@SuppressWarnings("unchecked") T... subTerms);
 
-//    public abstract T reachableValue(T h, T t, KeYJavaType kjt);
+    T andSC(@SuppressWarnings("unchecked") T... subTerms);
 
-    public abstract T arrayStore(T o, T i, T v);
+    T and(Iterable<T> subTerms);
 
-    public abstract T staticFieldStore(Function f, T v);
+    T andSC(Iterable<T> subTerms);
 
-    public abstract T fieldStore(TermServices services, T o, Function f,
-            T v);
+    T or(T t1, T t2);
 
-    public abstract T anon(T h1, T s, T h2);
+    T orSC(T t1, T t2);
 
-    public abstract T create(T h, T o);
+    T or(@SuppressWarnings("unchecked") T... subTerms);
 
-    public abstract T store(T h, T o, T f,
-            T v);
+    T orSC(@SuppressWarnings("unchecked") T... subTerms);
 
-    public abstract T classErroneous(Sort classSort);
+    T or(Iterable<T> subTerms);
 
-    public abstract T classInitializationInProgress(Sort classSort);
+    T orSC(Iterable<T> subTerms);
 
-    public abstract T classInitialized(Sort classSort);
+    T imp(T t1, T t2);
 
-    public abstract T classPrepared(Sort classSort);
+    T imp(T t1, T t2, ImmutableArray<TermLabel> labels);
 
-    public abstract T initialized(T o);
+    /**
+     * Creates a term with the correct equality symbol for the sorts involved
+     */
+    T equals(T t1, T t2);
 
-    public abstract T created(T o);
+    /**
+     * Creates a substitution term
+     * 
+     * @param substVar
+     *            the QuantifiableVariable to be substituted
+     * @param substTerm
+     *            the T that replaces substVar
+     * @param origTerm
+     *            the T that is substituted
+     */
+    T subst(CCSubstOp<T> op,
+            QuantifiableVariable substVar,
+            T substTerm,
+            T origTerm);
 
-    public abstract T created(T h, T o);
+    T subst(QuantifiableVariable substVar,
+            T substTerm,
+            T origTerm);
 
-    public abstract T dotLength(T a);
+    T pair(T first, T second);
 
-    public abstract T dotArr(T ref, T idx);
+    T prec(T mby, T mbyAtPre);
 
-    public abstract T unlabelRecursive(T term);
+    T measuredByCheck(T mby);
 
-    public abstract T unlabel(T term);
+    T measuredBy(T mby);
 
-    public abstract T shortcut(T term);
+    Function getMeasuredByEmpty();
 
-    public abstract T label(T term, TermLabel label);
+    T measuredByEmpty();
 
-    public abstract T label(T term, ImmutableArray<TermLabel> labels);
+    T elementary(UpdateableOperator lhs, T rhs);
 
-    public abstract T addLabel(T term, TermLabel label);
+    T skip();
 
-    public abstract T addLabel(T term, ImmutableArray<TermLabel> labels);
+    T parallel(T u1, T u2);
 
-    public abstract T arr(T idx);
+    T parallel(@SuppressWarnings("unchecked") T... updates);
 
-    public abstract T staticDot(Sort asSort, Function f);
+    T parallel(ImmutableList<T> updates);
 
-    public abstract T staticDot(Sort asSort, T f);
+    T sequential(T u1, T u2);
 
-//    public abstract T dot(Sort asSort, T o, LocationVariable field);
+    T sequential(T[] updates);
 
-    public abstract T dot(Sort asSort, T o, Function f);
+    T sequential(ImmutableList<T> updates);
 
-    public abstract T getBaseHeap();
+    T apply(T update, T target);
 
-    public abstract T dot(Sort asSort, T o, T f);
+    ImmutableList<T> apply(T update,
+            ImmutableList<T> targets);
 
-//    public abstract T select(Sort asSort, T h, T o,
-//            LocationVariable field);
+    T apply(T update, T target, ImmutableArray<TermLabel> labels);
 
-    public abstract T select(Sort asSort, T h, T o,
-            T f);
+    T applyParallel(T[] updates, T target);
 
-//    public abstract T staticInv(KeYJavaType t);
+    T applyParallel(ImmutableList<T> updates, T target);
 
-//    public abstract T staticInv(T[] h, KeYJavaType t);
+    T applySequential(T[] updates, T target);
 
-    public abstract T inv(T o);
+    T applySequential(ImmutableList<T> updates, T target);
 
-    public abstract T inv(T[] h, T o);
-
-//    public abstract T permissionsFor(LocationVariable permHeap, LocationVariable regularHeap);
-
-    public abstract T permissionsFor(T permHeap, T regularHeap);
-
-//    public abstract T wellFormed(LocationVariable heap);
-
-    public abstract T wellFormed(T heap);
-
-    public abstract T deepNonNull(T o, T d);
-
-    public abstract T NULL();
-
-    public abstract T[] wd(T[] l);
-
-    public abstract ImmutableList<T> wd(Iterable<T> l);
-
-    public abstract T wd(T t);
-
-    public abstract T createdLocs();
-
-    public abstract T createdInHeap(T s, T h);
-
-    public abstract T disjoint(T s1, T s2);
-
-    public abstract T subset(T s1, T s2);
-
-    public abstract T elementOf(T o, T f, T s);
-
-    public abstract T freshLocs(T h);
-
-    public abstract T arrayRange(T o, T lower, T upper);
-
-    public abstract T allObjects(T f);
-
-    public abstract T allFields(T o);
-
-    public abstract T setComprehension(QuantifiableVariable[] qvs, T guard,
-            T o, T f);
-
-    public abstract T setComprehension(QuantifiableVariable[] qvs, T o,
-            T f);
-
-    public abstract T infiniteUnion(QuantifiableVariable[] qvs, T guard, T s);
-
-    public abstract T infiniteUnion(QuantifiableVariable[] qvs, T s);
-
-    public abstract T setMinus(T s1, T s2);
-
-    public abstract T intersect(Iterable<T> subTerms);
-
-    public abstract T intersect(@SuppressWarnings("unchecked") T ... subTerms);
-
-    public abstract T intersect(T s1, T s2);
-
-    public abstract T union(Iterable<T> subTerms);
-
-    public abstract T union(@SuppressWarnings("unchecked") T ... subTerms);
-
-    public abstract T union(T s1, T s2);
-
-    public abstract T singleton(T o, T f);
-
-    public abstract T allLocs();
-
-    public abstract T empty();
-
-    public abstract T strictlyNothing();
-
-    public abstract T index();
-
-    public abstract T inLong(T var);
-
-    public abstract T inInt(T var);
-
-    public abstract T inChar(T var);
-
-    public abstract T inShort(T var);
-
-    public abstract T inByte(T var);
-
-    public abstract T add(T t1, T t2);
-
-    public abstract T zTerm(long number);
-
-    public abstract T zTerm(String numberString);
-
-    public abstract T one();
-
-    public abstract T zero();
-
-    public abstract T leq(T t1, T t2);
-
-    public abstract T lt(T t1, T t2);
-
-    public abstract T gt(T t1, T t2);
-
-    public abstract T geq(T t1, T t2);
-
-    public abstract T FALSE();
-
-    public abstract T TRUE();
-
-//    public abstract T applyUpdatePairsSequential(ImmutableList<UpdateLabelPair> updates, T target);
-
-    public abstract T applySequential(ImmutableList<T> updates, T target);
-
-    public abstract T applySequential(T[] updates, T target);
-
-    public abstract T applyParallel(T[] lhss, T[] values, T target);
-
-    public abstract T applyParallel(ImmutableList<T> updates, T target);
-
-    public abstract T applyParallel(T[] updates, T target);
-
-    public abstract ImmutableList<T> applyElementary(T heap, Iterable<T> targets);
-
-    public abstract T applyElementary(T heap, T target);
-
-    public abstract T applyElementary(T loc, T value,
+    T applyUpdatePairsSequential(ImmutableList<UpdateLabelPair<T>> updates,
             T target);
 
-    public abstract T apply(T update, T target, ImmutableArray<TermLabel> labels);
-
-    public abstract ImmutableList<T> apply(T update, ImmutableList<T> targets);
-
-    public abstract T apply(T update, T target);
-
-    public abstract T sequential(ImmutableList<T> updates);
-
-    public abstract T sequential(T[] updates);
-
-    public abstract T sequential(T u1, T u2);
-
-    public abstract T parallel(Iterable<T> lhss, Iterable<T> values);
-
-    public abstract T parallel(T[] lhss, T[] values);
-
-    public abstract T parallel(ImmutableList<T> updates);
-
-    public abstract T parallel(@SuppressWarnings("unchecked") T... updates);
-
-    public abstract T parallel(T u1, T u2);
-
-    public abstract T skip();
-
-    public abstract T elementary(T lhs, T rhs);
-
-    public abstract T elementary(UpdateableOperator lhs, T rhs);
-
-    public abstract T convertToBoolean(T a);
-
-    public abstract T convertToFormula(T a);
-
-    public abstract T measuredByEmpty();
-
-    public abstract Function getMeasuredByEmpty();
-
-    public abstract T measuredBy(T mby);
-
-    public abstract T measuredByCheck(T mby);
-
-    public abstract T prec(T mby, T mbyAtPre);
-
-    public abstract T pair(T first, T second);
-
-    public abstract T exactInstance(Sort s, T t);
-
-    public abstract T instance(Sort s, T t);
-
-    public abstract T subst(QuantifiableVariable substVar, T substTerm, T origTerm);
-
-    //TODO (DS) Will probably need that definitely!!!
-//    public abstract T subst(SubstOp op, QuantifiableVariable substVar, T substTerm,
-//            T origTerm);
-
-    public abstract T equals(T t1, T t2);
-
-    public abstract T imp(T t1, T t2, ImmutableArray<TermLabel> labels);
-
-    public abstract T imp(T t1, T t2);
-
-    public abstract T orSC(Iterable<T> subTerms);
-
-    public abstract T or(Iterable<T> subTerms);
-
-    public abstract T orSC(@SuppressWarnings("unchecked") T... subTerms);
-
-    public abstract T or(@SuppressWarnings("unchecked") T... subTerms);
-
-    public abstract T orSC(T t1, T t2);
-
-    public abstract T or(T t1, T t2);
-
-    public abstract T andSC(Iterable<T> subTerms);
-
-    public abstract T and(Iterable<T> subTerms);
-
-    public abstract T andSC(@SuppressWarnings("unchecked") T ... subTerms);
-
-    public abstract T and(@SuppressWarnings("unchecked") T ... subTerms);
-
-    public abstract T andSC(T t1, T t2);
-
-    public abstract T and(T t1, T t2);
-
-    public abstract T not(T t);
-
-    public abstract T max(ImmutableList<QuantifiableVariable> qvs, T range, T t,
-            TermServices services);
-
-    public abstract T min(ImmutableList<QuantifiableVariable> qvs, T range, T t,
-            TermServices services);
-
-    public abstract T prod(ImmutableList<QuantifiableVariable> qvs, T range, T t,
-            TermServices services);
-
-    public abstract T bprod(QuantifiableVariable qv, T a, T b,
-            T t, TermServices services);
-
-    public abstract T sum(ImmutableList<QuantifiableVariable> qvs, T range, T t);
-
-    public abstract T bsum(QuantifiableVariable qv, T a, T b,
-            T t);
-
-    public abstract T ex(Iterable<QuantifiableVariable> qvs, T t);
-
-    public abstract T ex(QuantifiableVariable qv, T t);
-
-    public abstract T open(T formula);
-
-    public abstract T allClose(T t);
-
-    public abstract T all(Iterable<QuantifiableVariable> qvs, T t);
-
-    public abstract T all(QuantifiableVariable qv, T t);
-
-    public abstract T ff();
-
-    public abstract T tt();
-
-    public abstract T cast(Sort s, T t);
-
-    public abstract T ifEx(ImmutableList<QuantifiableVariable> qvs, T cond, T _then,
-            T _else);
-
-    public abstract T ifEx(QuantifiableVariable qv, T cond, T _then,
-            T _else);
-
-    public abstract T ife(T cond, T _then, T _else);
-
-    public abstract T dia(P jb, T t);
-
-    public abstract T box(P jb, T t);
-
-//    public abstract T prog(Modality mod, P jb, T t,
-//            ImmutableArray<TermLabel> labels);
-
-//    public abstract T prog(Modality mod, P jb, T t);
-
-    public abstract T func(Function f, T[] s, ImmutableArray<QuantifiableVariable> boundVars);
-
-//    public abstract T func(IObserverFunction f, T ... s);
-
-    public abstract T func(Function f, @SuppressWarnings("unchecked") T ... s);
-
-    public abstract T func(Function f, T s1, T s2);
-
-    public abstract T func(Function f, T s);
-
-    public abstract T func(Function f);
-
-    public abstract T var(ParsableVariable v);
-
-    public abstract T var(SchemaVariable v);
-
-//    public abstract ImmutableList<T> var(Iterable<ProgramVariable> vs);
-
-//    public abstract ImmutableList<T> var(ProgramVariable ... vs);
-
-//    public abstract T var(ProgramVariable v);
-
-    public abstract T var(LogicVariable v);
-
-//    public abstract LocationVariable heapAtPreVar(String baseName, Sort sort, boolean makeNameUnique);
-
-//    public abstract LocationVariable heapAtPreVar(String baseName, boolean makeNameUnique);
-
-//    public abstract LocationVariable excVar(String name, IProgramMethod pm, boolean makeNameUnique);
-
-//    public abstract LocationVariable excVar(IProgramMethod pm, boolean makeNameUnique);
-
-//    public abstract LocationVariable resultVar(String name, IProgramMethod pm, boolean makeNameUnique);
-
-//    public abstract LocationVariable resultVar(IProgramMethod pm, boolean makeNameUnique);
-
-//    public abstract ImmutableList<ProgramVariable> paramVars(String postfix, IObserverFunction obs, boolean makeNamesUnique);
-
-//    public abstract ImmutableList<ProgramVariable> paramVars(IObserverFunction obs, boolean makeNamesUnique);
-
-//    public abstract LocationVariable selfVar(IProgramMethod pm, KeYJavaType kjt, boolean makeNameUnique);
-
-//    public abstract LocationVariable selfVar(IProgramMethod pm, KeYJavaType kjt, boolean makeNameUnique,
-//            String postfix);
-
-//    public abstract LocationVariable selfVar(KeYJavaType kjt, boolean makeNameUnique, String postfix);
-
-//    public abstract LocationVariable selfVar(KeYJavaType kjt, boolean makeNameUnique);
-
-    public abstract String newName(Sort sort);
-
-    public abstract String newName(String baseName);
-
-    public abstract String shortBaseName(Sort s);
-
-//    public abstract T parseTerm(String s, NamespaceSet namespaces)
-//            throws ParserException;
-
-//    public abstract T parseTerm(String s) throws ParserException;
-
-    public abstract CCTermFactory<P, T> tf();
+    /**
+     * This value is only used as a marker for "\strictly_nothing" in JML. It
+     * may return any term. Preferably of type LocSet, but this is not
+     * necessary.
+     *
+     * @return an arbitrary but fixed term.
+     */
+    T strictlyNothing();
+
+    T addLabel(T term, ImmutableArray<TermLabel> labels);
+
+    T addLabel(T term, TermLabel label);
+
+    T label(T term, ImmutableArray<TermLabel> labels);
+
+    T label(T term, TermLabel label);
+
+    T shortcut(T term);
+
+    T unlabel(T term);
+
+    T unlabelRecursive(T term);
+
+    /**
+     * Returns the {@link Sort}s of the given {@link T}s.
+     * 
+     * @param terms
+     *            The given {@link T}s.
+     * @return The {@link T} {@link Sort}s.
+     */
+    ImmutableList<Sort> getSorts(Iterable<T> terms);
+
+    /**
+     * Similar behavior as {@link #imp(T, T)} but simplifications are not
+     * performed if {@link TermLabel}s would be lost.
+     * 
+     * @param t1
+     *            The left side.
+     * @param t2
+     *            The right side.
+     * @return The created {@link T}.
+     */
+    T impPreserveLabels(T t1, T t2);
+
+    /**
+     * Similar behavior as {@link #not(T)} but simplifications are not performed
+     * if {@link TermLabel}s would be lost.
+     * 
+     * @param t
+     *            The child {@link T}.
+     * @return The created {@link T}.
+     */
+    T notPreserveLabels(T t);
+
+    /**
+     * Similar behavior as {@link #and(Iterable)} but simplifications are not
+     * performed if {@link TermLabel}s would be lost.
+     * 
+     * @param subTerms
+     *            The sub {@link T}s.
+     * @return The created {@link T}.
+     */
+    T andPreserveLabels(Iterable<T> subTerms);
+
+    /**
+     * Similar behavior as {@link #and(T, T)} but simplifications are not
+     * performed if {@link TermLabel}s would be lost.
+     * 
+     * @param t1
+     *            The left side.
+     * @param t2
+     *            The right side.
+     * @return The created {@link T}.
+     */
+    T andPreserveLabels(T t1, T t2);
+
+    /**
+     * Similar behavior as {@link #or(Iterable)} but simplifications are not
+     * performed if {@link TermLabel}s would be lost.
+     * 
+     * @param subTerms
+     *            The sub {@link T}s.
+     * @return The created {@link T}.
+     */
+    T orPreserveLabels(Iterable<T> subTerms);
+
+    /**
+     * Similar behavior as {@link #or(T, T)} but simplifications are not
+     * performed if {@link TermLabel}s would be lost.
+     * 
+     * @param t1
+     *            The left side.
+     * @param t2
+     *            The right side.
+     * @return The created {@link T}.
+     */
+    T orPreserveLabels(T t1, T t2);
 
 }

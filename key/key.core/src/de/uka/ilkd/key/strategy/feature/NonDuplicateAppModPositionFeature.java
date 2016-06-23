@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.common.core.logic.UpdateLabelPair;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -20,7 +21,6 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
 
 /**
@@ -46,9 +46,9 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
         final Term oldFocus = oldPio.subTerm ();
         if ( !newFocus.equals ( oldFocus ) ) return false;
         if ( newFocus.isRigid () ) return true;
-        final ImmutableList<UpdateLabelPair> oldUpdateContext =
+        final ImmutableList<UpdateLabelPair<Term>> oldUpdateContext =
             oldApp.instantiations ().getUpdateContext ();
-        final ImmutableList<UpdateLabelPair> newUpdateContext =
+        final ImmutableList<UpdateLabelPair<Term>> newUpdateContext =
             newApp.instantiations ().getUpdateContext ();
         return oldUpdateContext.equals ( newUpdateContext );
     }

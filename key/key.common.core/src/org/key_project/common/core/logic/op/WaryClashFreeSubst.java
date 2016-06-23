@@ -11,41 +11,47 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package org.key_project.common.core.logic.op;
 
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.common.core.logic.op.UpdateApplication;
+import java.lang.reflect.Array;
+
+import org.key_project.common.core.logic.CCClashFreeSubst;
+import org.key_project.common.core.logic.CCTerm;
+import org.key_project.common.core.logic.ModalContent;
+import org.key_project.common.core.logic.factories.CCTermBuilder;
+import org.key_project.common.core.logic.visitors.CCTermVisitor;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.WarySubstOp;
-
-public class WaryClashFreeSubst extends ClashFreeSubst {
+public class WaryClashFreeSubst<V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
+        extends CCClashFreeSubst<V, T> {
 
     /** depth of recursion of the <code>apply</code> method */
     private int depth = 0;
+
     /** the formula should be prepended with a quantifier */
-    private boolean createQuantifier = false;
+    protected boolean createQuantifier = false;
 
     /**
      * variable with which the original variable should be substituted below
      * modalities
      */
-    private QuantifiableVariable newVar = null;
-    private Term newVarTerm = null;
+    protected QuantifiableVariable newVar = null;
+    protected T newVarTerm = null;
+
+    private final Class<T> clazz;
 
     /**
      * variables occurring within the original term and within the term to be
      * substituted
      */
-    private ImmutableSet<QuantifiableVariable> warysvars = null;
+    protected ImmutableSet<QuantifiableVariable> warysvars = null;
 
-    public WaryClashFreeSubst(QuantifiableVariable v, Term s,
-            TermServices services) {
-        super(v, s, services);
+    public WaryClashFreeSubst(QuantifiableVariable v, T s,
+            TermServices services, Class<T> clazz) {
+        super(v, s, services, clazz);
+        this.clazz = clazz;
         warysvars = null;
     }
 
@@ -53,8 +59,8 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * substitute <code>s</code> for <code>v</code> in <code>t</code>, avoiding
      * collisions by replacing bound variables in <code>t</code> if necessary.
      */
-    public Term apply(Term t) {
-        Term res;
+    public T apply(T t) {
+        T res;
 
         if (depth == 0) {
             if (!getSubstitutedTerm().isRigid())
@@ -80,34 +86,19 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * or the substituted term, and whose names should not be used for free
      * variables
      */
-    private void findUsedVariables(Term t) {
-        VariableCollectVisitor vcv;
+    private void findUsedVariables(T t) {
+        VariableCollectVisitor<V, T> vcv;
 
-        vcv = new VariableCollectVisitor();
-        getSubstitutedTerm().execPostOrder(vcv);
+        vcv = new VariableCollectVisitor<V, T>();
+        @SuppressWarnings("unchecked")
+        V vcvV = (V) vcv;
+
+        getSubstitutedTerm().execPostOrder(vcvV);
         warysvars = vcv.vars();
 
-        vcv = new VariableCollectVisitor();
-        t.execPostOrder(vcv);
+        vcv = new VariableCollectVisitor<V, T>();
+        t.execPostOrder(vcvV);
         warysvars = warysvars.union(vcv.vars());
-    }
-
-    /**
-     * Create a new logic variable to be used for substitutions below modalities
-     */
-    private void createVariable() {
-        if (!createQuantifier) {
-            createQuantifier = true;
-
-            if (getSubstitutedTerm().freeVars().contains(getVariable()))
-                // in this case one might otherwise get collisions, as the
-                // substitution might be carried out partially within the scope
-                // of the original substitution operator
-                newVar = newVarFor(getVariable(), warysvars);
-            else
-                newVar = getVariable();
-            newVarTerm = services.<JavaBlock, Term, TermBuilder> getTermBuilder().var(newVar);
-        }
     }
 
     /**
@@ -116,7 +107,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * It is assumed, that <code>t</code> contains a free occurrence of
      * <code>v</code>.
      */
-    protected Term apply1(Term t) {
+    protected T apply1(T t) {
         // don't move to a different modality level
         if (!getSubstitutedTerm().isRigid()) {
             if (t.op() instanceof Modality)
@@ -137,7 +128,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      *
      * PRECONDITION: <code>warysvars != null</code>
      */
-    private Term applyOnModality(Term t) {
+    private T applyOnModality(T t) {
         return applyBelowModality(t);
     }
 
@@ -149,7 +140,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      *
      * PRECONDITION: <code>warysvars != null</code>
      */
-    private Term applyOnTransformer(Term t) {
+    private T applyOnTransformer(T t) {
         return applyBelowTransformer(t);
     }
 
@@ -161,14 +152,15 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      *
      * PRECONDITION: <code>warysvars != null</code>
      */
-    private Term applyOnUpdate(Term t) {
+    private T applyOnUpdate(T t) {
 
         // only the last child is below the update
-        final Term target = UpdateApplication.getTarget(t);
+        final T target = UpdateApplication.getTarget(t);
         if (!target.freeVars().contains(getVariable()))
             return super.apply1(t);
 
-        final Term[] newSubterms = new Term[t.arity()];
+        @SuppressWarnings("unchecked")
+        final T[] newSubterms = (T[]) Array.newInstance(clazz, t.arity());
         @SuppressWarnings("unchecked")
         final ImmutableArray<QuantifiableVariable>[] newBoundVars =
                 new ImmutableArray[t.arity()];
@@ -187,47 +179,77 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
                 addSubst ? substWithNewVar(target)
                         : target;
 
-        return services.<JavaBlock, Term, TermBuilder> getTermBuilder().tf()
-                .createTerm(t.op(),
-                        newSubterms,
-                        getSingleArray(newBoundVars),
-                        t.modalContent());
+        T result =
+                services.<ModalContent, T, CCTermBuilder<ModalContent, T>> getTermBuilder()
+                        .tf()
+                        .createTerm(t.op(),
+                                newSubterms,
+                                getSingleArray(newBoundVars),
+                                t.modalContent());
+
+        return result;
     }
 
     /**
      * Apply the substitution to a term/formula below a modality or update
      */
-    private Term applyBelowModality(Term t) {
+    private T applyBelowModality(T t) {
         return substWithNewVar(t);
     }
 
     /**
      * Apply the substitution to a term/formula below a transformer procedure
      */
-    private Term applyBelowTransformer(Term t) {
+    private T applyBelowTransformer(T t) {
         return substWithNewVar(t);
+    }
+
+    /**
+     * Rename the original variable to be substituted to <code>newVar</code>
+     */
+    private T substWithNewVar(T t) {
+        createVariable();
+        final CCClashFreeSubst<V, T> cfs =
+                new CCClashFreeSubst<V, T>(getVariable(),
+                        newVarTerm, services, clazz);
+        return cfs.apply(t);
+    }
+
+    /**
+     * Create a new logic variable to be used for substitutions below modalities
+     */
+    void createVariable() {
+        if (!createQuantifier) {
+            createQuantifier = true;
+
+            if (getSubstitutedTerm().freeVars().contains(getVariable())) {
+                // in this case one might otherwise get collisions, as the
+                // substitution might be carried out partially within the scope
+                // of the original substitution operator
+                newVar = newVarFor(getVariable(), warysvars);
+            }
+            else {
+                newVar = getVariable();
+            }
+            
+            newVarTerm =
+                    services
+                            .<ModalContent, T, CCTermBuilder<ModalContent, T>> getTermBuilder()
+                            .var(newVar);
+        }
     }
 
     /**
      * Prepend the given term with a wary substitution (substituting
      * <code>newVar</code> with <code>getSubstitutedTerm()</code>)
      */
-    private Term addWarySubst(Term t) {
+    T addWarySubst(T t) {
         createVariable();
-        return services.<JavaBlock, Term, TermBuilder> getTermBuilder().subst(
-                WarySubstOp.SUBST,
-                newVar,
-                getSubstitutedTerm(),
-                t);
-    }
-
-    /**
-     * Rename the original variable to be substituted to <code>newVar</code>
-     */
-    private Term substWithNewVar(Term t) {
-        createVariable();
-        final ClashFreeSubst cfs = new ClashFreeSubst(getVariable(),
-                newVarTerm, services);
-        return cfs.apply(t);
+        return services.<ModalContent, T, CCTermBuilder<ModalContent, T>> getTermBuilder()
+                .subst(
+                        // WarySubstOp.SUBST, // WarySubstOp is the standard
+                        newVar,
+                        getSubstitutedTerm(),
+                        t);
     }
 }

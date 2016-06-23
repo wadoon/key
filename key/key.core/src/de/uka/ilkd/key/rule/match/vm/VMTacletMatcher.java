@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule.match.vm;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.key_project.common.core.logic.UpdateLabelPair;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -28,8 +29,6 @@ import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletMatcher;
 import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
@@ -114,8 +113,8 @@ public class VMTacletMatcher implements TacletMatcher {
 
         final boolean updateContextPresent = 
                 !p_matchCond.getInstantiations().getUpdateContext().isEmpty();
-        ImmutableList<UpdateLabelPair> context = 
-                ImmutableSLList.<SVInstantiations.UpdateLabelPair>nil();
+        ImmutableList<UpdateLabelPair<Term>> context =
+                ImmutableSLList.<UpdateLabelPair<Term>>nil();
         
         if (updateContextPresent) { 
             context = p_matchCond.getInstantiations().getUpdateContext();   
@@ -146,13 +145,13 @@ public class VMTacletMatcher implements TacletMatcher {
      * @param formula the formula whose own update context must be equal (modulo renaming) to the given one
      * @return {@code null} if the update context does not match the one of the formula or the formula without the update context
      */
-    private Term matchUpdateContext(ImmutableList<UpdateLabelPair> context,
+    private Term matchUpdateContext(ImmutableList<UpdateLabelPair<Term>> context,
             Term formula) {
-        ImmutableList<UpdateLabelPair> curContext = context;
+        ImmutableList<UpdateLabelPair<Term>> curContext = context;
         for (int i = 0, size = context.size(); i<size; i++) {
             if (formula.op() instanceof UpdateApplication) {
                 final Term update = UpdateApplication.getUpdate(formula);
-                final UpdateLabelPair ulp = curContext.head();
+                final UpdateLabelPair<Term> ulp = curContext.head();
                 if (ulp.getUpdate().equalsModRenaming(update) &&
                         ulp.getUpdateApplicationlabels().equals(update.getLabels())) {  
                     curContext = curContext.tail();

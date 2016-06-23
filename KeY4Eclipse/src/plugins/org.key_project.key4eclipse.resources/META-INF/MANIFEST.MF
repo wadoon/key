@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.text;bundle-version="3.7.2",
  org.eclipse.jdt.ui;bundle-version="3.7.2",
  org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.200",
- org.eclipse.jdt.junit;bundle-version="3.7.300"
+ org.eclipse.jdt.junit;bundle-version="3.7.300",
+ org.key_project.common.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project

@@ -17,11 +17,11 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Equality;
 import org.key_project.common.core.logic.op.Junctor;
+import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.op.Quantifier;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;

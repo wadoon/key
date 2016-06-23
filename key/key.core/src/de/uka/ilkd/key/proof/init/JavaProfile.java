@@ -13,12 +13,12 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import org.key_project.common.core.logic.label.ParameterlessTermLabel;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;

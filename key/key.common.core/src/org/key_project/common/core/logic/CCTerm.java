@@ -72,7 +72,7 @@ public interface CCTerm<V extends CCTermVisitor<T>, T extends CCTerm<V, T>>
     /**
      * The modal content 
      */
-    public ModalContent modalContent();
+    public <M extends ModalContent> M modalContent();
 
     /**
      * Checks if the {@link ModalContent} or one of its direct or indirect children

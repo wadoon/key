@@ -20,9 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Named;
-import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.*;
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
@@ -44,14 +42,8 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.ClashFreeSubst;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -59,12 +51,7 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
-import de.uka.ilkd.key.rule.inst.GenericSortCondition;
-import de.uka.ilkd.key.rule.inst.GenericSortException;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
+import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -452,14 +439,14 @@ public abstract class TacletApp implements RuleApp {
     public boolean isExecutable(JavaDLTermServices services) {
         // bugfix #1336, see bugtracker
         if (taclet instanceof RewriteTaclet) {
-            ImmutableList<UpdateLabelPair> oldUpdCtx = 
+            ImmutableList<UpdateLabelPair<Term>> oldUpdCtx =
                     matchConditions().getInstantiations().getUpdateContext();
             MatchConditions newConditions = ((RewriteTaclet)taclet).checkPrefix(posInOccurrence(), 
                     MatchConditions.EMPTY_MATCHCONDITIONS);
             if(newConditions == null) {
                 return false;
             }
-            ImmutableList<UpdateLabelPair> newUpdCtx =
+            ImmutableList<UpdateLabelPair<Term>> newUpdCtx =
                     newConditions.getInstantiations().getUpdateContext();
             if(!oldUpdCtx.equals(newUpdCtx)) {
                 return false;

@@ -27,7 +27,6 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.rule.TacletForTests;
 

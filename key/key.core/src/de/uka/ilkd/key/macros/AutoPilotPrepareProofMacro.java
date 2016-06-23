@@ -21,12 +21,12 @@ import java.util.Set;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;

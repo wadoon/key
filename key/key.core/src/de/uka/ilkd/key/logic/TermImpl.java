@@ -14,12 +14,11 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.CCTermImpl;
+import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.op.Modality;
 
 /**
  * The currently only class implementing the Term interface. TermFactory should

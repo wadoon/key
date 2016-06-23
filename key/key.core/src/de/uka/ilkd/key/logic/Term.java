@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.CCTerm;
-import org.key_project.util.collection.ImmutableArray;
 
 /**
  * {@link CCTerm} extension for Java terms, provides methods related to
@@ -24,19 +23,11 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public interface Term extends CCTerm<Visitor, Term> {
 
-    @Override
-    public ImmutableArray<Term> subs();
-
-    @Override
-    public Term sub(int nr);
-
     /**
      * The Java block at top level.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public JavaBlock modalContent();
-
-    @Override
-    void execPostOrder(Visitor visitor);
 
 }

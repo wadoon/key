@@ -3301,7 +3301,7 @@ location_term returns[Term result]
 
 substitutionterm returns [Term _substitution_term = null] 
 @init{
-  SubstOp op = WarySubstOp.SUBST;
+  CCSubstOp<Term> op = WarySubstOp.SUBST;
    Namespace orig = variables();  
   Term result = null;
 }

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.FormulaSV;
+import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 

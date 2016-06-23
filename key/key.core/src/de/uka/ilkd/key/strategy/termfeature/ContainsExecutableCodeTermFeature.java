@@ -13,13 +13,13 @@
 
 package de.uka.ilkd.key.strategy.termfeature;
 
+import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.Quantifier;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Modality;
 
 
 /**

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.UpdateApplication;
@@ -23,7 +24,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
 
 /**
  * Matching triggers within another quantifier expression. Problems with the
