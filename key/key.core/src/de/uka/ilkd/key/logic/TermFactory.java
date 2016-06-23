@@ -56,11 +56,6 @@ public final class TermFactory extends CCTermFactoryImpl<JavaBlock, Term>
     // -------------------------------------------------------------------------
 
     @Override
-    protected ImmutableArray<Term> emptyTermList() {
-        return NO_SUBTERMS;
-    }
-
-    @Override
     protected Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             JavaBlock javaBlock, ImmutableArray<TermLabel> labels) {

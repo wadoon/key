@@ -53,8 +53,6 @@ public abstract class CCTermFactoryImpl<P extends ModalContent, T extends CCTerm
         this.clazz = clazz;
     }
 
-    protected abstract ImmutableArray<T> emptyTermList();
-
     protected abstract T doCreateTerm(Operator op, ImmutableArray<T> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             P javaBlock, ImmutableArray<TermLabel> labels);
@@ -234,6 +232,10 @@ public abstract class CCTermFactoryImpl<P extends ModalContent, T extends CCTerm
     private ImmutableArray<T> createSubtermArray(T[] subs) {
         return subs == null || subs.length == 0 ?
                 emptyTermList() : new ImmutableArray<T>(subs);
+    }
+
+    private ImmutableArray<T> emptyTermList() {
+        return new ImmutableArray<T>(createTermArray(0));
     }
 
 }
