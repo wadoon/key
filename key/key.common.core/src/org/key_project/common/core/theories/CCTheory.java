@@ -27,7 +27,7 @@ import org.key_project.common.core.services.TermServices;
  * class provides a programming interface to access these entities, and it
  * assists the type converter in handling them.
  */
-public abstract class Theory implements Named {
+public abstract class CCTheory implements Named {
 
     private final Name name;
 
@@ -41,7 +41,7 @@ public abstract class Theory implements Named {
     // constructors
     // -------------------------------------------------------------------------
 
-    protected Theory(Name name, TermServices<?, ?, ?, ?> services) {
+    protected CCTheory(Name name, TermServices<?, ?, ?, ?> services) {
         sort = (Sort) services.getNamespaces().sorts().lookup(name);
         if (sort == null)
             throw new RuntimeException(
@@ -53,7 +53,7 @@ public abstract class Theory implements Named {
         this.name = name;
     }
 
-    protected Theory(Name name, Sort targetSort) {
+    protected CCTheory(Name name, Sort targetSort) {
         sort = targetSort;
         if (sort == null)
             throw new RuntimeException(

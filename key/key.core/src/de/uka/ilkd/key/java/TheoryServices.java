@@ -6,7 +6,7 @@ import java.util.Map;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.CCTheoryServices;
-import org.key_project.common.core.theories.Theory;
+import org.key_project.common.core.theories.CCTheory;
 
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.util.Debug;
@@ -91,17 +91,17 @@ public class TheoryServices implements CCTheoryServices {
     }
 
     @Override
-    public Theory getTheory(Name theoryName) {
+    public CCTheory getTheory(Name theoryName) {
         return getLDT(theoryName);
     }
 
     @Override
-    public Theory getTheoryFor(Sort sort) {
+    public CCTheory getTheoryFor(Sort sort) {
         return getModelFor(sort);
     }
 
     @Override
-    public Iterable<? extends Theory> getTheories() {
+    public Iterable<? extends CCTheory> getTheories() {
         return theories.values();
     }
 

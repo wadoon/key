@@ -15,7 +15,7 @@ package org.key_project.common.core.services;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.theories.Theory;
+import org.key_project.common.core.theories.CCTheory;
 
 /**
  * Provides access to theories.
@@ -30,7 +30,7 @@ public interface CCTheoryServices {
      * @param theoryName
      * @return
      */
-    Theory getTheory(Name theoryName);
+    CCTheory getTheory(Name theoryName);
     
     /**
      * TODO: Document.
@@ -38,13 +38,13 @@ public interface CCTheoryServices {
      * @param sort
      * @return
      */
-    Theory getTheoryFor(Sort sort);
+    CCTheory getTheoryFor(Sort sort);
     
     /**
      * TODO: Document.
      *
      * @return
      */
-    Iterable<? extends Theory> getTheories();
+    Iterable<? extends CCTheory> getTheories();
     
 }

@@ -24,7 +24,7 @@ import org.key_project.common.core.services.TermServices;
  *
  * @author Dominic Scheurer
  */
-public class IntegerTheory<T extends CCTerm<?, ?, T>> extends Theory {
+public class CCIntegerTheory<T extends CCTerm<?, ?, T>> extends CCTheory {
 
     public static final Name NAME = new Name("int");
 
@@ -166,7 +166,7 @@ public class IntegerTheory<T extends CCTerm<?, ?, T>> extends Theory {
      * @param name
      * @param services
      */
-    protected IntegerTheory(TermServices<?, T, ?, ?> services) {
+    protected CCIntegerTheory(TermServices<?, T, ?, ?> services) {
         super(NAME, services);
 
         // Initialize caches for function symbols from integerHeader.key

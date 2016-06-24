@@ -20,7 +20,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.theories.Theory;
+import org.key_project.common.core.theories.CCTheory;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -37,7 +37,7 @@ import de.uka.ilkd.key.logic.Term;
  * a number of operators. The LDT class provides a programming interface to
  * access these entities, and it assists the type converter in handling them.
  */
-public abstract class LDT extends Theory implements Named {
+public abstract class LDT extends CCTheory implements Named {
 
     // -------------------------------------------------------------------------
     // constructors
