@@ -13,7 +13,6 @@
 
 package org.key_project.common.core.ldt;
 
-import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
@@ -23,30 +22,30 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 
 /**
- * A theory corresponds to a standard rule file
- * shipped with KeY. Usually, this rule file declares a sort (such as "int") and
- * a number of operators. The LDT class provides a programming interface to
- * access these entities, and it assists the type converter in handling them.
+ * A theory corresponds to a standard rule file shipped with KeY. Usually, this
+ * rule file declares a sort (such as "int") and a number of operators. The theory
+ * class provides a programming interface to access these entities, and it
+ * assists the type converter in handling them.
  */
-public abstract class CCTheory<T extends CCTerm<?, ?, ?>> implements Named {
+public abstract class Theory implements Named {
 
     private final Name name;
 
-    /** the main sort associated with the LDT */
+    /** the main sort associated with the theory */
     private final Sort sort;
 
-    /** the namespace of functions this LDT feels responsible for */
+    /** the namespace of functions this theory feels responsible for */
     private final Namespace functions = new Namespace();
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
-    protected CCTheory(Name name, TermServices<?, ?, ?, ?> services) {
+    protected Theory(Name name, TermServices<?, ?, ?, ?> services) {
         sort = (Sort) services.getNamespaces().sorts().lookup(name);
         if (sort == null)
             throw new RuntimeException(
-                    "LDT "
+                    "theory "
                             + name
                             + " not found.\n"
                             +
@@ -54,11 +53,11 @@ public abstract class CCTheory<T extends CCTerm<?, ?, ?>> implements Named {
         this.name = name;
     }
 
-    protected CCTheory(Name name, Sort targetSort) {
+    protected Theory(Name name, Sort targetSort) {
         sort = targetSort;
         if (sort == null)
             throw new RuntimeException(
-                    "LDT "
+                    "theory "
                             + name
                             + " not found.\n"
                             +
@@ -71,7 +70,7 @@ public abstract class CCTheory<T extends CCTerm<?, ?, ?>> implements Named {
     // -------------------------------------------------------------------------
 
     /**
-     * adds a function to the LDT
+     * adds a function to the theory
      * 
      * @return the added function (for convenience reasons)
      */
@@ -81,7 +80,7 @@ public abstract class CCTheory<T extends CCTerm<?, ?, ?>> implements Named {
     }
 
     /**
-     * looks up a function in the namespace and adds it to the LDT
+     * looks up a function in the namespace and adds it to the theory
      * 
      * @param funcName
      *            the String with the name of the function to look up
@@ -93,7 +92,7 @@ public abstract class CCTheory<T extends CCTerm<?, ?, ?>> implements Named {
         final Function f = (Function) funcNS.lookup(new Name(funcName));
         if (f == null)
             throw new RuntimeException(
-                    "LDT: Function "
+                    "theory: Function "
                             + funcName
                             + " not found.\n"
                             +
@@ -106,7 +105,7 @@ public abstract class CCTheory<T extends CCTerm<?, ?, ?>> implements Named {
             String kind) {
         final SortDependingFunction f =
                 services.getFirstInstance(new Name(kind));
-        assert f != null : "LDT: Sort depending function "
+        assert f != null : "theory: Sort depending function "
                 + kind + " not found";
         addFunction(f);
         return f;
@@ -132,11 +131,11 @@ public abstract class CCTheory<T extends CCTerm<?, ?, ?>> implements Named {
 
     @Override
     public final String toString() {
-        return "LDT " + name() + " (" + targetSort() + ")";
+        return "theory " + name() + " (" + targetSort() + ")";
     }
 
     /**
-     * Returns the sort associated with the LDT.
+     * Returns the sort associated with the theory.
      */
     public final Sort targetSort() {
         return sort;
@@ -146,6 +145,5 @@ public abstract class CCTheory<T extends CCTerm<?, ?, ?>> implements Named {
         Named n = functions.lookup(op.name());
         return (n == op);
     }
-
 
 }
