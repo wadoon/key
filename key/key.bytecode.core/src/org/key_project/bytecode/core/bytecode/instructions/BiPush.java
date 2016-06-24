@@ -11,9 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.ast.unops;
+package org.key_project.bytecode.core.bytecode.instructions;
 
-import org.key_project.bytecode.core.ast.Operand;
+import org.key_project.bytecode.core.bytecode.Operand;
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author Dominic Scheurer
  *
  */
-public class IStore extends UnaryInstruction {
+public class BiPush extends UnaryInstruction {
 
     private static final Name NAME = new Name("BIPUSH");
 
@@ -32,7 +32,7 @@ public class IStore extends UnaryInstruction {
      *
      * @param operand
      */
-    public IStore(Operand operand) {
+    public BiPush(Operand operand) {
         super(operand);
     }
     
@@ -41,10 +41,10 @@ public class IStore extends UnaryInstruction {
      *
      * @param operands
      */
-    public IStore(ImmutableList<Operand> operands) {
+    public BiPush(ImmutableList<Operand> operands) {
         super(operands);
     }
-
+    
     @Override
     public Name name() {
         return NAME;

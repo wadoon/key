@@ -11,16 +11,13 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.ast;
+package org.key_project.bytecode.core.bytecode;
 
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
- *
  */
-public interface LabeledInstruction extends Instruction {
+public interface Operand {
 
-    Label label();
-    
 }

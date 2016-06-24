@@ -11,37 +11,43 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.ast;
+package org.key_project.bytecode.core.bytecode.instructions;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.bytecode.core.bytecode.Instruction;
+import org.key_project.bytecode.core.bytecode.Operand;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
+ *
  */
-public interface Instruction {
+public abstract class UnaryInstruction implements Instruction {
+    
+    private final ImmutableList<Operand> operands;
+    
+    /**
+     * TODO: Document.
+     *
+     */
+    protected UnaryInstruction(Operand operand) {
+        this.operands = ImmutableSLList.<Operand>nil().prepend(operand);
+    }
+    
+    protected UnaryInstruction(ImmutableList<Operand> operands) {
+        this.operands = operands;
+    }
+    
+    @Override
+    public int arity() {
+        return 1;
+    }
 
-    /**
-     * TODO: Document.
-     *
-     * @return
-     */
-    Name name();
-    
-    /**
-     * TODO: Document.
-     *
-     * @return
-     */
-    int arity();
-    
-    /**
-     * TODO: Document.
-     *
-     * @return
-     */
-    ImmutableList<Operand> operands();
+    @Override
+    public ImmutableList<Operand> operands() {
+        return operands;
+    }
     
 }

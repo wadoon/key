@@ -11,17 +11,43 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.ast;
+package org.key_project.bytecode.core.bytecode.instructions;
 
+import org.key_project.bytecode.core.bytecode.Operand;
 import org.key_project.common.core.logic.Name;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
+ *
  */
-public interface Label {
+public class IStore extends UnaryInstruction {
+
+    private static final Name NAME = new Name("BIPUSH");
+
+    /**
+     * TODO: Document.
+     *
+     * @param operand
+     */
+    public IStore(Operand operand) {
+        super(operand);
+    }
     
-    Name name();
-    
+    /**
+     * TODO: Document.
+     *
+     * @param operands
+     */
+    public IStore(ImmutableList<Operand> operands) {
+        super(operands);
+    }
+
+    @Override
+    public Name name() {
+        return NAME;
+    }
+
 }

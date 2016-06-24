@@ -16,7 +16,7 @@ package org.key_project.bytecode.core.logic;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.bytecode.core.ast.Instruction;
+import org.key_project.bytecode.core.bytecode.Instruction;
 import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;

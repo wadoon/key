@@ -11,43 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.ast.unops;
+package org.key_project.bytecode.core.bytecode;
 
-import org.key_project.bytecode.core.ast.Operand;
 import org.key_project.common.core.logic.Name;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
- *
  */
-public class BiPush extends UnaryInstruction {
-
-    private static final Name NAME = new Name("BIPUSH");
-
-    /**
-     * TODO: Document.
-     *
-     * @param operand
-     */
-    public BiPush(Operand operand) {
-        super(operand);
-    }
+public interface Label {
     
-    /**
-     * TODO: Document.
-     *
-     * @param operands
-     */
-    public BiPush(ImmutableList<Operand> operands) {
-        super(operands);
-    }
+    Name name();
     
-    @Override
-    public Name name() {
-        return NAME;
-    }
-
 }
