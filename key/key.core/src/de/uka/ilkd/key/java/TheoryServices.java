@@ -5,16 +5,10 @@ import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.services.CCTheoryServices;
+import org.key_project.common.core.theories.Theory;
 
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.MapLDT;
-import de.uka.ilkd.key.ldt.PermissionLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -22,7 +16,7 @@ import de.uka.ilkd.key.util.Debug;
  * 
  * @author Richard Bubel
  */
-public class TheoryServices {
+public class TheoryServices implements CCTheoryServices {
     // Maps LDT names to LDT instances.
     private Map<Name, LDT> theories;
 
@@ -93,6 +87,21 @@ public class TheoryServices {
     }
 
     public Iterable<LDT> getModels() {
+        return theories.values();
+    }
+
+    @Override
+    public Theory getTheory(Name theoryName) {
+        return getLDT(theoryName);
+    }
+
+    @Override
+    public Theory getTheoryFor(Sort sort) {
+        return getModelFor(sort);
+    }
+
+    @Override
+    public Iterable<? extends Theory> getTheories() {
         return theories.values();
     }
 

@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.ldt;
+package org.key_project.common.core.theories;
 
 import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;

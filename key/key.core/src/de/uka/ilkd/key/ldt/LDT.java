@@ -16,11 +16,11 @@ package de.uka.ilkd.key.ldt;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.key_project.common.core.ldt.Theory;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.theories.Theory;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;

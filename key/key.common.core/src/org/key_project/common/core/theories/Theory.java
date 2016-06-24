@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.ldt;
+package org.key_project.common.core.theories;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
@@ -145,5 +145,4 @@ public abstract class Theory implements Named {
         Named n = functions.lookup(op.name());
         return (n == op);
     }
-
 }
