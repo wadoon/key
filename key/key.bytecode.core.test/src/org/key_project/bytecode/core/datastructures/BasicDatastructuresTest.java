@@ -21,10 +21,10 @@ import org.junit.Test;
 import org.key_project.bytecode.core.bytecode.Instruction;
 import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.Term;
-import org.key_project.bytecode.core.logic.TermServicesImpl;
 import org.key_project.bytecode.core.logic.calculus.*;
 import org.key_project.bytecode.core.logic.factories.TermBuilder;
-import org.key_project.common.core.ldt.IntegerTheory;
+import org.key_project.bytecode.core.services.TermServicesImpl;
+import org.key_project.bytecode.core.services.TheoryServices;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.sort.Sort;
@@ -41,21 +41,26 @@ public class BasicDatastructuresTest extends TestCase {
     private static final Sort INT_SORT = new SortImpl(new Name("int"));
     private static final TermBuilder TB = TermServicesImpl.instance()
             .getTermBuilder();
-    private static final IntegerTheory<Term> INT_THEORY = new IntegerTheory(TermServicesImpl.instance());
 
     @Test
     public void testSimpleBytecodeSequentCreation() {
+        TermServicesImpl.instance().getNamespaces().sorts().add(INT_SORT);
+        TheoryServices theories = new TheoryServices(
+                TermServicesImpl.instance());
+
         LinkedList<Instruction> insns = new LinkedList<Instruction>();
 
         // insns.add(...)
 
         InstructionBlock program = new InstructionBlock(insns);
 
-        Term anteForm = TB.equals(null /* i */, null /* 0 */);
+        Term anteForm =
+                TB.equals(null /* i */, theories.getIntegerTheory().zero());
 
         Term succForm =
                 TB.prog(Modality.DIA, program,
-                        TB.equals(null /* i */, null /* 1 */));
+                        TB.equals(null /* i */, theories.getIntegerTheory()
+                                .one()));
 
         Semisequent ante =
                 new SemisequentImpl(ImmutableSLList.<SequentFormula> nil()

@@ -16,6 +16,7 @@ package org.key_project.bytecode.core.logic.factories;
 import java.util.Map;
 
 import org.key_project.bytecode.core.logic.*;
+import org.key_project.bytecode.core.services.TypeCheckingAndInferenceServiceImpl;
 import org.key_project.common.core.logic.factories.CCTermFactoryImpl;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;

@@ -11,10 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.logic;
+package org.key_project.bytecode.core.services;
 
 import java.util.HashMap;
 
+import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.logic.factories.TermBuilder;
 import org.key_project.bytecode.core.logic.factories.TermFactory;
 import org.key_project.bytecode.core.logic.services.BCTermServices;
