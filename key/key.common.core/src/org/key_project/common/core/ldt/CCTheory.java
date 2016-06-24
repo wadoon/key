@@ -20,16 +20,15 @@ import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.abstraction.CCType;
 import org.key_project.common.core.services.TermServices;
 
 /**
- * An "LDT" or "language data type" class corresponds to a standard rule file
+ * A theory corresponds to a standard rule file
  * shipped with KeY. Usually, this rule file declares a sort (such as "int") and
  * a number of operators. The LDT class provides a programming interface to
  * access these entities, and it assists the type converter in handling them.
  */
-public abstract class CC_LDT<T extends CCTerm<?, ?, ?>> implements Named {
+public abstract class CCTheory<T extends CCTerm<?, ?, ?>> implements Named {
 
     private final Name name;
 
@@ -43,7 +42,7 @@ public abstract class CC_LDT<T extends CCTerm<?, ?, ?>> implements Named {
     // constructors
     // -------------------------------------------------------------------------
 
-    protected CC_LDT(Name name, TermServices<?, ?, ?, ?> services) {
+    protected CCTheory(Name name, TermServices<?, ?, ?, ?> services) {
         sort = (Sort) services.getNamespaces().sorts().lookup(name);
         if (sort == null)
             throw new RuntimeException(
@@ -55,7 +54,7 @@ public abstract class CC_LDT<T extends CCTerm<?, ?, ?>> implements Named {
         this.name = name;
     }
 
-    protected CC_LDT(Name name, Sort targetSort) {
+    protected CCTheory(Name name, Sort targetSort) {
         sort = targetSort;
         if (sort == null)
             throw new RuntimeException(
@@ -148,11 +147,5 @@ public abstract class CC_LDT<T extends CCTerm<?, ?, ?>> implements Named {
         return (n == op);
     }
 
-    // -------------------------------------------------------------------------
-    // abstract methods
-    // -------------------------------------------------------------------------
 
-    public abstract boolean hasLiteralFunction(Function f);
-
-    public abstract CCType getType(T t);
 }
