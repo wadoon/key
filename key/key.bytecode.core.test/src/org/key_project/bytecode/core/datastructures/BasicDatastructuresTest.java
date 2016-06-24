@@ -18,12 +18,13 @@ import java.util.LinkedList;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.bytecode.core.ast.Instruction;
+import org.key_project.bytecode.core.bytecode.Instruction;
 import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.logic.TermServicesImpl;
 import org.key_project.bytecode.core.logic.calculus.*;
 import org.key_project.bytecode.core.logic.factories.TermBuilder;
+import org.key_project.common.core.ldt.IntegerTheory;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.sort.Sort;
@@ -40,6 +41,7 @@ public class BasicDatastructuresTest extends TestCase {
     private static final Sort INT_SORT = new SortImpl(new Name("int"));
     private static final TermBuilder TB = TermServicesImpl.instance()
             .getTermBuilder();
+    private static final IntegerTheory<Term> INT_THEORY = new IntegerTheory(TermServicesImpl.instance());
 
     @Test
     public void testSimpleBytecodeSequentCreation() {
