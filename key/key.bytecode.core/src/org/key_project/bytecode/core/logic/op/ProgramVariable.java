@@ -13,9 +13,14 @@
 
 package org.key_project.bytecode.core.logic.op;
 
+import org.key_project.bytecode.core.bytecode.BytecodeSourceElement;
+import org.key_project.bytecode.core.bytecode.BytecodeVisitor;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.CCProgramVariable;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.NameAbstractionTable;
+import org.key_project.common.core.program.Position;
+import org.key_project.common.core.program.PositionInfo;
 import org.key_project.common.core.program.abstraction.SortedType;
 
 /**
@@ -23,8 +28,10 @@ import org.key_project.common.core.program.abstraction.SortedType;
  *
  * @author Dominic Scheurer
  */
-public abstract class ProgramVariable extends CCProgramVariable {
-    
+public abstract class ProgramVariable extends
+        CCProgramVariable<BytecodeVisitor, BytecodeSourceElement> implements
+        BytecodeSourceElement {
+
     private final boolean isFinal;
     private final boolean isStatic;
 
@@ -44,32 +51,88 @@ public abstract class ProgramVariable extends CCProgramVariable {
 
     /**
      * TODO: Document.
-    *
-    * @param name
-    * @param s
-    * @param t
-    * @param isModel
-    * @param isGhost
-    */
-   protected ProgramVariable(Name name, Sort s, SortedType t, boolean isModel,
-           boolean isGhost, boolean isFinal, boolean isStatic) {
-       super(name, s, t, isModel, isGhost);
-       this.isFinal = isFinal;
-       this.isStatic = isStatic;
-   }
-   
-   /**
-    * @return the isFinal
-    */
-   public boolean isFinal() {
-       return isFinal;
-   }
+     *
+     * @param name
+     * @param s
+     * @param t
+     * @param isModel
+     * @param isGhost
+     */
+    protected ProgramVariable(Name name, Sort s, SortedType t, boolean isModel,
+            boolean isGhost, boolean isFinal, boolean isStatic) {
+        super(name, s, t, isModel, isGhost);
+        this.isFinal = isFinal;
+        this.isStatic = isStatic;
+    }
 
-   /**
-    * @return the isStatic
-    */
-   public boolean isStatic() {
-       return isStatic;
-   }
+    /**
+     * @return the isFinal
+     */
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    /**
+     * @return the isStatic
+     */
+    public boolean isStatic() {
+        return isStatic;
+    }
+
+    // ---------------------------------------------------
+    // Methods defined in SourceElement
+    // ---------------------------------------------------
+
+    @Override
+    public BytecodeSourceElement getFirstElement() {
+        return this;
+    }
+
+    @Override
+    public BytecodeSourceElement getFirstElementIncludingBlocks() {
+        return getFirstElement();
+    }
+
+    @Override
+    public BytecodeSourceElement getLastElement() {
+        return this;
+    }
+
+    @Override
+    public void visit(BytecodeVisitor v) {
+        v.performActionOnProgramVariable(this);
+    }
+
+    @Override
+    public Position getStartPosition() {
+        return Position.UNDEFINED;
+    }
+
+    @Override
+    public Position getEndPosition() {
+        return Position.UNDEFINED;
+    }
+
+    @Override
+    public Position getRelativePosition() {
+        return Position.UNDEFINED;
+    }
+
+    @Override
+    public PositionInfo getPositionInfo() {
+        return PositionInfo.UNDEFINED;
+    }
+
+    /**
+     * equals modulo renaming is described in the corresponding comment in class
+     * SourceElement. In this case two programvariables are considered to be
+     * equal if they are assigned to the same abstract name or if they are the
+     * same object.
+     */
+    @Override
+    public boolean equalsModRenaming(BytecodeSourceElement se,
+            NameAbstractionTable<BytecodeSourceElement> nat) {
+        return nat.sameAbstractName(this, se);
+    }
 
 }

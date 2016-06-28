@@ -13,9 +13,9 @@
 
 package org.key_project.bytecode.core.logic.op;
 
+import org.key_project.bytecode.core.bytecode.BytecodeSourceElement;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.program.abstraction.SortedType;
 
@@ -41,8 +41,8 @@ public class ProgramConstant extends ProgramVariable {
     }
 
     @Override
-    public boolean equalsModRenaming(CCSourceElement se,
-            NameAbstractionTable<CCSourceElement> nat) {
+    public boolean equalsModRenaming(BytecodeSourceElement se,
+            NameAbstractionTable<BytecodeSourceElement> nat) {
         return nat.sameAbstractName(this, se);
     }
 

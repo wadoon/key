@@ -11,18 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.logic;
+package org.key_project.bytecode.core.bytecode;
 
-import org.key_project.bytecode.core.bytecode.BytecodeSourceElement;
-import org.key_project.bytecode.core.logic.visitors.Visitor;
-import org.key_project.common.core.logic.CCTerm;
+import org.key_project.bytecode.core.logic.op.ProgramVariable;
+import org.key_project.common.core.program.ProgramVisitor;
 
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
- *
  */
-public interface Term extends CCTerm<BytecodeSourceElement, InstructionBlock, Visitor, Term> {
-
+public interface BytecodeVisitor extends ProgramVisitor {
+    void performActionOnProgramVariable(
+            ProgramVariable x);
 }

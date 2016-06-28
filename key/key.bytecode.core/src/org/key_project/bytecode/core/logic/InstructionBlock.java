@@ -16,9 +16,9 @@ package org.key_project.bytecode.core.logic;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.key_project.bytecode.core.bytecode.BytecodeSourceElement;
 import org.key_project.bytecode.core.bytecode.Instruction;
 import org.key_project.common.core.logic.ModalContent;
-import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 
 /**
@@ -26,7 +26,7 @@ import org.key_project.common.core.program.NameAbstractionTable;
  *
  * @author Dominic Scheurer
  */
-public class InstructionBlock implements ModalContent {
+public class InstructionBlock implements ModalContent<BytecodeSourceElement> {
 
     private int pc;
     private LinkedList<Instruction> insns;
@@ -67,15 +67,15 @@ public class InstructionBlock implements ModalContent {
         return insns.isEmpty();
     }
 
-    @Override
-    public boolean equalsModRenaming(Object se,
-            NameAbstractionTable<? extends CCSourceElement> nat) {
-        // TODO implement
-        throw new RuntimeException("Method still waiting for implementation");
-    }
-
     public static InstructionBlock emptyBlock() {
         return EMPTY_BLOCK;
+    }
+
+    @Override
+    public boolean equalsModRenaming(Object se,
+            NameAbstractionTable<BytecodeSourceElement> nat) {
+        // TODO implement
+        throw new RuntimeException("Method still waiting for implementation");
     }
 
 }

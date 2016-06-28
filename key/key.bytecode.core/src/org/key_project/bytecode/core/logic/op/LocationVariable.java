@@ -15,8 +15,6 @@ package org.key_project.bytecode.core.logic.op;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.program.CCSourceElement;
-import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.program.abstraction.SortedType;
 
 /**
@@ -53,13 +51,6 @@ public class LocationVariable extends ProgramVariable {
     protected LocationVariable(Name name, SortedType t,
             boolean isModel, boolean isGhost) {
         super(name, t.getSort(), t, isModel, isGhost);
-    }
-
-    @Override
-    public boolean equalsModRenaming(CCSourceElement se,
-            NameAbstractionTable<? extends CCSourceElement> nat) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override

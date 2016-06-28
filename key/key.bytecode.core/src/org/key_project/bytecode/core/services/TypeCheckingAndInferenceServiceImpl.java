@@ -30,13 +30,13 @@ public class TypeCheckingAndInferenceServiceImpl<O extends Operator> implements
         TypeCheckingAndInferenceService<O> {
 
     @Override
-    public Sort sort(ImmutableArray<? extends CCTerm<?, ?, ?>> terms, O op) {
+    public Sort sort(ImmutableArray<? extends CCTerm<?, ?, ?, ?>> terms, O op) {
         // TODO This is a STUB -- add real sort computation.
         return terms.get(0).sort();
     }
 
     @Override
-    public boolean validTopLevel(CCTerm<?, ?, ?> term, O op) {
+    public boolean validTopLevel(CCTerm<?, ?, ?, ?> term, O op) {
         // TODO This is a STUB
         return true;
     }

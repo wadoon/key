@@ -13,6 +13,7 @@
 
 package org.key_project.bytecode.core.logic;
 
+import org.key_project.bytecode.core.bytecode.BytecodeSourceElement;
 import org.key_project.bytecode.core.logic.visitors.Visitor;
 import org.key_project.common.core.logic.CCLabeledTermImpl;
 import org.key_project.common.core.logic.label.TermLabel;
@@ -26,7 +27,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Dominic Scheurer
  */
-public class LabeledTermImpl extends CCLabeledTermImpl<InstructionBlock, Visitor, Term> implements Term {
+public class LabeledTermImpl extends CCLabeledTermImpl<BytecodeSourceElement, InstructionBlock, Visitor, Term> implements Term {
 
     /**
      * TODO: Document.

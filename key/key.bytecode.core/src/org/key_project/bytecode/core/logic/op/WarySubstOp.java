@@ -34,7 +34,8 @@ public final class WarySubstOp extends CCWarySubstOp<InstructionBlock, Visitor, 
     }
 
     @Override
-    public Term apply(Term term, TermServices services) {
+    public Term apply(Term term,
+            TermServices<InstructionBlock, Term, ?, ?> services) {
         return super.apply(term, services, Term.class);
     }
 }

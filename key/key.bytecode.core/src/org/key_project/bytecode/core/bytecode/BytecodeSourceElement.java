@@ -11,11 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.logic;
+package org.key_project.bytecode.core.bytecode;
 
-import org.key_project.bytecode.core.bytecode.BytecodeSourceElement;
-import org.key_project.bytecode.core.logic.visitors.Visitor;
-import org.key_project.common.core.logic.CCTerm;
+import org.key_project.common.core.program.CCSourceElement;
 
 /**
  * TODO: Document.
@@ -23,6 +21,7 @@ import org.key_project.common.core.logic.CCTerm;
  * @author Dominic Scheurer
  *
  */
-public interface Term extends CCTerm<BytecodeSourceElement, InstructionBlock, Visitor, Term> {
+public interface BytecodeSourceElement extends
+        CCSourceElement<BytecodeVisitor, BytecodeSourceElement> {
 
 }

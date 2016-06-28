@@ -13,6 +13,7 @@
 
 package org.key_project.bytecode.core.logic;
 
+import org.key_project.bytecode.core.bytecode.BytecodeSourceElement;
 import org.key_project.bytecode.core.logic.visitors.Visitor;
 import org.key_project.common.core.logic.CCTermImpl;
 import org.key_project.common.core.logic.op.Operator;
@@ -26,7 +27,7 @@ import org.key_project.util.collection.ImmutableArray;
  * @author Dominic Scheurer
  *
  */
-public class TermImpl extends CCTermImpl<InstructionBlock, Visitor, Term> implements Term {
+public class TermImpl extends CCTermImpl<BytecodeSourceElement, InstructionBlock, Visitor, Term> implements Term {
 
     static final ImmutableArray<Term> EMPTY_TERM_LIST =
             new ImmutableArray<Term>();
