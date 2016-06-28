@@ -68,7 +68,7 @@ KEY_LIB="$KEY_HOME/key.core/lib"
 
 key_ext_jars="antlr.jar recoderKey.jar"
 
-keyclasspath="$KEY_HOME/key.core/bin:$KEY_HOME/key.ui/bin:$KEY_HOME/key.util/bin:$KEY_HOME/key.core.proof_reference/bin:$KEY_HOME/key.core.symbolic_execution/bin:$KEY_HOME/key.core.testgen/bin:$KEY_HOME/key.core.test/bin"
+keyclasspath="$KEY_HOME/key.common.core/bin:$KEY_HOME/key.core/bin:$KEY_HOME/key.ui/bin:$KEY_HOME/key.util/bin:$KEY_HOME/key.core.proof_reference/bin:$KEY_HOME/key.core.symbolic_execution/bin:$KEY_HOME/key.core.testgen/bin:$KEY_HOME/key.core.test/bin"
 
 for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"
