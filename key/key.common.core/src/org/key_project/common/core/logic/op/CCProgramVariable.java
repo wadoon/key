@@ -16,6 +16,7 @@ package org.key_project.common.core.logic.op;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.CCSourceElement;
+import org.key_project.common.core.program.ProgramVisitor;
 import org.key_project.common.core.program.abstraction.SortedType;
 
 /**
@@ -24,8 +25,8 @@ import org.key_project.common.core.program.abstraction.SortedType;
  *
  * @author Dominic Scheurer
  */
-public abstract class CCProgramVariable extends AbstractSortedOperator
-        implements CCSourceElement {
+public abstract class CCProgramVariable<V extends ProgramVisitor, S extends CCSourceElement<V, S>> extends AbstractSortedOperator
+        implements CCSourceElement<V, S> {
 
     private final SortedType type;
     private final boolean isModel;

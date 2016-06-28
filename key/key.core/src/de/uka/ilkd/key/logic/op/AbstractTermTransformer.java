@@ -125,7 +125,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     /** @return String representing a logical integer literal 
      *  in decimal representation
      */
-    public static String convertToDecimalString(CCTerm<?, ?,?> term, Services services) {
+    public static String convertToDecimalString(CCTerm<?, ?, ?,?> term, Services services) {
       	StringBuilder result = new StringBuilder();
 	boolean neg = false;
 	

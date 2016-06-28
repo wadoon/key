@@ -4,7 +4,7 @@ import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 
 
-public interface ModalContent {
+public interface ModalContent<S extends CCSourceElement<?, S>> {
 
     /**
      * returns true if the program is empty
@@ -19,5 +19,5 @@ public interface ModalContent {
      * @param nat
      * @return
      */
-    boolean equalsModRenaming(Object se, NameAbstractionTable<? extends CCSourceElement> nat);
+    boolean equalsModRenaming(Object se, NameAbstractionTable<S> nat);
 }

@@ -24,7 +24,7 @@ import org.key_project.common.core.services.TermServices;
  *
  * @author Dominic Scheurer
  */
-public class CCIntegerTheory<T extends CCTerm<?, ?, T>> extends CCTheory {
+public class CCIntegerTheory<T extends CCTerm<?, ?, ?, T>> extends CCTheory {
 
     public static final Name NAME = new Name("int");
 

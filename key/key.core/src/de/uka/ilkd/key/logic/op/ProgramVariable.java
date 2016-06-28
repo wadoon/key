@@ -18,7 +18,6 @@ import java.io.IOException;
 import org.key_project.common.core.logic.op.CCProgramVariable;
 import org.key_project.common.core.logic.op.ParsableVariable;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.program.Position;
 import org.key_project.common.core.program.PositionInfo;
@@ -29,6 +28,7 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
@@ -48,7 +48,7 @@ import de.uka.ilkd.key.util.Debug;
  * actual proofs. The method HeapLDT.getFieldSymbolForPV() serves to convert
  * such fake program variables to the appropriate constant symbols.
  */
-public abstract class ProgramVariable extends CCProgramVariable
+public abstract class ProgramVariable extends CCProgramVariable<Visitor, SourceElement>
         implements SourceElement,
         ProgramElement,
         Expression,
@@ -212,16 +212,6 @@ public abstract class ProgramVariable extends CCProgramVariable
     public boolean equalsModRenaming(SourceElement se,
             NameAbstractionTable<SourceElement> nat) {
         return nat.sameAbstractName(this, se);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.key_project.common.core.program.CCSourceElement#equalsModRenaming(org.key_project.common.core.program.CCSourceElement, org.key_project.common.core.program.NameAbstractionTable)
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public boolean equalsModRenaming(CCSourceElement se,
-            NameAbstractionTable<? extends CCSourceElement> nat) {
-        return equalsModRenaming((SourceElement) se, (NameAbstractionTable<SourceElement>) nat);
     }
 
     // ---------------------------------------------------

@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,18 +11,13 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
-
-import org.key_project.common.core.logic.CCTerm;
-
-import de.uka.ilkd.key.java.SourceElement;
+package org.key_project.common.core.program;
 
 /**
- * {@link CCTerm} extension for Java terms, provides methods related to
- * contained Java statements.
+ * Interface to implement by program visitors / walkers.
  *
  * @author Dominic Scheurer
  */
-public interface Term extends CCTerm<SourceElement, JavaBlock, Visitor, Term> {
+public interface ProgramVisitor {
 
 }

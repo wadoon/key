@@ -18,6 +18,7 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.visitors.CCTermVisitor;
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -34,7 +35,8 @@ import org.key_project.util.java.ObjectUtil;
  * @see Term
  * @see TermImpl
  */
-public abstract class CCLabeledTermImpl<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P,V,T>> extends CCTermImpl<P,V,T> {
+public abstract class CCLabeledTermImpl<S extends CCSourceElement<?, S>, P extends ModalContent<S>, V extends CCTermVisitor<T>, T extends CCTerm<?, P, V, T>>
+        extends CCTermImpl<S, P, V, T> {
 
     private final ImmutableArray<TermLabel> labels;
 
@@ -116,7 +118,8 @@ public abstract class CCLabeledTermImpl<P extends ModalContent, V extends CCTerm
         }
 
         @SuppressWarnings("unchecked")
-        final CCLabeledTermImpl<P, V, T> cmp = (CCLabeledTermImpl<P, V, T>) o;
+        final CCLabeledTermImpl<?, P, V, T> cmp =
+                (CCLabeledTermImpl<?, P, V, T>) o;
         if (labels.size() == cmp.labels.size()) {
             for (int i = 0, sz = labels.size(); i < sz; i++) {
                 // this is not optimal, but as long as number of labels limited

@@ -30,7 +30,7 @@ import org.key_project.common.core.logic.op.SortDependingFunction;
  * @param <P>
  * @param <T>
  */
-public interface TermServices<P extends ModalContent, T extends CCTerm<P, ?, T>, TB extends CCTermBuilder<P, T>, TF extends CCTermFactory<P, T>> {
+public interface TermServices<P extends ModalContent<?>, T extends CCTerm<?, P, ?, T>, TB extends CCTermBuilder<P, T>, TF extends CCTermFactory<P, T>> {
 
     /**
      * Returns the {@link CCTermBuilder} used to create {@link Term}s.

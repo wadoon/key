@@ -32,7 +32,7 @@ import org.key_project.common.core.logic.IntIterator;
  * </ul>
  * 
  */
-public final class PosInTerm<T extends CCTerm<?, ?, T>> {
+public final class PosInTerm<T extends CCTerm<?, ?, ?, T>> {
 
     private static final PosInTerm<?> TOP_LEVEL = new PosInTerm<>();
 
@@ -54,7 +54,7 @@ public final class PosInTerm<T extends CCTerm<?, ?, T>> {
      * reverse order
      * @return the PosInTerm encapsulating the integer list in reverse order
      */
-    public static <T extends CCTerm<?, ?, T>> PosInTerm<T> parseReverseString(String s) {
+    public static <T extends CCTerm<?, ?, ?, T>> PosInTerm<T> parseReverseString(String s) {
         if ("".equals(s)) {
             return getTopLevel();
         }
@@ -85,7 +85,7 @@ public final class PosInTerm<T extends CCTerm<?, ?, T>> {
      * @return the top level position
      */
     @SuppressWarnings("unchecked")
-    public static <T extends CCTerm<?, ?, T>> PosInTerm<T> getTopLevel() {
+    public static <T extends CCTerm<?, ?, ?, T>> PosInTerm<T> getTopLevel() {
         return (PosInTerm<T>) TOP_LEVEL;
     }
     

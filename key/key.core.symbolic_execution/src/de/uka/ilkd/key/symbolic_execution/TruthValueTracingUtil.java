@@ -1096,7 +1096,7 @@ public final class TruthValueTracingUtil {
        * @param term The {@link Term} to check.
        * @return {@code true} has {@link TermLabel}, {@code false} do not has {@link TermLabel}.
        */
-      public boolean hasPredicateLabel(CCTerm<?, ?,?> term) {
+      public boolean hasPredicateLabel(CCTerm<?, ?, ?,?> term) {
          return getPredicateLabel(term) != null;
       }
 
@@ -1105,7 +1105,7 @@ public final class TruthValueTracingUtil {
        * @param term The {@link Term}.
        * @return The found {@link FormulaTermLabel} or {@code null} otherwise.
        */
-      public FormulaTermLabel getPredicateLabel(CCTerm<?, ?,?> term) {
+      public FormulaTermLabel getPredicateLabel(CCTerm<?, ?, ?,?> term) {
          TermLabel label = term.getLabel(termLabelName);
          return label instanceof FormulaTermLabel ? (FormulaTermLabel) label : null;
       }

@@ -20,13 +20,15 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.java.SourceElement;
+
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
  *
  */
-class LabeledTermImpl extends CCLabeledTermImpl<JavaBlock, Visitor, Term> implements Term {
+class LabeledTermImpl extends CCLabeledTermImpl<SourceElement, JavaBlock, Visitor, Term> implements Term {
 
     /**
      * TODO: Document.

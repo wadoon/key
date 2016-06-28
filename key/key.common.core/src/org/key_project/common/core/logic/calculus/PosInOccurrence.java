@@ -21,9 +21,9 @@ import org.key_project.common.core.logic.IntIterator;
  * SequentFormula<Term> and a PosInTerm<Term> determine an object of this 
  * class exactly. 
  */
-public final class PosInOccurrence<T extends CCTerm<?, ?,T>, SeqFor extends SequentFormula<T>> {
+public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends SequentFormula<T>> {
 
-    public static <T      extends CCTerm<?, ?, T>,
+    public static <T      extends CCTerm<?, ?, ?, T>,
                    SeqFor extends SequentFormula<T>>
             PosInOccurrence<T, SeqFor> findInSequent(CCSequent<T, SeqFor, ?, ?> seq, int formulaNumber, PosInTerm<T> pos) {
         return new PosInOccurrence<T, SeqFor>(

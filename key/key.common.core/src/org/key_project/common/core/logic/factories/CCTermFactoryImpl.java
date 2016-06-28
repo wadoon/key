@@ -37,7 +37,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Dominic Scheurer
  */
-public abstract class CCTermFactoryImpl<P extends ModalContent, T extends CCTerm<P, ?, T>>
+public abstract class CCTermFactoryImpl<P extends ModalContent<?>, T extends CCTerm<?, P, ?, T>>
         implements CCTermFactory<P, T> {
 
     protected final Map<T, T> cache;

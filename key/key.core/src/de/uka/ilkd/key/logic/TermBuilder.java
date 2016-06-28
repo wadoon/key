@@ -381,7 +381,7 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
     }
 
     @Override
-    public Term var(CCProgramVariable v) {
+    public Term var(CCProgramVariable<?, ?> v) {
         // if(v.isMember()) {
         // throw new TermCreationException(
         // "Cannot create term for \"member\" "
@@ -392,26 +392,26 @@ public class TermBuilder implements CCTermBuilder<JavaBlock, Term> {
     }
 
     public Term var(ProgramVariable v) {
-        return tf.createTerm((CCProgramVariable) v);
+        return tf.createTerm((CCProgramVariable<?, ?>) v);
     }
 
     @Override
-    public ImmutableList<Term> var(CCProgramVariable... vs) {
+    public ImmutableList<Term> var(CCProgramVariable<?, ?>... vs) {
         ImmutableList<Term> result = ImmutableSLList.<Term> nil();
-        for (CCProgramVariable v : vs) {
+        for (CCProgramVariable<?, ?> v : vs) {
             result = result.append(var(v));
         }
         return result;
     }
 
     public ImmutableList<Term> var(ProgramVariable... vs) {
-        return var((CCProgramVariable[]) vs);
+        return var((CCProgramVariable<?, ?>[]) vs);
     }
     
     @Override
-    public ImmutableList<Term> var(Iterable<? extends CCProgramVariable> vs) {
+    public ImmutableList<Term> var(Iterable<? extends CCProgramVariable<?, ?>> vs) {
         ImmutableList<Term> result = ImmutableSLList.<Term> nil();
-        for (CCProgramVariable v : vs) {
+        for (CCProgramVariable<?, ?> v : vs) {
             result = result.append(var(v));
         }
         return result;

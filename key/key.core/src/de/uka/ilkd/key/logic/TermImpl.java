@@ -19,11 +19,13 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.java.SourceElement;
+
 /**
  * The currently only class implementing the Term interface. TermFactory should
  * be the only class dealing directly with the TermImpl class.
  */
-class TermImpl extends CCTermImpl<JavaBlock, Visitor, Term>
+class TermImpl extends CCTermImpl<SourceElement, JavaBlock, Visitor, Term>
         implements Term {
 
     static final ImmutableArray<Term> EMPTY_TERM_LIST =

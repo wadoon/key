@@ -26,7 +26,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-public class CCClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P, V, T>> {
+public class CCClashFreeSubst<P extends ModalContent<?>, V extends CCTermVisitor<T>, T extends CCTerm<?, P, V, T>> {
     protected QuantifiableVariable v;
     protected T s;
     protected ImmutableSet<QuantifiableVariable> svars;
@@ -310,7 +310,7 @@ public class CCClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<T>
      * A Visitor class to collect all (not just the free) variables occurring in
      * a term.
      */
-    public static class VariableCollectVisitor <V extends CCTermVisitor<T>, T extends CCTerm<?, V, T>> extends CCDefaultVisitor<T> {
+    public static class VariableCollectVisitor <V extends CCTermVisitor<T>, T extends CCTerm<?, ?, V, T>> extends CCDefaultVisitor<T> {
         /** the collected variables */
         private ImmutableSet<QuantifiableVariable> vars;
 

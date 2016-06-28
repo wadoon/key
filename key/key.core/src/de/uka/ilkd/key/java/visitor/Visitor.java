@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.program.ProgramVisitor;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.CompilationUnit;
@@ -171,7 +172,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
  * calls the  doActionAt<NodeType> method. Similar to the pretty print
  * mechanism.
  */
-public interface Visitor {
+public interface Visitor extends ProgramVisitor {
 
     void performActionOnAbstractProgramElement
     (AbstractProgramElement x);

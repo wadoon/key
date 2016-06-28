@@ -38,7 +38,7 @@ import org.key_project.util.collection.Pair;
  * use the GenericTermFactory.
  * </p>
  */
-public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm<P, ?, T>>
+public abstract class CCTermBuilderImpl<P extends ModalContent<?>, T extends CCTerm<?, P, ?, T>>
         implements CCTermBuilder<P, T> {
 
     private final CCTermFactoryImpl<P, T> tf;
@@ -90,7 +90,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
     }
 
     @Override
-    public T var(CCProgramVariable v) {
+    public T var(CCProgramVariable<?, ?> v) {
         // if(v.isMember()) {
         // throw new TermCreationException(
         // "Cannot create term for \"member\" "
@@ -101,18 +101,18 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
     }
 
     @Override
-    public ImmutableList<T> var(CCProgramVariable... vs) {
+    public ImmutableList<T> var(CCProgramVariable<?, ?>... vs) {
         ImmutableList<T> result = ImmutableSLList.<T> nil();
-        for (CCProgramVariable v : vs) {
+        for (CCProgramVariable<?, ?> v : vs) {
             result = result.append(var(v));
         }
         return result;
     }
 
     @Override
-    public ImmutableList<T> var(Iterable<? extends CCProgramVariable> vs) {
+    public ImmutableList<T> var(Iterable<? extends CCProgramVariable<?, ?>> vs) {
         ImmutableList<T> result = ImmutableSLList.<T> nil();
-        for (CCProgramVariable v : vs) {
+        for (CCProgramVariable<?, ?> v : vs) {
             result = result.append(var(v));
         }
         return result;
@@ -852,7 +852,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
     /**
      * Removes leading updates from the passed term.
      */
-    public static <T extends CCTerm<?, ?, T>> T goBelowUpdates(T term) {
+    public static <T extends CCTerm<?, ?, ?, T>> T goBelowUpdates(T term) {
         while (term.op() instanceof UpdateApplication) {
             term = UpdateApplication.getTarget(term);
         }
@@ -862,7 +862,7 @@ public abstract class CCTermBuilderImpl<P extends ModalContent, T extends CCTerm
     /**
      * Removes leading updates from the passed term.
      */
-    public static <T extends CCTerm<?, ?, T>> Pair<ImmutableList<T>, T> goBelowUpdates2(
+    public static <T extends CCTerm<?, ?, ?, T>> Pair<ImmutableList<T>, T> goBelowUpdates2(
             T term) {
         ImmutableList<T> updates = ImmutableSLList.<T> nil();
         while (term.op() instanceof UpdateApplication) {

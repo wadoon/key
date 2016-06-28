@@ -26,7 +26,7 @@ import org.key_project.common.core.services.TermServices;
  *
  * @author Dominic Scheurer
  */
-public abstract class CCSubstOp<P extends ModalContent, T extends CCTerm<P, ?, T>> extends AbstractOperator {
+public abstract class CCSubstOp<P extends ModalContent<?>, T extends CCTerm<?, P, ?, T>> extends AbstractOperator {
 
     /**
      * Constructs a new {@link CCSubstOp} for the given name.

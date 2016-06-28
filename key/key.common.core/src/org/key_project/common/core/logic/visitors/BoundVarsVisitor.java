@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
  * visitor implements also a continuation on sequents, traversing all of the
  * formulas occuring in the sequent.
  */
-public class BoundVarsVisitor<T extends CCTerm<?, ?, T>> extends CCDefaultVisitor<T> {
+public class BoundVarsVisitor<T extends CCTerm<?, ?, ?, T>> extends CCDefaultVisitor<T> {
 
     private ImmutableSet<QuantifiableVariable> bdVars =
             DefaultImmutableSet.<QuantifiableVariable> nil();

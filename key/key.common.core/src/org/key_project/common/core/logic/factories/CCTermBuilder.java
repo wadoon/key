@@ -30,7 +30,7 @@ import org.key_project.util.collection.ImmutableList;
  * @param <P>
  * @param <T>
  */
-public interface CCTermBuilder<P extends ModalContent, T extends CCTerm<P, ?, T>> {
+public interface CCTermBuilder<P extends ModalContent<?>, T extends CCTerm<?, P, ?, T>> {
 
     CCTermFactoryImpl<P, T> tf();
 
@@ -38,11 +38,11 @@ public interface CCTermBuilder<P extends ModalContent, T extends CCTerm<P, ?, T>
 
     T var(LogicVariable v);
 
-    T var(CCProgramVariable v);
+    T var(CCProgramVariable<?, ?> v);
 
-    ImmutableList<T> var(CCProgramVariable... vs);
+    ImmutableList<T> var(CCProgramVariable<?, ?>... vs);
 
-    ImmutableList<T> var(Iterable<? extends CCProgramVariable> vs);
+    ImmutableList<T> var(Iterable<? extends CCProgramVariable<?, ?>> vs);
 
     T var(SchemaVariable v);
 

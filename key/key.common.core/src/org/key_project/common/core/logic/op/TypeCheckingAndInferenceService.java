@@ -40,7 +40,7 @@ public interface TypeCheckingAndInferenceService<O extends Operator> {
      * @return The sort of the given operator when instantiated with the given
      *         sub terms.
      */
-    Sort sort(ImmutableArray<? extends CCTerm<?, ?, ?>> terms, O op);
+    Sort sort(ImmutableArray<? extends CCTerm<?, ?, ?, ?>> terms, O op);
 
     /**
      * Checks whether the top level structure of the given @link GenericTerm is
@@ -50,6 +50,6 @@ public interface TypeCheckingAndInferenceService<O extends Operator> {
      * 
      * @return true iff the top level structure of the {@link CCTerm} is valid.
      */
-    boolean validTopLevel(CCTerm<?, ?, ?> term, O op);
+    boolean validTopLevel(CCTerm<?, ?, ?, ?> term, O op);
 
 }

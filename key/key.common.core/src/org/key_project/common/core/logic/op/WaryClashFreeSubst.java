@@ -23,7 +23,7 @@ import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-public class WaryClashFreeSubst<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P, V, T>>
+public class WaryClashFreeSubst<P extends ModalContent<?>, V extends CCTermVisitor<T>, T extends CCTerm<?, P, V, T>>
         extends CCClashFreeSubst<P, V, T> {
 
     /** depth of recursion of the <code>apply</code> method */

@@ -16,18 +16,11 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.program.Position;
 import org.key_project.common.core.program.PositionInfo;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.TerminalProgramElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -177,14 +170,6 @@ public class ProgramElementName extends Name
             return false;
         }
         return nat.sameAbstractName(this, se);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public boolean equalsModRenaming(CCSourceElement se,
-            NameAbstractionTable<? extends CCSourceElement> nat) {
-        return equalsModRenaming((SourceElement) this,
-                (NameAbstractionTable<SourceElement>) nat);
     }
 	
    	    

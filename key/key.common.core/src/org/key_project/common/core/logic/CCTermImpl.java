@@ -29,8 +29,8 @@ import org.key_project.util.collection.*;
  * @author Dominic Scheurer
  *
  */
-public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P, V, T>>
-        implements CCTerm<P, V, T> {
+public abstract class CCTermImpl<S extends CCSourceElement<?, S>, P extends ModalContent<S>, V extends CCTermVisitor<T>, T extends CCTerm<?, P, V, T>>
+        implements CCTerm<S, P, V, T> {
 
     static enum ThreeValuedTruth {
         TRUE, FALSE, UNKNOWN
@@ -52,7 +52,7 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
     private static NameAbstractionTable FAILED = new NameAbstractionTable();
 
     @SuppressWarnings("unchecked")
-    private static <S extends CCSourceElement> NameAbstractionTable<S> failed() {
+    private static <S extends CCSourceElement<?, ?>> NameAbstractionTable<S> failed() {
         return (NameAbstractionTable<S>) FAILED;
     }
 
@@ -281,7 +281,7 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
         }
 
         @SuppressWarnings("unchecked")
-        final CCTermImpl<P, V, T> t = (CCTermImpl<P, V, T>) o;
+        final CCTermImpl<?, P, V, T> t = (CCTermImpl<?, P, V, T>) o;
 
         return op.equals(t.op) && t.hasLabels() == hasLabels()
                 && subs.equals(t.subs) && boundVars.equals(t.boundVars)
@@ -448,7 +448,7 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
     protected boolean descendRecursively(T t0, T t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
-            NameAbstractionTable<CCSourceElement> nat) {
+            NameAbstractionTable<S> nat) {
 
         for (int i = 0; i < t0.arity(); i++) {
             ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
@@ -521,7 +521,7 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
     private boolean unifyTermsModuloBoundRenaming(T t0, T t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
-            NameAbstractionTable<CCSourceElement> nat) {
+            NameAbstractionTable<S> nat) {
 
         if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
             return true;
@@ -564,9 +564,9 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
      * @param failResult
      * @return
      */
-    private NameAbstractionTable<CCSourceElement> unifyModalContent(T t0,
+    private NameAbstractionTable<S> unifyModalContent(T t0,
             T t1,
-            NameAbstractionTable<CCSourceElement> nat) {
+            NameAbstractionTable<S> nat) {
 
         if (!t0.modalContent().isEmpty() || !t1.modalContent().isEmpty()) {
             nat = checkNat(nat);
@@ -582,8 +582,10 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
             }
             nat = checkNat(nat);
 
-            CCProgramVariable op0 = (CCProgramVariable) t0.op();
-            CCProgramVariable op1 = (CCProgramVariable) t1.op();
+            @SuppressWarnings("unchecked")
+            S op0 = (S) t0.op();
+            @SuppressWarnings("unchecked")
+            S op1 = (S) t1.op();
 
             if (!op0.equalsModRenaming(
                     op1, nat)) {
@@ -649,7 +651,7 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
         return -1;
     }
 
-    private static <S extends CCSourceElement> NameAbstractionTable<S> checkNat(
+    private static <S extends CCSourceElement<?, ?>> NameAbstractionTable<S> checkNat(
             NameAbstractionTable<S> nat) {
         if (nat == null) {
             return new NameAbstractionTable<S>();

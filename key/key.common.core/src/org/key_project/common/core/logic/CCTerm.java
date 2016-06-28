@@ -20,6 +20,7 @@ import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.visitors.CCTermVisitor;
+import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -54,7 +55,7 @@ import org.key_project.util.collection.ImmutableSet;
  * currently supported: {@link Term#execPostOrder(CCTermVisitor)} and
  * {@link Term#execPreOrder(CCTermVisitor)}.
  */
-public interface CCTerm<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P, V, T>>
+public interface CCTerm<S extends CCSourceElement<?, S>, P extends ModalContent<S>, V extends CCTermVisitor<T>, T extends CCTerm<?, P, V, T>>
         extends SVSubstitute, Sorted {
 
     /** 

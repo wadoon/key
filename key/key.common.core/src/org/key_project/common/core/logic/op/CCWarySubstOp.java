@@ -25,7 +25,7 @@ import org.key_project.common.core.services.TermServices;
  *
  * @author Dominic Scheurer
  */
-public abstract class CCWarySubstOp<P extends ModalContent, V extends CCTermVisitor<T>, T extends CCTerm<P, V, T>>
+public abstract class CCWarySubstOp<P extends ModalContent<?>, V extends CCTermVisitor<T>, T extends CCTerm<?, P, V, T>>
         extends CCSubstOp<P, T> {
 
     /**
