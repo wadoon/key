@@ -20,10 +20,9 @@ import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.SubstOp;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -61,7 +60,7 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
 
 	final Operator top = t.op ();
     
-	if ( top instanceof SubstOp ) {
+	if ( top instanceof CCSubstOp ) {
             final Operator substTermOp = t.sub ( 0 ).op ();
             final QuantifiableVariable substVar = t.varsBoundHere ( 1 ).get ( 0 );
             if ( substTermOp instanceof SchemaVariable

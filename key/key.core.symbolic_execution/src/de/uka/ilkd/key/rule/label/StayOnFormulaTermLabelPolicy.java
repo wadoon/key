@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
@@ -125,7 +124,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
          }
          return null;
       }
-      else if (newTermOp instanceof SubstOp) { // Such operations perform for instance skolemization (e.g. rule allRight)
+      else if (newTermOp instanceof CCSubstOp) { // Such operations perform for instance skolemization (e.g. rule allRight)
          return label;
       }
       else {

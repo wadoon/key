@@ -19,10 +19,12 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.services.TermServices;
 
 /**
- * TODO: Document.
+ * Standard first-order substitution operator, resolving clashes but not
+ * preventing (usually unsound) substitution of non-rigid terms across modal
+ * operators. Currently, only the subclass <code>WarySubstOp</code> is used and
+ * accessible through the key parser.
  *
  * @author Dominic Scheurer
- *
  */
 public abstract class CCSubstOp<P extends ModalContent, T extends CCTerm<P, ?, T>> extends AbstractOperator {
 
