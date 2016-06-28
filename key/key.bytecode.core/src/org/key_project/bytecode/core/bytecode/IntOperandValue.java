@@ -11,43 +11,39 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.bytecode.instructions;
+package org.key_project.bytecode.core.bytecode;
 
-import org.key_project.bytecode.core.bytecode.Operand;
-import org.key_project.common.core.logic.Name;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.bytecode.core.bytecode.abstraction.PrimitiveType;
+import org.key_project.bytecode.core.services.TheoryServices;
+import org.key_project.common.core.program.abstraction.SortedType;
+import org.key_project.common.core.theories.CCTheory;
 
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
- *
  */
-public class BiPush extends UnaryInstruction {
-
-    private static final Name NAME = new Name("BIPUSH");
+public class IntOperandValue implements OperandValue {
+    
+    final int val;
 
     /**
      * TODO: Document.
      *
-     * @param operand
+     * @param i
      */
-    public BiPush(Operand operand) {
-        super(operand);
+    public IntOperandValue(int val) {
+        this.val = val;
     }
-    
-    /**
-     * TODO: Document.
-     *
-     * @param operands
-     */
-    public BiPush(ImmutableList<Operand> operands) {
-        super(operands);
-    }
-    
+
     @Override
-    public Name name() {
-        return NAME;
+    public SortedType type() {
+        return PrimitiveType.JAVA_INT;
+    }
+
+    @Override
+    public CCTheory theory(TheoryServices services) {
+        return services.getIntegerTheory();
     }
 
 }

@@ -19,6 +19,9 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.bytecode.core.bytecode.Instruction;
+import org.key_project.bytecode.core.bytecode.Operand;
+import org.key_project.bytecode.core.bytecode.abstraction.PrimitiveType;
+import org.key_project.bytecode.core.bytecode.instructions.IConst;
 import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.logic.calculus.*;
@@ -43,7 +46,7 @@ public class BasicDatastructuresTest extends TestCase {
     private static final Sort INT_SORT = new SortImpl(new Name("int"));
     private static final TermBuilder TB = TermServicesImpl.instance()
             .getTermBuilder();
-    private static final SortedType INT_TYPE = new IntType();
+    private static final SortedType INT_TYPE = PrimitiveType.JAVA_INT;
 
     @Test
     public void testSimpleBytecodeSequentCreation() {
@@ -52,12 +55,14 @@ public class BasicDatastructuresTest extends TestCase {
         TheoryServices theories = new TheoryServices(
                 TermServicesImpl.instance());
         
-        LocationVariable i = new LocationVariable(new Name("i"), INT_TYPE); //TODO type
+        LocationVariable i = new LocationVariable(new Name("i"), INT_TYPE);
         Term iTerm = TB.var(i);
 
         LinkedList<Instruction> insns = new LinkedList<Instruction>();
 
         // insns.add(...)
+        
+        insns.add(new IConst((Operand) null)); // TODO
 
         InstructionBlock program = new InstructionBlock(insns);
 
@@ -79,23 +84,6 @@ public class BasicDatastructuresTest extends TestCase {
 
         assertNotNull(seq);
         
-    }
-    
-    private static class IntType implements SortedType {
-        @Override
-        public String getName() {
-            return "int";
-        }
-        
-        @Override
-        public String getFullName() {
-            return getName();
-        }
-        
-        @Override
-        public Sort getSort() {
-            return INT_SORT;
-        }
     }
 
 }
