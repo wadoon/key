@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -23,7 +24,6 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PackageSpecification;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;

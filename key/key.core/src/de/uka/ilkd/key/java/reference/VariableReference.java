@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;

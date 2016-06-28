@@ -19,10 +19,10 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.program.Position;
+import org.key_project.common.core.program.PositionInfo;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceData;

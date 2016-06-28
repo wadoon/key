@@ -16,12 +16,12 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.Map;
 import java.util.Stack;
 
+import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;

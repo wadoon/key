@@ -29,13 +29,13 @@ import java.util.Set;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Modality;
+import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;

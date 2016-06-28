@@ -14,11 +14,11 @@
 package de.uka.ilkd.key.java.expression;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;

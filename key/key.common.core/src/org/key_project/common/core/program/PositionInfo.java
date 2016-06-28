@@ -11,9 +11,8 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java;
+package org.key_project.common.core.program;
 
-import org.key_project.common.core.program.Position;
 
 /**
  * represents a group of three Positions: relativePosition, startPosition,
@@ -92,7 +91,7 @@ public class PositionInfo {
      * this violates immutability, but the method is only called right after the
      * object is created...
      */
-    protected void setParentClass(String s) {
+    public void setParentClass(String s) {
         parentClass = s;
     }
 

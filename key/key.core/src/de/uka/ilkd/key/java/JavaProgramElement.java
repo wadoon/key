@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
+import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;

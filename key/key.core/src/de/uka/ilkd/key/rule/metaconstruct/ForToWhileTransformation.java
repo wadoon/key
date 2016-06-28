@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;

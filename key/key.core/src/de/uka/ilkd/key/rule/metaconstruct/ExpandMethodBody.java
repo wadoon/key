@@ -18,11 +18,11 @@ import java.util.LinkedHashMap;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
