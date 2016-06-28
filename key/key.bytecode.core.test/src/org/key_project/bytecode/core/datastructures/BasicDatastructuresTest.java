@@ -23,12 +23,14 @@ import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.logic.calculus.*;
 import org.key_project.bytecode.core.logic.factories.TermBuilder;
+import org.key_project.bytecode.core.logic.op.LocationVariable;
 import org.key_project.bytecode.core.services.TermServicesImpl;
 import org.key_project.bytecode.core.services.TheoryServices;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
+import org.key_project.common.core.program.abstraction.SortedType;
 import org.key_project.util.collection.ImmutableSLList;
 
 /**
@@ -41,12 +43,17 @@ public class BasicDatastructuresTest extends TestCase {
     private static final Sort INT_SORT = new SortImpl(new Name("int"));
     private static final TermBuilder TB = TermServicesImpl.instance()
             .getTermBuilder();
+    private static final SortedType INT_TYPE = new IntType();
 
     @Test
     public void testSimpleBytecodeSequentCreation() {
+
         TermServicesImpl.instance().getNamespaces().sorts().add(INT_SORT);
         TheoryServices theories = new TheoryServices(
                 TermServicesImpl.instance());
+        
+        LocationVariable i = new LocationVariable(new Name("i"), INT_TYPE); //TODO type
+        Term iTerm = TB.var(i);
 
         LinkedList<Instruction> insns = new LinkedList<Instruction>();
 
@@ -55,11 +62,11 @@ public class BasicDatastructuresTest extends TestCase {
         InstructionBlock program = new InstructionBlock(insns);
 
         Term anteForm =
-                TB.equals(null /* i */, theories.getIntegerTheory().zero());
+                TB.equals(iTerm, theories.getIntegerTheory().zero());
 
         Term succForm =
                 TB.prog(Modality.DIA, program,
-                        TB.equals(null /* i */, theories.getIntegerTheory()
+                        TB.equals(iTerm, theories.getIntegerTheory()
                                 .one()));
 
         Semisequent ante =
@@ -71,6 +78,24 @@ public class BasicDatastructuresTest extends TestCase {
         Sequent seq = SequentImpl.createSequent(ante, succ);
 
         assertNotNull(seq);
+        
+    }
+    
+    private static class IntType implements SortedType {
+        @Override
+        public String getName() {
+            return "int";
+        }
+        
+        @Override
+        public String getFullName() {
+            return getName();
+        }
+        
+        @Override
+        public Sort getSort() {
+            return INT_SORT;
+        }
     }
 
 }

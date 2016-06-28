@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,17 +11,18 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.bytecode;
+package org.key_project.bytecode.core.bytecode.abstraction;
 
 import org.key_project.common.core.program.abstraction.SortedType;
 
 /**
- * TODO: Document.
- *
+ * A program model element representing primitive types.
+ * 
  * @author Dominic Scheurer
  */
-public interface Operand {
+public abstract class PrimitiveType implements SortedType {
 
-    SortedType type();
-    
+    // TODO: Implement this class, take corresponding Java class as orientation.
+    // Probably also have to supply a Literal class for default values.
+
 }

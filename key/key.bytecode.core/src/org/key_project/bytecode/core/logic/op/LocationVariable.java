@@ -34,7 +34,7 @@ public class LocationVariable extends ProgramVariable {
      * @param isModel
      * @param isGhost
      */
-    protected LocationVariable(Name name, SortedType t,
+    public LocationVariable(Name name, SortedType t,
             boolean isModel, boolean isGhost, boolean isFinal, boolean isStatic) {
         super(name, t.getSort(), t, isModel, isGhost, isFinal, isStatic);
     }
@@ -48,9 +48,19 @@ public class LocationVariable extends ProgramVariable {
      * @param isModel
      * @param isGhost
      */
-    protected LocationVariable(Name name, SortedType t,
+    public LocationVariable(Name name, SortedType t,
             boolean isModel, boolean isGhost) {
         super(name, t.getSort(), t, isModel, isGhost);
+    }
+
+    /**
+     * TODO: Document.
+     *
+     * @param name
+     * @param sortedType
+     */
+    public LocationVariable(Name name, SortedType t) {
+        this(name, t, false, false);
     }
 
     @Override
