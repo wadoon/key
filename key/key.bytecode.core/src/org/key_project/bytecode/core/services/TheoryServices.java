@@ -22,7 +22,7 @@ import org.key_project.bytecode.core.theories.IntegerTheory;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.CCTheoryServices;
-import org.key_project.common.core.theories.Theory;
+import org.key_project.common.core.theories.CCTheory;
 
 /**
  * TODO: Document.
@@ -31,7 +31,7 @@ import org.key_project.common.core.theories.Theory;
  */
 public class TheoryServices implements CCTheoryServices {
     // Maps LDT names to LDT instances.
-    private Map<Name, Theory> theories;
+    private Map<Name, CCTheory> theories;
 
     public TheoryServices() {
         theories = Collections.emptyMap();
@@ -65,13 +65,13 @@ public class TheoryServices implements CCTheoryServices {
     }
 
     @Override
-    public Theory getTheory(Name theoryName) {
+    public CCTheory getTheory(Name theoryName) {
         return theories.get(theoryName);
     }
 
     @Override
-    public Theory getTheoryFor(Sort sort) {
-        for (final Theory theory : theories.values()) {
+    public CCTheory getTheoryFor(Sort sort) {
+        for (final CCTheory theory : theories.values()) {
             if (sort.equals(theory.targetSort())) {
                 return theory;
             }
@@ -80,7 +80,7 @@ public class TheoryServices implements CCTheoryServices {
     }
 
     @Override
-    public Iterable<? extends Theory> getTheories() {
+    public Iterable<? extends CCTheory> getTheories() {
         return theories.values();
     }
     

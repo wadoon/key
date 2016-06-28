@@ -19,7 +19,7 @@ import java.util.TreeMap;
 import org.key_project.bytecode.core.logic.services.BCTermServices;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.theories.Theory;
+import org.key_project.common.core.theories.CCTheory;
 
 /**
  * TODO: Document.
@@ -27,7 +27,7 @@ import org.key_project.common.core.theories.Theory;
  * @author Dominic Scheurer
  *
  */
-public class BytecodeTheory extends Theory {
+public class BytecodeTheory extends CCTheory {
 
     /**
      * TODO: Document.
@@ -58,11 +58,11 @@ public class BytecodeTheory extends Theory {
      * input the name of an LDT and returns an instance of the corresponding
      * LDT.
      */
-    public static Map<Name, Theory> getNewLDTInstances(BCTermServices s) {
+    public static Map<Name, CCTheory> getNewLDTInstances(BCTermServices s) {
 
         // TreeMap ensures the map is sorted according
         // to the natural order of its keys.
-        Map<Name, Theory> ret = new TreeMap<Name, Theory>();
+        Map<Name, CCTheory> ret = new TreeMap<Name, CCTheory>();
 
         ret.put(IntegerTheory.NAME, new IntegerTheory(s));
 

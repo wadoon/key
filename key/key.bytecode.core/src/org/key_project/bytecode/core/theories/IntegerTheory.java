@@ -15,6 +15,7 @@ package org.key_project.bytecode.core.theories;
 
 import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.logic.services.BCTermServices;
+import org.key_project.common.core.theories.CCIntegerTheory;
 
 /**
  * TODO: Document.
@@ -22,7 +23,7 @@ import org.key_project.bytecode.core.logic.services.BCTermServices;
  * @author Dominic Scheurer
  *
  */
-public class IntegerTheory extends org.key_project.common.core.theories.IntegerTheory<Term> {
+public class IntegerTheory extends CCIntegerTheory<Term> {
 
     /**
      * TODO: Document.
