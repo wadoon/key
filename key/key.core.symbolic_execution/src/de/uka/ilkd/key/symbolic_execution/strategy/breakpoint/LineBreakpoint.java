@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import org.key_project.common.core.program.Position;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;

@@ -20,11 +20,11 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.common.core.program.Position;
 import org.key_project.sed.core.model.ISEMethodReturn;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**

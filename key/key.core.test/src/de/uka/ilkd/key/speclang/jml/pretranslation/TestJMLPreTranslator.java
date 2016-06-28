@@ -15,9 +15,9 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import junit.framework.TestCase;
 
+import org.key_project.common.core.program.Position;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 

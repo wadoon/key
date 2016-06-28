@@ -18,8 +18,8 @@ import org.antlr.runtime.NoViableAltException;
 import org.antlr.runtime.Parser;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.key_project.common.core.program.Position;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 

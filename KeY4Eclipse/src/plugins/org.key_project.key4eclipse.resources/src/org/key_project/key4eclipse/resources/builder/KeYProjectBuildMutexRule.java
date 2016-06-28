@@ -16,11 +16,7 @@ package org.key_project.key4eclipse.resources.builder;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
@@ -29,7 +25,7 @@ import org.key_project.util.java.ArrayUtil;
 
 /**
  * Rule to avoid multiple {@link KeYProjectBuildJob}s run simultaneously.
- * @author Stefan Käsdorf
+ * @author Stefan Kï¿½sdorf
  */
 public class KeYProjectBuildMutexRule implements ISchedulingRule{
    

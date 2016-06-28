@@ -18,12 +18,12 @@ import java.io.IOException;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
+import org.key_project.common.core.program.Position;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;

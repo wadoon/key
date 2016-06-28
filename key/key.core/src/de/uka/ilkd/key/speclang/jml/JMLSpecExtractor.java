@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.key_project.common.core.logic.label.ParameterlessTermLabel;
+import org.key_project.common.core.program.Position;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -28,7 +29,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;

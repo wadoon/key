@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import org.key_project.common.core.program.Position;
 import org.key_project.util.ExtList;
 
 /**

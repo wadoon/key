@@ -15,6 +15,8 @@
  */
 package de.uka.ilkd.key.java;
 
+import org.key_project.common.core.program.Position;
+
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 public interface Label extends TerminalProgramElement {

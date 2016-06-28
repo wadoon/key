@@ -21,11 +21,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.key_project.common.core.program.Position;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.ObjectUtil;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;

@@ -17,11 +17,11 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.key_project.common.core.program.Position;
 import org.key_project.util.java.StringUtil;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;

@@ -15,9 +15,9 @@ package de.uka.ilkd.key.speclang;
 
 import org.antlr.runtime.Token;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.program.Position;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.Debug;
 
 /**

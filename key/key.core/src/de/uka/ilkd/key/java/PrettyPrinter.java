@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.program.Position;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.abstraction.Type;

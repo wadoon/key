@@ -1,10 +1,6 @@
 package org.key_project.key4eclipse.resources.builder;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;

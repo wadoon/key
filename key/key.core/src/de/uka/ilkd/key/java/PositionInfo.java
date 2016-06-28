@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.java;
 
+import org.key_project.common.core.program.Position;
+
 /**
- * represents a group of three Positions: relativePosition,
- * startPosition, endPosition
+ * represents a group of three Positions: relativePosition, startPosition,
+ * endPosition
  */
 public class PositionInfo {
 
@@ -23,82 +25,88 @@ public class PositionInfo {
     final Position startPos;
     final Position endPos;
 
-    String fileName=null;
+    String fileName = null;
     protected String parentClass;
 
-    public final static PositionInfo UNDEFINED=new PositionInfo();
+    public final static PositionInfo UNDEFINED = new PositionInfo();
 
     private PositionInfo() {
-	this.relPos=Position.UNDEFINED;
-	this.startPos=Position.UNDEFINED;
-	this.endPos=Position.UNDEFINED;
+        this.relPos = Position.UNDEFINED;
+        this.startPos = Position.UNDEFINED;
+        this.endPos = Position.UNDEFINED;
     }
 
     public PositionInfo(Position relPos, Position startPos, Position endPos) {
-	this.relPos=relPos;
-	this.startPos=startPos;
-	this.endPos=endPos;
+        this.relPos = relPos;
+        this.startPos = startPos;
+        this.endPos = endPos;
     }
-    
-    public PositionInfo(Position relPos, Position startPos, Position endPos, String fileName) {
-        this.relPos=relPos;
-        this.startPos=startPos;
-        this.endPos=endPos;
-        this.fileName=simplifyPath(fileName);//bugfix:2009.09.17
+
+    public PositionInfo(Position relPos, Position startPos, Position endPos,
+            String fileName) {
+        this.relPos = relPos;
+        this.startPos = startPos;
+        this.endPos = endPos;
+        this.fileName = simplifyPath(fileName);// bugfix:2009.09.17
     }
-    
-    /** If the path contains the substring "/../", then this method tries to 
-     * simplify the path by removing this substring and the preceeding directory name
-     * to that substring. Otherwise java.io.FileReader would have a problem.
+
+    /**
+     * If the path contains the substring "/../", then this method tries to
+     * simplify the path by removing this substring and the preceeding directory
+     * name to that substring. Otherwise java.io.FileReader would have a problem.
      * E.g. Input "/A/B/../D" - Output "/A/D"
-     * @author gladisch*/
-    private static String simplifyPath(String path){
-	if(path==null || path.length()==0)
-	    return path;
-	int idx = path.indexOf("/../");
-        while(idx > 0){
-	    int pre= path.lastIndexOf("/", idx-1);
-	    if(pre!=-1){
-		path = path.substring(0, pre) + path.substring(idx+3);
-	    }
-	    idx = path.indexOf("/../");
-	}
-	return path;
+     * 
+     * @author gladisch
+     */
+    private static String simplifyPath(String path) {
+        if (path == null || path.length() == 0)
+            return path;
+        int idx = path.indexOf("/../");
+        while (idx > 0) {
+            int pre = path.lastIndexOf("/", idx - 1);
+            if (pre != -1) {
+                path = path.substring(0, pre) + path.substring(idx + 3);
+            }
+            idx = path.indexOf("/../");
+        }
+        return path;
     }
 
     public Position getRelativePosition() {
-	return relPos;
+        return relPos;
     }
 
     public Position getStartPosition() {
-	return startPos;
+        return startPos;
     }
 
     public Position getEndPosition() {
-	return endPos;
+        return endPos;
     }
 
-    public String getFileName(){
-	return fileName;
+    public String getFileName() {
+        return fileName;
     }
 
-    /** this violates immutability, but the method is only called
-      * right after the object is created...
-      */
+    /**
+     * this violates immutability, but the method is only called right after the
+     * object is created...
+     */
     protected void setParentClass(String s) {
         parentClass = s;
     }
-    
+
     /** get the class the statement originates from */
     public String getParentClass() {
         return parentClass;
     }
 
-    public String toString(){
-	if (this==PositionInfo.UNDEFINED) 
+    public String toString() {
+        if (this == PositionInfo.UNDEFINED)
             return "UNDEFINED";
-	else return (fileName+" rel. Pos: "+relPos+" start Pos: "+
-                    startPos+" end Pos: "+endPos);
+        else
+            return (fileName + " rel. Pos: " + relPos + " start Pos: " +
+                    startPos + " end Pos: " + endPos);
     }
 
 }

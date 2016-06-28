@@ -20,6 +20,7 @@ import org.key_project.common.core.logic.op.ParsableVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.NameAbstractionTable;
+import org.key_project.common.core.program.Position;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.*;

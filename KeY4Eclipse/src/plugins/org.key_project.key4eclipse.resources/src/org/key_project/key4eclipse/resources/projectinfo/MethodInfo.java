@@ -2,12 +2,7 @@ package org.key_project.key4eclipse.resources.projectinfo;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.*;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.jdt.JDTUtil;

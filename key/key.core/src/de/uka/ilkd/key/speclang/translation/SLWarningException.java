@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
-import de.uka.ilkd.key.java.Position;
+import org.key_project.common.core.program.Position;
+
 import de.uka.ilkd.key.speclang.PositionedString;
 
 

@@ -29,12 +29,11 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
+import org.key_project.common.core.program.Position;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.sed.ui.util.LaunchUIUtil;
-
-import de.uka.ilkd.key.java.Position;
 
 /**
  * {@link ILaunchShortcut} implementation for Symbolic Executiong Debugger

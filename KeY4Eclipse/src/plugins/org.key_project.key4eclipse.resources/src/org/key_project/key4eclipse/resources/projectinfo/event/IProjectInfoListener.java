@@ -3,14 +3,7 @@ package org.key_project.key4eclipse.resources.projectinfo.event;
 import java.util.Collection;
 import java.util.EventListener;
 
-import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
-import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
-import org.key_project.key4eclipse.resources.projectinfo.ContractInfo;
-import org.key_project.key4eclipse.resources.projectinfo.MethodInfo;
-import org.key_project.key4eclipse.resources.projectinfo.ObserverFunctionInfo;
-import org.key_project.key4eclipse.resources.projectinfo.PackageInfo;
-import org.key_project.key4eclipse.resources.projectinfo.ProjectInfo;
-import org.key_project.key4eclipse.resources.projectinfo.TypeInfo;
+import org.key_project.key4eclipse.resources.projectinfo.*;
 
 /**
  * An event thrown from a {@link ProjectInfo}.

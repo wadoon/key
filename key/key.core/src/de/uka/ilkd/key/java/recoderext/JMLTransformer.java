@@ -167,8 +167,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
         if(column < 0) {
             column = 0;
         }
-        de.uka.ilkd.key.java.Position pos
-            = new de.uka.ilkd.key.java.Position(ps.pos.getLine(), column);
+        org.key_project.common.core.program.Position pos
+            = new org.key_project.common.core.program.Position(ps.pos.getLine(), column);
 
         return new PositionedString(sb.toString() + ps.text, ps.fileName, pos);
     }
@@ -198,7 +198,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
      */
     private void updatePositionInformation(
                                 ProgramElement pe,
-                                de.uka.ilkd.key.java.Position pos) {
+                                org.key_project.common.core.program.Position pos) {
         //set start pos
         Position oldPos = pe.getStartPosition();
         Position newPos = new Position(pos.getLine() + oldPos.getLine() - 1,
@@ -500,8 +500,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
             //concatenate comments of child, determine position
             String concatenatedComment = concatenate(comments);
             Position recoderPos = comments[0].getStartPosition();
-            de.uka.ilkd.key.java.Position pos
-                = new de.uka.ilkd.key.java.Position(recoderPos.getLine(),
+            org.key_project.common.core.program.Position pos
+                = new org.key_project.common.core.program.Position(recoderPos.getLine(),
                                                     recoderPos.getColumn());
 
             //call preparser
@@ -560,8 +560,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
         //concatenate comments, determine position
         String concatenatedComment = concatenate(comments);
         Position recoderPos = comments[0].getStartPosition();
-        de.uka.ilkd.key.java.Position pos
-            = new de.uka.ilkd.key.java.Position(recoderPos.getLine(),
+        org.key_project.common.core.program.Position pos
+            = new org.key_project.common.core.program.Position(recoderPos.getLine(),
                                                 recoderPos.getColumn());
 
         //call preparser

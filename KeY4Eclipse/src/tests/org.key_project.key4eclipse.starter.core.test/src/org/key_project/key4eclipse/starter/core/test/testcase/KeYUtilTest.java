@@ -33,6 +33,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.junit.Test;
+import org.key_project.common.core.program.Position;
 import org.key_project.key4eclipse.starter.core.test.Activator;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.IRunnableWithDocument;
@@ -46,7 +47,6 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 /**

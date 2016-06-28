@@ -5,11 +5,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.*;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -20,13 +16,7 @@ import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.*;
 import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.log.LogRecord;
 import org.key_project.key4eclipse.resources.log.LogRecordKind;
@@ -38,7 +28,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
  * A job for running KeY Project Builds.
- * @author Stefan Käsdorf
+ * @author Stefan Kï¿½sdorf
  */
 @SuppressWarnings("restriction")
 public class KeYProjectBuildJob extends Job{

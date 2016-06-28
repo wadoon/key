@@ -38,6 +38,7 @@ import org.key_project.common.core.logic.label.ParameterlessTermLabel;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.program.Position;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
