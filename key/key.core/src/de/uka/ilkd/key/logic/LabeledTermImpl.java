@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableArray;
  * @author Dominic Scheurer
  *
  */
-public class LabeledTermImpl extends CCLabeledTermImpl<JavaBlock, Visitor, Term> implements Term {
+class LabeledTermImpl extends CCLabeledTermImpl<JavaBlock, Visitor, Term> implements Term {
 
     /**
      * TODO: Document.
