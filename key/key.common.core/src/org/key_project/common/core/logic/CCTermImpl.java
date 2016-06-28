@@ -52,7 +52,7 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
     private static NameAbstractionTable FAILED = new NameAbstractionTable();
 
     @SuppressWarnings("unchecked")
-    private static <S> NameAbstractionTable<S> failed() {
+    private static <S extends CCSourceElement> NameAbstractionTable<S> failed() {
         return (NameAbstractionTable<S>) FAILED;
     }
 
@@ -649,7 +649,7 @@ public abstract class CCTermImpl<P extends ModalContent, V extends CCTermVisitor
         return -1;
     }
 
-    private static <S> NameAbstractionTable<S> checkNat(
+    private static <S extends CCSourceElement> NameAbstractionTable<S> checkNat(
             NameAbstractionTable<S> nat) {
         if (nat == null) {
             return new NameAbstractionTable<S>();

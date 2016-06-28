@@ -26,7 +26,7 @@ import java.util.List;
  * o2 instead of their real name. For this comparison a method is
  * offered so that the assigned name is not given outside.
  */
-public class NameAbstractionTable<S /* SourceElement */> {
+public class NameAbstractionTable<S extends CCSourceElement> {
 
     /**
      * The order in which symbols are declared in the two terms or programs that
