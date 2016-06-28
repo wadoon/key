@@ -29,11 +29,11 @@ options {
     import java.util.List;
 
     import org.key_project.util.collection.*;
-    import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.speclang.*;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.ldt.HeapLDT;
     import org.key_project.common.core.logic.Name;
+    import org.key_project.common.core.program.Position;
     import de.uka.ilkd.key.logic.TermBuilder;
 
     import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;

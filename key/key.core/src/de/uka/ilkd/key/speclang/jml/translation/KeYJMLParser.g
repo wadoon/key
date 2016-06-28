@@ -15,11 +15,11 @@ options {
    import org.key_project.common.core.logic.*;
    import org.key_project.common.core.logic.op.*;
    import org.key_project.common.core.logic.sort.*;
+   import org.key_project.common.core.program.Position;
    import org.key_project.common.core.logic.factories.TermCreationException;
    
    import org.key_project.util.collection.*;
    import de.uka.ilkd.key.java.JavaInfo;
-   import de.uka.ilkd.key.java.Position;
    import de.uka.ilkd.key.java.Services;
    import de.uka.ilkd.key.java.abstraction.*;
    import de.uka.ilkd.key.java.expression.literal.StringLiteral;
