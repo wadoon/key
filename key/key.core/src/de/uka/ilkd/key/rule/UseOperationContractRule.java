@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.ParameterlessTermLabel;
@@ -509,16 +510,15 @@ public final class UseOperationContractRule implements BuiltInRule {
         Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
 
         // add term and taclet to post goal
-        goal.addFormula(new SequentFormula<>(contractApplPredTerm),
-                true,
-                false);
+        goal.applySequentChangeInfo(goal.sequent().addFormula(new SequentFormula<>(contractApplPredTerm),
+                true, false));
         goal.addTaclet(informationFlowContractApp,
                 SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
 
         // information flow proofs might get easier if we add the (proved)
         // method contract precondition as an assumption to the post goal
         // (in case the precondition cannot be proved easily)
-        goal.addFormula(new SequentFormula<>(finalPreTerm), true, false);
+        goal.applySequentChangeInfo(goal.sequent().addFormula(new SequentFormula<>(finalPreTerm), true, false));
         final InfFlowProof proof = (InfFlowProof) goal.proof();
         proof.addIFSymbol(contractApplPredTerm);
         proof.addIFSymbol(informationFlowContractApp);
@@ -885,8 +885,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
 
         finalPreTerm = TermLabelManager.refactorTerm(termLabelState, services, null, finalPreTerm, this, preGoal, FINAL_PRE_TERM_HINT, null);
-        preGoal.changeFormula(new SequentFormula<>(finalPreTerm),
-                              ruleApp.posInOccurrence());
+        preGoal.applySequentChangeInfo(
+                preGoal.sequent().changeFormula(new SequentFormula<>(finalPreTerm), ruleApp.posInOccurrence()));
 
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, preGoal, null, null);
 
@@ -913,14 +913,13 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                          null, postJavaBlock, inst.progPost.getLabels())
                                                  ),
                                          null);
-        postGoal.addFormula(new SequentFormula<>(wellFormedAnon),
-        	            true,
-        	            false);
-        postGoal.changeFormula(new SequentFormula<>(tb.apply(inst.u, normalPost, null)),
-        	               ruleApp.posInOccurrence());
-        postGoal.addFormula(new SequentFormula<>(postAssumption),
-        	            true,
-        	            false);
+        final CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> newSeqForPostGoal = 
+                postGoal.sequent().addFormula(new SequentFormula<>(wellFormedAnon), true, false);
+        
+        newSeqForPostGoal.combine(newSeqForPostGoal.sequent().changeFormula(new SequentFormula<>(tb.apply(inst.u, normalPost, null)),
+        	               ruleApp.posInOccurrence()));
+        newSeqForPostGoal.combine(newSeqForPostGoal.sequent().addFormula(new SequentFormula<>(postAssumption),
+        	            true, false));
 
         applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
                      tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
@@ -939,24 +938,25 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                                       inst.progPost.sub(0)),
                                                               null, excJavaBlock, inst.progPost.getLabels())), null);
         final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
-        excPostGoal.addFormula(new SequentFormula<>(wellFormedAnon),
-                	       true,
-                	       false);
-        excPostGoal.changeFormula(new SequentFormula<>(tb.apply(inst.u, excPost, null)),
-        	                  ruleApp.posInOccurrence());
-        excPostGoal.addFormula(new SequentFormula<>(excPostAssumption),
-        	               true,
-        	               false);
+        
+        final CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> newSeqForExcPostGoal = 
+                excPostGoal.sequent().addFormula(new SequentFormula<>(wellFormedAnon), true, false);
+        
+        newSeqForExcPostGoal.combine(newSeqForExcPostGoal.sequent().changeFormula(new SequentFormula<>(tb.apply(inst.u, excPost, null)), ruleApp.posInOccurrence()));
+        
+        newSeqForExcPostGoal.combine(newSeqForExcPostGoal.sequent().addFormula(new SequentFormula<>(excPostAssumption), true, false));
+        
+        excPostGoal.applySequentChangeInfo(newSeqForExcPostGoal);
 
 
         //create "Null Reference" branch
         if(nullGoal != null) {
             final Term actualSelfNotNull
             	= tb.not(tb.equals(inst.actualSelf, tb.NULL()));
-            nullGoal.changeFormula(new SequentFormula<>(tb.apply(inst.u, 
-        					               actualSelfNotNull,
-        					               null)),
-        	                   ruleApp.posInOccurrence());
+            nullGoal.applySequentChangeInfo(
+                    nullGoal.sequent().changeFormula(new SequentFormula<>(tb.apply(inst.u, 
+                            actualSelfNotNull, null)),
+                            ruleApp.posInOccurrence()));
         }
 
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, nullGoal, null, null);

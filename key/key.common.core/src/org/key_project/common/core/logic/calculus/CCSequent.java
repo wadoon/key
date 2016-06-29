@@ -4,7 +4,6 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
-import org.key_project.util.collection.ImmutableList;
 
 public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>,
                            SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<T, SeqFor, SemiSeq, Seq>>
@@ -68,7 +67,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      *         removed
      */
     CCSequentChangeInfo<?, SeqFor, SemiSeq, Seq> addFormula(
-            ImmutableList<SeqFor> insertions, boolean antec, boolean first);
+            Iterable<SeqFor> insertions, boolean antec, boolean first);
 
     /**
      * adds the formulas of list insertions to the sequent starting at position
@@ -76,7 +75,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      * not equality.)
      * 
      * @param insertions
-     *            a IList<SeqFor> with the formulas to be added
+     *            a {@link Iterable} of SeqFor with the formulas to be added
      * @param p
      *            the PosInOccurrence<?, SeqFor> describing the position where
      *            to insert the formulas
@@ -85,7 +84,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      *         removed
      */
     CCSequentChangeInfo<?, SeqFor, SemiSeq, Seq> addFormula(
-            ImmutableList<SeqFor> insertions, PosInOccurrence<?, SeqFor> p);
+            Iterable<SeqFor> insertions, PosInOccurrence<?, SeqFor> p);
 
     /** returns semisequent of the antecedent to work with */
     SemiSeq antecedent();
@@ -112,7 +111,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      * SeqFor> determines index using identity (==) not equality.)
      * 
      * @param replacements
-     *            the IList<SeqFor> whose head replaces the formula at position
+     *            the {@link Iterable} of sequent formulas whose head replaces the formula at position
      *            p and adds the rest of the list behind the changed formula
      * @param p
      *            a PosInOccurrence<?, SeqFor> describing the position of the
@@ -122,7 +121,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      *         removed
      */
     CCSequentChangeInfo<?, SeqFor, SemiSeq, Seq> changeFormula(
-            ImmutableList<SeqFor> replacements, PosInOccurrence<?, SeqFor> p);
+            Iterable<SeqFor> replacements, PosInOccurrence<?, SeqFor> p);
 
     /**
      * determines if the sequent is empty.

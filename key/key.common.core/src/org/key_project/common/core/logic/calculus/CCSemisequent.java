@@ -53,7 +53,7 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      *         and information which formulas have been added or removed
      */
     CCSemisequentChangeInfo<SeqFor, SemiSeq> insert(
-            int idx, ImmutableList<SeqFor> insertionList);
+            int idx, Iterable<SeqFor> insertionList);
 
     /**
      * inserts element at index 0 performing redundancy checks, this may result
@@ -77,7 +77,7 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      *         and information which formulas have been added or removed
      */
     CCSemisequentChangeInfo<SeqFor, SemiSeq> insertFirst(
-            ImmutableList<SeqFor> insertions);
+            Iterable<SeqFor> insertions);
 
     /**
      * inserts element at the end of the semisequent performing redundancy
@@ -103,7 +103,7 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      *         and information which formulas have been added or removed
      */
     CCSemisequentChangeInfo<SeqFor, SemiSeq> insertLast(
-            ImmutableList<SeqFor> insertions);
+            Iterable<SeqFor> insertions);
 
     /**
      * is this a semisequent that contains no formulas
@@ -155,10 +155,10 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      *         and information which formulas have been added or removed
      */
     CCSemisequentChangeInfo<SeqFor, SemiSeq> replace(
-            PosInOccurrence<?, SeqFor> pos, ImmutableList<SeqFor> replacements);
+            PosInOccurrence<?, SeqFor> pos, Iterable<SeqFor> replacements);
 
     CCSemisequentChangeInfo<SeqFor, SemiSeq> replace(
-            int idx, ImmutableList<SeqFor> replacements);
+            int idx, Iterable<SeqFor> replacements);
 
     /** @return int counting the elements of this semisequent */
     int size();

@@ -14,15 +14,7 @@
 package de.uka.ilkd.key.util.joinrule;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
@@ -32,18 +24,9 @@ import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.rule.TacletOption;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
@@ -694,6 +677,19 @@ public class JoinRuleUtils {
             return JavaBlock.EMPTY_JAVABLOCK;
         }
     }
+    
+    /** 
+     * converts a given list of terms (of sort {@link Sort#FORMULA}) into 
+     * a list of sequent formulas 
+     */
+    public static List<SequentFormula<Term>> mkSequentFormulas(List<Term> formulas) {
+        List<SequentFormula<Term>> result = new ArrayList<>(formulas.size());
+        for (Term t : formulas) {
+            result.add(new SequentFormula<Term>(t));
+        }
+        return result;
+    }
+    
 
     // /////////////////////////////////////////////////
     // //////////////// GENERAL LOGIC //////////////////
@@ -868,7 +864,7 @@ public class JoinRuleUtils {
         for (final SequentFormula<Term> f : semiseq) {
             final PosInOccurrence<Term, SequentFormula<Term>> gPio = new PosInOccurrence<Term, SequentFormula<Term>>(f,
                     PosInTerm.<Term>getTopLevel(), antec);
-            goal.removeFormula(gPio);
+            goal.applySequentChangeInfo(goal.sequent().removeFormula(gPio));
         }
     }
 

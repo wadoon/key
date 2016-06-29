@@ -21,7 +21,6 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
-import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -366,42 +365,6 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
        	fireSequentChanged(sci);
     }
 
-
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.proof.CCGoal#addFormula(org.key_project.common.core.logic.calculus.SequentFormula, org.key_project.common.core.logic.calculus.PosInOccurrence)
-     */
-    @Override
-    public void addFormula(SequentFormula<Term> cf, PosInOccurrence<Term, SequentFormula<Term>> p) {
-       applySequentChangeInfo(sequent().addFormula(cf, p));
-    }
-
-
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.proof.CCGoal#addFormula(org.key_project.common.core.logic.calculus.SequentFormula, boolean, boolean)
-     */
-    @Override
-    public void addFormula ( SequentFormula<Term> cf, boolean inAntec,
-          boolean first ) {
-       applySequentChangeInfo(sequent().addFormula(cf, inAntec, first));
-    }
-
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.proof.CCGoal#changeFormula(org.key_project.common.core.logic.calculus.SequentFormula, org.key_project.common.core.logic.calculus.PosInOccurrence)
-     */
-    @Override
-    public void changeFormula(SequentFormula<Term> cf, PosInOccurrence<Term, SequentFormula<Term>> p) {
-       applySequentChangeInfo(sequent().changeFormula(cf, p));
-    }
-
-
-    /** removes a formula at the given position from the sequent
-     * and informs the rule appliccation index about this change
-     * @param p PosInOccurrence<Term, SequentFormula<Term>> encodes the position
-     */
-    @Override
-    public void removeFormula(PosInOccurrence<Term, SequentFormula<Term>> p) {
-       applySequentChangeInfo(sequent().removeFormula(p));
-    }
 
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.proof.CCGoal#addNoPosTacletApp(de.uka.ilkd.key.rule.NoPosTacletApp)

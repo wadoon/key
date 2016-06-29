@@ -71,35 +71,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * desribing the applied changes to the sequent of the parent node
      */
     void applySequentChangeInfo(CCSequentChangeInfo<T, SequentFormula<T>, SemiSeq, Seq> sci);
-
-    /** adds a formula to the sequent before the given position
-     * and informs the rule application index about this change
-     * @param cf the SequentFormula<T> to be added
-     * @param p PosInOccurrence<T, SequentFormula<T>> encodes the position
-     */
-    void addFormula(SequentFormula<T> cf,
-            PosInOccurrence<T, SequentFormula<T>> p);
-
-    /** adds a formula to the antecedent or succedent of a
-     * sequent. Either at its front or back
-     * and informs the rule application index about this change
-     * @param cf the SequentFormula<T> to be added
-     * @param inAntec boolean true(false) if SequentFormula<T> has to be
-     * added to antecedent (succedent)
-     * @param first boolean true if at the front, if false then cf is
-     * added at the back
-     */
-    void addFormula(SequentFormula<T> cf, boolean inAntec, boolean first);
-
-    /**
-     * replaces a formula at the given position
-     * and informs the rule application index about this change
-     * @param cf the SequentFormula<T> replacing the old one
-     * @param p the PosInOccurrence<T, SequentFormula<T>> encoding the position
-     */
-    void changeFormula(SequentFormula<T> cf,
-            PosInOccurrence<T, SequentFormula<T>> p);
-
+    
     /**
      * Adds a partial instantiated {@link RuleApp} to the available rules 
      * @param app the partial instantiated RuleApp
@@ -129,12 +101,6 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * @return the result of the application
      */
     ImmutableList<Self> apply(RuleApp ruleApp);
-
-    /** removes a formula at the given position from the sequent
-     * and informs the rule appliccation index about this change
-     * @param p PosInOccurrence<T, SequentFormula<T>> encodes the position
-     */
-   void removeFormula(PosInOccurrence<T, SequentFormula<T>> p);
 
    /** 
     * returns the {@link Services} of the {@link Proof} 

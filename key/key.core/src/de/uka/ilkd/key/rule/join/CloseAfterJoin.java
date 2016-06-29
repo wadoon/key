@@ -151,8 +151,8 @@ public class CloseAfterJoin implements BuiltInRule {
             // Delete previous sequents
             clearSemisequent(ruleIsWeakeningGoal, true);
             clearSemisequent(ruleIsWeakeningGoal, false);
-            ruleIsWeakeningGoal.addFormula(new SequentFormula<>(isWeakeningForm),
-                    false, true);
+            ruleIsWeakeningGoal.applySequentChangeInfo(
+                    ruleIsWeakeningGoal.sequent().addFormula(new SequentFormula<>(isWeakeningForm), false, true));
         }
 
         return jpNewGoals;

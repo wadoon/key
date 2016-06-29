@@ -148,7 +148,7 @@ public class ModelGenerator implements SolverLauncherListener{
 			//System.out.println(tmodel);
 			Term notTerm = tb.not(tmodel);
 			SequentFormula<Term> sf = new SequentFormula<>(notTerm);			
-			goal.addFormula(sf, true, true);		
+			goal.applySequentChangeInfo(goal.sequent().addFormula(sf, true, true));		
 			return true;
 		}
 		return false;

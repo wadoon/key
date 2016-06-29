@@ -608,7 +608,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term termWithBaseHeap = TB.func(target, subs);
         final Term implication =
                 TB.imp(cutFormula, TB.equals(focus, termWithBaseHeap));
-        result.head().addFormula(new SequentFormula<>(implication), true, false);
+        result.head().applySequentChangeInfo(result.head().sequent().addFormula(new SequentFormula<>(implication), true, false));
 
         return result;
     }

@@ -207,7 +207,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          ImmutableList<Goal> goals = goal.split(1);
          Goal resultGoal = goals.head();
          final TermBuilder tb = services.getTermBuilder();
-         resultGoal.removeFormula(pio);
+         resultGoal.applySequentChangeInfo(resultGoal.sequent().removeFormula(pio));
          if (pio.isTopLevel() || queryConditionTerm != null) {
             for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
                Term conditionTerm = tb.and(conditionsAndResult.second);
@@ -220,21 +220,22 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                if (queryConditionTerm != null) {
                   resultTerm = tb.imp(queryConditionTerm, resultTerm);
                }
-               resultGoal.addFormula(new SequentFormula<>(resultTerm), pio.isInAntec(), false);
+               resultGoal.applySequentChangeInfo(resultGoal.sequent().addFormula(new SequentFormula<>(resultTerm), pio.isInAntec(), false));
             }
          }
          else {
             Function resultFunction = createResultConstant(services, varTerm.sort());
             Term resultFunctionTerm = tb.func(resultFunction);
-            resultGoal.addFormula(replace(pio, 
+            resultGoal.applySequentChangeInfo(
+                    resultGoal.sequent().addFormula(replace(pio, 
                                           varFirst ? tb.equals(resultFunctionTerm, varTerm) : tb.equals(resultFunctionTerm, varTerm),
                                           services), 
                                   pio.isInAntec(), 
-                                  false);
+                                  false));
             for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
                Term conditionTerm = tb.and(conditionsAndResult.second);
                Term resultTerm = tb.imp(conditionTerm, varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.first) : tb.equals(conditionsAndResult.first, resultFunctionTerm));
-               resultGoal.addFormula(new SequentFormula<>(resultTerm), true, false);
+               resultGoal.applySequentChangeInfo(resultGoal.sequent().addFormula(new SequentFormula<>(resultTerm), true, false));
             }
          }
          return goals;

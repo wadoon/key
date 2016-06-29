@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
+import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.ParameterlessTermLabel;
@@ -437,7 +438,7 @@ public class BlockContractRule implements BuiltInRule {
         final SequentFormula<Term> poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
 
         // add proof obligation to goal
-        infFlowGoal.addFormula(poFormula, false, true);
+        infFlowGoal.applySequentChangeInfo(infFlowGoal.sequent().addFormula(poFormula, false, true));
 
         proof.addIFSymbol(contractApplTerm);
         proof.addIFSymbol(informationFlowContractApp);
@@ -577,7 +578,7 @@ public class BlockContractRule implements BuiltInRule {
                                             anonymisationUpdate, tb);
             } else {
                 // nothing to prove -> set up trivial goal
-                validityGoal.addFormula(new SequentFormula<>(tb.tt()), false, true);
+                validityGoal.applySequentChangeInfo(validityGoal.sequent().addFormula(new SequentFormula<>(tb.tt()), false, true));
             }
         }
 
@@ -663,7 +664,8 @@ public class BlockContractRule implements BuiltInRule {
                     tb.applySequential(new Term[] {contextUpdate, remembranceUpdate},
                                     tb.and(infFlowValitidyData.preAssumption,
                                            tb.apply(anonymisationUpdate, infFlowValitidyData.postAssumption)));
-        usageGoal.addFormula(new SequentFormula<>(uAssumptions), true, false);
+        usageGoal.applySequentChangeInfo(
+            usageGoal.sequent().addFormula(new SequentFormula<>(uAssumptions), true, false));
     }
 
 
@@ -1158,7 +1160,7 @@ public class BlockContractRule implements BuiltInRule {
             final SequentFormula<Term> wdBlock = bwd.generateSequent(variables.self, variables.exception,
                     variables.result, heap, heapAtPre,
                     anon, localIns, update, services);
-            goal.changeFormula(wdBlock, occurrence);
+            goal.applySequentChangeInfo(goal.sequent().changeFormula(wdBlock, occurrence));
         }
 
         public void setUpValidityGoal(final Goal goal, final Term[] updates,
@@ -1168,8 +1170,8 @@ public class BlockContractRule implements BuiltInRule {
                                       final Terms terms) {
             goal.setBranchLabel("Validity");
             final TermBuilder tb = services.getTermBuilder();
-            goal.addFormula(new SequentFormula<>(
-                    tb.applySequential(updates, tb.and(assumptions))), true, false);
+            goal.applySequentChangeInfo(goal.sequent().addFormula(new SequentFormula<>(
+                    tb.applySequential(updates, tb.and(assumptions))), true, false));
             final StatementBlock block =
                     new ValidityProgramConstructor(labels, instantiation.block,
                                                    variables, exceptionParameter,
@@ -1180,7 +1182,7 @@ public class BlockContractRule implements BuiltInRule {
             Term newPost = tb.and(postconditions);
             newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, newPost, ImmutableSLList.<LocationVariable>nil().prepend(terms.remembranceLocalVariables.keySet()), terms.exception);
             newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule, goal, BlockContractRule.NEW_POSTCONDITION_TERM_HINT, null);
-            goal.changeFormula(new SequentFormula<>(
+            goal.applySequentChangeInfo(goal.sequent().changeFormula(new SequentFormula<>(
                   tb.applySequential(
                     updates,
                     tb.prog(instantiation.modality,
@@ -1199,7 +1201,7 @@ public class BlockContractRule implements BuiltInRule {
                                                                null, 
                                                                newJavaBlock, 
                                                                instantiation.formula.getLabels())))),
-                            occurrence);
+                            occurrence));
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
             final boolean oldInfFlowCheckInfoValue =
                     goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
@@ -1245,8 +1247,9 @@ public class BlockContractRule implements BuiltInRule {
             goal.setBranchLabel("Precondition");
             Term fullPrecondition = tb.apply(update, tb.and(preconditions), null);
             fullPrecondition = TermLabelManager.refactorTerm(termLabelState, services, null, fullPrecondition, rule, goal, BlockContractRule.FULL_PRECONDITION_TERM_HINT, null);
-            goal.changeFormula(new SequentFormula<>(fullPrecondition),
-                               occurrence);
+            goal.applySequentChangeInfo(
+                    goal.sequent().changeFormula(new SequentFormula<>(fullPrecondition),
+                            occurrence));
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
         }
 
@@ -1255,9 +1258,16 @@ public class BlockContractRule implements BuiltInRule {
             final TermBuilder tb = services.getTermBuilder();
             goal.setBranchLabel("Usage");
             Term uAssumptions = tb.applySequential(updates, tb.and(assumptions));
-            goal.addFormula(new SequentFormula<>(uAssumptions), true, false);
-            goal.changeFormula(new SequentFormula<>(tb.applySequential(updates, buildUsageFormula(goal))),
-                                                  occurrence);
+            
+            final CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> newSeq = 
+                    goal.sequent().addFormula(new SequentFormula<>(uAssumptions), true, false);
+            
+            newSeq.combine(
+                    newSeq.sequent().changeFormula(new SequentFormula<>(tb.applySequential(updates, buildUsageFormula(goal))),
+                                                   occurrence));
+            
+            goal.applySequentChangeInfo(newSeq);
+                       
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
         }
 

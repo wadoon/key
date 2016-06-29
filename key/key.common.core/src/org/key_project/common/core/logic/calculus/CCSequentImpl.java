@@ -20,7 +20,6 @@ import java.util.Set;
 import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * TODO: Document.
@@ -63,8 +62,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      */
     @Override
     @SuppressWarnings("unchecked")
-    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(SeqFor cf,
-                                                                        boolean antec, boolean first) {
+    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(SeqFor cf, boolean antec, boolean first) {
 
         final CCSemisequent<SeqFor, SemiSeq> seq =
                 antec ? antecedent : succedent;
@@ -97,7 +95,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
     @Override
     @SuppressWarnings("unchecked")
     public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(
-            ImmutableList<SeqFor> insertions,
+            Iterable<SeqFor> insertions,
             boolean antec, boolean first) {
 
         final CCSemisequent<SeqFor, SemiSeq> seq =
@@ -117,7 +115,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
     @Override
     @SuppressWarnings("unchecked")
     public  CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(
-            ImmutableList<SeqFor> insertions,
+            Iterable<SeqFor> insertions,
             PosInOccurrence<?, SeqFor> p) {
         final CCSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
@@ -156,7 +154,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      */
     @Override
     public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> changeFormula(
-            ImmutableList<SeqFor> replacements,
+            Iterable<SeqFor> replacements,
             PosInOccurrence<?, SeqFor> p) {
 
         final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =

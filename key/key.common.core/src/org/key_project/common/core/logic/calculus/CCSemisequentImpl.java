@@ -59,7 +59,7 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
      */
     @Override
     public CCSemisequentChangeInfo<SeqFor, SemiSeq> insert(
-            int idx, ImmutableList<SeqFor> insertionList) {
+            int idx, Iterable<SeqFor> insertionList) {
         return removeRedundance(idx, insertionList);
     }
 
@@ -77,7 +77,7 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
      */
     @Override
     public CCSemisequentChangeInfo<SeqFor, SemiSeq> insertFirst(
-            ImmutableList<SeqFor> insertions) {
+            Iterable<SeqFor> insertions) {
         return insert(0, insertions);
     }
 
@@ -95,7 +95,7 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
      */
     @Override
     public CCSemisequentChangeInfo<SeqFor, SemiSeq> insertLast(
-            ImmutableList<SeqFor> insertions) {
+            Iterable<SeqFor> insertions) {
         return insert(size(), insertions);
     }
 
@@ -185,7 +185,7 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
      * duplicates, perform simplifications etc.
      * 
      * @param sequentFormulasToBeInserted
-     *            the {@link ImmutableList<SeqFor>} to be inserted at position
+     *            the {@link Iterable<SeqFor>} to be inserted at position
      *            idx
      * @param idx
      *            an int that means insert sequentFormula at the idx-th position
@@ -195,18 +195,14 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
      */
     private CCSemisequentChangeInfo<SeqFor, SemiSeq> insertAndRemoveRedundancy(
             int idx,
-            ImmutableList<SeqFor> sequentFormulasToBeInserted,
+            Iterable<SeqFor> sequentFormulasToBeInserted,
             CCSemisequentChangeInfo<SeqFor, SemiSeq> sci) {
 
         int pos = idx;
         ImmutableList<SeqFor> oldFormulas = sci.getFormulaList();
 
-        while (!sequentFormulasToBeInserted.isEmpty()) {
-            final SeqFor aSequentFormula = sequentFormulasToBeInserted.head();
-            sequentFormulasToBeInserted = sequentFormulasToBeInserted.tail();
-
-            sci =
-                    insertAndRemoveRedundancyHelper(pos, aSequentFormula, sci,
+        for (SeqFor aSequentFormula : sequentFormulasToBeInserted) {
+            sci = insertAndRemoveRedundancyHelper(pos, aSequentFormula, sci,
                             null);
 
             if (sci.getFormulaList() != oldFormulas) {
@@ -230,7 +226,7 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
      *         and information which formulas have been added or removed
      */
     private CCSemisequentChangeInfo<SeqFor, SemiSeq> removeRedundance(
-            int idx, ImmutableList<SeqFor> sequentFormula) {
+            int idx, Iterable<SeqFor> sequentFormula) {
         return insertAndRemoveRedundancy(idx, sequentFormula,
                 createSemisequentChangeInfo(seqList));
     }
@@ -281,7 +277,7 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
      */
     @Override
     public CCSemisequentChangeInfo<SeqFor, SemiSeq> replace(
-            PosInOccurrence<?, SeqFor> pos, ImmutableList<SeqFor> replacements) {
+            PosInOccurrence<?, SeqFor> pos, Iterable<SeqFor> replacements) {
         final int idx = indexOf(pos.sequentFormula());
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
@@ -291,7 +287,7 @@ public abstract class CCSemisequentImpl<SeqFor extends SequentFormula<?>, SemiSe
      */
     @Override
     public CCSemisequentChangeInfo<SeqFor, SemiSeq> replace(
-            int idx, ImmutableList<SeqFor> replacements) {
+            int idx, Iterable<SeqFor> replacements) {
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
 

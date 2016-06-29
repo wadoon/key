@@ -629,7 +629,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         // change goal, set if-insts
         final ImmutableList<Goal> result = goal.split(1);
         final Goal resultGoal = result.head();
-        resultGoal.changeFormula(inst.getCf(), pos);
+        resultGoal.applySequentChangeInfo(resultGoal.sequent().changeFormula(inst.getCf(), pos));
         goal.setBranchLabel(inst.getNumAppliedRules()
                     + (inst.getNumAppliedRules() > 1
                                     ? " rules" : " rule"));

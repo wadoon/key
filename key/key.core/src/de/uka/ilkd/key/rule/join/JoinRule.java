@@ -46,10 +46,7 @@ import org.key_project.util.collection.Pair;
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -249,11 +246,10 @@ public class JoinRule implements BuiltInRule {
                 newGoal.indexOfTaclets().getPartialInstantiatedApps());
 
         // Add new antecedent (path condition)
-        for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
-            final SequentFormula<Term> newAntecedent =
-                    new SequentFormula<>(antecedentFormula);
-            newGoal.addFormula(newAntecedent, true, false);
-        }
+         
+        newGoal.applySequentChangeInfo(newGoal.sequent().
+                       addFormula(JoinRuleUtils.mkSequentFormulas(getConjunctiveElementsFor(resultPathCondition)), true, false));
+   
 
         // Add new succedent (symbolic state & program counter)
         final Term succedentFormula =
@@ -261,8 +257,8 @@ public class JoinRule implements BuiltInRule {
         final SequentFormula<Term> newSuccedent =
                 new SequentFormula<>(succedentFormula);
         
-        newGoal.addFormula(newSuccedent, new PosInOccurrence<Term, SequentFormula<Term>>(newSuccedent,
-                PosInTerm.<Term>getTopLevel(), false));
+        newGoal.applySequentChangeInfo(newGoal.sequent().addFormula(newSuccedent, new PosInOccurrence<Term, SequentFormula<Term>>(newSuccedent,
+                PosInTerm.<Term>getTopLevel(), false)));
         
         // The following line has the only effect of emptying the
         // name recorder -- the name recorder for currentNode will

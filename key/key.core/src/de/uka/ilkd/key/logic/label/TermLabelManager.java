@@ -1052,11 +1052,13 @@ public class TermLabelManager {
       Term newApplicationTerm = refactorApplicationTerm(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, refactorings, tf);
       if (newApplicationTerm != null && !newApplicationTerm.equals(applicationTerm)) {
          Term root = replaceTerm(state, applicationPosInOccurrence, newApplicationTerm, tf, refactorings.getChildAndGrandchildRefactoringsAndParents(), services, applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
-         goal.changeFormula(new SequentFormula<>(root), applicationPosInOccurrence.topLevel());
+         goal.applySequentChangeInfo(
+                 goal.sequent().changeFormula(new SequentFormula<>(root), applicationPosInOccurrence.topLevel()));
       }
       else if (!refactorings.getChildAndGrandchildRefactoringsAndParents().isEmpty()) {
          Term root = replaceTerm(state, applicationPosInOccurrence, applicationTerm, tf, refactorings.getChildAndGrandchildRefactoringsAndParents(), services, applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
-         goal.changeFormula(new SequentFormula<>(root), applicationPosInOccurrence.topLevel());
+         goal.applySequentChangeInfo(
+                 goal.sequent().changeFormula(new SequentFormula<>(root), applicationPosInOccurrence.topLevel()));
       }
       // Do sequent refactoring if required
       if (!refactorings.getSequentRefactorings().isEmpty()) {
@@ -1459,9 +1461,10 @@ public class TermLabelManager {
                                       boolean inAntec,
                                       ImmutableList<TermLabelRefactoring> activeRefactorings) {
       for (SequentFormula<Term> sfa : semisequent) {
-         Term updatedTerm = refactorLabelsRecursive(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(), activeRefactorings);
-         goal.changeFormula(new SequentFormula<>(updatedTerm),
-                            new PosInOccurrence<>(sfa, PosInTerm.<Term>getTopLevel(), inAntec));
+         final Term updatedTerm = refactorLabelsRecursive(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(), activeRefactorings);
+         goal.applySequentChangeInfo(
+                 goal.sequent().changeFormula(new SequentFormula<>(updatedTerm),
+                            new PosInOccurrence<>(sfa, PosInTerm.<Term>getTopLevel(), inAntec)));
       }
    }
 

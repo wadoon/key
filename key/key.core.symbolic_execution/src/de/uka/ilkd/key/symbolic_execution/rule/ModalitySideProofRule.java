@@ -179,7 +179,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
          // Create new single goal in which the query is replaced by the possible results
          ImmutableList<Goal> goals = goal.split(1);
          Goal resultGoal = goals.head();
-         resultGoal.removeFormula(pio);
+         resultGoal.applySequentChangeInfo(resultGoal.sequent().removeFormula(pio));
          // Create results
          Set<Term> resultTerms = new LinkedHashSet<Term>();
          for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
@@ -201,12 +201,13 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             }
             Term newImplication = tb.imp(newCondition, modalityTerm.sub(0).sub(1));
             Term newImplicationWithUpdates = tb.applySequential(updates, newImplication);
-            resultGoal.addFormula(new SequentFormula<>(newImplicationWithUpdates), pio.isInAntec(), false);
+            resultGoal.applySequentChangeInfo(resultGoal.sequent().
+                    addFormula(new SequentFormula<>(newImplicationWithUpdates), pio.isInAntec(), false));
          }
          else {
             // Add result directly as new top level formula
             for (Term result : resultTerms) {
-               resultGoal.addFormula(new SequentFormula<>(result), pio.isInAntec(), false);
+                resultGoal.applySequentChangeInfo(resultGoal.sequent().addFormula(new SequentFormula<>(result), pio.isInAntec(), false));
             }
          }
          return goals;
