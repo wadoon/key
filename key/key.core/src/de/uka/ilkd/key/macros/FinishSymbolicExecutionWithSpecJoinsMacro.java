@@ -393,7 +393,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                             (StatementBlock) theJavaBlock.program(), goal));
 
                     Statement breakpoint;
-                    if ((breakpoint = getBreakPoint(goal.sequent().succedent(), goal.proof().getServices())) != null) {
+                    if ((breakpoint = getBreakPoint(goal.sequent().succedent(), goal.getServices())) != null) {
                         final ImmutableList<Goal> subtreeGoals = goal.proof()
                                 .getSubtreeEnabledGoals(
                                         commonParents.get(breakpoint)).removeFirst(goal);
@@ -402,7 +402,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                         int nrCandidates = 0;
                         for (Goal subGoal : subtreeGoals) {
                             if (!subGoal.isLinked()
-                                    && hasBreakPoint(subGoal.sequent().succedent(), goal.proof().getServices(), breakpoint)) {
+                                    && hasBreakPoint(subGoal.sequent().succedent(), goal.getServices(), breakpoint)) {
                                 allStopped = allStopped
                                         && stoppedGoals.contains(subGoal);
                                 nrCandidates++;
@@ -530,7 +530,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          */
         private HashSet<ProgramElement> findJoinPoints(
                 final StatementBlock toSearch, final Goal goal) {
-            final Services services = goal.proof().getServices();
+            final Services services = goal.getServices();
             final HashSet<ProgramElement> result = new HashSet<ProgramElement>();
 
             if (toSearch.isEmpty()) {

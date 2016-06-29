@@ -87,7 +87,7 @@ public class TacletIfSelectionDialog extends JPanel{
 	    final JPanel p = new JPanel();
 	    p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
 	    JLabel label = new JLabel(ProofSaver.printAnything(
-	        model.ifFma(i), model.proof().getServices())) {
+	        model.ifFma(i), model.getServices())) {
 	        /**
                  * 
                  */
@@ -110,7 +110,7 @@ public class TacletIfSelectionDialog extends JPanel{
                 }
             };
 	    IfComboRenderer rend = new IfComboRenderer(ifChoice.getRenderer(),
-                    model.proof().getServices());
+                    model.getServices());
 	    ifChoice.setRenderer(rend);	    
 	    ifChoice.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {

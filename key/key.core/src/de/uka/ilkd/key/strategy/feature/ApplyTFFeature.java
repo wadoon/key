@@ -75,7 +75,7 @@ public class ApplyTFFeature implements Feature {
             return noInstCost;
         }
 
-        return termFeature.compute ( te, goal.proof().getServices() );
+        return termFeature.compute ( te, goal.getServices() );
     }
 
 }

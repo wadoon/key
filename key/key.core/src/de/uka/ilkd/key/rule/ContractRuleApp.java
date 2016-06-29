@@ -71,7 +71,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     	if (complete()) {
     		return this;
     	}
-    	Services services = goal.proof().getServices();
+    	Services services = goal.getServices();
     	ImmutableSet<FunctionalOperationContract> contracts = UseOperationContractRule
     	        .getApplicableContracts(
     	                UseOperationContractRule.computeInstantiation(
@@ -80,7 +80,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 	if (contracts.size() !=1) return this; // incomplete app;
 	Modality m = (Modality)programTerm().op();
 	boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
-	heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+	heapContext = HeapContext.getModHeaps(goal.getServices(), transaction);
 	return setContract(contracts.iterator().next());
     }
 
@@ -89,7 +89,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 	if (complete()) {
 		return this;
 	}
-	Services services = goal.proof().getServices();
+	Services services = goal.getServices();
 	ImmutableSet<FunctionalOperationContract> contracts = UseOperationContractRule
 	.getApplicableContracts(
 			UseOperationContractRule.computeInstantiation(
@@ -97,7 +97,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 					services);
 	Modality m = (Modality)programTerm().op();
 	boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
-	heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+	heapContext = HeapContext.getModHeaps(goal.getServices(), transaction);
 	final FunctionalOperationContract combinedContract = services.getSpecificationRepository()
 	.combineOperationContracts(contracts);
 	return setContract(combinedContract);

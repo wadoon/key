@@ -356,7 +356,7 @@ public abstract class AbstractBetaFeature implements Feature {
     
         final Term findTerm = pos.sequentFormula ().formula ();
         
-        return doComputation ( pos, findTerm, goal.proof().getServices().getCaches() );
+        return doComputation ( pos, findTerm, goal.getServices().getCaches() );
     }
 
     protected abstract RuleAppCost doComputation (PosInOccurrence<Term, SequentFormula<Term>> pos,

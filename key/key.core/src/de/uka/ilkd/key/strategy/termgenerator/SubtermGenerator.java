@@ -52,7 +52,7 @@ public abstract class SubtermGenerator implements TermGenerator {
                                              TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
             public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
-                return new LeftIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
+                return new LeftIterator ( getTermInst ( app, pos, goal ), goal.getServices() );
             }
         };
     }
@@ -65,7 +65,7 @@ public abstract class SubtermGenerator implements TermGenerator {
                                               TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
             public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
-                return new RightIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
+                return new RightIterator ( getTermInst ( app, pos, goal ), goal.getServices() );
             }
         };
     }

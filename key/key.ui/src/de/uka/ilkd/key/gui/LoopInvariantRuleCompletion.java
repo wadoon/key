@@ -39,7 +39,7 @@ public class LoopInvariantRuleCompletion implements
 
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
-        Services services = goal.proof().getServices();
+        Services services = goal.getServices();
 
         LoopInvariantBuiltInRuleApp loopApp =
                 ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);

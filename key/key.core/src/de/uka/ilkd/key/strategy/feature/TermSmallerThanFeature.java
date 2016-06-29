@@ -40,7 +40,7 @@ public class TermSmallerThanFeature extends SmallerThanFeature {
 
     protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         return lessThan ( left.toTerm ( app, pos, goal ),
-                          right.toTerm ( app, pos, goal ), goal.proof().getServices().getCaches() );
+                          right.toTerm ( app, pos, goal ), goal.getServices().getCaches() );
     }
 
 }

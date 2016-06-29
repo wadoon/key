@@ -399,13 +399,13 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       final TacletInstantiationModel model = models[id];
       Composite ifSelectionViewComposite = new Composite(assumptionViewGrp, SWT.NONE);
       ifSelectionViewComposite.setLayout(new GridLayout(2, true));
-      final Services svc = model.proof().getServices();
+      final Services svc = model.getServices();
       
       //For each required Assumption:
       for (int i = 0; i < model.ifChoiceModelCount(); i++) {
          //create a line in the assumptions field:
          //assumption text
-         String text = ProofSaver.printAnything(model.ifFma(i), model.proof().getServices());
+         String text = ProofSaver.printAnything(model.ifFma(i), model.getServices());
          Text assumption = new Text(ifSelectionViewComposite, SWT.READ_ONLY);
          assumption.setText(text);
          final TacletAssumesModel tam = model.ifChoiceModel(i);

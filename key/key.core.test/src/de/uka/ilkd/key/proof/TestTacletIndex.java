@@ -275,7 +275,7 @@ public class TestTacletIndex extends TestCase{
         final BuiltInRuleAppIndex builtinIdx =
             new BuiltInRuleAppIndex (new BuiltInRuleIndex ());
         final Goal goal_p5 =
-            new Goal (node_p5, new RuleAppIndex (ruleIdx, builtinIdx, node_p5.proof().getServices()));
+            new Goal (node_p5, new RuleAppIndex (ruleIdx, builtinIdx, node_p5.getServices()));
 	return goal_p5.ruleAppIndex ();
     }
 

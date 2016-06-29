@@ -258,7 +258,7 @@ public class IntermediateProofReplayer {
                                     ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
                                             ImmutableSLList.nil();
                                     for (Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
-                                        final Services services = currGoal.proof().getServices();
+                                        final Services services = currGoal.getServices();
                                         
                                         Triple<Term, Term, Term> ownSEState = sequentToSETriple(
                                                 currNode, joinApp.posInOccurrence(), services);
@@ -643,7 +643,7 @@ public class IntermediateProofReplayer {
                         .createApp(pos)).setContract(currContract);
             }
 
-            if (contractApp.check(currGoal.proof().getServices()) == null) {
+            if (contractApp.check(currGoal.getServices()) == null) {
                 throw new BuiltInConstructionException(
                         "Cannot apply contract: " + currContract);
             }

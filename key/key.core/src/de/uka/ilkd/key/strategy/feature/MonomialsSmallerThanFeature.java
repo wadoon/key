@@ -74,13 +74,13 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     
     protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         final MonomialCollector m1 = new MonomialCollector ();
-        m1.collect ( left.toTerm ( app, pos, goal ), goal.proof().getServices() );
+        m1.collect ( left.toTerm ( app, pos, goal ), goal.getServices() );
         final MonomialCollector m2 = new MonomialCollector ();
-        m2.collect ( right.toTerm ( app, pos, goal ), goal.proof().getServices() );
+        m2.collect ( right.toTerm ( app, pos, goal ), goal.getServices() );
 
         setCurrentGoal ( goal );
         
-        final boolean res = lessThan ( m1.getResult(), m2.getResult(), goal.proof().getServices().getCaches() );
+        final boolean res = lessThan ( m1.getResult(), m2.getResult(), goal.getServices().getCaches() );
         
         setCurrentGoal ( null );
         

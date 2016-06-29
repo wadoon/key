@@ -25,7 +25,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     */
    @Override
    public ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation, ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
-      final Services services = seedNode.proof().getServices();
+      final Services services = seedNode.getServices();
       Set<Location> relevantLocations = null;
       List<Node> result = new LinkedList<Node>();
       Map<Location, SortedSet<Location>> oldAliases = null;

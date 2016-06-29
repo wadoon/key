@@ -41,10 +41,10 @@ public class HeuristicInstantiation implements TermGenerator {
 
         final Term qf = pos.sequentFormula ().formula ();
         final Instantiation ia = Instantiation.create ( qf, goal.sequent(), 
-                goal.proof().getServices() );
+                goal.getServices() );
         final QuantifiableVariable var =
             qf.varsBoundHere ( 0 ).last ();
-        return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
+        return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.getServices() );
     }
 
 

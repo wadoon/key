@@ -304,7 +304,7 @@ public class TestSchemaModalOperators extends TestCase {
 	final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex
 	    ( new BuiltInRuleIndex () );
 	final RuleAppIndex ruleAppIndex = new RuleAppIndex
-	    ( tacletIndex, birIndex, n.proof().getServices() );
+	    ( tacletIndex, birIndex, n.getServices() );
 	final Goal goal = new Goal ( n, ruleAppIndex );
 	return goal;
     }

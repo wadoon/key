@@ -54,7 +54,7 @@ public final class DependencyContractFeature extends BinaryFeature {
             .getServices(), false);
 
       final List<PosInOccurrence<Term, SequentFormula<Term>>> steps = UseDependencyContractRule.getSteps(
-            heapContext, pos, goal.sequent(), goal.proof().getServices());
+            heapContext, pos, goal.sequent(), goal.getServices());
       if (steps.isEmpty()) {
          return false;
       }

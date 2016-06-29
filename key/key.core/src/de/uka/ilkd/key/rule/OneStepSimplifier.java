@@ -597,7 +597,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
 
         //applicable to the formula?
-        return applicableTo(goal.proof().getServices(),
+        return applicableTo(goal.getServices(),
                         pio.sequentFormula(),
                         pio.isInAntec(),
                         goal,

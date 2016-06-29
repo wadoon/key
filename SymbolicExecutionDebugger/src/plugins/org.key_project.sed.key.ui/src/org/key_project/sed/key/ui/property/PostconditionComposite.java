@@ -65,12 +65,12 @@ public class PostconditionComposite extends AbstractTruthValueComposite {
          Term termWithoutPredicate = predicatePosition != null ? 
                                      removeUninterpretedPredicate(keyNode, term, predicatePosition.getSubTerm(term)) :
                                      term;
-         return new Triple<Term, PosInTerm<Term>, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, termWithoutPredicate) : termWithoutPredicate, 
+         return new Triple<Term, PosInTerm<Term>, Term>(INCLUDE_UPDATES ? keyNode.getServices().getTermBuilder().applySequential(updates, termWithoutPredicate) : termWithoutPredicate, 
                                                   predicatePosition,
                                                   term);
       }
       else {
-         return new Triple<Term, PosInTerm<Term>, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, term) : term, 
+         return new Triple<Term, PosInTerm<Term>, Term>(INCLUDE_UPDATES ? keyNode.getServices().getTermBuilder().applySequential(updates, term) : term, 
                                                   null,
                                                   null);
       }

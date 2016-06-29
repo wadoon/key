@@ -98,7 +98,7 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
         if (complete() || cannotComplete(goal)) {
             return this;
         }
-        final Services services = goal.proof().getServices();
+        final Services services = goal.getServices();
         final BlockContractRule.Instantiation instantiation =
                 BlockContractRule.instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts =

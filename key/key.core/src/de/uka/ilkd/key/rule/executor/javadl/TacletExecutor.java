@@ -450,7 +450,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                     ifPart = inst.getConstrainedFormula ().formula ();
 
                     // negate formulas of the if succedent
-                    final JavaDLTermServices services = p_goal.proof().getServices();
+                    final JavaDLTermServices services = p_goal.getServices();
                     if ( i <= 0 )
                         ifPart = services.getTermBuilder().not(ifPart);          
 

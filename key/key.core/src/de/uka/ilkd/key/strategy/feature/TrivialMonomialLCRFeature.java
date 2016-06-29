@@ -43,7 +43,7 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
     }
 
     protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
-        final Services services = goal.proof().getServices();
+        final Services services = goal.getServices();
         final Monomial aMon =
             Monomial.create ( a.toTerm ( app, pos, goal ), services );
         final Monomial bMon =

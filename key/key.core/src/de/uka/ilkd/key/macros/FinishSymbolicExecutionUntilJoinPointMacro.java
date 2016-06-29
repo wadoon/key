@@ -297,7 +297,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
 
                 // Find break points
                 blockElems.addAll(findJoinPoints((StatementBlock) theJavaBlock
-                        .program(), goal.proof().getServices()));
+                        .program(), goal.getServices()));
 
                 if (app.rule().name().toString()
                         .equals("One Step Simplification")) {

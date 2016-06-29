@@ -489,7 +489,7 @@ public class OutputStreamProofSaver {
            } else if (iff instanceof IfFormulaInstDirect) {
 
                final String directInstantiation = printTerm(iff.getConstrainedFormula().formula(),
-                       node.proof().getServices()).toString();
+                       node.getServices()).toString();
 
                s += " (ifdirectformula \"" + escapeCharacters(directInstantiation) + "\")";
            } else throw new RuntimeException("Unknown If-Seq-Formula type");

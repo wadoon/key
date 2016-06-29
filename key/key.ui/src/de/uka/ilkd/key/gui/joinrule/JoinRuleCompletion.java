@@ -59,7 +59,7 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
         else {
             final JoinPartnerSelectionDialog dialog =
                     new JoinPartnerSelectionDialog(goal, pio, candidates, goal
-                            .proof().getServices());
+                            .getServices());
             dialog.setVisible(true);
             chosenCandidates = dialog.getChosenCandidates();
             chosenRule = dialog.getChosenJoinRule();

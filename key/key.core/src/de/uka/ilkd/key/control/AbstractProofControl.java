@@ -115,7 +115,7 @@ public abstract class AbstractProofControl implements ProofControl {
    public ImmutableList<TacletApp> getNoFindTaclet(Goal focusedGoal) {
         return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex().
                 getNoFindTaclet(TacletFilter.TRUE,
-                      focusedGoal.proof().getServices()), null);
+                      focusedGoal.getServices()), null);
     }
 
     @Override
@@ -126,7 +126,7 @@ public abstract class AbstractProofControl implements ProofControl {
             return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex().
                     getFindTaclet(TacletFilter.TRUE,
                             pos,
-                            focusedGoal.proof().getServices()), pos);
+                            focusedGoal.getServices()), pos);
         }
         return ImmutableSLList.<TacletApp>nil();
     }
@@ -137,7 +137,7 @@ public abstract class AbstractProofControl implements ProofControl {
             return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex().
                     getRewriteTaclet(TacletFilter.TRUE,
                             pos,
-                            focusedGoal.proof().getServices()), pos);
+                            focusedGoal.getServices()), pos);
         }
 
         return ImmutableSLList.<TacletApp>nil();
@@ -155,7 +155,7 @@ public abstract class AbstractProofControl implements ProofControl {
                 ImmutableList<TacletApp> ifCandidates
                         = app.findIfFormulaInstantiations(
                               focusedGoal.sequent(),
-                              focusedGoal.proof().getServices());
+                              focusedGoal.getServices());
                 if (ifCandidates.isEmpty()) {
                     continue; // skip this app
                 }
@@ -185,7 +185,7 @@ public abstract class AbstractProofControl implements ProofControl {
     
     @Override
     public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pos) {
-   final Services services = goal.proof().getServices();
+   final Services services = goal.getServices();
    ImmutableSet<TacletApp> applics =
          getAppsForName(goal, taclet.name().toString(), pos);
         if (applics.size() == 0) {
@@ -279,7 +279,7 @@ public abstract class AbstractProofControl implements ProofControl {
     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
             PosInOccurrence<Term, SequentFormula<Term>> pos,
             TacletFilter filter) {
-        Services services = goal.proof().getServices();
+        Services services = goal.getServices();
         ImmutableSet<TacletApp> result = DefaultImmutableSet.<TacletApp>nil();
         ImmutableList<TacletApp> fittingApps = ImmutableSLList.<TacletApp>nil();
         final RuleAppIndex index = goal.ruleAppIndex();

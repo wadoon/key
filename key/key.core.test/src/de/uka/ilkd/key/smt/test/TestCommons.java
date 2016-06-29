@@ -125,7 +125,7 @@ public abstract class TestCommons extends TestCase {
 	private SMTSolverResult checkGoal(Goal g) {
 	    SolverLauncher launcher = new SolverLauncher(new SMTTestSettings());
 		SMTProblem problem = new SMTProblem(g);
-		launcher.launch(problem, g.proof().getServices(), getSolverType());
+		launcher.launch(problem, g.getServices(), getSolverType());
 		return problem.getFinalResult();
     }
 	

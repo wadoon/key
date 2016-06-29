@@ -304,7 +304,7 @@ public class NodeInfo {
                             + tacletApp.rule().name());
                     res = arg; // use sv name instead
                 } else
-                    res = ProofSaver.printAnything(val, node.proof().getServices());
+                    res = ProofSaver.printAnything(val, node.getServices());
                 m.appendReplacement(sb, res.replace("$", "\\$"));
             }
             m.appendTail(sb);

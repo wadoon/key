@@ -206,7 +206,7 @@ public final class SymbolicExecutionUtil {
          else {
             ImmutableList<Term> goalImplications = ImmutableSLList.nil(); 
             for (Goal goal : openGoals) {
-               Term goalImplication = sequentToImplication(goal.sequent(), goal.proof().getServices());
+               Term goalImplication = sequentToImplication(goal.sequent(), goal.getServices());
                goalImplication = tb.not(goalImplication);
                goalImplications = goalImplications.append(goalImplication);
             }
@@ -794,7 +794,7 @@ public final class SymbolicExecutionUtil {
     */
    public static List<IProgramVariable> collectAllElementaryUpdateTerms(Node node) {
       if (node != null) {
-         Services services = node.proof().getServices();
+         Services services = node.getServices();
          List<IProgramVariable> result = new LinkedList<IProgramVariable>();
          for (SequentFormula<Term> sf : node.sequent().antecedent()) {
             internalCollectAllElementaryUpdateTerms(services, result, sf.formula());
@@ -941,7 +941,7 @@ public final class SymbolicExecutionUtil {
          Term term = pio.subTerm();
          term = TermBuilder.goBelowUpdates(term);
          JavaBlock jb = term.modalContent();
-         Services services = node.proof().getServices();
+         Services services = node.getServices();
          IExecutionContext context = JavaTools.getInnermostExecutionContext(jb, services);
          if (context instanceof ExecutionContext) {
             ReferencePrefix prefix = context.getRuntimeInstance();
@@ -984,8 +984,8 @@ public final class SymbolicExecutionUtil {
             }
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
-               IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               return isNotImplicit(node.proof().getServices(), pm);
+               IProgramMethod pm = mbs.getProgramMethod(node.getServices());
+               return isNotImplicit(node.getServices(), pm);
             }
          }
          else {
@@ -1086,7 +1086,7 @@ public final class SymbolicExecutionUtil {
          Contract contract = ((AbstractContractRuleApp)ruleApp).getInstantiation();
          if (contract instanceof OperationContract) {
             IProgramMethod target = ((OperationContract)contract).getTarget();
-            return isNotImplicit(node.proof().getServices(), target);
+            return isNotImplicit(node.getServices(), target);
          }
          else {
             return false;
@@ -1556,7 +1556,7 @@ public final class SymbolicExecutionUtil {
       term = TermBuilder.goBelowUpdates(term);
       JavaBlock block = term.modalContent();
       IExecutionContext context =
-              JavaTools.getInnermostExecutionContext(block, node.proof().getServices());
+              JavaTools.getInnermostExecutionContext(block, node.getServices());
       return context != null && context.getMethodContext() != null
               && context.getMethodContext().isImplicit();
    }
@@ -1664,7 +1664,7 @@ public final class SymbolicExecutionUtil {
          // Get current program method
          Term term = pio.subTerm();
          term = TermBuilder.goBelowUpdates(term);
-         Services services = node.proof().getServices();
+         Services services = node.getServices();
          MethodFrame mf = JavaTools.getInnermostMethodFrame(term.modalContent(), services);
          if (mf != null) {
             // Find call node
@@ -1781,7 +1781,7 @@ public final class SymbolicExecutionUtil {
                                                              Node node,
                                                              boolean simplify,
                                                              boolean improveReadability) throws ProofInputException {
-      final Services services = node.proof().getServices();
+      final Services services = node.getServices();
       // Make sure that a computation is possible
       if (!(parent.getAppliedRuleApp() instanceof ContractRuleApp)) {
          throw new ProofInputException("Only ContractRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
@@ -1807,7 +1807,7 @@ public final class SymbolicExecutionUtil {
       else {
          // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
          // Find Term to extract implications from.
-         ContractPostOrExcPostExceptionVariableResult search = searchContractPostOrExcPostExceptionVariable(node, node.proof().getServices());
+         ContractPostOrExcPostExceptionVariableResult search = searchContractPostOrExcPostExceptionVariable(node, node.getServices());
          
          List<Term> normalConditions = new LinkedList<Term>();
          List<Term> exceptinalConditions = new LinkedList<Term>();
@@ -1841,7 +1841,7 @@ public final class SymbolicExecutionUtil {
             if (!(callerNotNullTerm.sub(0).sub(0).op() instanceof ProgramVariable)) {
                throw new ProofInputException("ProgramVariable expected, implementation of UseOperationContractRule might have changed!");
             }
-            if (!isNullSort(callerNotNullTerm.sub(0).sub(1).sort(), parent.proof().getServices())) {
+            if (!isNullSort(callerNotNullTerm.sub(0).sub(1).sort(), parent.getServices())) {
                throw new ProofInputException("Null expected, implementation of UseOperationContractRule might have changed!");
             }
             result = services.getTermBuilder().and(callerNotNullTerm, result);
@@ -2155,7 +2155,7 @@ public final class SymbolicExecutionUtil {
       if (childIndex == 1 || childIndex == 2) { // Body Preserves Invariant or Use Case
          LoopInvariantBuiltInRuleApp app = (LoopInvariantBuiltInRuleApp)parent.getAppliedRuleApp();
          // Compute invariant (last antecedent formula of the use branch)
-         Services services = parent.proof().getServices();
+         Services services = parent.getServices();
          Node useNode = parent.child(2);
          Semisequent antecedent = useNode.sequent().antecedent();
          Term invTerm = antecedent.get(antecedent.size() - 1).formula();
@@ -2243,11 +2243,11 @@ public final class SymbolicExecutionUtil {
       // Make sure that branch is supported
       int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
       if (childIndex == 0) { // Validity branch
-         return parent.proof().getServices().getTermBuilder().tt();
+         return parent.getServices().getTermBuilder().tt();
       }
       else if (childIndex == 2) { // Usage branch
          // Compute invariant (last antecedent formula of the use branch)
-         Services services = parent.proof().getServices();
+         Services services = parent.getServices();
          Semisequent antecedent = node.sequent().antecedent();
          Term condition = antecedent.get(antecedent.size() - 1).formula();
          if (simplify) {
@@ -2375,7 +2375,7 @@ public final class SymbolicExecutionUtil {
          throw new ProofInputException("Only TacletApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
       }
       TacletApp app = (TacletApp)parent.getAppliedRuleApp();
-      Services services = node.proof().getServices();
+      Services services = node.getServices();
       // List new sequent formulas in the child node.
       ImmutableList<Term> newAntecedents = listNewSemisequentTerms(parent.sequent().antecedent(), node.sequent().antecedent());
       ImmutableList<Term> newSuccedents = listNewSemisequentTerms(parent.sequent().succedent(), node.sequent().succedent());
@@ -2860,7 +2860,7 @@ public final class SymbolicExecutionUtil {
                                                               Term newSuccedent,
                                                               ImmutableList<Term> updates,
                                                               boolean addResultLabel) {
-      final TermBuilder tb = node.proof().getServices().getTermBuilder();
+      final TermBuilder tb = node.getServices().getTermBuilder();
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve;
       if (updates != null) {
@@ -2881,7 +2881,7 @@ public final class SymbolicExecutionUtil {
                               collectSkolemConstants(originalSequentWithoutMethodFrame, tb.parallel(updates));
       originalSequentWithoutMethodFrame = removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
       if (addResultLabel) {
-         TermFactory factory = node.proof().getServices().getTermFactory();
+         TermFactory factory = node.getServices().getTermFactory();
          Set<Term> skolemInNewTerm = collectSkolemConstantsNonRecursive(newSuccedentToProve);
          originalSequentWithoutMethodFrame = labelSkolemConstants(originalSequentWithoutMethodFrame, skolemInNewTerm, factory);
          newSuccedentToProve = addLabelRecursiveToNonSkolem(factory, newSuccedentToProve, RESULT_LABEL);
@@ -3334,7 +3334,7 @@ public final class SymbolicExecutionUtil {
                                            boolean simplify,
                                            boolean improveReadability) throws ProofInputException {
       if (childNode != null) {
-         final Services services = childNode.proof().getServices();
+         final Services services = childNode.getServices();
          Term pathCondition = services.getTermBuilder().tt();
          while (childNode != null && childNode != parentNode) {
             Node parent = childNode.parent();

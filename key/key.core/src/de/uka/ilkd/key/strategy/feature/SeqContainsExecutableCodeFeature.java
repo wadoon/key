@@ -43,8 +43,8 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
         new SeqContainsExecutableCodeFeature ( true );
 
     protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
-        return containsExec ( goal.sequent ().succedent ().iterator (), goal.proof().getServices() )
-            || containsExec ( goal.sequent ().antecedent().iterator (), goal.proof().getServices() );
+        return containsExec ( goal.sequent ().succedent ().iterator (), goal.getServices() )
+            || containsExec ( goal.sequent ().antecedent().iterator (), goal.getServices() );
     }
 
     private boolean containsExec(Iterator<SequentFormula<Term>> it, Services services) {

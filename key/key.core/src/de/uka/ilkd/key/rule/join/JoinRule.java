@@ -723,7 +723,7 @@ public class JoinRule implements BuiltInRule {
     public static ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> findPotentialJoinPartners(
             Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio, Node start) {
 
-        Services services = goal.proof().getServices();
+        Services services = goal.getServices();
 
         ImmutableList<Goal> allGoals =
                 services.getProof().getSubtreeGoals(start);

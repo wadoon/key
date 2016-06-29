@@ -554,7 +554,7 @@ public class TacletMenu extends JMenu {
 	            list.add(new SMTProblem(goal));
 	           	launcher.launch(solverUnion.getTypes(),
 			            list,
-			            goal.proof().getServices());
+			            goal.getServices());
 
 
         	}},"SMTRunner");

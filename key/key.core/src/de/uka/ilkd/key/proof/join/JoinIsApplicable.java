@@ -100,8 +100,8 @@ public class JoinIsApplicable {
             PosInOccurrence<Term, SequentFormula<Term>> pio, Goal g2) {
         Term referenceFormula = pio.subTerm();
 
-        assert g1.proof().getServices() == g2.proof().getServices();
-        TermBuilder tb = g1.proof().getServices().getTermBuilder();
+        assert g1.getServices() == g2.getServices();
+        TermBuilder tb = g1.getServices().getTermBuilder();
 
         Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula
                 .sub(0) : tb.skip();

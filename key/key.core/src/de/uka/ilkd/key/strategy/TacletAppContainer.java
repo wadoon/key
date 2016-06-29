@@ -213,7 +213,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                 ImmutableList<RuleAppContainer> targetList,
                                                 Goal p_goal,
                                                 RuleAppCost cost) {
-        if ( !sufficientlyCompleteApp ( app, p_goal.proof().getServices() ) ) return targetList;
+        if ( !sufficientlyCompleteApp ( app, p_goal.getServices() ) ) return targetList;
         return targetList.prepend ( TacletAppContainer
                                     .createContainer ( app,
                                                        getPosInOccurrence ( p_goal ),
@@ -352,7 +352,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         final PosInOccurrence<Term, SequentFormula<Term>> pio = getPosInOccurrence ( p_goal );
         if ( !strategy.isApprovedApp(app, pio, p_goal) ) return null;
 
-        Services services = p_goal.proof().getServices();
+        Services services = p_goal.getServices();
         if ( pio != null ) {
             app = app.setPosInOccurrence ( pio, services );
             if ( app == null ) return null;

@@ -971,12 +971,12 @@ public abstract class AbstractUpdateExtractor {
                      value = originalTarget;
                   }
                }
-               else if (SymbolicExecutionUtil.isSelect(goal.proof().getServices(), value)) {
+               else if (SymbolicExecutionUtil.isSelect(goal.getServices(), value)) {
                   Term object = value.sub(1);
                   if (object.op() instanceof LocationVariable) {
                      Term originalTarget = preUpdateMap.get(object.op());
                      if (originalTarget != null) {
-                        value = goal.proof().getServices().getTermBuilder().select(value.sort(), value.sub(0), originalTarget, value.sub(2));
+                        value = goal.getServices().getTermBuilder().select(value.sort(), value.sub(0), originalTarget, value.sub(2));
                      }
                   }
                }

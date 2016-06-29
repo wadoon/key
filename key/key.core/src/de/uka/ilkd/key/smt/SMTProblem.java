@@ -172,7 +172,7 @@ public class SMTProblem {
 
                 ImmutableList<Term> ante = ImmutableSLList.nil();
 
-                final TermBuilder tb = goal.proof().getServices().getTermBuilder();
+                final TermBuilder tb = goal.getServices().getTermBuilder();
                 ante = ante.append(tb.tt());
                 for (SequentFormula<Term> f : s.antecedent()) {
                         ante = ante.append(f.formula());

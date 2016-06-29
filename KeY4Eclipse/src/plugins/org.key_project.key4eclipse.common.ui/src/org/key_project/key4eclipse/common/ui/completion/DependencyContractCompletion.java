@@ -76,7 +76,7 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
          super(app, goal, forced);
          cApp = (UseDependencyContractApp) app;
 
-         services = goal.proof().getServices();
+         services = goal.getServices();
 
          cApp = cApp.tryToInstantiateContract(services);
          

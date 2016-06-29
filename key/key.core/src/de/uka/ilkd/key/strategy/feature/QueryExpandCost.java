@@ -80,7 +80,7 @@ public class QueryExpandCost implements Feature {
     
 	@Override
 	public RuleAppCost compute(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
-		final Services services = goal.proof().getServices();
+		final Services services = goal.getServices();
 		final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
 		final Term t = pos.subTerm();
 

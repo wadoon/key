@@ -52,7 +52,7 @@ public class BuiltInRuleAppIndex {
         for (BuiltInRule builtInRule : index.rules()) {
             BuiltInRule bir = builtInRule;
             if (bir.isApplicable(goal, pos)) {
-                IBuiltInRuleApp app = bir.createApp(pos, goal.proof().getServices());
+                IBuiltInRuleApp app = bir.createApp(pos, goal.getServices());
                 result = result.prepend(app);
             }
         }
@@ -87,7 +87,7 @@ public class BuiltInRuleAppIndex {
 					  NewRuleListener listener ) {
         for (BuiltInRule builtInRule : index.rules()) {
             if(builtInRule.isApplicable(goal, null)) {
-                IBuiltInRuleApp app = builtInRule.createApp( null, goal.proof().getServices() );                            
+                IBuiltInRuleApp app = builtInRule.createApp( null, goal.getServices() );                            
                 listener.ruleAdded ( app, null );
             }
             
@@ -122,7 +122,7 @@ public class BuiltInRuleAppIndex {
         if(rule.isApplicableOnSubTerms()) {
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
-            IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );
+            IBuiltInRuleApp app = rule.createApp( pos, goal.getServices() );
             listener.ruleAdded ( app, pos );
         }
     }
@@ -133,7 +133,7 @@ public class BuiltInRuleAppIndex {
                                           PosInOccurrence<Term, SequentFormula<Term>> pos,
                                           NewRuleListener listener ) {
         if (rule.isApplicable ( goal, pos ) ) {
-            IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );                            
+            IBuiltInRuleApp app = rule.createApp( pos, goal.getServices() );                            
             listener.ruleAdded ( app, pos );
         }
         for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {

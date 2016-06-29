@@ -252,7 +252,7 @@ public class BlockContractRule implements BuiltInRule {
             selfOrParentNode = selfOrParentNode.parent();
         }
 
-        Services services = goal.proof().getServices();
+        Services services = goal.getServices();
         Proof proof = goal.proof();
         ProofOblInput po = services.getSpecificationRepository().getProofOblInput(proof);
         if (po instanceof SymbolicExecutionPO) {
@@ -279,12 +279,12 @@ public class BlockContractRule implements BuiltInRule {
             return false;
         }
         final Instantiation instantiation =
-                instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+                instantiate(occurrence.subTerm(), goal, goal.getServices());
         if (instantiation == null) {
             return false;
         }
         final ImmutableSet<BlockContract> contracts =
-                getApplicableContracts(instantiation, goal, goal.proof().getServices());
+                getApplicableContracts(instantiation, goal, goal.getServices());
         return !contracts.isEmpty() && !contracts.iterator().next().hasJoinProcedure();
     }
 

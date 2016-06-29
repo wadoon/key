@@ -622,7 +622,7 @@ public class JoinRuleUtils {
     public static LocationVariable getBranchUniqueLocVar(LocationVariable var,
             Node startLeaf) {
 
-        Services services = startLeaf.proof().getServices();
+        Services services = startLeaf.getServices();
 
         // Find the node where the variable was introduced
         Node intrNode = getIntroducingNodeforLocVar(var, startLeaf);

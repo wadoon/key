@@ -391,7 +391,7 @@ public final class ProblemInitializer {
             }
         } else if(term.modalContent() != null && !term.modalContent().isEmpty()) {
             final ProgramElement pe = term.modalContent().program();
-            final Services serv = rootGoal.proof().getServices();
+            final Services serv = rootGoal.getServices();
             final ImmutableSet<ProgramVariable> freeProgVars
                 = MiscTools.getLocalIns(pe, serv)
                            .union(MiscTools.getLocalOuts(pe, serv));

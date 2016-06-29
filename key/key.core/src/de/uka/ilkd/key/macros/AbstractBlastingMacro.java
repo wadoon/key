@@ -60,7 +60,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
     
     protected void addInvariantFormula(Goal goal) {
-       Sort nullSort = goal.proof().getServices().getTheories().getHeapLDT().getNull().sort();
+       Sort nullSort = goal.getServices().getTheories().getHeapLDT().getNull().sort();
 
        SortCollector sortCollector = new SortCollector();
 
@@ -70,7 +70,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
        Set<Sort> sorts = sortCollector.getSorts();
        sorts.remove(nullSort);
-       List<SequentFormula<Term>> formulae =  createFormulae(goal.proof().getServices(), sorts);
+       List<SequentFormula<Term>> formulae =  createFormulae(goal.getServices(), sorts);
        for(SequentFormula<Term> sf : formulae){
            Sequent s = goal.sequent();
            Semisequent antecedent = s.antecedent();

@@ -78,7 +78,7 @@ public class TriggeredInstantiations implements TermGenerator {
     public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         if (app instanceof TacletApp) {
 
-            final Services services = goal.proof().getServices();
+            final Services services = goal.getServices();
             final TacletApp tapp = (TacletApp) app;
             final Taclet taclet = tapp.taclet();
 

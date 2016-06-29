@@ -301,7 +301,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         if (inv != null) {
             return this;
         }
-        final Services services = goal.proof().getServices();
+        final Services services = goal.getServices();
         LoopInvariant inv = retrieveLoopInvariantFromSpecification(services);
         Modality m = (Modality)programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 

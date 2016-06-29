@@ -200,7 +200,7 @@ public class DelayedCutProcessor implements Runnable {
         };
 
         ImmutableList<NoPosTacletApp> apps = goal.ruleAppIndex().getFindTaclet(
-                filter, pio, goal.proof().getServices());
+                filter, pio, goal.getServices());
         assert apps.size() == 1;
         NoPosTacletApp app = apps.head();
 

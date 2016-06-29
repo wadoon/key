@@ -24,10 +24,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.SingletonIterator;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -81,7 +79,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     private void ensureQueueExists() {
         if ( queue != null ) return;
 
-        if ( getGoal () == null ) {
+        if ( goal == null ) {
             clearCache ();
             return;
         }
@@ -94,9 +92,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         // <code>FocussedRuleApplicationManager</code>) the rule index
         // reports its contents to the rule manager of the goal, which is not
         // necessarily this object
-        getGoal ().ruleAppIndex ()
-                  .reportAutomatedRuleApps ( getGoal ().getRuleAppManager (),
-                                             getServices () );
+        goal.ruleAppIndex ()
+                  .reportAutomatedRuleApps ( goal.getRuleAppManager (),
+                                             goal.getServices () );
         //        printQueue(queue);
     }
 
@@ -117,7 +115,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         
         final Iterator<RuleAppContainer> iterator = 
                 new SingletonIterator<RuleAppContainer>(RuleAppContainer.createAppContainer
-        	           ( rule, pos, getGoal (), getStrategy () ) );
+        	           ( rule, pos, goal, getStrategy () ) );
         ensureQueueExists();
         push ( iterator,  PRIMARY_QUEUE );
     }
@@ -134,7 +132,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
 
         final ImmutableList<RuleAppContainer> containers = 
-                RuleAppContainer.createAppContainers( rules, pos, getGoal (), getStrategy () );        
+                RuleAppContainer.createAppContainers( rules, pos, goal, getStrategy () );        
         ensureQueueExists();        
         for (RuleAppContainer rac : containers) {
             push ( new SingletonIterator<RuleAppContainer>(rac),  PRIMARY_QUEUE );
@@ -212,7 +210,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     private void ensureNextRuleAppExists () {
         ensureQueueExists ();
 
-        final long currentTime = getGoal ().getTime ();
+        final long currentTime = goal.getTime ();
         if ( currentTime != nextRuleTime ) {
             clearNextRuleApp ();
             nextRuleTime = currentTime;
@@ -220,7 +218,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         
         if ( nextRuleApp != null ) return;
         
-        final RuleAppIndex index = getGoal ().ruleAppIndex ();
+        final RuleAppIndex index = goal.ruleAppIndex ();
         index.fillCache ();
         
 //        printQueue(queue);
@@ -248,7 +246,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             final RuleAppContainer c = getMinRuleApp ( secondaryQueueUsed );
 //            printContainer ( "considering rule ", c );
 
-            nextRuleApp = c.completeRuleApp(getGoal(), getStrategy());
+            nextRuleApp = c.completeRuleApp(goal, getStrategy());
             
             if(nextRuleApp == null && c instanceof BuiltInRuleAppContainer) {
         	//XXX
@@ -318,28 +316,13 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
 
     private void createFurtherRuleApps (RuleAppContainer app, boolean secondary) {
-        push ( app.createFurtherApps ( getGoal (), getStrategy () ).iterator (),
+        push ( app.createFurtherApps ( goal, getStrategy () ).iterator (),
                secondary ? SECONDARY_QUEUE : PRIMARY_QUEUE );
     }
 
     
-    /**
-     * The goal this manager belongs to
-     */
-    private Goal getGoal() {
-        return goal;
-    }
-
-    private Services getServices() {
-	return getProof ().getServices ();
-    }
-
-    private Proof getProof() {
-	return getGoal ().proof ();
-    }
-
     private Strategy getStrategy () {
-    	return getGoal().getGoalStrategy();
+    	return goal.getGoalStrategy();
     }
 
     public AutomatedRuleApplicationManager copy () {

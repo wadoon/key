@@ -88,7 +88,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(contract, symbExecVars,
-                                                 initiatingGoal.proof().getServices());
+                                                 initiatingGoal.getServices());
 
         // symbolic execution under precondition
         final Term symExec =

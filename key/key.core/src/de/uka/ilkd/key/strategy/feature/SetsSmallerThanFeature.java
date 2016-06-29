@@ -55,7 +55,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
         final Term leftTerm = left.toTerm(app, pos, goal);
         final Term rightTerm = right.toTerm(app, pos, goal);
 
-        return origLessThan(leftTerm, rightTerm, goal.proof().getServices().getCaches());
+        return origLessThan(leftTerm, rightTerm, goal.getServices().getCaches());
     }
 
 

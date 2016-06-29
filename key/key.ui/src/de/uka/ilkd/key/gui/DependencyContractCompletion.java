@@ -45,7 +45,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
             boolean forced) {
         UseDependencyContractApp cApp = (UseDependencyContractApp) app;
 
-        Services services = goal.proof().getServices();
+        Services services = goal.getServices();
 
         cApp = cApp.tryToInstantiateContract(services);
 

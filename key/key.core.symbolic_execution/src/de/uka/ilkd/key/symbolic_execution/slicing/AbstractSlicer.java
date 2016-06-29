@@ -55,7 +55,7 @@ public abstract class AbstractSlicer {
     * @return The computed slice.
     */
    public ImmutableArray<Node> slice(Node seedNode, Term term, ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
-      return slice(seedNode, toLocation(seedNode.proof().getServices(), term), sec);
+      return slice(seedNode, toLocation(seedNode.getServices(), term), sec);
    }
 
    /**
@@ -70,7 +70,7 @@ public abstract class AbstractSlicer {
       PosInOccurrence<Term, SequentFormula<Term>> pio = seedNode.getAppliedRuleApp().posInOccurrence();
       Term topLevel = pio.sequentFormula().formula();
       Term modalityTerm = TermBuilder.goBelowUpdates(topLevel);
-      Services services = seedNode.proof().getServices();
+      Services services = seedNode.getServices();
       ExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.modalContent(), services);
       ReferencePrefix thisReference = ec != null ? ec.getRuntimeInstance() : null;
       // Perform slicing
@@ -197,7 +197,7 @@ public abstract class AbstractSlicer {
       Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(topLevel);
       Term modalityTerm = pair.second;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
-      Services services = node.proof().getServices();
+      Services services = node.getServices();
       HeapLDT heapLDT = services.getTheories().getHeapLDT();
       if (label != null) {
          // Solve this reference

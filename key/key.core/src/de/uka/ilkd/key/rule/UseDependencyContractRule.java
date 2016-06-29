@@ -403,7 +403,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 	//heap term of observer must be store-term (or anon, create,
 	//memset, ...)
-	final Services services = goal.proof().getServices();
+	final Services services = goal.getServices();
 	final IObserverFunction target = (IObserverFunction) focus.op();
 	//final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
 	boolean hasRawSteps = false;

@@ -32,7 +32,7 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
 
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
-        Services services = goal.proof().getServices();
+        Services services = goal.getServices();
 
         if (forced) {
             app = app.forceInstantiate(goal);

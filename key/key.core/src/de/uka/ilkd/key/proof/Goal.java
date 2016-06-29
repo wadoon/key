@@ -28,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -65,7 +66,8 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
 public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Sequent, NoPosTacletApp>  {
 
     private Node node;
-
+    
+    
     /** all possible rule applications at this node are managed with this index */
     private RuleAppIndex ruleAppIndex;
 
@@ -291,7 +293,16 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      */
     @Override
     public Proof proof() {
-        return node().proof();
+        return node.proof();
+    }
+    
+    
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#proof()
+     */
+    @Override
+    public Services getServices() {
+        return node.proof().getServices();
     }
 
     /* (non-Javadoc)
@@ -299,7 +310,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      */
     @Override
     public Sequent sequent() {
-	return node().sequent();
+	return node.sequent();
     }
 
     /* (non-Javadoc)
@@ -397,7 +408,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      */
     @Override
     public void addPartialInstantiatedRuleApp(NoPosTacletApp app) {
-	node().addNoPosTacletApp(app);
+	node.addNoPosTacletApp(app);
 	ruleAppIndex.addNoPosTacletApp(app);
     }
 
@@ -413,7 +424,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
        NoPosTacletApp tacletApp =
              NoPosTacletApp.createFixedNoPosTacletApp(rule,
                    insts,
-                   proof().getServices());
+                   getServices());
        if (tacletApp != null) {
           addPartialInstantiatedRuleApp(tacletApp);
           if (proof().getInitConfig() != null) { // do not break everything
@@ -447,7 +458,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      */
     @Override
     public void addProgramVariable(ProgramVariable pv) {
-       proof().getNamespaces().programVariables().addSafely(pv);
+       getServices().getNamespaces().programVariables().addSafely(pv);
 	node.setGlobalProgVars(getGlobalProgVars().add(pv));
     }
 
@@ -457,7 +468,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
 	while (it.hasNext()) {
 	    s = s.add((ProgramVariable)it.next());
 	}
-        node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
+        node.setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
         proof().getNamespaces().programVariables().set(s);
         setGlobalProgVars(s);
     }
@@ -506,7 +517,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
     public void addAppliedRuleApp(RuleApp app) {
 	// Last app first makes inserting and searching faster
 	appliedRuleApps = appliedRuleApps.prepend(app);
-	node().setAppliedRuleApp(app);
+	node.setAppliedRuleApp(app);
     }
 
     /**
@@ -576,7 +587,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
     }
 
     void pruneToParent(){
-            setNode(node().parent());
+            setNode(node.parent());
             removeLastAppliedRuleApp();
     }
 
@@ -621,7 +632,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
         de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
                 (new de.uka.ilkd.key.pp.ProgramPrinter(null),
                         new NotationInfo(),
-                        proof().getServices()));
+                        getServices()));
         lp.printSequent(node.sequent());
 	return lp.toString();
     }

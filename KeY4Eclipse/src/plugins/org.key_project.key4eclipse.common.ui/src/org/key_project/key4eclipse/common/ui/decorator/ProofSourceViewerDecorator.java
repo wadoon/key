@@ -198,7 +198,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          filter = new IdentitySequentPrintFilter(node.sequent());
          printer = new LogicPrinter(new ProgramPrinter(null), 
                                     notationInfo, 
-                                    node.proof().getServices());
+                                    node.getServices());
          text = computeText(notationInfo, node, filter, printer);
       }
       else {
@@ -315,7 +315,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       String s = printer.toString();
       RuleApp app = node.getAppliedRuleApp();
       s += "\nNode Nr " + node.serialNr() + "\n";
-      s += ruleToString(node.proof().getServices(), notationInfo, app, true);
+      s += ruleToString(node.getServices(), notationInfo, app, true);
       return s;
    }
    

@@ -50,10 +50,10 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
          topTerms.add(sf.formula());
       }
       // Compute equality terms
-      HeapLDT heapLDT = goal.node().proof().getServices().getTheories().getHeapLDT();
+      HeapLDT heapLDT = goal.node().getServices().getTheories().getHeapLDT();
       Set<Term> equalityTerms = new LinkedHashSet<Term>();
       for (SequentFormula<Term> sf : sequent) {
-         collectEqualityTerms(sf, equalityTerms, topTerms, heapLDT, goal.node().proof().getServices());
+         collectEqualityTerms(sf, equalityTerms, topTerms, heapLDT, goal.node().getServices());
       }
       return equalityTerms.iterator();
    }

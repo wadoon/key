@@ -62,7 +62,7 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         final Term dividendT = dividend.toTerm ( app, pos, goal );
         final Term divisorT = divisor.toTerm ( app, pos, goal );
         
-        final Services services = goal.proof().getServices();
+        final Services services = goal.getServices();
         final Monomial mDividend = Monomial.create ( dividendT, services );
         final Monomial mDivisor = Monomial.create ( divisorT, services );
         

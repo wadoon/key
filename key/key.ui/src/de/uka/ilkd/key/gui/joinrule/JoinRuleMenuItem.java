@@ -52,7 +52,7 @@ public class JoinRuleMenuItem extends JMenuItem {
      */
     public JoinRuleMenuItem(final Goal goal, final PosInOccurrence<Term, SequentFormula<Term>> pio,
             final KeYMediator mediator) {
-        final Services services = goal.proof().getServices();
+        final Services services = goal.getServices();
 
         this.setText(toString());
         this.setAction(new AbstractAction(toString()) {

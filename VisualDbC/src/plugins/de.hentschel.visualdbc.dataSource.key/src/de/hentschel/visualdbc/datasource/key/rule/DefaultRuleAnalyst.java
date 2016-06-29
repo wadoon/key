@@ -50,7 +50,7 @@ public class DefaultRuleAnalyst implements IRuleAnalyst {
    @Override
    public LinkedHashSet<IDSProvableReference> getReferences(KeyConnection connection, Services services, Node node) throws DSException {
       LinkedHashSet<IDSProvableReference> result = new LinkedHashSet<IDSProvableReference>();
-      LinkedHashSet<IProofReference<?>> references = ProofReferenceUtil.computeProofReferences(node, node.proof().getServices());
+      LinkedHashSet<IProofReference<?>> references = ProofReferenceUtil.computeProofReferences(node, node.getServices());
       for (IProofReference<?> reference : references) {
          if (IProofReference.INLINE_METHOD.equals(reference.getKind())) {
             Assert.isTrue(reference.getTarget() instanceof IProgramMethod);

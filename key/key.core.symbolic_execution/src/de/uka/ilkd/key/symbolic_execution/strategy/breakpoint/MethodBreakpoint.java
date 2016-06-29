@@ -152,7 +152,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
    private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp){
       Term term = ruleApp.posInOccurrence().subTerm();
       term = TermBuilder.goBelowUpdates(term);
-      MethodFrame mf = JavaTools.getInnermostMethodFrame(term.modalContent(), node.proof().getServices());
+      MethodFrame mf = JavaTools.getInnermostMethodFrame(term.modalContent(), node.getServices());
       return ObjectUtil.equals(getPm(), mf.getProgramMethod());
    }
 

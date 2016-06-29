@@ -76,7 +76,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
     
     private boolean distinguishablePathConditionsRequirement() {
-        final Services services = joinNode.proof().getServices();
+        final Services services = joinNode.getServices();
 
         // NOTE: Requiring distinguishable path conditions for the abstraction
         // procedures here is an intermediate construction: JoinRule returns
@@ -122,7 +122,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         
         joinPartnerStates = ImmutableSLList.nil();
         for (Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
-            final Services services = joinPartner.first.proof().getServices();
+            final Services services = joinPartner.first.getServices();
             
             Triple<Term, Term, Term> partnerSEState =
                   sequentToSETriple(joinPartner.first.node(), joinPartner.second, services);
@@ -146,7 +146,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
 	public void setJoinNode(Node joinNode) {
 		this.joinNode = joinNode;
-		this.thisSEState = JoinRuleUtils.sequentToSETriple(joinNode, super.pio, joinNode.proof().getServices());
+		this.thisSEState = JoinRuleUtils.sequentToSETriple(joinNode, super.pio, joinNode.getServices());
 	}
 	
 	public void setDistinguishingFormula(Term distForm) {

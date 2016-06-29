@@ -82,7 +82,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       /**
        * The services in use.
        */
-      private Services services = getGoal().proof().getServices();
+      private Services services = getGoal().getServices();
       /**
        * The heaps this object is dealing with.
        */

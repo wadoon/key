@@ -611,7 +611,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 	//instantiation must succeed
 	final Instantiation inst = instantiate(pio.subTerm(),
-		                               goal.proof().getServices());
+		                               goal.getServices());
 	if(inst == null) {
 	    return false;
 	}
@@ -623,7 +623,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         //there must be applicable contracts for the operation
         final ImmutableSet<FunctionalOperationContract> contracts
-                = getApplicableContracts(goal.proof().getServices(),
+                = getApplicableContracts(goal.getServices(),
                 	                 inst.pm,
                 	                 inst.staticType,
                 	                 inst.mod);
@@ -666,7 +666,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         assert contract.getTarget().equals(inst.pm);
 
         final List<LocationVariable> heapContext =
-                HeapContext.getModHeaps(goal.proof().getServices(), inst.transaction);
+                HeapContext.getModHeaps(goal.getServices(), inst.transaction);
 
 	//prepare heapBefore_method
         Map<LocationVariable,LocationVariable> atPreVars =

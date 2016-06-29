@@ -69,7 +69,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
                                          Map<Term, Term> vsMap,
                                          ImmutableList<Goal> symbExecGoals,
                                          Goal initGoal) {
-        Services services = initGoal.proof().getServices();
+        Services services = initGoal.getServices();
         final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         final InfFlowProgVarRenamer renamer =
                         new InfFlowProgVarRenamer(goalFormulas, vsMap,
@@ -96,7 +96,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
     }
 
     private static Term buildFormulaFromGoal(Goal symbExecGoal) {
-        final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
+        final TermBuilder tb = symbExecGoal.getServices().getTermBuilder();
         Term result = tb.tt();
         for (final SequentFormula<Term> f : symbExecGoal.sequent().antecedent()) {
             result = tb.and(result, f.formula());

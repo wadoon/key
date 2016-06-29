@@ -49,6 +49,6 @@ public class InstantiationCost implements Feature {
         final Term instance = varInst.toTerm ( app, pos, goal );
 
         return Instantiation.computeCost ( instance, formula, goal.sequent (), 
-                goal.proof().getServices() );
+                goal.getServices() );
 	}
 }

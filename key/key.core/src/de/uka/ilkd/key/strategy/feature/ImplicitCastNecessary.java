@@ -39,7 +39,7 @@ public class ImplicitCastNecessary extends BinaryFeature {
         final Sort maxSort =
             TermHelper.getMaxSort ( pos.up ().subTerm (), 
         	    		    subPos, 
-        	    		    goal.proof().getServices() );
+        	    		    goal.getServices() );
         return
           projection.toTerm ( app, pos, goal ).sort ().extendsTrans ( maxSort );
     }

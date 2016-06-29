@@ -72,7 +72,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         final ClauseCollector m2 = new ClauseCollector ();
         m2.collect ( rightTerm );
 
-        final boolean res = lessThan ( m1.getResult(), m2.getResult(), goal.proof().getServices().getCaches() );
+        final boolean res = lessThan ( m1.getResult(), m2.getResult(), goal.getServices().getCaches() );
         
         focus = null;
         services = null;

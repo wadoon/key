@@ -27,6 +27,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -143,6 +144,10 @@ public class Node  {
 	return proof;
     }
 
+    public Services getServices() {
+        return proof.getServices();
+    }
+    
     public void setAppliedRuleApp(RuleApp ruleApp) {
         this.nodeInfo.updateNoteInfo();
         this.appliedRuleApp = ruleApp;

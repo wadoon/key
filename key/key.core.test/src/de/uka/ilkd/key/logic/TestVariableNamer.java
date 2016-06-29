@@ -153,7 +153,7 @@ public class TestVariableNamer extends TestCase {
 						        false);
     	Statement statement = new PostIncrement(containedVar);
 	app = (NoPosTacletApp) app.addCheckedInstantiation(sv, statement, 
-                goal.proof().getServices(), false);
+                goal.getServices(), false);
 
     	goal.ruleAppIndex().tacletIndex().add(app);
     }

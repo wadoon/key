@@ -72,7 +72,7 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
 
     @Override
     public String toString() {
-        final Services services = getCorrespondingNode().proof().getServices();
+        final Services services = getCorrespondingNode().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
                 + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services))

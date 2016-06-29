@@ -53,7 +53,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
         
         final boolean res =
             lessThan ( collectAtoms ( left.toTerm ( app, pos, goal ) ),
-                       collectAtoms ( right.toTerm ( app, pos, goal ) ), goal.proof().getServices().getCaches() );
+                       collectAtoms ( right.toTerm ( app, pos, goal ) ), goal.getServices().getCaches() );
         
         setCurrentGoal ( null );
         

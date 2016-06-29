@@ -70,7 +70,7 @@ public class SWTBotNodePropertySectionTest extends AbstractSWTBotKeYEditorProper
             assertTrue(tabs.hasTabItem("Node"));
             assertTrue(tabs.selectTabItem("Node"));
             assertEquals(validate(ProofTreeLabelProvider.getNodeText(node)), propertiesView.bot().text(0).getText());
-            assertEquals(validate(ProofSourceViewerDecorator.ruleToString(node.proof().getServices(), SymbolicExecutionUtil.createNotationInfo(node), node.getAppliedRuleApp(), false)), propertiesView.bot().text(1).getText());
+            assertEquals(validate(ProofSourceViewerDecorator.ruleToString(node.getServices(), SymbolicExecutionUtil.createNotationInfo(node), node.getAppliedRuleApp(), false)), propertiesView.bot().text(1).getText());
             assertEquals(node.getNodeInfo().getInteractiveRuleApplication(), propertiesView.bot().checkBox(0).isChecked());
             assertEquals(node.isClosed(), propertiesView.bot().checkBox(1).isChecked());
             assertEquals(validate(node.getNodeInfo().getFirstStatementString()), propertiesView.bot().text(2).getText());

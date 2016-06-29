@@ -6,6 +6,7 @@ import org.key_project.common.core.logic.op.CCProgramVariable;
 import org.key_project.common.core.logic.visitors.CCTermVisitor;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -122,6 +123,12 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      */
     ImmutableList<Goal> split(int n);
 
+    /** 
+     * applies the provided rule application to this goal 
+     * 
+     * @param ruleApp the {@link RuleApp} to apply
+     * @return the result of the application
+     */
     ImmutableList<Goal> apply(RuleApp ruleApp);
 
     /** removes a formula at the given position from the sequent
@@ -129,5 +136,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * @param p PosInOccurrence<Term, SequentFormula<Term>> encodes the position
      */
    void removeFormula(PosInOccurrence<T, SequentFormula<T>> p);
+
+    Services getServices();
 
 }

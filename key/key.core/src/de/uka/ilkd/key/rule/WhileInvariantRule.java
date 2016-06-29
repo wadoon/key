@@ -730,7 +730,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (Transformer.inTransformer(pio)) {
             return false;
         }
-        Pair<Term, Term> up = applyUpdates(pio.subTerm(), g.proof().getServices());
+        Pair<Term, Term> up = applyUpdates(pio.subTerm(), g.getServices());
         final Term progPost = up.second;
         if (!checkFocus(progPost)) {
             return false;

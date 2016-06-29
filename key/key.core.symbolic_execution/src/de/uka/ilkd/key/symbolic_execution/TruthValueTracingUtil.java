@@ -173,7 +173,7 @@ public final class TruthValueTracingUtil {
       TruthValueTracingResult result = new TruthValueTracingResult();
       Deque<Map<String, MultiEvaluationResult>> evaluationStack = new LinkedList<Map<String, MultiEvaluationResult>>();
       evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>());
-      evaluateNode(node, useUnicode, usePrettyPrinting, node, termLabelName, evaluationStack, result, node.proof().getServices());
+      evaluateNode(node, useUnicode, usePrettyPrinting, node, termLabelName, evaluationStack, result, node.getServices());
       return result;
    }
 
@@ -1154,7 +1154,7 @@ public final class TruthValueTracingUtil {
             sb.append(" = ");
             sb.append(entry.getValue().evaluate(termLabelName, results));
             sb.append(" :: ");
-            sb.append(entry.getValue().toPrettyString(leafNode.proof().getServices()));
+            sb.append(entry.getValue().toPrettyString(leafNode.getServices()));
          }
          return sb.toString();
       }

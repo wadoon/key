@@ -83,7 +83,7 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
        */
       public Perform(IBuiltInRuleApp app, Goal goal, boolean forced) {
          super(app, goal, forced);
-         services = goal.proof().getServices();
+         services = goal.getServices();
          instantiation = BlockContractRule.instantiate(app.posInOccurrence().subTerm(), goal, getServices());
          contracts = BlockContractRule.getApplicableContracts(instantiation, goal, getServices());
       }

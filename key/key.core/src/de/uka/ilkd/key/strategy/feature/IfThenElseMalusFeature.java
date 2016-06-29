@@ -41,7 +41,7 @@ public class IfThenElseMalusFeature implements Feature {
     public RuleAppCost compute(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         if ( pos == null ) return NumberRuleAppCost.getZeroCost();
 
-        final ServiceCaches caches = goal.proof().getServices().getCaches();
+        final ServiceCaches caches = goal.getServices().getCaches();
         
         RuleAppCost resInt;
         final LRUCache<PosInOccurrence<Term, SequentFormula<Term>>, RuleAppCost> ifThenElseMalusCache = caches.getIfThenElseMalusCache();

@@ -364,7 +364,7 @@ public class SWTBotProofViewTest extends AbstractKeYDebugTargetTestCase {
             IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter(goal.sequent());
             LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null), 
                                        SymbolicExecutionUtil.createNotationInfo(view.getCurrentProof()), 
-                                       goal.proof().getServices());
+                                       goal.getServices());
             //check if source viewer is showing the content correctly
             assertEquals(proofView.bot().styledText().getText(), 
                          ProofSourceViewerDecorator.computeText(SymbolicExecutionUtil.createNotationInfo(view.getCurrentProof()), goal, filter, printer));

@@ -38,7 +38,7 @@ public class HeapGenerator implements TermGenerator {
         LinkedHashSet<Term> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();
         for (SequentFormula<Term> sf : seq) {
-            collectHeaps(sf.formula(), heaps, goal.proof().getServices());
+            collectHeaps(sf.formula(), heaps, goal.getServices());
         }
         return heaps.iterator();
     }

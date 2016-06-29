@@ -88,7 +88,7 @@ public class FunctionalOperationContractCompletion extends AbstractInteractiveRu
        */
       public Perform(IBuiltInRuleApp app, Goal goal, boolean forced) {
          super(app, goal, forced);
-         services = goal.proof().getServices();
+         services = goal.getServices();
          inst = UseOperationContractRule.computeInstantiation(app.posInOccurrence().subTerm(), getServices());
          contracts = UseOperationContractRule.getApplicableContracts(inst, getServices());
       }

@@ -62,7 +62,7 @@ public class SMTCommand extends AbstractCommand {
         SolverLauncher launcher = new SolverLauncher(settings);
         Collection<SMTProblem> probList = new LinkedList<SMTProblem>();
         probList.add(new SMTProblem(goal));
-        launcher.launch(su.getTypes(), probList, goal.proof().getServices());
+        launcher.launch(su.getTypes(), probList, goal.getServices());
 
         for (SMTProblem problem : probList) {
             if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {

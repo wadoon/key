@@ -47,7 +47,7 @@ public class RuleJustificationByAddRules implements RuleJustification{
             LogicPrinter tacPrinter = new LogicPrinter 
                 (new ProgramPrinter(null),                       
                  new NotationInfo(),   
-                 node.proof().getServices(),
+                 node.getServices(),
                  true);      
             tacPrinter.printTaclet((Taclet)(motherTaclet().rule()));
             mother = tacPrinter.toString();

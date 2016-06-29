@@ -106,14 +106,14 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp tryToInstantiate(Goal goal) {
         if(heapContext == null){
-            heapContext = HeapContext.getModHeaps(goal.proof().getServices(), false);
+            heapContext = HeapContext.getModHeaps(goal.getServices(), false);
         }
         if (complete()) {
             return this;
         }
         UseDependencyContractApp app = this;
 
-        final Services services = goal.proof().getServices();
+        final Services services = goal.getServices();
 
         app = tryToInstantiateContract(services);		
 
