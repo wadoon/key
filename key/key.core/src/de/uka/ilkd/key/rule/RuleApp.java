@@ -22,7 +22,6 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.rule.Rule;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -42,10 +41,9 @@ public interface RuleApp {
     /** applies the specified rule at the specified position
      * if all schema variables have been instantiated
      * @param goal the Goal where to apply the rule
-     * @param services the Services encapsulating all java information
      * @return list of new created goals
      */
-    ImmutableList<Goal> execute(Goal goal, Services services);
+    ImmutableList<Goal> execute(Goal goal);
 
     /** returns true if all variables are instantiated
      * @return true if all variables are instantiated

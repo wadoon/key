@@ -19,7 +19,6 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -97,8 +96,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
 
 	@Override
-	public ImmutableList<Goal> apply(Goal goal, Services services,
-	        RuleApp ruleApp) {
+	public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 		if (goal.proof().getInitConfig().getJustifInfo().getJustification(rule) == null) {
 		   goal.proof().getInitConfig().registerRule(rule,
 					new RuleJustification() {

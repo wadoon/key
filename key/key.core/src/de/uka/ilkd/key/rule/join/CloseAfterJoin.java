@@ -93,8 +93,7 @@ public class CloseAfterJoin implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services,
-            final RuleApp ruleApp) throws RuleAbortException {
+    public ImmutableList<Goal> apply(final Goal goal, final RuleApp ruleApp) throws RuleAbortException {
 
         assert ruleApp instanceof CloseAfterJoinRuleBuiltInRuleApp : "Rule app for CloseAfterJoin has to be an instance of CloseAfterJoinRuleBuiltInRuleApp";
 
@@ -120,7 +119,7 @@ public class CloseAfterJoin implements BuiltInRule {
         // node has also been closed, and to remove the mark as linked
         // node if the join node has been pruned.
         final Node joinNodeF = closeApp.getCorrespondingJoinNode();
-        services.getProof().addProofTreeListener(new ProofTreeAdapter() {
+        goal.proof().addProofTreeListener(new ProofTreeAdapter() {
 
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
@@ -147,7 +146,7 @@ public class CloseAfterJoin implements BuiltInRule {
             final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
             ruleIsWeakeningGoal.setBranchLabel(JOINED_NODE_IS_WEAKENING_TITLE);
 
-            final Term isWeakeningForm = getSyntacticWeakeningFormula(services,
+            final Term isWeakeningForm = getSyntacticWeakeningFormula(goal.getServices(),
                     closeApp);
             // Delete previous sequents
             clearSemisequent(ruleIsWeakeningGoal, true);

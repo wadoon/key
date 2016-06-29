@@ -50,10 +50,10 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * the rule is applied on the given goal using the
      * information of rule application. 
      * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
      * @param ruleApp the taclet application that is executed
      */
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+        final Services services = goal.getServices();
         final TermLabelState termLabelState = new TermLabelState();
 
         // Number without the if-goal eventually needed

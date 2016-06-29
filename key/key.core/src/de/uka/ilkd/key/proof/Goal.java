@@ -605,7 +605,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
 
         final Node n = node;
 
-        final ImmutableList<Goal> goalList = ruleApp.execute(this, proof.getServices());
+        final ImmutableList<Goal> goalList = ruleApp.execute(this);
 
         proof.getServices().saveNameRecorder(n);
 

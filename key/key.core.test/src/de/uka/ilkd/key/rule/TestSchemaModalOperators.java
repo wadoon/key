@@ -206,7 +206,7 @@ public class TestSchemaModalOperators extends TestCase {
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
-	ImmutableList<Goal> goals=rApp.execute(goal, services);
+	ImmutableList<Goal> goals=rApp.execute(goal);
 	assertTrue("There should be 1 goal for testSchemaModal1 taclet, was "+goals.size(), goals.size()==1);	
 	Sequent seq=goals.head().sequent();
         Semisequent antec0 = parseTermForSemisequent("\\<{ i--; }\\> i=0");
@@ -240,7 +240,7 @@ public class TestSchemaModalOperators extends TestCase {
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
-	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
+	ImmutableList<Goal> goals=rApp.execute(goal);
 	assertTrue("There should be 1 goal for testSchemaModal2 taclet, was "+goals.size(), goals.size()==1);	
 	Sequent seq=goals.head().sequent();
         Semisequent antec0 = parseTermForSemisequent("i=3");
@@ -270,7 +270,7 @@ public class TestSchemaModalOperators extends TestCase {
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
-	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
+	ImmutableList<Goal> goals=rApp.execute(goal);
 	assertTrue("There should be 3 goals for testSchemaModal3 taclet, was "+goals.size(), goals.size()==3);	
 	Sequent seq0=goals.head().sequent();
 	goals = goals.tail();

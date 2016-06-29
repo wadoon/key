@@ -775,8 +775,9 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
+    public ImmutableList<Goal> apply(Goal goal, final RuleApp ruleApp)
             throws RuleAbortException {
+        final Services services = goal.getServices();
         final TermLabelState termLabelState = new TermLabelState();
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
         LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;

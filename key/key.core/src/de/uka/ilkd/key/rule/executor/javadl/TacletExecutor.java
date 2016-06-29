@@ -54,7 +54,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * {@inheritDoc}
      */
     @Override
-    public abstract ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp);
+    public abstract ImmutableList<Goal> apply(Goal goal, RuleApp tacletApp);
 
 
     /** 

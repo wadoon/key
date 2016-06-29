@@ -606,7 +606,6 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     @Override
     public synchronized ImmutableList<Goal> apply(Goal goal,
-                    Services services,
                     RuleApp ruleApp) {
 
         assert ruleApp instanceof OneStepSimplifierRuleApp :
@@ -618,7 +617,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         Protocol protocol = new Protocol();
 
         // get instantiation
-        final Instantiation inst = computeInstantiation(services,
+        final Instantiation inst = computeInstantiation(goal.getServices(),
                                                         pos,
                                                         goal.sequent(),
                                                         protocol,

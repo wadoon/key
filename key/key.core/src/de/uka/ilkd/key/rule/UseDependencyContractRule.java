@@ -442,11 +442,11 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     @Override
     public ImmutableList<Goal> apply(Goal goal,
-	    			     Services services,
 	    			     RuleApp ruleApp) {
 	//collect information
-	final LocSetLDT locSetLDT = services.getTheories().getLocSetLDT();
-	final PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
+        final Services services = goal.getServices();
+        final LocSetLDT locSetLDT = services.getTheories().getLocSetLDT();
+        final PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
         final Term focus = pio.subTerm();
         final IObserverFunction target = (IObserverFunction) focus.op();
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);

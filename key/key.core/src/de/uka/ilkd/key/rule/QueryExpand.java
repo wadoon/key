@@ -83,8 +83,7 @@ public class QueryExpand implements BuiltInRule {
 
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services,
-            RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
         final PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
         final Term query = pio.subTerm();
@@ -92,6 +91,7 @@ public class QueryExpand implements BuiltInRule {
         // new goal
         ImmutableList<Goal> newGoal = goal.split(1);
         Goal g = newGoal.head();
+        final Services services = goal.getServices();
 
         Pair<Term,Term> queryEval = queryEvalTerm(services, query, null);
 

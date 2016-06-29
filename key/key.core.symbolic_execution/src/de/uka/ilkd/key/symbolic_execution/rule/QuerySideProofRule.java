@@ -169,9 +169,10 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
+   public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) throws RuleAbortException {
       try {
          // Extract required Terms from goal
+         final Services services = goal.getServices();
          PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
          Sequent goalSequent = goal.sequent();
          SequentFormula<Term> equalitySF = pio.sequentFormula();

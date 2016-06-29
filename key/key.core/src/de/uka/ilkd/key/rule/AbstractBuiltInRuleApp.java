@@ -20,7 +20,6 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -70,15 +69,14 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 	/** applies the specified rule at the specified position
      * if all schema variables have been instantiated
      * @param goal the Goal where to apply the rule
-     * @param services the Services encapsulating all java information
      * @return list of new created goals
      */
     @Override
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
+    public ImmutableList<Goal> execute(Goal goal) {
     goal.addAppliedRuleApp(this);
     ImmutableList<Goal> result = null;
     try {
-        result = builtInRule.apply(goal, services, this);
+        result = builtInRule.apply(goal, this);
     } catch (RuleAbortException rae) {
     }
     if (result == null){

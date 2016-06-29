@@ -453,15 +453,15 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services,
-                                     final RuleApp application) throws RuleAbortException {
+    public ImmutableList<Goal> apply(final Goal goal, final RuleApp application) throws RuleAbortException {
         assert application instanceof BlockContractBuiltInRuleApp;
-        return apply(goal, services, (BlockContractBuiltInRuleApp) application);
+        return apply(goal, (BlockContractBuiltInRuleApp) application);
     }
 
-    private ImmutableList<Goal> apply(final Goal goal, final Services services,
+    private ImmutableList<Goal> apply(final Goal goal,
                                       final BlockContractBuiltInRuleApp application)
                                               throws RuleAbortException {
+        final Services services = goal.getServices();
         final TermLabelState termLabelState = new TermLabelState();
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);

@@ -412,16 +412,16 @@ public abstract class TacletApp implements RuleApp {
      * 
      * @param goal
      *            the Goal at which the Taclet is applied
-     * @param services
-     *            the Services encapsulating all java information
      * @return list of new created goals
      */
-    public ImmutableList<Goal> execute(Goal goal, Services services)  {
+    public ImmutableList<Goal> execute(Goal goal)  {
 	if (!complete()) {
 	    throw new IllegalStateException("Tried to apply rule \n" + taclet
 		    + "\nthat is not complete.");
 	}
-	
+
+	final Services services = goal.getServices();
+
 	if (!isExecutable(services)) {
             throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
 	}
@@ -429,7 +429,7 @@ public abstract class TacletApp implements RuleApp {
 	registerSkolemConstants(services);
 	goal.addAppliedRuleApp(this);
 	
-	return taclet().getExecutor().apply(goal, services, this);
+	return taclet().getExecutor().apply(goal, this);
     }
 
     /*
