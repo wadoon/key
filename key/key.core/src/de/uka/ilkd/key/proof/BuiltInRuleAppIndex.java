@@ -103,8 +103,7 @@ public class BuiltInRuleAppIndex {
 					  Goal        goal,
 					  boolean     antec,
 					  NewRuleListener listener ) {
-	final Node                   node = goal.node ();
-	final Sequent                seq  = node.sequent ();
+	final Sequent                seq  = goal.sequent ();
 
         for (Object o : (antec ? seq.antecedent() : seq.succedent())) {
             @SuppressWarnings("unchecked")

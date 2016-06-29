@@ -15,10 +15,13 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.label.ParameterlessTermLabel;
+import org.key_project.common.core.logic.op.Modality;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -91,4 +94,50 @@ public abstract class AbstractProofMacro implements ProofMacro {
         }
         return steps;
     }
+    
+    /**
+     * Returns true iff there is a modality in the sequent of the given node.
+     * 
+     * @param sequent
+     *            {@link Sequent} to check.
+     * @return True iff there is a modality in the sequent of the given node.
+     */
+    protected static boolean hasModality(Sequent sequent) {
+        for (SequentFormula<Term> sequentFormula : sequent) {
+            if (hasModality(sequentFormula.formula())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+  
+    
+    /**
+     * Recursive check for existence of modality.
+     * 
+     * @param term
+     *            The term to check.
+     * @return True iff there is a modality in the sequent of the given term.
+     */
+    protected static boolean hasModality(Term term) {
+        if (term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
+            // ignore self composition terms
+            return false;
+        }
+
+        if (term.op() instanceof Modality) {
+            return true;
+        }
+
+        for (Term sub : term.subs()) {
+            if (hasModality(sub)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
@@ -232,10 +231,14 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
 	}
     }
 
-  
+
+    /** sets the given set of program variables as the new globally known ones
+     * ATTENTION: These variables be in the proof's namespaces
+     * @param s the set of program variables
+     */
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
-        assert node.proof().getNamespaces().contains(names(s)) :
-                    "\""+names(s)+ "\" not found in namespace.";
+        //assert node.proof().getNamespaces().contains(names(s)) :
+        //            "\""+names(s)+ "\" not found in namespace.";
         node.setGlobalProgVars(s);
     }
 
@@ -283,6 +286,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      * @return the current time of this goal (which is just the number of
      * applied rules)
      */
+    @Override
     public long getTime () {
     	return appliedRuleApps().size();
     }
@@ -335,6 +339,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      *
      * @return true iff this goal is linked to another node.
      */
+    @Override
     public boolean isLinked() {
         return this.linkedGoal != null;
     }
@@ -360,7 +365,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      */
     @Override
     public void applySequentChangeInfo(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci) {
-        node().setSequent(sci.sequent());
+        node.setSequent(sci.sequent());
 //VK reminder: now update the index
        	fireSequentChanged(sci);
     }
@@ -422,18 +427,17 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
     @Override
     public void addProgramVariable(ProgramVariable pv) {
        getServices().getNamespaces().programVariables().addSafely(pv);
-	node.setGlobalProgVars(getGlobalProgVars().add(pv));
+       node.setGlobalProgVars(getGlobalProgVars().add(pv));
     }
 
     public void setProgramVariables(Namespace ns) {
-	final Iterator<Named> it=ns.elements().iterator();
-	ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
-	while (it.hasNext()) {
-	    s = s.add((ProgramVariable)it.next());
-	}
-        node.setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
+        final Iterator<Named> it=ns.elements().iterator();
+        ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
+        while (it.hasNext()) {
+            s = s.add((ProgramVariable)it.next());
+        }
+        node.setGlobalProgVars(s);       
         proof().getNamespaces().programVariables().set(s);
-        setGlobalProgVars(s);
     }
 
     /**
@@ -598,14 +602,6 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
                         getServices()));
         lp.printSequent(node.sequent());
         return lp.toString();
-    }
-
-    private <T extends Named> ImmutableSet<Name> names(ImmutableSet<T> set) {
-        ImmutableSet<Name> names = DefaultImmutableSet.<Name>nil();
-        for (T elem : set) {
-            names = names.add(elem.name());
-        }
-        return names;
     }
 
     public <T> T getStrategyInfo(Property<T> property) {

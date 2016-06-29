@@ -37,6 +37,14 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * @return true, if the goal is enabled
      */
     boolean isEnabled();
+    
+    /**
+     * Checks if is this node is linked to another
+     * node (for example due to a join operation).
+     *
+     * @return true iff this goal is linked to another node.
+     */
+    boolean isLinked();
 
     /**
      * Sets the automatic status of this goal.
@@ -107,5 +115,11 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
     * @return the {@link Services}
     */
     Services getServices();
+    
+    /**
+     * @return the current time of this goal (which is just the number of
+     * applied rules)
+     */
+    long getTime ();
 
 }

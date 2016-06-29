@@ -131,7 +131,7 @@ public class TacletAppIndex  {
      */
     TacletAppIndex copyWithTacletIndex(TacletIndex p_tacletIndex) {
         return new TacletAppIndex ( p_tacletIndex, antecIndex, succIndex,
-                                    getGoal (), getSequent (), ruleFilter,
+                                    goal, seq, ruleFilter,
                                     indexCaches, cache );
     }
 
@@ -176,16 +176,16 @@ public class TacletAppIndex  {
     }
 
     private void createAllFromGoal() {
-        this.seq = getNode ().sequent ();
+        this.seq = goal.sequent ();
 
-        antecIndex = new SemisequentTacletAppIndex ( getSequent (), true,
-                                                     getServices (),
+        antecIndex = new SemisequentTacletAppIndex ( seq, true,
+                                                     goal.getServices (),
                                                      tacletIndex (),
                                                      getNewRulePropagator (),
                                                      getRuleFilter (),
                                                      indexCaches );
-        succIndex = new SemisequentTacletAppIndex ( getSequent (), false,
-                                                    getServices (),
+        succIndex = new SemisequentTacletAppIndex ( seq, false,
+                                                    goal.getServices (),
                                                     tacletIndex (),
                                                     getNewRulePropagator (),
                                                     getRuleFilter (),
@@ -193,7 +193,7 @@ public class TacletAppIndex  {
     }
 
     private void ensureIndicesExist () {
-    	Debug.assertFalse ( getGoal () == null,
+    	Debug.assertFalse ( goal == null,
     	                    "TacletAppIndex does not know to which goal it " +
                             "refers" );
 
@@ -208,7 +208,7 @@ public class TacletAppIndex  {
      * like an altered user constraint
      */
     private boolean isUpToDateForGoal() {
-        return getGoal () != null && getSequent() == getNode().sequent();
+        return goal != null && seq == goal.sequent();
     }
 
     private SemisequentTacletAppIndex getIndex(PosInOccurrence<Term, SequentFormula<Term>> pos) {
@@ -356,7 +356,7 @@ public class TacletAppIndex  {
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
     public void sequentChanged ( Goal goal, CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci ) {
-    	if ( sci.getOriginalSequent() != getSequent() )
+    	if ( sci.getOriginalSequent() != seq )
     	    // we are not up to date and have to rebuild everything (lazy)
     	    clearIndexes();
     	else
@@ -366,22 +366,22 @@ public class TacletAppIndex  {
     private void updateIndices(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci) {
         seq = sci.sequent ();
 
-        antecIndex = antecIndex.sequentChanged ( sci, getServices (),
+        antecIndex = antecIndex.sequentChanged ( sci, goal.getServices (),
                                                  tacletIndex (),
                                                  getNewRulePropagator () );
 
-        succIndex = succIndex.sequentChanged ( sci, getServices (),
+        succIndex = succIndex.sequentChanged ( sci, goal.getServices (),
                                                tacletIndex (),
                                                getNewRulePropagator () );
     }
     
     private void updateIndices(final SetRuleFilter newTaclets) {
-        antecIndex = antecIndex.addTaclets ( newTaclets, getSequent (),
-                                             getServices (),
+        antecIndex = antecIndex.addTaclets ( newTaclets, seq,
+                                             goal.getServices (),
                                              tacletIndex (),
                                              getNewRulePropagator () );
-        succIndex = succIndex.addTaclets ( newTaclets, getSequent (),
-                                           getServices (),
+        succIndex = succIndex.addTaclets ( newTaclets, seq,
+                                           goal.getServices (),
                                            tacletIndex (),
                                            getNewRulePropagator () );
     }
@@ -490,26 +490,6 @@ public class TacletAppIndex  {
             l1 = l1.prepend(aL2);
         }
         return l1;
-    }
-
-    private Goal getGoal() {
-        return goal;
-    }
-
-    private Sequent getSequent() {
-        return seq;
-    }
-
-    private Services getServices() {
-        return getProof ().getServices ();
-    }
-
-    private Proof getProof() {
-        return getNode ().proof ();
-    }
-
-    private Node getNode() {
-        return getGoal ().node ();
     }
 
     /**

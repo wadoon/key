@@ -20,31 +20,19 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.logic.label.ParameterlessTermLabel;
-import org.key_project.common.core.logic.op.Modality;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
@@ -204,49 +192,6 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         return difference;
     }
 
-    /**
-     * Returns true iff there is a modality in the sequent of the given node.
-     *
-     * @param node
-     *            Node to check.
-     * @return True iff there is a modality in the sequent of the given node.
-     */
-    private static boolean hasModality(Node node) {
-        Sequent sequent = node.sequent();
-        for (SequentFormula<Term> sequentFormula : sequent) {
-            if (hasModality(sequentFormula.formula())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Recursive check for existence of modality.
-     *
-     * @param term
-     *            The term to check.
-     * @return True iff there is a modality in the sequent of the given term.
-     */
-    private static boolean hasModality(Term term) {
-        if (term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
-            // ignore self composition terms
-            return false;
-        }
-
-        if (term.op() instanceof Modality) {
-            return true;
-        }
-
-        for (Term sub : term.subs()) {
-            if (hasModality(sub)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     /**
      * @param block
@@ -368,7 +313,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
             if (enforceJoin || stoppedGoals.contains(goal)
-                    || !hasModality(goal.node())) {
+                    || !FinishSymbolicExecutionWithSpecJoinsMacro.hasModality(goal.sequent())) {
                 return false;
             }
 

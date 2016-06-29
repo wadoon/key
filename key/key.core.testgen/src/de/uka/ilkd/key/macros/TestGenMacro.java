@@ -6,11 +6,9 @@ import java.util.Set;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.rule.Rule;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -82,7 +80,7 @@ public class TestGenMacro extends StrategyProofMacro {
 
 		@Override
 		public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
-			if (!TestGenMacro.hasModality(goal.node())) {
+			if (!TestGenMacro.hasModality(goal.sequent())) {
 				return false;
 			}
 			if (TestGenStrategy.isUnwindRule(app.rule())) {
@@ -109,33 +107,6 @@ public class TestGenMacro extends StrategyProofMacro {
       }
 	}
 
-	/*
-	 * find a modality term in a node
-	 */
-	private static boolean hasModality(Node node) {
-		final Sequent sequent = node.sequent();
-		for (final SequentFormula<Term> sequentFormula : sequent) {
-			if (TestGenMacro.hasModality(sequentFormula.formula())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/*
-	 * recursively descent into the term to detect a modality.
-	 */
-	private static boolean hasModality(Term term) {
-		if (term.op() instanceof Modality) {
-			return true;
-		}
-		for (final Term sub : term.subs()) {
-			if (TestGenMacro.hasModality(sub)) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	@Override
 	protected Strategy createStrategy(Proof proof,

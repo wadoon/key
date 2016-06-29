@@ -114,9 +114,8 @@ public class CounterExampleAction extends MainWindowAction {
        try {
           // Get required information
           Goal goal = getMediator().getSelectedGoal();
-          Node node = goal.node();
-          Proof oldProof = node.proof();
-          Sequent oldSequent = node.sequent();
+          Proof oldProof = goal.proof();
+          Sequent oldSequent = goal.sequent();
           // Start SwingWorker (CEWorker) in which counter example search is performed.
           getMediator().stopInterface(true);
           getMediator().setInteractive(false);
