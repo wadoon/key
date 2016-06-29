@@ -139,7 +139,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 return TopRuleAppCost.INSTANCE;
             }
 
-            if(hasModality(goal.node())) {
+            if(hasModality(goal.sequent())) {
                 return delegate.computeCost(app, pio, goal);
             }
 
