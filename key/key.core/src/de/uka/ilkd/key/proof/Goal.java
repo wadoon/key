@@ -629,7 +629,6 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
     }
 
     public String toString() {
-        if (true) throw new RuntimeException();
         de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
                 (new de.uka.ilkd.key.pp.ProgramPrinter(null),
                         new NotationInfo(),
