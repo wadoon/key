@@ -84,37 +84,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     /*
-     * find a modality term in a node
-     */
-    private static boolean hasModality(Node node) {
-        Sequent sequent = node.sequent();
-        for (SequentFormula<Term> sequentFormula : sequent) {
-            if(hasModality(sequentFormula.formula())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /*
-     * recursively descent into the term to detect a modality.
-     */
-    private static boolean hasModality(Term term) {
-        if(term.op() instanceof Modality) {
-            return true;
-        }
-
-        for (Term sub : term.subs()) {
-            if(hasModality(sub)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /*
      * Checks if a rule is marked as not suited for interaction.
      */
     private static boolean isNonHumanInteractionTagged(Rule rule) {
