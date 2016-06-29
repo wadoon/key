@@ -63,7 +63,7 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
  *  setting back several proof steps. The sequent has to be changed using the
  *  methods of Goal.
  */
-public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Sequent, NoPosTacletApp>  {
+public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Sequent, NoPosTacletApp, Goal>  {
 
     private Node node;
     

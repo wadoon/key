@@ -13,7 +13,8 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
     T extends CCTerm<?, ?, ? extends CCTermVisitor<T>, T>,
     SemiSeq extends CCSemisequent<SequentFormula<T>, SemiSeq>,
     Seq extends CCSequent<T, SequentFormula<T>, SemiSeq, Seq>, 
-    RA extends RuleApp> {
+    RA extends RuleApp,
+    Self extends CCGoal<ProgVar, T, SemiSeq, Seq, RA, Self>> {
 
     /** returns set of rules applied at this branch
      * @return IList<RuleApp> applied rule applications
@@ -50,7 +51,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      *
      * @return The goal that this goal is linked to (or null if there is no such one).
      */
-    Goal getLinkedGoal();
+    Self getLinkedGoal();
 
     /**
      * Sets the node that this goal is linked to; also sets this for
@@ -62,7 +63,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * 
      * @param linkedGoal The goal that this goal is linked to.
      */
-    void setLinkedGoal(Goal linkedGoal);
+    void setLinkedGoal(Self linkedGoal);
 
     /**
      * sets the sequent of the node
@@ -119,7 +120,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * n goals that have references to these new nodes.
      * @return the list of new created goals.
      */
-    ImmutableList<Goal> split(int n);
+    ImmutableList<Self> split(int n);
 
     /** 
      * applies the provided rule application to this goal 
@@ -127,7 +128,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * @param ruleApp the {@link RuleApp} to apply
      * @return the result of the application
      */
-    ImmutableList<Goal> apply(RuleApp ruleApp);
+    ImmutableList<Self> apply(RuleApp ruleApp);
 
     /** removes a formula at the given position from the sequent
      * and informs the rule appliccation index about this change
@@ -135,6 +136,10 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      */
    void removeFormula(PosInOccurrence<T, SequentFormula<T>> p);
 
+   /** 
+    * returns the {@link Services} of the {@link Proof} 
+    * @return the {@link Services}
+    */
     Services getServices();
 
 }
