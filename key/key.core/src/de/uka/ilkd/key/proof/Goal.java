@@ -86,8 +86,8 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
     /** goal listeners  */
     private List<GoalListener> listeners = new ArrayList<GoalListener>(10);
 
-    /** a goal has been excluded from automatic rule application iff automatic == false */
-    private boolean automatic = true;
+    /** a goal has been excluded from enabled rule application iff enabled == false */
+    private boolean enabled = true;
     
     /** Marks this goal as linked (-> join rules) */
     private Goal linkedGoal   = null;
@@ -318,7 +318,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      */
     @Override
     public boolean isEnabled() {
-        return automatic;
+        return enabled;
     }
 
     /* (non-Javadoc)
@@ -326,7 +326,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      */
     @Override
     public void setEnabled(boolean t) {
-        automatic = t;
+        enabled = t;
         node().clearNameCache();
     }
 
@@ -497,7 +497,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
         }
         clone.listeners = (List<GoalListener>)
                 ((ArrayList<GoalListener>) listeners).clone();
-        clone.automatic = this.automatic;
+        clone.enabled = this.enabled;
         return clone;
     }
 
