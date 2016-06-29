@@ -26,6 +26,7 @@ import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.visitors.BoundVarsVisitor;
+import org.key_project.common.core.rule.Rule;
 import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -33,10 +34,9 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -891,21 +891,7 @@ public abstract class Taclet implements Rule, Named {
        }
     }
     
-    /** 
-     * applies the given rule application to the specified goal
-     * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
-     * @param tacletApp the rule application that is executed.
-     * @return List of the goals created by the rule which have to be
-     * proved. If this is a close-goal-taclet ( this.closeGoal () ),
-     * the first goal of the return list is the goal that should be
-     * closed (with the constraint this taclet is applied under).
-     */
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
-        return getExecutor().apply(goal, services, tacletApp);
-    }
-
-    public TacletExecutor<? extends Taclet> getExecutor() {
+     public TacletExecutor<? extends Taclet> getExecutor() {
         return executor;
     }
     

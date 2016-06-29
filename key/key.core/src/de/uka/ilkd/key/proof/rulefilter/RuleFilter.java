@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.proof.rulefilter;
 
-import de.uka.ilkd.key.rule.Rule;
+import org.key_project.common.core.rule.Rule;
 
 /**
  * Interface for objects that represent sets of rules, and which can be used

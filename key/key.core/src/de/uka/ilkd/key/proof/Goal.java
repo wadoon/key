@@ -28,7 +28,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
@@ -60,7 +62,7 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
  *  setting back several proof steps. The sequent has to be changed using the
  *  methods of Goal.
  */
-public final class Goal  {
+public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Sequent, NoPosTacletApp>  {
 
     private Node node;
 
@@ -267,9 +269,10 @@ public final class Goal  {
     }
 
 
-    /** returns set of rules applied at this branch
-     * @return IList<RuleApp> applied rule applications
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#appliedRuleApps()
      */
+    @Override
     public ImmutableList<RuleApp> appliedRuleApps() {
 	return appliedRuleApps;
     }
@@ -283,35 +286,34 @@ public final class Goal  {
     	return appliedRuleApps().size();
     }
 
-    /** returns the proof the goal belongs to
-     * @return the Proof the goal belongs to
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#proof()
      */
+    @Override
     public Proof proof() {
         return node().proof();
     }
 
-    /** returns the sequent of the node
-     * @return the Sequent to be proved
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#sequent()
      */
+    @Override
     public Sequent sequent() {
 	return node().sequent();
     }
 
-    /**
-     * Checks if is an automatic goal.
-     *
-     * @return true, if is automatic
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#isAutomatic()
      */
-    public boolean isAutomatic() {
+    @Override
+    public boolean isEnabled() {
         return automatic;
     }
 
-    /**
-     * Sets the automatic status of this goal.
-     *
-     * @param t
-     *                the new status: true for automatic, false for interactive
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#setEnabled(boolean)
      */
+    @Override
     public void setEnabled(boolean t) {
         automatic = t;
         node().clearNameCache();
@@ -327,73 +329,57 @@ public final class Goal  {
         return this.linkedGoal != null;
     }
 
-    /**
-     * Returns the goal that this goal is linked to.
-     *
-     * @return The goal that this goal is linked to (or null if there is no such one).
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#getLinkedGoal()
      */
+    @Override
     public Goal getLinkedGoal() {
         return this.linkedGoal;
     }
 
-    /**
-     * Sets the node that this goal is linked to; also sets this for
-     * all parents.
-     * 
-     * TODO: Check whether it is problematic when multiple child nodes
-     * of a node are linked; in this case, the linkedNode field would
-     * be overwritten.
-     * 
-     * @param linkedGoal The goal that this goal is linked to.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#setLinkedGoal(de.uka.ilkd.key.proof.Goal)
      */
+    @Override
     public void setLinkedGoal(final Goal linkedGoal) {
         this.linkedGoal = linkedGoal;
     }
 
-    /**
-     * sets the sequent of the node
-     * @param sci SequentChangeInfo containing the sequent to be set and
-     * desribing the applied changes to the sequent of the parent node
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#setSequent(org.key_project.common.core.logic.calculus.CCSequentChangeInfo)
      */
-    public void setSequent(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci) {
+    @Override
+    public void applySequentChangeInfo(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci) {
         node().setSequent(sci.sequent());
 //VK reminder: now update the index
        	fireSequentChanged(sci);
     }
 
 
-    /** adds a formula to the sequent before the given position
-     * and informs the rule application index about this change
-     * @param cf the SequentFormula<Term> to be added
-     * @param p PosInOccurrence<Term, SequentFormula<Term>> encodes the position
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#addFormula(org.key_project.common.core.logic.calculus.SequentFormula, org.key_project.common.core.logic.calculus.PosInOccurrence)
      */
+    @Override
     public void addFormula(SequentFormula<Term> cf, PosInOccurrence<Term, SequentFormula<Term>> p) {
-       setSequent(sequent().addFormula(cf, p));
+       applySequentChangeInfo(sequent().addFormula(cf, p));
     }
 
 
-    /** adds a formula to the antecedent or succedent of a
-     * sequent. Either at its front or back
-     * and informs the rule application index about this change
-     * @param cf the SequentFormula<Term> to be added
-     * @param inAntec boolean true(false) if SequentFormula<Term> has to be
-     * added to antecedent (succedent)
-     * @param first boolean true if at the front, if false then cf is
-     * added at the back
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#addFormula(org.key_project.common.core.logic.calculus.SequentFormula, boolean, boolean)
      */
+    @Override
     public void addFormula ( SequentFormula<Term> cf, boolean inAntec,
           boolean first ) {
-       setSequent(sequent().addFormula(cf, inAntec, first));
+       applySequentChangeInfo(sequent().addFormula(cf, inAntec, first));
     }
 
-    /**
-     * replaces a formula at the given position
-     * and informs the rule application index about this change
-     * @param cf the SequentFormula<Term> replacing the old one
-     * @param p the PosInOccurrence<Term, SequentFormula<Term>> encoding the position
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#changeFormula(org.key_project.common.core.logic.calculus.SequentFormula, org.key_project.common.core.logic.calculus.PosInOccurrence)
      */
+    @Override
     public void changeFormula(SequentFormula<Term> cf, PosInOccurrence<Term, SequentFormula<Term>> p) {
-       setSequent(sequent().changeFormula(cf, p));
+       applySequentChangeInfo(sequent().changeFormula(cf, p));
     }
 
 
@@ -401,16 +387,16 @@ public final class Goal  {
      * and informs the rule appliccation index about this change
      * @param p PosInOccurrence<Term, SequentFormula<Term>> encodes the position
      */
+    @Override
     public void removeFormula(PosInOccurrence<Term, SequentFormula<Term>> p) {
-       setSequent(sequent().removeFormula(p));
+       applySequentChangeInfo(sequent().removeFormula(p));
     }
 
-    /**
-     * puts the NoPosTacletApp to the set of TacletApps at the node
-     * of the goal and to the current RuleAppIndex.
-     * @param app the TacletApp
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#addNoPosTacletApp(de.uka.ilkd.key.rule.NoPosTacletApp)
      */
-    public void addNoPosTacletApp(NoPosTacletApp app) {
+    @Override
+    public void addPartialInstantiatedRuleApp(NoPosTacletApp app) {
 	node().addNoPosTacletApp(app);
 	ruleAppIndex.addNoPosTacletApp(app);
     }
@@ -429,7 +415,7 @@ public final class Goal  {
                    insts,
                    proof().getServices());
        if (tacletApp != null) {
-          addNoPosTacletApp(tacletApp);
+          addPartialInstantiatedRuleApp(tacletApp);
           if (proof().getInitConfig() != null) { // do not break everything
              // because of ProofMgt
              proof().getInitConfig().registerRuleIntroducedAtNode(
@@ -456,6 +442,10 @@ public final class Goal  {
         ruleAppIndex.clearAndDetachCache ();
     }
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#addProgramVariable(de.uka.ilkd.key.logic.op.ProgramVariable)
+     */
+    @Override
     public void addProgramVariable(ProgramVariable pv) {
        proof().getNamespaces().programVariables().addSafely(pv);
 	node.setGlobalProgVars(getGlobalProgVars().add(pv));
@@ -509,11 +499,10 @@ public final class Goal  {
     }
 
     
-    /**
-     * puts a RuleApp to the list of the applied rule apps at this goal
-     * and stores it in the node of the goal
-     * @param app the applied rule app
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#addAppliedRuleApp(de.uka.ilkd.key.rule.RuleApp)
      */
+    @Override
     public void addAppliedRuleApp(RuleApp app) {
 	// Last app first makes inserting and searching faster
 	appliedRuleApps = appliedRuleApps.prepend(app);
@@ -530,11 +519,10 @@ public final class Goal  {
 
 
 
-    /** creates n new nodes as children of the
-     * referenced node and new
-     * n goals that have references to these new nodes.
-     * @return the list of new created goals.
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#split(int)
      */
+    @Override
     public ImmutableList<Goal> split(int n) {
 	ImmutableList<Goal> goalList=ImmutableSLList.<Goal>nil();
 	
@@ -592,6 +580,10 @@ public final class Goal  {
             removeLastAppliedRuleApp();
     }
 
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.CCGoal#apply(de.uka.ilkd.key.rule.RuleApp)
+     */
+    @Override
     public ImmutableList<Goal> apply(final RuleApp ruleApp ) {
 
         final Proof proof = proof();

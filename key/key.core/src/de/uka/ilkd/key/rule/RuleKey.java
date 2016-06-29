@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.rule.Rule;
 import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;

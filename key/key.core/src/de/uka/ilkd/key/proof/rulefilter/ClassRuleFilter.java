@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.proof.rulefilter;
 
 
-import de.uka.ilkd.key.rule.Rule;
+import org.key_project.common.core.rule.Rule;
 
 /**
  * Rule filter that selects taclets which are of a specific class 

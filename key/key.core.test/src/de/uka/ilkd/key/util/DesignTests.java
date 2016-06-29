@@ -187,7 +187,7 @@ public class DesignTests extends TestCase {
     public void testGuiSep() {
         LinkedList<Class<?>> badClasses = new LinkedList<Class<?>>();
         for (int i = 0; i<allClasses.length; i++) {
-            if (de.uka.ilkd.key.rule.Rule.class.isAssignableFrom(allClasses[i]) ||
+            if (org.key_project.common.core.rule.Rule.class.isAssignableFrom(allClasses[i]) ||
                     allClasses[i].getPackage().getName().contains("key.rule") ||
                     allClasses[i].getPackage().getName().contains("key.logic")  ||
                     allClasses[i].getPackage().getName().contains("key.proof") ||

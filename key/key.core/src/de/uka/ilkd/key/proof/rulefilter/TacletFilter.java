@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.proof.rulefilter;
 
-import de.uka.ilkd.key.rule.Rule;
+import org.key_project.common.core.rule.Rule;
+
 import de.uka.ilkd.key.rule.Taclet;
 
 /**

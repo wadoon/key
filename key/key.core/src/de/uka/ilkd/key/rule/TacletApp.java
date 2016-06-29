@@ -26,6 +26,7 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.rule.Rule;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -415,22 +416,20 @@ public abstract class TacletApp implements RuleApp {
      *            the Services encapsulating all java information
      * @return list of new created goals
      */
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
-
-        
-        
+    public ImmutableList<Goal> execute(Goal goal, Services services)  {
 	if (!complete()) {
 	    throw new IllegalStateException("Tried to apply rule \n" + taclet
 		    + "\nthat is not complete.");
 	}
 	
-
 	if (!isExecutable(services)) {
-        throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
+            throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
 	}
-    registerSkolemConstants(services);
+        
+	registerSkolemConstants(services);
 	goal.addAppliedRuleApp(this);
-	return taclet().apply(goal, services, this);
+	
+	return taclet().getExecutor().apply(goal, services, this);
     }
 
     /*

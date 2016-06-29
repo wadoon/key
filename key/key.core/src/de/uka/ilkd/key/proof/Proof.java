@@ -455,13 +455,13 @@ public class Proof implements Named {
      *
      * @param goals non-null list of goals
      * @return sublist such that every goal in the list is enabled
-     * @see Goal#isAutomatic()
+     * @see Goal#isEnabled()
      * @author mulbrich
      */
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
         ImmutableList<Goal> enabledGoals = ImmutableSLList.<Goal>nil();
         for(Goal g : goals) {
-            if(g.isAutomatic() && !g.isLinked()) {
+            if(g.isEnabled() && !g.isLinked()) {
                 enabledGoals = enabledGoals.prepend(g);
             }
         }

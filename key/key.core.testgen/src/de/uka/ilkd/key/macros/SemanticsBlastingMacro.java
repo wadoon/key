@@ -19,8 +19,9 @@ package de.uka.ilkd.key.macros;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.key_project.common.core.rule.Rule;
+
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
-import de.uka.ilkd.key.rule.Rule;
 
 /**
  * @author mihai

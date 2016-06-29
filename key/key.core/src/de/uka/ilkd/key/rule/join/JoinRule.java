@@ -260,6 +260,7 @@ public class JoinRule implements BuiltInRule {
                 tb.apply(joinedState.first, thisSEState.third);
         final SequentFormula<Term> newSuccedent =
                 new SequentFormula<>(succedentFormula);
+        
         newGoal.addFormula(newSuccedent, new PosInOccurrence<Term, SequentFormula<Term>>(newSuccedent,
                 PosInTerm.<Term>getTopLevel(), false));
         

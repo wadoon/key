@@ -1,9 +1,10 @@
 package de.uka.ilkd.key.control;
 
+import org.key_project.common.core.rule.Rule;
+
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.Rule;
 
 /**
  * Instances of this class are used by an {@link AbstractProofControl} to complete a {@link Rule} completion.

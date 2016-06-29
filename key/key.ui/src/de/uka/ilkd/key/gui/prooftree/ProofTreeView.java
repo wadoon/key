@@ -769,7 +769,7 @@ public class ProofTreeView extends JPanel {
             tree_cell.setIcon(IconFactory.keyHoleLinked(20, 20));
             ProofTreeView.this.setToolTipText("Linked Goal");
             tree_cell.setToolTipText("Linked goal - no automatic rule application");
-		   } else if ( !goal.isAutomatic() ) {
+		   } else if ( !goal.isEnabled() ) {
 		        tree_cell.setForeground(ORANGE_COLOR);
 		        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
 		        ProofTreeView.this.setToolTipText("Disabled Goal");

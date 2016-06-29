@@ -15,10 +15,12 @@ package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.rule.Rule;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.executor.RuleExecutor;
 
 /**
  * Buit-in rule interface.
@@ -26,7 +28,7 @@ import de.uka.ilkd.key.proof.Goal;
  * not be successful in each case one has to ensure that the goal split is
  * done only iff the application was successful.
  */
-public interface BuiltInRule extends Rule {
+public interface BuiltInRule extends Rule, RuleExecutor {
 
     /**
      * returns true iff a rule is applicable at the given

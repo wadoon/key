@@ -11,30 +11,18 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof.rulefilter;
+/** this interface has to be implemented by all classes that want to
+ * act as a rule in the calculus. */
+package org.key_project.common.core.rule;
 
-import org.key_project.common.core.rule.Rule;
-
-/**
- * Intersection (conjunction) of two rule filters
- */
-public class AndRuleFilter implements RuleFilter {
-
-    private final RuleFilter a;
-    private final RuleFilter b;
-
-    public AndRuleFilter ( RuleFilter p_a, RuleFilter p_b ) {
-	a = p_a;
-	b = p_b;
-    }
-
-    public boolean filter ( Rule rule ) {
-	return a.filter ( rule ) && b.filter ( rule );
-    }
+import org.key_project.common.core.logic.Named;
 
 
-    public String toString() {
-	return  a + " AND " + b;
-    }
+public interface Rule extends Named {
+
+    /** 
+     * returns the display name of the rule 
+     */
+    String displayName();
 
 }

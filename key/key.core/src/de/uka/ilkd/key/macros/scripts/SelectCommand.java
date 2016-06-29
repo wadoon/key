@@ -56,7 +56,7 @@ public class SelectCommand extends AbstractCommand {
                 seq = node.sequent();
                 if(contains(seq, formula)) {
                     g = getGoal(proof.openGoals(), node);
-                    if(g.isAutomatic()) {
+                    if(g.isEnabled()) {
                         return g;
                     }
                 }

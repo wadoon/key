@@ -133,7 +133,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
        
        TermLabelManager.mergeLabels(currentSequent, services);
        
-       currentGoal.setSequent(currentSequent);              
+       currentGoal.applySequentChangeInfo(currentSequent);              
         
        currentGoal.setBranchLabel(gt.name());
        
@@ -146,7 +146,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
     // sequent
     while (newSequentsIt.hasNext()) {
        Goal nextGoal = goalIt.next();
-       nextGoal.setSequent(newSequentsIt.next());
+       nextGoal.applySequentChangeInfo(newSequentsIt.next());
        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), ruleApp.rule(), nextGoal, null, null);
     }
     

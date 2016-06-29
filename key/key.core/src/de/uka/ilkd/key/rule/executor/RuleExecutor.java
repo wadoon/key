@@ -4,6 +4,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 
 
@@ -22,6 +23,6 @@ public interface RuleExecutor {
      * the first goal of the return list is the goal that should be
      * closed (with the constraint this taclet is applied under).
      */
-    public abstract ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp);
+    public abstract ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException;
 
 }

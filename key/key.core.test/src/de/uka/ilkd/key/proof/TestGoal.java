@@ -66,17 +66,17 @@ public class TestGoal extends TestCase {
                                 
                 Goal g = proof.openGoals().head();//new Goal(proof.root(), new RuleAppIndex(new TacletAppIndex(new TacletIndex(), proof.getServices()), new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
                 ImmutableList<Goal> lg = g.split(3);
-                lg.head().addNoPosTacletApp(
+                lg.head().addPartialInstantiatedRuleApp(
                                 TacletForTests.getRules().lookup("imp_right"));
                 lg.tail()
                                 .head()
-                                .addNoPosTacletApp(
+                                .addPartialInstantiatedRuleApp(
                                                 TacletForTests.getRules()
                                                                 .lookup("imp_left"));
                 lg.tail()
                                 .tail()
                                 .head()
-                                .addNoPosTacletApp(
+                                .addPartialInstantiatedRuleApp(
                                                 TacletForTests.getRules()
                                                                 .lookup("or_right"));
                 // just check if the test is trivially correct because of rules
@@ -123,17 +123,17 @@ public class TestGoal extends TestCase {
                                                                 new BuiltInRuleIndex()),
                                                 proof.getServices()));
                 ImmutableList<Goal> lg = g.split(3);
-                lg.head().addNoPosTacletApp(
+                lg.head().addPartialInstantiatedRuleApp(
                                 TacletForTests.getRules().lookup("imp_right"));
                 lg.tail()
                                 .head()
-                                .addNoPosTacletApp(
+                                .addPartialInstantiatedRuleApp(
                                                 TacletForTests.getRules()
                                                                 .lookup("imp_left"));
                 lg.tail()
                                 .tail()
                                 .head()
-                                .addNoPosTacletApp(
+                                .addPartialInstantiatedRuleApp(
                                                 TacletForTests.getRules()
                                                                 .lookup("or_right"));
                 // just check if the test is trivially correct because of rules
@@ -141,11 +141,11 @@ public class TestGoal extends TestCase {
                 assertNotNull(lg.head().indexOfTaclets().lookup("imp_right"));
 
                 ImmutableList<Goal> lg0 = lg.head().split(4);
-                lg0.head().addNoPosTacletApp(
+                lg0.head().addPartialInstantiatedRuleApp(
                                 TacletForTests.getRules().lookup("or_left"));
                 lg0.tail()
                                 .head()
-                                .addNoPosTacletApp(
+                                .addPartialInstantiatedRuleApp(
                                                 TacletForTests.getRules()
                                                                 .lookup("or_left"));
                 ImmutableList<Goal> lg1 = lg.tail().tail().head().split(2);

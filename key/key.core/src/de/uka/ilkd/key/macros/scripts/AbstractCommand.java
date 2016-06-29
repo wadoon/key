@@ -51,7 +51,7 @@ public abstract class AbstractCommand implements ProofScriptCommand {
             switch (childCount) {
             case 0:
                 g = getGoal(proof.openGoals(), node);
-                if(g.isAutomatic()) {
+                if(g.isEnabled()) {
                     return g;
                 }
                 node = choices.pollLast();

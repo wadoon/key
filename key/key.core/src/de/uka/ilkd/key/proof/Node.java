@@ -509,7 +509,7 @@ public class Node  {
                     return CLOSED_GOAL; // don't cache this
                 else if(goal.isLinked())
                    cachedName = LINKED_GOAL;
-                else if(goal.isAutomatic())
+                else if(goal.isEnabled())
                     cachedName = OPEN_GOAL;
                 else
                     cachedName = INTERACTIVE_GOAL;

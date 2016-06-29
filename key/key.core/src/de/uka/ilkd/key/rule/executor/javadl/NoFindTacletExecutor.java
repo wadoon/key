@@ -104,7 +104,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
             
             TermLabelManager.mergeLabels(currentSequent, services);
 
-            currentGoal.setSequent(currentSequent);
+            currentGoal.applySequentChangeInfo(currentSequent);
 
             currentGoal.setBranchLabel(gt.name());
             TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(), ruleApp.rule(), currentGoal, null, null);
