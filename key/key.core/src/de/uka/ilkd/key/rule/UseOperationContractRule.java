@@ -921,6 +921,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         newSeqForPostGoal.combine(newSeqForPostGoal.sequent().addFormula(new SequentFormula<>(postAssumption),
         	            true, false));
 
+        postGoal.applySequentChangeInfo(newSeqForPostGoal);
+        
         applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
                      tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
 
