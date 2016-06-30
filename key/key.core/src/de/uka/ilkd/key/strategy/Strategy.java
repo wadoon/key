@@ -20,29 +20,18 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.Feature;
 
 /**
  * Generic interface for evaluating the cost of
  * a RuleApp with regard to a specific strategy
  */
-public interface Strategy extends Named {
+public interface Strategy extends Named, Feature {
     /**
      * Checks if the {@link Strategy} should stop at the first non closeable {@link Goal}.
      * @return {@code true} stop, {@code false} continue on other {@link Goal}s.
      */
     boolean isStopAtFirstNonCloseableGoal();
-
-    /**
-     * Evaluate the cost of a <code>RuleApp</code>.
-     * @return the cost of the rule application expressed as
-     * a <code>RuleAppCost</code> object.
-     * <code>TopRuleAppCost.INSTANCE</code> indicates
-     * that the rule shall not be applied at all 
-     * (it is discarded by the strategy).
-     */
-    RuleAppCost computeCost ( RuleApp         app,
-                              PosInOccurrence<Term, SequentFormula<Term>> pio,
-                              Goal            goal );
 
     /**
      * Re-Evaluate a <code>RuleApp</code>. This method is

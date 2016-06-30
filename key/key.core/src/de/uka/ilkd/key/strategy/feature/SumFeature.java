@@ -32,15 +32,15 @@ import de.uka.ilkd.key.util.Debug;
 public class SumFeature implements Feature {
     
     @Override
-    public RuleAppCost compute (RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public RuleAppCost computeCost (RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         // We require that there is at least one feature (in method
         // <code>createSum</code>)
-        RuleAppCost res = features[0].compute ( app, pos, goal );
+        RuleAppCost res = features[0].computeCost ( app, pos, goal );
 
         for ( int i = 1; i < features.length
                          && !( res instanceof TopRuleAppCost ); i++ )
             
-            res = res.add ( features[i].compute ( app, pos, goal ) );
+            res = res.add (features[i].computeCost ( app, pos, goal ) );
 
         return res;
     }

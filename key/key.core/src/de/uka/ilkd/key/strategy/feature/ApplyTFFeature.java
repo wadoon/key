@@ -67,7 +67,7 @@ public class ApplyTFFeature implements Feature {
         return new ApplyTFFeature ( proj, tf, TopRuleAppCost.INSTANCE, true );
     }
 
-    public RuleAppCost compute(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         final Term te = proj.toTerm ( app, pos, goal );
         if ( te == null ) {
             Debug.assertFalse ( demandInst,

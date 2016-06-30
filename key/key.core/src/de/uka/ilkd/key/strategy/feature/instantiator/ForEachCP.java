@@ -69,7 +69,7 @@ public class ForEachCP implements Feature {
         this.manager = manager;
     }
 
-    public RuleAppCost compute(final RuleApp app,
+    public RuleAppCost computeCost(final RuleApp app,
                                final PosInOccurrence<Term, SequentFormula<Term>> pos,
                                final Goal goal) {
         final Term outerVarContent = var.getContent ();
@@ -79,7 +79,7 @@ public class ForEachCP implements Feature {
        
         final RuleAppCost res;
         if ( var.getContent() != null )
-            res = body.compute ( app, pos, goal );
+            res = body.computeCost ( app, pos, goal );
         else
             res = NumberRuleAppCost.getZeroCost();
         

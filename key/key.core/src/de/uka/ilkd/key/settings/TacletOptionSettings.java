@@ -29,6 +29,8 @@ import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 public class TacletOptionSettings implements Settings, Cloneable {
@@ -90,12 +92,12 @@ public class TacletOptionSettings implements Settings, Cloneable {
     
 
     private ImmutableSet<TacletOption> choiceMap2choiceSet(HashMap<String, String> ccc) {
-        ImmutableSet<TacletOption> choices = DefaultImmutableSet.<TacletOption>nil();        
+        ImmutableList<TacletOption> choices = ImmutableSLList.<TacletOption>nil();        
         for (final Map.Entry<String,String> entry : ccc.entrySet()) {
             choices = choices.
-              add(new TacletOption(new Name(entry.getValue()), entry.getKey()));
+              prepend(new TacletOption(new Name(entry.getValue()), entry.getKey()));
         }
-        return choices;
+        return DefaultImmutableSet.fromImmutableList(choices);
     }
     
     

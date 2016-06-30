@@ -352,6 +352,7 @@ public abstract class Taclet implements Rule, Named {
 
     /** returns the name of the Taclet
      */
+   @Override
     public Name name() {
 	return name;
     } 
@@ -360,6 +361,7 @@ public abstract class Taclet implements Rule, Named {
     /** returns the display name of the taclet, or, if not specified -- 
      *  the canonical name
      */
+   @Override
     public String displayName() {
 	return displayName;
     }
@@ -469,6 +471,7 @@ public abstract class Taclet implements Rule, Named {
      * <code>o</code> and <code>this</code> contain no mutually exclusive 
      * taclet options. 
      */
+   @Override
     public boolean equals(Object o) {
         if (o == this) return true;
         
@@ -499,6 +502,7 @@ public abstract class Taclet implements Rule, Named {
         return true;
     }
 
+   @Override
     public int hashCode() {
         if (hashcode == 0) {
            hashcode = 37 * name.hashCode() + 17;
@@ -633,6 +637,7 @@ public abstract class Taclet implements Rule, Named {
      * returns a representation of the Taclet as String
      * @return string representation
      */
+   @Override
     public String toString() {
 	if (tacletAsString == null) {
 	    StringBuffer sb=new StringBuffer();
@@ -676,7 +681,7 @@ public abstract class Taclet implements Rule, Named {
 
     public Set<SchemaVariable> collectSchemaVars() {
 
-	Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
+	Set<SchemaVariable> result = new LinkedHashSet<>();
 	OpCollector oc = new OpCollector();
 
 	//find, assumes

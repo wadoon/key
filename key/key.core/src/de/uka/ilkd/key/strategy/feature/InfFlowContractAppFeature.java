@@ -234,8 +234,8 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost compute(RuleApp ruleApp,
-                               PosInOccurrence<Term, SequentFormula<Term>> pos,
+    public RuleAppCost computeCost(RuleApp ruleApp,
+                                   PosInOccurrence<Term, SequentFormula<Term>> pos,
                                Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " +

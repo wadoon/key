@@ -191,13 +191,14 @@ public class InitConfig {
             c2DC.remove(c.category());
         }
 
+        ImmutableList<TacletOption> category2DefaultChoiceList = ImmutableSLList.nil();
         for (final String s : c2DC.values()) {
             final TacletOption c = (TacletOption) tacletOptionNS().lookup(new Name(s));
             if(c!=null){
-                activatedChoices = activatedChoices.add(c);
+                category2DefaultChoiceList = category2DefaultChoiceList.prepend(c);
             }
         }
-        this.activatedTacletOptions = activatedChoices;
+        this.activatedTacletOptions = activatedChoices.union(DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
 
         // invalidate active taclet cache
         activatedTacletCache = null;

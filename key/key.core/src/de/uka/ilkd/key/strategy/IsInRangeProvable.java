@@ -162,7 +162,7 @@ public class IsInRangeProvable implements Feature {
 
 
     @Override
-    public RuleAppCost compute(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         final Services services = goal.getServices();
        
         final ImmutableSet<Term> axioms = collectAxioms(goal.sequent(), pos, services);

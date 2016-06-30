@@ -56,14 +56,13 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * Create a list of new RuleAppContainers that are to be 
      * considered for application.
      */
-    public abstract ImmutableList<RuleAppContainer> createFurtherApps
-	( Goal p_goal, Strategy strategy );
+    public abstract ImmutableList<RuleAppContainer> createFurtherApps( Goal p_goal );
 
     /**
      * Create a <code>RuleApp</code> that is suitable to be applied 
      * or <code>null</code>.
      */
-    public abstract RuleApp completeRuleApp ( Goal p_goal, Strategy strategy );
+    public abstract RuleApp completeRuleApp ( Goal p_goal );
 
     protected final RuleApp getRuleApp() {
 	return ruleApp;
@@ -80,15 +79,13 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * may be an instance of <code>TopRuleAppCost</code>.
      */
     public static RuleAppContainer createAppContainer
-        ( RuleApp p_app, PosInOccurrence<Term, SequentFormula<Term>> p_pio, Goal p_goal, Strategy p_strategy ) {
+        ( RuleApp p_app, PosInOccurrence<Term, SequentFormula<Term>> p_pio, Goal p_goal) {
         
 	if ( p_app instanceof NoPosTacletApp )
-	    return TacletAppContainer.createAppContainers
-		( (NoPosTacletApp)p_app, p_pio, p_goal, p_strategy );
+	    return TacletAppContainer.createAppContainers( (NoPosTacletApp)p_app, p_pio, p_goal );
 
 	if ( p_app instanceof IBuiltInRuleApp )
-	    return BuiltInRuleAppContainer.createAppContainer
-		( (IBuiltInRuleApp)p_app, p_pio, p_goal, p_strategy );
+	    return BuiltInRuleAppContainer.createAppContainer( (IBuiltInRuleApp)p_app, p_pio, p_goal );
 
 	Debug.fail ( "Unexpected kind of rule." );
 
@@ -101,11 +98,11 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * may be an instance of <code>TopRuleAppCost</code>.
      */
     public static ImmutableList<RuleAppContainer> createAppContainers(ImmutableList<? extends RuleApp> rules, 
-            PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal, Strategy strategy) {
+            PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
 
         if (rules.size() == 1) {
-            result = result.prepend( createAppContainer(rules.head(), pos, goal, strategy));
+            result = result.prepend( createAppContainer(rules.head(), pos, goal));
         } else if (rules.size() > 1) {
             ImmutableList<NoPosTacletApp> tacletApplications = ImmutableSLList.<NoPosTacletApp>nil();
             ImmutableList<IBuiltInRuleApp> builtInRuleApplications = ImmutableSLList.<IBuiltInRuleApp>nil();
@@ -120,10 +117,10 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 
             if ( !builtInRuleApplications.isEmpty() ) {
                 result = result.append( BuiltInRuleAppContainer.createInitialAppContainers
-                        ( builtInRuleApplications, pos, goal, strategy ) );
+                        ( builtInRuleApplications, pos, goal) );
             }        
             result = result.prepend( TacletAppContainer.createInitialAppContainers
-                    ( tacletApplications, pos, goal, strategy ) );
+                    ( tacletApplications, pos, goal) );
         }
         return result;
     }

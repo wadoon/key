@@ -193,7 +193,7 @@ options {
 
    private LinkedHashMap<RuleKey, Taclet> taclets = new LinkedHashMap<RuleKey, Taclet>();
             
-   private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
+   private ImmutableList<Contract> contracts = ImmutableSLList.nil();
    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
    private ParserConfig schemaConfig;
@@ -461,7 +461,7 @@ options {
     }
 
     public ImmutableSet<Contract> getContracts(){
-        return contracts;
+        return DefaultImmutableSet.fromImmutableList(contracts);
     }
     
     public ImmutableSet<ClassInvariant> getInvariants(){
@@ -4446,7 +4446,7 @@ one_contract
      {
        DLSpecFactory dsf = new DLSpecFactory(getServices());
        try {
-         contracts = contracts.add(dsf.createDLOperationContract(contractName,
+         contracts = contracts.prepend(dsf.createDLOperationContract(contractName,
        					                         fma, 
            				                         modifiesClause));
        } catch(ProofInputException e) {

@@ -208,6 +208,7 @@ public abstract class TacletApp implements RuleApp {
      * 
      * @return the Rule the application information is collected for
      */
+    @Override
     public Rule rule() {
 	return taclet;
     }
@@ -245,7 +246,7 @@ public abstract class TacletApp implements RuleApp {
 	    					SVInstantiations insts,
 	    					Services services) {
 
-	HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<LogicVariable, SchemaVariable>();
+	HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<>();
 
 	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it = insts
 		.pairIterator();
@@ -414,6 +415,7 @@ public abstract class TacletApp implements RuleApp {
      *            the Goal at which the Taclet is applied
      * @return list of new created goals
      */
+    @Override
     public ImmutableList<Goal> execute(Goal goal)  {
 	if (!complete()) {
 	    throw new IllegalStateException("Tried to apply rule \n" + taclet
@@ -721,32 +723,6 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * Examine all schema variables of the taclet that are currently not
-     * instantiated, and for each one whose sort is generic add a condition to
-     * the instantiations object <code>insts</code> that requires this sort to
-     * be instantiated
-     * 
-     * @return the instantiations object after adding all the conditions, or
-     *         <code>null</code> if any of the generic sorts found cannot be
-     *         instantiated (at least at the time)
-     */
-    private SVInstantiations forceGenericSortInstantiations(SVInstantiations insts,
-                                                            Services services) {
-	// force all generic sorts to be instantiated
-	try {
-	    for (final SchemaVariable sv : uninstantiatedVars()) {
-		final GenericSortCondition c = GenericSortCondition
-			.forceInstantiation(sv.sort(), true);
-		if (c != null)
-		    insts = insts.add(c, services);
-	    }
-	} catch (GenericSortException e) {
-	    Debug.fail("TacletApp cannot be made complete");
-	}
-	return insts;
-    }
-
-    /**
      * @param services
      *            the Services class allowing access to the type model
      * @return p_s iff p_s is not a generic sort, the concrete sort p_s is
@@ -807,7 +783,6 @@ public abstract class TacletApp implements RuleApp {
 	    }
 	}
     }    
-    
     
     /**
      * adds a new instantiation to this TacletApp
@@ -1093,16 +1068,6 @@ public abstract class TacletApp implements RuleApp {
 		pos,
 		services);
     }
-
-    /**
-     * returns true iff all necessary informations are collected, so that the
-     * Taclet can be applied.
-     * 
-     * @return true iff all necessary informations are collected, so that the
-     *         Taclet can be applied.
-     */
-    public abstract boolean complete();
-
   
     /**
      * @return true iff the if instantiation list is not null or no if sequent
@@ -1124,6 +1089,7 @@ public abstract class TacletApp implements RuleApp {
      * compares the given Object with this one and returns true iff both are
      * from type TacletApp with equal taclets, instantiations and positions.
      */
+    @Override
     public boolean equals(Object o) {
        if (o == this)
           return true;
@@ -1136,6 +1102,7 @@ public abstract class TacletApp implements RuleApp {
                 ifInstantiations.equals(s.ifInstantiations));
     }
 
+    @Override
     public int hashCode() {
        int result = 17;
        result = 37 * result + taclet.hashCode();
@@ -1144,6 +1111,7 @@ public abstract class TacletApp implements RuleApp {
        return result;
     }
 
+    @Override
     public String toString() {
 	return "Application of Taclet " + taclet() + " with "
 		+ instantiations() + " and " + ifFormulaInstantiations();
@@ -1242,7 +1210,7 @@ public abstract class TacletApp implements RuleApp {
             SchemaVariable sv = schemaVariable;
 	    if (sv instanceof TermSV || sv instanceof FormulaSV) {
 		TacletPrefix prefix = taclet().getPrefix(sv);
-		HashSet<Name> names = new LinkedHashSet<Name>();
+		HashSet<Name> names = new LinkedHashSet<>();
                 if (prefix.context()) {
                     for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
                         names.add(quantifiableVariable.name());

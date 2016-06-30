@@ -65,15 +65,13 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * i.e. if the find-position does still exist (if-formulas are not
      * considered)
      */
-    protected boolean isStillApplicable ( Goal p_goal ) {
-    	final PosInOccurrence<Term, SequentFormula<Term>> topPos =
-    	    p_goal.getFormulaTagManager().getPosForTag(positionTag);
-	if ( topPos == null )
-	    // the formula does not exist anymore, bail out
-	    return false;	
-	if ( subformulaOrPreceedingUpdateHasChanged ( p_goal ) )
-	    return false;
-	return true;
+    @Override
+    protected boolean isStillApplicable(Goal p_goal) {
+        PosInOccurrence<Term, SequentFormula<Term>> topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
+        if (topPos == null || subformulaOrPreceedingUpdateHasChanged(p_goal)) {
+            return false;
+        }
+        return true;
     }
 
 
@@ -175,14 +173,15 @@ public class FindTacletAppContainer extends TacletAppContainer {
     /**
      * @return non-null for FindTaclets
      */
+    @Override
     protected PosInOccurrence<Term, SequentFormula<Term>> getPosInOccurrence ( Goal p_goal ) {
     	final PosInOccurrence<Term, SequentFormula<Term>> topPos =
-    	    p_goal.getFormulaTagManager().getPosForTag(positionTag);
+   	    p_goal.getFormulaTagManager().getPosForTag(positionTag);
 
-	assert topPos != null;
+		assert topPos != null;
 	
-	return applicationPosition.replaceConstrainedFormula
-	    ( topPos.sequentFormula () );
+		return applicationPosition.replaceConstrainedFormula
+	    								( topPos.sequentFormula () );
     }
 
 }

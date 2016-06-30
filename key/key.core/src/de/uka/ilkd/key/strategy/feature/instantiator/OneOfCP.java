@@ -42,9 +42,9 @@ public class OneOfCP implements Feature {
         return new OneOfCP ( manager, features );
     }
     
-    public RuleAppCost compute(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {        
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {        
         manager.passChoicePoint ( cp, this );
-        return features[theChosenOne].compute ( app, pos, goal );
+        return features[theChosenOne].computeCost ( app, pos, goal );
     }
     
     private final class CP implements ChoicePoint {

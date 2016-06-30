@@ -137,7 +137,7 @@ public class RewriteTaclet extends FindTaclet {
 
     @Override
     protected void createAndInitializeExecutor() {
-        this.executor = new RewriteTacletExecutor<RewriteTaclet>(this);
+        this.executor = new RewriteTacletExecutor<>(this);
     }
       
     /** 
