@@ -4,7 +4,8 @@ Bundle-Name: Core
 Bundle-SymbolicName: org.key_project.common.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.common.core.Activator
-Require-Bundle: org.eclipse.core.runtime
+Require-Bundle: org.eclipse.core.runtime,
+ org.key_project.util;bundle-version="1.0.0";visibility:=reexport
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.jface.resource,
