@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
@@ -26,6 +27,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -141,7 +143,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
    protected boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence<Term, SequentFormula<Term>> pio) {
       if (pmTerm.op() instanceof IProgramMethod && pmTerm.freeVars().isEmpty()) {
          IProgramMethod pm = (IProgramMethod) pmTerm.op();
-         final Sort nullSort = goal.proof().getJavaInfo().nullSort();
+         final Sort nullSort = goal.getServices().getProgramServices().getJavaInfo().nullSort();
          if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) &&
                  !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
              PIOPathIterator<Term, SequentFormula<Term>> it = pio.iterator();
@@ -205,9 +207,9 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve, newPredicate);
          // Create new single goal in which the query is replaced by the possible results
          ImmutableList<Goal> goals = goal.split(1);
-         Goal resultGoal = goals.head();
+         final Goal resultGoal = goals.head();
          final TermBuilder tb = services.getTermBuilder();
-         resultGoal.applySequentChangeInfo(resultGoal.sequent().removeFormula(pio));
+         final CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> newSeqForGoal = resultGoal.sequent().removeFormula(pio);
          if (pio.isTopLevel() || queryConditionTerm != null) {
             for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
                Term conditionTerm = tb.and(conditionsAndResult.second);
@@ -220,14 +222,13 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                if (queryConditionTerm != null) {
                   resultTerm = tb.imp(queryConditionTerm, resultTerm);
                }
-               resultGoal.applySequentChangeInfo(resultGoal.sequent().addFormula(new SequentFormula<>(resultTerm), pio.isInAntec(), false));
+               newSeqForGoal.combine(newSeqForGoal.sequent().addFormula(new SequentFormula<>(resultTerm), pio.isInAntec(), false));
             }
          }
          else {
             Function resultFunction = createResultConstant(services, varTerm.sort());
             Term resultFunctionTerm = tb.func(resultFunction);
-            resultGoal.applySequentChangeInfo(
-                    resultGoal.sequent().addFormula(replace(pio, 
+            newSeqForGoal.combine(newSeqForGoal.sequent().addFormula(replace(pio, 
                                           varFirst ? tb.equals(resultFunctionTerm, varTerm) : tb.equals(resultFunctionTerm, varTerm),
                                           services), 
                                   pio.isInAntec(), 
@@ -235,9 +236,10 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
                Term conditionTerm = tb.and(conditionsAndResult.second);
                Term resultTerm = tb.imp(conditionTerm, varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.first) : tb.equals(conditionsAndResult.first, resultFunctionTerm));
-               resultGoal.applySequentChangeInfo(resultGoal.sequent().addFormula(new SequentFormula<>(resultTerm), true, false));
+               newSeqForGoal.combine(newSeqForGoal.sequent().addFormula(new SequentFormula<>(resultTerm), true, false));
             }
          }
+         resultGoal.applySequentChangeInfo(newSeqForGoal);
          return goals;
       }
       catch (Exception e) {
