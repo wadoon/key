@@ -42,7 +42,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
     protected void addToAntec(Semisequent semi,
             TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent,
+            CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent,
             PosInOccurrence<Term, SequentFormula<Term>> pos,
             PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
             MatchConditions matchCond,

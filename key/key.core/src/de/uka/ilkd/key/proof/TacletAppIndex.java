@@ -355,7 +355,7 @@ public class TacletAppIndex  {
      * called if a formula has been replaced
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal goal, CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci ) {
+    public void sequentChanged ( Goal goal, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci ) {
     	if ( sci.getOriginalSequent() != seq )
     	    // we are not up to date and have to rebuild everything (lazy)
     	    clearIndexes();
@@ -363,7 +363,7 @@ public class TacletAppIndex  {
     	    updateIndices ( sci );
     }
 
-    private void updateIndices(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci) {
+    private void updateIndices(CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci) {
         seq = sci.sequent ();
 
         antecIndex = antecIndex.sequentChanged ( sci, goal.getServices (),

@@ -31,7 +31,7 @@ public class NodeReplacement {
 
     Node                    node;
     Node                    parent;
-    ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>> rawChanges;
+    ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> rawChanges;
     ImmutableList<NodeChange>        changes    = null;
 
     /**
@@ -43,7 +43,7 @@ public class NodeReplacement {
      */
     public NodeReplacement ( Node                    p_node,
 			     Node                    p_parent,
-			     ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>> p_changes ) {
+			     ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> p_changes ) {
 	node       = p_node;
 	parent     = p_parent;
 	rawChanges = p_changes;
@@ -51,7 +51,7 @@ public class NodeReplacement {
 
     private void addNodeChanges () {
 	if ( !rawChanges.isEmpty() ) {
-	    CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci = rawChanges.head ();
+	    CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci = rawChanges.head ();
 	    rawChanges            = rawChanges.tail ();
 
 	    addNodeChanges ();
@@ -61,7 +61,7 @@ public class NodeReplacement {
 	}
     }
 
-    private void addNodeChange ( CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> p_sci ) {
+    private void addNodeChange ( CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> p_sci ) {
         Iterator<SequentFormula<Term>> it;
         Iterator<FormulaChangeInfo<SequentFormula<Term>>>  it2;
      

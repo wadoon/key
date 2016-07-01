@@ -22,17 +22,17 @@ import de.uka.ilkd.key.logic.*;
 
 
 public class NodeChangesHolder {
-    public ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>> scis;
+    public ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> scis;
 
     NodeChangesHolder () {
-	this ( ImmutableSLList.<CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>>nil() );
+	this ( ImmutableSLList.<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>>nil() );
     }
 
-    NodeChangesHolder ( ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>> p_scis ) {
+    NodeChangesHolder ( ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> p_scis ) {
 	scis = p_scis;
     }
 
-    public void addSCI ( CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> p_sci ) {
+    public void addSCI ( CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> p_sci ) {
 	scis = scis.prepend ( p_sci );
     }
 

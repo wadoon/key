@@ -1731,7 +1731,7 @@ public class TermLabelManager {
     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
     * @param services The {@link Services} to use.
     */
-   public static void mergeLabels(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent, Services services) {
+   public static void mergeLabels(CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, Services services) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
          manager.mergeLabels(services, currentSequent);
@@ -1743,11 +1743,11 @@ public class TermLabelManager {
     * @param services The {@link Services} to use.
     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
     */
-   public void mergeLabels(Services services, CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent) {
-      for (SequentFormula<Term> rejectedSF : currentSequent.getSemisequentChangeInfo(true).rejectedFormulas()) {
+   public void mergeLabels(Services services, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent) {
+      for (SequentFormula<Term> rejectedSF : currentSequent.rejectedFormulas(true)) {
          mergeLabels(currentSequent, services, rejectedSF, true);
       }
-      for (final SequentFormula<Term> rejectedSF : currentSequent.getSemisequentChangeInfo(false).rejectedFormulas()) {
+      for (final SequentFormula<Term> rejectedSF : currentSequent.rejectedFormulas(false)) {
          mergeLabels(currentSequent, services, rejectedSF, false);
       }
    }
@@ -1759,14 +1759,14 @@ public class TermLabelManager {
     * @param rejectedSF The rejected {@link SequentFormula} to work with.
     * @param inAntecedent {@code true} rejected {@link SequentFormula} is in antecedent, {@code false} it is in succedent.
     */
-   protected void mergeLabels(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent, 
+   protected void mergeLabels(CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, 
                               Services services, 
                               SequentFormula<Term> rejectedSF, 
                               boolean inAntecedent) {
       final Term rejectedTerm = rejectedSF.formula();
       if (rejectedTerm.hasLabels()) {
          // Search existing SequentFormula
-         Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
+         Semisequent s = inAntecedent ? currentSequent.sequent().antecedent() : currentSequent.sequent().succedent();
          SequentFormula<Term> existingSF = CollectionUtil.search(s, new IFilter<SequentFormula<Term>>() {
             @Override
             public boolean select(SequentFormula<Term> element) {
@@ -1793,7 +1793,7 @@ public class TermLabelManager {
             // Replace sequent formula
             if (labelsChanged) {
                Term newTerm = services.getTermFactory().createTerm(existingTerm.op(), existingTerm.subs(), existingTerm.boundVars(), existingTerm.modalContent(), new ImmutableArray<TermLabel>(mergedLabels));
-               CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci = currentSequent.sequent().changeFormula(new SequentFormula<>(newTerm), new PosInOccurrence<Term, SequentFormula<Term>>(existingSF, PosInTerm.<Term>getTopLevel(), inAntecedent));
+               CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci = currentSequent.sequent().changeFormula(new SequentFormula<>(newTerm), new PosInOccurrence<Term, SequentFormula<Term>>(existingSF, PosInTerm.<Term>getTopLevel(), inAntecedent));
                currentSequent.combine(sci);
             }
          }

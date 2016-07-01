@@ -144,7 +144,7 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
      * not release it. This means when invoking the method it must be snsured
      * that succ is never used afterwards.
      */
-    public void combine(CCSemisequentChangeInfo<SeqFor, SemiSeq> succ) {
+    public void combine(CCSemisequentChangeInfo<SeqFor, ?> succ) {
         final CCSemisequentChangeInfo<SeqFor, SemiSeq> predecessor = this;
         if (succ == predecessor) {
             return;

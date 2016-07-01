@@ -20,7 +20,9 @@ import org.key_project.common.core.logic.calculus.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -95,7 +97,7 @@ public class FormulaTagManager {
     }
 
 
-    public void sequentChanged (Goal source, CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci) {
+    public void sequentChanged (Goal source, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci) {
 	assert source != null;
         removeTags ( sci, true, source  );
 	removeTags ( sci, false, source );
@@ -107,12 +109,12 @@ public class FormulaTagManager {
         addTags    ( sci, false, source );
     }
 
-    private void updateTags(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
+    private void updateTags(CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci, boolean p_antec, Goal p_goal) {
         for (FormulaChangeInfo<SequentFormula<Term>> formulaChangeInfo : sci.modifiedFormulas(p_antec))
             updateTag(formulaChangeInfo, sci.sequent(), p_goal);
     }
 
-    private void addTags(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
+    private void addTags(CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula<Term> constrainedFormula : sci.addedFormulas(p_antec)) {
             final PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>
                     (constrainedFormula, PosInTerm.<Term>getTopLevel(), p_antec);
@@ -120,7 +122,7 @@ public class FormulaTagManager {
         }
     }
 
-    private void removeTags(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci, boolean p_antec, Goal p_goal) {
+    private void removeTags(CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula<Term> constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>
                     (constrainedFormula, PosInTerm.<Term>getTopLevel(), p_antec);
@@ -159,6 +161,7 @@ public class FormulaTagManager {
         final Semisequent ss = p_antec ? seq.antecedent () : seq.succedent ();
 
         for (Object s : ss) {
+            @SuppressWarnings("unchecked")
             final PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>((SequentFormula<Term>) s,
                     PosInTerm.<Term>getTopLevel(),
                     p_antec);

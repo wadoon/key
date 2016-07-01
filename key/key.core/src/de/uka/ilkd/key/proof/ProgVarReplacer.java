@@ -20,11 +20,7 @@ import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -34,13 +30,7 @@ import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.OperatorInstantiation;
-import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
-import de.uka.ilkd.key.rule.inst.ProgramListInstantiation;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.rule.inst.*;
 
 
 /**
@@ -220,7 +210,7 @@ public final class ProgVarReplacer {
     /**
      * replaces in a sequent
      */
-    public CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> replace(Sequent s) {
+    public CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> replace(Sequent s) {
         SemisequentChangeInfo anteCI = replace(s.antecedent());
         SemisequentChangeInfo succCI = replace(s.succedent());
 
@@ -230,7 +220,7 @@ public final class ProgVarReplacer {
         Sequent newSequent = Sequent.createSequent(newAntecedent,
                                                    newSuccedent);
 
-        CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> result = SequentChangeInfo.createSequentChangeInfo
+        CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> result = SequentChangeInfo.createSequentChangeInfo
                                               (anteCI, succCI, newSequent, s);
         return result;
     }

@@ -27,7 +27,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -61,7 +60,7 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
  *  setting back several proof steps. The sequent has to be changed using the
  *  methods of Goal.
  */
-public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Sequent, NoPosTacletApp, Goal>  {
+public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosTacletApp, Goal>  {
 
     private Node node;
     
@@ -215,7 +214,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      * to reduce unnecessary object creation the necessary information is passed
      * to the listener as parameters and not through an event object.
      */
-    protected void fireSequentChanged(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci) {
+    protected void fireSequentChanged(CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci) {
 	getFormulaTagManager().sequentChanged(this, sci);
 	ruleAppIndex()        .sequentChanged(this, sci);
 	for (GoalListener listener : listeners) {
@@ -364,7 +363,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Semisequent, Se
      * @see de.uka.ilkd.key.proof.CCGoal#setSequent(org.key_project.common.core.logic.calculus.CCSequentChangeInfo)
      */
     @Override
-    public void applySequentChangeInfo(CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci) {
+    public void applySequentChangeInfo(CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci) {
         node.setSequent(sci.sequent());
 //VK reminder: now update the index
        	fireSequentChanged(sci);

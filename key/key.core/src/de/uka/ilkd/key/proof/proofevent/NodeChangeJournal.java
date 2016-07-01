@@ -18,15 +18,10 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.*;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.GoalListener;
 import de.uka.ilkd.key.proof.Node;
@@ -97,7 +92,7 @@ public class NodeChangeJournal implements GoalListener {
      * of goal
      */
     public void sequentChanged ( Goal              source,
-				 CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci ) {
+				 CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci ) {
         NodeChangesHolder nc = getChangeObj(source.node ());
         
 	if ( nc != null )

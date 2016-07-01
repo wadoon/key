@@ -375,7 +375,7 @@ public final class RuleAppIndex  {
      * @param g the Goal which sequent has been changed
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal g, CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci ) {
+    public void sequentChanged ( Goal g, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci ) {
 	if ( !autoMode )
             // the TacletAppIndex is able to detect modification of the
             // sequent itself, it is not necessary to clear the index

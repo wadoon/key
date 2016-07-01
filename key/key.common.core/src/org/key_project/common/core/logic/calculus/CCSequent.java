@@ -28,7 +28,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      *         the new sequent and information which formulas have been added or
      *         removed
      */
-    CCSequentChangeInfo<?, SeqFor, SemiSeq, Seq> addFormula(SeqFor cf,
+    CCSequentChangeInfo<?, SeqFor, Seq> addFormula(SeqFor cf,
             boolean antec, boolean first);
 
     /**
@@ -44,7 +44,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      *         the new sequent and information which formulas have been added or
      *         removed
      */
-    CCSequentChangeInfo<?, SeqFor, SemiSeq, Seq> addFormula(SeqFor cf,
+    CCSequentChangeInfo<?, SeqFor, Seq> addFormula(SeqFor cf,
             PosInOccurrence<T, SeqFor> p);
 
     /**
@@ -66,7 +66,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      *         the new sequent and information which formulas have been added or
      *         removed
      */
-    CCSequentChangeInfo<?, SeqFor, SemiSeq, Seq> addFormula(
+    CCSequentChangeInfo<?, SeqFor, Seq> addFormula(
             Iterable<SeqFor> insertions, boolean antec, boolean first);
 
     /**
@@ -83,7 +83,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      *         the new sequent and information which formulas have been added or
      *         removed
      */
-    CCSequentChangeInfo<?, SeqFor, SemiSeq, Seq> addFormula(
+    CCSequentChangeInfo<?, SeqFor, Seq> addFormula(
             Iterable<SeqFor> insertions, PosInOccurrence<?, SeqFor> p);
 
     /** returns semisequent of the antecedent to work with */
@@ -102,7 +102,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      *         the new sequent and information which formulas have been added or
      *         removed
      */
-    CCSequentChangeInfo<?, SeqFor, SemiSeq, Seq> changeFormula(SeqFor newCF,
+    CCSequentChangeInfo<?, SeqFor, Seq> changeFormula(SeqFor newCF,
             PosInOccurrence<?, SeqFor> p);
 
     /**
@@ -120,7 +120,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      *         the new sequent and information which formulas have been added or
      *         removed
      */
-    CCSequentChangeInfo<?, SeqFor, SemiSeq, Seq> changeFormula(
+    CCSequentChangeInfo<?, SeqFor, Seq> changeFormula(
             Iterable<SeqFor> replacements, PosInOccurrence<?, SeqFor> p);
 
     /**
@@ -148,7 +148,7 @@ public interface CCSequent<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentF
      *         the new sequent and information which formulas have been added or
      *         removed
      */
-    CCSequentChangeInfo<?, SeqFor, SemiSeq, Seq> removeFormula(
+    CCSequentChangeInfo<?, SeqFor, Seq> removeFormula(
             PosInOccurrence<?, SeqFor> p);
 
     int size();

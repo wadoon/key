@@ -129,7 +129,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
      */
    @Override
    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-           CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
+           CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
            MatchConditions matchCond,
            Goal goal,
            RuleApp ruleApp,
@@ -171,7 +171,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     */
    @Override
    protected void applyAdd(Sequent add, TermLabelState termLabelState,
-         CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
+         CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
          MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
       if (posOfFind.isInAntec()) {
          addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, posOfFind, posOfFind, matchCond, goal, ruleApp, services);

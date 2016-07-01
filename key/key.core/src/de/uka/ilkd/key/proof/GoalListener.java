@@ -17,9 +17,8 @@ import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 
 /** interface to be implemented by a goal listener */
 public interface GoalListener {
@@ -27,7 +26,7 @@ public interface GoalListener {
     /** 
      * informs the listener about a change that occured to the sequent of goal
      */
-    void sequentChanged(Goal source, CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci);
+    void sequentChanged(Goal source, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci);
 
 
     /**

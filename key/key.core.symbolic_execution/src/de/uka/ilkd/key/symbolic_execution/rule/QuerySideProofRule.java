@@ -27,7 +27,6 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -209,7 +208,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          ImmutableList<Goal> goals = goal.split(1);
          final Goal resultGoal = goals.head();
          final TermBuilder tb = services.getTermBuilder();
-         final CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> newSeqForGoal = resultGoal.sequent().removeFormula(pio);
+         final CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> newSeqForGoal = resultGoal.sequent().removeFormula(pio);
          if (pio.isTopLevel() || queryConditionTerm != null) {
             for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
                Term conditionTerm = tb.and(conditionsAndResult.second);
