@@ -178,7 +178,6 @@ public class SemisequentTacletAppIndex {
                 addTermIndex ( newFor, newSeq, services, tacletIndex,
                                listener );
             else {
-                @SuppressWarnings("unchecked")
                 final PosInOccurrence<Term> oldPos = (PosInOccurrence<Term>) info.getPositionOfModification ();
                 final PosInOccurrence<Term> newPos = oldPos.replaceConstrainedFormula ( newFor );
                 termIndices = termIndices.put ( newFor,
