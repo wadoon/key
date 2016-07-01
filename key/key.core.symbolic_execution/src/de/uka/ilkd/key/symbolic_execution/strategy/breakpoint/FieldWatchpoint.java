@@ -14,7 +14,9 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.proof.Goal;
+
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
+import org.key_project.common.core.rule.RuleApp;
 
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
@@ -26,7 +28,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * This{@link FieldWatchpoint} represents a Java watchpoint and is responsible to tell the debugger to stop execution when the respective

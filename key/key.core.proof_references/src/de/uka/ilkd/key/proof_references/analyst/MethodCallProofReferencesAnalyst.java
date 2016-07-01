@@ -16,9 +16,11 @@ package de.uka.ilkd.key.proof_references.analyst;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.proof.Goal;
+
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -42,7 +44,6 @@ import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**

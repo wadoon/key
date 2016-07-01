@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.ListIterator;
 
 import de.uka.ilkd.key.logic.Term;
+
 import org.key_project.common.core.proof.NameRecorder;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -33,7 +35,6 @@ import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 
 public class Node  {
     private static final String RULE_WITHOUT_NAME = "rule without name";

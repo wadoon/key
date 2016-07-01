@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,17 +11,15 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof.mgt;
+package org.key_project.common.core.proof;
 
-import org.key_project.common.core.rule.RuleApp;
+import org.key_project.common.core.logic.Named;
 
-import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Goal;
+/**
+ * TODO: Document.
+ *
+ * @author Dominic Scheurer
+ */
+public interface CCProof extends Named {
 
-public interface ComplexRuleJustification extends RuleJustification {
-    
-    public RuleJustification getSpecificJustification(RuleApp<Term, Goal> app,
-            JavaDLTermServices services);
-    
 }

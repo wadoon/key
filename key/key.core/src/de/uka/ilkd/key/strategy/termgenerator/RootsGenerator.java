@@ -19,6 +19,7 @@ import java.util.Iterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.op.Equality;
 import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
@@ -28,7 +29,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 

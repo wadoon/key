@@ -19,10 +19,10 @@ import java.util.Stack;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.rule.RuleApp;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * Enumerate potential subformulas of a formula that could be used for a cut

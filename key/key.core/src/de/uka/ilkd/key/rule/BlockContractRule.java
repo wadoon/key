@@ -33,6 +33,7 @@ import org.key_project.common.core.logic.op.Transformer;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.PositionInfo;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;

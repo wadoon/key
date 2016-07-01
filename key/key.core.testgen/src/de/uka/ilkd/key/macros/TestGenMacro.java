@@ -6,12 +6,12 @@ import java.util.Set;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.rule.Rule;
+import org.key_project.common.core.rule.RuleApp;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -65,7 +65,7 @@ public class TestGenMacro extends StrategyProofMacro {
 			int totalUnwinds = 0;
 			Node node = goal.node();
 			while (!node.root()) {
-				final RuleApp app = node.getAppliedRuleApp();
+				final RuleApp<Term, Goal> app = node.getAppliedRuleApp();
 				if (app != null) {
 					final Rule rule = app.rule();
 					if (TestGenStrategy.isUnwindRule(rule)) {

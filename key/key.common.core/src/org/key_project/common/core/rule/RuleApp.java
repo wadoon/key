@@ -15,14 +15,12 @@
  * rule application with specific information how and where the rule
  * has to be applied
  */
-package de.uka.ilkd.key.rule;
+package org.key_project.common.core.rule;
 
 import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.rule.Rule;
+import org.key_project.common.core.proof.CCGoal;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.proof.CCGoal;
 
 public interface RuleApp<T extends CCTerm<?, ?, ?, T>, G extends CCGoal<?, T, ?, ?, ?>> {
 

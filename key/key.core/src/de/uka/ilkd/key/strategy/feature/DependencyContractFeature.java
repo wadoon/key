@@ -16,13 +16,13 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.List;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.speclang.HeapContext;
 

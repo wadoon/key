@@ -29,6 +29,7 @@ import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.Position;
 import org.key_project.common.core.program.PositionInfo;
 import org.key_project.common.core.rule.Rule;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;

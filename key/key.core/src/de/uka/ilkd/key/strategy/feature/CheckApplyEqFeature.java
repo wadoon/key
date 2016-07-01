@@ -63,7 +63,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
         // Position may not be one of the terms compared in
         // the equation
 
-        final PIOPathIterator it = pos.iterator ();
+        final PIOPathIterator<Term> it = pos.iterator ();
 
         it.next ();
 

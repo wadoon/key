@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.rule.executor;
 
 import de.uka.ilkd.key.logic.Term;
+
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.RuleApp;
 
 
 /**

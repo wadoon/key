@@ -27,7 +27,8 @@ import de.uka.ilkd.key.proof.Node;
 public class ProspectivePartner {
     private final Term[] updates = new Term[2];
     private final Term commonFormula;
-    private final SequentFormula[] formula = new SequentFormula[2];
+    @SuppressWarnings("unchecked")
+    private final SequentFormula<Term>[] formula = new SequentFormula[2];
     private final Node[] nodes = new Node[2];
     private Term commonPredicate = null;
     private Node commonParent = null;

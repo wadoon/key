@@ -17,11 +17,11 @@ import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.op.Equality;
 import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.rule.RuleApp;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
@@ -48,7 +48,7 @@ public class FindRightishFeature implements Feature {
         assert pos != null : "Feature is only applicable to rules with find";
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
-        final PIOPathIterator it = pos.iterator ();
+        final PIOPathIterator<Term> it = pos.iterator ();
 
         while ( it.next () != -1 ) {
             final Operator op = it.getSubTerm ().op ();

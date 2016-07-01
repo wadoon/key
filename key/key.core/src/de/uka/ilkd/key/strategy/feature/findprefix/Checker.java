@@ -45,7 +45,7 @@ interface Checker {
      * @param it   the prefix iterator
      */
     public void checkOperator(Operator op,
-                              PIOPathIterator it);
+                              PIOPathIterator<Term> it);
 
 
 

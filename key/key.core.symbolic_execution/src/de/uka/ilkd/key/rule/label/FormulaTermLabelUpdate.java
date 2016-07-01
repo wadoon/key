@@ -10,6 +10,7 @@ import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.rule.Rule;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
@@ -82,7 +83,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
       if (ruleApp instanceof TacletApp) {
          TacletApp ta = (TacletApp) ruleApp;
          if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
-            Map<SequentFormula, FormulaTermLabel> ifLabels = new LinkedHashMap<SequentFormula, FormulaTermLabel>();
+            Map<SequentFormula<Term>, FormulaTermLabel> ifLabels = new LinkedHashMap<SequentFormula<Term>, FormulaTermLabel>();
             for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(ifInst.getConstrainedFormula().formula().getLabels());
                if (ifLabel != null) {
@@ -93,7 +94,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                if (TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs)
 //                   || TruthValueEvaluationUtil.isPredicate(newTermOp)
                    ) {
-                  for (Entry<SequentFormula, FormulaTermLabel> ifEntry : ifLabels.entrySet()) {
+                  for (Entry<SequentFormula<Term>, FormulaTermLabel> ifEntry : ifLabels.entrySet()) {
                      FormulaTermLabel ifLabel = ifEntry.getValue();
                      int labelSubID = FormulaTermLabel.newLabelSubID(services, ifLabel);
                      FormulaTermLabel newLabel = new FormulaTermLabel(ifLabel.getMajorId(), labelSubID, Collections.singletonList(ifLabel.getId()));

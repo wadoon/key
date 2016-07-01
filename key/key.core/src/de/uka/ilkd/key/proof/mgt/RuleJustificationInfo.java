@@ -18,11 +18,12 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+
 import org.key_project.common.core.rule.Rule;
+import org.key_project.common.core.rule.RuleApp;
 
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.JavaDLTermServices;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleKey;
 
 

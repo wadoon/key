@@ -36,7 +36,7 @@ class SuccChecker implements Checker {
 
     @Override
     public void checkOperator(Operator op,
-                              PIOPathIterator it) {
+                              PIOPathIterator<Term> it) {
         // do nothing
     }
 

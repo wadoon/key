@@ -15,11 +15,12 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import javax.swing.tree.TreeNode;
 
+import org.key_project.common.core.rule.RuleApp;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * A special kind of gui proof tree node to show intermediate intermediate steps of the 

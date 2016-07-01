@@ -17,6 +17,7 @@ package de.uka.ilkd.key.proof.proofevent;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.GoalListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 
 
 /**

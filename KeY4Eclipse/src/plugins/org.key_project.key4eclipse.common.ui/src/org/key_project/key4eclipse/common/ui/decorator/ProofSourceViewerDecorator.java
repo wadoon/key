@@ -29,8 +29,8 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.ObjectUtil;
@@ -38,11 +38,11 @@ import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
@@ -313,13 +313,13 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       
       printer.printSequent(filter);
       String s = printer.toString();
-      RuleApp app = node.getAppliedRuleApp();
+      RuleApp<Term, Goal> app = node.getAppliedRuleApp();
       s += "\nNode Nr " + node.serialNr() + "\n";
       s += ruleToString(node.getServices(), notationInfo, app, true);
       return s;
    }
    
-   public static String ruleToString(Services services, NotationInfo notationInfo, RuleApp app, boolean withHeadder) {
+   public static String ruleToString(Services services, NotationInfo notationInfo, RuleApp<Term, Goal> app, boolean withHeadder) {
       String s = StringUtil.EMPTY_STRING;
       if ( app != null ) {
          if (withHeadder) {

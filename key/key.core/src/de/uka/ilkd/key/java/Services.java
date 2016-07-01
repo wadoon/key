@@ -24,10 +24,12 @@ import org.key_project.common.core.logic.factories.CCTermFactory;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.common.core.proof.NameRecorder;
+import org.key_project.common.core.services.CCServices;
 import org.key_project.common.core.services.ProgramServices;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -41,7 +43,8 @@ import de.uka.ilkd.key.util.Debug;
  * include information on the underlying Java model and a converter to
  * transform Java program elements to logic (where possible) and back.
  */
-public class Services implements JavaDLTermServices, ProofServices {
+public class Services implements JavaDLTermServices, ProofServices,
+        CCServices<JavaBlock, Term, TermBuilder, TermFactory> {
    /**
      * the proof
      */

@@ -15,9 +15,10 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
 
+import org.key_project.common.core.rule.RuleApp;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * Interface encapsulating points during the evaluation of a feature term where

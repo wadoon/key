@@ -13,28 +13,18 @@
 
 package org.key_project.common.core.services;
 
-import org.key_project.common.core.logic.NamespaceSet;
-import org.key_project.common.core.proof.NameRecorder;
+import org.key_project.common.core.logic.CCTerm;
+import org.key_project.common.core.logic.ModalContent;
+import org.key_project.common.core.logic.factories.CCTermBuilder;
+import org.key_project.common.core.logic.factories.CCTermFactory;
 
 /**
- * TODO: Document.
+ * The general services interface provides access to all important sub-services.
  *
  * @author Dominic Scheurer
  */
-public interface CCProofServices {
-
-    ProgramServices getProgramServices();
-
-    <S extends ProgramServices> S getProgramServices(Class<S> clazz);
-    
-    CCTheoryServices getTheories();
-
-    /**
-     * returns the namespaces for functions, predicates etc.
-     * @return the proof specific namespaces
-     */
-    NamespaceSet getNamespaces();
-
-    NameRecorder getNameRecorder();
+public interface CCServices<P extends ModalContent<?>, T extends CCTerm<?, P, ?, T>, TB extends CCTermBuilder<P, T>, TF extends CCTermFactory<P, T>>
+        extends TermServices<P, T, TB, TF>,
+        CCProofServices {
 
 }

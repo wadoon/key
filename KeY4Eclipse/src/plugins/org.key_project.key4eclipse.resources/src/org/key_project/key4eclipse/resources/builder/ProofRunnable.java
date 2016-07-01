@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
 import org.key_project.key4eclipse.resources.counterexamples.KeYProjectCounterExampleGenerator;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
@@ -26,6 +27,7 @@ import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -37,7 +39,6 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.testgen.MemoryTestGenerationLog;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
@@ -266,7 +267,7 @@ public class ProofRunnable implements Runnable {
                    // Collect goals at which a specification would be applied next
                    ImmutableList<Goal> specGoals = ImmutableSLList.nil();
                    for (Goal goal : proof.openEnabledGoals()) {
-                      RuleApp nextRule = goal.getRuleAppManager().peekNext();
+                      RuleApp<Term, Goal> nextRule = goal.getRuleAppManager().peekNext();
                       if (profile.isSpecificationInvolvedInRuleApp(nextRule)) {
                          specGoals = specGoals.prepend(goal);
                       }

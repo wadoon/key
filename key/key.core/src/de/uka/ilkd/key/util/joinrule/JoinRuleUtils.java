@@ -23,6 +23,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.NameAbstractionTable;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.*;
 
@@ -42,7 +43,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.join.CloseAfterJoin;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;

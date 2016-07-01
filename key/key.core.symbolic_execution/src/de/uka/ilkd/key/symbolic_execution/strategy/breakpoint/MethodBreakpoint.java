@@ -14,7 +14,9 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.proof.Goal;
+
 import org.key_project.common.core.program.Position;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -31,7 +33,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;

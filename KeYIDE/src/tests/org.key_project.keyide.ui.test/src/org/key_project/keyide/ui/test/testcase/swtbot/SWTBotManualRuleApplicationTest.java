@@ -25,16 +25,17 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.Test;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -63,7 +64,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                         
                           @Override
                           public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-                             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                             RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
                              return !"closeFalse".equals(MiscTools.getRuleName(ruleApp)) ||
                                     proof.openEnabledGoals().size() >= 2; // Stop before last goal is closed with closeFalse
                           }
@@ -160,7 +161,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                @Override
                public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
                      IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Use Operation Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
@@ -235,7 +236,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                @Override
                public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
                      IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Use Operation Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
@@ -295,7 +296,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                            
                            @Override
                            public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-                              RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                              RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
                               return !"Use Operation Contract".equals(MiscTools.getRuleName(ruleApp));
                            }
                            
@@ -355,7 +356,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                
                @Override
                public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Block Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
@@ -413,7 +414,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                
                @Override
                public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Block Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
@@ -471,7 +472,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                
                @Override
                public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Block Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
@@ -542,7 +543,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                
                @Override
                public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Use Dependency Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
@@ -605,7 +606,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                
                @Override
                public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Use Dependency Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                

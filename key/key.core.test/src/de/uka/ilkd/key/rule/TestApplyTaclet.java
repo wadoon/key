@@ -24,6 +24,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Quantifier;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.program.NameAbstractionTable;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -31,17 +32,11 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -155,7 +150,7 @@ public class TestApplyTaclet extends TestCase{
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
-	RuleApp rApp=rApplist.head();
+	RuleApp<Term, Goal> rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals=rApp.execute(goal);
 	assertTrue("Too many or zero goals for imp-right.",goals.size()==1);	
@@ -182,7 +177,7 @@ public class TestApplyTaclet extends TestCase{
 	    getTacletAppAt(TacletFilter.TRUE, applyPos,
 			   null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
-	RuleApp rApp=rApplist.head();
+	RuleApp<Term, Goal> rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals=rApp.execute(goal);
 	assertTrue("Too many or zero goals for imp_right_add.",goals.size()==1);
@@ -230,7 +225,7 @@ public class TestApplyTaclet extends TestCase{
 	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);
 	assertTrue("Too many or zero rule applications.", rApplist.size()==1);
-	RuleApp rApp=rApplist.head();
+	RuleApp<Term, Goal> rApp=rApplist.head();
 	rApp = ((TacletApp)rApp).tryToInstantiate ( TacletForTests.services() );
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals = rApp.execute(goal);
@@ -296,7 +291,7 @@ public class TestApplyTaclet extends TestCase{
 	    = goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE,
 	            applyPos, null);
  	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
- 	RuleApp rApp=rApplist.head();
+ 	RuleApp<Term, Goal> rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
  	ImmutableList<Goal> goals=rApp.execute(goal);
  	assertTrue("Too many or zero goals for imp-left.",goals.size()==2);	
@@ -339,7 +334,7 @@ public class TestApplyTaclet extends TestCase{
 	    getTacletAppAt(TacletFilter.TRUE, pos, null);	
 
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
-	RuleApp rApp=rApplist.head();
+	RuleApp<Term, Goal> rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals=rApp.execute(goal);
 	assertTrue("Too many or zero goals for contradiction.",goals.size()==1);	
@@ -1008,7 +1003,7 @@ public class TestApplyTaclet extends TestCase{
                         "int i=17; } catch (Exception e) { return null;}}");
                         
         ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().modalContent().program();
-        assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable()));      
+        assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable<SourceElement>()));      
     }
     
     /**
@@ -1040,7 +1035,7 @@ public class TestApplyTaclet extends TestCase{
                         "int i=17; } catch (Exception e) { return null;}}");
         
         ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().modalContent().program();
-        assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable()));
+        assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable<SourceElement>()));
     }
     
 }

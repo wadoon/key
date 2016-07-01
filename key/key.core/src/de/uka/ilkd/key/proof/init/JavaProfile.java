@@ -15,9 +15,11 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+
 import org.key_project.common.core.logic.label.ParameterlessTermLabel;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.rule.Rule;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;

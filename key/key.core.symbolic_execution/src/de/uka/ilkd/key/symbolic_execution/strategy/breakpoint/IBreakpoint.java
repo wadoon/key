@@ -13,11 +13,12 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import org.key_project.common.core.rule.RuleApp;
+
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 
 /**

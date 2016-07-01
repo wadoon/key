@@ -62,7 +62,7 @@ class AntecSuccPrefixChecker implements Checker {
 
     @Override
     public void checkOperator(Operator op,
-                              PIOPathIterator it) {
+                              PIOPathIterator<Term> it) {
         // compute polarity
         // toggle polarity if find term is subterm of
         if ((op == Junctor.NOT) ||                                          //   not

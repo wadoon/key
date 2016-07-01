@@ -19,6 +19,7 @@ import java.util.List;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.rule.RuleApp;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 public class ThrownExceptionFeature extends BinaryFeature {

@@ -1,14 +1,13 @@
-package de.uka.ilkd.key.proof;
+package org.key_project.common.core.proof;
 
-import de.uka.ilkd.key.logic.Term;
 import org.key_project.common.core.logic.CCTerm;
-import org.key_project.common.core.logic.calculus.*;
+import org.key_project.common.core.logic.calculus.CCSequent;
+import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.op.CCProgramVariable;
 import org.key_project.common.core.logic.visitors.CCTermVisitor;
+import org.key_project.common.core.rule.RuleApp;
+import org.key_project.common.core.services.CCServices;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  *  A proof is represented as a tree of nodes containing sequents. The initial
@@ -23,23 +22,23 @@ import de.uka.ilkd.key.rule.RuleApp;
  *  track of all applied rule applications on the branch and of the
  *  corresponding rule application index. Furthermore it offers methods for
  *  setting back several proof steps. The sequent has to be changed using the
- *  methods of Goal.
+ *  methods of Self.
  */
 public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>, 
     T extends CCTerm<?, ?, ? extends CCTermVisitor<T>, T>,
     Seq extends CCSequent<T, ?, Seq>,
-    RA extends RuleApp<Term, Goal>,
+    RA extends RuleApp<T, Self>,
     Self extends CCGoal<ProgVar, T, Seq, RA, Self>> {
 
     /** returns set of rules applied at this branch
      * @return IList<RuleApp> applied rule applications
      */
-    ImmutableList<RuleApp<Term, Goal>> appliedRuleApps();
+    ImmutableList<RuleApp<T, Self>> appliedRuleApps();
 
     /** returns the proof the goal belongs to
      * @return the Proof the goal belongs to
      */
-    Proof proof();
+    CCProof proof();
 
     /** returns the sequent of the node
      * @return the Seq to be proved
@@ -108,7 +107,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * and stores it in the node of the goal
      * @param app the applied rule app
      */
-    void addAppliedRuleApp(RuleApp<Term, Goal> app);
+    void addAppliedRuleApp(RuleApp<T, Self> app);
 
     /** creates n new nodes as children of the
      * referenced node and new
@@ -123,13 +122,13 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * @param ruleApp the {@link RuleApp} to apply
      * @return the result of the application
      */
-    ImmutableList<Self> apply(RuleApp<Term, Goal> ruleApp);
+    ImmutableList<Self> apply(RuleApp<T, Self> ruleApp);
 
    /** 
-    * returns the {@link Services} of the {@link Proof} 
-    * @return the {@link Services}
+    * returns the {@link CCServices} of the {@link Proof} 
+    * @return the {@link CCServices}
     */
-    Services getServices();
+    CCServices<?, T, ?, ?> getServices();
     
     /**
      * @return the current time of this goal (which is just the number of

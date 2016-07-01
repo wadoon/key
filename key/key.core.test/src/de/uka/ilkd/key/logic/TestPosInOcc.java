@@ -58,7 +58,7 @@ public class TestPosInOcc extends TestCase {
 	      PosInTerm.<Term>getTopLevel(),
 	    true);
 
-	PIOPathIterator it = pio.iterator ();
+	PIOPathIterator<Term> it = pio.iterator ();
 
 	// a top-level position
 

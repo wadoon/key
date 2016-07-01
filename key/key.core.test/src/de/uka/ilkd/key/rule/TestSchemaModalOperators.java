@@ -26,27 +26,17 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -204,7 +194,7 @@ public class TestSchemaModalOperators extends TestCase {
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
-	RuleApp rApp=rApplist.head();
+	RuleApp<Term, Goal> rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals=rApp.execute(goal);
 	assertTrue("There should be 1 goal for testSchemaModal1 taclet, was "+goals.size(), goals.size()==1);	
@@ -238,7 +228,7 @@ public class TestSchemaModalOperators extends TestCase {
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
-	RuleApp rApp=rApplist.head();
+	RuleApp<Term, Goal> rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals=rApp.execute(goal);
 	assertTrue("There should be 1 goal for testSchemaModal2 taclet, was "+goals.size(), goals.size()==1);	
@@ -268,7 +258,7 @@ public class TestSchemaModalOperators extends TestCase {
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
-	RuleApp rApp=rApplist.head();
+	RuleApp<Term, Goal> rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals=rApp.execute(goal);
 	assertTrue("There should be 3 goals for testSchemaModal3 taclet, was "+goals.size(), goals.size()==3);	
