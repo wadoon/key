@@ -65,7 +65,7 @@ import de.uka.ilkd.key.util.Triple;
  * namespaces and several other informations about the current state
  * of the proof.
  */
-public class Proof implements CCProof {
+public class Proof implements CCProof<Goal> {
    
     /**
      * The time when the {@link Proof} instance was created.
@@ -240,6 +240,7 @@ public class Proof implements CCProof {
      * Cut off all reference such that it does not lead to a big memory leak
      * if someone still holds a reference to this proof object.
      */
+    @Override
     public void dispose() {
         if (isDisposed()) {
             return;
@@ -280,6 +281,7 @@ public class Proof implements CCProof {
      * been called on this object. Should be asserted before proof object is
      * accessed.
      */
+    @Override
     public boolean isDisposed() {
         return disposed;
     }
@@ -295,6 +297,7 @@ public class Proof implements CCProof {
     }
 
 
+    @Override
     public String header() {
         return problemHeader;
     }
@@ -307,6 +310,7 @@ public class Proof implements CCProof {
     /**
      * returns a collection of the namespaces valid for this proof
      */
+    @Override
     public NamespaceSet getNamespaces() {
         return getServices().getNamespaces();
     }
@@ -317,14 +321,17 @@ public class Proof implements CCProof {
     }
 
     /** returns the Services with the java service classes */
+    @Override
     public Services getServices() {
         return initConfig.getServices();
     }
 
+    @Override
     public long getAutoModeTime() {
         return autoModeTime;
     }
 
+    @Override
     public void addAutoModeTime(long time) {
         autoModeTime += time;
     }
@@ -332,6 +339,7 @@ public class Proof implements CCProof {
 
 
     /** sets the variable, function, sort, heuristics namespaces */
+    @Override
     public void setNamespaces(NamespaceSet ns) {
         getServices().setNamespaces(ns);
         if (openGoals().size() > 1)
@@ -423,6 +431,7 @@ public class Proof implements CCProof {
      * returns the list of open goals
      * @return list with the open goals
      */
+    @Override
     public ImmutableList<Goal> openGoals() {
         return openGoals;
     }
@@ -433,6 +442,7 @@ public class Proof implements CCProof {
      * @return list of open and enabled goals, never null
      * @author mulbrich
      */
+    @Override
     public ImmutableList<Goal> openEnabledGoals() {
         return filterEnabledGoals(openGoals);
     }
@@ -463,6 +473,7 @@ public class Proof implements CCProof {
      * @param newGoals the IList<Goal> with the new goals that were
      * result of a rule application on goal
      */
+    @Override
     public void replace(Goal oldGoal, ImmutableList<Goal> newGoals) {
         openGoals = openGoals.removeAll(oldGoal);
 
@@ -479,6 +490,7 @@ public class Proof implements CCProof {
      * Add the given constraint to the closure constraint of the given
      * goal, i.e. the given goal is closed if p_c is satisfied.
      */
+    @Override
     public void closeGoal ( Goal p_goal ) {
 
         Node closedSubtree = p_goal.node().close();
@@ -513,6 +525,7 @@ public class Proof implements CCProof {
      *
      * @param p_goal The goal to be opened again.
      */
+    @Override
     public void reOpenGoal(Goal p_goal) {
         p_goal.node().reopen();
     }
@@ -536,6 +549,7 @@ public class Proof implements CCProof {
     /** adds a new goal to the list of goals
      * @param goal the Goal to be added
      */
+    @Override
     public void add(Goal goal) {
         ImmutableList<Goal> newOpenGoals = openGoals.prepend(goal);
         if (openGoals != newOpenGoals) {
@@ -548,6 +562,7 @@ public class Proof implements CCProof {
     /** adds a list with new goals to the list of open goals
      * @param goals the IList<Goal> to be prepended
      */
+    @Override
     public void add(ImmutableList<Goal> goals) {
         ImmutableList<Goal> newOpenGoals = openGoals.prepend(goals);
         if (openGoals != newOpenGoals) {
@@ -563,6 +578,7 @@ public class Proof implements CCProof {
     /**
      * returns true if the root node is marked as closed and all goals have been removed
      */
+    @Override
     public boolean closed () {
         return root.isClosed() && openGoals.isEmpty();
     }
@@ -730,6 +746,7 @@ public class Proof implements CCProof {
 
     }
 
+    @Override
     public synchronized void pruneProof(Goal goal) {
         if(goal.node().parent()!= null){
             pruneProof(goal.node().parent());
@@ -1121,6 +1138,7 @@ public class Proof implements CCProof {
      * Returns the {@link File} under which the {@link Proof} was saved the last time if available.
      * @return The {@link File} under which the {@link Proof} was saved the last time or {@code null} if not available.
      */
+    @Override
     public File getProofFile() {
        return proofFile;
     }
@@ -1129,10 +1147,12 @@ public class Proof implements CCProof {
      * Sets the {@link File} under which the {@link Proof} was saved the last time.
      * @param proofFile The {@link File} under which the {@link Proof} was saved the last time.
      */
+    @Override
     public void setProofFile(File proofFile) {
        this.proofFile = proofFile;
     }
     
+    @Override
     public void saveToFile(File file) throws IOException{
        ProofSaver saver = new ProofSaver(this, file);
        saver.save();
@@ -1141,7 +1161,8 @@ public class Proof implements CCProof {
    /**
     * Extracts java source directory from {@link #header()}, if it exists.
     */
-   public File getJavaSourceLocation() {
+   @Override
+public File getJavaSourceLocation() {
       String header = header();
       int i = header.indexOf("\\javaSource");
       if (i >= 0) {
