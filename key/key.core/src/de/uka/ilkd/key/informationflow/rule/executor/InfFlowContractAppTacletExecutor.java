@@ -6,6 +6,7 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.properties.Properties;
 
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.Services;
@@ -16,7 +17,6 @@ import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
-import de.uka.ilkd.key.util.properties.Properties;
 
 public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfFlowContractAppTaclet> {
     /**

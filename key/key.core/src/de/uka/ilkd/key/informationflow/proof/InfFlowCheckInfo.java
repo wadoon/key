@@ -4,10 +4,11 @@
  */
 package de.uka.ilkd.key.informationflow.proof;
 
+import org.key_project.util.properties.Properties;
+import org.key_project.util.properties.Properties.Property;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
-import de.uka.ilkd.key.util.properties.Properties;
-import de.uka.ilkd.key.util.properties.Properties.Property;
 
 
 /**

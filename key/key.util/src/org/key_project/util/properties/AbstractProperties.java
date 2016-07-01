@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.util.properties;
+package org.key_project.util.properties;
 
 
 import java.util.HashSet;

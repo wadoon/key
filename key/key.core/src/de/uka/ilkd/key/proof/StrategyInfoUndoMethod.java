@@ -4,7 +4,7 @@
  */
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.util.properties.Properties;
+import org.key_project.util.properties.Properties;
 
 
 /**

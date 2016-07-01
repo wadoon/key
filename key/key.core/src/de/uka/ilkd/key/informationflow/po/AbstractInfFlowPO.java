@@ -31,7 +31,7 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
                 new StrategyInfoUndoMethod() {
             @Override
             public void undo(
-                    de.uka.ilkd.key.util.properties.Properties strategyInfos) {
+                    org.key_project.util.properties.Properties strategyInfos) {
                 strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
             }
         };

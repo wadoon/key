@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.key_project.common.core.logic.Named;
@@ -26,6 +25,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.properties.MapProperties;
+import org.key_project.util.properties.Properties;
+import org.key_project.util.properties.Properties.Property;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -41,9 +43,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.util.properties.MapProperties;
-import de.uka.ilkd.key.util.properties.Properties;
-import de.uka.ilkd.key.util.properties.Properties.Property;
 
 /**
  *  A proof is represented as a tree of nodes containing sequents. The initial
@@ -430,13 +429,13 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosT
     }
 
     public void setProgramVariables(Namespace ns) {
-        final Iterator<Named> it=ns.elements().iterator();
-        ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
-        while (it.hasNext()) {
-            s = s.add((ProgramVariable)it.next());
+        ImmutableList<ProgramVariable> s = ImmutableSLList.<ProgramVariable>nil();
+        for (Named n : ns.elements()) {
+            s = s.prepend((ProgramVariable) n);
         }
-        node.setGlobalProgVars(s);       
-        proof().getNamespaces().programVariables().set(s);
+        ImmutableSet<ProgramVariable> set = DefaultImmutableSet.fromImmutableList(s);
+        node.setGlobalProgVars(set);       
+        proof().getNamespaces().programVariables().set(set);
     }
 
     /**
