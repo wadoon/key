@@ -13,6 +13,7 @@ public class FormulaChangeInfo<T extends CCTerm<?, ?, ?, T>> {
 
     /** position within the original formula */
     protected final PosInOccurrence<T> positionOfModification;
+    
     /** modified formula */
     protected final SequentFormula<T> newFormula;
 
@@ -29,9 +30,6 @@ public class FormulaChangeInfo<T extends CCTerm<?, ?, ?, T>> {
     public SequentFormula<T> getOriginalFormula() {
         return getPositionOfModification().sequentFormula();
     }
-
-    // FIXME (DS): We might have to include the Term type as generic argument
-    // for callers of the method below...
 
     /**
      * @return position within the original formula
