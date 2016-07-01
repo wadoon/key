@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.termProjection;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -44,7 +43,7 @@ public class SVInstantiationProjection implements ProjectionToTerm {
     }
     
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         if ( ! ( app instanceof TacletApp ) )
             Debug.fail ( "Projection is only applicable to taclet apps," +
                          " but got " + app );

@@ -45,7 +45,7 @@ public class BuiltInRuleAppIndex {
      * for the given goal and position
      */
     public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal            goal, 
-						 PosInOccurrence<Term, SequentFormula<Term>> pos) {
+						 PosInOccurrence<Term> pos) {
 
 	ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.<IBuiltInRuleApp>nil();
 
@@ -117,7 +117,7 @@ public class BuiltInRuleAppIndex {
                                           boolean antec, 
                                           SequentFormula<Term> cfma, 
                                           NewRuleListener listener ) {
-        final PosInOccurrence<Term, SequentFormula<Term>> pos = new PosInOccurrence<Term, SequentFormula<Term>>( cfma, PosInTerm.<Term>getTopLevel(), antec );
+        final PosInOccurrence<Term> pos = new PosInOccurrence<Term>( cfma, PosInTerm.<Term>getTopLevel(), antec );
         if(rule.isApplicableOnSubTerms()) {
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
@@ -129,7 +129,7 @@ public class BuiltInRuleAppIndex {
     //TODO: optimise?
     private void scanSimplificationRule ( BuiltInRule rule,
 	    				  Goal goal,
-                                          PosInOccurrence<Term, SequentFormula<Term>> pos,
+                                          PosInOccurrence<Term> pos,
                                           NewRuleListener listener ) {
         if (rule.isApplicable ( goal, pos ) ) {
             IBuiltInRuleApp app = rule.createApp( pos, goal.getServices() );                            
@@ -149,7 +149,7 @@ public class BuiltInRuleAppIndex {
      * called if a formula has been replaced
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal goal, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci ) {        
+    public void sequentChanged ( Goal goal, CCSequentChangeInfo<Term, Sequent> sci ) {
         scanAddedFormulas ( goal, true, sci );
         scanAddedFormulas ( goal, false, sci );
         
@@ -157,7 +157,7 @@ public class BuiltInRuleAppIndex {
         scanModifiedFormulas ( goal, false, sci );
     }
     
-    private void scanAddedFormulas ( Goal goal, boolean antec, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci ) {
+    private void scanAddedFormulas ( Goal goal, boolean antec, CCSequentChangeInfo<Term, Sequent> sci ) {
         ImmutableList<SequentFormula<Term>> cfmas = sci.addedFormulas( antec );
         final NewRuleListener listener = getNewRulePropagator();
         while ( !cfmas.isEmpty() ) {
@@ -172,13 +172,13 @@ public class BuiltInRuleAppIndex {
     }
 
 
-    private void scanModifiedFormulas ( Goal goal, boolean antec, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci ) {
+    private void scanModifiedFormulas ( Goal goal, boolean antec, CCSequentChangeInfo<Term, Sequent> sci ) {
         
         final NewRuleListener listener = getNewRulePropagator();
-        ImmutableList<FormulaChangeInfo<SequentFormula<Term>>> fcis = sci.modifiedFormulas( antec );
+        ImmutableList<FormulaChangeInfo<Term>> fcis = sci.modifiedFormulas( antec );
 
         while ( !fcis.isEmpty() ) {
-            final FormulaChangeInfo<SequentFormula<Term>> fci = fcis.head();               
+            final FormulaChangeInfo<Term> fci = fcis.head();
             final SequentFormula<Term> cfma = fci.getNewFormula();
             for (BuiltInRule builtInRule : index.rules()) {
                 final BuiltInRule rule = builtInRule;

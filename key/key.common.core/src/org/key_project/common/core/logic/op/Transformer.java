@@ -18,7 +18,6 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.TermServices;
 import org.key_project.util.collection.ImmutableArray;
@@ -87,13 +86,13 @@ public class Transformer extends Function {
      * @param pio A position in an occurrence of a term
      * @return true if inside a term transformer, false otherwise
      */
-    public static <T extends CCTerm<?, ?, ?, T>> boolean inTransformer(PosInOccurrence<T, SequentFormula<T>> pio) {
+    public static <T extends CCTerm<?, ?, ?, T>> boolean inTransformer(PosInOccurrence<T> pio) {
         boolean trans = false;
         if (pio == null) {
             return false;
         }
         if ( pio.posInTerm () != null ) {
-            PIOPathIterator<T, SequentFormula<T>> it = pio.iterator ();
+            PIOPathIterator<T> it = pio.iterator ();
             Operator        op;
 
             while ( it.next () != -1 && !trans) {
@@ -111,9 +110,9 @@ public class Transformer extends Function {
      * @param pio A position in an occurrence of a term
      * @return the term transformer the position is in, null otherwise
      */
-    public static <T extends CCTerm<?, ?, ?, T>> Transformer getTransformer(PosInOccurrence<T, SequentFormula<T>> pio) {
+    public static <T extends CCTerm<?, ?, ?, T>> Transformer getTransformer(PosInOccurrence<T> pio) {
         if ( pio.posInTerm () != null ) {
-            PIOPathIterator<T, SequentFormula<T>> it = pio.iterator ();
+            PIOPathIterator<T> it = pio.iterator ();
             Operator        op;
 
             while ( it.next () != -1) {

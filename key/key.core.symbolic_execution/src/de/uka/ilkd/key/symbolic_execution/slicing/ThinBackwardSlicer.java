@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -65,7 +64,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                   SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp()) ||
                   SymbolicExecutionUtil.isBlockContract(node, node.getAppliedRuleApp())) {
             // Compute this reference
-            PosInOccurrence<Term, SequentFormula<Term>> pio = node.getAppliedRuleApp().posInOccurrence();
+            PosInOccurrence<Term> pio = node.getAppliedRuleApp().posInOccurrence();
             // Compute modified locations
             List<Location> modifiedLocations = new LinkedList<Location>();
             Term loopConditionModalityTerm = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);

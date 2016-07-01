@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -47,7 +46,7 @@ public class MediatorProofControl extends AbstractProofControl {
     * {@inheritDoc}
     */
    @Override
-   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence<Term> pos) {
       boolean result = super.selectedTaclet(taclet, goal, pos);
       if (!result) {
          ui.notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));
@@ -206,7 +205,7 @@ public class MediatorProofControl extends AbstractProofControl {
     * {@inheritDoc}
     */
    @Override
-   public void runMacro(Node node, ProofMacro macro, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+   public void runMacro(Node node, ProofMacro macro, PosInOccurrence<Term> posInOcc) {
       KeYMediator mediator = ui.getMediator();
       final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
       mediator.stopInterface(true);

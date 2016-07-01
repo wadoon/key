@@ -27,18 +27,18 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  * @author Dominic Scheurer
  */
-public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>, Seq extends CCSequent<T, SeqFor, ?, Seq>> {
+public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, Seq extends CCSequent<T, ?, Seq>> {
 
     /**
      * change information related to the antecedent, this means the there added
      * and removed formulas
      */
-    protected CCSemisequentChangeInfo<SeqFor, ? extends CCSemisequent<SeqFor, ?>> antecedent;
+    protected CCSemisequentChangeInfo<T, ? extends CCSemisequent<T, ?>> antecedent;
     /**
      * change information related to the antecedent, this means the there added
      * and removed formulas
      */
-    protected CCSemisequentChangeInfo<SeqFor, ? extends CCSemisequent<SeqFor, ?>> succedent;
+    protected CCSemisequentChangeInfo<T, ? extends CCSemisequent<T, ?>> succedent;
     
     /**
      * the sequent before the changes
@@ -66,8 +66,8 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      *            the Sequent that has been transformed
      */
     protected CCSequentChangeInfo(
-            CCSemisequentChangeInfo<SeqFor, ? extends CCSemisequent<SeqFor, ?>> antecedent,
-            CCSemisequentChangeInfo<SeqFor, ? extends CCSemisequent<SeqFor, ?>> succedent,
+            CCSemisequentChangeInfo<T, ? extends CCSemisequent<T, ?>> antecedent,
+            CCSemisequentChangeInfo<T, ? extends CCSemisequent<T, ?>> succedent,
             Seq resultingSequent,
             Seq originalSequent) {
         this.antecedent = antecedent;
@@ -108,11 +108,11 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      *            sequent (true means antecedent; false means succedent)
      * @return list of formulas added to the selected semisequent
      */
-    public ImmutableList<SeqFor> addedFormulas(boolean antec) {
+    public ImmutableList<SequentFormula<T>> addedFormulas(boolean antec) {
         return antec ? (antecedent != null ? antecedent.addedFormulas()
-                : ImmutableSLList.<SeqFor> nil())
+                : ImmutableSLList.<SequentFormula<T>> nil())
                 : (succedent != null ? succedent.addedFormulas()
-                        : ImmutableSLList.<SeqFor> nil());
+                        : ImmutableSLList.<SequentFormula<T>> nil());
     }
 
     /**
@@ -121,7 +121,7 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      * 
      * @return list of formulas added to sequent
      */
-    public ImmutableList<SeqFor> addedFormulas() {
+    public ImmutableList<SequentFormula<T>> addedFormulas() {
         return addedFormulas(true).size() > addedFormulas(false).size() ? addedFormulas(
                 false).prepend(addedFormulas(true))
                 : addedFormulas(true).prepend(addedFormulas(false));
@@ -137,12 +137,12 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      *            sequent (true means antecedent; false means succedent)
      * @return list of formulas removed from the selected semisequent
      */
-    public ImmutableList<SeqFor> removedFormulas(
+    public ImmutableList<SequentFormula<T>> removedFormulas(
             boolean antec) {
         return antec ? (antecedent != null ? antecedent.removedFormulas()
-                : ImmutableSLList.<SeqFor> nil())
+                : ImmutableSLList.<SequentFormula<T>> nil())
                 : (succedent != null ? succedent.removedFormulas()
-                        : ImmutableSLList.<SeqFor> nil());
+                        : ImmutableSLList.<SequentFormula<T>> nil());
     }
 
     /**
@@ -151,7 +151,7 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      * 
      * @return list of formulas removed from the sequent
      */
-    public ImmutableList<SeqFor> removedFormulas() {
+    public ImmutableList<SequentFormula<T>> removedFormulas() {
         return removedFormulas(true).size() > removedFormulas(false).size() ? removedFormulas(
                 false).prepend(removedFormulas(true))
                 : removedFormulas(true).prepend(removedFormulas(false));
@@ -167,14 +167,14 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      *            sequent (true means antecedent; false means succedent)
      * @return list of formulas modified within the selected semisequent
      */
-    public ImmutableList<FormulaChangeInfo<SeqFor>> modifiedFormulas(
+    public ImmutableList<FormulaChangeInfo<T>> modifiedFormulas(
             boolean antec) {
         return antec ? (antecedent != null ? antecedent.modifiedFormulas()
                 : ImmutableSLList
-                        .<FormulaChangeInfo<SeqFor>> nil())
+                        .<FormulaChangeInfo<T>> nil())
                 : (succedent != null ? succedent.modifiedFormulas()
                         : ImmutableSLList
-                                .<FormulaChangeInfo<SeqFor>> nil());
+                                .<FormulaChangeInfo<T>> nil());
     }
 
     /**
@@ -183,7 +183,7 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      * 
      * @return list of formulas modified to sequent
      */
-    public ImmutableList<FormulaChangeInfo<SeqFor>> modifiedFormulas() {
+    public ImmutableList<FormulaChangeInfo<T>> modifiedFormulas() {
         return modifiedFormulas(true).size() > modifiedFormulas(false).size() ? modifiedFormulas(
                 false).prepend(modifiedFormulas(true))
                 : modifiedFormulas(true).prepend(modifiedFormulas(false));
@@ -199,12 +199,12 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      * @return list of formulas rejected when trying to add to the selected
      *         semisequent
      */
-    public ImmutableList<SeqFor> rejectedFormulas(
+    public ImmutableList<SequentFormula<T>> rejectedFormulas(
             boolean antec) {
         return antec ? (antecedent != null ? antecedent.rejectedFormulas()
-                : ImmutableSLList.<SeqFor> nil())
+                : ImmutableSLList.<SequentFormula<T>> nil())
                 : (succedent != null ? succedent.rejectedFormulas()
-                        : ImmutableSLList.<SeqFor> nil());
+                        : ImmutableSLList.<SequentFormula<T>> nil());
     }
 
     /**
@@ -213,7 +213,7 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      * 
      * @return list of rejected formulas
      */
-    public ImmutableList<SeqFor> rejectedFormulas() {
+    public ImmutableList<SequentFormula<T>> rejectedFormulas() {
         return rejectedFormulas(true).size() > rejectedFormulas(false).size() ? rejectedFormulas(
                 false).prepend(rejectedFormulas(true))
                 : rejectedFormulas(true).prepend(rejectedFormulas(false));
@@ -225,8 +225,8 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      * not release it. This means when invoking the method it must be ensured
      * that {@code succ} is never used afterwards.
      */
-    public void combine(CCSequentChangeInfo<T, SeqFor, Seq> succ) {
-        final CCSequentChangeInfo<T, SeqFor, Seq> antec = this;
+    public void combine(CCSequentChangeInfo<T, Seq> succ) {
+        final CCSequentChangeInfo<T, Seq> antec = this;
         if (antec == succ) {
             return;
         }

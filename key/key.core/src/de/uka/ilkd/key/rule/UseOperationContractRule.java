@@ -603,7 +603,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal,
-                                PosInOccurrence<Term, SequentFormula<Term>> pio) {
+                                PosInOccurrence<Term> pio) {
 	//focus must be top level succedent
 	if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
 	    return false;
@@ -913,7 +913,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                          null, postJavaBlock, inst.progPost.getLabels())
                                                  ),
                                          null);
-        final CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> newSeqForPostGoal = 
+        final CCSequentChangeInfo<Term, Sequent> newSeqForPostGoal =
                 postGoal.sequent().addFormula(new SequentFormula<>(wellFormedAnon), true, false);
         
         newSeqForPostGoal.combine(newSeqForPostGoal.sequent().changeFormula(new SequentFormula<>(tb.apply(inst.u, normalPost, null)),
@@ -941,7 +941,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                               null, excJavaBlock, inst.progPost.getLabels())), null);
         final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
         
-        final CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> newSeqForExcPostGoal = 
+        final CCSequentChangeInfo<Term, Sequent> newSeqForExcPostGoal =
                 excPostGoal.sequent().addFormula(new SequentFormula<>(wellFormedAnon), true, false);
         
         newSeqForExcPostGoal.combine(newSeqForExcPostGoal.sequent().changeFormula(new SequentFormula<>(tb.apply(inst.u, excPost, null)), ruleApp.posInOccurrence()));
@@ -1042,12 +1042,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
     }
 
-    public ContractRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    public ContractRuleApp createApp(PosInOccurrence<Term> pos) {
        return createApp(pos, null);
     }
 
     @Override
-    public ContractRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pos, JavaDLTermServices services) {
+    public ContractRuleApp createApp(PosInOccurrence<Term> pos, JavaDLTermServices services) {
 		return new ContractRuleApp(this, pos);
     }
 

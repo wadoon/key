@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.Proof;
 /**
  * <p>
  * A {@link TermLabelPolicy} is used by
- * {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term, SequentFormula<Term>>, Term, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
+ * {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence<Term>, Term, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
  * to decide for each {@link TermLabel} of an old {@link Term} if it
  * should be re-added to the new {@link Term} or not.
  * </p>
@@ -52,8 +52,8 @@ public interface TermLabelPolicy {
     * provided by the application {@link Term}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence<Term, SequentFormula<Term>>} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence<Term>} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence<Term>} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
@@ -68,7 +68,7 @@ public interface TermLabelPolicy {
     */
    public TermLabel keepLabel(TermLabelState state,
                               Services services,
-                              PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+                              PosInOccurrence<Term> applicationPosInOccurrence,
                               Term applicationTerm,
                               Rule rule,
                               Goal goal,

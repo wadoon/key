@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -99,7 +98,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
         this.targetCandidate = targetCandidate;
     }
 
-    protected final boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected final boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
         final Monomial targetM =
             Monomial.create ( targetCandidate.toTerm ( app, pos, goal ),

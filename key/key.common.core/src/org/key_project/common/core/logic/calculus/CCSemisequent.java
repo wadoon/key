@@ -13,6 +13,7 @@
 
 package org.key_project.common.core.logic.calculus;
 
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -23,8 +24,8 @@ import org.key_project.util.collection.ImmutableList;
  * @param <SeqFor>
  * @param <SemiSeq>
  */
-public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>>
-        extends Iterable<SeqFor> {
+public interface CCSemisequent<T extends CCTerm<?, ?, ?, T>, SemiSeq extends CCSemisequent<T, SemiSeq>>
+        extends Iterable<SequentFormula<T>> {
 
     /**
      * inserts an element at a specified index performing redundancy checks,
@@ -38,8 +39,8 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> insert(
-            int idx, SeqFor sequentFormula);
+    CCSemisequentChangeInfo<T, SemiSeq> insert(
+            int idx, SequentFormula<T> sequentFormula);
 
     /**
      * inserts the elements of the list at the specified index performing
@@ -52,8 +53,8 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> insert(
-            int idx, Iterable<SeqFor> insertionList);
+    CCSemisequentChangeInfo<T, SemiSeq> insert(
+            int idx, Iterable<SequentFormula<T>> insertionList);
 
     /**
      * inserts element at index 0 performing redundancy checks, this may result
@@ -64,8 +65,8 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> insertFirst(
-            SeqFor sequentFormula);
+    CCSemisequentChangeInfo<T, SemiSeq> insertFirst(
+            SequentFormula<T> sequentFormula);
 
     /**
      * inserts element at index 0 performing redundancy checks, this may result
@@ -76,8 +77,8 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> insertFirst(
-            Iterable<SeqFor> insertions);
+    CCSemisequentChangeInfo<T, SemiSeq> insertFirst(
+            Iterable<SequentFormula<T>> insertions);
 
     /**
      * inserts element at the end of the semisequent performing redundancy
@@ -89,8 +90,8 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> insertLast(
-            SeqFor sequentFormula);
+    CCSemisequentChangeInfo<T, SemiSeq> insertLast(
+            SequentFormula<T> sequentFormula);
 
     /**
      * inserts the formulas of the list at the end of the semisequent performing
@@ -102,8 +103,8 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> insertLast(
-            Iterable<SeqFor> insertions);
+    CCSemisequentChangeInfo<T, SemiSeq> insertLast(
+            Iterable<SequentFormula<T>> insertions);
 
     /**
      * is this a semisequent that contains no formulas
@@ -116,7 +117,7 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * replaces the element at place idx with sequentFormula
      * 
      * @param pos
-     *            the PosInOccurrence<Term, SequentFormula<Term>>
+     *            the PosInOccurrence<Term, SequentFormula<T><Term>>
      *            describing the position of and within the formula below which
      *            the formula differs from the new formula
      *            <code>sequentFormula</code>
@@ -125,8 +126,8 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> replace(
-            PosInOccurrence<?, SeqFor> pos, SeqFor sequentFormula);
+    CCSemisequentChangeInfo<T, SemiSeq> replace(
+            PosInOccurrence<T> pos, SequentFormula<T> sequentFormula);
 
     /**
      * replaces the <tt>idx</tt>-th formula by <tt>sequentFormula</tt>
@@ -138,8 +139,8 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * @return a SemisequentChangeInfo containing the new sequent and a diff to
      *         the old one
      */
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> replace(
-            int idx, SeqFor sequentFormula);
+    CCSemisequentChangeInfo<T, SemiSeq> replace(
+            int idx, SequentFormula<T> sequentFormula);
 
     /**
      * replaces the element at place idx with the first element of the given
@@ -154,11 +155,11 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> replace(
-            PosInOccurrence<?, SeqFor> pos, Iterable<SeqFor> replacements);
+    CCSemisequentChangeInfo<T, SemiSeq> replace(
+            PosInOccurrence<T> pos, Iterable<SequentFormula<T>> replacements);
 
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> replace(
-            int idx, Iterable<SeqFor> replacements);
+    CCSemisequentChangeInfo<T, SemiSeq> replace(
+            int idx, Iterable<SequentFormula<T>> replacements);
 
     /** @return int counting the elements of this semisequent */
     int size();
@@ -171,7 +172,7 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
-    CCSemisequentChangeInfo<SeqFor, SemiSeq> remove(int idx);
+    CCSemisequentChangeInfo<T, SemiSeq> remove(int idx);
 
     /**
      * returns the index of the given {@link SeqFor} or {@code -1} if the
@@ -182,7 +183,7 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      *            the {@link SeqFor} to look for
      * @return index of sequentFormula (-1 if not found)
      */
-    int indexOf(SeqFor sequentFormula);
+    int indexOf(SequentFormula<T> sequentFormula);
 
     /**
      * gets the element at a specific index
@@ -194,10 +195,10 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      *             if idx is negative or greater or equal to
      *             {@link Sequent#size()}
      */
-    SeqFor get(int idx);
+    SequentFormula<T> get(int idx);
 
     /** @return the first {@link SeqFor} of this Semisequent */
-    SeqFor getFirst();
+    SequentFormula<T> getFirst();
 
     /**
      * checks if the {@link SeqFor} occurs in this Semisequent (identity check)
@@ -206,7 +207,7 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      *            the {@link SeqFor} to look for
      * @return true iff. sequentFormula has been found in this Semisequent
      */
-    boolean contains(SeqFor sequentFormula);
+    boolean contains(SequentFormula<T> sequentFormula);
 
     /**
      * checks if a {@link SeqFor} is in this Semisequent (equality check)
@@ -215,8 +216,8 @@ public interface CCSemisequent<SeqFor extends SequentFormula<?>, SemiSeq extends
      *            the {@link SeqFor} to look for
      * @return true iff. sequentFormula has been found in this Semisequent
      */
-    boolean containsEqual(SeqFor sequentFormula);
+    boolean containsEqual(SequentFormula<T> sequentFormula);
 
-    ImmutableList<SeqFor> asList();
+    ImmutableList<SequentFormula<T>> asList();
 
 }

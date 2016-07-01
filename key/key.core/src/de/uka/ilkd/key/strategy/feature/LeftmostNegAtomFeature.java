@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Equality;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
@@ -37,8 +36,8 @@ public class LeftmostNegAtomFeature extends AbstractBetaFeature {
     private LeftmostNegAtomFeature () {}
     
     @Override
-    protected RuleAppCost doComputation (PosInOccurrence<Term, SequentFormula<Term>> pos, Term findTerm, ServiceCaches caches) {
-        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
+    protected RuleAppCost doComputation (PosInOccurrence<Term> pos, Term findTerm, ServiceCaches caches) {
+        final PIOPathIterator<Term> it = pos.iterator ();
         boolean positive = pos.isInAntec ();
 
         while ( it.next () != -1 ) {

@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -38,7 +37,7 @@ public class TermSmallerThanFeature extends SmallerThanFeature {
         this.right = right;
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         return lessThan ( left.toTerm ( app, pos, goal ),
                           right.toTerm ( app, pos, goal ), goal.getServices().getCaches() );
     }

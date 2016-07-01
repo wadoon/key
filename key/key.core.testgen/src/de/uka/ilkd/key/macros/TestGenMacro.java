@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.rule.Rule;
 
 import de.uka.ilkd.key.logic.Term;
@@ -54,7 +53,7 @@ public class TestGenMacro extends StrategyProofMacro {
 		}
 
 		@Override
-		public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio,
+		public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pio,
 		        Goal goal) {
 			if (TestGenStrategy.isUnwindRule(app.rule())) {
 				return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);
@@ -79,7 +78,7 @@ public class TestGenMacro extends StrategyProofMacro {
 		}
 
 		@Override
-		public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+		public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
 			if (!TestGenMacro.hasModality(goal.sequent())) {
 				return false;
 			}
@@ -110,7 +109,7 @@ public class TestGenMacro extends StrategyProofMacro {
 
 	@Override
 	protected Strategy createStrategy(Proof proof,
-	        PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+	        PosInOccurrence<Term> posInOcc) {
 		return new TestGenStrategy(proof
 		        .getActiveStrategy());
 	}

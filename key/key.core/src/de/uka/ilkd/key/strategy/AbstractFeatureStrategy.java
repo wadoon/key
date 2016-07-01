@@ -18,10 +18,6 @@ import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.PosInTerm;
-import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -135,7 +131,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     private final BackTrackingManager btManager = new BackTrackingManager ();
 
     public final void instantiateApp ( RuleApp              app,
-                                       PosInOccurrence<Term, SequentFormula<Term>>      pio,
+                                       PosInOccurrence<Term>      pio,
                                        Goal                 goal,
                                        RuleAppCostCollector collector ) {
         btManager.setup ( app );
@@ -149,7 +145,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     }
  
     protected abstract RuleAppCost instantiateApp (RuleApp              app,
-                                                   PosInOccurrence<Term, SequentFormula<Term>>      pio,
+                                                   PosInOccurrence<Term>      pio,
                                                    Goal                 goal);
     
     protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {

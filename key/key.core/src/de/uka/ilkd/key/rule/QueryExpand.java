@@ -85,7 +85,7 @@ public class QueryExpand implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
-        final PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
+        final PosInOccurrence<Term> pio = ruleApp.posInOccurrence();
         final Term query = pio.subTerm();
 
         // new goal
@@ -607,7 +607,7 @@ public class QueryExpand implements BuiltInRule {
      * The method is equipped with a side-effect that stores the age of the term. This information is useful
      * for <code>QueryExpandCost</cost>.
      */
-    public boolean isApplicable(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence<Term> pio) {
         if (pio != null
                 && pio.subTerm().op() instanceof IProgramMethod
                 && pio.subTerm().freeVars().isEmpty()) {
@@ -624,7 +624,7 @@ public class QueryExpand implements BuiltInRule {
             if (pm.isStatic()
                     || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort())
                             && !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
-                PIOPathIterator<Term, SequentFormula<Term>> it = pio.iterator();
+                PIOPathIterator<Term> it = pio.iterator();
                 while ( it.next() != -1 ) {
                     Term focus = it.getSubTerm();
                     if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
@@ -654,7 +654,7 @@ public class QueryExpand implements BuiltInRule {
     }
 
 	@Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pos, JavaDLTermServices services) {
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence<Term> pos, JavaDLTermServices services) {
 	    return new DefaultBuiltInRuleApp(this, pos);
     }
 

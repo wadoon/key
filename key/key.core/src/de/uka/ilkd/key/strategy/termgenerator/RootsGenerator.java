@@ -17,7 +17,6 @@ import java.math.BigInteger;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Equality;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.util.collection.ImmutableSLList;
@@ -61,7 +60,7 @@ public class RootsGenerator implements TermGenerator {
         this.tb = tb;
     }
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
         final IntegerLDT numbers = services.getTheories().getIntegerLDT();
         

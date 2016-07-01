@@ -229,7 +229,7 @@ public final class TruthValueTracingUtil {
       }
       else if (node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
          OneStepSimplifierRuleApp app = (OneStepSimplifierRuleApp) node.getAppliedRuleApp();
-         PosInOccurrence<Term, SequentFormula<Term>> parentPio = null;
+         PosInOccurrence<Term> parentPio = null;
          for (RuleApp protocolApp : app.getProtocol()) {
             if (parentPio != null) {
                updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(), parentPio, termLabelName, services.getTermBuilder(), currentResults);
@@ -247,7 +247,7 @@ public final class TruthValueTracingUtil {
          // Compare last PIO with PIO in child sequent (Attention: Child PIO is computed with help of the PIO of the OSS)
          if (parentPio != null) {
             assert 1 == node.childrenCount() : "Implementaton of the OneStepSimplifierRule has changed.";
-            PosInOccurrence<Term, SequentFormula<Term>> childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(node, node.getAppliedRuleApp().posInOccurrence(), node.child(0));
+            PosInOccurrence<Term> childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(node, node.getAppliedRuleApp().posInOccurrence(), node.child(0));
             updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName, services.getTermBuilder(), currentResults);
          }
       }
@@ -292,7 +292,7 @@ public final class TruthValueTracingUtil {
                                                              Name termLabelName) {
       List<LabelOccurrence> result = new LinkedList<LabelOccurrence>();
       // Search for labels in find part
-      PosInOccurrence<Term, SequentFormula<Term>> pio = tacletApp.posInOccurrence();
+      PosInOccurrence<Term> pio = tacletApp.posInOccurrence();
       if (pio != null) {
          Term term = pio.subTerm();
          if (term != null) {
@@ -410,8 +410,8 @@ public final class TruthValueTracingUtil {
     * @param tb The {@link CCTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
-   protected static void updatePredicateResultBasedOnNewMinorIdsOSS(final PosInOccurrence<Term, SequentFormula<Term>> childPio,
-                                                                    final PosInOccurrence<Term, SequentFormula<Term>> parentPio,
+   protected static void updatePredicateResultBasedOnNewMinorIdsOSS(final PosInOccurrence<Term> childPio,
+                                                                    final PosInOccurrence<Term> parentPio,
                                                                     final Name termLabelName,
                                                                     final TermBuilder tb,
                                                                     final Map<String, MultiEvaluationResult> results) {
@@ -424,7 +424,7 @@ public final class TruthValueTracingUtil {
             }
          });
          // Check application term parents
-         PosInOccurrence<Term, SequentFormula<Term>> currentPio = parentPio;
+         PosInOccurrence<Term> currentPio = parentPio;
          while (!currentPio.isTopLevel()) {
             currentPio = currentPio.up();
             checkForNewMinorIdsOSS(childPio.sequentFormula(), currentPio.subTerm(), termLabelName, parentPio, tb, results);
@@ -437,14 +437,14 @@ public final class TruthValueTracingUtil {
     * @param onlyChangedChildSF The only changed {@link SequentFormula} in the child {@link Node}.
     * @param term The {@link Term} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-    * @param parentPio The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the applied rule of the parent {@link Node}.
+    * @param parentPio The {@link PosInOccurrence<Term>} of the applied rule of the parent {@link Node}.
     * @param tb The {@link CCTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIdsOSS(SequentFormula<Term> onlyChangedChildSF, 
                                                 Term term, 
                                                 Name termLabelName, 
-                                                PosInOccurrence<Term, SequentFormula<Term>> parentPio, 
+                                                PosInOccurrence<Term> parentPio,
                                                 TermBuilder tb, 
                                                 Map<String, MultiEvaluationResult> results) {
       TermLabel label = term.getLabel(termLabelName);
@@ -495,7 +495,7 @@ public final class TruthValueTracingUtil {
       final Node parentNode = childNode.parent();
       if (parentNode != null) {
          final RuleApp parentRuleApp = parentNode.getAppliedRuleApp();
-         final PosInOccurrence<Term, SequentFormula<Term>> parentPio = parentRuleApp.posInOccurrence();
+         final PosInOccurrence<Term> parentPio = parentRuleApp.posInOccurrence();
          if (parentPio != null) {
             // Check application term and all of its children and grand children
             parentPio.subTerm().execPreOrder(new DefaultVisitor() {
@@ -505,7 +505,7 @@ public final class TruthValueTracingUtil {
                }
             });
             // Check application term parents
-            PosInOccurrence<Term, SequentFormula<Term>> currentPio = parentPio;
+            PosInOccurrence<Term> currentPio = parentPio;
             while (!currentPio.isTopLevel()) {
                currentPio = currentPio.up();
                checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, parentPio, tb, results);
@@ -528,14 +528,14 @@ public final class TruthValueTracingUtil {
     * @param childNode The child {@link Node}.
     * @param term The {@link Term} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-    * @param parentPio The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the applied rule of the parent {@link Node}.
+    * @param parentPio The {@link PosInOccurrence<Term>} of the applied rule of the parent {@link Node}.
     * @param tb The {@link CCTermBuilder} to use.
     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIds(Node childNode, 
                                              Term term, 
                                              Name termLabelName, 
-                                             PosInOccurrence<Term, SequentFormula<Term>> parentPio, 
+                                             PosInOccurrence<Term> parentPio,
                                              TermBuilder tb, 
                                              Map<String, MultiEvaluationResult> results) {
       TermLabel label = term.getLabel(termLabelName);

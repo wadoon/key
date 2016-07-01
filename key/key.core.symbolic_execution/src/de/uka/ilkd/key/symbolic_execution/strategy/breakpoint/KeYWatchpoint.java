@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.program.Position;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -96,7 +95,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
          try {
             Term negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
             //initialize values
-            PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
+            PosInOccurrence<Term> pio = ruleApp.posInOccurrence();
             Term term = pio.subTerm();
             term = TermBuilder.goBelowUpdates(term);
             IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.modalContent(), proof.getServices());

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.macros;
 
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -137,7 +136,7 @@ public class TryCloseMacro extends AbstractProofMacro {
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+                              PosInOccurrence<Term> posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
@@ -148,7 +147,7 @@ public class TryCloseMacro extends AbstractProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+                                          PosInOccurrence<Term> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         if (goals == null || goals.isEmpty()) {
             // should not happen, because in this case canApplyTo returns

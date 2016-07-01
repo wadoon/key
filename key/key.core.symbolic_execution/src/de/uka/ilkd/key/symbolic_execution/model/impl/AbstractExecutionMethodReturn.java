@@ -164,7 +164,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
       // Get relevant information in current node
       Node proofNode = methodCall.getProofNode();
       assert proofNode.childrenCount() == 1;
-      PosInOccurrence<Term, SequentFormula<Term>> originalPIO = methodCall.getModalityPIO();
+      PosInOccurrence<Term> originalPIO = methodCall.getModalityPIO();
       int index = originalPIO.isInAntec() ?
                   proofNode.sequent().antecedent().indexOf(originalPIO.sequentFormula()) :
                   proofNode.sequent().succedent().indexOf(originalPIO.sequentFormula());
@@ -173,7 +173,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
       SequentFormula<Term> nodeSF = originalPIO.isInAntec() ?
                               childNode.sequent().antecedent().get(index) :
                               childNode.sequent().succedent().get(index);
-      PosInOccurrence<Term, SequentFormula<Term>> modalityPIO = new PosInOccurrence<Term, SequentFormula<Term>>(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
+      PosInOccurrence<Term> modalityPIO = new PosInOccurrence<Term>(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
       Term modalityTerm = modalityPIO.subTerm();
       while (modalityTerm.op() instanceof UpdateApplication) {
          modalityPIO = modalityPIO.down(1);

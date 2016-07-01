@@ -190,7 +190,7 @@ public class TestMatchTaclet extends TestCase {
 	(find_addrule_conflict,
 	        find_addrule_conflict.getMatcher().matchFind(match.sub(0), 
 	                MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
-                    new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(match),
+                    new PosInOccurrence<Term>(new SequentFormula<>(match),
                             PosInTerm.<Term>getTopLevel().down(0), true), services);
         
     
@@ -204,7 +204,7 @@ public class TestMatchTaclet extends TestCase {
 	(find_addrule_conflict,
             find_addrule_conflict.getMatcher().matchFind(match, 
                     MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
-                    new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(match),
+                    new PosInOccurrence<Term>(new SequentFormula<>(match),
                             PosInTerm.<Term>getTopLevel(), true), services);
 	assertTrue("A match should have been found,"+
 		   " because here there formerly free variable is bound.",
@@ -225,7 +225,7 @@ public class TestMatchTaclet extends TestCase {
             if_find_clash.getMatcher().matchFind(match.sub(0),  
                MatchConditions.EMPTY_MATCHCONDITIONS, 
                services).getInstantiations(),
-               new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(match.sub(0)),
+               new PosInOccurrence<Term>(new SequentFormula<>(match.sub(0)),
                        PosInTerm.<Term>getTopLevel().down(0), true), services);
         
 	assertTrue("Match found but match term contains free var and"+
@@ -283,7 +283,7 @@ public class TestMatchTaclet extends TestCase {
 	     (0, new SequentFormula<>(closeable_two)).semisequent()); 	
 	TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
 	index.add(close_rule.taclet());
-        PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(closeable_two),
+        PosInOccurrence<Term> pio = new PosInOccurrence<Term>(new SequentFormula<>(closeable_two),
                 PosInTerm.<Term>getTopLevel(), false);
 
 	TacletApp tacletApp = index.getSuccedentTaclet(pio,

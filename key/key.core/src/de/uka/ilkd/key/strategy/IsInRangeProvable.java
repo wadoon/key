@@ -48,7 +48,7 @@ public class IsInRangeProvable implements Feature {
      * @param services the {@link Services}
      * @return the set of axioms
      */
-    private ImmutableSet<Term> collectAxioms(Sequent seq, PosInOccurrence<Term, SequentFormula<Term>> ignore, Services services) {
+    private ImmutableSet<Term> collectAxioms(Sequent seq, PosInOccurrence<Term> ignore, Services services) {
         final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
 
         // collect the operators used to identify the formulas of interest in the sequent
@@ -162,7 +162,7 @@ public class IsInRangeProvable implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         final Services services = goal.getServices();
        
         final ImmutableSet<Term> axioms = collectAxioms(goal.sequent(), pos, services);
@@ -179,11 +179,11 @@ public class IsInRangeProvable implements Feature {
 
     /**
      * creates the term to be proven to follow from a (possibly empty) set of axioms
-     * @param pos the {@link PosInOccurrence<Term, SequentFormula<Term>>} of the focus term
+     * @param pos the {@link PosInOccurrence<Term>} of the focus term
      * @param services the {@link Services}
      * @return the term to prove
      */
-    protected Term createConsequence(final PosInOccurrence<Term, SequentFormula<Term>> pos, final Services services) {
+    protected Term createConsequence(final PosInOccurrence<Term> pos, final Services services) {
         
         final Term termToCheck = pos.subTerm().sub(0);
         final TermBuilder tb = services.getTermBuilder();

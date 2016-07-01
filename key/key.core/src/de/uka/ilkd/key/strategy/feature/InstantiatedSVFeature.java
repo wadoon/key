@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -40,7 +39,7 @@ public class InstantiatedSVFeature extends BinaryTacletAppFeature {
         instProj = SVInstantiationProjection.create ( svName, false );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         return instProj.toTerm ( app, pos, goal ) != null;
     }
 

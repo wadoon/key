@@ -46,9 +46,9 @@ public abstract class AbstractUpdateExtractor {
    protected final Node node;
    
    /**
-    * The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality or its updates.
+    * The {@link PosInOccurrence<Term>} of the modality or its updates.
     */
-   protected final PosInOccurrence<Term, SequentFormula<Term>> modalityPio;
+   protected final PosInOccurrence<Term> modalityPio;
    
    /**
     * An incremented number used to give each pre value an unique name.
@@ -58,10 +58,10 @@ public abstract class AbstractUpdateExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
-    * @param modalityPio The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality or its updates.
+    * @param modalityPio The {@link PosInOccurrence<Term>} of the modality or its updates.
     */
    public AbstractUpdateExtractor(Node node, 
-                                  PosInOccurrence<Term, SequentFormula<Term>> modalityPio) {
+                                  PosInOccurrence<Term> modalityPio) {
       assert node != null;
       assert modalityPio != null;
       this.node = node;
@@ -208,7 +208,7 @@ public abstract class AbstractUpdateExtractor {
                                               Set<Term> updateValueObjectsToFill, 
                                               Set<Term> objectsToIgnore) throws ProofInputException {
       // Go up in parent hierarchy and collect updates on all update applications
-      PosInOccurrence<Term, SequentFormula<Term>> pio = modalityPio;
+      PosInOccurrence<Term> pio = modalityPio;
       while (pio != null) {
          Term updateApplication = pio.subTerm();
          if (updateApplication.op() == UpdateApplication.UPDATE_APPLICATION) {
@@ -1029,11 +1029,11 @@ public abstract class AbstractUpdateExtractor {
    
    /**
     * Computes the original updates.
-    * @param pio The {@link PosInOccurrence<Term, SequentFormula<Term>>}.
+    * @param pio The {@link PosInOccurrence<Term>}.
     * @param currentLayout Is current layout?
     * @return The original updates.
     */
-   protected ImmutableList<Term> computeOriginalUpdates(PosInOccurrence<Term, SequentFormula<Term>> pio, boolean currentLayout) {
+   protected ImmutableList<Term> computeOriginalUpdates(PosInOccurrence<Term> pio, boolean currentLayout) {
       ImmutableList<Term> originalUpdates;
       if (!currentLayout) {
          originalUpdates = ImmutableSLList.nil();

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.sort.Sort;
@@ -35,7 +34,7 @@ public class HeuristicInstantiation implements TermGenerator {
     private HeuristicInstantiation() {}
     
     public Iterator<Term> generate(RuleApp app,
-                                   PosInOccurrence<Term, SequentFormula<Term>> pos,
+                                   PosInOccurrence<Term> pos,
                                    Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 

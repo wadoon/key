@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.op.Operator;
 
@@ -47,7 +46,7 @@ public class TermConstructionProjection implements ProjectionToTerm {
         return new TermConstructionProjection ( op, subTerms );
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         final Term[] subs = new Term[subTerms.length];
         for ( int i = 0; i != subTerms.length; ++i ) {
             subs[i] = subTerms[i].toTerm ( app, pos, goal );           

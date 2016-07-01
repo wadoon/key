@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.rule.join;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
@@ -26,9 +25,9 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private Term pc = null;
 
     public CloseAfterJoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence<Term, SequentFormula<Term>> pio, Node thePartnerNode,
-            Node correspondingJoinNode, SymbolicExecutionState joinNodeState,
-            SymbolicExecutionState partnerState, Term pc) {
+                                            PosInOccurrence<Term> pio, Node thePartnerNode,
+                                            Node correspondingJoinNode, SymbolicExecutionState joinNodeState,
+                                            SymbolicExecutionState partnerState, Term pc) {
         this(builtInRule, pio);
         setThePartnerNode(thePartnerNode);
         setCorrespondingJoinNode(correspondingJoinNode);
@@ -38,17 +37,17 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public CloseAfterJoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
-            PosInOccurrence<Term, SequentFormula<Term>> pio) {
+            PosInOccurrence<Term> pio) {
         super(builtInRule, pio);
     }
 
     @Override
-    public AbstractBuiltInRuleApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos) {
+    public AbstractBuiltInRuleApp replacePos(PosInOccurrence<Term> newPos) {
         return null;
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
+    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term>> ifInsts) {
         setMutable(ifInsts);
         return this;
     }

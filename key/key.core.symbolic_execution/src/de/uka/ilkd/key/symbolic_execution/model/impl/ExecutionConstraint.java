@@ -21,9 +21,9 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
    private final Term term;
    
    /**
-    * The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
+    * The {@link PosInOccurrence<Term>} of the modality of interest.
     */
-   private final PosInOccurrence<Term, SequentFormula<Term>> modalityPIO;
+   private final PosInOccurrence<Term> modalityPIO;
 
    /**
     * Constructor.
@@ -31,7 +31,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param term The {@link Term} representing the constraint.
     */
-   public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence<Term, SequentFormula<Term>> modalityPIO, Term term) {
+   public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence<Term> modalityPIO, Term term) {
       super(settings, proofNode);
       assert term != null;
       assert modalityPIO != null;
@@ -67,7 +67,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
+   public PosInOccurrence<Term> getModalityPIO() {
       return modalityPIO;
    }
 }

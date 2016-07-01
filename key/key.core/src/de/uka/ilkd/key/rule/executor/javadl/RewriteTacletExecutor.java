@@ -35,7 +35,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
             Term with,
             TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
+            PosInOccurrence<Term> posOfFind,
             IntIterator it,
             MatchConditions mc,
             Sort maxSort,
@@ -80,7 +80,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     private SequentFormula<Term> applyReplacewithHelper(Goal goal,
                TermLabelState termLabelState, 
                     RewriteTacletGoalTemplate gt, 
-                    PosInOccurrence<Term, SequentFormula<Term>>    posOfFind,
+                    PosInOccurrence<Term>    posOfFind,
                     Services           services,
                     MatchConditions    matchCond,
                     RuleApp ruleApp) {
@@ -128,12 +128,12 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
      * {@inheritDoc}
      */
    @Override
-   protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-           CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
-           MatchConditions matchCond,
-           Goal goal,
-           RuleApp ruleApp,
-           Services services) {
+   protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
+                                   CCSequentChangeInfo<Term, Sequent> currentSequent, PosInOccurrence<Term> posOfFind,
+                                   MatchConditions matchCond,
+                                   Goal goal,
+                                   RuleApp ruleApp,
+                                   Services services) {
       if (gt instanceof RewriteTacletGoalTemplate) {
          SequentFormula<Term> cf = applyReplacewithHelper(goal, termLabelState,
                (RewriteTacletGoalTemplate) gt, posOfFind, services, matchCond, ruleApp);
@@ -162,7 +162,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     *           the Sequent which is the current (intermediate) result of
     *           applying the taclet
  * @param posOfFind
-    *           the PosInOccurrence<Term, SequentFormula<Term>> describes the place where to add the
+    *           the PosInOccurrence<Term> describes the place where to add the
     *           semisequent
  * @param matchCond
     *           the MatchConditions with all required instantiations
@@ -171,8 +171,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     */
    @Override
    protected void applyAdd(Sequent add, TermLabelState termLabelState,
-         CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
-         MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
+                           CCSequentChangeInfo<Term, Sequent> currentSequent, PosInOccurrence<Term> posOfFind,
+                           MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
       if (posOfFind.isInAntec()) {
          addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, posOfFind, posOfFind, matchCond, goal, ruleApp, services);
          addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);

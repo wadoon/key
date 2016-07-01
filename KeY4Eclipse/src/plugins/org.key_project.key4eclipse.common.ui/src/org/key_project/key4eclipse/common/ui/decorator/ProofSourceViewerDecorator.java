@@ -218,7 +218,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
             mergeRanges(textPresentation, false);
          }   
          else {
-            PosInOccurrence<Term, SequentFormula<Term>> pio = node.getAppliedRuleApp().posInOccurrence();
+            PosInOccurrence<Term> pio = node.getAppliedRuleApp().posInOccurrence();
             setGreenBackground(pio);
          }
       }
@@ -367,10 +367,10 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    }
    /**
     * Sets up {@link StyleRange} for green background color.
-    * @param pos PosInOccurrence<Term, SequentFormula<Term>>, where green color should be applied.
+    * @param pos PosInOccurrence<Term>, where green color should be applied.
     * 
     */
-   protected void setGreenBackground(PosInOccurrence<Term, SequentFormula<Term>> pos){
+   protected void setGreenBackground(PosInOccurrence<Term> pos){
       TextPresentation textPresentation = new TextPresentation();
       marked1 = initializeValuesForBackground(greenColor, textPresentation);
       if (pos != null) {

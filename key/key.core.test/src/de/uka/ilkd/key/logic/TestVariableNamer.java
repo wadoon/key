@@ -103,8 +103,8 @@ public class TestVariableNamer extends TestCase {
     }
 
     
-    private PosInOccurrence<Term, SequentFormula<Term>> constructPIO(SequentFormula<Term> formula) {
-    	return new PosInOccurrence<Term, SequentFormula<Term>>(formula, PosInTerm.<Term>getTopLevel(), true);
+    private PosInOccurrence<Term> constructPIO(SequentFormula<Term> formula) {
+    	return new PosInOccurrence<Term>(formula, PosInTerm.<Term>getTopLevel(), true);
     }
 
 
@@ -190,7 +190,7 @@ public class TestVariableNamer extends TestCase {
 	ProgramVariable v = constructProgramVariable(name);
 	SequentFormula<Term> formula = constructFormula(v);
 	Goal goal = constructGoal(formula);
-	PosInOccurrence<Term, SequentFormula<Term>> pio = constructPIO(formula);
+	PosInOccurrence<Term> pio = constructPIO(formula);
 	v = vn.rename(v, goal, pio);
 	assertTrue(v.getProgramElementName().getProgramName().equals("x"));
     }
@@ -200,7 +200,7 @@ public class TestVariableNamer extends TestCase {
     	VariableNamer vn = services.getProgramServices().getInnerVarNamer();
 	ProgramVariable v, w;
 
-	PosInOccurrence<Term, SequentFormula<Term>> pio = constructPIO(formulaWithX);
+	PosInOccurrence<Term> pio = constructPIO(formulaWithX);
  	Goal goal = constructGoal(formulaWithX);
 
 	v = vn.rename(y, goal, pio);
@@ -227,7 +227,7 @@ public class TestVariableNamer extends TestCase {
 //     	VariableNamer vn = services.getVariableNamer();
 //	ProgramVariable v;
 //	
-//	PosInOccurrence<Term, SequentFormula<Term>> pio = constructPIO(formulaWithX);
+//	PosInOccurrence<Term> pio = constructPIO(formulaWithX);
 //	Goal goal = constructGoal(formulaWithX);
 //        proof.getNamespaces().programVariables().addSafely(xx);
 //	addGlobal(goal, xx);
@@ -242,7 +242,7 @@ public class TestVariableNamer extends TestCase {
     	VariableNamer vn = services.getProgramServices().getInnerVarNamer();
 	ProgramElementName proposal;
 
-	PosInOccurrence<Term, SequentFormula<Term>> pio = constructPIO(formulaWithVar_1);
+	PosInOccurrence<Term> pio = constructPIO(formulaWithVar_1);
 	Goal goal = constructGoal(formulaWithVar_1);
 	
 	proposal = vn.getNameProposalForSchemaVariable(null,
@@ -268,7 +268,7 @@ public class TestVariableNamer extends TestCase {
     	VariableNamer vn = services.getProgramServices().getInnerVarNamer();
 	ProgramVariable v;
 	
-	PosInOccurrence<Term, SequentFormula<Term>> pio = constructPIO(formulaWithX_1);
+	PosInOccurrence<Term> pio = constructPIO(formulaWithX_1);
 	Goal goal = constructGoal(formulaWithX_1);
         proof.getNamespaces().programVariables().addSafely(xx);
 	addGlobal(goal, xx);

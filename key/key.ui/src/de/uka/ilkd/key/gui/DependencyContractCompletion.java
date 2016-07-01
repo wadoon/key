@@ -19,7 +19,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.java.Services;
@@ -49,10 +48,10 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         cApp = cApp.tryToInstantiateContract(services);
 
-        final List<PosInOccurrence<Term, SequentFormula<Term>>> steps = UseDependencyContractRule.getSteps(
+        final List<PosInOccurrence<Term>> steps = UseDependencyContractRule.getSteps(
         		app.getHeapContext(),
                 cApp.posInOccurrence(), goal.sequent(), services);
-        PosInOccurrence<Term, SequentFormula<Term>> step = letUserChooseStep(app.getHeapContext(), steps, forced, services);
+        PosInOccurrence<Term> step = letUserChooseStep(app.getHeapContext(), steps, forced, services);
         if (step == null) {
             return null;
         }
@@ -67,9 +66,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
      * @param services
      * @return
      */
-    private static PosInOccurrence<Term, SequentFormula<Term>> letUserChooseStep(
-    		List<LocationVariable> heapContext,
-            List<PosInOccurrence<Term, SequentFormula<Term>>> steps, boolean forced, Services services) {
+    private static PosInOccurrence<Term> letUserChooseStep(
+            List<LocationVariable> heapContext,
+            List<PosInOccurrence<Term>> steps, boolean forced, Services services) {
         assert heapContext != null;
 
         if (steps.size() == 0) {
@@ -104,9 +103,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         return findCorrespondingStep(steps, resultHeaps);
     }
     
-    public static PosInOccurrence<Term, SequentFormula<Term>> findCorrespondingStep(List<PosInOccurrence<Term, SequentFormula<Term>>> steps, Term[] resultHeaps) {
+    public static PosInOccurrence<Term> findCorrespondingStep(List<PosInOccurrence<Term>> steps, Term[] resultHeaps) {
        // find corresponding step
-       for (PosInOccurrence<Term, SequentFormula<Term>> step : steps) {
+       for (PosInOccurrence<Term> step : steps) {
            boolean match = true;
            for(int j = 0; j<resultHeaps.length; j++) {
               if (!step.subTerm().sub(j).equals(resultHeaps[j])) {
@@ -123,10 +122,10 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     }
 
     public static void extractHeaps(List<LocationVariable> heapContext,
-            List<PosInOccurrence<Term, SequentFormula<Term>>> steps, final TermStringWrapper[] heaps,
-            final LogicPrinter lp) {
+                                    List<PosInOccurrence<Term>> steps, final TermStringWrapper[] heaps,
+                                    final LogicPrinter lp) {
         int i = 0;
-        for (PosInOccurrence<Term, SequentFormula<Term>> step : steps) {
+        for (PosInOccurrence<Term> step : steps) {
             Operator op = step.subTerm().op();
             // necessary distinction (see bug #1232)
             // subterm may either be an observer or a heap term already

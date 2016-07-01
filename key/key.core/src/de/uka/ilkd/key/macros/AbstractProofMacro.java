@@ -65,14 +65,14 @@ public abstract class AbstractProofMacro implements ProofMacro {
 
     @Override
     public boolean canApplyTo(Node node,
-                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+                              PosInOccurrence<Term> posInOcc) {
         return canApplyTo(node.proof(), getGoals(node), posInOcc);
     }
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Node node,
-                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+                                          PosInOccurrence<Term> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException, Exception {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }

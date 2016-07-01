@@ -123,7 +123,7 @@ public class TestTacletIndex extends TestCase{
 	Term term_p1 = TacletForTests.parseTerm("p(one, zero)");	
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
         listofHeuristic=listofHeuristic.prepend(h3);
-        PosInOccurrence<Term, SequentFormula<Term>> pos = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term_p1),
+        PosInOccurrence<Term> pos = new PosInOccurrence<Term>(new SequentFormula<>(term_p1),
                 PosInTerm.<Term>getTopLevel(), true);
   	assertTrue("Noninteractive antecrule is not in list, but none of its"+
 		   "heuristics is active.",
@@ -158,7 +158,7 @@ public class TestTacletIndex extends TestCase{
 
         SequentFormula<Term> cfma = new SequentFormula<>(term_p1);
         
-        PosInOccurrence<Term, SequentFormula<Term>> posSucc  = new PosInOccurrence<Term, SequentFormula<Term>>(cfma, PosInTerm.<Term>getTopLevel(), false);
+        PosInOccurrence<Term> posSucc  = new PosInOccurrence<Term>(cfma, PosInTerm.<Term>getTopLevel(), false);
         
   	assertTrue("ruleSucc has no heuristics, but is"+
 		   " not in succ list.",
@@ -190,9 +190,9 @@ public class TestTacletIndex extends TestCase{
 
 	Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 	
-        PosInOccurrence<Term, SequentFormula<Term>> posAntec = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term_p2),
+        PosInOccurrence<Term> posAntec = new PosInOccurrence<Term>(new SequentFormula<>(term_p2),
                 PosInTerm.<Term>getTopLevel(), true);
-        PosInOccurrence<Term, SequentFormula<Term>> posSucc = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term_p2),
+        PosInOccurrence<Term> posSucc = new PosInOccurrence<Term>(new SequentFormula<>(term_p2),
                 PosInTerm.<Term>getTopLevel(), true);
 
         
@@ -223,7 +223,7 @@ public class TestTacletIndex extends TestCase{
 	Term term_p4 = TacletForTests.parseTerm("p(zero, one)");
 
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
-        PosInOccurrence<Term, SequentFormula<Term>> posAntec = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term_p4),
+        PosInOccurrence<Term> posAntec = new PosInOccurrence<Term>(new SequentFormula<>(term_p4),
                 PosInTerm.<Term>getTopLevel(), true);
 	
  	assertTrue("rule matched, but no match possible",
@@ -241,7 +241,7 @@ public class TestTacletIndex extends TestCase{
 	SequentFormula<Term> cfma_p5 = new SequentFormula<>(term_p5);
 	Sequent seq_p5 = Sequent.createAnteSequent
 	    (Semisequent.nil().insertFirst(cfma_p5).semisequent());
-	PosInOccurrence<Term, SequentFormula<Term>> pio_p5 = new PosInOccurrence<Term, SequentFormula<Term>>
+	PosInOccurrence<Term> pio_p5 = new PosInOccurrence<Term>
 	    (cfma_p5, PosInTerm.<Term>getTopLevel(), true);
         RuleAppIndex appIdx = createGoalFor(seq_p5, ruleIdx);
 		  
@@ -257,7 +257,7 @@ public class TestTacletIndex extends TestCase{
 	SequentFormula<Term> cfma_p6 = new SequentFormula<>(term_p6);
 	Sequent seq_p6 = Sequent.createAnteSequent
 	    (Semisequent.nil().insertFirst(cfma_p6).semisequent());
-	PosInOccurrence<Term, SequentFormula<Term>> pio_p6 = new PosInOccurrence<Term, SequentFormula<Term>>
+	PosInOccurrence<Term> pio_p6 = new PosInOccurrence<Term>
 	    (cfma_p6, PosInTerm.<Term>getTopLevel(), true);
 	appIdx = createGoalFor(seq_p6, ruleIdx);
 

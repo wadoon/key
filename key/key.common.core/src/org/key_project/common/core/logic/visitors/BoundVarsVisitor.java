@@ -53,7 +53,7 @@ public class BoundVarsVisitor<T extends CCTerm<?, ?, ?, T>> extends CCDefaultVis
      * visits a sequent
      */
     @SuppressWarnings("unchecked")
-    public void visit(CCSequent<?, ?, ?, ?> visited) {
+    public void visit(CCSequent<?, ?, ?> visited) {
         for (SequentFormula<?> cf : visited) {
             visit((T) cf.formula());
         }

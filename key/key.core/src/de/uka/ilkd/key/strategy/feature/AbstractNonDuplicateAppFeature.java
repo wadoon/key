@@ -43,14 +43,14 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     protected AbstractNonDuplicateAppFeature () {}
     
     /**
-     * Compare whether two <code>PosInOccurrence<Term, SequentFormula<Term>></code>s are equal. This can be
+     * Compare whether two <code>PosInOccurrence<Term></code>s are equal. This can be
      * done using <code>equals</code> or <code>eqEquals</code> (checking for
      * same or equal formulas), which has to be decided by the subclasses
      */
     protected abstract boolean comparePio(TacletApp newApp,
                                           TacletApp oldApp,
-                                          PosInOccurrence<Term, SequentFormula<Term>> newPio,
-                                          PosInOccurrence<Term, SequentFormula<Term>> oldPio);
+                                          PosInOccurrence<Term> newPio,
+                                          PosInOccurrence<Term> oldPio);
 
     /**
      * Check whether a semisequent contains a formula. Again, one can either
@@ -67,7 +67,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      */
     protected boolean sameApplication(RuleApp ruleCmp,
                                       TacletApp newApp,
-                                      PosInOccurrence<Term, SequentFormula<Term>> newPio) {
+                                      PosInOccurrence<Term> newPio) {
         // compare the rules
         if ( newApp.rule () != ruleCmp.rule () ) {
             return false;
@@ -78,7 +78,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         // compare the position of application
         if ( newPio != null ) {
             if ( ! ( cmp instanceof PosTacletApp ) ) return false;
-            final PosInOccurrence<Term, SequentFormula<Term>> oldPio = cmp.posInOccurrence();
+            final PosInOccurrence<Term> oldPio = cmp.posInOccurrence();
             if ( !comparePio ( newApp, cmp, newPio, oldPio ) ) return false;
         }
 
@@ -153,7 +153,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * sequent
      */
     protected boolean noDuplicateFindTaclet(TacletApp app,
-                                            PosInOccurrence<Term, SequentFormula<Term>> pos,
+                                            PosInOccurrence<Term> pos,
                                             Goal goal) {
         final SequentFormula<Term> focusFor = pos.sequentFormula ();
         final boolean antec = pos.isInAntec ();

@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -31,16 +30,16 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
     protected final Contract instantiation;
 
-    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence<Term> pio) {
         this(rule, pio, null);
     }
 
-    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pio, Contract contract) {
-        this(rule, pio, ImmutableSLList.<PosInOccurrence<Term, SequentFormula<Term>>>nil(), contract);
+    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence<Term> pio, Contract contract) {
+        this(rule, pio, ImmutableSLList.<PosInOccurrence<Term>>nil(), contract);
     }
 
-    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pio,
-                                      ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts,
+    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence<Term> pio,
+                                      ImmutableList<PosInOccurrence<Term>> ifInsts,
                                       Contract contract) {
         super(rule, pio, ifInsts);
         this.instantiation = contract;

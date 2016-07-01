@@ -18,15 +18,14 @@ import org.key_project.common.core.logic.IntIterator;
 
 /**
  * This class describes a position in an occurrence of a term. A
- * SequentFormula<Term> and a PosInTerm<Term> determine an object of this 
+ * SequentFormula<T><Term> and a PosInTerm<Term> determine an object of this 
  * class exactly. 
  */
-public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends SequentFormula<T>> {
+public final class PosInOccurrence<T extends CCTerm<?, ?, ?, T>> {
 
-    public static <T      extends CCTerm<?, ?, ?, T>,
-                   SeqFor extends SequentFormula<T>>
-            PosInOccurrence<T, SeqFor> findInSequent(CCSequent<T, SeqFor, ?, ?> seq, int formulaNumber, PosInTerm<T> pos) {
-        return new PosInOccurrence<T, SeqFor>(
+    public static <T      extends CCTerm<?, ?, ?, T>>
+            PosInOccurrence<T> findInSequent(CCSequent<T, ?, ?> seq, int formulaNumber, PosInTerm<T> pos) {
+        return new PosInOccurrence<T>(
                 seq.getFormulabyNr(formulaNumber), pos,
                 seq.numberInAntec(formulaNumber));
     }
@@ -34,7 +33,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
     /**
      * the constrained formula the pos in occurrence describes
      */
-    private final SeqFor sequentFormula;
+    private final SequentFormula<T> sequentFormula;
 
     // saves 8 bytes (due to alignment issues) per instance if we use a
     // short here instead of an int
@@ -53,9 +52,9 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
      */
     private T subTermCache = null;
 
-    public PosInOccurrence(SeqFor sequentFormula,
-                           PosInTerm<T> posInTerm,
-                           boolean inAntec) {
+    public PosInOccurrence(SequentFormula<T> sequentFormula,
+						   PosInTerm<T> posInTerm,
+						   boolean inAntec) {
         assert posInTerm != null;
     assert sequentFormula != null;
 	this.inAntec = inAntec;
@@ -65,10 +64,10 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
     }
            
     /**
-     * returns the SequentFormula<Term> that determines the occurrence of
+     * returns the SequentFormula<T><Term> that determines the occurrence of
      * this PosInOccurrence 
      */
-    public SeqFor sequentFormula() {
+    public SequentFormula<T> sequentFormula() {
 	return sequentFormula;
     }
 
@@ -86,7 +85,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
      * subterm, as specified in method down of 
      * {@link de.uka.ilkd.key.logic.PosInTerm<Term>}.
      */
-    public PosInOccurrence<T, SeqFor> down(int i) {
+    public PosInOccurrence<T> down(int i) {
 	return new PosInOccurrence<>(sequentFormula, posInTerm.down(i), inAntec);
     }
     
@@ -99,7 +98,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
 	    return false;
 	}
 	@SuppressWarnings("unchecked")
-    final PosInOccurrence<T, SeqFor> cmp = (PosInOccurrence<T, SeqFor>)obj;
+    final PosInOccurrence<T> cmp = (PosInOccurrence<T>)obj;
 
 	if ( !sequentFormula.equals ( cmp.sequentFormula ) ) {
 	    return false;
@@ -119,7 +118,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
 	    return false;
 	}
     @SuppressWarnings("unchecked")
-    final PosInOccurrence<T, SeqFor> cmp = (PosInOccurrence<T, SeqFor>)obj;
+    final PosInOccurrence<T> cmp = (PosInOccurrence<T>)obj;
 
 	// NB: the class <code>NonDuplicateAppFeature</code> depends on the usage
 	// of <code>!=</code> in this condition
@@ -130,7 +129,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
 	return equalsHelp ( cmp );
     }
 
-    private boolean equalsHelp (final PosInOccurrence<T, SeqFor> cmp) {
+    private boolean equalsHelp (final PosInOccurrence<T> cmp) {
 	if ( inAntec == cmp.inAntec ) {
 	    return posInTerm .equals ( cmp.posInTerm );
 	}
@@ -170,7 +169,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
      * @return an iterator that walks from the root of the term to the
      * position this <code>PosInOccurrence</code>-object points to
      */
-    public PIOPathIterator<T,SeqFor> iterator () {
+    public PIOPathIterator<T> iterator () {
 	return new PIOPathIteratorImpl ();
     }
 
@@ -178,8 +177,8 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
      * The usage of this method is strongly discouraged, use 
      * {@link PosInOccurrence#iterator} instead.     
      * describes the exact occurrence of the referred term inside
-     * {@link SequentFormula#formula()} 
-     * @returns the position in the formula of the SequentFormula<Term> of
+     * {@link SequentFormula<T>#formula()} 
+     * @returns the position in the formula of the SequentFormula<T><Term> of
      * this PosInOccurrence. 
      */
     public PosInTerm<T> posInTerm() {
@@ -196,9 +195,9 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
      *         object does within the formula <code>constrainedFormula()</code>.
      *         It is not tested whether this position exists within <code>p_newFormula</code>
      */
-    public PosInOccurrence<T, SeqFor> replaceConstrainedFormula (SeqFor p_newFormula) {
+    public PosInOccurrence<T> replaceConstrainedFormula (SequentFormula<T> p_newFormula) {
         assert p_newFormula != null;
-        final PIOPathIterator<T, SeqFor> it = iterator ();
+        final PIOPathIterator<T> it = iterator ();
         T newTerm = p_newFormula.formula ();
         PosInTerm<T> newPosInTerm = PosInTerm.<T>getTopLevel();
 
@@ -232,7 +231,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
     /**
      * Ascend to the top node of the formula this object points to 
      */
-    public PosInOccurrence<T, SeqFor> topLevel () {
+    public PosInOccurrence<T> topLevel () {
         if (isTopLevel()) {
             return this;
         }
@@ -255,7 +254,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
     /**
      * Ascend to the parent node
      */
-    public PosInOccurrence<T, SeqFor> up() {
+    public PosInOccurrence<T> up() {
 	assert !isTopLevel() : "not possible to go up from top level position";
 
 	return new PosInOccurrence<>(sequentFormula, posInTerm.up(), inAntec);
@@ -263,7 +262,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
     }
 
     
-    private final class PIOPathIteratorImpl implements PIOPathIterator<T,SeqFor> {	
+    private final class PIOPathIteratorImpl implements PIOPathIterator<T> {
 	int               child;
 	int               count             = 0;
 	IntIterator       currentPathIt;
@@ -286,7 +285,7 @@ public final class PosInOccurrence<T extends CCTerm<?, ?, ?,T>, SeqFor extends S
 	 * @return the current position within the term
 	 * (i.e. corresponding to the latest <code>next()</code>-call)
 	 */
-	public PosInOccurrence<T, SeqFor> getPosInOccurrence () {
+	public PosInOccurrence<T> getPosInOccurrence () {
 	    // the object is created only now to make the method
 	    // <code>next()</code> faster
 

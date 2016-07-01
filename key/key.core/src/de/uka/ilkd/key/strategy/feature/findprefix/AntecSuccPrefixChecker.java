@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.IfThenElse;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
@@ -56,7 +55,7 @@ class AntecSuccPrefixChecker implements Checker {
 
 
     @Override
-    public void initPrefixCheck(PosInOccurrence<Term, SequentFormula<Term>> p_pos) {
+    public void initPrefixCheck(PosInOccurrence<Term> p_pos) {
         pol = p_pos.isInAntec() ? -1 : 1;  // init polarity
     }
 

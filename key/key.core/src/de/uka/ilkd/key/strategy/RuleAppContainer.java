@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -79,7 +78,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * may be an instance of <code>TopRuleAppCost</code>.
      */
     public static RuleAppContainer createAppContainer
-        ( RuleApp p_app, PosInOccurrence<Term, SequentFormula<Term>> p_pio, Goal p_goal) {
+        (RuleApp p_app, PosInOccurrence<Term> p_pio, Goal p_goal) {
         
 	if ( p_app instanceof NoPosTacletApp )
 	    return TacletAppContainer.createAppContainers( (NoPosTacletApp)p_app, p_pio, p_goal );
@@ -97,8 +96,8 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return list of containers for the currently applicable RuleApps, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    public static ImmutableList<RuleAppContainer> createAppContainers(ImmutableList<? extends RuleApp> rules, 
-            PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public static ImmutableList<RuleAppContainer> createAppContainers(ImmutableList<? extends RuleApp> rules,
+                                                                      PosInOccurrence<Term> pos, Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
 
         if (rules.size() == 1) {

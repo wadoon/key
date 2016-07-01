@@ -36,7 +36,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
 
     private DiffFindAndIfFeature () {}
     
-    protected boolean filter ( TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal ) {
+    protected boolean filter (TacletApp app, PosInOccurrence<Term> pos, Goal goal ) {
         assert pos != null : "Feature is only applicable to rules with find";
         
         ImmutableList<IfFormulaInstantiation> list = app.ifFormulaInstantiations();

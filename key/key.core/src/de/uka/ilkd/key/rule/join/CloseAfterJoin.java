@@ -254,7 +254,7 @@ public class CloseAfterJoin implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence<Term> pio) {
         return true;
     }
 
@@ -264,7 +264,7 @@ public class CloseAfterJoin implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pos, JavaDLTermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence<Term> pos, JavaDLTermServices services) {
         return new CloseAfterJoinRuleBuiltInRuleApp(this, pos);
     }
 
@@ -290,7 +290,7 @@ public class CloseAfterJoin implements BuiltInRule {
      *            and PHI is a DL formula).
      * @return A complete {@link CloseAfterJoinRuleBuiltInRuleApp}.
      */
-    public CloseAfterJoinRuleBuiltInRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pio,
+    public CloseAfterJoinRuleBuiltInRuleApp createApp(PosInOccurrence<Term> pio,
             Node thePartnerNode, Node correspondingJoinNode,
             SymbolicExecutionState joinNodeState,
             SymbolicExecutionState partnerState, Term pc) {

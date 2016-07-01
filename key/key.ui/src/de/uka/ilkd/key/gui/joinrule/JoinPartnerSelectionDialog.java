@@ -113,25 +113,25 @@ public class JoinPartnerSelectionDialog extends JDialog {
             .getInstance();
 
     /** Comparator for goals; sorts by serial nr. of the node */
-    private static Comparator<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> GOAL_COMPARATOR =
-            new Comparator<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>>() {
+    private static Comparator<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> GOAL_COMPARATOR =
+            new Comparator<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>>() {
                 @Override
                 public int compare(
-                        Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> o1,
-                        Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> o2) {
+                        Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>> o1,
+                        Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>> o2) {
                     return o1.first.node().serialNr()
                             - o2.first.node().serialNr();
                 }
             };
 
-    private LinkedList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> candidates =
+    private LinkedList<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> candidates =
             null;
     private Services services = null;
-    private Pair<Goal, PosInOccurrence<Term, SequentFormula<Term>>> joinGoalPio = null;
+    private Pair<Goal, PosInOccurrence<Term>> joinGoalPio = null;
 
     /** The chosen goals. */
-    private SortedSet<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> chosenGoals =
-            new TreeSet<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>>(
+    private SortedSet<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> chosenGoals =
+            new TreeSet<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>>(
                     GOAL_COMPARATOR);
 
     /** The chosen join method. */
@@ -182,7 +182,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
         cmbCandidates.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> selectedCandidate =
+                Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>> selectedCandidate =
                         getSelectedCandidate();
 
                 setHighlightedSequentForArea(selectedCandidate.first,
@@ -349,7 +349,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
         chooseAllButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> candidate : candidates) {
+                for (Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>> candidate : candidates) {
                     chosenGoals.add(candidate);
                 }
                 setVisible(false);
@@ -416,18 +416,18 @@ public class JoinPartnerSelectionDialog extends JDialog {
      */
     public JoinPartnerSelectionDialog(
             Goal joinGoal,
-            PosInOccurrence<Term, SequentFormula<Term>> pio,
-            ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> candidates,
+            PosInOccurrence<Term> pio,
+            ImmutableList<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> candidates,
             Services services) {
 
         this();
         this.services = services;
 
         this.candidates =
-                new LinkedList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>>();
-        this.joinGoalPio = new Pair<Goal, PosInOccurrence<Term, SequentFormula<Term>>>(joinGoal, pio);
+                new LinkedList<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>>();
+        this.joinGoalPio = new Pair<Goal, PosInOccurrence<Term>>(joinGoal, pio);
 
-        for (Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> candidate : candidates) {
+        for (Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>> candidate : candidates) {
             int insPos =
                     Collections.binarySearch(this.candidates, candidate,
                             GOAL_COMPARATOR);
@@ -444,8 +444,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
     /**
      * @return All chosen join partners.
      */
-    public ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> getChosenCandidates() {
-        ImmutableSLList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> result =
+    public ImmutableList<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> getChosenCandidates() {
+        ImmutableSLList<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> result =
                 ImmutableSLList.nil();
 
         if (chosenGoals != null) {
@@ -481,7 +481,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
      *         candidates is applicable.
      */
     private boolean isApplicableForCandidates(
-            ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> theCandidates) {
+            ImmutableList<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> theCandidates) {
         if (joinGoalPio != null && candidates != null && chosenRule != null) {
             JoinRuleBuiltInRuleApp joinRuleApp =
                     (JoinRuleBuiltInRuleApp) JoinRule.INSTANCE.createApp(
@@ -598,7 +598,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
     /**
      * @return The candidate chosen at the moment (by the combo box).
      */
-    private Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> getSelectedCandidate() {
+    private Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>> getSelectedCandidate() {
         return getNthCandidate(cmbCandidates.getSelectedIndex());
     }
 
@@ -609,10 +609,10 @@ public class JoinPartnerSelectionDialog extends JDialog {
      *            Index of the join candidate.
      * @return The n-th candidate in the list.
      */
-    private Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> getNthCandidate(
+    private Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>> getNthCandidate(
             int n) {
         int i = 0;
-        for (Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> elem : candidates) {
+        for (Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>> elem : candidates) {
             if (i == n) {
                 return elem;
             }
@@ -631,7 +631,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
             return;
         }
 
-        for (Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> candidate : candidates) {
+        for (Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>> candidate : candidates) {
             cmbCandidates.addItem("Node " + candidate.first.node().serialNr());
         }
 
@@ -652,7 +652,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
      * @param area
      *            The editor pane to add the highlighted goal to.
      */
-    private void setHighlightedSequentForArea(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio,
+    private void setHighlightedSequentForArea(Goal goal, PosInOccurrence<Term> pio,
             JEditorPane area) {
 
         String subterm = LogicPrinter.quickPrintTerm(pio.subTerm(), services);

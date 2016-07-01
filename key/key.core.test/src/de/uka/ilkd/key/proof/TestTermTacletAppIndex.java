@@ -123,7 +123,7 @@ public class TestTermTacletAppIndex extends TestCase{
         Term term = TacletForTests.parseTerm ( "f(f(f(zero)))=one" );
         SequentFormula<Term> cfma = new SequentFormula<Term> ( term );
 
-        PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>> ( cfma, PosInTerm.<Term>getTopLevel(),
+        PosInOccurrence<Term> pio = new PosInOccurrence<Term> ( cfma, PosInTerm.<Term>getTopLevel(),
                                                     false );
 
         TermTacletAppIndex termIdx =
@@ -143,7 +143,7 @@ public class TestTermTacletAppIndex extends TestCase{
         // now a real change
         Term term2 = TacletForTests.parseTerm ( "f(f(zero))=one" );
         SequentFormula<Term> cfma2 = new SequentFormula<Term> ( term2 );
-        PosInOccurrence<Term, SequentFormula<Term>> pio2 = new PosInOccurrence<Term, SequentFormula<Term>> ( cfma2,
+        PosInOccurrence<Term> pio2 = new PosInOccurrence<Term> ( cfma2,
                                                      PosInTerm.<Term>getTopLevel(), false );
 
         termIdx = termIdx.update ( pio2.down ( 0 ).down ( 0 ).down ( 0 ), serv,
@@ -160,7 +160,7 @@ public class TestTermTacletAppIndex extends TestCase{
         checkTermIndex3 ( pio2, termIdx );
     }
 
-    private void checkAtPos(PosInOccurrence<Term, SequentFormula<Term>> pio,
+    private void checkAtPos(PosInOccurrence<Term> pio,
 			    TermTacletAppIndex termIdx,
 			    ImmutableList<Taclet> list) {
         checkTacletList(termIdx.getTacletAppAt(pio,
@@ -168,11 +168,11 @@ public class TestTermTacletAppIndex extends TestCase{
                         list);
     }
 
-    private PosInOccurrence<Term, SequentFormula<Term>> down ( PosInOccurrence<Term, SequentFormula<Term>> pio, int i ) {
+    private PosInOccurrence<Term> down ( PosInOccurrence<Term> pio, int i ) {
 	return pio.down(i);
     }
 
-    private void checkTermIndex(PosInOccurrence<Term, SequentFormula<Term>> pio,
+    private void checkTermIndex(PosInOccurrence<Term> pio,
                                 TermTacletAppIndex termIdx) {
         ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
@@ -186,7 +186,7 @@ public class TestTermTacletAppIndex extends TestCase{
         checkAtPos(down(pio, 1), termIdx, listA);
     }
 
-    private void checkTermIndex2(PosInOccurrence<Term, SequentFormula<Term>> pio,
+    private void checkTermIndex2(PosInOccurrence<Term> pio,
 				 TermTacletAppIndex termIdx) {
 	ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
 	ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
@@ -199,7 +199,7 @@ public class TestTermTacletAppIndex extends TestCase{
 	checkAtPos(down(pio, 1), termIdx, listA);
     }
 
-    private void checkTermIndex3(PosInOccurrence<Term, SequentFormula<Term>> pio,
+    private void checkTermIndex3(PosInOccurrence<Term> pio,
 				 TermTacletAppIndex termIdx) {
 	ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
 	ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -122,7 +121,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
        // Make sure that modalities without symbolic execution label are executed first because they might forbid rule application on modalities with symbolic execution label (see loop body branches)
        globalF = add(globalF, ifZero(not(new BinaryFeature() {
           @Override
-          protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+          protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
              return pos != null && SymbolicExecutionUtil.hasSymbolicExecutionLabel(pos.subTerm());
           }
        }), longConst(-3000)));

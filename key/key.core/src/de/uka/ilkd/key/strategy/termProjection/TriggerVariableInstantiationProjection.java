@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -24,7 +23,7 @@ import de.uka.ilkd.key.rule.Taclet;
 public class TriggerVariableInstantiationProjection implements ProjectionToTerm  {
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         assert app.rule() instanceof Taclet;
         final Taclet t = (Taclet) app.rule();
         

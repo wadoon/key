@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -38,7 +37,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     public final QueueRuleApplicationManager rootManager;
 
     private final FormulaTag              focussedFormula;
-    private final PosInOccurrence<Term, SequentFormula<Term>>         focussedSubterm;
+    private final PosInOccurrence<Term>         focussedSubterm;
 
     private Goal                          goal;
     
@@ -53,7 +52,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     private FocussedRuleApplicationManager (AutomatedRuleApplicationManager delegate,
                                     Goal goal,
                                     FormulaTag focussedFormula,
-                                    PosInOccurrence<Term, SequentFormula<Term>> focussedSubterm,
+                                    PosInOccurrence<Term> focussedSubterm,
                                     boolean onlyModifyFocussedFormula) {
         this.delegate = delegate;
         this.rootManager = delegate instanceof QueueRuleApplicationManager
@@ -67,7 +66,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     
     public FocussedRuleApplicationManager (AutomatedRuleApplicationManager delegate,
                                    Goal goal,
-                                   PosInOccurrence<Term, SequentFormula<Term>> focussedSubterm) {
+                                   PosInOccurrence<Term> focussedSubterm) {
         this ( delegate,
                goal,
                goal.getFormulaTagManager ()
@@ -116,20 +115,20 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     }
 
     @Override
-    public void ruleAdded (RuleApp rule, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    public void ruleAdded (RuleApp rule, PosInOccurrence<Term> pos) {
         if ( isRuleApplicationForFocussedFormula(rule, pos) ) {            
             delegate.ruleAdded ( rule, pos );
         }         
     }
 
     protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
-            PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            PosInOccurrence<Term> pos) {
         // filter the rule applications, only allow applications within the
         // focussed subterm or to other formulas that have been added after creation
         // of the manager (we rely on the fact that the caching rule indexes only
         // report rules for modified/added formulas anyway)
         
-        final PosInOccurrence<Term, SequentFormula<Term>> focFormula = getPIOForFocussedSubterm ();
+        final PosInOccurrence<Term> focFormula = getPIOForFocussedSubterm ();
 
         if ( focFormula != null && pos != null ) {
             if ( isSameFormula ( pos, focFormula ) ) {
@@ -149,7 +148,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
 
     
     @Override
-    public void rulesAdded (ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    public void rulesAdded (ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term> pos) {
         ImmutableList<RuleApp> applicableRules = ImmutableSLList.<RuleApp>nil();
         for (RuleApp r : rules) {
             if (isRuleApplicationForFocussedFormula(r, pos)) {
@@ -161,14 +160,14 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     }
 
     
-    private boolean isSameFormula (PosInOccurrence<Term, SequentFormula<Term>> pio1,
-                                   PosInOccurrence<Term, SequentFormula<Term>> pio2) {
+    private boolean isSameFormula (PosInOccurrence<Term> pio1,
+                                   PosInOccurrence<Term> pio2) {
         return pio2.isInAntec () == pio1.isInAntec ()
                && pio2.sequentFormula ().equals ( pio1.sequentFormula () );
     }
 
-    private PosInOccurrence<Term, SequentFormula<Term>> getPIOForFocussedSubterm () {
-        final PosInOccurrence<Term, SequentFormula<Term>> formula =
+    private PosInOccurrence<Term> getPIOForFocussedSubterm () {
+        final PosInOccurrence<Term> formula =
             goal.getFormulaTagManager ().getPosForTag ( focussedFormula );
 
         if ( formula == null ) return null;
@@ -178,9 +177,9 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
             .replaceConstrainedFormula ( formula.sequentFormula () );
     }
     
-    private boolean isBelow (PosInOccurrence<Term, SequentFormula<Term>> over, PosInOccurrence<Term, SequentFormula<Term>> under) {
-        final PIOPathIterator<Term, SequentFormula<Term>> overIt = over.iterator ();
-        final PIOPathIterator<Term, SequentFormula<Term>> underIt = under.iterator ();
+    private boolean isBelow (PosInOccurrence<Term> over, PosInOccurrence<Term> under) {
+        final PIOPathIterator<Term> overIt = over.iterator ();
+        final PIOPathIterator<Term> underIt = under.iterator ();
 
         while ( true ) {
             final int overChild = overIt.next ();

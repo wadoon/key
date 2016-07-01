@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -29,5 +28,5 @@ import de.uka.ilkd.key.rule.RuleApp;
  * instantiate schema variables with different terms/formulas.
  */
 public interface TermGenerator {
-    Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal);
+    Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal);
 }

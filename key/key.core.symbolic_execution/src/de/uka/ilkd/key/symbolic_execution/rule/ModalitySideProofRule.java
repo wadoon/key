@@ -91,7 +91,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public boolean isApplicable(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+   public boolean isApplicable(Goal goal, PosInOccurrence<Term> pio) {
       boolean applicable = false;
       if (pio != null && pio.isTopLevel()) {
           // abort if inside of transformer
@@ -124,7 +124,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public IBuiltInRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pos, JavaDLTermServices services) {
+   public IBuiltInRuleApp createApp(PosInOccurrence<Term> pos, JavaDLTermServices services) {
       return new DefaultBuiltInRuleApp(this, pos);
    }
 
@@ -135,7 +135,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) throws RuleAbortException {
       try {
          // Extract required Terms from goal
-         PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
+         PosInOccurrence<Term> pio = ruleApp.posInOccurrence();
          Term topLevelTerm = pio.subTerm();
          Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.goBelowUpdates2(topLevelTerm);
          Term modalityTerm = updatesAndTerm.second;

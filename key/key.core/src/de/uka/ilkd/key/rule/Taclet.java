@@ -871,13 +871,13 @@ public abstract class Taclet implements Rule, Named {
           REPLACE_TO_ANTECEDENT, 
           
           /**
-           * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently the current {@link PosInOccurrence<Term, SequentFormula<Term>>} on the succedent is modified.
+           * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently the current {@link PosInOccurrence<Term>} on the succedent is modified.
            * Available information are {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSequentFormula()}.
            */
           REPLACE_AT_SUCCEDENT, 
           
           /**
-           * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently the current {@link PosInOccurrence<Term, SequentFormula<Term>>} on the antecedent is modified.
+           * Replace clause of a {@link Taclet} provides a {@link Sequent} and currently the current {@link PosInOccurrence<Term>} on the antecedent is modified.
            * Available information are {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSequentFormula()}.
            */
           REPLACE_AT_ANTECEDENT, 
@@ -889,7 +889,7 @@ public abstract class Taclet implements Rule, Named {
           REPLACE_TO_SUCCEDENT, 
 
           /**
-           * Replace clause of a {@link Taclet} provides a {@link Term} which is currently used to modify the {@link PosInOccurrence<Term, SequentFormula<Term>>}.
+           * Replace clause of a {@link Taclet} provides a {@link Term} which is currently used to modify the {@link PosInOccurrence<Term>}.
            * Available information are {@link TacletLabelHint#getTerm()}.
            */
           REPLACE_TERM;

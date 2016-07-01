@@ -78,9 +78,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    private ExecutionNodeSymbolicLayoutExtractor layoutExtractor;
    
    /**
-    * The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality or its updates.
+    * The {@link PosInOccurrence<Term>} of the modality or its updates.
     */
-   private PosInOccurrence<Term, SequentFormula<Term>> modalityPIO;
+   private PosInOccurrence<Term> modalityPIO;
    
    /**
     * The up to know discovered completed {@link IExecutionBlockStartNode}s.
@@ -358,7 +358,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
+   public PosInOccurrence<Term> getModalityPIO() {
       if (modalityPIO == null) {
          modalityPIO = lazyComputeModalityPIO();
       }
@@ -366,14 +366,14 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    }
 
    /**
-    * Computes the {@link PosInOccurrence<Term, SequentFormula<Term>>} lazily when {@link #getModalityPIO()} is 
+    * Computes the {@link PosInOccurrence<Term>} lazily when {@link #getModalityPIO()} is 
     * called the first time.
-    * @return The {@link PosInOccurrence<Term, SequentFormula<Term>>}s of the modality or its updates.
+    * @return The {@link PosInOccurrence<Term>}s of the modality or its updates.
     */
-   protected PosInOccurrence<Term, SequentFormula<Term>> lazyComputeModalityPIO() {
-      PosInOccurrence<Term, SequentFormula<Term>> originalPio = getProofNode().getAppliedRuleApp().posInOccurrence();
+   protected PosInOccurrence<Term> lazyComputeModalityPIO() {
+      PosInOccurrence<Term> originalPio = getProofNode().getAppliedRuleApp().posInOccurrence();
       // Try to go back to the parent which provides the updates
-      PosInOccurrence<Term, SequentFormula<Term>> pio = originalPio;
+      PosInOccurrence<Term> pio = originalPio;
       Term term = pio.subTerm();
       if (!pio.isTopLevel() && term.op() != UpdateApplication.UPDATE_APPLICATION) {
          pio = pio.up();

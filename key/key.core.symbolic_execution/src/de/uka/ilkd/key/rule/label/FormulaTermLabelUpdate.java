@@ -47,7 +47,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
    @Override
    public void updateLabels(TermLabelState state,
                             Services services, 
-                            PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, 
+                            PosInOccurrence<Term> applicationPosInOccurrence,
                             Term applicationTerm, 
                             Term modalityTerm, 
                             Rule rule, 

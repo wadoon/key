@@ -138,7 +138,7 @@ public class JoinProcessor implements Runnable {
 
     private void orRight(Goal goal) {
         SequentFormula<Term> sf = goal.sequent().succedent().get(0);
-        PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(sf, PosInTerm.<Term>getTopLevel(),
+        PosInOccurrence<Term> pio = new PosInOccurrence<Term>(sf, PosInTerm.<Term>getTopLevel(),
                 false);
         apply(new String[] { OR_RIGHT_TACLET }, goal, pio);
 
@@ -159,7 +159,7 @@ public class JoinProcessor implements Runnable {
 
         SequentFormula<Term> sf = findFormula(goal.sequent(), cut.getFormula(), false);
 
-        PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(sf, PosInTerm.<Term>getTopLevel()
+        PosInOccurrence<Term> pio = new PosInOccurrence<Term>(sf, PosInTerm.<Term>getTopLevel()
                 .down(0), false);
         Goal result = apply(SIMPLIFY_UPDATE, goal, pio).head();
 
@@ -171,7 +171,7 @@ public class JoinProcessor implements Runnable {
      * is thrown.
      */
     private ImmutableList<Goal> apply(final String[] tacletNames, Goal goal,
-            PosInOccurrence<Term, SequentFormula<Term>> pio) {
+            PosInOccurrence<Term> pio) {
 
         TacletFilter filter = new TacletFilter() {
 
@@ -205,7 +205,7 @@ public class JoinProcessor implements Runnable {
         }
         int index = goal.sequent().formulaNumberInSequent(false,
                 partner.getFormulaForHiding());
-        PosInOccurrence<Term, SequentFormula<Term>> pio = PosInOccurrence.findInSequent(goal.sequent(),
+        PosInOccurrence<Term> pio = PosInOccurrence.findInSequent(goal.sequent(),
                 index, PosInTerm.<Term>getTopLevel());
         return apply(new String[] { HIDE_RIGHT_TACLET }, goal, pio).head();
 

@@ -161,7 +161,7 @@ public class TestCollisionResolving extends TestCase {
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_coll_context").taclet();
 
-	PosInOccurrence<Term, SequentFormula<Term>> pos=new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term),
+	PosInOccurrence<Term> pos=new PosInOccurrence<Term>(new SequentFormula<>(term),
 						PosInTerm.<Term>getTopLevel().down(0),
 						true);
 
@@ -191,7 +191,7 @@ public class TestCollisionResolving extends TestCase {
 		
 	FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_ns1").taclet();
-	PosInOccurrence<Term, SequentFormula<Term>> pos=new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term),
+	PosInOccurrence<Term> pos=new PosInOccurrence<Term>(new SequentFormula<>(term),
 						PosInTerm.<Term>getTopLevel().down(0),
 						true);
 	TacletApp app 
@@ -286,7 +286,7 @@ public class TestCollisionResolving extends TestCase {
 	    .insert(1, new SequentFormula<>(TacletForTests.parseTerm
 					      ("\\exists s x; p(x)"))).semisequent();
 	Sequent seq=Sequent.createSuccSequent(semiseq);
-	PosInOccurrence<Term, SequentFormula<Term>> pos=new PosInOccurrence<Term, SequentFormula<Term>>(semiseq.get(0),
+	PosInOccurrence<Term> pos=new PosInOccurrence<Term>(semiseq.get(0),
 						PosInTerm.<Term>getTopLevel(), false);
 
 	NoPosTacletApp app0 = NoPosTacletApp.createNoPosTacletApp ( taclet );
@@ -395,7 +395,7 @@ public class TestCollisionResolving extends TestCase {
 	    .insert(1, new SequentFormula<>(TacletForTests.parseTerm("all x:s"
 								    +".p(x)")));
 	Sequent seq=Sequent.createSuccSequent(semiseq);
-	PosInOccurrence<Term, SequentFormula<Term>> pos=new PosInOccurrence<Term, SequentFormula<Term>>(semiseq.get(1),
+	PosInOccurrence<Term> pos=new PosInOccurrence<Term>(semiseq.get(1),
 						PosInTerm<Term>.TOP_LEVEL.down(0),
 						seq);
 	IList<SVInstantiations> sviList=taclet.matchIf
@@ -419,7 +419,7 @@ public class TestCollisionResolving extends TestCase {
 	FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict_with_context2").taclet();
 	Term term=TacletForTests.parseTerm("\\forall s x; p(x)");
-	PosInOccurrence<Term, SequentFormula<Term>> pos=new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(term),
+	PosInOccurrence<Term> pos=new PosInOccurrence<Term>(new SequentFormula<>(term),
 						PosInTerm.<Term>getTopLevel().down(0),
 						true);
 	MatchConditions mc=taclet.getMatcher().matchFind(term.sub(0),

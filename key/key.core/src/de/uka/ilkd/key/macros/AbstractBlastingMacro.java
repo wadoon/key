@@ -51,7 +51,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+                                          PosInOccurrence<Term> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
        for (Goal goal : goals) {
           addInvariantFormula(goal);
@@ -81,7 +81,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }    
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term> posInOcc) {
         return new SemanticsBlastingStrategy();
     }
     
@@ -216,7 +216,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio,
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pio,
                 Goal goal) {
 
             if(app.rule() instanceof OneStepSimplifier){
@@ -250,7 +250,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
 
             if(app.rule() instanceof OneStepSimplifier){
                 return true;
@@ -271,8 +271,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal,
-                RuleAppCostCollector collector) {}
+        public void instantiateApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal,
+                                   RuleAppCostCollector collector) {}
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {

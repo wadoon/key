@@ -71,13 +71,13 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+            PosInOccurrence<Term> posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-            Proof proof, ImmutableList<Goal> goals, PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+            Proof proof, ImmutableList<Goal> goals, PosInOccurrence<Term> posInOcc,
             ProverTaskListener listener) throws InterruptedException {
 
         if (goals == null || goals.isEmpty()) {
@@ -308,7 +308,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
             if (enforceJoin || stoppedGoals.contains(goal)
                     || !FinishSymbolicExecutionWithSpecJoinsMacro.hasModality(goal.sequent())) {
                 return false;
@@ -362,7 +362,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                             final JoinRule joinRule = JoinRule.INSTANCE;
 
                             final Node joinNode = goal.node();
-                            final PosInOccurrence<Term, SequentFormula<Term>> joinPio = getPioForBreakpoint(
+                            final PosInOccurrence<Term> joinPio = getPioForBreakpoint(
                                     breakpoint, goal.sequent());
                             final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
                                     .createApp(joinPio, goal.proof()
@@ -372,7 +372,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                                 // Consider only the partners below the common
                                 // parent node. Otherwise, we obtain
                                 // behavior that may be hard to understand.
-                                ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
+                                ImmutableList<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                                         .findPotentialJoinPartners(goal,
                                                 joinPio,
                                                 commonParents.get(breakpoint));
@@ -428,9 +428,9 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
         /**
-         * Returns the {@link PosInOccurrence<Term, SequentFormula<Term>>} for the given breakpoint
+         * Returns the {@link PosInOccurrence<Term>} for the given breakpoint
          * statement inside the given sequent, or null if the statement does not
-         * exist within the sequent. The returned {@link PosInOccurrence<Term, SequentFormula<Term>>} is the
+         * exist within the sequent. The returned {@link PosInOccurrence<Term>} is the
          * top level formula inside the sequent containing the breakpoint
          * statement.
          *
@@ -441,8 +441,8 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          * @return The top level formula inside the sequent containing the
          *         breakpoint statement.
          */
-        private PosInOccurrence<Term, SequentFormula<Term>> getPioForBreakpoint(Statement breakpoint,
-                Sequent sequent) {
+        private PosInOccurrence<Term> getPioForBreakpoint(Statement breakpoint,
+                                                          Sequent sequent) {
             Semisequent succedent = sequent.succedent();
 
             for (SequentFormula<Term> formula : succedent) {
@@ -452,7 +452,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
                 if (activeStmt != null
                         && ((Statement) activeStmt).equals(breakpoint)) {
-                    return new PosInOccurrence<Term, SequentFormula<Term>>(formula,
+                    return new PosInOccurrence<Term>(formula,
                             PosInTerm.<Term>getTopLevel(), false);
                 }
             }

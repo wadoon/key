@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.*;
 
 import de.uka.ilkd.key.logic.Term;
@@ -28,13 +27,13 @@ public class QuanEliminationAnalyser {
      *         <code>Integer.MAX_VALUE</code> if the subformula is not an
      *         eliminable definition
      */
-    public int eliminableDefinition(Term definition, PosInOccurrence<Term, SequentFormula<Term>> envPIO) {
-        final PosInOccurrence<Term, SequentFormula<Term>> matrixPIO = walkUpMatrix ( envPIO );
+    public int eliminableDefinition(Term definition, PosInOccurrence<Term> envPIO) {
+        final PosInOccurrence<Term> matrixPIO = walkUpMatrix ( envPIO );
         final Term matrix = matrixPIO.subTerm ();
 
         if ( matrixPIO.isTopLevel () ) return Integer.MAX_VALUE;
         
-        PosInOccurrence<Term, SequentFormula<Term>> quantPIO = matrixPIO.up ();
+        PosInOccurrence<Term> quantPIO = matrixPIO.up ();
         Term quantTerm = quantPIO.subTerm ();
         final boolean ex;
         if ( quantTerm.op () == Quantifier.EX ) {
@@ -90,9 +89,9 @@ public class QuanEliminationAnalyser {
         return false;
     }
     
-    private PosInOccurrence<Term, SequentFormula<Term>> walkUpMatrix(PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    private PosInOccurrence<Term> walkUpMatrix(PosInOccurrence<Term> pio) {
         while ( !pio.isTopLevel () ) {
-            final PosInOccurrence<Term, SequentFormula<Term>> parent = pio.up ();
+            final PosInOccurrence<Term> parent = pio.up ();
             final Operator parentOp = parent.subTerm ().op ();
             if ( parentOp != Junctor.AND && parentOp != Junctor.OR ) return pio;
             pio = parent;

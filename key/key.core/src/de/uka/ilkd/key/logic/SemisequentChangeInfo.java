@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * Records the changes made to a semisequent. Keeps track of added and
  * removed formula to the semisequents. 
  */
-public class SemisequentChangeInfo extends CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> {
+public class SemisequentChangeInfo extends CCSemisequentChangeInfo<Term, Semisequent> {
    
     public SemisequentChangeInfo() {
         super(ImmutableSLList.<SequentFormula<Term>> nil());

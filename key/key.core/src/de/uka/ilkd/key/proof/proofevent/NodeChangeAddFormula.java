@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 
@@ -23,7 +22,7 @@ import de.uka.ilkd.key.logic.Term;
  * position given is the position of the formula within the new
  * sequent) */
 public class NodeChangeAddFormula extends NodeChangeARFormula {    
-    public NodeChangeAddFormula ( PosInOccurrence<Term, SequentFormula<Term>> p_pos ) {
+    public NodeChangeAddFormula ( PosInOccurrence<Term> p_pos ) {
 	super ( p_pos );
     }
 

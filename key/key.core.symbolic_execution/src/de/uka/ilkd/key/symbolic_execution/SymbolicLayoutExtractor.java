@@ -201,13 +201,13 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
-    * @param modalityPio The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality or its updates.
+    * @param modalityPio The {@link PosInOccurrence<Term>} of the modality or its updates.
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     */
    public SymbolicLayoutExtractor(Node node, 
-                                  PosInOccurrence<Term, SequentFormula<Term>> modalityPio,
+                                  PosInOccurrence<Term> modalityPio,
                                   boolean useUnicode,
                                   boolean usePrettyPrinting,
                                   boolean simplifyConditions) {

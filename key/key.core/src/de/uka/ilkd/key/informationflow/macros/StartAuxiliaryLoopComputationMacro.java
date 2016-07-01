@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -47,7 +46,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+                              PosInOccurrence<Term> posInOcc) {
         if (goals == null || goals.head() == null
                 || goals.head().node() == null
                 || goals.head().node().parent() == null) {
@@ -89,7 +88,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+                                          PosInOccurrence<Term> posInOcc,
                                           ProverTaskListener listener) throws Exception {
         final LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) 
                 goals.head().node().parent().getAppliedRuleApp();

@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -91,7 +90,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement> impleme
     * {@inheritDoc}
     */
    @Override
-   protected PosInOccurrence<Term, SequentFormula<Term>> lazyComputeModalityPIO() {
+   protected PosInOccurrence<Term> lazyComputeModalityPIO() {
       return SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(getProofNode().sequent());
    }
 

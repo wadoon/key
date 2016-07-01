@@ -31,18 +31,18 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param gt the {@link TacletGoalTemplate} used to get the taclet's {@code replacewith}-expression 
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the {@link GenericSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>} which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the {@link PosInOccurrence<Term, SequentFormula<Term>>} belonging to the find expression
+     * @param posOfFind the {@link PosInOccurrence<Term>} belonging to the find expression
      * @param matchCond the {@link MatchConditions} with all required instantiations 
      * @param goal the {@link Goal} on which the taclet is applied 
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Java model information
      */
-    protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-            CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
-            MatchConditions matchCond,
-            Goal goal,
-            RuleApp ruleApp,
-            Services services);
+    protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
+                                             CCSequentChangeInfo<Term, Sequent> currentSequent, PosInOccurrence<Term> posOfFind,
+                                             MatchConditions matchCond,
+                                             Goal goal,
+                                             RuleApp ruleApp,
+                                             Services services);
 
 
     /**
@@ -50,14 +50,14 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param add the {@link Sequent} with the uninstantiated {@link SequentFormula}'s to be added to the goal's sequent
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the {@link GenericSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>} which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the {@link PosInOccurrence<Term, SequentFormula<Term>>} providing the position information where the match took place 
+     * @param posOfFind the {@link PosInOccurrence<Term>} providing the position information where the match took place 
      * (it will be tried to add the new formulas close to that position)
      * @param matchCond the {@link MatchConditions} with all required instantiations 
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Java model information
      */
-    protected abstract void applyAdd(Sequent add, TermLabelState termLabelState, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent,
-            PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
+    protected abstract void applyAdd(Sequent add, TermLabelState termLabelState, CCSequentChangeInfo<Term, Sequent> currentSequent,
+            PosInOccurrence<Term> posOfFind,
             MatchConditions matchCond,
             Goal goal,
             RuleApp ruleApp,
@@ -81,7 +81,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
         TacletApp                    tacletApp        = (TacletApp) ruleApp;
         MatchConditions              mc               = tacletApp.matchConditions ();
 
-        ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>>                   newSequentsForGoals         =
+        ImmutableList<CCSequentChangeInfo<Term, Sequent>>                   newSequentsForGoals         =
                 checkIfGoals ( goal,
                         tacletApp.ifFormulaInstantiations (),
                         mc,
@@ -91,12 +91,12 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
 
         Iterator<TacletGoalTemplate> it               = taclet.goalTemplates().iterator(); 
         Iterator<Goal>               goalIt           = newGoals.iterator();
-        Iterator<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> newSequentsIt = newSequentsForGoals.iterator();
+        Iterator<CCSequentChangeInfo<Term, Sequent>> newSequentsIt = newSequentsForGoals.iterator();
 
         while (it.hasNext()) {
             TacletGoalTemplate gt          = it    .next();
             Goal               currentGoal = goalIt.next();
-            CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>  currentSequent = newSequentsIt.next();
+            CCSequentChangeInfo<Term, Sequent>  currentSequent = newSequentsIt.next();
 
             // add first because we want to use pos information that
             // is lost applying replacewith

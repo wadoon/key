@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -35,7 +34,7 @@ public class TacletRequiringInstantiationFeature extends BinaryTacletAppFeature 
         super ( false );
     }
     
-    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         final ImmutableSet<SchemaVariable> neededVars = app.uninstantiatedVars ();
         final ImmutableSet<SchemaVariable> ifFindVars = app.taclet ().getIfFindVariables ();
         for (SchemaVariable neededVar : neededVars) {

@@ -34,7 +34,7 @@ public class HeapGenerator implements TermGenerator {
     }
     
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         LinkedHashSet<Term> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();
         for (SequentFormula<Term> sf : seq) {

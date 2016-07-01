@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Sequent#EMPTY_SEQUENT}.
  */
 public class Sequent
-        extends CCSequentImpl<Term, SequentFormula<Term>, Semisequent, Sequent> {
+        extends CCSequentImpl<Term, Semisequent, Sequent> {
 
     public static final Sequent EMPTY_SEQUENT = new NILSequent();
 
@@ -137,7 +137,7 @@ public class Sequent
     @Override
     protected SequentChangeInfo createSequentChangeInfo(
             boolean inAntec,
-            CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> semiCI,
+            CCSemisequentChangeInfo<Term, Semisequent> semiCI,
             Sequent result, Sequent original) {
         assert semiCI instanceof SemisequentChangeInfo;
 

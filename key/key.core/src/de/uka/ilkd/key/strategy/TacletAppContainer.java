@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -67,7 +66,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     protected static TacletAppContainer createContainer(NoPosTacletApp p_app,
-                                                        PosInOccurrence<Term, SequentFormula<Term>> p_pio,
+                                                        PosInOccurrence<Term> p_pio,
                                                         Goal p_goal,
                                                         boolean p_initial) {
         return createContainer ( p_app, p_pio, p_goal,
@@ -76,7 +75,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     private static TacletAppContainer createContainer(NoPosTacletApp p_app,
-                                                      PosInOccurrence<Term, SequentFormula<Term>> p_pio,
+                                                      PosInOccurrence<Term> p_pio,
                                                       Goal p_goal,
                                                       RuleAppCost p_cost,
                                                       boolean p_initial) {
@@ -221,8 +220,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         return createAppContainers ( p_app, null, p_goal );
     }
     
-    protected static ImmutableList<RuleAppContainer> createInitialAppContainers(ImmutableList<NoPosTacletApp> p_app, 
-            PosInOccurrence<Term, SequentFormula<Term>> p_pio, Goal p_goal) {
+    protected static ImmutableList<RuleAppContainer> createInitialAppContainers(ImmutableList<NoPosTacletApp> p_app,
+                                                                                PosInOccurrence<Term> p_pio, Goal p_goal) {
         
         List<RuleAppCost> costs = new LinkedList<>();
         
@@ -250,7 +249,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     static RuleAppContainer createAppContainers
         ( NoPosTacletApp  p_app,
-          PosInOccurrence<Term, SequentFormula<Term>> p_pio,
+          PosInOccurrence<Term> p_pio,
           Goal            p_goal ) {
         if ( !( p_pio == null
                 ? p_app.taclet () instanceof NoFindTaclet
@@ -300,7 +299,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     protected abstract boolean isStillApplicable ( Goal p_goal );
 
-    protected PosInOccurrence<Term, SequentFormula<Term>> getPosInOccurrence ( Goal p_goal ) {
+    protected PosInOccurrence<Term> getPosInOccurrence (Goal p_goal ) {
     	return null;
     }
 
@@ -315,7 +314,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
         TacletApp app = getTacletApp();
-        PosInOccurrence<Term, SequentFormula<Term>> pio = getPosInOccurrence(p_goal);
+        PosInOccurrence<Term> pio = getPosInOccurrence(p_goal);
         if (!p_goal.getGoalStrategy().isApprovedApp(app, pio, p_goal)) {
             return null;
         }

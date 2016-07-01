@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -37,7 +36,7 @@ public class TermBuffer implements ProjectionToTerm {
         this.t = t;
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         return t;
     }
 

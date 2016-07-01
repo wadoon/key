@@ -17,7 +17,6 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SortedOperator;
 import org.key_project.common.core.logic.sort.Sort;
@@ -42,7 +41,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator ( cond ) {
-            protected Iterator<Term> createIterator(PosInOccurrence<Term, SequentFormula<Term>> focus) {
+            protected Iterator<Term> createIterator(PosInOccurrence<Term> focus) {
                 return new UpwardsIterator ( focus, services );
             }
         };
@@ -50,17 +49,17 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
         return new SuperTermWithIndexGenerator ( cond ) {
-            protected Iterator<Term> createIterator(PosInOccurrence<Term, SequentFormula<Term>> focus) {
+            protected Iterator<Term> createIterator(PosInOccurrence<Term> focus) {
                 return new UpwardsIterator ( focus, services );
             }
         };
     }
     
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         return createIterator ( pos );
     }
 
-    protected abstract Iterator<Term> createIterator(PosInOccurrence<Term, SequentFormula<Term>> focus);
+    protected abstract Iterator<Term> createIterator(PosInOccurrence<Term> focus);
     
     protected Term generateOneTerm(Term superterm, int child) {
         return superterm;
@@ -78,7 +77,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             super ( cond );
         }
 
-        public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+        public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
             if ( services == null ) {
                 services = goal.proof ().getServices ();
                 final IntegerLDT numbers = services.getTheories().getIntegerLDT();
@@ -144,11 +143,11 @@ public abstract class SuperTermGenerator implements TermGenerator {
     }
     
     class UpwardsIterator implements Iterator<Term> {
-        private PosInOccurrence<Term, SequentFormula<Term>> currentPos;
+        private PosInOccurrence<Term> currentPos;
         
         private final Services services;
 
-        private UpwardsIterator(PosInOccurrence<Term, SequentFormula<Term>> startPos, Services services) {
+        private UpwardsIterator(PosInOccurrence<Term> startPos, Services services) {
             this.currentPos = startPos;
             this.services = services;
         }

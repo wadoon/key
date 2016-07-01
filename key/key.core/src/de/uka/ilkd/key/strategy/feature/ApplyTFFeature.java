@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -67,7 +66,7 @@ public class ApplyTFFeature implements Feature {
         return new ApplyTFFeature ( proj, tf, TopRuleAppCost.INSTANCE, true );
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         final Term te = proj.toTerm ( app, pos, goal );
         if ( te == null ) {
             Debug.assertFalse ( demandInst,

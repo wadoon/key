@@ -72,13 +72,13 @@ public class TermTacletAppIndex {
     /** 
      * collects all RewriteTacletInstantiations for the given
      * heuristics in a subterm of the constrainedFormula described by a
-     * PosInOccurrence<Term, SequentFormula<Term>>
-     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> to focus 
+     * PosInOccurrence<Term>
+     * @param pos the PosInOccurrence<Term> to focus 
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
-    private static ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    private static ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence<Term> pos,
                                                          RuleFilter      filter,
                                                          Services        services,
                                                          TacletIndex     tacletIndex) {
@@ -89,12 +89,12 @@ public class TermTacletAppIndex {
     /** 
      * collects all FindTaclets with instantiations for the given
      * heuristics and position
-     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> to focus
+     * @param pos the PosInOccurrence<Term> to focus
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
-    private static ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    private static ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence<Term> pos,
                                                       RuleFilter      filter,
                                                       Services        services,
                                                       TacletIndex     tacletIndex) { 
@@ -121,14 +121,14 @@ public class TermTacletAppIndex {
     /** 
      * collects all AntecedentTaclet instantiations for the given
      * heuristics and SequentFormula
-     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> of the SequentFormula<Term> 
+     * @param pos the PosInOccurrence<Term> of the SequentFormula<Term> 
      *  the taclets have to be connected to 
      * (pos must point to the top level formula, i.e. <tt>pos.isTopLevel()</tt> must be true)     
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
-    private static ImmutableList<NoPosTacletApp> antecTaclet(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    private static ImmutableList<NoPosTacletApp> antecTaclet(PosInOccurrence<Term> pos,
                                                     RuleFilter filter,
                                                     Services services,
                                                     TacletIndex tacletIndex) {
@@ -138,7 +138,7 @@ public class TermTacletAppIndex {
     /** 
      * collects all SuccedentTaclet instantiations for the given
      * heuristics and SequentFormula
-     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> of the SequentFormula<Term> 
+     * @param pos the PosInOccurrence<Term> of the SequentFormula<Term> 
      *  the taclets have to be connected to 
      * (pos must point to the top level formula, 
      * i.e. <tt>pos.isTopLevel()</tt> must be true)     
@@ -146,7 +146,7 @@ public class TermTacletAppIndex {
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
-    private static ImmutableList<NoPosTacletApp> succTaclet(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    private static ImmutableList<NoPosTacletApp> succTaclet(PosInOccurrence<Term> pos,
                                                    RuleFilter filter,
                                                    Services services,
                                                    TacletIndex tacletIndex) {
@@ -161,7 +161,7 @@ public class TermTacletAppIndex {
      * @return list of the index objects
      */
     private static ImmutableList<TermTacletAppIndex>
-                   createSubIndices (PosInOccurrence<Term, SequentFormula<Term>> pos,
+                   createSubIndices (PosInOccurrence<Term> pos,
                                      Services        services,
                                      TacletIndex     tacletIndex,
                                      NewRuleListener listener,
@@ -193,7 +193,7 @@ public class TermTacletAppIndex {
      *            position
      * @return the index object
      */
-    public static TermTacletAppIndex create(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    public static TermTacletAppIndex create(PosInOccurrence<Term> pos,
                                             Services        services,
                                             TacletIndex     tacletIndex,
                                             NewRuleListener listener,
@@ -209,7 +209,7 @@ public class TermTacletAppIndex {
     }
 
     private static ITermTacletAppIndexCache
-                   determineIndexCache(PosInOccurrence<Term, SequentFormula<Term>> pos,
+                   determineIndexCache(PosInOccurrence<Term> pos,
                                        TermTacletAppIndexCacheSet indexCaches) {       
         if ( pos.isInAntec () )
             return indexCaches.getAntecCache ();
@@ -218,7 +218,7 @@ public class TermTacletAppIndex {
     }
 
 
-    private static TermTacletAppIndex createHelp(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    private static TermTacletAppIndex createHelp(PosInOccurrence<Term> pos,
                                                  Services        services,
                                                  TacletIndex     tacletIndex,
                                                  NewRuleListener listener,
@@ -262,7 +262,7 @@ public class TermTacletAppIndex {
      * @return the index object
      */
     public TermTacletAppIndex addTaclets(RuleFilter      filter,
-                                         PosInOccurrence<Term, SequentFormula<Term>> pos,
+                                         PosInOccurrence<Term> pos,
                                          Services        services,
                                          TacletIndex     tacletIndex,
                                          NewRuleListener listener) {
@@ -273,7 +273,7 @@ public class TermTacletAppIndex {
     }
 
     private TermTacletAppIndex addTacletsHelp(RuleFilter      filter,
-                                              PosInOccurrence<Term, SequentFormula<Term>> pos,
+                                              PosInOccurrence<Term> pos,
                                               Services        services,
                                               TacletIndex     tacletIndex,
                                               NewRuleListener listener) {
@@ -295,7 +295,7 @@ public class TermTacletAppIndex {
 
 
     private ImmutableList<TermTacletAppIndex> addTacletsSubIndices( RuleFilter      filter,
-                                                           PosInOccurrence<Term, SequentFormula<Term>> pos,
+                                                           PosInOccurrence<Term> pos,
                                                            Services        services,
                                                            TacletIndex     tacletIndex,
                                                            NewRuleListener listener ) {
@@ -324,7 +324,7 @@ public class TermTacletAppIndex {
      * formula to the position of modification
      * @return the updated TermTacletAppIndex
      */
-    private TermTacletAppIndex updateHelp(PIOPathIterator<Term, SequentFormula<Term>> pathToModification,
+    private TermTacletAppIndex updateHelp(PIOPathIterator<Term> pathToModification,
                                           Services services,
                                           TacletIndex tacletIndex,
                                           NewRuleListener listener,
@@ -334,7 +334,7 @@ public class TermTacletAppIndex {
 
         // Below the position of modification everything has to be rebuilt
         final boolean completeRebuild = !pathToModification.hasNext ();
-        final PosInOccurrence<Term, SequentFormula<Term>> pos = pathToModification.getPosInOccurrence ();
+        final PosInOccurrence<Term> pos = pathToModification.getPosInOccurrence ();
 
         if ( completeRebuild )
             return updateCompleteRebuild ( pos, services, tacletIndex,
@@ -361,7 +361,7 @@ public class TermTacletAppIndex {
     }
 
 
-    private TermTacletAppIndex updateCompleteRebuild(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    private TermTacletAppIndex updateCompleteRebuild(PosInOccurrence<Term> pos,
                                                      Services services,
                                                      TacletIndex tacletIndex,
                                                      NewRuleListener listener,
@@ -384,7 +384,7 @@ public class TermTacletAppIndex {
     }
 
 
-    private TermTacletAppIndex updateLocalApps(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    private TermTacletAppIndex updateLocalApps(PosInOccurrence<Term> pos,
                                                Term newSubterm,
                                                Services services,
                                                TacletIndex tacletIndex,
@@ -402,7 +402,7 @@ public class TermTacletAppIndex {
 
 
     private ImmutableList<TermTacletAppIndex>
-               updateSubIndexes(PIOPathIterator<Term, SequentFormula<Term>> pathToModification,
+               updateSubIndexes(PIOPathIterator<Term> pathToModification,
                                 Services services,
                                 TacletIndex tacletIndex,
                                 NewRuleListener listener,
@@ -441,7 +441,7 @@ public class TermTacletAppIndex {
     private ImmutableList<TermTacletAppIndex>
                  updateIUpdateTarget ( ImmutableList<TermTacletAppIndex> oldSubindices,
                                        int             updateTarget,
-                                       PosInOccurrence<Term, SequentFormula<Term>> targetPos,
+                                       PosInOccurrence<Term> targetPos,
                                        Services        services,
                                        TacletIndex     tacletIndex,
                                        NewRuleListener listener,
@@ -481,7 +481,7 @@ public class TermTacletAppIndex {
      */
     private ImmutableList<TermTacletAppIndex>
 	              updateOneSubIndex ( ImmutableList<TermTacletAppIndex> oldSubindices,
-	                                  PIOPathIterator<Term, SequentFormula<Term>> pathToModification,
+	                                  PIOPathIterator<Term> pathToModification,
 	                                  Services        services,
 	                                  TacletIndex     tacletIndex,
 	                                  NewRuleListener listener,
@@ -522,7 +522,7 @@ public class TermTacletAppIndex {
      * @param pos Pointer to the term/formula where a change occurred
      * @return the updated index object
      */
-    TermTacletAppIndex update ( PosInOccurrence<Term, SequentFormula<Term>> pos,
+    TermTacletAppIndex update ( PosInOccurrence<Term> pos,
                                 Services        services,
                                 TacletIndex     tacletIndex,
                                 NewRuleListener listener,	
@@ -531,7 +531,7 @@ public class TermTacletAppIndex {
         final ITermTacletAppIndexCache indexCache =
             determineIndexCache ( pos, indexCaches );
 
-        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
+        final PIOPathIterator<Term> it = pos.iterator ();
         return updateHelp ( it, services, tacletIndex, listener,
                             indexCache );
     }
@@ -540,10 +540,10 @@ public class TermTacletAppIndex {
     /**
      * @return the sub-index for the given position
      */
-    private TermTacletAppIndex descend(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    private TermTacletAppIndex descend(PosInOccurrence<Term> pos) {
         if ( pos.isTopLevel () ) return this;
 
-        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
+        final PIOPathIterator<Term> it = pos.iterator ();
         TermTacletAppIndex res = this;
 
         while ( true ) {
@@ -558,7 +558,7 @@ public class TermTacletAppIndex {
     /**
      * @return all taclet apps for the given position
      */
-    public ImmutableList<NoPosTacletApp> getTacletAppAt(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    public ImmutableList<NoPosTacletApp> getTacletAppAt(PosInOccurrence<Term> pos,
                                                RuleFilter p_filter) {
         TermTacletAppIndex index = descend ( pos );
         return filter ( p_filter, index.localTacletApps );
@@ -568,13 +568,13 @@ public class TermTacletAppIndex {
     /**
      * @return all taclet apps for or below the given position
      */
-    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence<Term> pos,
                                                   RuleFilter filter,
                                                   Services services) {
         return descend ( pos ).collectTacletApps ( pos, filter, services );
     }
     
-    private ImmutableList<TacletApp> convert(ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term, SequentFormula<Term>> pos, 
+    private ImmutableList<TacletApp> convert(ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term> pos,
             RuleFilter filter, ImmutableList<TacletApp> convertedApps, Services services) {
 
         for (final RuleApp app : rules) {
@@ -599,16 +599,16 @@ public class TermTacletAppIndex {
      * @param pos The position of this index
      * @return a list of all taclet apps
      */
-    private ImmutableList<TacletApp> collectTacletApps(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    private ImmutableList<TacletApp> collectTacletApps(PosInOccurrence<Term> pos,
                                               RuleFilter p_filter,
                                               Services services) {
         
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         
-        final ImmutableMap<PosInOccurrence<Term, SequentFormula<Term>>,ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow = 
-                collectAllTacletAppsHereAndBelow( pos,  DefaultImmutableMap.<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>>nilMap() );
+        final ImmutableMap<PosInOccurrence<Term>,ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow =
+                collectAllTacletAppsHereAndBelow( pos,  DefaultImmutableMap.<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>>nilMap() );
         
-        for (final ImmutableMapEntry<PosInOccurrence<Term, SequentFormula<Term>>,ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
+        for (final ImmutableMapEntry<PosInOccurrence<Term>,ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
             result = convert(pair.value(), pair.key(), p_filter, result, services);
         }
 
@@ -625,14 +625,14 @@ public class TermTacletAppIndex {
      *            The listener to which the taclet apps found are supposed to be
      *            reported
      */
-    void reportTacletApps ( PosInOccurrence<Term, SequentFormula<Term>> pos,
+    void reportTacletApps ( PosInOccurrence<Term> pos,
                             NewRuleListener listener ) {
                 
-        final ImmutableMap<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>> result = 
-                DefaultImmutableMap.<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>>nilMap();
-        final ImmutableMap<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow = 
+        final ImmutableMap<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>> result =
+                DefaultImmutableMap.<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>>nilMap();
+        final ImmutableMap<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow =
                 collectAllTacletAppsHereAndBelow( pos, result );
-        for (final ImmutableMapEntry<PosInOccurrence<Term, SequentFormula<Term>>,ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
+        for (final ImmutableMapEntry<PosInOccurrence<Term>,ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
             fireRulesAdded ( listener, pair.value(), pair.key() );
         }
     }
@@ -644,14 +644,14 @@ public class TermTacletAppIndex {
      * @param pos
      *            The position of this index
      * @param collectedApps
-     *            the {@link ImmutableMap<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>>} to which to 
+     *            the {@link ImmutableMap<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>>} to which to 
      *            add the found taclet applications; it must not contain 
      *            {@code pos} or any position below pos as key 
      * @return the resulting list of taclet applications from this and all subterm taclet indices
      */
-    private ImmutableMap<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>> collectAllTacletAppsHereAndBelow 
-        ( PosInOccurrence<Term, SequentFormula<Term>> pos,
-                ImmutableMap<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>> collectedApps ) {
+    private ImmutableMap<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>> collectAllTacletAppsHereAndBelow
+        ( PosInOccurrence<Term> pos,
+                ImmutableMap<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>> collectedApps ) {
     
         // assert collectedApps.get(pos) == null;
         collectedApps = collectedApps.put(pos, localTacletApps);
@@ -671,13 +671,13 @@ public class TermTacletAppIndex {
      * the taclet above and below the place of modification, and the taclets
      * whose update context has changed.
      */
-    private void reportTacletApps ( PIOPathIterator<Term, SequentFormula<Term>> pathToModification,
+    private void reportTacletApps ( PIOPathIterator<Term> pathToModification,
                                     NewRuleListener listener ) {
-        final ImmutableMap<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow = 
+        final ImmutableMap<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow =
                 collectAllTacletAppsAffectedByModification ( pathToModification, 
-                DefaultImmutableMap.<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>>nilMap() ); 
+                DefaultImmutableMap.<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>>nilMap() );
         
-        for (final ImmutableMapEntry<PosInOccurrence<Term, SequentFormula<Term>>,ImmutableList<NoPosTacletApp>> pair  : allTacletsHereAndBelow ) {
+        for (final ImmutableMapEntry<PosInOccurrence<Term>,ImmutableList<NoPosTacletApp>> pair  : allTacletsHereAndBelow ) {
             fireRulesAdded ( listener, pair.value(), pair.key() );
         }
     }
@@ -688,14 +688,14 @@ public class TermTacletAppIndex {
      * the taclet above and below the place of modification, and the taclets
      * whose update context has changed.
      * <strong>The map of already collected apps must not contain any entry for a position on or below the path to modification.</strong> 
-     * @return all affected taclet apps grouped by the corresponding {@link PosInOccurrence<Term, SequentFormula<Term>>}
+     * @return all affected taclet apps grouped by the corresponding {@link PosInOccurrence<Term>}
      */
-    private  ImmutableMap<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>> collectAllTacletAppsAffectedByModification 
-            ( PIOPathIterator<Term, SequentFormula<Term>> pathToModification, 
-                    ImmutableMap<PosInOccurrence<Term, SequentFormula<Term>>, ImmutableList<NoPosTacletApp>> collectedApps ) {
+    private  ImmutableMap<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>> collectAllTacletAppsAffectedByModification
+            ( PIOPathIterator<Term> pathToModification,
+                    ImmutableMap<PosInOccurrence<Term>, ImmutableList<NoPosTacletApp>> collectedApps ) {
         
         TermTacletAppIndex index = this;        
-        PosInOccurrence<Term, SequentFormula<Term>> pos = pathToModification.getPosInOccurrence ();
+        PosInOccurrence<Term> pos = pathToModification.getPosInOccurrence ();
         
         while ( pathToModification.hasNext () ) {
             // assert collectedApps.get(pos) == null;
@@ -727,7 +727,7 @@ public class TermTacletAppIndex {
     
     private static void fireRulesAdded(NewRuleListener listener,
                                        ImmutableList<NoPosTacletApp> taclets,
-                                       PosInOccurrence<Term, SequentFormula<Term>> pos) {
+                                       PosInOccurrence<Term> pos) {
         listener.rulesAdded(taclets, pos);
     }
 

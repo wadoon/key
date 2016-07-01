@@ -13,15 +13,10 @@
 
 package de.uka.ilkd.key.strategy;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.*;
-import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.BooleanLDT;
@@ -2778,7 +2773,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
      *         shall not be applied at all (it is discarded by the strategy).
      */
-    public final RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio,
+    public final RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pio,
             Goal goal) {
         return costComputationF.computeCost(app, pio, goal);
     }
@@ -2789,13 +2784,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * 
      * @return true iff the rule should be applied, false otherwise
      */
-    public final boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio,
+    public final boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio,
             Goal goal) {
         return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
     }
 
     protected final RuleAppCost instantiateApp(RuleApp app,
-            PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+                                               PosInOccurrence<Term> pio, Goal goal) {
         return instantiationF.computeCost(app, pio, goal);
     }
 

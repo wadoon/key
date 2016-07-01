@@ -17,7 +17,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -336,7 +335,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
       ApplyStrategyInfo info = null;
       try {
          //initialize values
-         PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
+         PosInOccurrence<Term> pio = ruleApp.posInOccurrence();
          Term term = pio.subTerm();
          getProof().getServices().getTermBuilder();
          term = TermBuilder.goBelowUpdates(term);

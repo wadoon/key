@@ -53,15 +53,15 @@ public class InfFlowContractAppFeature implements Feature {
 
     /**
      * Compare whether two
-     * <code>PosInOccurrence<Term, SequentFormula<Term>></code>s are equal. This can be done using
+     * <code>PosInOccurrence<Term></code>s are equal. This can be done using
      * <code>equals</code> or
      * <code>eqEquals</code> (checking for same or equal formulas), which has to
      * be decided by the subclasses
      */
     protected boolean comparePio(TacletApp newApp,
                                  TacletApp oldApp,
-                                 PosInOccurrence<Term, SequentFormula<Term>> newPio,
-                                 PosInOccurrence<Term, SequentFormula<Term>> oldPio) {
+                                 PosInOccurrence<Term> newPio,
+                                 PosInOccurrence<Term> oldPio) {
         return oldPio.eqEquals(newPio);
     }
 
@@ -85,7 +85,7 @@ public class InfFlowContractAppFeature implements Feature {
      */
     protected boolean sameApplication(RuleApp ruleCmp,
                                       TacletApp newApp,
-                                      PosInOccurrence<Term, SequentFormula<Term>> newPio) {
+                                      PosInOccurrence<Term> newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -98,7 +98,7 @@ public class InfFlowContractAppFeature implements Feature {
             if (!(cmp instanceof PosTacletApp)) {
                 return false;
             }
-            final PosInOccurrence<Term, SequentFormula<Term>> oldPio =
+            final PosInOccurrence<Term> oldPio =
                     ((PosTacletApp) cmp).posInOccurrence();
             if (!comparePio(newApp, cmp, newPio, oldPio)) {
                 return false;
@@ -179,7 +179,7 @@ public class InfFlowContractAppFeature implements Feature {
      * occurs in the sequent
      */
     protected boolean duplicateFindTaclet(TacletApp app,
-                                          PosInOccurrence<Term, SequentFormula<Term>> pos,
+                                          PosInOccurrence<Term> pos,
                                           Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert app.ifFormulaInstantiations().size() >= 1 :
@@ -235,7 +235,7 @@ public class InfFlowContractAppFeature implements Feature {
 
     @Override
     public RuleAppCost computeCost(RuleApp ruleApp,
-                                   PosInOccurrence<Term, SequentFormula<Term>> pos,
+                                   PosInOccurrence<Term> pos,
                                Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " +

@@ -20,17 +20,13 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.rule.Rule;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -106,7 +102,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         private static final Name NAME = new Name("Autopilot filter strategy");
         private final Strategy delegate;
 
-        public AutoPilotStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+        public AutoPilotStrategy(Proof proof, PosInOccurrence<Term> posInOcc) {
             this.delegate = proof.getActiveStrategy();
         }
 
@@ -116,7 +112,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
             return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
                    // Assumptions are normally not considered by the cost
                    // computation, because they are normally not yet
@@ -132,7 +128,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
 
             Rule rule = app.rule();
             if(isNonHumanInteractionTagged(rule)) {
@@ -163,8 +159,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal,
-                RuleAppCostCollector collector) {
+        public void instantiateApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal,
+                                   RuleAppCostCollector collector) {
             delegate.instantiateApp(app, pio, goal, collector);
         }
 
@@ -176,7 +172,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term> posInOcc) {
         return new AutoPilotStrategy(proof, posInOcc);
     }
 }

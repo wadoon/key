@@ -29,7 +29,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  * which use their own strategy.
  *
  * In order to implement a {@link StrategyProofMacro}, override
- * {@link #createStrategy(KeYMediator, PosInOccurrence<Term, SequentFormula<Term>>)}.
+ * {@link #createStrategy(KeYMediator, PosInOccurrence<Term>)}.
  *
  * This class is aware of Position in occurrences and can also be applied to
  * inner nodes. Both {@link AutomatedRuleApplicationManager} and
@@ -41,7 +41,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  */
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
-    protected abstract Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc);
+    protected abstract Strategy createStrategy(Proof proof, PosInOccurrence<Term> posInOcc);
 
     /**
      * {@inheritDoc}
@@ -54,7 +54,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+                              PosInOccurrence<Term> posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
@@ -77,7 +77,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+                                          PosInOccurrence<Term> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         if (goals == null || goals.isEmpty()) {
             // should not happen, because in this case canApplyTo returns

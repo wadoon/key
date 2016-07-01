@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableList;
  * other simplifications. A sequent and so a semisequent has to be immutable.
  */
 public class Semisequent extends
-        CCSemisequentImpl<SequentFormula<Term>, Semisequent> {
+        CCSemisequentImpl<Term, Semisequent> {
 
     private static final Semisequent EMPTY = new Semisequent();
 
@@ -63,7 +63,7 @@ public class Semisequent extends
      * org.key_project.util.collection.ImmutableList)
      */
     @Override
-    protected CCSemisequentChangeInfo<SequentFormula<Term>, Semisequent> createSemisequentChangeInfo(
+    protected CCSemisequentChangeInfo<Term, Semisequent> createSemisequentChangeInfo(
             ImmutableList<SequentFormula<Term>> formulas) {
         return new SemisequentChangeInfo(formulas);
     }

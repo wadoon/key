@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 
@@ -22,7 +21,7 @@ public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
     
     private OneStepSimplifier.Protocol protocol;
 
-    protected OneStepSimplifierRuleApp(BuiltInRule builtInRule, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    protected OneStepSimplifierRuleApp(BuiltInRule builtInRule, PosInOccurrence<Term> pio) {
         super(builtInRule, pio);
     }
 

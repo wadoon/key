@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
 import de.uka.ilkd.key.logic.Term;
@@ -30,19 +29,19 @@ import de.uka.ilkd.key.rule.TacletApp;
 public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
 
     private static abstract class TopLevelWithoutUpdate extends TopLevelFindFeature {
-        protected abstract boolean matches(PosInOccurrence<Term, SequentFormula<Term>> pos);
+        protected abstract boolean matches(PosInOccurrence<Term> pos);
         
-        protected boolean checkPosition(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+        protected boolean checkPosition(PosInOccurrence<Term> pos) {
             return pos.isTopLevel () && matches ( pos );
         }
     }
     
     private static abstract class TopLevelWithUpdate extends TopLevelFindFeature {
-        protected abstract boolean matches(PosInOccurrence<Term, SequentFormula<Term>> pos);
+        protected abstract boolean matches(PosInOccurrence<Term> pos);
         
-        protected boolean checkPosition(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+        protected boolean checkPosition(PosInOccurrence<Term> pos) {
             if ( !pos.isTopLevel () ) {
-                final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
+                final PIOPathIterator<Term> it = pos.iterator ();
                 while ( it.next () != -1 ) {
                     if ( ! ( it.getSubTerm ().op () instanceof UpdateApplication ) )
                         return false;
@@ -55,51 +54,51 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
     
     public final static Feature ANTEC_OR_SUCC =
         new TopLevelWithoutUpdate () {
-            protected boolean matches(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            protected boolean matches(PosInOccurrence<Term> pos) {
                 return true;
         }
     };
     
     public final static Feature ANTEC =
         new TopLevelWithoutUpdate () {
-            protected boolean matches(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            protected boolean matches(PosInOccurrence<Term> pos) {
                 return pos.isInAntec ();
         }
     };
     
     public final static Feature SUCC =
         new TopLevelWithoutUpdate () {
-            protected boolean matches(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            protected boolean matches(PosInOccurrence<Term> pos) {
                 return !pos.isInAntec ();
         }
     };
     
     public final static Feature ANTEC_OR_SUCC_WITH_UPDATE =
         new TopLevelWithUpdate () {
-            protected boolean matches(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            protected boolean matches(PosInOccurrence<Term> pos) {
                 return true;
         }
     };
     
     public final static Feature ANTEC_WITH_UPDATE =
         new TopLevelWithUpdate () {
-            protected boolean matches(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            protected boolean matches(PosInOccurrence<Term> pos) {
                 return pos.isInAntec ();
         }
     };
     
     public final static Feature SUCC_WITH_UPDATE =
         new TopLevelWithUpdate () {
-            protected boolean matches(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            protected boolean matches(PosInOccurrence<Term> pos) {
                 return !pos.isInAntec ();
         }
     };
     
-    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
         return checkPosition ( pos );
     }
 
-    protected abstract boolean checkPosition(PosInOccurrence<Term, SequentFormula<Term>> pos);
+    protected abstract boolean checkPosition(PosInOccurrence<Term> pos);
     
 }

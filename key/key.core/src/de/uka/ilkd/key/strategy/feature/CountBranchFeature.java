@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -41,7 +40,7 @@ public class CountBranchFeature implements Feature {
      * @param goal the goal on which <code>app</code> is to be applied
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost computeCost ( RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal ) {	
+    public RuleAppCost computeCost (RuleApp app, PosInOccurrence<Term> pos, Goal goal ) {
 	if (app.rule() instanceof Taclet) {
 	    final Taclet tac     = (Taclet)app.rule();
 	    final long branches  = tac.goalTemplates().size();	    

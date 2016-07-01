@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy.termProjection;
 import java.math.BigInteger;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -46,7 +45,7 @@ public class CoeffGcdProjection implements ProjectionToTerm {
         return new CoeffGcdProjection ( monomialLeft, polynomialRight );
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
 
         final Term monoT = monomialLeft.toTerm ( app, pos, goal );

@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.joinrule;
 import java.util.HashMap;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
@@ -41,12 +40,12 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
             boolean forced) {
 
         final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) app;
-        final PosInOccurrence<Term, SequentFormula<Term>> pio = joinApp.posInOccurrence();
+        final PosInOccurrence<Term> pio = joinApp.posInOccurrence();
 
-        final ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> candidates =
+        final ImmutableList<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> candidates =
                 JoinRule.findPotentialJoinPartners(goal, pio);
 
-        ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> chosenCandidates =
+        ImmutableList<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> chosenCandidates =
                 null;
         final JoinProcedure chosenRule;
         Term chosenDistForm = null; // null is admissible standard ==> auto

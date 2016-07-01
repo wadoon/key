@@ -862,7 +862,7 @@ public class JoinRuleUtils {
         final Semisequent semiseq = antec ? goal.sequent().antecedent() : goal
                 .sequent().succedent();
         for (final SequentFormula<Term> f : semiseq) {
-            final PosInOccurrence<Term, SequentFormula<Term>> gPio = new PosInOccurrence<Term, SequentFormula<Term>>(f,
+            final PosInOccurrence<Term> gPio = new PosInOccurrence<Term>(f,
                     PosInTerm.<Term>getTopLevel(), antec);
             goal.applySequentChangeInfo(goal.sequent().removeFormula(gPio));
         }
@@ -1115,7 +1115,7 @@ public class JoinRuleUtils {
      *            Partner goal to close.
      */
     public static void closeJoinPartnerGoal(Node joinNodeParent,
-            Goal joinPartner, PosInOccurrence<Term, SequentFormula<Term>> pio,
+            Goal joinPartner, PosInOccurrence<Term> pio,
             SymbolicExecutionState joinState,
             SymbolicExecutionState joinPartnerState, Term pc) {
 
@@ -1150,10 +1150,10 @@ public class JoinRuleUtils {
      * @param services
      *            The services object.
      * @return An SE state (U,C).
-     * @see #sequentToSETriple(Goal, PosInOccurrence<Term, SequentFormula<Term>>, Services)
+     * @see #sequentToSETriple(Goal, PosInOccurrence<Term>, Services)
      */
     public static SymbolicExecutionState sequentToSEPair(Node node,
-            PosInOccurrence<Term, SequentFormula<Term>> pio, Services services) {
+                                                         PosInOccurrence<Term> pio, Services services) {
 
         SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio,
                 services);
@@ -1186,7 +1186,7 @@ public class JoinRuleUtils {
      * @return An SE state (U,C,p).
      */
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(
-            Node node, PosInOccurrence<Term, SequentFormula<Term>> pio, Services services) {
+            Node node, PosInOccurrence<Term> pio, Services services) {
 
         ImmutableList<SequentFormula<Term>> pathConditionSet = ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent()

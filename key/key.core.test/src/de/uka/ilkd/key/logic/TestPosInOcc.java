@@ -53,7 +53,7 @@ public class TestPosInOcc extends TestCase {
 	terms[1]     = TB.func ( f, new Term[] { terms[0] } );
 	terms[2]     = TB.func ( p, new Term[] { terms[1] } );
 
-	PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>
+	PosInOccurrence<Term> pio = new PosInOccurrence<Term>
 	    ( new SequentFormula<Term> ( terms[2] ),
 	      PosInTerm.<Term>getTopLevel(),
 	    true);
@@ -119,15 +119,15 @@ public class TestPosInOcc extends TestCase {
         terms2[3] = TB.func ( p, new Term[] { terms2[2] } );
         SequentFormula<Term> cfma2 = new SequentFormula<Term> ( terms2[3] );
 
-        final PosInOccurrence<Term, SequentFormula<Term>> topPIO = new PosInOccurrence<Term, SequentFormula<Term>> ( cfma,
+        final PosInOccurrence<Term> topPIO = new PosInOccurrence<Term> ( cfma,
                                                              PosInTerm.<Term>getTopLevel(),
                                                              true );
 
 
         // Test without metavariables involved
-        PosInOccurrence<Term, SequentFormula<Term>> pio = topPIO.down ( 0 );
+        PosInOccurrence<Term> pio = topPIO.down ( 0 );
         assertTrue ( pio.subTerm () == terms[1] );
-        PosInOccurrence<Term, SequentFormula<Term>> pio2 = pio.replaceConstrainedFormula ( cfma );
+        PosInOccurrence<Term> pio2 = pio.replaceConstrainedFormula ( cfma );
         assertEquals ( pio, pio2 );
         pio = pio.replaceConstrainedFormula ( cfma2 );
         assertTrue ( pio.subTerm () == terms2[2] );

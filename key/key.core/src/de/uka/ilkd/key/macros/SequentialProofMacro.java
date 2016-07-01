@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -72,7 +71,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+                              PosInOccurrence<Term> posInOcc) {
         List<ProofMacro> macros = getProofMacros();
         if(macros.isEmpty()) {
             return false;
@@ -96,7 +95,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+                                          PosInOccurrence<Term> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException, Exception {
         final List<Node> initNodes = new ArrayList<Node>(goals.size());
         for (Goal goal : goals) {

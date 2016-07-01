@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.LRUCache;
@@ -92,7 +91,7 @@ public class ServiceCaches {
     */
    private final LRUCache<Term, TermInfo> betaCandidates = new LRUCache<Term, TermInfo> (1000);
 
-   private final LRUCache<PosInOccurrence<Term, SequentFormula<Term>>, RuleAppCost> ifThenElseMalusCache = new LRUCache<PosInOccurrence<Term, SequentFormula<Term>>, RuleAppCost>(1000); 
+   private final LRUCache<PosInOccurrence<Term>, RuleAppCost> ifThenElseMalusCache = new LRUCache<PosInOccurrence<Term>, RuleAppCost>(1000);
 
    private final LRUCache<Operator, Integer> introductionTimeCache = new LRUCache<Operator, Integer> ( 10000 );
    
@@ -132,7 +131,7 @@ public class ServiceCaches {
    private LRUCache<Pair<Term, Term>, Term> provedByArithSndCache = new LRUCache<Pair<Term, Term>, Term>(5000);
 
    /** Cache used by the exhaustive macro */
-   private Map<Node, PosInOccurrence<Term, SequentFormula<Term>>> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence<Term, SequentFormula<Term>>>();;
+   private Map<Node, PosInOccurrence<Term>> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence<Term>>();;
 
    
    /**
@@ -147,7 +146,7 @@ public class ServiceCaches {
       return betaCandidates;
    }
 
-   public final LRUCache<PosInOccurrence<Term, SequentFormula<Term>>, RuleAppCost> getIfThenElseMalusCache() {
+   public final LRUCache<PosInOccurrence<Term>, RuleAppCost> getIfThenElseMalusCache() {
       return ifThenElseMalusCache;
    }
 
@@ -191,7 +190,7 @@ public class ServiceCaches {
       return provedByArithSndCache;
    }
 
-   public final Map<Node, PosInOccurrence<Term, SequentFormula<Term>>> getExhaustiveMacroCache() {
+   public final Map<Node, PosInOccurrence<Term>> getExhaustiveMacroCache() {
        return exhaustiveMacroCache;
    }
 

@@ -26,7 +26,6 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.FormulaSV;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
@@ -289,8 +288,8 @@ public class InnerNodeView extends SequentView {
                 continue;
             }
             final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
-            final PosInOccurrence<Term, SequentFormula<Term>> pos
-                    = new PosInOccurrence<Term, SequentFormula<Term>>(inst.getConstrainedFormula(),
+            final PosInOccurrence<Term> pos
+                    = new PosInOccurrence<Term>(inst.getConstrainedFormula(),
                     PosInTerm.<Term>getTopLevel(),
                     inst.inAntec());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
@@ -299,19 +298,19 @@ public class InnerNodeView extends SequentView {
 
     private void highlightIfInsts(IBuiltInRuleApp bapp)
             throws BadLocationException {
-        final ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifs = bapp.ifInsts();
-        for (PosInOccurrence<Term, SequentFormula<Term>> pio : ifs) {
+        final ImmutableList<PosInOccurrence<Term>> ifs = bapp.ifInsts();
+        for (PosInOccurrence<Term> pio : ifs) {
             highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
         }
     }
 
     /**
-     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> that should be highlighted.
+     * @param pos the PosInOccurrence<Term> that should be highlighted.
      * @param light the painter for the highlight.
      * @return the range of characters that was highlighted.
      * @throws BadLocationException
      */
-    private Range highlightPos(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    private Range highlightPos(PosInOccurrence<Term> pos,
             HighlightPainter light)
             throws BadLocationException {
         ImmutableList<Integer> path = posTable.pathForPosition(pos, filter);

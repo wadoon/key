@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -22,17 +21,17 @@ import de.uka.ilkd.key.logic.*;
 
 
 public class NodeChangesHolder {
-    public ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> scis;
+    public ImmutableList<CCSequentChangeInfo<Term, Sequent>> scis;
 
     NodeChangesHolder () {
-	this ( ImmutableSLList.<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>>nil() );
+	this ( ImmutableSLList.<CCSequentChangeInfo<Term, Sequent>>nil() );
     }
 
-    NodeChangesHolder ( ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> p_scis ) {
+    NodeChangesHolder ( ImmutableList<CCSequentChangeInfo<Term, Sequent>> p_scis ) {
 	scis = p_scis;
     }
 
-    public void addSCI ( CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> p_sci ) {
+    public void addSCI ( CCSequentChangeInfo<Term, Sequent> p_sci ) {
 	scis = scis.prepend ( p_sci );
     }
 

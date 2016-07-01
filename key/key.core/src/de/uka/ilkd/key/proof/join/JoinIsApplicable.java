@@ -47,7 +47,7 @@ public class JoinIsApplicable {
      * @return The list of possible join partner objects -- may be empty (then,
      *         the join is not applicable).
      */
-    public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence<Term> pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return new LinkedList<ProspectivePartner>();
         }
@@ -65,7 +65,7 @@ public class JoinIsApplicable {
      * @return The list of possible join partners.
      */
     public List<ProspectivePartner> computeProspecitvePartner(Goal goal,
-            PosInOccurrence<Term, SequentFormula<Term>> pio) {
+            PosInOccurrence<Term> pio) {
         assert !pio.isInAntec();
         List<ProspectivePartner> partners = new LinkedList<ProspectivePartner>();
 
@@ -97,7 +97,7 @@ public class JoinIsApplicable {
      *         null otherwise.
      */
     private ProspectivePartner areProspectivePartners(Goal g1,
-            PosInOccurrence<Term, SequentFormula<Term>> pio, Goal g2) {
+                                                      PosInOccurrence<Term> pio, Goal g2) {
         Term referenceFormula = pio.subTerm();
 
         assert g1.getServices() == g2.getServices();

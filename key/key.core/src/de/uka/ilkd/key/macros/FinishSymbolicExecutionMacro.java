@@ -15,7 +15,6 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -58,7 +57,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
  
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term> posInOcc) {
         return new FilterSymbexStrategy(
                 proof.getActiveStrategy());
     }
@@ -81,7 +80,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
             if(!hasModality(goal.sequent())) {
                 return false;
             }

@@ -40,7 +40,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * to indicate that a refactoring below an update 
     * ({@link RefactoringScope#APPLICATION_BELOW_UPDATES})
     * is required performed by
-    * {@link #refactorBewlowUpdates(PosInOccurrence<Term, SequentFormula<Term>>, Term, List)}.
+    * {@link #refactorBewlowUpdates(PosInOccurrence<Term>, Term, List)}.
     * <p>
     * This is for instance required for the following rules:
     * <ul>
@@ -113,7 +113,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    @Override
    public RefactoringScope defineRefactoringScope(TermLabelState state,
                                                   Services services, 
-                                                  PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, 
+                                                  PosInOccurrence<Term> applicationPosInOccurrence,
                                                   Term applicationTerm, 
                                                   Rule rule, 
                                                   Goal goal, 
@@ -177,7 +177,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    @Override
    public void refactoreLabels(TermLabelState state,
                                Services services, 
-                               PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, 
+                               PosInOccurrence<Term> applicationPosInOccurrence,
                                Term applicationTerm, 
                                Rule rule, 
                                Goal goal, 
@@ -251,11 +251,11 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    
    /**
     * Refactors the {@link Term} below its update.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence<Term>} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
     * @param term The {@link Term} which is now refactored.
     * @param labels The new labels the {@link Term} will have after the refactoring.
     */
-   protected void refactorBewlowUpdates(PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, 
+   protected void refactorBewlowUpdates(PosInOccurrence<Term> applicationPosInOccurrence,
                                         Term term, 
                                         List<TermLabel> labels) {
       FormulaTermLabel applicationLabel = (FormulaTermLabel)applicationPosInOccurrence.subTerm().getLabel(FormulaTermLabel.NAME);

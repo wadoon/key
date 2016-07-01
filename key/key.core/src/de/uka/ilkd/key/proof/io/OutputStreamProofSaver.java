@@ -433,7 +433,7 @@ public class OutputStreamProofSaver {
    }
 
 
-    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence<Term> pos) {
         if (pos == null) return "";
         return " (formula \""+seq.formulaNumberInSequent(pos.isInAntec(),
                 pos.sequentFormula())+"\")"+
@@ -500,9 +500,9 @@ public class OutputStreamProofSaver {
 
 
    public String builtinRuleIfInsts(Node node, 
-	   			    ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
+	   			    ImmutableList<PosInOccurrence<Term>> ifInsts) {
        String s = "";
-       for(PosInOccurrence<Term, SequentFormula<Term>> ifInst : ifInsts) {
+       for(PosInOccurrence<Term> ifInst : ifInsts) {
 	   s += " (ifInst \"\" ";
 	   s += posInOccurrence2Proof(node.sequent(), ifInst);
 	   s += ")";

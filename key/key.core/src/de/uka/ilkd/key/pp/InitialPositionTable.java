@@ -97,12 +97,12 @@ public class InitialPositionTable extends PositionTable{
     }
 
 
-    /** Returns the path for a given PosInOccurrence<Term, SequentFormula<Term>>.  This is 
+    /** Returns the path for a given PosInOccurrence<Term>.  This is 
      * built up from the initial 0, the number of the 
      * SequentFormula<Term> in the sequent, the position in the 
      * constrained formula, and possibly inside a Metavariable
      * instantiation. */
-    public ImmutableList<Integer> pathForPosition(PosInOccurrence<Term, SequentFormula<Term>> pio,
+    public ImmutableList<Integer> pathForPosition(PosInOccurrence<Term> pio,
 					 SequentPrintFilter filter) {
 	ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
 
@@ -114,7 +114,7 @@ public class InitialPositionTable extends PositionTable{
     }
 
     private ImmutableList<Integer> prependPathInFormula(ImmutableList<Integer> p,
-					       PosInOccurrence<Term, SequentFormula<Term>> pio) {
+					       PosInOccurrence<Term> pio) {
 	IntIterator pit = pio.posInTerm().reverseIterator();
 	while (pit.hasNext()) {
 	    p = p.prepend(Integer.valueOf(pit.next()));

@@ -103,7 +103,7 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
          return new Triple<Term, PosInTerm<Term>, Term>(termWithoutPredicate, predicatePosition, term);
       }
       else if (node instanceof KeYLoopInvariant) {
-         PosInOccurrence<Term, SequentFormula<Term>> pio = executionNode.getModalityPIO();
+         PosInOccurrence<Term> pio = executionNode.getModalityPIO();
          Term term;
          if (pio.isInAntec()) {
             int index = executionNode.getProofNode().sequent().antecedent().indexOf(pio.sequentFormula());

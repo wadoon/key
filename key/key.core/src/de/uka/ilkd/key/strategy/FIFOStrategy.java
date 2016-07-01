@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -44,7 +43,7 @@ public class FIFOStrategy implements Strategy {
      * (it is discarded by the strategy).
      */
     public RuleAppCost computeCost ( RuleApp         app,
-	                             PosInOccurrence<Term, SequentFormula<Term>> pio,
+	                             PosInOccurrence<Term> pio,
 	                             Goal            goal ) {
 	return NumberRuleAppCost.create ( goal.getTime () );
     }
@@ -55,13 +54,13 @@ public class FIFOStrategy implements Strategy {
      * @return true iff the rule should be applied, false otherwise
      */
     public boolean isApprovedApp (  RuleApp         app,
-	                            PosInOccurrence<Term, SequentFormula<Term>> pio,
+	                            PosInOccurrence<Term> pio,
 	                            Goal            goal ) {
 	return true;
     }
 
     public void instantiateApp(RuleApp app,
-                               PosInOccurrence<Term, SequentFormula<Term>> pio,
+                               PosInOccurrence<Term> pio,
                                Goal goal,
                                RuleAppCostCollector collector) {}
 

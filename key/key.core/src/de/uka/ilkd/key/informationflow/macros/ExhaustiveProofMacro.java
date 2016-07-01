@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -47,17 +46,17 @@ import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
  */
 public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
-    private PosInOccurrence<Term, SequentFormula<Term>> getApplicablePosInOcc(Proof proof,
-                                                  Goal goal,
-                                                  PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
-                                                  ProofMacro macro) {
+    private PosInOccurrence<Term> getApplicablePosInOcc(Proof proof,
+                                                        Goal goal,
+                                                        PosInOccurrence<Term> posInOcc,
+                                                        ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
         } else if (macro.canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
             return posInOcc;
         } else {
             final Term subTerm = posInOcc.subTerm();
-            PosInOccurrence<Term, SequentFormula<Term>> res = null;
+            PosInOccurrence<Term> res = null;
             for (int i = 0; i < subTerm.arity() && res == null; i++) {
                 res = getApplicablePosInOcc(proof, goal, posInOcc.down(i), macro);
             }
@@ -86,10 +85,10 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+                              PosInOccurrence<Term> posInOcc) {
         final Services services = proof.getServices();
         
-        final Map<Node, PosInOccurrence<Term, SequentFormula<Term>>> applicableOnNodeAtPos = services.getCaches().getExhaustiveMacroCache();
+        final Map<Node, PosInOccurrence<Term>> applicableOnNodeAtPos = services.getCaches().getExhaustiveMacroCache();
         
         Sequent seq = null;
         boolean applicable = false;
@@ -101,9 +100,9 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                     // node has not been checked before, so do it
                     for (int i = 1; i <= seq.size() &&
                             applicableOnNodeAtPos.get(goal.node()) == null; i++) {
-                        PosInOccurrence<Term, SequentFormula<Term>> searchPos =
+                        PosInOccurrence<Term> searchPos =
                                 PosInOccurrence.findInSequent(seq, i, PosInTerm.<Term>getTopLevel());
-                        PosInOccurrence<Term, SequentFormula<Term>> applicableAt =
+                        PosInOccurrence<Term> applicableAt =
                                 getApplicablePosInOcc(proof, goal, searchPos, macro);
                         applicableOnNodeAtPos.put(goal.node(), applicableAt);
                     }
@@ -119,10 +118,10 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+                                          PosInOccurrence<Term> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException, Exception {
 
-        final Map<Node, PosInOccurrence<Term, SequentFormula<Term>>> applicableOnNodeAtPos = proof.getServices().getCaches().getExhaustiveMacroCache();
+        final Map<Node, PosInOccurrence<Term>> applicableOnNodeAtPos = proof.getServices().getCaches().getExhaustiveMacroCache();
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);        
         final ProofMacro macro = getProofMacro();
         
@@ -142,7 +141,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                     }
                 }
 
-                final PosInOccurrence<Term, SequentFormula<Term>> applicableAt; 
+                final PosInOccurrence<Term> applicableAt;
 
                 applicableAt = applicableOnNodeAtPos.get(goal.node());
 

@@ -45,9 +45,9 @@ import org.key_project.common.core.logic.Named;
  * <p>
  * The {@link TermLabelManager} is responsible during prove to maintain term labels.
  * This means that labels of new {@link Term}s created during rule application are computed
- * via {@link TermLabelManager#instantiateLabels(org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.PosInOccurrence<Term, SequentFormula<Term>>, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock)}
+ * via {@link TermLabelManager#instantiateLabels(org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.PosInOccurrence<Term>, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock)}
  * and of existing {@link Term}s are refactored (added or removed) via
- * {@link TermLabelManager#refactorGoal(org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.PosInOccurrence<Term, SequentFormula<Term>>, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}.
+ * {@link TermLabelManager#refactorGoal(org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.PosInOccurrence<Term>, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}.
  * </p>
  * <p>
  * Antecedent and succedent of a {@link Sequent} are sets. The equality check
@@ -108,8 +108,8 @@ import org.key_project.common.core.logic.Named;
  *       is only called for newly created {@link Term}s labeled up to now. If
  *       your {@link TermLabelPolicy}, {@link TermLabelUpdate} or {@link TermLabelRefactoring}
  *       is not called on the right {@link Term}, it is your task to call
- *       {@link TermLabelManager#instantiateLabels(org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock)} and
- *       {@link TermLabelManager#refactorLabels(org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.PosInOccurrence<Term, SequentFormula<Term>>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}
+ *       {@link TermLabelManager#instantiateLabels(org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.PosInOccurrence<Term>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock)} and
+ *       {@link TermLabelManager#refactorLabels(org.key_project.common.core.services.Services, de.uka.ilkd.key.logic.PosInOccurrence<Term>, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}
  *       on the right place in the rule implementation.
  *    </li>
  * </ol>

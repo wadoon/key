@@ -17,7 +17,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.factories.CCTermBuilder;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
@@ -70,7 +69,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
                             Node proofNode, 
-                            PosInOccurrence<Term, SequentFormula<Term>> modalityPIO, 
+                            PosInOccurrence<Term> modalityPIO,
                             IProgramVariable programVariable,
                             Term additionalCondition) {
       this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
@@ -86,7 +85,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
                             Node proofNode, 
-                            PosInOccurrence<Term, SequentFormula<Term>> modalityPIO, 
+                            PosInOccurrence<Term> modalityPIO,
                             ExecutionValue parentValue, 
                             IProgramVariable programVariable,
                             Term additionalCondition) {
@@ -113,7 +112,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
                             Node proofNode, 
-                            PosInOccurrence<Term, SequentFormula<Term>> modalityPIO, 
+                            PosInOccurrence<Term> modalityPIO,
                             ExecutionValue parentValue, 
                             Term arrayIndex,
                             ExecutionValue lengthValue,

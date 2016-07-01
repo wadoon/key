@@ -34,9 +34,9 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    private final Term returnValue;
    
    /**
-    * The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
+    * The {@link PosInOccurrence<Term>} of the modality of interest.
     */
-   private final PosInOccurrence<Term, SequentFormula<Term>> modalityPIO;
+   private final PosInOccurrence<Term> modalityPIO;
 
    /**
     * The return value as human readable {@link String}.
@@ -62,7 +62,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     */
    public ExecutionMethodReturnValue(ITreeSettings settings,
                                      Node proofNode, 
-                                     PosInOccurrence<Term, SequentFormula<Term>> modalityPIO,
+                                     PosInOccurrence<Term> modalityPIO,
                                      Term returnValue, 
                                      Term condition) {
       super(settings, proofNode);
@@ -167,7 +167,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
+   public PosInOccurrence<Term> getModalityPIO() {
       return modalityPIO;
    }
 }

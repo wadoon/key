@@ -15,7 +15,6 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
@@ -64,12 +63,12 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof,
-                                      PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+                                      PosInOccurrence<Term> posInOcc) {
         return new WellDefinednessStrategy();
     }
 
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence<Term> posInOcc) {
         if (proof == null
                 || proof.isDisposed()
                 || !WellDefinednessCheck.isOn()) {
@@ -113,7 +112,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence<Term> pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if(name.startsWith(WD_PREFIX)) {
                 return NumberRuleAppCost.getZeroCost();
@@ -123,13 +122,13 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
             return true;
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal,
-                RuleAppCostCollector collector) {
+        public void instantiateApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal,
+                                   RuleAppCostCollector collector) {
         }
 
         @Override

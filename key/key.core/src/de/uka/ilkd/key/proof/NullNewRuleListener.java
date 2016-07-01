@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
@@ -28,12 +27,12 @@ public class NullNewRuleListener implements NewRuleListener {
 
     @Override
     public void ruleAdded( RuleApp        rule,
-			   PosInOccurrence<Term, SequentFormula<Term>> pos ) {
+			   PosInOccurrence<Term> pos ) {
     }
     
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rule,
-            PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            PosInOccurrence<Term> pos) {
     }
 
     public static final NewRuleListener INSTANCE = new NullNewRuleListener();

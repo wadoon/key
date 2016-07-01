@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy;
 
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -39,7 +38,7 @@ public interface Strategy extends Named, Feature {
      * @return true iff the rule should be applied, false otherwise
      */
     boolean isApprovedApp ( RuleApp         app,
-                            PosInOccurrence<Term, SequentFormula<Term>> pio,
+                            PosInOccurrence<Term> pio,
                             Goal            goal );
     
     /**
@@ -53,7 +52,7 @@ public interface Strategy extends Named, Feature {
      * <code>RuleAppCostCollector</code>.
      */
     void instantiateApp ( RuleApp              app,
-                          PosInOccurrence<Term, SequentFormula<Term>>      pio,
+                          PosInOccurrence<Term>      pio,
                           Goal                 goal,
                           RuleAppCostCollector collector );
 }

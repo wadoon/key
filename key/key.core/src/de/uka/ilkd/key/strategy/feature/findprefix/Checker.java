@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.logic.Term;
@@ -35,7 +34,7 @@ interface Checker {
      *
      * @param pos   the initial position of occurrence
      */
-    public void initPrefixCheck(PosInOccurrence<Term, SequentFormula<Term>> pos);
+    public void initPrefixCheck(PosInOccurrence<Term> pos);
 
 
     /**

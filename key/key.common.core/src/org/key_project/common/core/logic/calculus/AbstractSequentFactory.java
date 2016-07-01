@@ -20,7 +20,7 @@ package org.key_project.common.core.logic.calculus;
  * @author Dominic Scheurer
  *
  */
-public abstract class AbstractSequentFactory<SemiSeq extends CCSemisequent<?, ?>, Seq extends CCSequent<?, ?, ?, ?>> {
+public abstract class AbstractSequentFactory<SemiSeq extends CCSemisequent<?, ?>, Seq extends CCSequent<?, ?, ?>> {
 
     /**
      * TODO: Document.

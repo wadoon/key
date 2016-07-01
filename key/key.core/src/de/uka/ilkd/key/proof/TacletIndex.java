@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -315,7 +314,7 @@ public abstract class TacletIndex  {
      */
     private ImmutableList<NoPosTacletApp> getFindTaclet(ImmutableList<NoPosTacletApp> taclets,
 					       RuleFilter           filter,
-					       PosInOccurrence<Term, SequentFormula<Term>>      pos,
+					       PosInOccurrence<Term>      pos,
 					       Services             services) { 
 	return matchTaclets ( taclets,
 			      filter,
@@ -329,7 +328,7 @@ public abstract class TacletIndex  {
      */
     protected abstract ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
             final RuleFilter           p_filter,
-            final PosInOccurrence<Term, SequentFormula<Term>>      pos,
+            final PosInOccurrence<Term>      pos,
             final Services             services);   
     
     /**
@@ -457,7 +456,7 @@ public abstract class TacletIndex  {
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
-    public ImmutableList<NoPosTacletApp> getAntecedentTaclet(PosInOccurrence<Term, SequentFormula<Term>> pos,						    
+    public ImmutableList<NoPosTacletApp> getAntecedentTaclet(PosInOccurrence<Term> pos,
 						    RuleFilter filter,
 						    Services   services) {                        
         return getTopLevelTaclets(antecList,
@@ -475,7 +474,7 @@ public abstract class TacletIndex  {
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
-    public ImmutableList<NoPosTacletApp> getSuccedentTaclet(PosInOccurrence<Term, SequentFormula<Term>> pos,						  
+    public ImmutableList<NoPosTacletApp> getSuccedentTaclet(PosInOccurrence<Term> pos,
 						   RuleFilter filter,
 						   Services   services) {       
            
@@ -488,7 +487,7 @@ public abstract class TacletIndex  {
     private ImmutableList<NoPosTacletApp>
 	getTopLevelTaclets(HashMap<Object, ImmutableList<NoPosTacletApp>> findTaclets,
 			   RuleFilter filter,
-			   PosInOccurrence<Term, SequentFormula<Term>> pos,			   
+			   PosInOccurrence<Term> pos,
 			   Services services) {
       
         assert pos.isTopLevel();
@@ -512,7 +511,7 @@ public abstract class TacletIndex  {
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
-    public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence<Term> pos,
 						 RuleFilter      filter,
 						 Services        services) { 
 	ImmutableList<NoPosTacletApp> result = matchTaclets(getList(rwList, pos.subTerm(), false),

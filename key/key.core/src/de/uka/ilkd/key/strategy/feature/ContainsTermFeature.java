@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
@@ -67,7 +66,7 @@ public class ContainsTermFeature implements Feature {
 
     @Override
     public RuleAppCost computeCost(RuleApp app,
-                               	   PosInOccurrence<Term, SequentFormula<Term>> pos,
+                               	   PosInOccurrence<Term> pos,
                                Goal goal) {
         final Term t1 = proj1.toTerm(app, pos, goal);
         final Term t2 = proj2.toTerm(app, pos, goal);

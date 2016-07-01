@@ -272,8 +272,8 @@ public class PositionTable {
 
 	SequentFormula<Term> cfma = filterEntry.getOriginalFormula();
 
-	PosInOccurrence<Term, SequentFormula<Term>> currentPos = 
-	    new PosInOccurrence<Term, SequentFormula<Term>> ( cfma, PosInTerm.<Term>getTopLevel(),
+	PosInOccurrence<Term> currentPos =
+	    new PosInOccurrence<Term> ( cfma, PosInTerm.<Term>getTopLevel(),
 				  filter.getSequent ().antecedent().contains(cfma) );
 	
 	return child[cfmaNo].getTermPIS(filterEntry,tail,
@@ -292,16 +292,16 @@ public class PositionTable {
      * @param posList
      *            the position list that navigates through the position tables.
      * @param pio
-     *            the PosInOccurrence<Term, SequentFormula<Term>> leading to the current term
+     *            the PosInOccurrence<Term> leading to the current term
      */
     private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry,
 				    ImmutableList<Integer> posList,
-				    PosInOccurrence<Term, SequentFormula<Term>> pio) {
+				    PosInOccurrence<Term> pio) {
 	if(posList.isEmpty()) {
 	    return PosInSequent.createCfmaPos(pio);
 	} else {
 	    int subNo  =  posList.head().intValue();
-	    PosInOccurrence<Term, SequentFormula<Term>> subpio = pio.down ( subNo );	   
+	    PosInOccurrence<Term> subpio = pio.down ( subNo );
 
 	    return child[subNo].getTermPIS(filterEntry,
 					   posList.tail(),

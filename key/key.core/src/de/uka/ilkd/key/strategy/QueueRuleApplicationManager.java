@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
@@ -115,7 +114,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * rule app is added to the heap
      */
     @Override
-    public void ruleAdded(RuleApp rule, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    public void ruleAdded(RuleApp rule, PosInOccurrence<Term> pos) {
         if ( queue == null ) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
@@ -132,7 +131,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * rule app is added to the heap
      */
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term> pos) {
         if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us

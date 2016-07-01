@@ -17,7 +17,6 @@ package de.uka.ilkd.key.proof.proofevent;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -92,7 +91,7 @@ public class NodeChangeJournal implements GoalListener {
      * of goal
      */
     public void sequentChanged ( Goal              source,
-				 CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci ) {
+				 CCSequentChangeInfo<Term, Sequent> sci ) {
         NodeChangesHolder nc = getChangeObj(source.node ());
         
 	if ( nc != null )

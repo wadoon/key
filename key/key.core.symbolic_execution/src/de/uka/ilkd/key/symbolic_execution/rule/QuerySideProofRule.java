@@ -113,7 +113,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public boolean isApplicable(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+   public boolean isApplicable(Goal goal, PosInOccurrence<Term> pio) {
       boolean applicable = false;
       if (pio != null) {
           // abort if inside of transformer
@@ -133,19 +133,19 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
    
    /**
     * Checks if the query term is supported. The functionality is identical to
-    * {@link QueryExpand#isApplicable(Goal, PosInOccurrence<Term, SequentFormula<Term>>)}.
+    * {@link QueryExpand#isApplicable(Goal, PosInOccurrence<Term>)}.
     * @param goal The {@link Goal}.
     * @param pmTerm The {@link Term} to with the query to check.
-    * @param pio The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the {@link Goal}.
+    * @param pio The {@link PosInOccurrence<Term>} in the {@link Goal}.
     * @return {@code true} is applicable, {@code false} is not applicable
     */
-   protected boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+   protected boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence<Term> pio) {
       if (pmTerm.op() instanceof IProgramMethod && pmTerm.freeVars().isEmpty()) {
          IProgramMethod pm = (IProgramMethod) pmTerm.op();
          final Sort nullSort = goal.getServices().getProgramServices().getJavaInfo().nullSort();
          if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) &&
                  !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
-             PIOPathIterator<Term, SequentFormula<Term>> it = pio.iterator();
+             PIOPathIterator<Term> it = pio.iterator();
              while ( it.next() != -1 ) {
                  Term focus = it.getSubTerm();
                  if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
@@ -162,7 +162,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public IBuiltInRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pos, JavaDLTermServices services) {
+   public IBuiltInRuleApp createApp(PosInOccurrence<Term> pos, JavaDLTermServices services) {
       return new DefaultBuiltInRuleApp(this, pos);
    }
    
@@ -174,7 +174,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
       try {
          // Extract required Terms from goal
          final Services services = goal.getServices();
-         PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
+         PosInOccurrence<Term> pio = ruleApp.posInOccurrence();
          Sequent goalSequent = goal.sequent();
          SequentFormula<Term> equalitySF = pio.sequentFormula();
          Term equalityTerm = pio.subTerm();
@@ -208,7 +208,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
          ImmutableList<Goal> goals = goal.split(1);
          final Goal resultGoal = goals.head();
          final TermBuilder tb = services.getTermBuilder();
-         final CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> newSeqForGoal = resultGoal.sequent().removeFormula(pio);
+         final CCSequentChangeInfo<Term, Sequent> newSeqForGoal = resultGoal.sequent().removeFormula(pio);
          if (pio.isTopLevel() || queryConditionTerm != null) {
             for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
                Term conditionTerm = tb.and(conditionsAndResult.second);

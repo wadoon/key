@@ -60,7 +60,7 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
        */
       private final Services services;
       
-      private final List<PosInOccurrence<Term, SequentFormula<Term>>> steps;
+      private final List<PosInOccurrence<Term>> steps;
       
       private final TermStringWrapper[] heaps;
       
@@ -164,7 +164,7 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
       public IBuiltInRuleApp finish() {
          final Term[] resultHeaps = selectedHeap.terms;
           
-         PosInOccurrence<Term, SequentFormula<Term>> step = de.uka.ilkd.key.gui.DependencyContractCompletion.findCorrespondingStep(steps, resultHeaps);
+         PosInOccurrence<Term> step = de.uka.ilkd.key.gui.DependencyContractCompletion.findCorrespondingStep(steps, resultHeaps);
          if (step == null) {
             return null;
         }

@@ -210,7 +210,7 @@ public class TermPropertySection extends AbstractNodePropertySection {
             sb.append("Sequent");
          }
          else {
-            PosInOccurrence<Term, SequentFormula<Term>> pio = pis.getPosInOccurrence();
+            PosInOccurrence<Term> pio = pis.getPosInOccurrence();
             if (pio != null) {
                if (pio.isInAntec()) {
                   sb.append("Antecedent at ");

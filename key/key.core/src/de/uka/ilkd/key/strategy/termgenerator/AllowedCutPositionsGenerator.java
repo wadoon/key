@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.Stack;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 
@@ -36,7 +35,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
     
     public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator ();
     
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         return new ACPIterator ( pos.sequentFormula ().formula (),
                               pos.isInAntec () );
     }

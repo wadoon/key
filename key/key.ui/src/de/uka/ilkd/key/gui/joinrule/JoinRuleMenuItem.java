@@ -20,7 +20,6 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -50,7 +49,7 @@ public class JoinRuleMenuItem extends JMenuItem {
      * @param mediator
      *            The KeY mediator.
      */
-    public JoinRuleMenuItem(final Goal goal, final PosInOccurrence<Term, SequentFormula<Term>> pio,
+    public JoinRuleMenuItem(final Goal goal, final PosInOccurrence<Term> pio,
             final KeYMediator mediator) {
         final Services services = goal.getServices();
 

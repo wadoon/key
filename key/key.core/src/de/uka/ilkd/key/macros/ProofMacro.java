@@ -48,17 +48,17 @@ import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
  *
  * Whenever a situation arises where the user wants to apply macros, they are
  * asked whether they can be applied (
- * {@link #canApplyTo(KeYMediator, PosInOccurrence<Term, SequentFormula<Term>>)}). A macro is offered to the
+ * {@link #canApplyTo(KeYMediator, PosInOccurrence<Term>)}). A macro is offered to the
  * user iff it returns <code>true</code>. No changes should be made there.
  *
- * A macro is then applied using {@link #applyTo(KeYMediator, PosInOccurrence<Term, SequentFormula<Term>>)}.
+ * A macro is then applied using {@link #applyTo(KeYMediator, PosInOccurrence<Term>)}.
  * This may change the proof by applying rule applications. It is allowed to use
  * automatic runs, manual instantiations, ...
  *
  * A proof macro needs to extract all necessary information on the application
  * from the mediator passed to the
- * {@link #applyTo(KeYMediator, PosInOccurrence<Term, SequentFormula<Term>>)} (or
- * {@link #canApplyTo(KeYMediator, PosInOccurrence<Term, SequentFormula<Term>>)}) method. You will be able
+ * {@link #applyTo(KeYMediator, PosInOccurrence<Term>)} (or
+ * {@link #canApplyTo(KeYMediator, PosInOccurrence<Term>)}) method. You will be able
  * to access any interesting data from that starting point, especially
  * {@link KeYMediator#getInteractiveProver()}.
  *
@@ -134,7 +134,7 @@ public interface ProofMacro {
      */
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc);
+                              PosInOccurrence<Term> posInOcc);
 
     /**
      * Can this macro be applied on the given node?
@@ -146,7 +146,7 @@ public interface ProofMacro {
      * with that fact.
      *
      * This method must be implemented to have the same effect as calling
-     * {@link #canApplyTo(Proof, ImmutableList, PosInOccurrence<Term, SequentFormula<Term>>)} with
+     * {@link #canApplyTo(Proof, ImmutableList, PosInOccurrence<Term>)} with
      * <code>node.proof()</code> as proof and all open goals below
      * <code>node</code>.
      *
@@ -158,7 +158,7 @@ public interface ProofMacro {
      * @return <code>true</code>, if the macro is allowed to be applied
      */
     public boolean canApplyTo(Node node,
-                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc);
+                              PosInOccurrence<Term> posInOcc);
 
     /**
      * Apply this macro on the given goals.
@@ -191,7 +191,7 @@ public interface ProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Proof proof,
                                           ImmutableList<Goal> goals,
-                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+                                          PosInOccurrence<Term> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException, Exception;
 
     /**
@@ -222,7 +222,7 @@ public interface ProofMacro {
      */
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
                                           Node node,
-                                          PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+                                          PosInOccurrence<Term> posInOcc,
                                           ProverTaskListener listener) throws InterruptedException, Exception;
 
     /**

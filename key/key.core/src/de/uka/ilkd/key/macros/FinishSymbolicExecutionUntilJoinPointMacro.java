@@ -82,14 +82,14 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-            Proof proof, ImmutableList<Goal> goals, PosInOccurrence<Term, SequentFormula<Term>> posInOcc,
+            Proof proof, ImmutableList<Goal> goals, PosInOccurrence<Term> posInOcc,
             ProverTaskListener listener) throws InterruptedException {
         this.uic = uic;
         return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term> posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.
@@ -200,7 +200,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
             if (!hasModality(goal.sequent())) {
                 return false;
             }

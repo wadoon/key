@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui;
 import javax.swing.SwingWorker;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -74,7 +73,7 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     /**
      * This position may be null if no subterm selected
      */
-    private final PosInOccurrence<Term, SequentFormula<Term>> posInOcc;
+    private final PosInOccurrence<Term> posInOcc;
 
     /**
      * Instantiates a new proof macro worker.
@@ -84,7 +83,7 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
      * @param mediator the mediator, not null
      * @param posInOcc the position, possibly null
      */
-    public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+    public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator, PosInOccurrence<Term> posInOcc) {
         assert macro != null;
         assert mediator != null;
         this.node = node;

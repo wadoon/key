@@ -19,9 +19,9 @@ import org.key_project.common.core.logic.IntIterator;
 /**
  * This interface represents an iterator, iterating the nodes on the
  * path between the root of a term and a position within the term,
- * given by a <code>PosInOccurrence<Term, SequentFormula<Term>></code>-object
+ * given by a <code>PosInOccurrence<Term></code>-object
  */
-public interface PIOPathIterator<T extends CCTerm<?, ?, ?,T>, SeqFor extends SequentFormula<T>> extends IntIterator {
+public interface PIOPathIterator<T extends CCTerm<?, ?, ?,T>> extends IntIterator {
 
     /**
      * @return the number of the next child on the path, or
@@ -36,7 +36,7 @@ public interface PIOPathIterator<T extends CCTerm<?, ?, ?,T>, SeqFor extends Seq
      * @return the current position within the term
      * (i.e. corresponding to the latest <code>next()</code>-call)
      */
-    PosInOccurrence<T,SeqFor> getPosInOccurrence ();
+    PosInOccurrence<T> getPosInOccurrence ();
 
     /**
      * @return the current subterm this object points to

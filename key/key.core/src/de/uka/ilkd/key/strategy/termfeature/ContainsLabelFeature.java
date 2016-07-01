@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 
 import de.uka.ilkd.key.logic.Term;
@@ -34,7 +33,7 @@ public class ContainsLabelFeature extends BinaryFeature {
   
 
    @Override
-   protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+   protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
       return pos != null && pos.subTerm().containsLabel(label);
    }
 

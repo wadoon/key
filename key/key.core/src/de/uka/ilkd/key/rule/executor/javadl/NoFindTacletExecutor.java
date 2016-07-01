@@ -3,7 +3,6 @@ package de.uka.ilkd.key.rule.executor.javadl;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
@@ -40,8 +39,8 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      *           the MatchConditions with all required instantiations
      */   
     protected void applyAdd(TermLabelState termLabelState, Sequent add,
-            CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, Services services,
-            MatchConditions matchCond, Goal goal, RuleApp ruleApp) {
+                            CCSequentChangeInfo<Term, Sequent> currentSequent, Services services,
+                            MatchConditions matchCond, Goal goal, RuleApp ruleApp) {
         addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, null, matchCond, goal, ruleApp, services);
         addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null, null, matchCond, goal, ruleApp, services);
     }    
@@ -62,7 +61,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
         TacletApp                    tacletApp        = (TacletApp) ruleApp;
         MatchConditions              mc               = tacletApp.matchConditions ();
 
-        ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> newSequentsForGoals         =
+        ImmutableList<CCSequentChangeInfo<Term, Sequent>> newSequentsForGoals         =
                 checkIfGoals ( goal,
                         tacletApp.ifFormulaInstantiations (),
                         mc,
@@ -72,7 +71,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
 
         Iterator<TacletGoalTemplate> it               = taclet.goalTemplates().iterator();
         Iterator<Goal>               goalIt           = newGoals.iterator();
-        Iterator<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> newSequentsIt     = newSequentsForGoals.iterator();  
+        Iterator<CCSequentChangeInfo<Term, Sequent>> newSequentsIt     = newSequentsForGoals.iterator();
 
         while (it.hasNext()) {
             TacletGoalTemplate gt          = it    .next();
@@ -80,7 +79,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
             // add first because we want to use pos information that
             // is lost applying replacewith
 
-            CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent = newSequentsIt.next();
+            CCSequentChangeInfo<Term, Sequent> currentSequent = newSequentsIt.next();
 
             applyAdd(   termLabelState,
                     gt.sequent(),

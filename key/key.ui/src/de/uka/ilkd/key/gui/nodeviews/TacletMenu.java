@@ -35,7 +35,6 @@ import javax.swing.JOptionPane;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.FormulaSV;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
@@ -232,7 +231,7 @@ public class TacletMenu extends JMenu {
 	addClipboardItem(control);
 
 	if (pos != null) {
-	    PosInOccurrence<Term, SequentFormula<Term>> occ = pos.getPosInOccurrence();
+	    PosInOccurrence<Term> occ = pos.getPosInOccurrence();
 	    if (occ != null && occ.posInTerm() != null) {
 		Term t = occ.subTerm ();
 		createAbbrevSection(t, control);
@@ -579,14 +578,14 @@ public class TacletMenu extends JMenu {
                     GuiUtilities.copyHighlightToClipboard(sequentView, pos);
 		} else if(((JMenuItem)e.getSource()).getText().
 			  startsWith(DISABLE_ABBREVIATION)){
-		    PosInOccurrence<Term, SequentFormula<Term>> occ = pos.getPosInOccurrence();
+		    PosInOccurrence<Term> occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(),false);
 			sequentView.printSequent();
 		    }
 		}else if(((JMenuItem)e.getSource()).getText().
 			 startsWith(ENABLE_ABBREVIATION)){
-		    PosInOccurrence<Term, SequentFormula<Term>> occ = pos.getPosInOccurrence();
+		    PosInOccurrence<Term> occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			mediator.getNotationInfo().
 			    getAbbrevMap().setEnabled(occ.subTerm(),true);
@@ -594,7 +593,7 @@ public class TacletMenu extends JMenu {
 		    }
 		}else if(((JMenuItem)e.getSource()).getText().
 			 startsWith(CREATE_ABBREVIATION)){
-		    PosInOccurrence<Term, SequentFormula<Term>> occ = pos.getPosInOccurrence();
+		    PosInOccurrence<Term> occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 		        // trim string, otherwise window gets too large (bug #1430)
 		        final String oldTerm = occ.subTerm().toString();
@@ -629,7 +628,7 @@ public class TacletMenu extends JMenu {
 
 		}else if(((JMenuItem)e.getSource()).getText().
 			 startsWith(CHANGE_ABBREVIATION)){
-		    PosInOccurrence<Term, SequentFormula<Term>> occ = pos.getPosInOccurrence();
+		    PosInOccurrence<Term> occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			String abbreviation = (String)JOptionPane.showInputDialog
 			    (new JFrame(),

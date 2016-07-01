@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.IfThenElse;
 import org.key_project.util.LRUCache;
 
@@ -38,13 +37,13 @@ public class IfThenElseMalusFeature implements Feature {
     
     private IfThenElseMalusFeature () {}
     
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         if ( pos == null ) return NumberRuleAppCost.getZeroCost();
 
         final ServiceCaches caches = goal.getServices().getCaches();
         
         RuleAppCost resInt;
-        final LRUCache<PosInOccurrence<Term, SequentFormula<Term>>, RuleAppCost> ifThenElseMalusCache = caches.getIfThenElseMalusCache();
+        final LRUCache<PosInOccurrence<Term>, RuleAppCost> ifThenElseMalusCache = caches.getIfThenElseMalusCache();
         synchronized(ifThenElseMalusCache) {
             resInt = ifThenElseMalusCache.get ( pos );
         }
@@ -55,7 +54,7 @@ public class IfThenElseMalusFeature implements Feature {
 
         int res = 0;
 
-        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
+        final PIOPathIterator<Term> it = pos.iterator ();
         while ( true ) {
             final int ind = it.next ();
             if ( ind == -1 ) break;

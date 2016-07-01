@@ -67,14 +67,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} which provides the state.
-    * @param modalityPio The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the {@link Node}.
+    * @param modalityPio The {@link PosInOccurrence<Term>} in the {@link Node}.
     * @param executionNode The current {@link IExecutionNode}.
     * @param condition An optional additional condition.
     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     * @throws ProofInputException Occurred Exception
     */
    public ExecutionVariableExtractor(Node node, 
-                                     PosInOccurrence<Term, SequentFormula<Term>> modalityPio, 
+                                     PosInOccurrence<Term> modalityPio,
                                      IExecutionNode<?> executionNode, 
                                      Term condition,
                                      boolean simplifyConditions) throws ProofInputException {
@@ -428,14 +428,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        * Constructor.
        * @param parentNode The {@link IExecutionNode} providing relevant information.
        * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
-       * @param modalityPIO The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
+       * @param modalityPIO The {@link PosInOccurrence<Term>} of the modality of interest.
        * @param programVariable The represented {@link IProgramVariable} which value is shown.
        * @param arrayIndex The index in the parent array.
        * @param additionalCondition An optional additional condition to consider.
        */
       public StateExecutionVariable(IExecutionNode<?> parentNode, 
                                     Node proofNode, 
-                                    PosInOccurrence<Term, SequentFormula<Term>> modalityPIO,
+                                    PosInOccurrence<Term> modalityPIO,
                                     IProgramVariable programVariable,
                                     Term arrayIndex,
                                     Term additionalCondition) {
@@ -500,7 +500,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        * Constructor.
        * @param parentNode The {@link IExecutionNode} providing relevant information.
        * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
-       * @param modalityPIO The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
+       * @param modalityPIO The {@link PosInOccurrence<Term>} of the modality of interest.
        * @param programVariable The represented {@link IProgramVariable} which value is shown.
        * @param arrayIndex The index in the parent array.
        * @param additionalCondition An optional additional condition to consider.
@@ -508,7 +508,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
        */
       public ExtractedExecutionVariable(IExecutionNode<?> parentNode, 
                                         Node proofNode, 
-                                        PosInOccurrence<Term, SequentFormula<Term>> modalityPIO,
+                                        PosInOccurrence<Term> modalityPIO,
                                         IProgramVariable programVariable,
                                         Term arrayIndex,
                                         Term additionalCondition,

@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
@@ -72,7 +71,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         return new MonomialsSmallerThanFeature ( left, right, numbers );
     }
     
-    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         final MonomialCollector m1 = new MonomialCollector ();
         m1.collect ( left.toTerm ( app, pos, goal ), goal.getServices() );
         final MonomialCollector m2 = new MonomialCollector ();

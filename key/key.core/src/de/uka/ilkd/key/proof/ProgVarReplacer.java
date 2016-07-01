@@ -210,7 +210,7 @@ public final class ProgVarReplacer {
     /**
      * replaces in a sequent
      */
-    public CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> replace(Sequent s) {
+    public CCSequentChangeInfo<Term, Sequent> replace(Sequent s) {
         SemisequentChangeInfo anteCI = replace(s.antecedent());
         SemisequentChangeInfo succCI = replace(s.succedent());
 
@@ -220,7 +220,7 @@ public final class ProgVarReplacer {
         Sequent newSequent = Sequent.createSequent(newAntecedent,
                                                    newSuccedent);
 
-        CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> result = SequentChangeInfo.createSequentChangeInfo
+        CCSequentChangeInfo<Term, Sequent> result = SequentChangeInfo.createSequentChangeInfo
                                               (anteCI, succCI, newSequent, s);
         return result;
     }

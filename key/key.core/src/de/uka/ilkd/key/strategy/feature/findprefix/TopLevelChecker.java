@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 
 import de.uka.ilkd.key.logic.Term;
@@ -30,7 +29,7 @@ class TopLevelChecker implements Checker {
     private boolean topLevel;
 
     @Override
-    public void initPrefixCheck(PosInOccurrence<Term, SequentFormula<Term>> p_pos) {
+    public void initPrefixCheck(PosInOccurrence<Term> p_pos) {
         topLevel = p_pos.isTopLevel();
     }
 

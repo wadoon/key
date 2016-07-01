@@ -33,7 +33,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     protected boolean containsRuleApp (ImmutableList<RuleApp> list,
                                        TacletApp rapp,
-                                       PosInOccurrence<Term, SequentFormula<Term>> pio) {
+                                       PosInOccurrence<Term> pio) {
 
         for (RuleApp aList : list) {
             if (sameApplication(aList, rapp, pio)) return true;
@@ -42,7 +42,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
         return false;
     }
 
-    public boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         if ( !app.ifInstsComplete () ) {
             return true;
         }
@@ -56,7 +56,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     protected boolean comparePio(TacletApp newApp,
                                  TacletApp oldApp,
-                                 PosInOccurrence<Term, SequentFormula<Term>> newPio, PosInOccurrence<Term, SequentFormula<Term>> oldPio) {
+                                 PosInOccurrence<Term> newPio, PosInOccurrence<Term> oldPio) {
         return oldPio.equals ( newPio );
     }
 

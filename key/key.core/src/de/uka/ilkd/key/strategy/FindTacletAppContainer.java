@@ -41,10 +41,10 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * rule app was created
      */
     private final FormulaTag      positionTag;
-    private final PosInOccurrence<Term, SequentFormula<Term>> applicationPosition;
+    private final PosInOccurrence<Term> applicationPosition;
 
     FindTacletAppContainer ( RuleApp         p_app,
-			     PosInOccurrence<Term, SequentFormula<Term>> p_pio,
+			     PosInOccurrence<Term> p_pio,
 			     RuleAppCost     p_cost,
 			     Goal            p_goal,
                              long            p_age ) {
@@ -67,7 +67,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      */
     @Override
     protected boolean isStillApplicable(Goal p_goal) {
-        PosInOccurrence<Term, SequentFormula<Term>> topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
+        PosInOccurrence<Term> topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
         if (topPos == null || subformulaOrPreceedingUpdateHasChanged(p_goal)) {
             return false;
         }
@@ -82,11 +82,11 @@ public class FindTacletAppContainer extends TacletAppContainer {
      */
     @SuppressWarnings("unchecked")
     private boolean subformulaOrPreceedingUpdateHasChanged ( Goal p_goal ) {
-    	ImmutableList<FormulaChangeInfo<SequentFormula<Term>>> infoList =
+    	ImmutableList<FormulaChangeInfo<Term>> infoList =
     	    p_goal.getFormulaTagManager().getModifications(positionTag);
 
 	while ( !infoList.isEmpty () ) {
-	    final FormulaChangeInfo<SequentFormula<Term>> info = infoList.head ();
+	    final FormulaChangeInfo<Term> info = infoList.head ();
 	    infoList = infoList.tail ();
 	    
 	    final SequentFormula<Term> newFormula = info.getNewFormula();
@@ -95,7 +95,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
             // of the rule app object
             return false;
 
-	    if ( !independentSubformulas ( (PosInOccurrence<Term, SequentFormula<Term>>) info.getPositionOfModification(),
+	    if ( !independentSubformulas ( (PosInOccurrence<Term>) info.getPositionOfModification(),
 	                                   newFormula ) )
 	        return true;
 	}
@@ -115,10 +115,10 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * positions within the formulas) and no indirect relationship exists which 
      * is established by a modification that occurred inside an update 
      */
-    private boolean independentSubformulas(PosInOccurrence<Term, SequentFormula<Term>> changePos,
+    private boolean independentSubformulas(PosInOccurrence<Term> changePos,
                                            SequentFormula<Term> newFormula) {
-        final PIOPathIterator<Term, SequentFormula<Term>> changePIO = changePos.iterator ();
-        final PIOPathIterator<Term, SequentFormula<Term>> appPIO = applicationPosition.iterator ();
+        final PIOPathIterator<Term> changePIO = changePos.iterator ();
+        final PIOPathIterator<Term> appPIO = applicationPosition.iterator ();
 
         while ( true ) {
             final int changeIndex = changePIO.next ();
@@ -136,7 +136,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // during symbolic program execution; also consider
                 // <code>TermTacletAppIndex.updateCompleteRebuild</code>
                 if ( beforeChangeOp instanceof Modality ) {
-                    final PosInOccurrence<Term, SequentFormula<Term>> afterChangePos =
+                    final PosInOccurrence<Term> afterChangePos =
                         changePos.replaceConstrainedFormula ( newFormula );
                     final Term afterChangeTerm = afterChangePos.subTerm ();
                     return beforeChangeOp == afterChangeTerm.op ()
@@ -174,8 +174,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @return non-null for FindTaclets
      */
     @Override
-    protected PosInOccurrence<Term, SequentFormula<Term>> getPosInOccurrence ( Goal p_goal ) {
-    	final PosInOccurrence<Term, SequentFormula<Term>> topPos =
+    protected PosInOccurrence<Term> getPosInOccurrence (Goal p_goal ) {
+    	final PosInOccurrence<Term> topPos =
    	    p_goal.getFormulaTagManager().getPosForTag(positionTag);
 
 		assert topPos != null;

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Equality;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
@@ -42,7 +41,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     
     // ugly, but we need some services
     private Services               services = null;
-    private PosInOccurrence<Term, SequentFormula<Term>>        focus = null;
+    private PosInOccurrence<Term>        focus = null;
 
     private LiteralsSmallerThanFeature(ProjectionToTerm left,
                                        ProjectionToTerm right,
@@ -58,7 +57,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return new LiteralsSmallerThanFeature ( left, right, numbers );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         final Term leftTerm = left.toTerm ( app, pos, goal );
         final Term rightTerm = right.toTerm ( app, pos, goal );
 
@@ -66,7 +65,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     protected boolean compareTerms(Term leftTerm, Term rightTerm,
-                                   PosInOccurrence<Term, SequentFormula<Term>> pos, Services p_services) {
+                                   PosInOccurrence<Term> pos, Services p_services) {
         services = p_services;
         focus = pos;
         

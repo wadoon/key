@@ -1,30 +1,31 @@
 package org.key_project.common.core.logic.calculus;
 
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>> {
+public abstract class CCSemisequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SemiSeq extends CCSemisequent<T, SemiSeq>> {
 
     /** contains the added formulas to the semisequent */
-    private ImmutableList<SeqFor> added = ImmutableSLList.<SeqFor> nil();
+    private ImmutableList<SequentFormula<T>> added = ImmutableSLList.<SequentFormula<T>> nil();
     /** contains the removed formulas from the semisequent */
-    private ImmutableList<SeqFor> removed = ImmutableSLList.<SeqFor> nil();
+    private ImmutableList<SequentFormula<T>> removed = ImmutableSLList.<SequentFormula<T>> nil();
     /** contains the modified formulas from the semisequent */
-    private ImmutableList<FormulaChangeInfo<SeqFor>> modified = ImmutableSLList
-            .<FormulaChangeInfo<SeqFor>> nil();
+    private ImmutableList<FormulaChangeInfo<T>> modified = ImmutableSLList
+            .<FormulaChangeInfo<T>> nil();
     /** stores the redundance free formula list of the semisequent */
-    protected ImmutableList<SeqFor> modifiedSemisequent = ImmutableSLList
-            .<SeqFor> nil();
+    protected ImmutableList<SequentFormula<T>> modifiedSemisequent = ImmutableSLList
+            .<SequentFormula<T>> nil();
     /**
      * contains formulas that have been tried to add, but which have been
      * rejected due to already existing formulas in the sequent subsuming these
      * formulas
      */
-    private ImmutableList<SeqFor> rejected = ImmutableSLList.<SeqFor> nil();
+    private ImmutableList<SequentFormula<T>> rejected = ImmutableSLList.<SequentFormula<T>> nil();
     /** */
     private int lastFormulaIndex = -1;
 
-    protected CCSemisequentChangeInfo(ImmutableList<SeqFor> formulas) {
+    protected CCSemisequentChangeInfo(ImmutableList<SequentFormula<T>> formulas) {
         this.modifiedSemisequent = formulas;
     }
 
@@ -41,21 +42,21 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
      * sets the list of constrained formula containing all formulas of the
      * semisequent after the operation
      */
-    public void setFormulaList(ImmutableList<SeqFor> list) {
+    public void setFormulaList(ImmutableList<SequentFormula<T>> list) {
         modifiedSemisequent = list;
     }
 
     /**
      * returns the list of constrained formula of the new semisequent
      */
-    public ImmutableList<SeqFor> getFormulaList() {
+    public ImmutableList<SequentFormula<T>> getFormulaList() {
         return modifiedSemisequent;
     }
 
     /**
      * logs an added formula at position idx
      */
-    public void addedFormula(int idx, SeqFor cf) {
+    public void addedFormula(int idx, SequentFormula<T> cf) {
         added = added.prepend(cf);
         lastFormulaIndex = idx;
     }
@@ -63,7 +64,7 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
     /**
      * logs a modified formula at position idx
      */
-    public void modifiedFormula(int idx, FormulaChangeInfo<SeqFor> fci) {
+    public void modifiedFormula(int idx, FormulaChangeInfo<T> fci) {
         // This information can overwrite older records about removed
         // formulas
         removed = removed.removeAll
@@ -77,7 +78,7 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
      * 
      * @return IList<SeqFor> added to the semisequent
      */
-    public ImmutableList<SeqFor> addedFormulas() {
+    public ImmutableList<SequentFormula<T>> addedFormulas() {
         return added;
     }
 
@@ -86,7 +87,7 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
      * 
      * @return IList<SeqFor> removed from the semisequent
      */
-    public ImmutableList<SeqFor> removedFormulas() {
+    public ImmutableList<SequentFormula<T>> removedFormulas() {
         return removed;
     }
 
@@ -96,7 +97,7 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
      * 
      * @return list of formulas rejected due to redundancy
      */
-    public ImmutableList<SeqFor> rejectedFormulas() {
+    public ImmutableList<SequentFormula<T>> rejectedFormulas() {
         return this.rejected;
     }
 
@@ -108,7 +109,7 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
      * @param f
      *            the SeqFor
      */
-    public void rejectedFormula(SeqFor f) {
+    public void rejectedFormula(SequentFormula<T> f) {
         this.rejected = this.rejected.append(f);
     }
 
@@ -117,14 +118,14 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
      * 
      * @return IList<SeqFor> modified within the semisequent
      */
-    public ImmutableList<FormulaChangeInfo<SeqFor>> modifiedFormulas() {
+    public ImmutableList<FormulaChangeInfo<T>> modifiedFormulas() {
         return modified;
     }
 
     /**
      * logs an added formula at position idx
      */
-    public void removedFormula(int idx, SeqFor cf) {
+    public void removedFormula(int idx, SequentFormula<T> cf) {
         removed = removed.prepend(cf);
 
         lastFormulaIndex =
@@ -144,17 +145,17 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
      * not release it. This means when invoking the method it must be snsured
      * that succ is never used afterwards.
      */
-    public void combine(CCSemisequentChangeInfo<SeqFor, ?> succ) {
-        final CCSemisequentChangeInfo<SeqFor, SemiSeq> predecessor = this;
+    public void combine(CCSemisequentChangeInfo<T, ?> succ) {
+        final CCSemisequentChangeInfo<T, SemiSeq> predecessor = this;
         if (succ == predecessor) {
             return;
         }
 
-        for (SeqFor sf : succ.removed) {
+        for (SequentFormula<T> sf : succ.removed) {
             predecessor.added = predecessor.added.removeAll(sf);
 
             boolean skip = false;
-            for (FormulaChangeInfo<SeqFor> fci : predecessor.modified) {
+            for (FormulaChangeInfo<T> fci : predecessor.modified) {
                 if (fci.getNewFormula() == sf) {
                     predecessor.modified = predecessor.modified.removeAll(fci);
                     if (!predecessor.removed.contains(fci.getOriginalFormula())) {
@@ -171,7 +172,7 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
             }
         }
 
-        for (FormulaChangeInfo<SeqFor> fci : succ.modified) {
+        for (FormulaChangeInfo<T> fci : succ.modified) {
             if (predecessor.addedFormulas().contains(fci.getOriginalFormula())) {
                 predecessor.added =
                         predecessor.added.removeAll(fci.getOriginalFormula());
@@ -183,14 +184,14 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
             }
         }
 
-        for (SeqFor sf : succ.added) {
+        for (SequentFormula<T> sf : succ.added) {
             predecessor.removed = predecessor.removed.removeAll(sf);
             if (!predecessor.added.contains(sf)) {
                 predecessor.addedFormula(succ.lastFormulaIndex, sf);
             }
         }
 
-        for (SeqFor sf : succ.rejected) {
+        for (SequentFormula<T> sf : succ.rejected) {
             if (!predecessor.rejected.contains(sf)) {
                 predecessor.rejectedFormula(sf);
             }
@@ -214,7 +215,7 @@ public abstract class CCSemisequentChangeInfo<SeqFor extends SequentFormula<?>, 
      * @return
      */
     protected abstract SemiSeq createSemisequent(
-            ImmutableList<SeqFor> modifiedFormulas);
+            ImmutableList<SequentFormula<T>> modifiedFormulas);
 
     /**
      * returns the semisequent that is the result of the change operation

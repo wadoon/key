@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -28,24 +27,24 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
 	protected final BuiltInRule builtInRule;
 
-	protected final PosInOccurrence<Term, SequentFormula<Term>> pio;
-	protected ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts;
+	protected final PosInOccurrence<Term> pio;
+	protected ImmutableList<PosInOccurrence<Term>> ifInsts;
 
-	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pio,
-	                                 ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
+	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<Term> pio,
+	                                 ImmutableList<PosInOccurrence<Term>> ifInsts) {
         this.builtInRule = rule;
 	    this.pio     = pio;
-	    this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence<Term, SequentFormula<Term>>>nil() : ifInsts);
+	    this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence<Term>>nil() : ifInsts);
 	}
 
-	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<Term> pio) {
 	    this(rule, pio, null);
 	}
 
 	/** HACK: but strategies do not work otherwise in the moment; I need to have a closer look on what is going on there
 	 * This restores the behaviour as it was before my previous commit for the moment
 	 */
-    public void setMutable(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
+    public void setMutable(ImmutableList<PosInOccurrence<Term>> ifInsts) {
         this.ifInsts = ifInsts;
     }
 
@@ -62,7 +61,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * a position in the corresponding formula) of this rule application
      */
     @Override
-    public PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence() {
+    public PosInOccurrence<Term> posInOccurrence() {
     return pio;
     }
 
@@ -86,13 +85,13 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     return result;
     }
 
-    public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos);
+    public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence<Term> newPos);
 
     @Override
-    public abstract IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts);
+    public abstract IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term>> ifInsts);
 
     @Override
-    public ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts() {
+    public ImmutableList<PosInOccurrence<Term>> ifInsts() {
 	return ifInsts;
     }
 

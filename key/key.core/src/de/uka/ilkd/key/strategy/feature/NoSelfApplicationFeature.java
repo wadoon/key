@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
@@ -34,7 +33,7 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
     private NoSelfApplicationFeature() {}
 
     @Override
-    protected boolean filter ( TacletApp p_app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal ) {
+    protected boolean filter (TacletApp p_app, PosInOccurrence<Term> pos, Goal goal ) {
         Debug.assertTrue ( pos != null,
                 "NoSelfApplicationFeature: Need to know the position of the application of the taclet" );
 

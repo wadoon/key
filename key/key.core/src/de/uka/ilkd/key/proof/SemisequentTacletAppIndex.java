@@ -72,8 +72,8 @@ public class SemisequentTacletAppIndex {
                                 Services           services,
                                 TacletIndex        tacletIndex,
                                 NewRuleListener    listener ) {
-        final PosInOccurrence<Term, SequentFormula<Term>> pos =
-            new PosInOccurrence<Term, SequentFormula<Term>> ( cfma, PosInTerm.<Term>getTopLevel(), antec );
+        final PosInOccurrence<Term> pos =
+            new PosInOccurrence<Term> ( cfma, PosInTerm.<Term>getTopLevel(), antec );
         termIndices =
             termIndices.put ( cfma, TermTacletAppIndex.create ( pos,
                                                                 services,
@@ -100,8 +100,8 @@ public class SemisequentTacletAppIndex {
             "Term index that is supposed to be updated " +
             "does not exist";
     
-        final PosInOccurrence<Term, SequentFormula<Term>> pos =
-            new PosInOccurrence<Term, SequentFormula<Term>> ( cfma, PosInTerm.<Term>getTopLevel(), antec );
+        final PosInOccurrence<Term> pos =
+            new PosInOccurrence<Term> ( cfma, PosInTerm.<Term>getTopLevel(), antec );
 
         termIndices = termIndices.put ( cfma,
                                         oldIndex.addTaclets ( filter,
@@ -136,12 +136,12 @@ public class SemisequentTacletAppIndex {
      * <code>infos</code>
      * Note: destructive, use only when constructing new index
      */
-    private ImmutableList<TermTacletAppIndex> removeFormulas(ImmutableList<FormulaChangeInfo<SequentFormula<Term>>> infos) {
+    private ImmutableList<TermTacletAppIndex> removeFormulas(ImmutableList<FormulaChangeInfo<Term>> infos) {
 
         ImmutableList<TermTacletAppIndex> oldIndices = ImmutableSLList.<TermTacletAppIndex>nil();
 
-        for (FormulaChangeInfo<SequentFormula<Term>> info1 : infos) {
-            final FormulaChangeInfo<SequentFormula<Term>> info = info1;
+        for (FormulaChangeInfo<Term> info1 : infos) {
+            final FormulaChangeInfo<Term> info = info1;
             final SequentFormula<Term> oldFor = info.getOriginalFormula();
 
             oldIndices = oldIndices.prepend(termIndices.get(oldFor));
@@ -159,17 +159,17 @@ public class SemisequentTacletAppIndex {
      * Note: destructive, use only when constructing new index
      */
     private void updateTermIndices ( ImmutableList<TermTacletAppIndex> oldIndices,
-                                     ImmutableList<FormulaChangeInfo<SequentFormula<Term>>>  infos,
+                                     ImmutableList<FormulaChangeInfo<Term>>  infos,
                                      Sequent                  newSeq,
                                      Services                 services,
                                      TacletIndex              tacletIndex,
                                      NewRuleListener          listener ) {
 
-	final Iterator<FormulaChangeInfo<SequentFormula<Term>>> infoIt = infos.iterator ();
+	final Iterator<FormulaChangeInfo<Term>> infoIt = infos.iterator ();
         final Iterator<TermTacletAppIndex> oldIndexIt = oldIndices.iterator ();
 
         while ( infoIt.hasNext () ) {
-            final FormulaChangeInfo<SequentFormula<Term>> info = infoIt.next ();
+            final FormulaChangeInfo<Term> info = infoIt.next ();
             final SequentFormula<Term> newFor = info.getNewFormula ();
             final TermTacletAppIndex oldIndex = oldIndexIt.next ();
 
@@ -179,8 +179,8 @@ public class SemisequentTacletAppIndex {
                                listener );
             else {
                 @SuppressWarnings("unchecked")
-                final PosInOccurrence<Term, SequentFormula<Term>> oldPos = (PosInOccurrence<Term, SequentFormula<Term>>) info.getPositionOfModification ();
-                final PosInOccurrence<Term, SequentFormula<Term>> newPos = oldPos.replaceConstrainedFormula ( newFor );
+                final PosInOccurrence<Term> oldPos = (PosInOccurrence<Term>) info.getPositionOfModification ();
+                final PosInOccurrence<Term> newPos = oldPos.replaceConstrainedFormula ( newFor );
                 termIndices = termIndices.put ( newFor,
                                                 oldIndex.update ( newPos,
                                                                   services,
@@ -191,7 +191,7 @@ public class SemisequentTacletAppIndex {
         }
     }
 
-    private void updateTermIndices ( ImmutableList<FormulaChangeInfo<SequentFormula<Term>>> infos,
+    private void updateTermIndices ( ImmutableList<FormulaChangeInfo<Term>> infos,
                                      Sequent                 newSeq,
                                      Services                services,
                                      TacletIndex             tacletIndex,
@@ -241,14 +241,14 @@ public class SemisequentTacletAppIndex {
     /**
      * Get term index for the formula to which position <code>pos</code> points
      */ 
-    private TermTacletAppIndex getTermIndex(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    private TermTacletAppIndex getTermIndex(PosInOccurrence<Term> pos) {
         return termIndices.get ( pos.sequentFormula () );
     }
 
     /**
      * @return all taclet apps for the given position
      */
-    public ImmutableList<NoPosTacletApp> getTacletAppAt(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    public ImmutableList<NoPosTacletApp> getTacletAppAt(PosInOccurrence<Term> pos,
                                                RuleFilter filter) {
         return getTermIndex ( pos ).getTacletAppAt ( pos, filter );
     }
@@ -256,7 +256,7 @@ public class SemisequentTacletAppIndex {
     /**
      * @return all taclet apps for or below the given position
      */
-    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence<Term> pos,
                                                   RuleFilter filter,
                                                   Services services) {
         return getTermIndex ( pos ).getTacletAppAtAndBelow ( pos, filter, services );
@@ -266,7 +266,7 @@ public class SemisequentTacletAppIndex {
      * called if a formula has been replaced
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public SemisequentTacletAppIndex sequentChanged ( CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci,
+    public SemisequentTacletAppIndex sequentChanged ( CCSequentChangeInfo<Term, Sequent> sci,
                                                       Services          services,
                                                       TacletIndex       tacletIndex,
                                                       NewRuleListener   listener) {
@@ -315,8 +315,8 @@ public class SemisequentTacletAppIndex {
         for (final ImmutableMapEntry<SequentFormula<Term>,TermTacletAppIndex> entry : termIndices) {
             final SequentFormula<Term> cfma = entry.key (); 
             final TermTacletAppIndex index = entry.value ();
-            final PosInOccurrence<Term, SequentFormula<Term>> pio = 
-                new PosInOccurrence<Term, SequentFormula<Term>> ( cfma, PosInTerm.<Term>getTopLevel(), antec );
+            final PosInOccurrence<Term> pio =
+                new PosInOccurrence<Term> ( cfma, PosInTerm.<Term>getTopLevel(), antec );
             
             index.reportTacletApps( pio, l );
         }

@@ -1378,7 +1378,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param node The {@link Node} on which the loop invariant rule is applied.
     */
    protected void initNewLoopBodyMethodCallStack(Node node) {
-      PosInOccurrence<Term, SequentFormula<Term>> childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
+      PosInOccurrence<Term> childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
       initNewMethodCallStack(node, childPIO);
    }
    
@@ -1390,16 +1390,16 @@ public class SymbolicExecutionTreeBuilder {
     * @param node The {@link Node} on which the block contract rule is applied.
     */
    protected void initNewValidiityMethodCallStack(Node node) {
-      PosInOccurrence<Term, SequentFormula<Term>> childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(0).sequent());
+      PosInOccurrence<Term> childPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(0).sequent());
       initNewMethodCallStack(node, childPIO);
    }
    
    /**
     * Initializes a new method call stack.
     * @param currentNode The current {@link Node}.
-    * @param childPIO The {@link PosInOccurrence<Term, SequentFormula<Term>>} where the modality has a new symbolic execution label counter.
+    * @param childPIO The {@link PosInOccurrence<Term>} where the modality has a new symbolic execution label counter.
     */
-   protected void initNewMethodCallStack(Node currentNode, PosInOccurrence<Term, SequentFormula<Term>> childPIO) {
+   protected void initNewMethodCallStack(Node currentNode, PosInOccurrence<Term> childPIO) {
       Term newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
       assert newModality != null;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);

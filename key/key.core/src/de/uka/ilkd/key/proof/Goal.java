@@ -20,7 +20,6 @@ import java.util.List;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -214,7 +213,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosT
      * to reduce unnecessary object creation the necessary information is passed
      * to the listener as parameters and not through an event object.
      */
-    protected void fireSequentChanged(CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci) {
+    protected void fireSequentChanged(CCSequentChangeInfo<Term, Sequent> sci) {
 	getFormulaTagManager().sequentChanged(this, sci);
 	ruleAppIndex()        .sequentChanged(this, sci);
 	for (GoalListener listener : listeners) {
@@ -363,7 +362,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosT
      * @see de.uka.ilkd.key.proof.CCGoal#setSequent(org.key_project.common.core.logic.calculus.CCSequentChangeInfo)
      */
     @Override
-    public void applySequentChangeInfo(CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci) {
+    public void applySequentChangeInfo(CCSequentChangeInfo<Term, Sequent> sci) {
         node.setSequent(sci.sequent());
 //VK reminder: now update the index
        	fireSequentChanged(sci);

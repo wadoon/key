@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -59,13 +58,13 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
    private final JavaDLTermServices services;
 
-    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pos, JavaDLTermServices services) {
+    public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence<Term> pos, JavaDLTermServices services) {
         this(rule, pos, null, null, null, services);
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence<Term, SequentFormula<Term>> pio, ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts,
-            LoopInvariant inv, List<LocationVariable> heapContext, JavaDLTermServices services) {
+                                          PosInOccurrence<Term> pio, ImmutableList<PosInOccurrence<Term>> ifInsts,
+                                          LoopInvariant inv, List<LocationVariable> heapContext, JavaDLTermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
         this.loop = (While) JavaTools.getActiveStatement(programTerm()
@@ -216,7 +215,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence<Term, SequentFormula<Term>> pio, LoopInvariant inv, JavaDLTermServices services) {
+                                          PosInOccurrence<Term> pio, LoopInvariant inv, JavaDLTermServices services) {
         this(rule, pio, null, inv, null, services);
     }
 
@@ -260,7 +259,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos) {
+    public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence<Term> newPos) {
         return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext, services);
     }
 
@@ -271,7 +270,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp setIfInsts(
-            ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
+            ImmutableList<PosInOccurrence<Term>> ifInsts) {
         setMutable(ifInsts);
         return this;
 

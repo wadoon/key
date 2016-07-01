@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -40,7 +39,7 @@ public class ReduceMonomialsProjection implements ProjectionToTerm {
         return new ReduceMonomialsProjection ( dividend, divisor );
     }
     
-    public Term toTerm(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         final Term dividendT = dividend.toTerm ( app, pos, goal );
         final Term divisorT = divisor.toTerm ( app, pos, goal );
 

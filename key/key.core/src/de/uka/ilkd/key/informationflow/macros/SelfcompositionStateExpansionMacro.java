@@ -4,7 +4,6 @@ import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.util.collection.ImmutableList;
 
@@ -16,7 +15,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -63,12 +61,12 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence<Term> posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
 
     @Override
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence<Term> pio, Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
         if ("andLeft".equals(ruleName) &&
             pio.sequentFormula().formula().op() instanceof UpdateApplication) {
@@ -89,7 +87,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence<Term, SequentFormula<Term>> posInOcc) {
+                              PosInOccurrence<Term> posInOcc) {
 
         if (proof == null) {
             return false;
@@ -131,7 +129,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp,
-                                       PosInOccurrence<Term, SequentFormula<Term>> pio,
+                                       PosInOccurrence<Term> pio,
                                        Goal goal) {
             String name = ruleApp.rule().name().toString();
             if (    (   admittedRuleNames.contains(name)
@@ -153,13 +151,13 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
             return true;
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pio, Goal goal,
-                RuleAppCostCollector collector) {
+        public void instantiateApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal,
+                                   RuleAppCostCollector collector) {
         }
 
         @Override

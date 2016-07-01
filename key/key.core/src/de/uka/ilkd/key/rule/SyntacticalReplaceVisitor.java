@@ -24,7 +24,6 @@ import java.util.Deque;
 import java.util.Stack;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.Sort;
@@ -54,7 +53,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     protected final SVInstantiations svInst;
     protected final Services services;
     private Term computedResult = null;
-    protected final PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence;
+    protected final PosInOccurrence<Term> applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
     protected final RuleApp ruleApp;
@@ -77,7 +76,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+            PosInOccurrence<Term> applicationPosInOccurrence,
             SVInstantiations svInst,
             Goal goal,                                     
             Rule rule,
@@ -99,7 +98,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
             Services services,
-            PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+            PosInOccurrence<Term> applicationPosInOccurrence,
             Rule rule,
             RuleApp ruleApp,
             TacletLabelHint labelHint, 

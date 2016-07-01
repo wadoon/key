@@ -271,7 +271,7 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence<Term, SequentFormula<Term>> occurrence) {
+    public boolean isApplicable(final Goal goal, final PosInOccurrence<Term> occurrence) {
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -449,7 +449,7 @@ public class BlockContractRule implements BuiltInRule {
                                        informationFlowContractApp);
     }
 
-    private static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence<Term, SequentFormula<Term>> occurrence) {
+    private static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence<Term> occurrence) {
         return occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec();
     }
 
@@ -605,7 +605,7 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     @Override
-    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence<Term, SequentFormula<Term>> occurrence, JavaDLTermServices services)
+    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence<Term> occurrence, JavaDLTermServices services)
     {
         return new BlockContractBuiltInRuleApp(this, occurrence);
     }
@@ -1122,7 +1122,7 @@ public class BlockContractRule implements BuiltInRule {
         private final Instantiation instantiation;
         private final List<Label> labels;
         private final BlockContract.Variables variables;
-        private final PosInOccurrence<Term, SequentFormula<Term>> occurrence;
+        private final PosInOccurrence<Term> occurrence;
         private final Services services;
         private final BlockContractRule rule;
 
@@ -1131,7 +1131,7 @@ public class BlockContractRule implements BuiltInRule {
                                  final Instantiation instantiation,
                                  final List<Label> labels,
                                  final BlockContract.Variables variables,
-                                 final PosInOccurrence<Term, SequentFormula<Term>> occurrence,
+                                 final PosInOccurrence<Term> occurrence,
                                  final Services services,
                                  final BlockContractRule rule)
         {
@@ -1259,7 +1259,7 @@ public class BlockContractRule implements BuiltInRule {
             goal.setBranchLabel("Usage");
             Term uAssumptions = tb.applySequential(updates, tb.and(assumptions));
             
-            final CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> newSeq = 
+            final CCSequentChangeInfo<Term, Sequent> newSeq =
                     goal.sequent().addFormula(new SequentFormula<>(uAssumptions), true, false);
             
             newSeq.combine(

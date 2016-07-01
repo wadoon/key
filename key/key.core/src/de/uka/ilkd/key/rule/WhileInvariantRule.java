@@ -674,7 +674,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                             final Term uAnonInv) {
         final TermBuilder tb = services.getTermBuilder();
         bodyGoal.setBranchLabel(BODY_PRESERVES_INVARIANT_LABEL);
-        final CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> newBodyGoalSeq = 
+        final CCSequentChangeInfo<Term, Sequent> newBodyGoalSeq =
                 bodyGoal.sequent().addFormula(new SequentFormula<>(wellFormedAnon), true, false);         
 
         newBodyGoalSeq.combine(newBodyGoalSeq.sequent().addFormula(new SequentFormula<>(uAnonInv), 
@@ -702,7 +702,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                       final Term guardFalseTerm,
                                       final Term[] uAnon, final Term uAnonInv) {
         useGoal.setBranchLabel("Use Case");
-        final CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> newUseGoal =       
+        final CCSequentChangeInfo<Term, Sequent> newUseGoal =
                 useGoal.sequent().addFormula(new SequentFormula<>(wellFormedAnon), true, false);        
         newUseGoal.combine(newUseGoal.sequent().addFormula(new SequentFormula<>(uAnonInv), true, false));
         useGoal.applySequentChangeInfo(newUseGoal);
@@ -719,13 +719,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     //-------------------------------------------------------------------------
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence<Term> pio) {
         return checkApplicability(goal,pio);
     }
 
 
     //focus must be top level succedent
-    static boolean checkApplicability (Goal g, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    static boolean checkApplicability (Goal g, PosInOccurrence<Term> pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
         }
@@ -759,7 +759,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                              final Term update, final Term selfTerm,
                              final LocationVariable heap, final Term anonHeap,
                              final ImmutableSet<ProgramVariable> localIns,
-                             PosInOccurrence<Term, SequentFormula<Term>> pio, Services services) {
+                             PosInOccurrence<Term> pio, Services services) {
         if (goal == null) {
             return;
         }
@@ -1017,7 +1017,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     @Override
-    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence<Term, SequentFormula<Term>> pos, JavaDLTermServices services) {
+    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence<Term> pos, JavaDLTermServices services) {
         return new LoopInvariantBuiltInRuleApp(this, pos, services);
     }
 

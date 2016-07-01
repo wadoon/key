@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.sort.Sort;
 
@@ -76,7 +75,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
         return false;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         return app instanceof TacletApp && filter(pos.subTerm(), goal.proof()
                 .getServices(), ((TacletApp) app).instantiations()
                 .getExecutionContext());

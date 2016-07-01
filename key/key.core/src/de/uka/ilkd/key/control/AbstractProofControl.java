@@ -7,7 +7,6 @@ import java.util.List;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -97,7 +96,7 @@ public abstract class AbstractProofControl implements ProofControl {
    }
    
    @Override
-   public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+   public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence<Term> pos) {
         ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
 
         for (RuleApp ruleApp : focusedGoal.ruleAppIndex().getBuiltInRules(focusedGoal, pos)) {
@@ -119,7 +118,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-   public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+   public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence<Term> pos) {
         if (pos != null && focusedGoal != null) {
             Debug.out("NoPosTacletApp: Looking for applicables rule at node",
                     focusedGoal.node().serialNr());
@@ -132,7 +131,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-   public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+   public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence<Term> pos) {
         if (pos != null) {
             return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex().
                     getRewriteTaclet(TacletFilter.TRUE,
@@ -147,7 +146,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * takes NoPosTacletApps as arguments and returns a duplicate free list of
      * the contained TacletApps
      */
-    private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal, ImmutableList<NoPosTacletApp> tacletInstances, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal, ImmutableList<NoPosTacletApp> tacletInstances, PosInOccurrence<Term> pos) {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         for (NoPosTacletApp app : tacletInstances) {
@@ -184,7 +183,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
     
     @Override
-    public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence<Term> pos) {
    final Services services = goal.getServices();
    ImmutableSet<TacletApp> applics =
          getAppsForName(goal, taclet.name().toString(), pos);
@@ -255,12 +254,12 @@ public abstract class AbstractProofControl implements ProofControl {
      * @param goal the Goal for which the applications should be returned
      * @param name the String with the taclet names whose applications are
      * looked for
-     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> describing the position
+     * @param pos the PosInOccurrence<Term> describing the position
      * @return a list of all found rule applications of the given rule at
      * position pos
      */
     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
-            PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            PosInOccurrence<Term> pos) {
         return getAppsForName(goal, name, pos, TacletFilter.TRUE);
     }
 
@@ -271,13 +270,13 @@ public abstract class AbstractProofControl implements ProofControl {
      * @param goal the Goal for which the applications should be returned
      * @param name the String with the taclet names whose applications are
      * looked for
-     * @param pos the PosInOccurrence<Term, SequentFormula<Term>> describing the position
+     * @param pos the PosInOccurrence<Term> describing the position
      * @param filter the TacletFilter expressing restrictions
      * @return a list of all found rule applications of the given rule at
      * position <tt>pos</tt> passing the filter
      */
     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
-            PosInOccurrence<Term, SequentFormula<Term>> pos,
+            PosInOccurrence<Term> pos,
             TacletFilter filter) {
         Services services = goal.getServices();
         ImmutableSet<TacletApp> result = DefaultImmutableSet.<TacletApp>nil();
@@ -367,7 +366,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
     
     @Override
-    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pos, boolean forced) {
+    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence<Term> pos, boolean forced) {
       assert goal != null;
 
       ImmutableSet<IBuiltInRuleApp> set = getBuiltInRuleApp(goal, rule, pos);
@@ -401,7 +400,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @return a SetOf<IBuiltInRuleApp> with all possible rule applications
      */
     public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApp(Goal focusedGoal, BuiltInRule rule,
-            PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            PosInOccurrence<Term> pos) {
 
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
 
@@ -425,7 +424,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * applied
      * @return a SetOf<RuleApp> with all possible applications of the rule
      */
-    protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(Goal focusedGoal, String name, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(Goal focusedGoal, String name, PosInOccurrence<Term> pos) {
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
         ImmutableList<BuiltInRule> match = ImmutableSLList.<BuiltInRule>nil();
 
@@ -594,7 +593,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * <code>focus!=null</code>) to a particular subterm or subformula of that
      * goal
      */
-    public void startFocussedAutoMode(PosInOccurrence<Term, SequentFormula<Term>> focus, Goal goal) {
+    public void startFocussedAutoMode(PosInOccurrence<Term> focus, Goal goal) {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
 

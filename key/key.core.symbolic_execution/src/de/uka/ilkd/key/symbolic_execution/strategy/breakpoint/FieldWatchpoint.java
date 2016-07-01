@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
@@ -68,7 +67,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
          Assignment assignment = (Assignment) activeStatement;
          SourceElement firstElement = assignment.getChildAt(0);
          if(firstElement instanceof FieldReference){
-            PosInOccurrence<Term, SequentFormula<Term>> pio = ruleApp.posInOccurrence();
+            PosInOccurrence<Term> pio = ruleApp.posInOccurrence();
             Term term = pio.subTerm();
             getProof().getServices().getTermBuilder();
             term = TermBuilder.goBelowUpdates(term);

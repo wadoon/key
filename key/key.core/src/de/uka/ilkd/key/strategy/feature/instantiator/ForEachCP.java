@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -70,7 +69,7 @@ public class ForEachCP implements Feature {
     }
 
     public RuleAppCost computeCost(final RuleApp app,
-                               final PosInOccurrence<Term, SequentFormula<Term>> pos,
+                               final PosInOccurrence<Term> pos,
                                final Goal goal) {
         final Term outerVarContent = var.getContent ();
         var.setContent ( null );
@@ -118,11 +117,11 @@ public class ForEachCP implements Feature {
             }
         }
 
-        private final PosInOccurrence<Term, SequentFormula<Term>> pos;
+        private final PosInOccurrence<Term> pos;
         private final RuleApp         app;
         private final Goal            goal;
     
-        private CP(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+        private CP(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;

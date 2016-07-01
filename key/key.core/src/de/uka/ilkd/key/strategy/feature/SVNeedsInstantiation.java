@@ -2,7 +2,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 
 import de.uka.ilkd.key.logic.Term;
@@ -23,7 +22,7 @@ public class SVNeedsInstantiation extends InstantiatedSVFeature {
     }
     
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         boolean res = super.filter(app, pos, goal);
         if (res == false) {
             for (SchemaVariable sv : app.uninstantiatedVars()) {

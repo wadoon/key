@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
 import de.uka.ilkd.key.logic.Term;
@@ -32,7 +31,7 @@ public class RemoveParentUpdateModifier implements Modifier {
 
 
     @Override
-    public PosInOccurrence<Term, SequentFormula<Term>> modifyPosistion(PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    public PosInOccurrence<Term> modifyPosistion(PosInOccurrence<Term> pos) {
         if (!pos.isTopLevel() &&
             pos.up().subTerm().op() instanceof UpdateApplication) {
             return modifyPosistion(pos.up());

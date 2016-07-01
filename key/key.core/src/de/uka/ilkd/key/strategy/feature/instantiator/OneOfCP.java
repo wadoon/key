@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -42,7 +41,7 @@ public class OneOfCP implements Feature {
         return new OneOfCP ( manager, features );
     }
     
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {        
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         manager.passChoicePoint ( cp, this );
         return features[theChosenOne].computeCost ( app, pos, goal );
     }

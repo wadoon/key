@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -303,7 +302,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     * {@inheritDoc}
     */
    @Override
-   protected PosInOccurrence<Term, SequentFormula<Term>> lazyComputeModalityPIO() {
+   protected PosInOccurrence<Term> lazyComputeModalityPIO() {
       return SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(getProofNode().sequent());
    }
 

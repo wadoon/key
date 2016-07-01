@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -35,7 +34,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
     public static final Feature INSTANCE =
         new SplittableQuantifiedFormulaFeature ();
     
-    protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Analyser analyser = new Analyser ();

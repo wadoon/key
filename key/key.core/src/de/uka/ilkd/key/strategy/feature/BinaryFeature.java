@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -36,7 +35,7 @@ public abstract class BinaryFeature implements Feature {
     public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
     
 	@Override
-    public RuleAppCost computeCost ( RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal ) {
+    public RuleAppCost computeCost (RuleApp app, PosInOccurrence<Term> pos, Goal goal ) {
         return filter ( app, pos, goal ) ? ZERO_COST : TOP_COST; 
     }
     
@@ -53,7 +52,7 @@ public abstract class BinaryFeature implements Feature {
      * @return true iff the the result of the feature is supposed to be zero.
      */
     protected abstract boolean filter ( RuleApp app,
-                                        PosInOccurrence<Term, SequentFormula<Term>> pos,
+                                        PosInOccurrence<Term> pos,
                                         Goal goal );
 
 }

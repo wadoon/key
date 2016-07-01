@@ -16,7 +16,6 @@ package de.uka.ilkd.key.logic;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -54,7 +53,7 @@ public class InnerVariableNamer extends VariableNamer {
 
     public ProgramVariable rename(ProgramVariable var,
                                   Goal goal,
-                                  PosInOccurrence<Term, SequentFormula<Term>> posOfFind) {
+                                  PosInOccurrence<Term> posOfFind) {
 	ProgramElementName name = var.getProgramElementName();
 	BasenameAndIndex bai = getBasenameAndIndex(name);
 	Globals globals = wrapGlobals(goal.getGlobalProgVars());

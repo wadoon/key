@@ -151,7 +151,7 @@ public class RuleCommand extends AbstractCommand {
             }
             allApps = allApps.append(
                     index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence<Term, SequentFormula<Term>>(sf, PosInTerm.<Term>getTopLevel(), true),
+                            new PosInOccurrence<Term>(sf, PosInTerm.<Term>getTopLevel(), true),
                             services));
         }
 
@@ -161,7 +161,7 @@ public class RuleCommand extends AbstractCommand {
             }
             allApps = allApps.append(
                     index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence<Term, SequentFormula<Term>>(sf, PosInTerm.<Term>getTopLevel(), false),
+                            new PosInOccurrence<Term>(sf, PosInTerm.<Term>getTopLevel(), false),
                             services));
         }
 

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.rule.Rule;
 
 import de.uka.ilkd.key.java.Services;
@@ -28,7 +27,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
     public ConstraintAwareSyntacticalReplaceVisitor(
             TermLabelState termLabelState, Services services,
             Constraint metavariableInst,
-            PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
+            PosInOccurrence<Term> applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal) {
         super(termLabelState, services,
                 applicationPosInOccurrence, rule, ruleApp, labelHint, goal);

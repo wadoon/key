@@ -27,8 +27,8 @@ import org.key_project.common.core.logic.label.TermLabel;
  * @author Dominic Scheurer
  *
  */
-public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<T, SeqFor, SemiSeq, Seq>>
-                          implements CCSequent<T, SeqFor, SemiSeq, Seq> {
+public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SemiSeq extends CCSemisequent<T, SemiSeq>, Seq extends CCSequent<T, SemiSeq, Seq>>
+                          implements CCSequent<T, SemiSeq, Seq> {
 
     private final SemiSeq antecedent;
 
@@ -45,29 +45,29 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      * @param genericSequent
      * @return
      */
-    protected abstract CCSequentChangeInfo<T, SeqFor, Seq> createSequentChangeInfo(
+    protected abstract CCSequentChangeInfo<T, Seq> createSequentChangeInfo(
             boolean inAntec,
-            CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI,
+            CCSemisequentChangeInfo<T, SemiSeq> semiCI,
             Seq composeSequent,
             Seq genericSequent);
 
-    /** creates new GenericSequent<T, SeqFor> with antecedence and succedence */
+    /** creates new GenericSequent<T, SequentFormula<T>> with antecedence and succedence */
     protected CCSequentImpl(SemiSeq antecedent, SemiSeq succedent) {
         this.antecedent = antecedent;
         this.succedent = succedent;
     }
 
     /* (non-Javadoc)
-     * @see org.key_project.common.core.logic.calculus.CCSequent#addFormula(SeqFor, boolean, boolean)
+     * @see org.key_project.common.core.logic.calculus.CCSequent#addFormula(SequentFormula<T>, boolean, boolean)
      */
     @Override
     @SuppressWarnings("unchecked")
-    public CCSequentChangeInfo<T, SeqFor, Seq> addFormula(SeqFor cf, boolean antec, boolean first) {
+    public CCSequentChangeInfo<T, Seq> addFormula(SequentFormula<T> cf, boolean antec, boolean first) {
 
-        final CCSemisequent<SeqFor, SemiSeq> seq =
+        final CCSemisequent<T, SemiSeq> seq =
                 antec ? antecedent : succedent;
 
-        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<T, SemiSeq> semiCI =
                 first ? seq.insertFirst(cf) : seq.insertLast(cf);
 
         return createSequentChangeInfo(antec, semiCI,
@@ -75,14 +75,14 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
     }
 
     /* (non-Javadoc)
-     * @see org.key_project.common.core.logic.calculus.CCSequent#addFormula(SeqFor, org.key_project.common.core.logic.calculus.PosInOccurrence)
+     * @see org.key_project.common.core.logic.calculus.CCSequent#addFormula(SequentFormula<T>, org.key_project.common.core.logic.calculus.PosInOccurrence)
      */
     @Override
     @SuppressWarnings("unchecked")
-    public CCSequentChangeInfo<T, SeqFor, Seq> addFormula(SeqFor cf, PosInOccurrence<T, SeqFor> p) {
-        final CCSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
+    public CCSequentChangeInfo<T, Seq> addFormula(SequentFormula<T> cf, PosInOccurrence<T> p) {
+        final CCSemisequent<T, SemiSeq> seq = getSemisequent(p);
 
-        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<T, SemiSeq> semiCI =
                 seq.insert(seq.indexOf(p.sequentFormula()), cf);
 
         return createSequentChangeInfo(p.isInAntec(), semiCI,
@@ -94,14 +94,14 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      */
     @Override
     @SuppressWarnings("unchecked")
-    public CCSequentChangeInfo<T, SeqFor, Seq> addFormula(
-            Iterable<SeqFor> insertions,
+    public CCSequentChangeInfo<T, Seq> addFormula(
+            Iterable<SequentFormula<T>> insertions,
             boolean antec, boolean first) {
 
-        final CCSemisequent<SeqFor, SemiSeq> seq =
+        final CCSemisequent<T, SemiSeq> seq =
                 antec ? antecedent : succedent;
 
-        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<T, SemiSeq> semiCI =
                 first ? seq.insertFirst(insertions) : seq
                         .insertLast(insertions);
 
@@ -114,12 +114,12 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      */
     @Override
     @SuppressWarnings("unchecked")
-    public  CCSequentChangeInfo<T, SeqFor, Seq> addFormula(
-            Iterable<SeqFor> insertions,
-            PosInOccurrence<?, SeqFor> p) {
-        final CCSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
+    public  CCSequentChangeInfo<T, Seq> addFormula(
+            Iterable<SequentFormula<T>> insertions,
+            PosInOccurrence<T> p) {
+        final CCSemisequent<T, SemiSeq> seq = getSemisequent(p);
 
-        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<T, SemiSeq> semiCI =
                 seq.insert(seq.indexOf(p.sequentFormula()), insertions);
 
         return createSequentChangeInfo(p.isInAntec(), semiCI,
@@ -135,14 +135,14 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
     }
 
     /* (non-Javadoc)
-     * @see org.key_project.common.core.logic.calculus.CCSequent#changeFormula(SeqFor, org.key_project.common.core.logic.calculus.PosInOccurrence)
+     * @see org.key_project.common.core.logic.calculus.CCSequent#changeFormula(SequentFormula<T>, org.key_project.common.core.logic.calculus.PosInOccurrence)
      */
     @Override
     @SuppressWarnings("unchecked")
-    public CCSequentChangeInfo<T, SeqFor, Seq> changeFormula(
-            SeqFor newCF,
-            PosInOccurrence<?, SeqFor> p) {
-        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+    public CCSequentChangeInfo<T, Seq> changeFormula(
+            SequentFormula<T> newCF,
+            PosInOccurrence<T> p) {
+        final CCSemisequentChangeInfo<T, SemiSeq> semiCI =
                 getSemisequent(p).replace(p, newCF);
 
         return createSequentChangeInfo(p.isInAntec(), semiCI,
@@ -153,15 +153,15 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      * @see org.key_project.common.core.logic.calculus.CCSequent#changeFormula(org.key_project.util.collection.ImmutableList, org.key_project.common.core.logic.calculus.PosInOccurrence)
      */
     @Override
-    public CCSequentChangeInfo<T, SeqFor, Seq> changeFormula(
-            Iterable<SeqFor> replacements,
-            PosInOccurrence<?, SeqFor> p) {
+    public CCSequentChangeInfo<T, Seq> changeFormula(
+            Iterable<SequentFormula<T>> replacements,
+            PosInOccurrence<T> p) {
 
-        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<T, SemiSeq> semiCI =
                 getSemisequent(p).replace(p, replacements);
 
         @SuppressWarnings("unchecked")
-        final CCSequentChangeInfo<T, SeqFor, Seq> sci =
+        final CCSequentChangeInfo<T, Seq> sci =
                 createSequentChangeInfo(p.isInAntec(),
                         semiCI,
                         composeSequent(p.isInAntec(), semiCI.semisequent()),
@@ -172,13 +172,13 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
 
     /**
      * replaces the antecedent ({@code antec} is true) of this sequent by the
-     * given {@link GenericSemisequent<SeqFor, SemiSeq>} similar for the
+     * given {@link GenericSemisequent<SequentFormula<T>, SemiSeq>} similar for the
      * succedent if {@code antec} is false.
      * 
      * @param antec
      *            if the antecedent or succedent shall be replaced
      * @param semiSeq
-     *            the {@link GenericSemisequent<SeqFor, SemiSeq>} to use
+     *            the {@link GenericSemisequent<SequentFormula<T>, SemiSeq>} to use
      * @return the resulting sequent
      */
     private Seq composeSequent(boolean antec,
@@ -212,20 +212,20 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof CCSequentImpl<?, ?, ?, ?>))
+        if (!(o instanceof CCSequentImpl<?, ?, ?>))
             return false;
-        final CCSequentImpl<?, ?, ?, ?> o1 = (CCSequentImpl<?, ?, ?, ?>) o;
+        final CCSequentImpl<?, ?, ?> o1 = (CCSequentImpl<?, ?, ?>) o;
         return antecedent.equals(o1.antecedent)
                 && succedent.equals(o1.succedent);
     }
 
     /* (non-Javadoc)
-     * @see org.key_project.common.core.logic.calculus.CCSequent#formulaNumberInSequent(boolean, SeqFor)
+     * @see org.key_project.common.core.logic.calculus.CCSequent#formulaNumberInSequent(boolean, SequentFormula<T>)
      */
     @Override
-    public int formulaNumberInSequent(boolean inAntec, SeqFor cfma) {
+    public int formulaNumberInSequent(boolean inAntec, SequentFormula<T> cfma) {
         int n = inAntec ? 0 : antecedent.size();
-        final Iterator<SeqFor> formIter =
+        final Iterator<SequentFormula<T>> formIter =
                 inAntec ? antecedent.iterator() : succedent.iterator();
         while (formIter.hasNext()) {
             n++;
@@ -240,7 +240,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      * @see org.key_project.common.core.logic.calculus.CCSequent#getFormulabyNr(int)
      */
     @Override
-    public SeqFor getFormulabyNr(int formulaNumber) {
+    public SequentFormula<T> getFormulabyNr(int formulaNumber) {
         if (formulaNumber <= 0 || formulaNumber > size()) {
             throw new RuntimeException("No formula nr. " + formulaNumber
                     + " in seq. " + this);
@@ -252,11 +252,11 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
     }
 
     /**
-     * returns the semisequent in which the SeqFor described by
-     * PosInOccurrence<?, SeqFor> p lies
+     * returns the semisequent in which the SequentFormula<T> described by
+     * PosInOccurrence<?, SequentFormula<T>> p lies
      */
     protected SemiSeq getSemisequent(
-            PosInOccurrence<?, SeqFor> p) {
+            PosInOccurrence<?> p) {
         return p.isInAntec() ? antecedent() : succedent();
     }
 
@@ -269,8 +269,8 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      * 
      * @return iterator about all ConstrainedFormulae of the sequent
      */
-    public Iterator<SeqFor> iterator() {
-        return new SequentIterator<SeqFor, SemiSeq, Seq>(antecedent(),
+    public Iterator<SequentFormula<T>> iterator() {
+        return new SequentIterator<T, SemiSeq, Seq>(antecedent(),
                 succedent());
     }
 
@@ -286,15 +286,15 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      * @see org.key_project.common.core.logic.calculus.CCSequent#removeFormula(org.key_project.common.core.logic.calculus.PosInOccurrence)
      */
     @Override
-    public CCSequentChangeInfo<T, SeqFor, Seq> removeFormula(
-            PosInOccurrence<?, SeqFor> p) {
-        final CCSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
+    public CCSequentChangeInfo<T, Seq> removeFormula(
+            PosInOccurrence<T> p) {
+        final CCSemisequent<T, SemiSeq> seq = getSemisequent(p);
 
-        final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
+        final CCSemisequentChangeInfo<T, SemiSeq> semiCI =
                 seq.remove(seq.indexOf(p.sequentFormula()));
 
         @SuppressWarnings("unchecked")
-        final CCSequentChangeInfo<T, SeqFor, Seq> sci =
+        final CCSequentChangeInfo<T, Seq> sci =
                 createSequentChangeInfo(p.isInAntec(), semiCI,
                         composeSequent(p.isInAntec(), semiCI.semisequent()),
                         (Seq) this);
@@ -327,14 +327,14 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
         return antecedent().toString() + "==>" + succedent().toString();
     }
 
-    static class SequentIterator<SeqFor extends SequentFormula<?>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<?, SeqFor, SemiSeq, Seq>>
-            implements Iterator<SeqFor> {
+    static class SequentIterator<T extends CCTerm<?, ?, ?, T>, SemiSeq extends CCSemisequent<T, SemiSeq>, Seq extends CCSequent<?, SemiSeq, Seq>>
+            implements Iterator<SequentFormula<T>> {
 
-        private final Iterator<SeqFor> anteIt;
-        private final Iterator<SeqFor> succIt;
+        private final Iterator<SequentFormula<T>> anteIt;
+        private final Iterator<SequentFormula<T>> succIt;
 
-        SequentIterator(CCSemisequent<SeqFor, SemiSeq> ante,
-                CCSemisequent<SeqFor, SemiSeq> succ) {
+        SequentIterator(CCSemisequent<T, SemiSeq> ante,
+                CCSemisequent<T, SemiSeq> succ) {
             this.anteIt = ante.iterator();
             this.succIt = succ.iterator();
         }
@@ -343,7 +343,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
             return anteIt.hasNext() || succIt.hasNext();
         }
 
-        public SeqFor next() {
+        public SequentFormula<T> next() {
             if (anteIt.hasNext()) {
                 return anteIt.next();
             }
@@ -387,7 +387,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
     @Override
     public Set<Name> getOccuringTermLabels() {
         final Set<Name> result = new HashSet<Name>();
-        for (final SeqFor sf : this) {
+        for (final SequentFormula<T> sf : this) {
             result.addAll(getLabelsForTermRecursively(sf.formula()));
         }
         return result;

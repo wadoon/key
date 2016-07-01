@@ -23,7 +23,7 @@ import de.uka.ilkd.key.rule.Taclet;
 
 /**
  * A multi-threaded taclet index implementation. It executes method 
- * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence<Term, SequentFormula<Term>>, Services)}
+ * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence<Term>, Services)}
  * using multiple threads (depending on the number of taclets being matched 
  * and number of available processors).
  *
@@ -71,7 +71,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
     @Override
     protected ImmutableList<NoPosTacletApp> matchTaclets(
             ImmutableList<NoPosTacletApp> tacletApps, RuleFilter p_filter,
-            PosInOccurrence<Term, SequentFormula<Term>> pos, Services services) { 
+            PosInOccurrence<Term> pos, Services services) {
 
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
         if (tacletApps == null) {
@@ -126,7 +126,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
         private final int lower;
         private final int upper;
         private Services services;
-        private PosInOccurrence<Term, SequentFormula<Term>> pos;
+        private PosInOccurrence<Term> pos;
         private RuleFilter ruleFilter;
 
         /**
@@ -137,13 +137,13 @@ final class MultiThreadedTacletIndex extends TacletIndex {
          * @param toMatch the list containing the taclets to be matched
          * @param lower the index (incl.) where to start         
          * @param upper the index (excl.) where to stop
-         * @param pos the {@link PosInOccurrence<Term, SequentFormula<Term>>} refering to the term to match
+         * @param pos the {@link PosInOccurrence<Term>} refering to the term to match
          * @param ruleFilter {@link RuleFilter} constraining the taclets to be matched
          * @param services the {@link Services}
          */
         public TacletSetMatchTask(NoPosTacletApp[] toMatch, int lower,
-                int upper, PosInOccurrence<Term, SequentFormula<Term>> pos, RuleFilter ruleFilter,
-                Services services) {
+                                  int upper, PosInOccurrence<Term> pos, RuleFilter ruleFilter,
+                                  Services services) {
             this.toMatch = toMatch;
             this.lower = lower;
             this.upper = upper;

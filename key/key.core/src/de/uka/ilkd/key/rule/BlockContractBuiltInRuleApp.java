@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -40,13 +39,13 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private IFProofObligationVars infFlowVars;
     private ExecutionContext context;
 
-    public BlockContractBuiltInRuleApp(final BuiltInRule rule, final PosInOccurrence<Term, SequentFormula<Term>> occurrence) {
+    public BlockContractBuiltInRuleApp(final BuiltInRule rule, final PosInOccurrence<Term> occurrence) {
         this(rule, occurrence, null, null, null, null);
     }
 
     public BlockContractBuiltInRuleApp(final BuiltInRule rule,
-                                       final PosInOccurrence<Term, SequentFormula<Term>> occurrence,
-                                       final ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInstantiations,
+                                       final PosInOccurrence<Term> occurrence,
+                                       final ImmutableList<PosInOccurrence<Term>> ifInstantiations,
                                        final StatementBlock block,
                                        final BlockContract contract,
                                        final List<LocationVariable> heaps) {
@@ -73,12 +72,12 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public BlockContractBuiltInRuleApp replacePos(final PosInOccurrence<Term, SequentFormula<Term>> newOccurrence) {
+    public BlockContractBuiltInRuleApp replacePos(final PosInOccurrence<Term> newOccurrence) {
         return new BlockContractBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,block, contract, heaps);
     }
 
     @Override
-    public BlockContractBuiltInRuleApp setIfInsts(final ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInstantiations) {
+    public BlockContractBuiltInRuleApp setIfInsts(final ImmutableList<PosInOccurrence<Term>> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;
     }

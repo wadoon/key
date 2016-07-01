@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -51,7 +50,7 @@ public abstract class SubtermGenerator implements TermGenerator {
     public static TermGenerator leftTraverse(ProjectionToTerm cTerm,
                                              TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+            public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
                 return new LeftIterator ( getTermInst ( app, pos, goal ), goal.getServices() );
             }
         };
@@ -64,13 +63,13 @@ public abstract class SubtermGenerator implements TermGenerator {
     public static TermGenerator rightTraverse(ProjectionToTerm cTerm,
                                               TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+            public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
                 return new RightIterator ( getTermInst ( app, pos, goal ), goal.getServices() );
             }
         };
     }
 
-    protected Term getTermInst(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected Term getTermInst(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         return completeTerm.toTerm ( app, pos, goal );
     }
     

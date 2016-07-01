@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 
@@ -41,7 +40,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         new QuanEliminationAnalyser ();
     
     // ugly
-    private PosInOccurrence<Term, SequentFormula<Term>>        focus = null;
+    private PosInOccurrence<Term>        focus = null;
     private Services               services = null;
 
     private final LiteralsSmallerThanFeature litComparator;
@@ -60,7 +59,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         return new ClausesSmallerThanFeature ( left, right, numbers );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         final Term leftTerm = left.toTerm ( app, pos, goal );
         final Term rightTerm = right.toTerm ( app, pos, goal );
 

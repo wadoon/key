@@ -638,7 +638,7 @@ public class Proof implements Named {
                         final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) visitedNode
                                 .getAppliedRuleApp();
 
-                        for (Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinApp
+                        for (Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinApp
                                 .getJoinPartners()) {
                             final Goal linkedGoal = joinPartner.first;
 

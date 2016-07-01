@@ -149,7 +149,7 @@ public class IfInstantiator {
         final boolean antec = ((IfFormulaInstSeq) p_ifInstantiation).inAntec();
 
         final SequentFormula<Term> cfma = p_ifInstantiation.getConstrainedFormula();
-        final PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<>(cfma, PosInTerm.<Term>getTopLevel(), antec);
+        final PosInOccurrence<Term> pio = new PosInOccurrence<>(cfma, PosInTerm.<Term>getTopLevel(), antec);
 
         final FormulaTagManager tagManager = goal.getFormulaTagManager();
 

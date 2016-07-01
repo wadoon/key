@@ -18,7 +18,6 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.rule.Rule;
 import org.key_project.util.collection.ImmutableList;
 
@@ -36,7 +35,7 @@ public interface RuleApp {
      * returns the PositionInOccurrence (representing a SequentFormula<Term> and
      * a position in the corresponding formula) of this rule application
      */
-    PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence();
+    PosInOccurrence<Term> posInOccurrence();
 
     /** applies the specified rule at the specified position
      * if all schema variables have been instantiated

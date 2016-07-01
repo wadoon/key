@@ -6,7 +6,7 @@ import org.key_project.common.core.logic.sort.Sort;
 /** 
  * A sequent formula is a wrapper around a formula that occurs 
  * as top level formula in a sequent. SequentFormula<Term> instances have
- * to be unique in the sequent as they are used by PosInOccurrence<Term, SequentFormula<Term>> 
+ * to be unique in the sequent as they are used by PosInOccurrence<Term> 
  * to determine the exact position. In earlier KeY versions this class 
  * was called ConstrainedFormula as it was equipped with an additional 
  * constraints. It would be interesting to add more value to this class 

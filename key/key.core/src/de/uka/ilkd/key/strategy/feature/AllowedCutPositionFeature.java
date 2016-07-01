@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.Quantifier;
@@ -37,16 +36,16 @@ public class AllowedCutPositionFeature extends BinaryFeature {
 
     private AllowedCutPositionFeature () {}
     
-    public boolean filter (RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public boolean filter (RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         Debug.assertFalse ( pos == null,
                             "Feature is only applicable to rules with find" );
 
         return onlyBelowRightJunctors ( pos );
     }
 
-    private boolean onlyBelowRightJunctors (PosInOccurrence<Term, SequentFormula<Term>> pos) {
+    private boolean onlyBelowRightJunctors (PosInOccurrence<Term> pos) {
         boolean negated = pos.isInAntec ();        
-        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
+        final PIOPathIterator<Term> it = pos.iterator ();
 
         while ( it.next () != -1 ) {
             final int child = it.getChild ();

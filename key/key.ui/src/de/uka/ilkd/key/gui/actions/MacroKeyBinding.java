@@ -20,7 +20,6 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
@@ -59,7 +58,7 @@ public class MacroKeyBinding extends AbstractAction {
             return;
         }
 
-        PosInOccurrence<Term, SequentFormula<Term>> posInOcc = mousePos.getPosInOccurrence();
+        PosInOccurrence<Term> posInOcc = mousePos.getPosInOccurrence();
         mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
     }
 

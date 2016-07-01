@@ -157,7 +157,7 @@ public abstract class TacletApp implements RuleApp {
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(
 	    TacletPrefix prefix, 
 	    SVInstantiations instantiations,
-	    PosInOccurrence<Term, SequentFormula<Term>> pos) {
+	    PosInOccurrence<Term> pos) {
 
 	ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix,
 		instantiations);
@@ -1044,18 +1044,18 @@ public abstract class TacletApp implements RuleApp {
 
     /**
      * returns a new PosTacletApp that is equal to this TacletApp except that
-     * the position is set to the given PosInOccurrence<Term, SequentFormula<Term>>.
+     * the position is set to the given PosInOccurrence<Term>.
      * 
      * <p><b>CAUTION:</b> If you call this method, consider to call 
-     * {@link NoPosTacletApp#matchFind(PosInOccurrence<Term, SequentFormula<Term>>, Services)} first (if
+     * {@link NoPosTacletApp#matchFind(PosInOccurrence<Term>, Services)} first (if
      * applicable) as otherwise the TacletApp may become invalid. 
      * (This happened sometimes during interactive proofs).
      * 
      * @param pos
-     *            the PosInOccurrence<Term, SequentFormula<Term>> of the newl created PosTacletApp
+     *            the PosInOccurrence<Term> of the newl created PosTacletApp
      * @return the new TacletApp
      */
-    public PosTacletApp setPosInOccurrence(PosInOccurrence<Term, SequentFormula<Term>> pos, 
+    public PosTacletApp setPosInOccurrence(PosInOccurrence<Term> pos,
 	    			           Services services) {
 	if (taclet() instanceof NoFindTaclet) {
 	    throw new IllegalStateException("Cannot add position to an taclet"
@@ -1081,9 +1081,9 @@ public abstract class TacletApp implements RuleApp {
      * returns the PositionInOccurrence (representing a SequentFormula<Term> and a
      * position in the corresponding formula)
      * 
-     * @return the PosInOccurrence<Term, SequentFormula<Term>>
+     * @return the PosInOccurrence<Term>
      */
-    public abstract PosInOccurrence<Term, SequentFormula<Term>> posInOccurrence();
+    public abstract PosInOccurrence<Term> posInOccurrence();
 
     /**
      * compares the given Object with this one and returns true iff both are
@@ -1304,11 +1304,11 @@ public abstract class TacletApp implements RuleApp {
      * @param instantiations
      *            the SVInstantiations so that the find(if) expression matches
      * @param pos
-     *            the PosInOccurrence<Term, SequentFormula<Term>> where the Taclet is applied
+     *            the PosInOccurrence<Term> where the Taclet is applied
      * @return true iff all variable conditions x not free in y are hold
      */
     public static boolean checkVarCondNotFreeIn(Taclet taclet,
-	    SVInstantiations instantiations, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+	    SVInstantiations instantiations, PosInOccurrence<Term> pos) {
 
 	Iterator<SchemaVariable> it = instantiations.svIterator();
 	while (it.hasNext()) {
@@ -1331,15 +1331,15 @@ public abstract class TacletApp implements RuleApp {
      * given term position information
      * 
      * @param pos
-     *            the PosInOccurrence<Term, SequentFormula<Term>> describing a subterm in Term
+     *            the PosInOccurrence<Term> describing a subterm in Term
      * @return a set of logic variables that are bound above the specified
      *         subterm
      */
     protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(
-	    PosInOccurrence<Term, SequentFormula<Term>> pos) {
+	    PosInOccurrence<Term> pos) {
 	ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.<QuantifiableVariable>nil();
 
-	PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator();
+	PIOPathIterator<Term> it = pos.iterator();
 	int i;
 	ImmutableArray<QuantifiableVariable> vars;
 

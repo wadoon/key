@@ -2,7 +2,6 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -51,7 +50,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
       Feature superFeature = super.setupApprovalF();
       Feature labelFeature = new Feature() {
          @Override
-         public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+         public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
             boolean hasLabel = false;
             if (pos != null && app instanceof TacletApp) {
                Term findTerm = pos.subTerm();

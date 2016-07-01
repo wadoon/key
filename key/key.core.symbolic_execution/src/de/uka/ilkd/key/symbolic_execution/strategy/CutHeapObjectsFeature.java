@@ -46,7 +46,7 @@ public class CutHeapObjectsFeature extends BinaryFeature {
     * {@inheritDoc}
     */
    @Override
-   protected boolean filter(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+   protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
       Term cutFormula = SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal);
       if (cutFormula != null) {
          if (cutFormula.op() == Junctor.NOT) {

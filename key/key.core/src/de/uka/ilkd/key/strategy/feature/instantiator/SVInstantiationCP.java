@@ -17,7 +17,6 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -67,7 +66,7 @@ public class SVInstantiationCP implements Feature {
         this.manager = manager;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         manager.passChoicePoint ( new CP (app, pos, goal), this );
         return NumberRuleAppCost.getZeroCost();
     }
@@ -95,11 +94,11 @@ public class SVInstantiationCP implements Feature {
     
     private class CP implements ChoicePoint {
         
-        private final PosInOccurrence<Term, SequentFormula<Term>> pos;
+        private final PosInOccurrence<Term> pos;
         private final RuleApp         app;
         private final Goal            goal;
     
-        private CP(RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+        private CP(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;

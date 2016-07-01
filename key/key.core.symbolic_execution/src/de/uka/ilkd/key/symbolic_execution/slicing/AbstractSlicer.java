@@ -67,7 +67,7 @@ public abstract class AbstractSlicer {
     */
    public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation, ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
       // Solve this reference
-      PosInOccurrence<Term, SequentFormula<Term>> pio = seedNode.getAppliedRuleApp().posInOccurrence();
+      PosInOccurrence<Term> pio = seedNode.getAppliedRuleApp().posInOccurrence();
       Term topLevel = pio.sequentFormula().formula();
       Term modalityTerm = TermBuilder.goBelowUpdates(topLevel);
       Services services = seedNode.getServices();
@@ -89,7 +89,7 @@ public abstract class AbstractSlicer {
       if (seedNode.getAppliedRuleApp() == null) {
          throw new IllegalStateException("No rule applied on seed Node '" + seedNode.serialNr() + "'.");
       }
-      PosInOccurrence<Term, SequentFormula<Term>> pio = seedNode.getAppliedRuleApp().posInOccurrence();
+      PosInOccurrence<Term> pio = seedNode.getAppliedRuleApp().posInOccurrence();
       Term applicationTerm = pio.subTerm();
       Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(applicationTerm);
       Term modalityTerm = pair.second;
@@ -187,12 +187,12 @@ public abstract class AbstractSlicer {
    
    /**
     * Computes the aliases specified by the updates of the current {@link Node}
-    * at the application {@link PosInOccurrence<Term, SequentFormula<Term>>} and computes the current {@code this} reference.
+    * at the application {@link PosInOccurrence<Term>} and computes the current {@code this} reference.
     * @param node The {@link Node} to analyze.
     * @return The computed {@link SequentInfo} or {@code null} if the {@link Node} is not supported.
     */
    protected SequentInfo analyzeSequent(Node node, ImmutableList<ISymbolicEquivalenceClass> sec) {
-      PosInOccurrence<Term, SequentFormula<Term>> pio = node.getAppliedRuleApp().posInOccurrence();
+      PosInOccurrence<Term> pio = node.getAppliedRuleApp().posInOccurrence();
       Term topLevel = pio.sequentFormula().formula();
       Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(topLevel);
       Term modalityTerm = pair.second;

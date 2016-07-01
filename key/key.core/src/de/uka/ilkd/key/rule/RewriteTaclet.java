@@ -181,14 +181,14 @@ public class RewriteTaclet extends FindTaclet {
      * <code>null</code>, if program modalities appear above
      * <code>p_pos</code>
      */
-    public MatchConditions checkPrefix(PosInOccurrence<Term, SequentFormula<Term>> p_pos,
+    public MatchConditions checkPrefix(PosInOccurrence<Term> p_pos,
                                        MatchConditions p_mc) {
 	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
 	// this is assumed to hold
 	assert p_pos.posInTerm () != null;
 
-	PIOPathIterator<Term, SequentFormula<Term>> it = p_pos.iterator ();
+	PIOPathIterator<Term> it = p_pos.iterator ();
 	Operator        op;
 	while ( it.next () != -1 ) {
 	    final Term t = it.getSubTerm ();
@@ -227,7 +227,7 @@ public class RewriteTaclet extends FindTaclet {
      * Compute polarity
      * @see AntecSuccPrefixChecker seems to reimplement this.
      */
-    private int polarity(final Operator op, final PIOPathIterator<Term, SequentFormula<Term>> it, int polarity) {
+    private int polarity(final Operator op, final PIOPathIterator<Term> it, int polarity) {
                                                                 // toggle polarity if find term is
                                                                 // subterm of
         if ((op == Junctor.NOT) ||                              //   not

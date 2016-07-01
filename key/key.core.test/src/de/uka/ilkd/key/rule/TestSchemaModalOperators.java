@@ -183,7 +183,7 @@ public class TestSchemaModalOperators extends TestCase {
 	         mc.getInstantiations().isInstantiated(osv));
 	 assertTrue(mc.getInstantiations().getInstantiation(osv) == Modality.DIA);
 
-	 PosInOccurrence<Term, SequentFormula<Term>> pos = new PosInOccurrence<Term, SequentFormula<Term>>(new SequentFormula<>(goal), PosInTerm.<Term>getTopLevel(), true);
+	 PosInOccurrence<Term> pos = new PosInOccurrence<Term>(new SequentFormula<>(goal), PosInTerm.<Term>getTopLevel(), true);
 	 PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
 	 Term instReplace = 
 	         t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();
@@ -197,8 +197,8 @@ public class TestSchemaModalOperators extends TestCase {
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( testmodal1 );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
-	PosInOccurrence<Term, SequentFormula<Term>> applyPos= new 
-			PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+	PosInOccurrence<Term> applyPos= new 
+			PosInOccurrence<Term>(goal.sequent().succedent().getFirst(), 
 					PosInTerm.<Term>getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
@@ -231,8 +231,8 @@ public class TestSchemaModalOperators extends TestCase {
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( testmodal2 );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
-	PosInOccurrence<Term, SequentFormula<Term>> applyPos= new 
-			PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+	PosInOccurrence<Term> applyPos= new 
+			PosInOccurrence<Term>(goal.sequent().succedent().getFirst(), 
 					PosInTerm.<Term>getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
@@ -261,8 +261,8 @@ public class TestSchemaModalOperators extends TestCase {
 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( testmodal3 );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
-	PosInOccurrence<Term, SequentFormula<Term>> applyPos= new 
-			PosInOccurrence<Term, SequentFormula<Term>>(goal.sequent().succedent().getFirst(), 
+	PosInOccurrence<Term> applyPos= new 
+			PosInOccurrence<Term>(goal.sequent().succedent().getFirst(), 
 					PosInTerm.<Term>getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -41,16 +40,16 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     private List<LocationVariable> heapContext;
 
-    ContractRuleApp(BuiltInRule rule, PosInOccurrence<Term, SequentFormula<Term>> pio) {
+    ContractRuleApp(BuiltInRule rule, PosInOccurrence<Term> pio) {
     	this(rule,	pio, null);
     }   
 
-    private ContractRuleApp(BuiltInRule rule, 
-    		PosInOccurrence<Term, SequentFormula<Term>> pio, Contract instantiation) {
+    private ContractRuleApp(BuiltInRule rule,
+                            PosInOccurrence<Term> pio, Contract instantiation) {
     	super(rule, pio, instantiation);
     }
     
-    public ContractRuleApp replacePos(PosInOccurrence<Term, SequentFormula<Term>> newPos) {
+    public ContractRuleApp replacePos(PosInOccurrence<Term> newPos) {
 	    return new ContractRuleApp(rule(), newPos, instantiation);
     }
     
@@ -104,7 +103,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     }
 
     @Override
-    public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> ifInsts) {
+    public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence<Term>> ifInsts) {
         super.setMutable(ifInsts);
         return this;
     }

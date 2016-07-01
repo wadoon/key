@@ -75,7 +75,7 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
                                                              IExecutionNode<?> executionNode, 
                                                              Node keyNode) {
       if (node instanceof KeYMethodContract || node instanceof KeYBlockContract) {
-         PosInOccurrence<Term, SequentFormula<Term>> pio = executionNode.getModalityPIO();
+         PosInOccurrence<Term> pio = executionNode.getModalityPIO();
          Term term;
          if (pio.isInAntec()) {
             int index = executionNode.getProofNode().sequent().antecedent().indexOf(pio.sequentFormula());

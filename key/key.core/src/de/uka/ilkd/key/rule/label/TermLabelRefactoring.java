@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.logic.factories.CCTermBuilder;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.rule.Rule;
 
@@ -32,7 +31,7 @@ import de.uka.ilkd.key.proof.Proof;
 /**
  * <p>
  * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<Term, SequentFormula<Term>>, Term, Rule, Goal, Term)}
+ * {@link TermLabelManager#refactorGoal(Services, PosInOccurrence<Term>, Term, Rule, Goal, Term)}
  * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
@@ -48,8 +47,8 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     * Defines if a refactoring is required and if so in which {@link RefactoringScope}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence<Term, SequentFormula<Term>>} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence<Term>} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence<Term>} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
@@ -58,7 +57,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     */
    public RefactoringScope defineRefactoringScope(TermLabelState state,
                                                   Services services,
-                                                  PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+                                                  PosInOccurrence<Term> applicationPosInOccurrence,
                                                   Term applicationTerm,
                                                   Rule rule,
                                                   Goal goal,
@@ -69,8 +68,8 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     * This method is used to refactor the labels of the given {@link Term}.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence<Term, SequentFormula<Term>>} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence<Term, SequentFormula<Term>>} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence<Term>} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence<Term>} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
@@ -80,7 +79,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     */
    public void refactoreLabels(TermLabelState state,
                                Services services,
-                               PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+                               PosInOccurrence<Term> applicationPosInOccurrence,
                                Term applicationTerm,
                                Rule rule,
                                Goal goal,

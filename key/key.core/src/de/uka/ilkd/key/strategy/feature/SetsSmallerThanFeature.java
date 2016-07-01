@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
 
@@ -50,7 +49,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
     @Override
     protected boolean filter(TacletApp app,
-                             PosInOccurrence<Term, SequentFormula<Term>> pos,
+                             PosInOccurrence<Term> pos,
                              Goal goal) {
         final Term leftTerm = left.toTerm(app, pos, goal);
         final Term rightTerm = right.toTerm(app, pos, goal);

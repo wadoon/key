@@ -39,9 +39,9 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
    private final Term additionalCondition;
    
    /**
-    * The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
+    * The {@link PosInOccurrence<Term>} of the modality of interest.
     */
-   private final PosInOccurrence<Term, SequentFormula<Term>> modalityPIO;
+   private final PosInOccurrence<Term> modalityPIO;
 
    /**
     * Constructor.
@@ -51,7 +51,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
     * @param arrayIndex The index in the parent array.
     * @param additionalCondition An optional additional condition to consider.
-    * @param modalityPIO The {@link PosInOccurrence<Term, SequentFormula<Term>>} of the modality of interest.
+    * @param modalityPIO The {@link PosInOccurrence<Term>} of the modality of interest.
     */
    public AbstractExecutionVariable(ITreeSettings settings, 
                                     Node proofNode, 
@@ -59,7 +59,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
                                     IExecutionValue parentValue, 
                                     Term arrayIndex, 
                                     Term additionalCondition,
-                                    PosInOccurrence<Term, SequentFormula<Term>> modalityPIO) {
+                                    PosInOccurrence<Term> modalityPIO) {
       super(settings, proofNode);
       this.programVariable = programVariable;
       this.parentValue = parentValue;
@@ -142,7 +142,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
+   public PosInOccurrence<Term> getModalityPIO() {
       return modalityPIO;
    }
 }

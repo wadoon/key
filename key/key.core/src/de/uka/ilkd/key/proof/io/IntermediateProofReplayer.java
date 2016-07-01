@@ -120,7 +120,7 @@ public class IntermediateProofReplayer {
     private LinkedList<Pair<Node, NodeIntermediate>> queue = new LinkedList<Pair<Node, NodeIntermediate>>();
 
     /** Maps join node IDs to previously seen join partners */
-    private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>>>();
+    private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence<Term>, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence<Term>, NodeIntermediate>>>();
 
     /** The current open goal */
     private Goal currGoal = null;
@@ -220,7 +220,7 @@ public class IntermediateProofReplayer {
     
                         if (appInterm instanceof JoinAppIntermediate) {
                             JoinAppIntermediate joinAppInterm = (JoinAppIntermediate) appInterm;
-                            HashSet<Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>> partnerNodesInfo = joinPartnerNodes
+                            HashSet<Triple<Node, PosInOccurrence<Term>, NodeIntermediate>> partnerNodesInfo = joinPartnerNodes
                                     .get(((JoinAppIntermediate) appInterm).getId());
     
                             if (partnerNodesInfo == null
@@ -255,9 +255,9 @@ public class IntermediateProofReplayer {
                                             proof.getServices(), joinAppInterm
                                                     .getDistinguishingFormula()));
     
-                                    ImmutableList<Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
+                                    ImmutableList<Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
                                             ImmutableSLList.nil();
-                                    for (Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    for (Triple<Node, PosInOccurrence<Term>, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
                                         final Services services = currGoal.getServices();
                                         
                                         Triple<Term, Term, Term> ownSEState = sequentToSETriple(
@@ -271,7 +271,7 @@ public class IntermediateProofReplayer {
                                         assert !matchVisitor.isIncompatible() : "Cannot join incompatible program counters";
                                         
                                         joinPartners = joinPartners
-                                                .append(new Triple<Goal, PosInOccurrence<Term, SequentFormula<Term>>, HashMap<ProgramVariable, ProgramVariable>>(
+                                                .append(new Triple<Goal, PosInOccurrence<Term>, HashMap<ProgramVariable, ProgramVariable>>(
                                                         proof.getGoal(partnerNodeInfo.first),
                                                         partnerNodeInfo.second,
                                                         matchVisitor.getMatches().getValue()));
@@ -293,7 +293,7 @@ public class IntermediateProofReplayer {
                                     }
     
                                     // Now add children of partner nodes
-                                    for (Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    for (Triple<Node, PosInOccurrence<Term>, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
                                         Iterator<Node> children = partnerNodeInfo.first
                                                 .childrenIterator();
                                         LinkedList<NodeIntermediate> intermChildren = partnerNodeInfo.third
@@ -321,18 +321,18 @@ public class IntermediateProofReplayer {
                         else if (appInterm instanceof JoinPartnerAppIntermediate) {
                             // Register this partner node
                             JoinPartnerAppIntermediate joinPartnerApp = (JoinPartnerAppIntermediate) appInterm;
-                            HashSet<Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>> partnerNodeInfo = joinPartnerNodes
+                            HashSet<Triple<Node, PosInOccurrence<Term>, NodeIntermediate>> partnerNodeInfo = joinPartnerNodes
                                     .get(joinPartnerApp.getJoinNodeId());
     
                             if (partnerNodeInfo == null) {
-                                partnerNodeInfo = new HashSet<Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>>();
+                                partnerNodeInfo = new HashSet<Triple<Node, PosInOccurrence<Term>, NodeIntermediate>>();
                                 joinPartnerNodes.put(
                                         joinPartnerApp.getJoinNodeId(),
                                         partnerNodeInfo);
                             }
     
                             partnerNodeInfo
-                                    .add(new Triple<Node, PosInOccurrence<Term, SequentFormula<Term>>, NodeIntermediate>(
+                                    .add(new Triple<Node, PosInOccurrence<Term>, NodeIntermediate>(
                                             currNode,
                                             PosInOccurrence.findInSequent(
                                                     currGoal.sequent(),
@@ -464,7 +464,7 @@ public class IntermediateProofReplayer {
         final Sequent seq = currGoal.sequent();
         
         TacletApp ourApp = null;
-        PosInOccurrence<Term, SequentFormula<Term>> pos = null;
+        PosInOccurrence<Term> pos = null;
 
         Taclet t = proof.getInitConfig().lookupActiveTaclet(
                 new Name(tacletName));
@@ -539,7 +539,7 @@ public class IntermediateProofReplayer {
         final PosInTerm<Term> currPosInTerm = currInterm.getPosInfo().second;
 
         Contract currContract = null;
-        ImmutableList<PosInOccurrence<Term, SequentFormula<Term>>> builtinIfInsts = null;
+        ImmutableList<PosInOccurrence<Term>> builtinIfInsts = null;
 
         // Load contracts, if applicable
         if (currInterm.getContract() != null) {
@@ -563,7 +563,7 @@ public class IntermediateProofReplayer {
                 final PosInTerm<Term> currIfInstPosInTerm = ifInstP.second;
 
                 try {
-                    final PosInOccurrence<Term, SequentFormula<Term>> ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
+                    final PosInOccurrence<Term> ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
                                     currIfInstFormula, currIfInstPosInTerm);
                     builtinIfInsts = builtinIfInsts.append(ifInst);
                 }
@@ -615,7 +615,7 @@ public class IntermediateProofReplayer {
         }
 
         IBuiltInRuleApp ourApp = null;
-        PosInOccurrence<Term, SequentFormula<Term>> pos = null;
+        PosInOccurrence<Term> pos = null;
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
@@ -708,7 +708,7 @@ public class IntermediateProofReplayer {
      * @return All matching rule applications at pos in g.
      */
     private static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(
-            String ruleName, Goal g, PosInOccurrence<Term, SequentFormula<Term>> pos) {
+            String ruleName, Goal g, PosInOccurrence<Term> pos) {
         
         ImmutableSet<IBuiltInRuleApp> result = 
                 DefaultImmutableSet.<IBuiltInRuleApp> nil();

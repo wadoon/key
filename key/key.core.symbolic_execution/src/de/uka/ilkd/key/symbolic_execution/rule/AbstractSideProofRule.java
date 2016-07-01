@@ -109,14 +109,14 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
    }
    
    /**
-    * Replaces the {@link Term} defined by the given {@link PosInOccurrence<Term, SequentFormula<Term>>}
+    * Replaces the {@link Term} defined by the given {@link PosInOccurrence<Term>}
     * with the given new {@link Term}.
-    * @param pio The {@link PosInOccurrence<Term, SequentFormula<Term>>} which defines the {@link Term} to replace.
+    * @param pio The {@link PosInOccurrence<Term>} which defines the {@link Term} to replace.
     * @param newTerm The new {@link Term}.
     * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
     */
-   protected static SequentFormula<Term> replace(PosInOccurrence<Term, SequentFormula<Term>> pio, Term newTerm, Services services) {
-      // Iterate along the PosInOccurrence<Term, SequentFormula<Term>> and collect the parents and indices
+   protected static SequentFormula<Term> replace(PosInOccurrence<Term> pio, Term newTerm, Services services) {
+      // Iterate along the PosInOccurrence<Term> and collect the parents and indices
       Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<Pair<Integer, Term>>();
       Term root = pio.sequentFormula().formula();
       final PosInTerm<Term> pit = pio.posInTerm();

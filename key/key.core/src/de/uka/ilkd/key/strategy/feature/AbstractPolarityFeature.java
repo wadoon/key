@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Equality;
 import org.key_project.common.core.logic.op.IfThenElse;
 import org.key_project.common.core.logic.op.Junctor;
@@ -39,10 +38,10 @@ public abstract class AbstractPolarityFeature {
      *         <code>Boolean.TRUE</code>,<code>Boolean.FALSE</code> or
      *         <code>null</code>
      */
-    protected Boolean polarity (PosInOccurrence<Term, SequentFormula<Term>> pos, Boolean formulaPol) {
+    protected Boolean polarity (PosInOccurrence<Term> pos, Boolean formulaPol) {
         if ( formulaPol == null ) return null;
 
-        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
+        final PIOPathIterator<Term> it = pos.iterator ();
 
         while ( it.next () != -1 ) {
             final Term t = it.getSubTerm ();

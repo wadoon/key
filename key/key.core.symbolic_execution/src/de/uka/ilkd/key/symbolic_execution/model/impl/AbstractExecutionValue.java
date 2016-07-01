@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -166,7 +165,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
     * {@inheritDoc}
     */
    @Override
-   public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
+   public PosInOccurrence<Term> getModalityPIO() {
       return getVariable().getModalityPIO();
    }
 

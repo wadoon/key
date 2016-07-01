@@ -15,7 +15,6 @@ package de.uka.ilkd.key.symbolic_execution.profile;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -79,7 +78,7 @@ public class SimplifyTermProfile extends JavaProfile {
       ImmutableList<TermLabelPolicy> symExcPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new TermLabelPolicy() {
          @Override
          public TermLabel keepLabel(TermLabelState state, Services services,
-               PosInOccurrence<Term, SequentFormula<Term>> applicationPosInOccurrence,
+               PosInOccurrence<Term> applicationPosInOccurrence,
                Term applicationTerm, Rule rule, Goal goal, Object hint,
                Term tacletTerm, Operator newTermOp,
                ImmutableArray<Term> newTermSubs,

@@ -191,7 +191,7 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     private ImmutableList<Goal> apply(final String tacletName, Goal goal,
-            PosInOccurrence<Term, SequentFormula<Term>> pio) {
+            PosInOccurrence<Term> pio) {
         TacletFilter filter = new TacletFilter() {
             @Override
             protected boolean filter(Taclet taclet) {
@@ -217,7 +217,7 @@ public class DelayedCutProcessor implements Runnable {
         SequentFormula<Term> sf = getSequentFormula(goal,
                 cut.isDecisionPredicateInAntecendet());
 
-        PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(sf, PosInTerm.<Term>getTopLevel(),
+        PosInOccurrence<Term> pio = new PosInOccurrence<Term>(sf, PosInTerm.<Term>getTopLevel(),
                 cut.isDecisionPredicateInAntecendet());
 
         ImmutableList<Goal> result = apply(getHideTacletName(cut), goal, pio);
@@ -356,7 +356,7 @@ public class DelayedCutProcessor implements Runnable {
     private RuleApp createNewRuleApp(NodeGoalPair pair, Services services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
 
-        PosInOccurrence<Term, SequentFormula<Term>> newPos = translate(pair, services);
+        PosInOccurrence<Term> newPos = translate(pair, services);
         try {
             check(pair.goal, oldRuleApp, newPos, services);
         }
@@ -381,7 +381,7 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private void check(Goal goal, final RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> newPos,
+    private void check(Goal goal, final RuleApp app, PosInOccurrence<Term> newPos,
             Services services) {
         if (newPos == null) {
             return;
@@ -432,7 +432,7 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private PosInOccurrence<Term, SequentFormula<Term>> translate(NodeGoalPair pair, JavaDLTermServices services) {
+    private PosInOccurrence<Term> translate(NodeGoalPair pair, JavaDLTermServices services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if (oldRuleApp == null || oldRuleApp.posInOccurrence() == null) {
             return null;

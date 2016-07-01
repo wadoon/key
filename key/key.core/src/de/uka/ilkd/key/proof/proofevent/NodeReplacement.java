@@ -31,7 +31,7 @@ public class NodeReplacement {
 
     Node                    node;
     Node                    parent;
-    ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> rawChanges;
+    ImmutableList<CCSequentChangeInfo<Term, Sequent>> rawChanges;
     ImmutableList<NodeChange>        changes    = null;
 
     /**
@@ -43,7 +43,7 @@ public class NodeReplacement {
      */
     public NodeReplacement ( Node                    p_node,
 			     Node                    p_parent,
-			     ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> p_changes ) {
+			     ImmutableList<CCSequentChangeInfo<Term, Sequent>> p_changes ) {
 	node       = p_node;
 	parent     = p_parent;
 	rawChanges = p_changes;
@@ -51,7 +51,7 @@ public class NodeReplacement {
 
     private void addNodeChanges () {
 	if ( !rawChanges.isEmpty() ) {
-	    CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci = rawChanges.head ();
+	    CCSequentChangeInfo<Term, Sequent> sci = rawChanges.head ();
 	    rawChanges            = rawChanges.tail ();
 
 	    addNodeChanges ();
@@ -61,9 +61,9 @@ public class NodeReplacement {
 	}
     }
 
-    private void addNodeChange ( CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> p_sci ) {
+    private void addNodeChange ( CCSequentChangeInfo<Term, Sequent> p_sci ) {
         Iterator<SequentFormula<Term>> it;
-        Iterator<FormulaChangeInfo<SequentFormula<Term>>>  it2;
+        Iterator<FormulaChangeInfo<Term>>  it2;
      
         //---
         it = p_sci.removedFormulas ( true ).iterator ();
@@ -135,7 +135,7 @@ public class NodeReplacement {
 	
 	if ( !oldSS.contains ( p_cf ) &&
 	     newSS.contains ( p_cf ) ) {
-	    PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>> ( p_cf,
+	    PosInOccurrence<Term> pio = new PosInOccurrence<Term> ( p_cf,
 							PosInTerm.<Term>getTopLevel(),
 							p_inAntec );
 	    addNodeChange ( new NodeChangeAddFormula ( pio ) );
@@ -151,7 +151,7 @@ public class NodeReplacement {
     private void addAddedRedundantChange(SequentFormula<Term> p_cf,
             boolean p_inAntec) {
 
-        final PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>>(p_cf, PosInTerm.<Term>getTopLevel(),
+        final PosInOccurrence<Term> pio = new PosInOccurrence<Term>(p_cf, PosInTerm.<Term>getTopLevel(),
                 p_inAntec);
         addNodeChange(new NodeRedundantAddChange(pio));
 
@@ -170,7 +170,7 @@ public class NodeReplacement {
 	removeNodeChanges ( p_cf, p_inAntec );
 	
 	if ( oldSS.contains ( p_cf ) ) {
-	    PosInOccurrence<Term, SequentFormula<Term>> pio = new PosInOccurrence<Term, SequentFormula<Term>> ( p_cf,
+	    PosInOccurrence<Term> pio = new PosInOccurrence<Term> ( p_cf,
 							PosInTerm.<Term>getTopLevel(),
 							p_inAntec );
 	    addNodeChange ( new NodeChangeRemoveFormula ( pio ) );
@@ -186,7 +186,7 @@ public class NodeReplacement {
 	Iterator<NodeChange> it     = changes.iterator ();
 	changes                     = ImmutableSLList.<NodeChange>nil();
 	NodeChange           oldNC;
-	PosInOccurrence<Term, SequentFormula<Term>>      oldPio;
+	PosInOccurrence<Term>      oldPio;
 
 	while ( it.hasNext () ) {
 	    oldNC = it.next ();

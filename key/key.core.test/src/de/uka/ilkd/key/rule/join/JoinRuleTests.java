@@ -174,7 +174,7 @@ public class JoinRuleTests extends TestCase {
 
         final Goal joinGoal = proof.openGoals().head();
         final Node joinNode = joinGoal.node();
-        final PosInOccurrence<Term, SequentFormula<Term>> joinPio = getPioFirstFormula(joinNode.sequent());
+        final PosInOccurrence<Term> joinPio = getPioFirstFormula(joinNode.sequent());
         final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
                 .createApp(joinPio, services);
 
@@ -197,8 +197,8 @@ public class JoinRuleTests extends TestCase {
      *            Sequent to get the PIO of the first succedent formula for.
      * @return The PIO for the first succedent formula of the given sequent.
      */
-    private PosInOccurrence<Term, SequentFormula<Term>> getPioFirstFormula(Sequent sequent) {
-        return new PosInOccurrence<Term, SequentFormula<Term>>(sequent.succedent().getFirst(),
+    private PosInOccurrence<Term> getPioFirstFormula(Sequent sequent) {
+        return new PosInOccurrence<Term>(sequent.succedent().getFirst(),
                 PosInTerm.<Term>getTopLevel(), false);
     }
 

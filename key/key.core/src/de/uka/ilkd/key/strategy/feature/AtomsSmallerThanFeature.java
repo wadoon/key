@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Function;
 
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -48,7 +47,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
         return new AtomsSmallerThanFeature ( left, right, numbers );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence<Term> pos, Goal goal) {
         setCurrentGoal ( goal );
         
         final boolean res =

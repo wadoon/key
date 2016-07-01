@@ -15,7 +15,6 @@ package de.uka.ilkd.key.logic;
 
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 /**
  * Records the changes made to a sequent. Keeps track of added and removed
@@ -25,14 +24,14 @@ import org.key_project.common.core.logic.calculus.SequentFormula;
  * situation where this can happen is that a list of formulas had to be added to
  * the sequent and the list has not been redundance free.
  */
-public class SequentChangeInfo extends CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> {
+public class SequentChangeInfo extends CCSequentChangeInfo<Term, Sequent> {
     /**
      * creates a new sequent change info whose semisequent described by position
      * pos has changed. The made changes are stored in semiCI and the resulting
      * sequent is given by result
      * 
      * @param pos
-     *            the PosInOccurrence<Term, SequentFormula<Term>> describing the semisequent where the
+     *            the PosInOccurrence<Term> describing the semisequent where the
      *            changes took place
      * @param semiCI
      *            the SemisequentChangeInfo describing the changes in detail
@@ -40,8 +39,8 @@ public class SequentChangeInfo extends CCSequentChangeInfo<Term, SequentFormula<
      * @return the sequent change information object describing the complete
      *         changes made to the sequent together with the operations result.
      */
-    public static CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> createSequentChangeInfo(
-            PosInOccurrence<Term, SequentFormula<Term>> pos,
+    public static CCSequentChangeInfo<Term, Sequent> createSequentChangeInfo(
+            PosInOccurrence<Term> pos,
             SemisequentChangeInfo semiCI,
             Sequent result, Sequent original) {
         return createSequentChangeInfo(pos.isInAntec(), semiCI, result,

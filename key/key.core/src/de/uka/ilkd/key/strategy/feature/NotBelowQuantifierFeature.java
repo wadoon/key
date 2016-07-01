@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.Quantifier;
 
@@ -35,7 +34,7 @@ public class NotBelowQuantifierFeature extends BinaryFeature {
 
     private NotBelowQuantifierFeature () {}
     
-    public boolean filter (RuleApp app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal) {
+    public boolean filter (RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
         Debug.assertFalse ( pos == null,
                             "Feature is only applicable to rules with find" );
 
@@ -45,8 +44,8 @@ public class NotBelowQuantifierFeature extends BinaryFeature {
     /**
      * @return true iff the given position is in the scope of a quantifier
      */
-    private boolean belowQuantifier (PosInOccurrence<Term, SequentFormula<Term>> pos) {
-        final PIOPathIterator<Term, SequentFormula<Term>> it = pos.iterator ();
+    private boolean belowQuantifier (PosInOccurrence<Term> pos) {
+        final PIOPathIterator<Term> it = pos.iterator ();
 
         while ( it.next () != -1 ) {
             final Term t = it.getSubTerm ();

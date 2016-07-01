@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Equality;
 import org.key_project.common.core.logic.op.UpdateApplication;
 
@@ -38,7 +37,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     private CheckApplyEqFeature () {}
     
-    protected boolean filter ( TacletApp p_app, PosInOccurrence<Term, SequentFormula<Term>> pos, Goal goal ) {
+    protected boolean filter (TacletApp p_app, PosInOccurrence<Term> pos, Goal goal ) {
         Debug.assertTrue ( pos != null, 
                 "Need to know the position of " +
                "the application of the taclet" );
@@ -54,7 +53,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
                ;
     }
 
-    private boolean isNotSelfApplication(PosInOccurrence<Term, SequentFormula<Term>> pos,
+    private boolean isNotSelfApplication(PosInOccurrence<Term> pos,
                                          IfFormulaInstantiation ifInst) {
         if ( ! ( ifInst instanceof IfFormulaInstSeq )
              || ifInst.getConstrainedFormula () != pos.sequentFormula ()

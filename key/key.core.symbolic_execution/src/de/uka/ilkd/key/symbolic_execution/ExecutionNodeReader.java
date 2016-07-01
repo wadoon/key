@@ -25,7 +25,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.collection.ImmutableList;
@@ -1309,7 +1308,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
+      public PosInOccurrence<Term> getModalityPIO() {
          return null;
       }
       
@@ -2172,7 +2171,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
+      public PosInOccurrence<Term> getModalityPIO() {
          return null;
       }
    }
@@ -2551,7 +2550,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
+      public PosInOccurrence<Term> getModalityPIO() {
          return null;
       }
    }
@@ -2675,7 +2674,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
+      public PosInOccurrence<Term> getModalityPIO() {
          return null;
       }
 
@@ -2868,7 +2867,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public PosInOccurrence<Term, SequentFormula<Term>> getModalityPIO() {
+      public PosInOccurrence<Term> getModalityPIO() {
          return null;
       }
    }

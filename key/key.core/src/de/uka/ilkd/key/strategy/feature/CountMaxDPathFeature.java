@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.Term;
@@ -34,7 +33,7 @@ public class CountMaxDPathFeature extends AbstractBetaFeature {
     private CountMaxDPathFeature () {}
     
     @Override
-    protected RuleAppCost doComputation (PosInOccurrence<Term, SequentFormula<Term>> pos, Term findTerm, ServiceCaches caches) {
+    protected RuleAppCost doComputation (PosInOccurrence<Term> pos, Term findTerm, ServiceCaches caches) {
         return NumberRuleAppCost.create ( maxDPath ( findTerm, !pos.isInAntec (), caches ) );
     }
 
