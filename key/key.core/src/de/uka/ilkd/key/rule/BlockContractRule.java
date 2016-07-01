@@ -1259,7 +1259,7 @@ public class BlockContractRule implements BuiltInRule {
             goal.setBranchLabel("Usage");
             Term uAssumptions = tb.applySequential(updates, tb.and(assumptions));
             
-            final CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> newSeq = 
+            final CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> newSeq = 
                     goal.sequent().addFormula(new SequentFormula<>(uAssumptions), true, false);
             
             newSeq.combine(

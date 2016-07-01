@@ -674,7 +674,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                             final Term uAnonInv) {
         final TermBuilder tb = services.getTermBuilder();
         bodyGoal.setBranchLabel(BODY_PRESERVES_INVARIANT_LABEL);
-        final CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> newBodyGoalSeq = 
+        final CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> newBodyGoalSeq = 
                 bodyGoal.sequent().addFormula(new SequentFormula<>(wellFormedAnon), true, false);         
 
         newBodyGoalSeq.combine(newBodyGoalSeq.sequent().addFormula(new SequentFormula<>(uAnonInv), 
@@ -702,7 +702,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                       final Term guardFalseTerm,
                                       final Term[] uAnon, final Term uAnonInv) {
         useGoal.setBranchLabel("Use Case");
-        final CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> newUseGoal =       
+        final CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> newUseGoal =       
                 useGoal.sequent().addFormula(new SequentFormula<>(wellFormedAnon), true, false);        
         newUseGoal.combine(newUseGoal.sequent().addFormula(new SequentFormula<>(uAnonInv), true, false));
         useGoal.applySequentChangeInfo(newUseGoal);

@@ -27,18 +27,18 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  * @author Dominic Scheurer
  */
-public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>, SemiSeq extends CCSemisequent<SeqFor, SemiSeq>, Seq extends CCSequent<T, SeqFor, SemiSeq, Seq>> {
+public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends SequentFormula<T>, Seq extends CCSequent<T, SeqFor, ?, Seq>> {
 
     /**
      * change information related to the antecedent, this means the there added
      * and removed formulas
      */
-    protected CCSemisequentChangeInfo<SeqFor, SemiSeq> antecedent;
+    protected CCSemisequentChangeInfo<SeqFor, ? extends CCSemisequent<SeqFor, ?>> antecedent;
     /**
      * change information related to the antecedent, this means the there added
      * and removed formulas
      */
-    protected CCSemisequentChangeInfo<SeqFor, SemiSeq> succedent;
+    protected CCSemisequentChangeInfo<SeqFor, ? extends CCSemisequent<SeqFor, ?>> succedent;
     
     /**
      * the sequent before the changes
@@ -66,8 +66,8 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      *            the Sequent that has been transformed
      */
     protected CCSequentChangeInfo(
-            CCSemisequentChangeInfo<SeqFor, SemiSeq> antecedent,
-            CCSemisequentChangeInfo<SeqFor, SemiSeq> succedent,
+            CCSemisequentChangeInfo<SeqFor, ? extends CCSemisequent<SeqFor, ?>> antecedent,
+            CCSemisequentChangeInfo<SeqFor, ? extends CCSemisequent<SeqFor, ?>> succedent,
             Seq resultingSequent,
             Seq originalSequent) {
         this.antecedent = antecedent;
@@ -96,11 +96,6 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
     public boolean hasChanged(boolean antec) {
         return antec ? (antecedent != null && antecedent.hasChanged())
                 : (succedent != null && succedent.hasChanged());
-    }
-
-    public CCSemisequentChangeInfo<SeqFor, SemiSeq> getSemisequentChangeInfo(
-            boolean antec) {
-        return antec ? antecedent : succedent;
     }
 
     /**
@@ -230,8 +225,8 @@ public class CCSequentChangeInfo<T extends CCTerm<?, ?, ?, T>, SeqFor extends Se
      * not release it. This means when invoking the method it must be ensured
      * that {@code succ} is never used afterwards.
      */
-    public void combine(CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> succ) {
-        final CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> antec = this;
+    public void combine(CCSequentChangeInfo<T, SeqFor, Seq> succ) {
+        final CCSequentChangeInfo<T, SeqFor, Seq> antec = this;
         if (antec == succ) {
             return;
         }

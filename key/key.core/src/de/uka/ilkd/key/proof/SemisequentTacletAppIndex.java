@@ -266,7 +266,7 @@ public class SemisequentTacletAppIndex {
      * called if a formula has been replaced
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public SemisequentTacletAppIndex sequentChanged ( CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> sci,
+    public SemisequentTacletAppIndex sequentChanged ( CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> sci,
                                                       Services          services,
                                                       TacletIndex       tacletIndex,
                                                       NewRuleListener   listener) {

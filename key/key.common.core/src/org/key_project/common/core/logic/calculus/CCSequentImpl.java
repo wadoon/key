@@ -45,7 +45,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      * @param genericSequent
      * @return
      */
-    protected abstract CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> createSequentChangeInfo(
+    protected abstract CCSequentChangeInfo<T, SeqFor, Seq> createSequentChangeInfo(
             boolean inAntec,
             CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI,
             Seq composeSequent,
@@ -62,7 +62,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      */
     @Override
     @SuppressWarnings("unchecked")
-    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(SeqFor cf, boolean antec, boolean first) {
+    public CCSequentChangeInfo<T, SeqFor, Seq> addFormula(SeqFor cf, boolean antec, boolean first) {
 
         final CCSemisequent<SeqFor, SemiSeq> seq =
                 antec ? antecedent : succedent;
@@ -79,7 +79,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      */
     @Override
     @SuppressWarnings("unchecked")
-    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(SeqFor cf, PosInOccurrence<T, SeqFor> p) {
+    public CCSequentChangeInfo<T, SeqFor, Seq> addFormula(SeqFor cf, PosInOccurrence<T, SeqFor> p) {
         final CCSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
         final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
@@ -94,7 +94,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      */
     @Override
     @SuppressWarnings("unchecked")
-    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(
+    public CCSequentChangeInfo<T, SeqFor, Seq> addFormula(
             Iterable<SeqFor> insertions,
             boolean antec, boolean first) {
 
@@ -114,7 +114,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      */
     @Override
     @SuppressWarnings("unchecked")
-    public  CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> addFormula(
+    public  CCSequentChangeInfo<T, SeqFor, Seq> addFormula(
             Iterable<SeqFor> insertions,
             PosInOccurrence<?, SeqFor> p) {
         final CCSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
@@ -139,7 +139,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      */
     @Override
     @SuppressWarnings("unchecked")
-    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> changeFormula(
+    public CCSequentChangeInfo<T, SeqFor, Seq> changeFormula(
             SeqFor newCF,
             PosInOccurrence<?, SeqFor> p) {
         final CCSemisequentChangeInfo<SeqFor, SemiSeq> semiCI =
@@ -153,7 +153,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      * @see org.key_project.common.core.logic.calculus.CCSequent#changeFormula(org.key_project.util.collection.ImmutableList, org.key_project.common.core.logic.calculus.PosInOccurrence)
      */
     @Override
-    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> changeFormula(
+    public CCSequentChangeInfo<T, SeqFor, Seq> changeFormula(
             Iterable<SeqFor> replacements,
             PosInOccurrence<?, SeqFor> p) {
 
@@ -161,7 +161,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
                 getSemisequent(p).replace(p, replacements);
 
         @SuppressWarnings("unchecked")
-        final CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> sci =
+        final CCSequentChangeInfo<T, SeqFor, Seq> sci =
                 createSequentChangeInfo(p.isInAntec(),
                         semiCI,
                         composeSequent(p.isInAntec(), semiCI.semisequent()),
@@ -286,7 +286,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
      * @see org.key_project.common.core.logic.calculus.CCSequent#removeFormula(org.key_project.common.core.logic.calculus.PosInOccurrence)
      */
     @Override
-    public CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> removeFormula(
+    public CCSequentChangeInfo<T, SeqFor, Seq> removeFormula(
             PosInOccurrence<?, SeqFor> p) {
         final CCSemisequent<SeqFor, SemiSeq> seq = getSemisequent(p);
 
@@ -294,7 +294,7 @@ public abstract class CCSequentImpl<T extends CCTerm<?, ?, ?, T>, SeqFor extends
                 seq.remove(seq.indexOf(p.sequentFormula()));
 
         @SuppressWarnings("unchecked")
-        final CCSequentChangeInfo<T, SeqFor, SemiSeq, Seq> sci =
+        final CCSequentChangeInfo<T, SeqFor, Seq> sci =
                 createSequentChangeInfo(p.isInAntec(), semiCI,
                         composeSequent(p.isInAntec(), semiCI.semisequent()),
                         (Seq) this);

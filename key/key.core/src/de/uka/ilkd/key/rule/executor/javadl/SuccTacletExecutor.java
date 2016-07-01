@@ -5,7 +5,8 @@ import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -27,7 +28,7 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacle
      */
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-            CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
+            CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
             MatchConditions matchCond,
             Goal goal,
             RuleApp ruleApp,
@@ -50,7 +51,7 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacle
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState, 
-            CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent,
+            CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent,
             PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
             MatchConditions matchCond,
             Goal goal,

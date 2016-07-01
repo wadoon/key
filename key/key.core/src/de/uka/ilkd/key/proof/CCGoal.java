@@ -11,10 +11,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>, 
     T extends CCTerm<?, ?, ? extends CCTermVisitor<T>, T>,
-    SemiSeq extends CCSemisequent<SequentFormula<T>, SemiSeq>,
-    Seq extends CCSequent<T, SequentFormula<T>, SemiSeq, Seq>, 
+    Seq extends CCSequent<T, SequentFormula<T>, ?, Seq>, 
     RA extends RuleApp,
-    Self extends CCGoal<ProgVar, T, SemiSeq, Seq, RA, Self>> {
+    Self extends CCGoal<ProgVar, T, Seq, RA, Self>> {
 
     /** returns set of rules applied at this branch
      * @return IList<RuleApp> applied rule applications
@@ -78,7 +77,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * @param sci SequentChangeInfo containing the sequent to be set and
      * desribing the applied changes to the sequent of the parent node
      */
-    void applySequentChangeInfo(CCSequentChangeInfo<T, SequentFormula<T>, SemiSeq, Seq> sci);
+    void applySequentChangeInfo(CCSequentChangeInfo<T, SequentFormula<T>, Seq> sci);
     
     /**
      * Adds a partial instantiated {@link RuleApp} to the available rules 

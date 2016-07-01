@@ -29,7 +29,7 @@ extends FindTacletExecutor<TacletKind> {
      * {@inheritDoc}
      */
     @Override
-    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
+    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
             MatchConditions matchCond,
             Goal goal, 
             RuleApp ruleApp,
@@ -62,7 +62,7 @@ extends FindTacletExecutor<TacletKind> {
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState, 
-            CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent,
+            CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent,
             PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
             MatchConditions matchCond,
             Goal goal,

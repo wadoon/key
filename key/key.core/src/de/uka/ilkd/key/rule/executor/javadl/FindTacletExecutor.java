@@ -38,7 +38,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-            CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
+            CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent, PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
             MatchConditions matchCond,
             Goal goal,
             RuleApp ruleApp,
@@ -56,7 +56,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Java model information
      */
-    protected abstract void applyAdd(Sequent add, TermLabelState termLabelState, CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent> currentSequent,
+    protected abstract void applyAdd(Sequent add, TermLabelState termLabelState, CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent> currentSequent,
             PosInOccurrence<Term, SequentFormula<Term>> posOfFind,
             MatchConditions matchCond,
             Goal goal,
@@ -81,7 +81,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
         TacletApp                    tacletApp        = (TacletApp) ruleApp;
         MatchConditions              mc               = tacletApp.matchConditions ();
 
-        ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>>                   newSequentsForGoals         =
+        ImmutableList<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>>                   newSequentsForGoals         =
                 checkIfGoals ( goal,
                         tacletApp.ifFormulaInstantiations (),
                         mc,
@@ -91,12 +91,12 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
 
         Iterator<TacletGoalTemplate> it               = taclet.goalTemplates().iterator(); 
         Iterator<Goal>               goalIt           = newGoals.iterator();
-        Iterator<CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>> newSequentsIt = newSequentsForGoals.iterator();
+        Iterator<CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>> newSequentsIt = newSequentsForGoals.iterator();
 
         while (it.hasNext()) {
             TacletGoalTemplate gt          = it    .next();
             Goal               currentGoal = goalIt.next();
-            CCSequentChangeInfo<Term, SequentFormula<Term>, Semisequent, Sequent>  currentSequent = newSequentsIt.next();
+            CCSequentChangeInfo<Term, SequentFormula<Term>, Sequent>  currentSequent = newSequentsIt.next();
 
             // add first because we want to use pos information that
             // is lost applying replacewith
