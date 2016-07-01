@@ -27,9 +27,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>key.common.core.src</name>
+			<name>key.src</name>
 			<type>2</type>
-			<locationURI>PARENT-4-PROJECT_LOC/key/key.common.core/src</locationURI>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.common.core/src</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

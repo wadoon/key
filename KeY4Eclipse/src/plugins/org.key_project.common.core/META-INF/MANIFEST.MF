@@ -1,19 +1,16 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Core
-Bundle-SymbolicName: org.key_project.common.core;singleton:=true
+Bundle-Name: KeY Common Core
+Bundle-SymbolicName: org.key_project.common.core
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.common.core.Activator
 Require-Bundle: org.eclipse.core.runtime,
- org.key_project.util;bundle-version="1.0.0";visibility:=reexport
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+ org.eclipse.ui,
+ org.key_project.util;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Import-Package: org.eclipse.jface.resource,
- org.eclipse.ui.plugin
-Export-Package: 
- org.key_project.common.core,
- org.key_project.common.core.theories,
- org.key_project.common.core.logic,
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.common.core.logic,
  org.key_project.common.core.logic.calculus,
  org.key_project.common.core.logic.factories,
  org.key_project.common.core.logic.label,
@@ -25,4 +22,5 @@ Export-Package:
  org.key_project.common.core.proof,
  org.key_project.common.core.rule,
  org.key_project.common.core.services,
+ org.key_project.common.core.theories,
  org.key_project.common.core.util

@@ -5,8 +5,8 @@
 	<!-- Before PDE compilation -->
 	<target name="pre.@dot" description="Called before source files are compiled.">
 		<!-- Create temporary local folder 'key.src' for compilation -->
-		<mkdir dir="${basedir}/key.common.core.src"/>
-		<copy todir="${basedir}/key.common.core.src" failonerror="true" overwrite="true">
+		<mkdir dir="${basedir}/key.src"/>
+		<copy todir="${basedir}/key.src" failonerror="true" overwrite="true">
 			<fileset dir="${basedir}/../../../../key/key.common.core/src">
 				<include name="*/"/>
 			</fileset>
@@ -17,7 +17,7 @@
 	<target name="post.@dot" description="Called at the end of the compilation target after the results are copied to the build result folder.">
 		<!-- Delete temporary created local folder 'key.src' after compilation -->
 		<delete includeemptydirs="true">
-			<fileset dir="${basedir}/key.common.core.src"/>
+			<fileset dir="${basedir}/key.src"/>
 		</delete>
 	</target>
 
