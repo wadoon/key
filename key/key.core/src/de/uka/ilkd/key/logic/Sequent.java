@@ -13,14 +13,9 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Iterator;
-
 import org.key_project.common.core.logic.calculus.AbstractSequentFactory;
 import org.key_project.common.core.logic.calculus.CCSemisequentChangeInfo;
 import org.key_project.common.core.logic.calculus.CCSequentImpl;
-import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.logic.op.QuantifiableVariable;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class represents a sequent. A sequent consists of an antecedent and
@@ -31,10 +26,10 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Sequent#createSuccSequent} or by inserting formulas directly into
  * {@link Sequent#EMPTY_SEQUENT}.
  */
-public class Sequent
+public final class Sequent
         extends CCSequentImpl<Term, Semisequent, Sequent> {
 
-    public static final Sequent EMPTY_SEQUENT = new NILSequent();
+    public static final Sequent EMPTY_SEQUENT = new Sequent(Semisequent.nil(), Semisequent.nil());
 
     /**
      * creates a new Sequent with empty succedent
@@ -88,32 +83,6 @@ public class Sequent
         super(antecedent, succedent);
     }
 
-    static class NILSequent extends Sequent {
-
-        /**
-         * TODO: Document.
-         *
-         * @param antecedent
-         * @param succedent
-         */
-        NILSequent() {
-            super(Semisequent.nil(), Semisequent.nil());
-        }
-
-        public boolean isEmpty() {
-            return true;
-        }
-
-        public Iterator<SequentFormula<Term>> iterator() {
-            return ImmutableSLList.<SequentFormula<Term>> nil()
-                    .iterator();
-        }
-
-        public boolean varIsBound(QuantifiableVariable v) {
-            return false;
-        }
-
-    }
 
     /*
      * (non-Javadoc)

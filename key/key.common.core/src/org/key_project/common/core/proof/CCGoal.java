@@ -4,7 +4,6 @@ import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.calculus.CCSequent;
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
 import org.key_project.common.core.logic.op.CCProgramVariable;
-import org.key_project.common.core.logic.visitors.CCTermVisitor;
 import org.key_project.common.core.rule.RuleApp;
 import org.key_project.common.core.services.CCServices;
 import org.key_project.util.collection.ImmutableList;
@@ -25,7 +24,7 @@ import org.key_project.util.collection.ImmutableList;
  *  methods of Self.
  */
 public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>, 
-    T extends CCTerm<?, ?, ? extends CCTermVisitor<T>, T>,
+    T extends CCTerm<?, ?, ?, T>,
     Seq extends CCSequent<T, ?, Seq>,
     RA extends RuleApp<T, Self>,
     Self extends CCGoal<ProgVar, T, Seq, RA, Self>> {

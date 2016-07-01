@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableList;
  * using method removeRedundancy. In future versions it can be enhanced to do
  * other simplifications. A sequent and so a semisequent has to be immutable.
  */
-public class Semisequent extends
+public final class Semisequent extends
         CCSemisequentImpl<Term, Semisequent> {
 
     private static final Semisequent EMPTY = new Semisequent();
