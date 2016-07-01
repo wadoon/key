@@ -53,7 +53,7 @@ public class TestGenMacro extends StrategyProofMacro {
 		}
 
 		@Override
-		public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pio,
+		public RuleAppCost computeCost(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio,
 		        Goal goal) {
 			if (TestGenStrategy.isUnwindRule(app.rule())) {
 				return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);
@@ -78,7 +78,7 @@ public class TestGenMacro extends StrategyProofMacro {
 		}
 
 		@Override
-		public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
+		public boolean isApprovedApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal) {
 			if (!TestGenMacro.hasModality(goal.sequent())) {
 				return false;
 			}

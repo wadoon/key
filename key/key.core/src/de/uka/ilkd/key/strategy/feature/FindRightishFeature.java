@@ -44,7 +44,7 @@ public class FindRightishFeature implements Feature {
         add = numbers.getAdd();
     }
     
-    public RuleAppCost computeCost (RuleApp app, PosInOccurrence<Term> pos, Goal goal ) {
+    public RuleAppCost computeCost (RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal ) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();

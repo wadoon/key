@@ -44,7 +44,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     
     private final long age;
 
-    protected TacletAppContainer ( RuleApp     p_app,
+    protected TacletAppContainer ( RuleApp<Term, Goal> p_app,
 				   RuleAppCost p_cost,
                                    long        p_age ) {
 	super ( p_app, p_cost );
@@ -146,7 +146,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         final RuleAppCostCollector collector =
             new RuleAppCostCollector () {
                 @Override
-                public void collect(RuleApp newApp, RuleAppCost cost) {
+                public void collect(RuleApp<Term, Goal> newApp, RuleAppCost cost) {
                     if (cost instanceof TopRuleAppCost) return;
                     resA[0] = addContainer ( (NoPosTacletApp)newApp,
                                              resA[0],

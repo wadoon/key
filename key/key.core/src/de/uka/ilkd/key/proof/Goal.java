@@ -68,7 +68,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosT
     private RuleAppIndex ruleAppIndex;
 
     /** list of all applied rule applications at this branch */
-    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.<RuleApp>nil();
+    private ImmutableList<RuleApp<Term, Goal>> appliedRuleApps = ImmutableSLList.<RuleApp<Term, Goal>>nil();
 
     /** this object manages the tags for all formulas of the sequent */
     private FormulaTagManager tagManager;
@@ -97,7 +97,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosT
     /** creates a new goal referencing the given node */
     private Goal(Node node,
                  RuleAppIndex ruleAppIndex,
-                 ImmutableList<RuleApp> appliedRuleApps,
+                 ImmutableList<RuleApp<Term, Goal>> appliedRuleApps,
                  FormulaTagManager tagManager,
                  AutomatedRuleApplicationManager ruleAppManager,
                  Properties strategyInfos) {
@@ -113,7 +113,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosT
 
     private Goal(Node node,
                  RuleAppIndex ruleAppIndex,
-                 ImmutableList<RuleApp> appliedRuleApps,
+                 ImmutableList<RuleApp<Term, Goal>> appliedRuleApps,
                  AutomatedRuleApplicationManager ruleAppManager,
                  Properties strategyInfos) {
       this.node            = node;
@@ -132,7 +132,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosT
     public Goal (Node node, RuleAppIndex ruleAppIndex) {
         this ( node,
                ruleAppIndex,
-               ImmutableSLList.<RuleApp>nil(),
+               ImmutableSLList.<RuleApp<Term, Goal>>nil(),
                null,
                new QueueRuleApplicationManager (),
                new MapProperties());
@@ -275,7 +275,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosT
      * @see de.uka.ilkd.key.proof.CCGoal#appliedRuleApps()
      */
     @Override
-    public ImmutableList<RuleApp> appliedRuleApps() {
+    public ImmutableList<RuleApp<Term, Goal>> appliedRuleApps() {
 	return appliedRuleApps;
     }
 
@@ -479,7 +479,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosT
      * @see de.uka.ilkd.key.proof.CCGoal#addAppliedRuleApp(de.uka.ilkd.key.rule.RuleApp)
      */
     @Override
-    public void addAppliedRuleApp(RuleApp app) {
+    public void addAppliedRuleApp(RuleApp<Term, Goal> app) {
 	// Last app first makes inserting and searching faster
 	appliedRuleApps = appliedRuleApps.prepend(app);
 	node.setAppliedRuleApp(app);
@@ -560,7 +560,7 @@ public final class Goal implements CCGoal<ProgramVariable, Term, Sequent, NoPosT
      * @see de.uka.ilkd.key.proof.CCGoal#apply(de.uka.ilkd.key.rule.RuleApp)
      */
     @Override
-    public ImmutableList<Goal> apply(final RuleApp ruleApp ) {
+    public ImmutableList<Goal> apply(final RuleApp<Term, Goal> ruleApp ) {
 
         final Proof proof = proof();
 

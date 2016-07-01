@@ -15,6 +15,8 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
@@ -33,6 +35,6 @@ public interface ChoicePoint {
      *            modified by earlier <code>ChoicePoint</code>s
      * @return an iterator over the branches of the <code>ChoicePoint</code>
      */
-    Iterator<CPBranch> getBranches(RuleApp oldApp);
+    Iterator<CPBranch> getBranches(RuleApp<Term, Goal> oldApp);
 
 }

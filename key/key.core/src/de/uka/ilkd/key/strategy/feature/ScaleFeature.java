@@ -181,7 +181,7 @@ public abstract class ScaleFeature implements Feature {
             offset = p_offset;
         }
 
-        public RuleAppCost computeCost (RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+        public RuleAppCost computeCost (RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
             final RuleAppCost cost = getFeature ().computeCost ( app, pos, goal );
             long costVal;
             

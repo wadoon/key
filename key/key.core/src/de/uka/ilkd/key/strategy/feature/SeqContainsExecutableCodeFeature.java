@@ -42,7 +42,7 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
     public final static Feature PROGRAMS_OR_QUERIES =
         new SeqContainsExecutableCodeFeature ( true );
 
-    protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    protected boolean filter(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         return containsExec ( goal.sequent ().succedent ().iterator (), goal.getServices() )
             || containsExec ( goal.sequent ().antecedent().iterator (), goal.getServices() );
     }

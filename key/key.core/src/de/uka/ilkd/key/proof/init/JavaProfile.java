@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.label.ParameterlessTermLabel;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.rule.Rule;
@@ -28,7 +30,6 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.join.JoinRule;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -215,7 +216,7 @@ public class JavaProfile extends AbstractProfile {
 	 * {@inheritDoc}
 	 */
    @Override
-   public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
+   public boolean isSpecificationInvolvedInRuleApp(RuleApp<Term, Goal> app) {
       return app instanceof LoopInvariantBuiltInRuleApp ||
              app instanceof AbstractContractRuleApp ||
              app instanceof BlockContractBuiltInRuleApp;

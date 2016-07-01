@@ -112,7 +112,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence<Term> pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp<Term, Goal> ruleApp, PosInOccurrence<Term> pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if(name.startsWith(WD_PREFIX)) {
                 return NumberRuleAppCost.getZeroCost();
@@ -122,12 +122,12 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal) {
             return true;
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal,
+        public void instantiateApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal,
                                    RuleAppCostCollector collector) {
         }
 

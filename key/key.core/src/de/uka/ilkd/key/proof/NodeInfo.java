@@ -92,7 +92,7 @@ public class NodeInfo {
     private void determineFirstAndActiveStatement() {
         if (determinedFstAndActiveStatement)
             return;
-        final RuleApp ruleApp = node.getAppliedRuleApp();
+        final RuleApp<Term, Goal> ruleApp = node.getAppliedRuleApp();
         if (ruleApp instanceof PosTacletApp) {
            firstStatement = computeFirstStatement(ruleApp);
            firstStatementString = null;
@@ -112,7 +112,7 @@ public class NodeInfo {
      * @param ruleApp The given {@link RuleApp}.
      * @return The active statement or {@code null} if no one is provided.
      */
-    public static SourceElement computeActiveStatement(RuleApp ruleApp) {
+    public static SourceElement computeActiveStatement(RuleApp<Term, Goal> ruleApp) {
        SourceElement firstStatement = computeFirstStatement(ruleApp);
        return computeActiveStatement(firstStatement);
     }
@@ -128,7 +128,7 @@ public class NodeInfo {
      * @param ruleApp The given {@link RuleApp}.
      * @return The first statement or {@code null} if no one is provided.
      */
-    public static SourceElement computeFirstStatement(RuleApp ruleApp) {
+    public static SourceElement computeFirstStatement(RuleApp<Term, Goal> ruleApp) {
        SourceElement firstStatement = null;
        // TODO: unify with MiscTools getActiveStatement
        if (ruleApp instanceof PosTacletApp) {
@@ -195,7 +195,7 @@ public class NodeInfo {
      * @param node The {@link Node} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
-    public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
+    public static boolean isSymbolicExecutionRuleApplied(RuleApp<Term, Goal> app) {
        return app instanceof BlockContractBuiltInRuleApp ||
               app instanceof AbstractContractRuleApp ||
               app instanceof LoopInvariantBuiltInRuleApp ||
@@ -282,7 +282,7 @@ public class NodeInfo {
         if (s == null)
             return;
         if(node.parent() == null){ return;}
-        RuleApp ruleApp = node.parent().getAppliedRuleApp();
+        RuleApp<Term, Goal> ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof TacletApp) {
             TacletApp tacletApp = (TacletApp) ruleApp; // XXX
 

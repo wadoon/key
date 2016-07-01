@@ -81,7 +81,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp,
+        public RuleAppCost computeCost(RuleApp<Term, Goal> ruleApp,
                                        PosInOccurrence<Term> pio,
                                        Goal goal) {
             String name = ruleApp.rule().name().toString();
@@ -98,7 +98,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public boolean isApprovedApp(RuleApp app,
+        public boolean isApprovedApp(RuleApp<Term, Goal> app,
                                      PosInOccurrence<Term> pio,
                                      Goal goal) {
             String name = app.rule().name().toString();
@@ -128,14 +128,14 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         private String getAppRuleName(Node parent) {
-            RuleApp parentRuleApp = parent.getAppliedRuleApp();
+            RuleApp<Term, Goal> parentRuleApp = parent.getAppliedRuleApp();
             String parentRuleName = parentRuleApp.rule().name().toString();
             return parentRuleName;
         }
 
 
         @Override
-        protected RuleAppCost instantiateApp(RuleApp app,
+        protected RuleAppCost instantiateApp(RuleApp<Term, Goal> app,
                                              PosInOccurrence<Term> pio,
                                              Goal goal) {
             return computeCost(app, pio, goal);

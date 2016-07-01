@@ -65,7 +65,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return new MultiplesModEquationsGenerator ( source, target );
     }
     
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
         
         final Monomial sourceM =

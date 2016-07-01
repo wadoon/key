@@ -43,7 +43,7 @@ public class SVInstantiationProjection implements ProjectionToTerm {
     }
     
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public Term toTerm(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         if ( ! ( app instanceof TacletApp ) )
             Debug.fail ( "Projection is only applicable to taclet apps," +
                          " but got " + app );

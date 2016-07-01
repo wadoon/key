@@ -31,11 +31,11 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppFeature ();
 
-    protected boolean containsRuleApp (ImmutableList<RuleApp> list,
+    protected boolean containsRuleApp (ImmutableList<RuleApp<Term, Goal>> list,
                                        TacletApp rapp,
                                        PosInOccurrence<Term> pio) {
 
-        for (RuleApp aList : list) {
+        for (RuleApp<Term, Goal> aList : list) {
             if (sameApplication(aList, rapp, pio)) return true;
         }
 

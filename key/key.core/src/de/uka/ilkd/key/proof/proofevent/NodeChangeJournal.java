@@ -62,7 +62,7 @@ public class NodeChangeJournal implements GoalListener {
      * Create an RuleAppInfo object containing all changes stored
      * within this object; remove all listeners
      */
-    public RuleAppInfo getRuleAppInfo ( RuleApp p_ruleApp ) {
+    public RuleAppInfo getRuleAppInfo ( RuleApp<Term, Goal> p_ruleApp ) {
 	ImmutableList<NodeReplacement>                     nrs =
 	    ImmutableSLList.<NodeReplacement>nil();
 

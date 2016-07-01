@@ -38,14 +38,14 @@ public class DelayedCut {
     private final ImmutableList<Node> subtrees;
     private final int cutMode;
     private final Term decisionPredicate;
-    private final RuleApp firstAppliedRuleApp;
+    private final RuleApp<Term, Goal> firstAppliedRuleApp;
     private NoPosTacletApp hideApp = null;
     private ImmutableList<NodeGoalPair> goalsAfterUncovering = null;
     private Goal remainingGoal = null;
 
     public DelayedCut(Proof proof, Node node, Term formula,
             ImmutableList<Node> subtrees, int sideOfDecisionPredicate,
-            RuleApp firstAppliedRuleApp) {
+            RuleApp<Term, Goal> firstAppliedRuleApp) {
         super();
         assert sideOfDecisionPredicate == DECISION_PREDICATE_IN_ANTECEDENT
                 || sideOfDecisionPredicate == DECISION_PREDICATE_IN_SUCCEDENT;
@@ -62,7 +62,7 @@ public class DelayedCut {
         return decisionPredicate;
     }
 
-    public RuleApp getFirstAppliedRuleApp() {
+    public RuleApp<Term, Goal> getFirstAppliedRuleApp() {
         return firstAppliedRuleApp;
     }
 

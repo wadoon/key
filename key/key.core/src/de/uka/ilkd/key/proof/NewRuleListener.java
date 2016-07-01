@@ -27,13 +27,13 @@ public interface NewRuleListener {
     /**
      * Called when a new RuleApp is added
      */
-    void ruleAdded( RuleApp         rule,
+    void ruleAdded( RuleApp<Term, Goal> rule,
                     PosInOccurrence<Term> pos );
     
     /**
      * Called when a collection of new RuleApps is added
      */
-    void rulesAdded( ImmutableList<? extends RuleApp>  rule,
+    void rulesAdded( ImmutableList<? extends RuleApp<Term, Goal>>  rule,
                      PosInOccurrence<Term> pos );
 
 }

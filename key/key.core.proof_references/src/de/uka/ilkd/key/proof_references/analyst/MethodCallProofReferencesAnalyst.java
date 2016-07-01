@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
 
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.op.SchemaVariable;
@@ -98,7 +99,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
     * @return The found {@link ExecutionContext} or {@code null} if not available.
     */
    protected ExecutionContext extractContext(Node node, Services services) {
-      RuleApp app = node.getAppliedRuleApp();
+      RuleApp<Term, Goal> app = node.getAppliedRuleApp();
       PosInOccurrence<Term> pio = app.posInOccurrence();
       JavaBlock jb = TermBuilder.goBelowUpdates(pio.subTerm()).modalContent();
       return JavaTools.getInnermostExecutionContext(jb, services);

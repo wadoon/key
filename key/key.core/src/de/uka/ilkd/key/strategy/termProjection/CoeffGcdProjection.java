@@ -45,7 +45,7 @@ public class CoeffGcdProjection implements ProjectionToTerm {
         return new CoeffGcdProjection ( monomialLeft, polynomialRight );
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public Term toTerm(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
 
         final Term monoT = monomialLeft.toTerm ( app, pos, goal );

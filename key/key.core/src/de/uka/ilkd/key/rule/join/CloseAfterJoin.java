@@ -93,7 +93,7 @@ public class CloseAfterJoin implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final RuleApp ruleApp) throws RuleAbortException {
+    public ImmutableList<Goal> apply(final Goal goal, final RuleApp<Term, Goal> ruleApp) throws RuleAbortException {
 
         assert ruleApp instanceof CloseAfterJoinRuleBuiltInRuleApp : "Rule app for CloseAfterJoin has to be an instance of CloseAfterJoinRuleBuiltInRuleApp";
 

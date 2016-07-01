@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.Term;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
@@ -99,7 +100,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                return null;
             }
             Node node = next.node();
-            RuleApp ruleApp = next.getRuleAppManager().peekNext();
+            RuleApp<Term, Goal> ruleApp = next.getRuleAppManager().peekNext();
             if (!SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
                // Internal proof node, goal from super class can be used
                goal = next;

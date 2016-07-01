@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.program.Position;
 import org.key_project.util.java.ObjectUtil;
 
@@ -91,7 +92,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
    }
    
    @Override
-   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       return !proof.isDisposed() && 
              ((isEntry && isMethodCallNode(node, ruleApp)) || (isExit && isMethodReturnNode(node, ruleApp))) && 
              (!isConditionEnabled() || conditionMet(ruleApp, proof, node)) && 
@@ -104,7 +105,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     * @param ruleApp the applied rule app
     * @return true if the node represents a method call
     */
-   private boolean isMethodCallNode(Node node, RuleApp ruleApp){
+   private boolean isMethodCallNode(Node node, RuleApp<Term, Goal> ruleApp){
       SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
       IProgramMethod currentPm=null;
       if (statement instanceof MethodBodyStatement) {
@@ -131,7 +132,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     * @param ruleApp the applied rule app
     * @return true if the node represents a method return
     */
-   private boolean isMethodReturnNode(Node node, RuleApp ruleApp){
+   private boolean isMethodReturnNode(Node node, RuleApp<Term, Goal> ruleApp){
       if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp)) && 
           isCorrectMethodReturn(node, ruleApp)) {
          return true;
@@ -149,7 +150,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
       return false;      
    }
    
-   private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp){
+   private boolean isCorrectMethodReturn(Node node, RuleApp<Term, Goal> ruleApp){
       Term term = ruleApp.posInOccurrence().subTerm();
       term = TermBuilder.goBelowUpdates(term);
       MethodFrame mf = JavaTools.getInnermostMethodFrame(term.modalContent(), node.getServices());

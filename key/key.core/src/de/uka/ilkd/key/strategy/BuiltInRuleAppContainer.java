@@ -165,7 +165,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     
 
     @Override
-    public RuleApp completeRuleApp(Goal goal) {
+    public RuleApp<Term, Goal> completeRuleApp(Goal goal) {
         if (!isStillApplicable(goal)) {
             return null;
         }

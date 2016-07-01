@@ -42,7 +42,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
     * {@inheritDoc}
     */
    @Override
-   public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+   public Iterator<Term> generate(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
       // Compute collect terms of sequent formulas
       Sequent sequent = goal.sequent();
       Set<Term> topTerms = new LinkedHashSet<Term>();

@@ -32,7 +32,7 @@ public class AgeFeature implements Feature {
 
     private AgeFeature () {}
     
-    public RuleAppCost computeCost (RuleApp app, PosInOccurrence<Term> pos, Goal goal ) {
+    public RuleAppCost computeCost (RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal ) {
         return NumberRuleAppCost.create ( goal.getTime() );
 //        return LongRuleAppCost.create ( goal.getTime() / goal.sequent ().size () );
 //        return LongRuleAppCost.create ( (long)Math.sqrt ( goal.getTime () ) );

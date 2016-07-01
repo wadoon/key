@@ -56,7 +56,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     protected final PosInOccurrence<Term> applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
-    protected final RuleApp ruleApp;
+    protected final RuleApp<Term, Goal> ruleApp;
 
     protected final TermLabelState termLabelState;
     protected final TacletLabelHint labelHint;
@@ -80,7 +80,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             SVInstantiations svInst,
             Goal goal,                                     
             Rule rule,
-            RuleApp ruleApp,
+            RuleApp<Term, Goal> ruleApp,
             Services services) {
         this.termLabelState   = termLabelState;
         this.services         = services;
@@ -100,7 +100,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             Services services,
             PosInOccurrence<Term> applicationPosInOccurrence,
             Rule rule,
-            RuleApp ruleApp,
+            RuleApp<Term, Goal> ruleApp,
             TacletLabelHint labelHint, 
             Goal goal) {
         this(termLabelState,

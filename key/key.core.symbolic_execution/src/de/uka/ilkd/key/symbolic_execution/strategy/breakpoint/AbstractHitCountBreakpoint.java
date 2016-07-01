@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -85,7 +87,7 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
     * {@inheritDoc}
     */
    @Override
-   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       return hitcountExceeded(node);
    }
 

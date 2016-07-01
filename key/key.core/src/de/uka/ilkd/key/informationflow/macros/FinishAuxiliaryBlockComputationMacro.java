@@ -42,7 +42,7 @@ public class FinishAuxiliaryBlockComputationMacro
             if (poForProof instanceof BlockExecutionPO) {
                 final Goal initiatingGoal = ((BlockExecutionPO)poForProof).getInitiatingGoal();
                 if (initiatingGoal.node().parent() != null) {
-                    final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
+                    final RuleApp<Term, Goal> app = initiatingGoal.node().parent().getAppliedRuleApp();
                     if (app instanceof BlockContractBuiltInRuleApp) {
                         return true;
                     }
@@ -73,7 +73,7 @@ public class FinishAuxiliaryBlockComputationMacro
         // initiating goal must not be root and it is the result of a block contract application
         // otherwise the applicable check would have already failed
         // and we assume that before calling this method, the applicability of the macro was checked
-        final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
+        final RuleApp<Term, Goal> app = initiatingGoal.node().parent().getAppliedRuleApp();
 
         final BlockContractBuiltInRuleApp blockRuleApp = (BlockContractBuiltInRuleApp)app;
         final BlockContract contract = blockRuleApp.getContract();

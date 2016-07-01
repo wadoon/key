@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
@@ -27,6 +26,7 @@ import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -79,9 +79,9 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
          Term term;
          if (keyNode.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
             OneStepSimplifierRuleApp app = (OneStepSimplifierRuleApp) keyNode.getAppliedRuleApp();
-            RuleApp ruleApp = CollectionUtil.search(app.getProtocol(), new IFilter<RuleApp>() {
+            RuleApp<Term, Goal> ruleApp = CollectionUtil.search(app.getProtocol(), new IFilter<RuleApp<Term, Goal>>() {
                @Override
-               public boolean select(RuleApp ruleApp) {
+               public boolean select(RuleApp<Term, Goal> ruleApp) {
                   return SymbolicExecutionUtil.isLoopBodyTermination(keyNode, ruleApp);
                }
             });

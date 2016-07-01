@@ -26,5 +26,5 @@ import de.uka.ilkd.key.rule.RuleApp;
  * returning <code>null</code>
  */
 public interface ProjectionToTerm {
-    Term toTerm (RuleApp app, PosInOccurrence<Term> pos, Goal goal );
+    Term toTerm (RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal );
 }

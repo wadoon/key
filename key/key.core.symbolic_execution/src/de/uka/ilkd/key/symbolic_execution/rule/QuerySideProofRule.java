@@ -170,7 +170,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) throws RuleAbortException {
+   public ImmutableList<Goal> apply(Goal goal, RuleApp<Term, Goal> ruleApp) throws RuleAbortException {
       try {
          // Extract required Terms from goal
          final Services services = goal.getServices();

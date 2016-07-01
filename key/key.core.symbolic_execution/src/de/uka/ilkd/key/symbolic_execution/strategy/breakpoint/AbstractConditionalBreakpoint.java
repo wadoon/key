@@ -135,7 +135,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
       super.updateState(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
       if (goal != null) {
          Node node = goal.node();
-         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+         RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
          if (getVarsForCondition() != null && ruleApp != null && node != null) {
             refreshVarMaps(ruleApp, node);
          }
@@ -180,7 +180,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @param ruleApp
     * @param inScope
     */
-   private void freeVariablesAfterReturn(Node node, RuleApp ruleApp,boolean inScope) {
+   private void freeVariablesAfterReturn(Node node, RuleApp<Term, Goal> ruleApp, boolean inScope) {
       if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) ||
            SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp)) &&
           inScope) {
@@ -195,7 +195,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @param inScope the flag to determine if the current statement is in the scope of the breakpoint
     * @param oldMap the oldMap variableNamings
     */
-   private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope, Map<SVSubstitute, SVSubstitute> oldMap, RuleApp ruleApp) {
+   private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope, Map<SVSubstitute, SVSubstitute> oldMap, RuleApp<Term, Goal> ruleApp) {
       // look for renamings KeY did
       boolean found = false;
       //get current renaming tables
@@ -249,7 +249,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @param ruleApp the applied rule app
     * @param nodethe current node
     */
-   protected void refreshVarMaps(RuleApp ruleApp, Node node) {
+   protected void refreshVarMaps(RuleApp<Term, Goal> ruleApp, Node node) {
       boolean inScope = isInScope(node);
       // collect old values
       Map<SVSubstitute, SVSubstitute> oldMap = getOldMap();
@@ -331,7 +331,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @param node the current {@link Node}
     * @return true if the condition evaluates to true
     */
-   protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+   protected boolean conditionMet(RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       ApplyStrategyInfo info = null;
       try {
          //initialize values
@@ -372,7 +372,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * {@inheritDoc}
     */
    @Override
-   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       return (!conditionEnabled || conditionMet(ruleApp, proof, node)) &&
              super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    }

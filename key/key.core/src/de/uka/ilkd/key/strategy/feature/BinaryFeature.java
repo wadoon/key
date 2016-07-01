@@ -35,7 +35,7 @@ public abstract class BinaryFeature implements Feature {
     public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
     
 	@Override
-    public RuleAppCost computeCost (RuleApp app, PosInOccurrence<Term> pos, Goal goal ) {
+    public RuleAppCost computeCost (RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal ) {
         return filter ( app, pos, goal ) ? ZERO_COST : TOP_COST; 
     }
     
@@ -51,7 +51,7 @@ public abstract class BinaryFeature implements Feature {
      *            the goal on which <code>app</code> is to be applied
      * @return true iff the the result of the feature is supposed to be zero.
      */
-    protected abstract boolean filter ( RuleApp app,
+    protected abstract boolean filter ( RuleApp<Term, Goal> app,
                                         PosInOccurrence<Term> pos,
                                         Goal goal );
 

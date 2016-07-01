@@ -132,7 +132,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
     * {@inheritDoc}
     */
    @Override
-   public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) throws RuleAbortException {
+   public ImmutableList<Goal> apply(Goal goal, RuleApp<Term, Goal> ruleApp) throws RuleAbortException {
       try {
          // Extract required Terms from goal
          PosInOccurrence<Term> pio = ruleApp.posInOccurrence();

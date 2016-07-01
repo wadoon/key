@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -65,7 +65,7 @@ public interface IExecutionElement {
     * Returns the applied {@link RuleApp}.
     * @return The applied {@link RuleApp}.
     */
-   public RuleApp getAppliedRuleApp();
+   public RuleApp<Term, Goal> getAppliedRuleApp();
    
    /**
     * Returns the {@link PosInOccurrence<Term>} of the modality of interest including updates.

@@ -24,6 +24,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.common.core.logic.op.FormulaSV;
@@ -202,7 +203,7 @@ public class InnerNodeView extends SequentView {
             Node node,
             SequentPrintFilter filter) {
 
-        RuleApp app = node.getAppliedRuleApp();
+        RuleApp<Term, Goal> app = node.getAppliedRuleApp();
         String s = "";
 
         if (app != null) {
@@ -248,7 +249,7 @@ public class InnerNodeView extends SequentView {
     static final HighlightPainter IF_FORMULA_HIGHLIGHTER
             = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.8f, 1.0f, 0.8f, 0.5f));
 
-    private void highlightRuleAppPosition(RuleApp app) {
+    private void highlightRuleAppPosition(RuleApp<Term, Goal> app) {
         try {
             // Set the find highlight first and then the if highlights
             // This seems to make cause the find one to be painted
@@ -338,7 +339,7 @@ public class InnerNodeView extends SequentView {
         setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
         posTable = getLogicPrinter().getInitialPositionTable();
 
-        RuleApp app = node.getAppliedRuleApp();
+        RuleApp<Term, Goal> app = node.getAppliedRuleApp();
         if (app != null) {
             highlightRuleAppPosition(app);
         }

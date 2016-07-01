@@ -36,5 +36,5 @@ public interface Feature {
      * indicates that the rule shall not be applied at all (it is discarded by
      * the strategy).
      */
-    RuleAppCost computeCost (RuleApp app, PosInOccurrence<Term> pos, Goal goal );
+    RuleAppCost computeCost (RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal );
 }

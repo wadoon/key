@@ -97,13 +97,13 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     }
     
     @Override
-    public RuleApp peekNext () {   
+    public RuleApp<Term, Goal> peekNext () {
 	return delegate.peekNext();
     } 
 
     @Override
-    public RuleApp next () {
-        final RuleApp app = delegate.next ();
+    public RuleApp<Term, Goal> next () {
+        final RuleApp<Term, Goal> app = delegate.next ();
         onlyModifyFocussedFormula = false;
         return app;
     }
@@ -115,13 +115,13 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     }
 
     @Override
-    public void ruleAdded (RuleApp rule, PosInOccurrence<Term> pos) {
+    public void ruleAdded (RuleApp<Term, Goal> rule, PosInOccurrence<Term> pos) {
         if ( isRuleApplicationForFocussedFormula(rule, pos) ) {            
             delegate.ruleAdded ( rule, pos );
         }         
     }
 
-    protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
+    protected boolean isRuleApplicationForFocussedFormula(RuleApp<Term, Goal> rule,
             PosInOccurrence<Term> pos) {
         // filter the rule applications, only allow applications within the
         // focussed subterm or to other formulas that have been added after creation
@@ -148,9 +148,9 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
 
     
     @Override
-    public void rulesAdded (ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term> pos) {
-        ImmutableList<RuleApp> applicableRules = ImmutableSLList.<RuleApp>nil();
-        for (RuleApp r : rules) {
+    public void rulesAdded (ImmutableList<? extends RuleApp<Term, Goal>> rules, PosInOccurrence<Term> pos) {
+        ImmutableList<RuleApp<Term, Goal>> applicableRules = ImmutableSLList.<RuleApp<Term, Goal>>nil();
+        for (RuleApp<Term, Goal> r : rules) {
             if (isRuleApplicationForFocussedFormula(r, pos)) {
                 applicableRules = applicableRules.prepend(r);
             }

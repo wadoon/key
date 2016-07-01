@@ -43,7 +43,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
     private final FormulaTag      positionTag;
     private final PosInOccurrence<Term> applicationPosition;
 
-    FindTacletAppContainer ( RuleApp         p_app,
+    FindTacletAppContainer ( RuleApp<Term, Goal> p_app,
 			     PosInOccurrence<Term> p_pio,
 			     RuleAppCost     p_cost,
 			     Goal            p_goal,

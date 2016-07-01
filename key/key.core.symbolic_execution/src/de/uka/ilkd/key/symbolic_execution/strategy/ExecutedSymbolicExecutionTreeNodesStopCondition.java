@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
@@ -114,7 +115,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
       if (goal != null) {
          Node node = goal.node();
          // Check if goal is allowed
-         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+         RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
          if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
             // Check if the result for the current node was already computed.
             Boolean value = goalAllowedResultPerSetNode.get(node);
@@ -172,7 +173,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                                           int countApplied, 
                                           Goal goal,
                                           Node node,
-                                          RuleApp ruleApp,
+                                          RuleApp<Term, Goal> ruleApp,
                                           Integer executedNumberOfSetNodes) {
       goalAllowedResultPerSetNode.put(node, Boolean.FALSE);
    }
@@ -198,7 +199,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                                              int countApplied, 
                                              Goal goal,
                                              Node node,
-                                             RuleApp ruleApp,
+                                             RuleApp<Term, Goal> ruleApp,
                                              Integer executedNumberOfSetNodes) {
       goalAllowedResultPerSetNode.put(node, Boolean.TRUE);
    }

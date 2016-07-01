@@ -17,13 +17,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 
 public class ComplexRuleJustificationBySpec implements ComplexRuleJustification {
 
-    private Map<RuleApp, RuleJustificationBySpec> app2Just 
-        = new LinkedHashMap<RuleApp, RuleJustificationBySpec>();
+    private Map<RuleApp<Term, Goal>, RuleJustificationBySpec> app2Just
+        = new LinkedHashMap<RuleApp<Term, Goal>, RuleJustificationBySpec>();
    
         
     public boolean isAxiomJustification() {
@@ -31,14 +33,14 @@ public class ComplexRuleJustificationBySpec implements ComplexRuleJustification 
     }
     
     
-    public RuleJustification getSpecificJustification(RuleApp app, 
+    public RuleJustification getSpecificJustification(RuleApp<Term, Goal> app,
             JavaDLTermServices services) {
         RuleJustification result = app2Just.get(app);
         return result == null ? this : result;
     }
     
     
-    public void add(RuleApp ruleApp, RuleJustificationBySpec just) {
+    public void add(RuleApp<Term, Goal> ruleApp, RuleJustificationBySpec just) {
 	// assert !(just instanceof ComplexRuleJustification);
         app2Just.put(ruleApp, just);
     }

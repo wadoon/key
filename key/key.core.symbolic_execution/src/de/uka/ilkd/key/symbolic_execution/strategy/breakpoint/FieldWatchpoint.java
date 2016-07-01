@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
@@ -62,7 +63,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
     * {@inheritDoc}
     */
    @Override
-   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       if (activeStatement != null && activeStatement instanceof Assignment) {
          Assignment assignment = (Assignment) activeStatement;
          SourceElement firstElement = assignment.getChildAt(0);

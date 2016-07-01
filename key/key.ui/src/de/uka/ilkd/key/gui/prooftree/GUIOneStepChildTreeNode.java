@@ -16,7 +16,9 @@ package de.uka.ilkd.key.gui.prooftree;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
@@ -27,10 +29,10 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
-    private final RuleApp app;
+    private final RuleApp<Term, Goal> app;
     private final GUIAbstractTreeNode parent;
 
-    public GUIOneStepChildTreeNode(GUIProofTreeModel tree, GUIAbstractTreeNode parent, RuleApp app) {
+    public GUIOneStepChildTreeNode(GUIProofTreeModel tree, GUIAbstractTreeNode parent, RuleApp<Term, Goal> app) {
         super(tree, parent.getNode());
         this.parent = parent;
         this.app = app;

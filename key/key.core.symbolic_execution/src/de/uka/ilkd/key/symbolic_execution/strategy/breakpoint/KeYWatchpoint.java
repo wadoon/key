@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.program.Position;
 
@@ -87,7 +88,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
    }
    
    @Override
-   protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+   protected boolean conditionMet(RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       if(suspendOnTrue){
          return super.conditionMet(ruleApp, proof, node);
       }else{
@@ -137,7 +138,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
    }
    
    @Override
-   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       if(activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED){
          return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
       }

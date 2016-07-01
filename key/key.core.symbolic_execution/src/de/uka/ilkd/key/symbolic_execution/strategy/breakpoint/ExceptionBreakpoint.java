@@ -16,6 +16,8 @@ package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -109,7 +111,7 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
     * {@inheritDoc}
     */
    @Override
-   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
       if(activeStatement!=null&&activeStatement instanceof Throw&&isEnabled()){
          Throw throwStatement = (Throw)activeStatement;

@@ -102,7 +102,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      * @param goal    context
      * @return true if rule may be applied
      */
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
+    protected boolean ruleApplicationInContextAllowed(RuleApp<Term, Goal> ruleApp,
                                                       PosInOccurrence<Term> pio,
                                                       Goal goal) {
         return true;
@@ -152,7 +152,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
     private String getAppRuleName(Node parent) {
-        RuleApp parentRuleApp = parent.getAppliedRuleApp();
+        RuleApp<Term, Goal> parentRuleApp = parent.getAppliedRuleApp();
         String parentRuleName = parentRuleApp.rule().name().toString();
         return parentRuleName;
     }
@@ -182,7 +182,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp,
+        public RuleAppCost computeCost(RuleApp<Term, Goal> ruleApp,
                                        PosInOccurrence<Term> pio,
                                        Goal goal) {
             // first try to apply
@@ -213,7 +213,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public boolean isApprovedApp(RuleApp app,
+        public boolean isApprovedApp(RuleApp<Term, Goal> app,
                                      PosInOccurrence<Term> pio,
                                      Goal goal) {
             // abort if
@@ -250,7 +250,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public void instantiateApp(RuleApp app,
+        public void instantiateApp(RuleApp<Term, Goal> app,
                                    PosInOccurrence<Term> pio,
                                    Goal goal,
                                    RuleAppCostCollector collector) {

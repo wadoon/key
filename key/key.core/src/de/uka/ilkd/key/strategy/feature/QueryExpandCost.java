@@ -78,7 +78,7 @@ public class QueryExpandCost implements Feature {
 	}
     
 	@Override
-	public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+	public RuleAppCost computeCost(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
 		final Services services = goal.getServices();
 		final IntegerLDT integerLDT = services.getTheories().getIntegerLDT();
 		final Term t = pos.subTerm();
@@ -174,13 +174,13 @@ public class QueryExpandCost implements Feature {
 	 *  at the same position in the sequent. This method detects repetitive rule
 	 *  applications and is used to prevent loops in the proof tree.
 	 */
-	protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence<Term> pos, Goal goal){
+	protected int queryExpandAlreadyAppliedAtPos(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal){
 		 int count=0;
-		 ImmutableList<RuleApp> appliedRuleApps =goal.appliedRuleApps();
+		 ImmutableList<RuleApp<Term, Goal>> appliedRuleApps =goal.appliedRuleApps();
 	        if(appliedRuleApps!=null && !appliedRuleApps.isEmpty()){
-	        	Iterator<RuleApp> appliedRuleAppIter=appliedRuleApps.iterator();
+	        	Iterator<RuleApp<Term, Goal>> appliedRuleAppIter=appliedRuleApps.iterator();
 	        	while(appliedRuleAppIter.hasNext()){
-	        		RuleApp appliedRuleApp = appliedRuleAppIter.next();
+	        		RuleApp<Term, Goal> appliedRuleApp = appliedRuleAppIter.next();
 	        		final PosInOccurrence<Term> pio = appliedRuleApp.posInOccurrence();
 	        		if(pio!=null){
 		        		final Term oldterm = pio.subTerm();

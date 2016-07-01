@@ -33,14 +33,14 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     /**
      * The stored rule app
      */
-    private final RuleApp ruleApp;
+    private final RuleApp<Term, Goal> ruleApp;
 
     /**
      * The costs of the stored rule app
      */
     private final RuleAppCost cost;
 
-    protected RuleAppContainer(RuleApp         p_app,
+    protected RuleAppContainer(RuleApp<Term, Goal> p_app,
 			       RuleAppCost     p_cost ) {
 	ruleApp = p_app;
     	cost    = p_cost;
@@ -61,9 +61,9 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * Create a <code>RuleApp</code> that is suitable to be applied 
      * or <code>null</code>.
      */
-    public abstract RuleApp completeRuleApp ( Goal p_goal );
+    public abstract RuleApp<Term, Goal> completeRuleApp (Goal p_goal );
 
-    protected final RuleApp getRuleApp() {
+    protected final RuleApp<Term, Goal> getRuleApp() {
 	return ruleApp;
     }
 
@@ -78,7 +78,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * may be an instance of <code>TopRuleAppCost</code>.
      */
     public static RuleAppContainer createAppContainer
-        (RuleApp p_app, PosInOccurrence<Term> p_pio, Goal p_goal) {
+        (RuleApp<Term, Goal> p_app, PosInOccurrence<Term> p_pio, Goal p_goal) {
         
 	if ( p_app instanceof NoPosTacletApp )
 	    return TacletAppContainer.createAppContainers( (NoPosTacletApp)p_app, p_pio, p_goal );
@@ -96,7 +96,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return list of containers for the currently applicable RuleApps, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    public static ImmutableList<RuleAppContainer> createAppContainers(ImmutableList<? extends RuleApp> rules,
+    public static ImmutableList<RuleAppContainer> createAppContainers(ImmutableList<? extends RuleApp<Term, Goal>> rules,
                                                                       PosInOccurrence<Term> pos, Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
 
@@ -106,7 +106,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
             ImmutableList<NoPosTacletApp> tacletApplications = ImmutableSLList.<NoPosTacletApp>nil();
             ImmutableList<IBuiltInRuleApp> builtInRuleApplications = ImmutableSLList.<IBuiltInRuleApp>nil();
 
-            for (RuleApp rule : rules) {
+            for (RuleApp<Term, Goal> rule : rules) {
                 if (rule instanceof NoPosTacletApp) {
                     tacletApplications = tacletApplications.prepend((NoPosTacletApp) rule);
                 } else {

@@ -41,7 +41,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
                                              CCSequentChangeInfo<Term, Sequent> currentSequent, PosInOccurrence<Term> posOfFind,
                                              MatchConditions matchCond,
                                              Goal goal,
-                                             RuleApp ruleApp,
+                                             RuleApp<Term, Goal> ruleApp,
                                              Services services);
 
 
@@ -60,7 +60,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
             PosInOccurrence<Term> posOfFind,
             MatchConditions matchCond,
             Goal goal,
-            RuleApp ruleApp,
+            RuleApp<Term, Goal> ruleApp,
             Services services);
 
 
@@ -72,7 +72,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param ruleApp the taclet application that is executed.
      */
     public final ImmutableList<Goal> apply(Goal     goal,
-            RuleApp  ruleApp) {
+            RuleApp<Term, Goal> ruleApp) {
         final Services services = goal.getServices();
         final TermLabelState termLabelState = new TermLabelState();
         // Number without the if-goal eventually needed

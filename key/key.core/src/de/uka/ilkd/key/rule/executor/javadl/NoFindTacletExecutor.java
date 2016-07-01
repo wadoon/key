@@ -40,7 +40,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      */   
     protected void applyAdd(TermLabelState termLabelState, Sequent add,
                             CCSequentChangeInfo<Term, Sequent> currentSequent, Services services,
-                            MatchConditions matchCond, Goal goal, RuleApp ruleApp) {
+                            MatchConditions matchCond, Goal goal, RuleApp<Term, Goal> ruleApp) {
         addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, null, matchCond, goal, ruleApp, services);
         addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null, null, matchCond, goal, ruleApp, services);
     }    
@@ -51,7 +51,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * @param goal the goal that the rule application should refer to.
      * @param ruleApp the taclet application that is executed
      */
-    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, RuleApp<Term, Goal> ruleApp) {
         final Services services = goal.getServices();
         final TermLabelState termLabelState = new TermLabelState();
 

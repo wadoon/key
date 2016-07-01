@@ -65,7 +65,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * duplicate of the new application <code>newApp</code> at position
      * <code>newPio</code>.<code>newPio</code> can be <code>null</code>
      */
-    protected boolean sameApplication(RuleApp ruleCmp,
+    protected boolean sameApplication(RuleApp<Term, Goal> ruleCmp,
                                       TacletApp newApp,
                                       PosInOccurrence<Term> newPio) {
         // compare the rules

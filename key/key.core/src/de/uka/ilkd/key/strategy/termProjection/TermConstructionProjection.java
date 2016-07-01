@@ -46,7 +46,7 @@ public class TermConstructionProjection implements ProjectionToTerm {
         return new TermConstructionProjection ( op, subTerms );
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public Term toTerm(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         final Term[] subs = new Term[subTerms.length];
         for ( int i = 0; i != subTerms.length; ++i ) {
             subs[i] = subTerms[i].toTerm ( app, pos, goal );           

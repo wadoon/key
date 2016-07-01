@@ -303,7 +303,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a {@link SymbolicExecutionTermLabel}.
     * @return The {@link Set} of {@link Node}s to ignore its return.
     */
-   protected Set<Node> getMethodReturnsToIgnore(RuleApp ruleApp) {
+   protected Set<Node> getMethodReturnsToIgnore(RuleApp<Term, Goal> ruleApp) {
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
       return getMethodReturnsToIgnore(label);
    }
@@ -345,7 +345,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a {@link SymbolicExecutionTermLabel}.
     * @return The method call stack of the ID of the modified modality {@link Term} with a {@link SymbolicExecutionTermLabel}.
     */
-   protected Map<Node, ImmutableList<Node>> getMethodCallStack(RuleApp ruleApp) {
+   protected Map<Node, ImmutableList<Node>> getMethodCallStack(RuleApp<Term, Goal> ruleApp) {
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
       return getMethodCallStack(label);
    }
@@ -781,7 +781,7 @@ public class SymbolicExecutionTreeBuilder {
          // Update call stack
          updateCallStack(node, statement);
          // Update block map
-         RuleApp currentOrFutureRuleApplication = node.getAppliedRuleApp();
+         RuleApp<Term, Goal> currentOrFutureRuleApplication = node.getAppliedRuleApp();
          if (currentOrFutureRuleApplication == null && 
              node != proof.root()) { // Executing peekNext() on the root crashes the tests for unknown reasons.
             Goal goal = proof.getGoal(node);
@@ -1096,7 +1096,7 @@ public class SymbolicExecutionTreeBuilder {
                                          int expectedStackSize, 
                                          SourceElement... expectedSourceElements) {
       if (node != null && expectedSourceElements != null && expectedSourceElements.length >= 1) {
-         RuleApp ruleApp = null;
+         RuleApp<Term, Goal> ruleApp = null;
          boolean seNodeFound = false;
          // Find single symbolic execution child node
          while (!seNodeFound && node != null) {
@@ -1210,7 +1210,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param ruleApp The {@link RuleApp} to consider.
     * @return The now completed blocks.
     */
-   protected Map<JavaPair, ImmutableList<IExecutionNode<?>>> updateAfterBlockMap(Node node, RuleApp ruleApp) {
+   protected Map<JavaPair, ImmutableList<IExecutionNode<?>>> updateAfterBlockMap(Node node, RuleApp<Term, Goal> ruleApp) {
       Map<JavaPair, ImmutableList<IExecutionNode<?>>> completedBlocks = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
       if (label != null) {
@@ -1516,7 +1516,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param currentNode The {@link Node} for that the method call {@link Node} is needed.
     * @return The found call {@link Node} or {@code null} if no one was found.
     */
-   protected Node findMethodCallNode(Node currentNode, RuleApp ruleApp) {
+   protected Node findMethodCallNode(Node currentNode, RuleApp<Term, Goal> ruleApp) {
       // Compute the stack frame size before the method is called
       int returnStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
       // Return the method from the call stack

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.label;
 import java.util.Set;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
@@ -74,7 +73,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
                             Term applicationTerm,
                             Term modalityTerm,
                             Rule rule,
-                            RuleApp ruleApp,
+                            RuleApp<Term, Goal> ruleApp,
                             Goal goal,
                             Object hint,
                             Term tacletTerm,

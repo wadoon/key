@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import de.uka.ilkd.key.logic.Term;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -117,7 +118,7 @@ public class AutomaticProver {
                                 while (!openGoals.isEmpty()
                                                 && ruleCounter < maxNumberOfRules) {
                                         Goal goal = openGoals.getFirst();
-                                        RuleApp app = getNextApp(goal);
+                                        RuleApp<Term, Goal> app = getNextApp(goal);
                                         if (app == null) {
                                                 openGoals.removeFirst();
                                         } else {
@@ -147,8 +148,8 @@ public class AutomaticProver {
                         }
                 }
 
-                private RuleApp getNextApp(Goal goal) {
-                        RuleApp app = goal.getRuleAppManager().next();
+                private RuleApp<Term, Goal> getNextApp(Goal goal) {
+                        RuleApp<Term, Goal> app = goal.getRuleAppManager().next();
                         if (app == null) {
                                 goal.ruleAppIndex().scanBuiltInRules(goal);
                                 app = goal.getRuleAppManager().next();

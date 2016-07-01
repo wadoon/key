@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.control;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
@@ -74,7 +73,7 @@ public interface ProofControl {
     * @param app
     * @param goal
     */
-   public void applyInteractive(RuleApp app, Goal goal);
+   public void applyInteractive(RuleApp<Term, Goal> app, Goal goal);
    
    /** selected rule to apply
     * @param rule the selected built-in rule

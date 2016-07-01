@@ -22,6 +22,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.Term;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -251,16 +252,16 @@ public class ApplyStrategy {
         private boolean success;
         private final String message;
         private final Goal goal;
-        private RuleApp appliedRuleApp;
+        private RuleApp<Term, Goal> appliedRuleApp;
 
-        SingleRuleApplicationInfo(Goal mayCloseableGoal, RuleApp appliedRuleApp) {
+        SingleRuleApplicationInfo(Goal mayCloseableGoal, RuleApp<Term, Goal> appliedRuleApp) {
             this.message = "Rule applied successful";
             this.goal = mayCloseableGoal;
             this.appliedRuleApp = appliedRuleApp;
             this.success = true;
         }
 
-        SingleRuleApplicationInfo(String message, Goal nonCloseableGoal, RuleApp appliedRuleApp) {
+        SingleRuleApplicationInfo(String message, Goal nonCloseableGoal, RuleApp<Term, Goal> appliedRuleApp) {
             this.message = message;
             this.goal = nonCloseableGoal;
             this.appliedRuleApp = appliedRuleApp;
@@ -279,7 +280,7 @@ public class ApplyStrategy {
             return message;
         }
 
-        public RuleApp getAppliedRuleApp() {
+        public RuleApp<Term, Goal> getAppliedRuleApp() {
             return appliedRuleApp;
         }
     }
@@ -413,7 +414,7 @@ public class ApplyStrategy {
                                                 final IStopCondition stopCondition,
                                                 boolean stopAtFirstNonClosableGoal) {
         // Look for the strategy ...
-        RuleApp               app = null;
+        RuleApp<Term, Goal> app = null;
         Goal                  g;
         while ( ( g = goalChooser.getNextGoal () ) != null ) {
             if (!stopCondition.isGoalAllowed(maxApplications, timeout, proof,

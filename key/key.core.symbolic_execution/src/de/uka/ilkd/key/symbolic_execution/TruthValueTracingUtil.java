@@ -230,7 +230,7 @@ public final class TruthValueTracingUtil {
       else if (node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
          OneStepSimplifierRuleApp app = (OneStepSimplifierRuleApp) node.getAppliedRuleApp();
          PosInOccurrence<Term> parentPio = null;
-         for (RuleApp protocolApp : app.getProtocol()) {
+         for (RuleApp<Term, Goal> protocolApp : app.getProtocol()) {
             if (parentPio != null) {
                updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(), parentPio, termLabelName, services.getTermBuilder(), currentResults);
             }
@@ -494,7 +494,7 @@ public final class TruthValueTracingUtil {
                                                                  final Map<String, MultiEvaluationResult> results) {
       final Node parentNode = childNode.parent();
       if (parentNode != null) {
-         final RuleApp parentRuleApp = parentNode.getAppliedRuleApp();
+         final RuleApp<Term, Goal> parentRuleApp = parentNode.getAppliedRuleApp();
          final PosInOccurrence<Term> parentPio = parentRuleApp.posInOccurrence();
          if (parentPio != null) {
             // Check application term and all of its children and grand children

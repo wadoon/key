@@ -60,7 +60,7 @@ public class RootsGenerator implements TermGenerator {
         this.tb = tb;
     }
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
         final IntegerLDT numbers = services.getTheories().getIntegerLDT();
         

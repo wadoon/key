@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -60,7 +61,7 @@ public interface IBreakpoint {
     * @return true if execution should hold
     */
    public boolean isBreakpointHit(SourceElement activeStatement, 
-                                  RuleApp ruleApp, 
+                                  RuleApp<Term, Goal> ruleApp,
                                   Proof proof, 
                                   Node node);
 }

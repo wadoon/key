@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -71,7 +72,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
       if (goal != null) {
          Node node = goal.node();
          // Check if goal is allowed
-         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+         RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
          SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
          breakpointHit = isBreakpointHit(activeStatement, ruleApp, proof, node);
       }
@@ -102,7 +103,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     * @param node the current node
     * @return {@code true} at least one breakpoint is hit, {@code false} all breakpoints are not hit.
     */
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       boolean result = false;
       Iterator<IBreakpoint> iter = breakpoints.iterator();
       while (!result && iter.hasNext()) {

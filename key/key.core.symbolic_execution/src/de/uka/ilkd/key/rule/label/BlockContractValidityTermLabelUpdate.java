@@ -62,7 +62,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                             Term applicationTerm,
                             Term modalityTerm,
                             Rule rule,
-                            RuleApp ruleApp,
+                            RuleApp<Term, Goal> ruleApp,
                             Goal goal,
                             Object hint,
                             Term tacletTerm,

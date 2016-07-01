@@ -103,13 +103,13 @@ public final class RuleAppIndex  {
 
     private void setNewRuleListeners() {
 	NewRuleListener newRuleListener = new NewRuleListener () {
-            public void ruleAdded( RuleApp         taclet,
+            public void ruleAdded( RuleApp<Term, Goal> taclet,
         			   PosInOccurrence<Term> pos ) {
         	informNewRuleListener(taclet, pos);			   	
             }
 
             @Override
-            public void rulesAdded(ImmutableList<? extends RuleApp> rules,
+            public void rulesAdded(ImmutableList<? extends RuleApp<Term, Goal>> rules,
                     PosInOccurrence<Term> pos) {
                 informNewRuleListener(rules, pos);
             }
@@ -435,7 +435,7 @@ public final class RuleAppIndex  {
      * informs all observers, if a formula has been added, changed or 
      * removed
      */ 
-    private void informNewRuleListener(RuleApp         p_app,
+    private void informNewRuleListener(RuleApp<Term, Goal> p_app,
                                        PosInOccurrence<Term> p_pos) {
 	for (final NewRuleListener listener : listenerList) {
 	    listener.ruleAdded(p_app, p_pos);
@@ -446,7 +446,7 @@ public final class RuleAppIndex  {
      * informs all observers, if a formula has been added, changed or 
      * removed
      */ 
-    private void informNewRuleListener(ImmutableList<? extends RuleApp> p_apps,
+    private void informNewRuleListener(ImmutableList<? extends RuleApp<Term, Goal>> p_apps,
                                        PosInOccurrence<Term> p_pos) {
         for (final NewRuleListener listener : listenerList) {
             listener.rulesAdded(p_apps, p_pos);

@@ -42,7 +42,7 @@ public class FIFOStrategy implements Strategy {
      * that the rule shall not be applied at all 
      * (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost ( RuleApp         app,
+    public RuleAppCost computeCost ( RuleApp<Term, Goal> app,
 	                             PosInOccurrence<Term> pio,
 	                             Goal            goal ) {
 	return NumberRuleAppCost.create ( goal.getTime () );
@@ -53,13 +53,13 @@ public class FIFOStrategy implements Strategy {
      * called immediately before a rule is really applied
      * @return true iff the rule should be applied, false otherwise
      */
-    public boolean isApprovedApp (  RuleApp         app,
+    public boolean isApprovedApp (  RuleApp<Term, Goal> app,
 	                            PosInOccurrence<Term> pio,
 	                            Goal            goal ) {
 	return true;
     }
 
-    public void instantiateApp(RuleApp app,
+    public void instantiateApp(RuleApp<Term, Goal> app,
                                PosInOccurrence<Term> pio,
                                Goal goal,
                                RuleAppCostCollector collector) {}

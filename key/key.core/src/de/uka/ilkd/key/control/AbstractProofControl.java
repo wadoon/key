@@ -99,7 +99,7 @@ public abstract class AbstractProofControl implements ProofControl {
    public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence<Term> pos) {
         ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
 
-        for (RuleApp ruleApp : focusedGoal.ruleAppIndex().getBuiltInRules(focusedGoal, pos)) {
+        for (RuleApp<Term, Goal> ruleApp : focusedGoal.ruleAppIndex().getBuiltInRules(focusedGoal, pos)) {
             BuiltInRule r = (BuiltInRule) ruleApp.rule();
             if (!rules.contains(r)) {
                 rules = rules.prepend(r);
@@ -241,7 +241,7 @@ public abstract class AbstractProofControl implements ProofControl {
     
 
     @Override
-    public void applyInteractive(RuleApp app, Goal goal) {
+    public void applyInteractive(RuleApp<Term, Goal> app, Goal goal) {
        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
        goal.apply(app);
     }

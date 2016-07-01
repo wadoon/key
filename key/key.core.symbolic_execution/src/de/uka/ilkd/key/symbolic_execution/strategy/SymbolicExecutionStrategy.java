@@ -121,7 +121,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
        // Make sure that modalities without symbolic execution label are executed first because they might forbid rule application on modalities with symbolic execution label (see loop body branches)
        globalF = add(globalF, ifZero(not(new BinaryFeature() {
           @Override
-          protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+          protected boolean filter(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
              return pos != null && SymbolicExecutionUtil.hasSymbolicExecutionLabel(pos.subTerm());
           }
        }), longConst(-3000)));

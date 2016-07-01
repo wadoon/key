@@ -14,11 +14,7 @@
 package de.uka.ilkd.key.logic;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import junit.framework.TestCase;
 
@@ -40,31 +36,17 @@ import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.label.TermLabelException;
-import de.uka.ilkd.key.logic.label.TermLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
-import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletAppIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
-import de.uka.ilkd.key.rule.label.TermLabelPolicy;
-import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.*;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
-import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
@@ -719,7 +701,7 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public void updateLabels(TermLabelState state, Services services, PosInOccurrence<Term> applicationPosInOccurrence, Term applicationTerm, Term modalityTerm, Rule rule, RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, 
+      public void updateLabels(TermLabelState state, Services services, PosInOccurrence<Term> applicationPosInOccurrence, Term applicationTerm, Term modalityTerm, Rule rule, RuleApp<Term, Goal> ruleApp, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, 
               ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
          if (!labels.contains(toAdd)) {
             labels.add(toAdd);

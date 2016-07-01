@@ -25,7 +25,7 @@ public class FocusInAntecFeature extends BinaryFeature {
     
     public static final Feature INSTANCE = new FocusInAntecFeature ();
     
-    protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    protected boolean filter(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
         return pos.isInAntec ();
     }

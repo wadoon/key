@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
@@ -81,7 +82,7 @@ public class SymbolicExecutionBreakpointStopCondition extends ExecutedSymbolicEx
                                              int countApplied, 
                                              Goal goal,
                                              Node node,
-                                             RuleApp ruleApp,
+                                             RuleApp<Term, Goal> ruleApp,
                                              Integer executedNumberOfSetNodes) {
       super.handleNodeLimitNotExceeded(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
       SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
@@ -98,7 +99,7 @@ public class SymbolicExecutionBreakpointStopCondition extends ExecutedSymbolicEx
     * @param node the current node
     * @return {@code true} at least one breakpoint is hit, {@code false} all breakpoints are not hit.
     */
-   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+   protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       boolean result = false;
       Iterator<IBreakpoint> iter = breakpoints.iterator();
       while (!result && iter.hasNext()) {

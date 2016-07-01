@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.Junctor;
 import org.key_project.common.core.logic.op.Modality;
@@ -128,7 +127,7 @@ public final class WhileInvariantTransformer {
     
     
     /** calculates the resulting term. */
-    public Term transform(TermLabelState termLabelState, Rule rule, RuleApp ruleApp, Goal goal, Sequent applicationSequent, PosInOccurrence<Term> applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
+    public Term transform(TermLabelState termLabelState, Rule rule, RuleApp<Term, Goal> ruleApp, Goal goal, Sequent applicationSequent, PosInOccurrence<Term> applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
         
         // global initialisation
         init(initialPost, invariantFramingTermination, services);
@@ -300,7 +299,7 @@ public final class WhileInvariantTransformer {
                                                                     Services services,
                                                                     PosInOccurrence<Term> applicationPos,
                                                                     Rule rule, 
-                                                                    RuleApp ruleApp,
+                                                                    RuleApp<Term, Goal> ruleApp,
                                                                     Goal goal, 
                                                                     Operator loopBodyModality, 
                                                                     Term result, 
@@ -403,7 +402,7 @@ public final class WhileInvariantTransformer {
                             ProgramVariable returnExpression,
                             Term post,
                             Rule rule,
-                            RuleApp ruleApp,
+                            RuleApp<Term, Goal> ruleApp,
                             Goal goal,
                             PosInOccurrence<Term> applicationPos,
                             Services services) {
@@ -435,7 +434,7 @@ public final class WhileInvariantTransformer {
                            Term post,
                            ArrayList<If> breakIfCascade,
                            Rule rule,
-                           RuleApp ruleApp,
+                           RuleApp<Term, Goal> ruleApp,
                            Goal goal,
                            PosInOccurrence<Term> applicationPos,
                            Services services) {
@@ -454,7 +453,7 @@ public final class WhileInvariantTransformer {
                                         Services services,
                                         PosInOccurrence<Term> applicationPos,
                                         Rule rule,
-                                        RuleApp ruleApp,
+                                        RuleApp<Term, Goal> ruleApp,
                                         Goal goal,
                                         Sequent applicationSequent,
                                         Term contFlagTerm,
@@ -511,7 +510,7 @@ public final class WhileInvariantTransformer {
                                                                       Services services,
                                                                       PosInOccurrence<Term> applicationPos,
                                                                       Rule rule, 
-                                                                      RuleApp ruleApp,
+                                                                      RuleApp<Term, Goal> ruleApp,
                                                                       Goal goal, 
                                                                       Operator operator, 
                                                                       ImmutableArray<Term> subs, 
@@ -525,7 +524,7 @@ public final class WhileInvariantTransformer {
                            ProgramVariable thrownException,
                            Term post,
                            Rule rule,
-                           RuleApp ruleApp,
+                           RuleApp<Term, Goal> ruleApp,
                            Goal goal,
                            PosInOccurrence<Term> applicationPos,
                            Services services) {

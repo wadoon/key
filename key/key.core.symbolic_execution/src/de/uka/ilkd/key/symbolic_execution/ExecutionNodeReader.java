@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.PositionInfo;
@@ -1031,7 +1032,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public RuleApp getAppliedRuleApp() {
+      public RuleApp<Term, Goal> getAppliedRuleApp() {
          return null;
       }
 

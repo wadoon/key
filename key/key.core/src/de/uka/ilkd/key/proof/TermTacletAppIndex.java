@@ -17,7 +17,6 @@ import java.util.Iterator;
 
 import org.key_project.common.core.logic.calculus.PIOPathIterator;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.UpdateApplication;
@@ -574,10 +573,10 @@ public class TermTacletAppIndex {
         return descend ( pos ).collectTacletApps ( pos, filter, services );
     }
     
-    private ImmutableList<TacletApp> convert(ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term> pos,
-            RuleFilter filter, ImmutableList<TacletApp> convertedApps, Services services) {
+    private ImmutableList<TacletApp> convert(ImmutableList<? extends RuleApp<Term, Goal>> rules, PosInOccurrence<Term> pos,
+                                             RuleFilter filter, ImmutableList<TacletApp> convertedApps, Services services) {
 
-        for (final RuleApp app : rules) {
+        for (final RuleApp<Term, Goal> app : rules) {
             if ( filter.filter( ( app.rule() ) ) ) {
                 final TacletApp tacletApp = 
                         TacletAppIndex.createTacletApp( (NoPosTacletApp) app, pos, services );

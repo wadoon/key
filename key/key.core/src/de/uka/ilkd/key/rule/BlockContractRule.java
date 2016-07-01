@@ -236,7 +236,7 @@ public class BlockContractRule implements BuiltInRule {
         Node selfOrParentNode = goal.node();
         Node previousNode = null;
         while (selfOrParentNode != null) {
-            RuleApp app = selfOrParentNode.getAppliedRuleApp();
+            RuleApp<Term, Goal> app = selfOrParentNode.getAppliedRuleApp();
             if (app instanceof BlockContractBuiltInRuleApp) {
                 BlockContractBuiltInRuleApp blockRuleApp =
                         (BlockContractBuiltInRuleApp)app;
@@ -454,7 +454,7 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final RuleApp application) throws RuleAbortException {
+    public ImmutableList<Goal> apply(final Goal goal, final RuleApp<Term, Goal> application) throws RuleAbortException {
         assert application instanceof BlockContractBuiltInRuleApp;
         return apply(goal, (BlockContractBuiltInRuleApp) application);
     }

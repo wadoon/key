@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.logic.Term;
 import org.key_project.util.collection.Pair;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
@@ -135,7 +136,7 @@ public class Statistics {
                 }
             }
 
-            final RuleApp ruleApp = node.getAppliedRuleApp();
+            final RuleApp<Term, Goal> ruleApp = node.getAppliedRuleApp();
             if (ruleApp != null) {
                 if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
                     tmpOss++;

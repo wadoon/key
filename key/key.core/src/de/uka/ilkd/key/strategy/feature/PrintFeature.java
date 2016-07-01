@@ -26,7 +26,7 @@ public class PrintFeature implements Feature {
 
    
    @Override
-   public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+   public RuleAppCost computeCost(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
       RuleAppCost cost = f.computeCost(app, pos, goal);
       System.out.println(prefix + ":" + cost.toString() + ":" + (pos != null ? pos.subTerm() + ":" : "") + app.rule().name() );
       return cost;

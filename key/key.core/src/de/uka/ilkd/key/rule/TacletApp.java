@@ -66,7 +66,7 @@ import de.uka.ilkd.key.util.Debug;
  * used to determine if the information is complete or at least sufficient (can
  * be completed using meta variables) complete, so that is can be applied.
  */
-public abstract class TacletApp implements RuleApp {
+public abstract class TacletApp implements RuleApp<Term, Goal> {
     
     /** the taclet for which the application information is collected */
     private final Taclet taclet;

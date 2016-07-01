@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
@@ -286,7 +287,7 @@ public class OutputStreamProofSaver {
 
    private void printSingleNode(Node node, String prefix, StringBuffer tree) {
 
-      RuleApp appliedRuleApp = node.getAppliedRuleApp();
+      RuleApp<Term, Goal> appliedRuleApp = node.getAppliedRuleApp();
       if (appliedRuleApp == null && (proof.getGoal(node)!=null)) { // open goal
          tree.append(prefix); 
          tree.append("(opengoal \"");

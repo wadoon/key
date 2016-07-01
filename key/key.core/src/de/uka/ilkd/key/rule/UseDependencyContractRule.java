@@ -444,7 +444,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     @Override
     public ImmutableList<Goal> apply(Goal goal,
-	    			     RuleApp ruleApp) {
+	    			     RuleApp<Term, Goal> ruleApp) {
 	//collect information
         final Services services = goal.getServices();
         final LocSetLDT locSetLDT = services.getTheories().getLocSetLDT();

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
@@ -72,7 +73,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     * {@inheritDoc}
     */
    @Override
-   public RuleApp getAppliedRuleApp() {
+   public RuleApp<Term, Goal> getAppliedRuleApp() {
       return proofNode.getAppliedRuleApp();
    }
    

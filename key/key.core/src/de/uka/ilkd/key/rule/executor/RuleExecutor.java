@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule.executor;
 
+import de.uka.ilkd.key.logic.Term;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -21,6 +22,6 @@ public interface RuleExecutor {
      * the first goal of the return list is the goal that should be
      * closed (with the constraint this taclet is applied under).
      */
-    public abstract ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) throws RuleAbortException;
+    public abstract ImmutableList<Goal> apply(Goal goal, RuleApp<Term, Goal> ruleApp) throws RuleAbortException;
 
 }

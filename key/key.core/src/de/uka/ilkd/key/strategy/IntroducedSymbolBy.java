@@ -52,7 +52,7 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
 	
 	Node n = goal.node();
 	while (n != root) {	    
-	    final RuleApp ra = n.getAppliedRuleApp();
+	    final RuleApp<Term, Goal> ra = n.getAppliedRuleApp();
 	    if (ra instanceof TacletApp) {
 		final TacletApp ta = (TacletApp) ra;
 		if (ta.taclet().getRuleSets().contains(new RuleSet(ruleSetName))) {

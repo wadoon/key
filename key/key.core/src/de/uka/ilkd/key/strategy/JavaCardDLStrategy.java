@@ -2773,8 +2773,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
      *         shall not be applied at all (it is discarded by the strategy).
      */
-    public final RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pio,
-            Goal goal) {
+    public final RuleAppCost computeCost(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio,
+                                         Goal goal) {
         return costComputationF.computeCost(app, pio, goal);
     }
 
@@ -2784,12 +2784,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * 
      * @return true iff the rule should be applied, false otherwise
      */
-    public final boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio,
-            Goal goal) {
+    public final boolean isApprovedApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio,
+                                       Goal goal) {
         return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
     }
 
-    protected final RuleAppCost instantiateApp(RuleApp app,
+    protected final RuleAppCost instantiateApp(RuleApp<Term, Goal> app,
                                                PosInOccurrence<Term> pio, Goal goal) {
         return instantiationF.computeCost(app, pio, goal);
     }

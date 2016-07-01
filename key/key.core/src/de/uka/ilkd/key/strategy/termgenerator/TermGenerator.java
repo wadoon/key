@@ -28,5 +28,5 @@ import de.uka.ilkd.key.rule.RuleApp;
  * instantiate schema variables with different terms/formulas.
  */
 public interface TermGenerator {
-    Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal);
+    Iterator<Term> generate(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal);
 }

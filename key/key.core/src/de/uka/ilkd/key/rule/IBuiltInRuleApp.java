@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
-public interface IBuiltInRuleApp extends RuleApp {
+public interface IBuiltInRuleApp extends RuleApp<Term, Goal> {
 
     /**
      * returns the built in rule of this rule application

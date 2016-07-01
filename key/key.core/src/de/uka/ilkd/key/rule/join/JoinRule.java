@@ -145,7 +145,7 @@ public class JoinRule implements BuiltInRule {
     }
 
     @Override
-    public final ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) throws RuleAbortException {
+    public final ImmutableList<Goal> apply(Goal goal, RuleApp<Term, Goal> ruleApp) throws RuleAbortException {
         final Services services = goal.getServices();
 
         final JoinRuleBuiltInRuleApp joinRuleApp =

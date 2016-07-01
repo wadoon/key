@@ -81,7 +81,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
          * If no rule was applied yet, apply the first rule and increase counter, s.t. no more rules can be applied.
          */
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal) {
             if(counter == 0 && delegate.isApprovedApp(app, pio, goal)){
                 counter++;
                 return true;
@@ -91,15 +91,15 @@ public class OneStepProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pio,
-                Goal goal) {
+        public RuleAppCost computeCost(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio,
+                                       Goal goal) {
             return delegate.computeCost(app, pio, goal);
 
         }
 
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal,
+        public void instantiateApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal,
                                    RuleAppCostCollector collector) {
             delegate.instantiateApp(app, pio, goal, collector);
         }

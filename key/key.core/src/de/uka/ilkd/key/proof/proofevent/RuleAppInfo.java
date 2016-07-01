@@ -16,6 +16,8 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.Node;
@@ -27,7 +29,7 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public class RuleAppInfo {
 
-    RuleAppInfo ( RuleApp               p_appliedRule,
+    RuleAppInfo ( RuleApp<Term, Goal> p_appliedRule,
 		  Node                  p_originalNode,
 		  ImmutableList<NodeReplacement> p_newNodes ) {
 	app          = p_appliedRule;
@@ -39,7 +41,7 @@ public class RuleAppInfo {
     /**
      * RuleApp this event reports
      */
-    RuleApp               app          = null;
+    RuleApp<Term, Goal> app          = null;
     
     /**
      * Node the rule has been applied on
@@ -51,7 +53,7 @@ public class RuleAppInfo {
      */
     ImmutableList<NodeReplacement> newNodes     = null;
 
-    public RuleApp                   getRuleApp          () {
+    public RuleApp<Term, Goal> getRuleApp          () {
 	return app;
     }
 

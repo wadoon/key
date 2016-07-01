@@ -35,7 +35,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
         this.polynomial = polynomial;
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public Term toTerm(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         final Term coeffT = leftCoefficient.toTerm ( app, pos, goal );
         final Term polyT = polynomial.toTerm ( app, pos, goal );
 

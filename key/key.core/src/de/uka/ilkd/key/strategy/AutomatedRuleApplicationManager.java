@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NewRuleListener;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -35,12 +36,12 @@ public interface AutomatedRuleApplicationManager extends NewRuleListener {
      *         nextAndCache() or next() is called. A call of next() empties the
      *         cache again.
      */
-    RuleApp peekNext();
+    RuleApp<Term, Goal> peekNext();
     
     /**
      * @return the next rule that is supposed to be applied
      */
-    RuleApp next();
+    RuleApp<Term, Goal> next();
 
     /**
      * Set the goal <code>this</code> is the rule app manager for

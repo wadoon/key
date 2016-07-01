@@ -68,7 +68,7 @@ public class ForEachCP implements Feature {
         this.manager = manager;
     }
 
-    public RuleAppCost computeCost(final RuleApp app,
+    public RuleAppCost computeCost(final RuleApp<Term, Goal> app,
                                final PosInOccurrence<Term> pos,
                                final Goal goal) {
         final Term outerVarContent = var.getContent ();
@@ -89,9 +89,9 @@ public class ForEachCP implements Feature {
     private final class CP implements ChoicePoint {
         private final class BranchIterator implements Iterator<CPBranch> {
             private final Iterator<Term> terms;
-            private final RuleApp        oldApp;
+            private final RuleApp<Term, Goal> oldApp;
 
-            private BranchIterator(Iterator<Term> terms, RuleApp oldApp) {
+            private BranchIterator(Iterator<Term> terms, RuleApp<Term, Goal> oldApp) {
                 this.terms = terms;
                 this.oldApp = oldApp;
             }
@@ -106,7 +106,7 @@ public class ForEachCP implements Feature {
                     public void choose() {
                         var.setContent ( generatedTerm );
                     }
-                    public RuleApp getRuleAppForBranch() {
+                    public RuleApp<Term, Goal> getRuleAppForBranch() {
                         return oldApp;
                     }
                 };
@@ -118,16 +118,16 @@ public class ForEachCP implements Feature {
         }
 
         private final PosInOccurrence<Term> pos;
-        private final RuleApp         app;
+        private final RuleApp<Term, Goal> app;
         private final Goal            goal;
     
-        private CP(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+        private CP(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;
         }
     
-        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
+        public Iterator<CPBranch> getBranches(RuleApp<Term, Goal> oldApp) {
             return new BranchIterator ( generator.generate ( app, pos, goal ),
                                         oldApp );
         }

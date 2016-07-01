@@ -33,7 +33,7 @@ public class HeuristicInstantiation implements TermGenerator {
         
     private HeuristicInstantiation() {}
     
-    public Iterator<Term> generate(RuleApp app,
+    public Iterator<Term> generate(RuleApp<Term, Goal> app,
                                    PosInOccurrence<Term> pos,
                                    Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";

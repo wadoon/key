@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
@@ -21,5 +23,5 @@ import de.uka.ilkd.key.rule.RuleApp;
  * method <code>Strategy.instantiateApp</code>
  */
 public interface RuleAppCostCollector {
-    void collect(RuleApp app, RuleAppCost cost);
+    void collect(RuleApp<Term, Goal> app, RuleAppCost cost);
 }

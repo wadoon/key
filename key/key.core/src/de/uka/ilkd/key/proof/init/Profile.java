@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.rule.Rule;
 import org.key_project.util.collection.ImmutableSet;
@@ -137,5 +139,5 @@ public interface Profile {
     
     TermLabelManager getTermLabelManager();
     
-    boolean isSpecificationInvolvedInRuleApp(RuleApp app);
+    boolean isSpecificationInvolvedInRuleApp(RuleApp<Term, Goal> app);
 }

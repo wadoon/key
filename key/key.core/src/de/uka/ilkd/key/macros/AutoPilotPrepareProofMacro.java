@@ -112,7 +112,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal) {
             return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
                    // Assumptions are normally not considered by the cost
                    // computation, because they are normally not yet
@@ -128,7 +128,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal) {
 
             Rule rule = app.rule();
             if(isNonHumanInteractionTagged(rule)) {
@@ -159,7 +159,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal,
+        public void instantiateApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal,
                                    RuleAppCostCollector collector) {
             delegate.instantiateApp(app, pio, goal, collector);
         }

@@ -80,7 +80,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal) {
             if(!hasModality(goal.sequent())) {
                 return false;
             }

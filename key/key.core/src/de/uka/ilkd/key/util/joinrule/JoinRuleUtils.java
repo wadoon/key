@@ -1122,7 +1122,7 @@ public class JoinRuleUtils {
         InitConfig initConfig = joinNodeParent.proof().getInitConfig();
 
         CloseAfterJoin closeRule = CloseAfterJoin.INSTANCE;
-        RuleApp app = closeRule.createApp(pio, joinPartner.node(),
+        RuleApp<Term, Goal> app = closeRule.createApp(pio, joinPartner.node(),
                 joinNodeParent, joinState, joinPartnerState, pc);
 
         // Register rule if not done yet.

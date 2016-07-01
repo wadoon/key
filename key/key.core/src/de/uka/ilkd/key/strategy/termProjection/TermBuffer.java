@@ -36,7 +36,7 @@ public class TermBuffer implements ProjectionToTerm {
         this.t = t;
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public Term toTerm(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         return t;
     }
 

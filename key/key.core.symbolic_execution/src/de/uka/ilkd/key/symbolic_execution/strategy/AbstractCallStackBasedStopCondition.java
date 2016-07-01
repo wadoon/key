@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.*;
@@ -64,7 +65,7 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
       if (goal != null) {
          Node node = goal.node();
          // Check if goal is allowed
-         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+         RuleApp<Term, Goal> ruleApp = goal.getRuleAppManager().peekNext();
          if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
             // Check if goal is treated the first time
             NodeStartEntry startingCallStackSizeEntry = startingCallStackSizePerGoal.get(goal);

@@ -41,7 +41,7 @@ public class FocusProjection implements ProjectionToTerm {
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public Term toTerm(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;

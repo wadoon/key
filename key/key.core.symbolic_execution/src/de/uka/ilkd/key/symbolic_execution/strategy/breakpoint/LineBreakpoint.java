@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.program.Position;
 import org.key_project.util.ExtList;
 
@@ -119,7 +121,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
    }
    
    @Override
-   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
+   public boolean isBreakpointHit(SourceElement activeStatement, RuleApp<Term, Goal> ruleApp, Proof proof, Node node) {
       return isInLine(activeStatement)&&super.isBreakpointHit(activeStatement, ruleApp, proof, node);
    }
    

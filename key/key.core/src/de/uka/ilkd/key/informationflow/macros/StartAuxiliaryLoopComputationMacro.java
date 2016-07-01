@@ -58,7 +58,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
         }
         final Services services = proof.getServices();
 
-        RuleApp app = goals.head().node().parent().getAppliedRuleApp();
+        RuleApp<Term, Goal> app = goals.head().node().parent().getAppliedRuleApp();
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
             return false;
         }

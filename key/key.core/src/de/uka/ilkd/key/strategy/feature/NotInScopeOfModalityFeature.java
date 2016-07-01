@@ -36,7 +36,7 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
 
     private NotInScopeOfModalityFeature () {}
     
-    protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    protected boolean filter(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         Debug.assertFalse ( pos == null,
                             "Feature is only applicable to rules with find" );
 

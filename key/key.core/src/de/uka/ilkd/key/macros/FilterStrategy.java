@@ -32,12 +32,12 @@ public abstract class FilterStrategy implements Strategy {
     }
 
     @Override
-    public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
+    public boolean isApprovedApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal) {
         return delegate.isApprovedApp(app, pio, goal);
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
+    public RuleAppCost computeCost(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal) {
         if(!isApprovedApp(app, pio, goal)) {
             return TopRuleAppCost.INSTANCE;
         }
@@ -45,7 +45,7 @@ public abstract class FilterStrategy implements Strategy {
     }
 
     @Override
-    public void instantiateApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal,
+    public void instantiateApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal,
                                RuleAppCostCollector collector) {
         delegate.instantiateApp(app, pio, goal, collector);
     }

@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.logic.Term;
 import org.key_project.common.core.proof.NameRecorder;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -58,7 +59,7 @@ public class Node  {
 
     Node                 parent              = null;
 
-    private RuleApp              appliedRuleApp;
+    private RuleApp<Term, Goal> appliedRuleApp;
 
     private NameRecorder         nameRecorder;
 
@@ -148,7 +149,7 @@ public class Node  {
         return proof.getServices();
     }
     
-    public void setAppliedRuleApp(RuleApp ruleApp) {
+    public void setAppliedRuleApp(RuleApp<Term, Goal> ruleApp) {
         this.nodeInfo.updateNoteInfo();
         this.appliedRuleApp = ruleApp;
         clearNameCache();
@@ -178,7 +179,7 @@ public class Node  {
 	return renamings;
     }
 
-    public RuleApp getAppliedRuleApp() {
+    public RuleApp<Term, Goal> getAppliedRuleApp() {
         return appliedRuleApp;
     }
 
@@ -508,7 +509,7 @@ public class Node  {
     public String name() {
         if (cachedName == null) {
 
-            RuleApp rap = getAppliedRuleApp();
+            RuleApp<Term, Goal> rap = getAppliedRuleApp();
             if (rap == null) {
                 Goal goal = proof().getGoal(this);
                 if ( goal == null || this.isClosed() )

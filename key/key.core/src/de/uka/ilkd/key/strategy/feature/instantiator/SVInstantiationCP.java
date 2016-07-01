@@ -66,7 +66,7 @@ public class SVInstantiationCP implements Feature {
         this.manager = manager;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         manager.passChoicePoint ( new CP (app, pos, goal), this );
         return NumberRuleAppCost.getZeroCost();
     }
@@ -95,16 +95,16 @@ public class SVInstantiationCP implements Feature {
     private class CP implements ChoicePoint {
         
         private final PosInOccurrence<Term> pos;
-        private final RuleApp         app;
+        private final RuleApp<Term, Goal> app;
         private final Goal            goal;
     
-        private CP(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+        private CP(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;
         }
 
-        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
+        public Iterator<CPBranch> getBranches(RuleApp<Term, Goal> oldApp) {
             if ( ! ( oldApp instanceof TacletApp ) )
                 Debug.fail ( "Instantiation feature is only applicable to " +
                              "taclet apps, but got " + oldApp );
@@ -113,7 +113,7 @@ public class SVInstantiationCP implements Feature {
             final SchemaVariable sv = findSVWithName ( tapp );
             final Term instTerm = value.toTerm ( app, pos, goal );
 
-            final RuleApp newApp =
+            final RuleApp<Term, Goal> newApp =
                 tapp.addCheckedInstantiation ( sv,
                                                instTerm,
                                                goal.proof ().getServices (),
@@ -121,7 +121,7 @@ public class SVInstantiationCP implements Feature {
 
             final CPBranch branch = new CPBranch () {
                 public void choose() {}
-                public RuleApp getRuleAppForBranch() { return newApp; }
+                public RuleApp<Term, Goal> getRuleAppForBranch() { return newApp; }
             };
             
             return ImmutableSLList.<CPBranch>nil().prepend ( branch ).iterator ();

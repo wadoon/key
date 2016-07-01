@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.logic.Term;
 import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.calculus.*;
 import org.key_project.common.core.logic.op.CCProgramVariable;
@@ -9,16 +10,31 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.RuleApp;
 
+/**
+ *  A proof is represented as a tree of nodes containing sequents. The initial
+ *  proof consists of just one node -- the root -- that has to be
+ *  proved. Therefore it is divided up into several sub goals and so on. A
+ *  single goal is not divided into sub goals any longer if the contained
+ *  sequent becomes an axiom. A proof is closed if all leaves are closed. As
+ *  the calculus works only on the leaves of a tree, the goals are the
+ *  additional information needed for the proof is only stored at the leaves
+ *  (saves memory) and not in the inner nodes. This class represents now a goal
+ *  of the proof, this means a leave whose sequent is not closed. It keeps
+ *  track of all applied rule applications on the branch and of the
+ *  corresponding rule application index. Furthermore it offers methods for
+ *  setting back several proof steps. The sequent has to be changed using the
+ *  methods of Goal.
+ */
 public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>, 
     T extends CCTerm<?, ?, ? extends CCTermVisitor<T>, T>,
     Seq extends CCSequent<T, ?, Seq>,
-    RA extends RuleApp,
+    RA extends RuleApp<Term, Goal>,
     Self extends CCGoal<ProgVar, T, Seq, RA, Self>> {
 
     /** returns set of rules applied at this branch
      * @return IList<RuleApp> applied rule applications
      */
-    ImmutableList<RuleApp> appliedRuleApps();
+    ImmutableList<RuleApp<Term, Goal>> appliedRuleApps();
 
     /** returns the proof the goal belongs to
      * @return the Proof the goal belongs to
@@ -92,7 +108,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * and stores it in the node of the goal
      * @param app the applied rule app
      */
-    void addAppliedRuleApp(RuleApp app);
+    void addAppliedRuleApp(RuleApp<Term, Goal> app);
 
     /** creates n new nodes as children of the
      * referenced node and new
@@ -107,7 +123,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
      * @param ruleApp the {@link RuleApp} to apply
      * @return the result of the application
      */
-    ImmutableList<Self> apply(RuleApp ruleApp);
+    ImmutableList<Self> apply(RuleApp<Term, Goal> ruleApp);
 
    /** 
     * returns the {@link Services} of the {@link Proof} 

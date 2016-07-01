@@ -14,9 +14,11 @@
 package de.uka.ilkd.key.proof.mgt;
 
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -37,7 +39,7 @@ public class RuleJustificationByAddRules implements RuleJustification{
 	return isAxiom;
     }
 
-    public RuleApp motherTaclet() {
+    public RuleApp<Term, Goal> motherTaclet() {
 	return node.getAppliedRuleApp();
     }
 

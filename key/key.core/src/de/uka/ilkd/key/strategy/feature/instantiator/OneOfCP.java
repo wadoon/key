@@ -41,7 +41,7 @@ public class OneOfCP implements Feature {
         return new OneOfCP ( manager, features );
     }
     
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         manager.passChoicePoint ( cp, this );
         return features[theChosenOne].computeCost ( app, pos, goal );
     }
@@ -49,9 +49,9 @@ public class OneOfCP implements Feature {
     private final class CP implements ChoicePoint {
         private final class BranchIterator implements Iterator<CPBranch> {
             private int num = 0;
-            private final RuleApp oldApp;
+            private final RuleApp<Term, Goal> oldApp;
             
-            public BranchIterator(RuleApp oldApp) {
+            public BranchIterator(RuleApp<Term, Goal> oldApp) {
                 this.oldApp = oldApp;
             }
 
@@ -65,7 +65,7 @@ public class OneOfCP implements Feature {
                     public void choose () {
                         theChosenOne = chosen;
                     }
-                    public RuleApp getRuleAppForBranch () {
+                    public RuleApp<Term, Goal> getRuleAppForBranch () {
                         return oldApp;
                     }
                 };
@@ -79,7 +79,7 @@ public class OneOfCP implements Feature {
             }
         }
             
-        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
+        public Iterator<CPBranch> getBranches(RuleApp<Term, Goal> oldApp) {
             return new BranchIterator ( oldApp );
         }
     }

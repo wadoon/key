@@ -216,8 +216,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence<Term> pio,
-                Goal goal) {
+        public RuleAppCost computeCost(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio,
+                                       Goal goal) {
 
             if(app.rule() instanceof OneStepSimplifier){
                 return NumberRuleAppCost.getZeroCost();
@@ -250,7 +250,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal) {
 
             if(app.rule() instanceof OneStepSimplifier){
                 return true;
@@ -271,7 +271,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal,
+        public void instantiateApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal,
                                    RuleAppCostCollector collector) {}
 
         @Override

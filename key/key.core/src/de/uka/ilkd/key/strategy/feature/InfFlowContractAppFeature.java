@@ -83,7 +83,7 @@ public class InfFlowContractAppFeature implements Feature {
      * <code>newPio</code>.<code>newPio</code> can be
      * <code>null</code>
      */
-    protected boolean sameApplication(RuleApp ruleCmp,
+    protected boolean sameApplication(RuleApp<Term, Goal> ruleCmp,
                                       TacletApp newApp,
                                       PosInOccurrence<Term> newPio) {
         // compare the rules
@@ -234,7 +234,7 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp,
+    public RuleAppCost computeCost(RuleApp<Term, Goal> ruleApp,
                                    PosInOccurrence<Term> pos,
                                Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";

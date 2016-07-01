@@ -35,7 +35,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
     
     public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator ();
     
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         return new ACPIterator ( pos.sequentFormula ().formula (),
                               pos.isInAntec () );
     }

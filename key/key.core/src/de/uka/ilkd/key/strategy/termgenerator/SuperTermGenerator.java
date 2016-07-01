@@ -55,7 +55,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         };
     }
     
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         return createIterator ( pos );
     }
 
@@ -77,7 +77,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             super ( cond );
         }
 
-        public Iterator<Term> generate(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+        public Iterator<Term> generate(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
             if ( services == null ) {
                 services = goal.proof ().getServices ();
                 final IntegerLDT numbers = services.getTheories().getIntegerLDT();

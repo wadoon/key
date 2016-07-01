@@ -17,14 +17,14 @@
  */
 package de.uka.ilkd.key.rule;
 
+import org.key_project.common.core.logic.CCTerm;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.rule.Rule;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.CCGoal;
 
-public interface RuleApp {
+public interface RuleApp<T extends CCTerm<?, ?, ?, T>, G extends CCGoal<?, T, ?, ?, ?>> {
 
     /**
      * returns the rule of this rule application
@@ -35,14 +35,14 @@ public interface RuleApp {
      * returns the PositionInOccurrence (representing a SequentFormula<Term> and
      * a position in the corresponding formula) of this rule application
      */
-    PosInOccurrence<Term> posInOccurrence();
+    PosInOccurrence<T> posInOccurrence();
 
     /** applies the specified rule at the specified position
      * if all schema variables have been instantiated
      * @param goal the Goal where to apply the rule
      * @return list of new created goals
      */
-    ImmutableList<Goal> execute(Goal goal);
+    ImmutableList<G> execute(G goal);
 
     /** returns true if all variables are instantiated
      * @return true if all variables are instantiated

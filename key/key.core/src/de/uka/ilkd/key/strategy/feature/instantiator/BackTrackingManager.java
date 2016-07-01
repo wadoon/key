@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.rule.RuleApp;
@@ -39,7 +41,7 @@ public final class BackTrackingManager {
      * The original rule application in question, i.e., the application without
      * the changes that can possibly be applied by <code>ChoicePoint</code>s
      */
-    private RuleApp initialApp = null;
+    private RuleApp<Term, Goal> initialApp = null;
     
     /**
      * Stack of <code>Iterator<CPBranch></code>: the branches of
@@ -104,7 +106,7 @@ public final class BackTrackingManager {
      * @param initialApp
      *            the original rule application in question
      */
-    public void setup(RuleApp initialApp) {
+    public void setup(RuleApp<Term, Goal> initialApp) {
         this.initialApp = initialApp;
         choices.clear ();
         chosenBranches.clear ();
@@ -146,7 +148,7 @@ public final class BackTrackingManager {
      * @return the resulting rule application when all choice points have
      *         applied their modifications
      */
-    public RuleApp getResultingapp() {
+    public RuleApp<Term, Goal> getResultingapp() {
         return getOldRuleApp ();
     }
 
@@ -157,7 +159,7 @@ public final class BackTrackingManager {
     }
 
     private void addChoicePoint(ChoicePoint cp) {
-        final RuleApp oldApp = getOldRuleApp ();
+        final RuleApp<Term, Goal> oldApp = getOldRuleApp ();
         if ( oldApp == null ) {
             // This means that an earlier <code>ChoicePoint</code> did not have
             // any branches. It is necessary to backtrack and to choose a
@@ -202,7 +204,7 @@ public final class BackTrackingManager {
         }
     }
     
-    private RuleApp getOldRuleApp() {
+    private RuleApp<Term, Goal> getOldRuleApp() {
         if ( chosenBranches.isEmpty () ) return initialApp;
         final CPBranch branch = chosenBranches.get ( position - 1 );
         if ( branch == null ) return null;

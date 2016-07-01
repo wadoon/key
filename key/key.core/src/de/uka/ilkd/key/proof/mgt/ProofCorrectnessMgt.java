@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -24,11 +26,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
@@ -44,7 +41,7 @@ public final class ProofCorrectnessMgt {
     private final DefaultMgtProofTreeListener proofTreeListener
 	= new DefaultMgtProofTreeListener();
 
-    private Set<RuleApp> cachedRuleApps = new LinkedHashSet<RuleApp>();
+    private Set<RuleApp<Term, Goal>> cachedRuleApps = new LinkedHashSet<RuleApp<Term, Goal>>();
     private ProofStatus proofStatus = ProofStatus.OPEN;
     
     
@@ -81,7 +78,7 @@ public final class ProofCorrectnessMgt {
     //public interface
     //-------------------------------------------------------------------------
     
-    public RuleJustification getJustification(RuleApp r) {
+    public RuleJustification getJustification(RuleApp<Term, Goal> r) {
 	return proof.getInitConfig()
 	            .getJustifInfo()
 	            .getJustification(r, proof.getServices());
@@ -240,7 +237,7 @@ public final class ProofCorrectnessMgt {
     }
 
     
-    public void ruleApplied(RuleApp r) {
+    public void ruleApplied(RuleApp<Term, Goal> r) {
 	RuleJustification rj = getJustification(r);
 	if(rj==null) {
 	    Debug.out("No justification found for rule " 
@@ -253,7 +250,7 @@ public final class ProofCorrectnessMgt {
     }
 
     
-    public void ruleUnApplied(RuleApp r) {
+    public void ruleUnApplied(RuleApp<Term, Goal> r) {
         cachedRuleApps.remove(r);
     }
 
@@ -261,7 +258,7 @@ public final class ProofCorrectnessMgt {
     public ImmutableSet<Contract> getUsedContracts() {
 	ImmutableSet<Contract> result 
 		= DefaultImmutableSet.<Contract>nil();
-	for(RuleApp ruleApp : cachedRuleApps) {
+	for(RuleApp<Term, Goal> ruleApp : cachedRuleApps) {
             RuleJustification ruleJusti = getJustification(ruleApp);
             if(ruleJusti instanceof RuleJustificationBySpec) {
         	Contract contract

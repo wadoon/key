@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.PositionInfo;
@@ -495,7 +496,7 @@ public final class MiscTools {
      * @param ruleApp The given {@link RuleApp}.
      * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
      */
-    public static String getRuleDisplayName(RuleApp ruleApp) {
+    public static String getRuleDisplayName(RuleApp<Term, Goal> ruleApp) {
        String name = null;
        if (ruleApp != null) {
           Rule rule = ruleApp.rule();
@@ -537,7 +538,7 @@ public final class MiscTools {
      * @param ruleApp The given {@link RuleApp}.
      * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
      */
-    public static String getRuleName(RuleApp ruleApp) {
+    public static String getRuleName(RuleApp<Term, Goal> ruleApp) {
        String name = null;
        if (ruleApp != null) {
           Rule rule = ruleApp.rule();

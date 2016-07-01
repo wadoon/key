@@ -68,9 +68,9 @@ public abstract class AbstractMonomialSmallerThanFeature
     }
 
     private int introductionTimeHelp(Operator op) {
-        ImmutableList<RuleApp> appliedRules = getCurrentGoal().appliedRuleApps ();
+        ImmutableList<RuleApp<Term, Goal>> appliedRules = getCurrentGoal().appliedRuleApps ();
         while ( !appliedRules.isEmpty () ) {
-            final RuleApp app = appliedRules.head ();
+            final RuleApp<Term, Goal> app = appliedRules.head ();
             appliedRules = appliedRules.tail ();
             
             if ( app instanceof TacletApp ) {

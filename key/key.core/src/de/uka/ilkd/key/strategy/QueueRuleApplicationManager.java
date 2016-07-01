@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.RuleApp;
  * be equipped with a {@link RuleAppCost} by converting it into a
  * {@link RuleAppContainer}. The cost of a {@link RuleApp} is computed according
  * to a given {@link Strategy} (see
- * {@link Strategy#computeCost(RuleApp, PosInOccurrence, Goal)}).
+ * {@link Strategy#computeCost(RuleApp<Term, Goal>, PosInOccurrence, Goal)}).
  */
 public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
 
@@ -61,7 +61,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * The next automatic {@link RuleApp} determined by the strategy. Aka result
      * of methods {@link #next()} and {@link #peekNext()}.
      */
-    private RuleApp nextRuleApp = null;
+    private RuleApp<Term, Goal> nextRuleApp = null;
 
     private long nextRuleTime;
 
@@ -114,7 +114,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * rule app is added to the heap
      */
     @Override
-    public void ruleAdded(RuleApp rule, PosInOccurrence<Term> pos) {
+    public void ruleAdded(RuleApp<Term, Goal> rule, PosInOccurrence<Term> pos) {
         if ( queue == null ) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
@@ -131,7 +131,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * rule app is added to the heap
      */
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence<Term> pos) {
+    public void rulesAdded(ImmutableList<? extends RuleApp<Term, Goal>> rules, PosInOccurrence<Term> pos) {
         if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
@@ -176,7 +176,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      *         cache again.
      */
     @Override
-    public RuleApp peekNext() {
+    public RuleApp<Term, Goal> peekNext() {
         ensureQueueExists();
 
         final long currentTime = goal.getTime();
@@ -211,8 +211,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      *         of the heap that is not obsolete
      */
     @Override
-    public RuleApp next() {
-        final RuleApp res = peekNext();
+    public RuleApp<Term, Goal> next() {
+        final RuleApp<Term, Goal> res = peekNext();
         clearNextRuleApp();
         return res;
     }

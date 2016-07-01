@@ -26,12 +26,12 @@ import de.uka.ilkd.key.rule.RuleApp;
 public class NullNewRuleListener implements NewRuleListener {
 
     @Override
-    public void ruleAdded( RuleApp        rule,
+    public void ruleAdded( RuleApp<Term, Goal> rule,
 			   PosInOccurrence<Term> pos ) {
     }
     
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rule,
+    public void rulesAdded(ImmutableList<? extends RuleApp<Term, Goal>> rule,
             PosInOccurrence<Term> pos) {
     }
 

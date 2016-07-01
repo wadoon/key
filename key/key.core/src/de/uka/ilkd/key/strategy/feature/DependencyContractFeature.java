@@ -30,7 +30,7 @@ public final class DependencyContractFeature extends BinaryFeature {
 
    private void removePreviouslyUsedSteps(Term focus, Goal goal,
          List<PosInOccurrence<Term>> steps) {
-      for (RuleApp app : goal.appliedRuleApps()) {
+      for (RuleApp<Term, Goal> app : goal.appliedRuleApps()) {
          if (app.rule() instanceof UseDependencyContractRule
                && app.posInOccurrence().subTerm().equalsModRenaming(focus)) {
             final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
@@ -42,7 +42,7 @@ public final class DependencyContractFeature extends BinaryFeature {
    }
 
    @Override
-   protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+   protected boolean filter(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
       IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
       final Term focus = pos.subTerm();
 

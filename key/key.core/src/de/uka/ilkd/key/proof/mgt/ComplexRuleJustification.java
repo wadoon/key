@@ -14,11 +14,13 @@
 package de.uka.ilkd.key.proof.mgt;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 public interface ComplexRuleJustification extends RuleJustification {
     
-    public RuleJustification getSpecificJustification(RuleApp app, 
+    public RuleJustification getSpecificJustification(RuleApp<Term, Goal> app,
             JavaDLTermServices services);
     
 }

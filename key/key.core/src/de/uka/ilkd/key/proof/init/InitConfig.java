@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.*;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.NamespaceSet;
@@ -29,10 +31,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
@@ -286,7 +284,7 @@ public class InitConfig {
    justifInfo.addJustification(r, j);
     }
 
-    public void registerRuleIntroducedAtNode(RuleApp r, 
+    public void registerRuleIntroducedAtNode(RuleApp<Term, Goal> r,
                                              Node node, 
                                              boolean isAxiom) {
         justifInfo.addJustification(r.rule(), 

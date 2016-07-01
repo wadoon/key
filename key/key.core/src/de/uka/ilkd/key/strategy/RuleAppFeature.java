@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -26,6 +27,6 @@ public interface RuleAppFeature {
     /**
      * Evaluate the cost of a RuleApp.
      */
-    public long cost ( RuleApp app, Goal goal );
+    public long cost (RuleApp<Term, Goal> app, Goal goal );
 
 }

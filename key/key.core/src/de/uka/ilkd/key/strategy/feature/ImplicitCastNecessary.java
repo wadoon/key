@@ -30,7 +30,7 @@ public class ImplicitCastNecessary extends BinaryFeature {
         this.projection = projection;       
     }
     
-    protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    protected boolean filter(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         assert pos != null && pos.depth() >= 1;       
         
         int subPos = pos.getIndex();

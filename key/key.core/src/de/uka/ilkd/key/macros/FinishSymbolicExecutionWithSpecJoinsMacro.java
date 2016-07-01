@@ -308,7 +308,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence<Term> pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp<Term, Goal> app, PosInOccurrence<Term> pio, Goal goal) {
             if (enforceJoin || stoppedGoals.contains(goal)
                     || !FinishSymbolicExecutionWithSpecJoinsMacro.hasModality(goal.sequent())) {
                 return false;

@@ -34,7 +34,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
     public static final Feature INSTANCE =
         new SplittableQuantifiedFormulaFeature ();
     
-    protected boolean filter(RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    protected boolean filter(RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Analyser analyser = new Analyser ();

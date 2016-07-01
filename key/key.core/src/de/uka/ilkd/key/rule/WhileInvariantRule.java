@@ -562,7 +562,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private Term bodyTerm(TermLabelState termLabelState, Services services, RuleApp ruleApp,
+    private Term bodyTerm(TermLabelState termLabelState, Services services, RuleApp<Term, Goal> ruleApp,
                           final Sequent applicationSequent, Instantiation inst,
                           final Term invTerm, Term frameCondition, final Term variantPO,
                           Goal bodyGoal, final JavaBlock guardJb, final Term guardTrueTerm) {
@@ -603,7 +603,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         return new SequentFormula<>(sfTerm);
     }
 
-    private Term useCaseFormula(TermLabelState termLabelState, Services services, RuleApp ruleApp,
+    private Term useCaseFormula(TermLabelState termLabelState, Services services, RuleApp<Term, Goal> ruleApp,
                                 Instantiation inst, Goal useGoal, final JavaBlock guardJb,
                                 final Term guardFalseTerm) {
         final TermBuilder tb = services.getTermBuilder();
@@ -645,7 +645,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private void prepareInvInitiallyValidBranch(TermLabelState termLabelState,
                                                 Services services,
-                                                RuleApp ruleApp,
+                                                RuleApp<Term, Goal> ruleApp,
                                                 Instantiation inst,
                                                 final Term invTerm,
                                                 Term reachableState,
@@ -660,7 +660,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private void prepareBodyPreservesBranch(TermLabelState termLabelState,
                                             Services services,
-                                            RuleApp ruleApp,
+                                            RuleApp<Term, Goal> ruleApp,
                                             final Sequent applicationSequent,
                                             Instantiation inst,
                                             final Term invTerm,
@@ -696,7 +696,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private void prepareUseCaseBranch(TermLabelState termLabelState,
-                                      Services services, RuleApp ruleApp,
+                                      Services services, RuleApp<Term, Goal> ruleApp,
                                       Instantiation inst, Term wellFormedAnon,
                                       Goal useGoal, final JavaBlock guardJb,
                                       final Term guardFalseTerm,
@@ -778,7 +778,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, final RuleApp ruleApp)
+    public ImmutableList<Goal> apply(Goal goal, final RuleApp<Term, Goal> ruleApp)
             throws RuleAbortException {
         final Services services = goal.getServices();
         final TermLabelState termLabelState = new TermLabelState();

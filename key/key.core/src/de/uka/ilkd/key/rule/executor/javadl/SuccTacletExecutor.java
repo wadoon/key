@@ -30,7 +30,7 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacle
                                     CCSequentChangeInfo<Term, Sequent> currentSequent, PosInOccurrence<Term> posOfFind,
                                     MatchConditions matchCond,
                                     Goal goal,
-                                    RuleApp ruleApp,
+                                    RuleApp<Term, Goal> ruleApp,
                                     Services services) {
         if (gt instanceof AntecSuccTacletGoalTemplate) {
             final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
@@ -54,7 +54,7 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacle
             PosInOccurrence<Term> posOfFind,
             MatchConditions matchCond,
             Goal goal,
-            RuleApp ruleApp,
+            RuleApp<Term, Goal> ruleApp,
             Services services) {
         addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
         addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, posOfFind, posOfFind, matchCond, goal, ruleApp, services);

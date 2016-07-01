@@ -47,7 +47,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
             PosInOccurrence<Term> applicationPosInOccurrence,
             MatchConditions matchCond,
             Goal goal,
-            RuleApp tacletApp,
+            RuleApp<Term, Goal> tacletApp,
             Services services) {
         final ImmutableList<SequentFormula<Term>> replacements =
                 instantiateSemisequent(semi, termLabelState, labelHint, pos, matchCond, goal, tacletApp, services);

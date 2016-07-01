@@ -36,7 +36,7 @@ public class AllowedCutPositionFeature extends BinaryFeature {
 
     private AllowedCutPositionFeature () {}
     
-    public boolean filter (RuleApp app, PosInOccurrence<Term> pos, Goal goal) {
+    public boolean filter (RuleApp<Term, Goal> app, PosInOccurrence<Term> pos, Goal goal) {
         Debug.assertFalse ( pos == null,
                             "Feature is only applicable to rules with find" );
 

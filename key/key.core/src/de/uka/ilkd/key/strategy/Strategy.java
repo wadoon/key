@@ -37,7 +37,7 @@ public interface Strategy extends Named, Feature {
      * called immediately before a rule is really applied
      * @return true iff the rule should be applied, false otherwise
      */
-    boolean isApprovedApp ( RuleApp         app,
+    boolean isApprovedApp ( RuleApp<Term, Goal> app,
                             PosInOccurrence<Term> pio,
                             Goal            goal );
     
@@ -51,7 +51,7 @@ public interface Strategy extends Named, Feature {
      * feeding them into the provided
      * <code>RuleAppCostCollector</code>.
      */
-    void instantiateApp ( RuleApp              app,
+    void instantiateApp ( RuleApp<Term, Goal> app,
                           PosInOccurrence<Term>      pio,
                           Goal                 goal,
                           RuleAppCostCollector collector );
