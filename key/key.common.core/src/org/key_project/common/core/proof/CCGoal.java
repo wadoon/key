@@ -38,7 +38,7 @@ public interface CCGoal<ProgVar extends CCProgramVariable<?, ?>,
     /** returns the proof the goal belongs to
      * @return the Proof the goal belongs to
      */
-    CCProof proof();
+    CCProof<Self> proof();
 
     /** returns the sequent of the node
      * @return the Seq to be proved
