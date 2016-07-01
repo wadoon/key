@@ -39,9 +39,8 @@ public class JMLOutlineElement implements IJavaElement, ISourceReference, IOutli
       this.jmlNode = node;
    }
 
-   @SuppressWarnings("rawtypes")
    @Override
-    public final Object getAdapter(Class adapter) {
+    public final <T> T getAdapter(Class<T> adapter) {
       return Platform.getAdapterManager().getAdapter(this, adapter);
    }
 

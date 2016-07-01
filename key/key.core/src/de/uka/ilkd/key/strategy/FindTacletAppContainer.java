@@ -80,7 +80,6 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * this object has been altered since the creation of this object or if a 
      * preceding update has changed
      */
-    @SuppressWarnings("unchecked")
     private boolean subformulaOrPreceedingUpdateHasChanged ( Goal p_goal ) {
     	ImmutableList<FormulaChangeInfo<Term>> infoList =
     	    p_goal.getFormulaTagManager().getModifications(positionTag);

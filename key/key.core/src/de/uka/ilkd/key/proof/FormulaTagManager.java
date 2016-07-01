@@ -198,7 +198,6 @@ public class FormulaTagManager {
                              Goal              p_goal ) {
      
  
-	@SuppressWarnings("unchecked")
     final PosInOccurrence<Term> oldPIO  =
 	    (PosInOccurrence<Term>) p_info.getPositionOfModification().topLevel();
         final FormulaTag      tag     = getTagForPos ( oldPIO );

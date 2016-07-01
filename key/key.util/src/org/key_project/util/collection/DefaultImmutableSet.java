@@ -13,7 +13,6 @@
 
 package org.key_project.util.collection;
 
-import java.util.HashSet;
 import java.util.Iterator;
 
 

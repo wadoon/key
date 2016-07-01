@@ -13,18 +13,12 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Iterator;
-
-import junit.framework.TestCase;
-
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.SortImpl;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -36,21 +30,13 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
+import junit.framework.TestCase;
 
 
 public class TestVariableNamer extends TestCase {
@@ -159,28 +145,6 @@ public class TestVariableNamer extends TestCase {
     }
     
     
-    private boolean inTacletApps(Goal goal, ProgramVariable containedVar) {
-	RuleAppIndex ruleAppIndex = goal.ruleAppIndex();
-	TacletIndex tacletIndex = ruleAppIndex.tacletIndex();
-	ImmutableList<NoPosTacletApp> noPosTacletApps
-		= tacletIndex.getPartialInstantiatedApps();
-
-        for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
-            SVInstantiations insts = noPosTacletApp.instantiations();
-            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it2;
-            it2 = insts.pairIterator();
-            while (it2.hasNext()) {
-                ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it2.next();
-                Object inst = e.value().getInstantiation();
-                if (inst instanceof PostIncrement
-                        && ((PostIncrement) inst).getFirstElement() == containedVar) {
-                    return true;
-                }
-            }
-        }
-	
-	return false;
-    }
 
 
     private void testTemporaryNames(VariableNamer vn) {
@@ -221,23 +185,6 @@ public class TestVariableNamer extends TestCase {
     }
 
 
-   
-    
-//    public void testInnerRenameInTacletApps() {
-//     	VariableNamer vn = services.getVariableNamer();
-//	ProgramVariable v;
-//	
-//	PosInOccurrence<Term> pio = constructPIO(formulaWithX);
-//	Goal goal = constructGoal(formulaWithX);
-//        proof.getNamespaces().programVariables().addSafely(xx);
-//	addGlobal(goal, xx);
-//	addTacletApp(goal, x);
-//	
-//	v = vn.rename(x, goal, pio);
-//	assertFalse(inTacletApps(goal, x));
-//	assertTrue(inTacletApps(goal, v));
-//    }
-    
     public void testNameProposals() {
     	VariableNamer vn = services.getProgramServices().getInnerVarNamer();
 	ProgramElementName proposal;

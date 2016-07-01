@@ -226,7 +226,6 @@ public abstract class TypeResolver {
             return result;
         }
     
-        @SuppressWarnings("deprecation")
         private Sort getContainerSort(Operator op, JavaDLTermServices services) {
             Sort result = null;
             if (op instanceof ProgramVariable) {

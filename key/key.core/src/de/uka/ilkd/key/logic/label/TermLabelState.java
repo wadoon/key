@@ -3,8 +3,6 @@ package de.uka.ilkd.key.logic.label;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Goal;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 
