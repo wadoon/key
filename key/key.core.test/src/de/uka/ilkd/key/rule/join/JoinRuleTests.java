@@ -5,17 +5,14 @@ package de.uka.ilkd.key.rule.join;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilJoinPointMacro;
 import de.uka.ilkd.key.macros.FullAutoPilotWithJMLSpecJoinsProofMacro;
@@ -27,6 +24,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.util.ProofStarter;
+import junit.framework.TestCase;
 
 /**
  * Test suite for the join rule.

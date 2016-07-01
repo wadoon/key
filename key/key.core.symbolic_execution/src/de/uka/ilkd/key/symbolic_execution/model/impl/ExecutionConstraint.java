@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;

@@ -13,12 +13,8 @@
 
 package de.uka.ilkd.key.logic.label;
 
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
@@ -44,12 +40,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
-import de.uka.ilkd.key.rule.label.TermLabelMerger;
-import de.uka.ilkd.key.rule.label.TermLabelPolicy;
-import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.*;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
-import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**

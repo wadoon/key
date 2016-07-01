@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
-import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.UpdateApplication;
 import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.collection.ImmutableList;
