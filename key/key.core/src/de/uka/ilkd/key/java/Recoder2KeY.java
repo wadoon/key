@@ -34,7 +34,6 @@ import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.ModelElement;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

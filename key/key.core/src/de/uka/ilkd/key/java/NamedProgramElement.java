@@ -13,20 +13,25 @@
 
 package de.uka.ilkd.key.java;
 
-import org.key_project.common.core.program.NamedModelElement;
-
-
 /**
- *  Named program element.
- * taken from COMPOST and changed to achieve an immutable structure
+ * Named program element. taken from COMPOST and changed to achieve an immutable
+ * structure
  */
 
-public interface NamedProgramElement extends NamedModelElement, NonTerminalProgramElement {
+public interface NamedProgramElement extends NonTerminalProgramElement {
 
     /**
- *      Get identifier.
- *      @return the identifier.
+     * Get identifier.
+     * 
+     * @return the identifier.
      */
     de.uka.ilkd.key.logic.ProgramElementName getProgramElementName();
+
+    /**
+     * Return the name of the model element.
+     *
+     * @return the name of the model element.
+     */
+    String getName();
 
 }

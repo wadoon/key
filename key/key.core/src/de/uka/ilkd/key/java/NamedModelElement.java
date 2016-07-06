@@ -11,8 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.program;
-
+package de.uka.ilkd.key.java;
 
 /** 
  * A model element that carries a name.

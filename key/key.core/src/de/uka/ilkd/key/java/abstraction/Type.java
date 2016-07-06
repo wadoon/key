@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.java.abstraction;
 
 import org.key_project.common.core.program.abstraction.CCType;
-import org.key_project.common.core.program.abstraction.ProgramModelElement;
 
 import de.uka.ilkd.key.java.expression.Literal;
 

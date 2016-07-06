@@ -18,7 +18,6 @@ import java.util.HashMap;
 import junit.framework.TestCase;
 
 import org.junit.Assert;
-import org.key_project.common.core.program.ModelElement;
 
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 

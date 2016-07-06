@@ -11,24 +11,13 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.program.abstraction;
+package de.uka.ilkd.key.java;
 
-import org.key_project.common.core.program.NamedModelElement;
-
-/**
-   An entity of the program meta model.
-   @author AL
-   @author RN
+/** 
+ * A semantical part of the software model. A source element is
+ * not necessarily connected to a piece of syntax.
+ *
  */
-public interface ProgramModelElement 
-    extends NamedModelElement {
-
-    /**
-       Returns the maximal expanded name including all applicable
-       qualifiers.
-       @return the full name of this program model element.
-     */
-    String getFullName();
-    
+public interface ModelElement {
 
 }

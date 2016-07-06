@@ -19,6 +19,6 @@ package org.key_project.common.core.program.abstraction;
  *
  * @author Dominic Scheurer
  */
-public interface CCType extends ProgramModelElement {
+public interface CCType {
 
 }

@@ -13,8 +13,7 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.common.core.program.ModelElement;
-
+import de.uka.ilkd.key.java.ModelElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Reference;
 import de.uka.ilkd.key.java.SourceElement;
