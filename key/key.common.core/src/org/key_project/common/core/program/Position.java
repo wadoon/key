@@ -13,6 +13,8 @@
 
 package org.key_project.common.core.program;
 
+import java.io.File;
+
 /**
  * The position of a source element, given by its line and column number.
  * Depending on the implementation, the valid range of defined line and column
@@ -33,6 +35,11 @@ public class Position {
     private final int column;
 
     /**
+     * The file for the current position.
+     */
+    private final File file;
+
+    /**
      * The "undefined position" constant used to compare to undefined positions
      * or remove positional information.
      */
@@ -43,6 +50,7 @@ public class Position {
      */
     Position() {
         line = column = -1;
+        file = null;
     }
 
     /**
@@ -57,6 +65,13 @@ public class Position {
     public Position(int line, int column) {
         this.line = line;
         this.column = column;
+        this.file = null;
+    }
+
+    public Position(int line, int column, File file) {
+        this.line = line;
+        this.column = column;
+        this.file = file;
     }
 
     /**
@@ -77,6 +92,13 @@ public class Position {
 
     public int getColumn() {
         return column;
+    }
+
+    /**
+     * @return the file in which to find this position.
+     */
+    public File getFile() {
+        return file;
     }
 
     /**
