@@ -24,12 +24,16 @@ import org.key_project.bytecode.core.bytecode.abstraction.PrimitiveType;
 import org.key_project.bytecode.core.bytecode.instructions.IConst;
 import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.Term;
-import org.key_project.bytecode.core.logic.calculus.*;
+import org.key_project.bytecode.core.logic.calculus.Semisequent;
+import org.key_project.bytecode.core.logic.calculus.SemisequentImpl;
+import org.key_project.bytecode.core.logic.calculus.Sequent;
+import org.key_project.bytecode.core.logic.calculus.SequentImpl;
 import org.key_project.bytecode.core.logic.factories.TermBuilder;
 import org.key_project.bytecode.core.logic.op.LocationVariable;
 import org.key_project.bytecode.core.services.TermServicesImpl;
 import org.key_project.bytecode.core.services.TheoryServices;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
@@ -75,11 +79,11 @@ public class BasicDatastructuresTest extends TestCase {
                                 .one()));
 
         Semisequent ante =
-                new SemisequentImpl(ImmutableSLList.<SequentFormula> nil()
-                        .prepend(new SequentFormula(anteForm)));
+                new SemisequentImpl(ImmutableSLList.<SequentFormula<Term>> nil()
+                        .prepend(new SequentFormula<Term>(anteForm)));
         Semisequent succ =
-                new SemisequentImpl(ImmutableSLList.<SequentFormula> nil()
-                        .prepend(new SequentFormula(succForm)));
+                new SemisequentImpl(ImmutableSLList.<SequentFormula<Term>> nil()
+                        .prepend(new SequentFormula<Term>(succForm)));
         Sequent seq = SequentImpl.createSequent(ante, succ);
 
         assertNotNull(seq);
