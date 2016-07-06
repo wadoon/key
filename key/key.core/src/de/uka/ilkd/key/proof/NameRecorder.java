@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.proof;
+package de.uka.ilkd.key.proof;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;

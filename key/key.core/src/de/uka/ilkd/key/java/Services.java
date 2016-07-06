@@ -23,7 +23,6 @@ import org.key_project.common.core.logic.factories.CCTermBuilder;
 import org.key_project.common.core.logic.factories.CCTermFactory;
 import org.key_project.common.core.logic.op.SortDependingFunction;
 import org.key_project.common.core.logic.sort.SortImpl;
-import org.key_project.common.core.proof.NameRecorder;
 import org.key_project.common.core.services.CCServices;
 import org.key_project.common.core.services.ProgramServices;
 
@@ -117,11 +116,6 @@ public class Services implements JavaDLTermServices, ProofServices,
         this.javaServices = new JavaServices(this, crsc, rec2key);
     }
 
-
-    /* (non-Javadoc)
-     * @see org.key_project.common.core.services.ProofServices#getNameRecorder()
-     */
-    @Override
     public NameRecorder getNameRecorder() {
         return nameRecorder;
     }

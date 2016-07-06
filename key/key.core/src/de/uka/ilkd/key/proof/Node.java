@@ -24,7 +24,6 @@ import java.util.ListIterator;
 
 import de.uka.ilkd.key.logic.Term;
 
-import org.key_project.common.core.proof.NameRecorder;
 import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
