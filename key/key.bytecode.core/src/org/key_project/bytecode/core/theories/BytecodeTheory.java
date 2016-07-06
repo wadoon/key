@@ -16,7 +16,7 @@ package org.key_project.bytecode.core.theories;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.key_project.bytecode.core.logic.services.BCTermServices;
+import org.key_project.bytecode.core.services.BCTermServices;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.theories.CCTheory;

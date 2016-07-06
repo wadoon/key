@@ -16,7 +16,6 @@ package org.key_project.bytecode.core.services;
 import java.util.Collections;
 import java.util.Map;
 
-import org.key_project.bytecode.core.logic.services.BCTermServices;
 import org.key_project.bytecode.core.theories.BytecodeTheory;
 import org.key_project.bytecode.core.theories.IntegerTheory;
 import org.key_project.common.core.logic.Name;

@@ -19,9 +19,9 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.bytecode.core.bytecode.Instruction;
-import org.key_project.bytecode.core.bytecode.Operand;
 import org.key_project.bytecode.core.bytecode.abstraction.PrimitiveType;
 import org.key_project.bytecode.core.bytecode.instructions.IConst;
+import org.key_project.bytecode.core.bytecode.operands.IntOperand;
 import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.logic.calculus.Semisequent;
@@ -47,26 +47,31 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  */
 public class BasicDatastructuresTest extends TestCase {
-    private static final Sort INT_SORT = new SortImpl(new Name("int"));
-    private static final TermBuilder TB = TermServicesImpl.instance()
-            .getTermBuilder();
-    private static final SortedType INT_TYPE = PrimitiveType.JAVA_INT;
-
+    private final Sort INT_SORT;
+    private final TermBuilder TB;
+    private final SortedType INT_TYPE;
+    
+    public BasicDatastructuresTest() {
+        INT_SORT = new SortImpl(new Name("int"));
+        TB = TermServicesImpl.instance()
+                .getTermBuilder();
+        INT_TYPE = PrimitiveType.JAVA_INT;
+    }
+    
     @Test
     public void testSimpleBytecodeSequentCreation() {
 
         TermServicesImpl.instance().getNamespaces().sorts().add(INT_SORT);
         TheoryServices theories = new TheoryServices(
                 TermServicesImpl.instance());
-        
+
         LocationVariable i = new LocationVariable(new Name("i"), INT_TYPE);
         Term iTerm = TB.var(i);
 
         LinkedList<Instruction> insns = new LinkedList<Instruction>();
 
-        // insns.add(...)
-        
-        insns.add(new IConst((Operand) null)); // TODO
+        insns.add(new IConst(new IntOperand(theories.getIntegerTheory()
+                .one())));
 
         InstructionBlock program = new InstructionBlock(insns);
 
@@ -79,15 +84,17 @@ public class BasicDatastructuresTest extends TestCase {
                                 .one()));
 
         Semisequent ante =
-                new SemisequentImpl(ImmutableSLList.<SequentFormula<Term>> nil()
+                new SemisequentImpl(ImmutableSLList
+                        .<SequentFormula<Term>> nil()
                         .prepend(new SequentFormula<Term>(anteForm)));
         Semisequent succ =
-                new SemisequentImpl(ImmutableSLList.<SequentFormula<Term>> nil()
+                new SemisequentImpl(ImmutableSLList
+                        .<SequentFormula<Term>> nil()
                         .prepend(new SequentFormula<Term>(succForm)));
         Sequent seq = SequentImpl.createSequent(ante, succ);
 
         assertNotNull(seq);
-        
+
     }
 
 }

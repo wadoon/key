@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.logic.services;
+package org.key_project.bytecode.core.services;
 
 import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.Term;

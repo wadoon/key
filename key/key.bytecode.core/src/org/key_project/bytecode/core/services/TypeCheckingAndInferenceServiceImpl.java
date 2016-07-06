@@ -14,6 +14,7 @@
 package org.key_project.bytecode.core.services;
 
 import org.key_project.common.core.logic.CCTerm;
+import org.key_project.common.core.logic.Sorted;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.TypeCheckingAndInferenceService;
 import org.key_project.common.core.logic.sort.Sort;
@@ -32,7 +33,7 @@ public class TypeCheckingAndInferenceServiceImpl<O extends Operator> implements
     @Override
     public Sort sort(ImmutableArray<? extends CCTerm<?, ?, ?, ?>> terms, O op) {
         // TODO This is a STUB -- add real sort computation.
-        return terms.get(0).sort();
+        return ((Sorted) op).sort();
     }
 
     @Override

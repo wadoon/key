@@ -18,7 +18,6 @@ import java.util.HashMap;
 import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.logic.factories.TermBuilder;
 import org.key_project.bytecode.core.logic.factories.TermFactory;
-import org.key_project.bytecode.core.logic.services.BCTermServices;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.op.SortDependingFunction;
