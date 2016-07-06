@@ -13,7 +13,9 @@
 
 package org.key_project.bytecode.core.logic.calculus;
 
+import org.key_project.bytecode.core.logic.Term;
 import org.key_project.common.core.logic.calculus.CCSemisequentChangeInfo;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -24,14 +26,14 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  */
 public class SemisequentChangeInfo extends
-        CCSemisequentChangeInfo<SequentFormula, Semisequent> {
+        CCSemisequentChangeInfo<Term, Semisequent> {
 
     /**
      * TODO: Document.
      *
      */
     public SemisequentChangeInfo() {
-        super(ImmutableSLList.<SequentFormula> nil());
+        super(ImmutableSLList.<SequentFormula<Term>> nil());
     }
     
     /**
@@ -39,13 +41,13 @@ public class SemisequentChangeInfo extends
      *
      * @param formulas
      */
-    public SemisequentChangeInfo(ImmutableList<SequentFormula> formulas) {
+    public SemisequentChangeInfo(ImmutableList<SequentFormula<Term>> formulas) {
         super(formulas);
     }
 
     @Override
     protected Semisequent createSemisequent(
-            ImmutableList<SequentFormula> modifiedFormulas) {
+            ImmutableList<SequentFormula<Term>> modifiedFormulas) {
         if (modifiedFormulas.isEmpty()) {
             return SemisequentImpl.nil();
         }

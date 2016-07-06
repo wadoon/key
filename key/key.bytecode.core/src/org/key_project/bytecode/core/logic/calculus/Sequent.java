@@ -23,6 +23,6 @@ import org.key_project.common.core.logic.calculus.CCSequent;
  *
  */
 public interface Sequent extends
-        CCSequent<Term, SequentFormula, Semisequent, Sequent> {
+        CCSequent<Term, Semisequent, Sequent> {
 
 }

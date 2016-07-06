@@ -13,6 +13,7 @@
 
 package org.key_project.bytecode.core.logic.calculus;
 
+import org.key_project.bytecode.core.logic.Term;
 import org.key_project.common.core.logic.calculus.CCSemisequent;
 
 /**
@@ -22,6 +23,6 @@ import org.key_project.common.core.logic.calculus.CCSemisequent;
  *
  */
 public interface Semisequent extends
-        CCSemisequent<SequentFormula, Semisequent> {
+        CCSemisequent<Term, Semisequent> {
 
 }

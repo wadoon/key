@@ -51,13 +51,13 @@ public class PrimitiveType implements Type {
     public static final PrimitiveType JAVA_INT =
             new PrimitiveType("int", new IntOperandValue(0), IntegerTheory.NAME);
 
-    private final String name;
+    private final Name name;
     private final OperandValue defaultValue;
     private final Name theoryName;
 
     private PrimitiveType(String name, OperandValue defaultValue, Name theoryName) {
         this.defaultValue = defaultValue;
-        this.name = name.intern();
+        this.name = new Name(name.intern());
         this.theoryName = theoryName;
         TYPE_MAP.put(name, this);
 
@@ -66,20 +66,10 @@ public class PrimitiveType implements Type {
         }
     }
 
-    /**
-     * Returns the name of this type.
-     * 
-     * @return the name of this type.
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o instanceof PrimitiveType &&
-                ((PrimitiveType) o).getName().equals(name)) {
+                ((PrimitiveType) o).name().equals(name)) {
             return true;
         }
         return false;
@@ -87,7 +77,7 @@ public class PrimitiveType implements Type {
 
     @Override
     public int hashCode() {
-        return getName().hashCode();
+        return name().toString().hashCode();
     }
 
     /**
@@ -108,18 +98,8 @@ public class PrimitiveType implements Type {
      * @return the full name of this program model element.
      */
     @Override
-    public String getFullName() {
-        return name;
-    }
-
-    /**
-     * Returns the name of type.
-     * 
-     * @return the full name of this program model element.
-     */
-    @Override
     public String toString() {
-        return name;
+        return name.toString();
     }
 
     /**
@@ -148,5 +128,10 @@ public class PrimitiveType implements Type {
     public Sort getSort() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public Name name() {
+        return name;
     }
 }

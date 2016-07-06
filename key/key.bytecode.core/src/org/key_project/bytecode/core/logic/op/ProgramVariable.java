@@ -20,7 +20,6 @@ import org.key_project.common.core.logic.op.CCProgramVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.program.Position;
-import org.key_project.common.core.program.PositionInfo;
 import org.key_project.common.core.program.abstraction.SortedType;
 
 /**
@@ -116,11 +115,6 @@ public abstract class ProgramVariable extends
     @Override
     public Position getRelativePosition() {
         return Position.UNDEFINED;
-    }
-
-    @Override
-    public PositionInfo getPositionInfo() {
-        return PositionInfo.UNDEFINED;
     }
 
     /**

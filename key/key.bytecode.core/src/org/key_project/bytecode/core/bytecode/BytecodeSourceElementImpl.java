@@ -15,7 +15,6 @@ package org.key_project.bytecode.core.bytecode;
 
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.program.Position;
-import org.key_project.common.core.program.PositionInfo;
 
 /**
  * TODO: Document.
@@ -58,12 +57,6 @@ public class BytecodeSourceElementImpl implements
 
     @Override
     public Position getRelativePosition() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PositionInfo getPositionInfo() {
         // TODO Auto-generated method stub
         return null;
     }

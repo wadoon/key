@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * @author Dominic Scheurer
  */
 public class SequentImpl extends
-        CCSequentImpl<Term, SequentFormula, Semisequent, Sequent>
+        CCSequentImpl<Term, Semisequent, Sequent>
         implements Sequent {
 
     private static final Sequent EMPTY_SEQUENT = new NilSequent();
@@ -46,9 +46,9 @@ public class SequentImpl extends
     }
 
     @Override
-    protected CCSequentChangeInfo<Term, SequentFormula, Semisequent, Sequent> createSequentChangeInfo(
+    protected CCSequentChangeInfo<Term, Sequent> createSequentChangeInfo(
             boolean inAntec,
-            CCSemisequentChangeInfo<SequentFormula, Semisequent> semiCI,
+            CCSemisequentChangeInfo<Term, Semisequent> semiCI,
             Sequent composeSequent, Sequent genericSequent) {
         assert semiCI instanceof SemisequentChangeInfo;
 
@@ -130,8 +130,8 @@ public class SequentImpl extends
         }
 
         @Override
-        public Iterator<SequentFormula> iterator() {
-            return ImmutableSLList.<SequentFormula> nil()
+        public Iterator<SequentFormula<Term>> iterator() {
+            return ImmutableSLList.<SequentFormula<Term>> nil()
                     .iterator();
         }
 

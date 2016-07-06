@@ -24,7 +24,7 @@ import org.key_project.common.core.logic.calculus.CCSequentChangeInfo;
  *
  */
 public class SequentChangeInfo extends
-        CCSequentChangeInfo<Term, SequentFormula, Semisequent, Sequent> {
+        CCSequentChangeInfo<Term, Sequent> {
 
     /**
      * TODO: Document.
@@ -35,8 +35,8 @@ public class SequentChangeInfo extends
      * @param originalSequent
      */
     protected SequentChangeInfo(
-            CCSemisequentChangeInfo<SequentFormula, Semisequent> antecedent,
-            CCSemisequentChangeInfo<SequentFormula, Semisequent> succedent,
+            CCSemisequentChangeInfo<Term, Semisequent> antecedent,
+            CCSemisequentChangeInfo<Term, Semisequent> succedent,
             Sequent resultingSequent, Sequent originalSequent) {
         super(antecedent, succedent, resultingSequent, originalSequent);
     }

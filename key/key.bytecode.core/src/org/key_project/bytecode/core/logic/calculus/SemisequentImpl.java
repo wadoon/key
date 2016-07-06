@@ -13,8 +13,10 @@
 
 package org.key_project.bytecode.core.logic.calculus;
 
+import org.key_project.bytecode.core.logic.Term;
 import org.key_project.common.core.logic.calculus.CCSemisequentChangeInfo;
 import org.key_project.common.core.logic.calculus.CCSemisequentImpl;
+import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -23,7 +25,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author Dominic Scheurer
  *
  */
-public class SemisequentImpl extends CCSemisequentImpl<SequentFormula, Semisequent>
+public class SemisequentImpl extends CCSemisequentImpl<Term, Semisequent>
         implements Semisequent {
     
     private static final Semisequent EMPTY = new SemisequentImpl();
@@ -37,18 +39,18 @@ public class SemisequentImpl extends CCSemisequentImpl<SequentFormula, Semiseque
      *
      * @param modifiedFormulas
      */
-    public SemisequentImpl(ImmutableList<SequentFormula> modifiedFormulas) {
+    public SemisequentImpl(ImmutableList<SequentFormula<Term>> modifiedFormulas) {
         super(modifiedFormulas);
-    }
-
-    @Override
-    protected CCSemisequentChangeInfo<SequentFormula, Semisequent> createSemisequentChangeInfo(
-            ImmutableList<SequentFormula> formulas) {
-        return new SemisequentChangeInfo(formulas);
     }
     
     public static Semisequent nil() {
         return EMPTY;
+    }
+
+    @Override
+    protected CCSemisequentChangeInfo<Term, Semisequent> createSemisequentChangeInfo(
+            ImmutableList<org.key_project.common.core.logic.calculus.SequentFormula<Term>> formulas) {
+        return new SemisequentChangeInfo(formulas);
     }
 
 }
