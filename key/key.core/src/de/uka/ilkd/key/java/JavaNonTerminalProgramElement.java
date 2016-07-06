@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.java;
 
 import org.key_project.common.core.program.NameAbstractionTable;
-import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 

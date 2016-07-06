@@ -19,10 +19,10 @@ import java.util.Iterator;
 
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
-import org.key_project.common.core.program.PositionInfo;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;

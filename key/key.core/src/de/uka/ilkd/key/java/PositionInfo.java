@@ -11,8 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.program;
+package de.uka.ilkd.key.java;
 
+import org.key_project.common.core.program.Position;
 
 /**
  * represents a group of three Positions: relativePosition, startPosition,

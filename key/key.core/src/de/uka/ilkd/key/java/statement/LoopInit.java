@@ -17,15 +17,10 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.LoopInitializer;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 public class LoopInit extends JavaNonTerminalProgramElement

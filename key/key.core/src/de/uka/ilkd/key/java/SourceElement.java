@@ -35,4 +35,6 @@ public interface SourceElement extends CCSourceElement<Visitor, SourceElement> {
      */
     void prettyPrint(PrettyPrinter w) throws java.io.IOException;
 
+    PositionInfo getPositionInfo();
+
 }

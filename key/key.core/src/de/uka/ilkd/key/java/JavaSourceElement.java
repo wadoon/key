@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import org.key_project.common.core.program.Position;
-import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.ExtList;
 
 /**

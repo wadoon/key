@@ -18,7 +18,6 @@ package de.uka.ilkd.key.logic;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.program.Position;
-import org.key_project.common.core.program.PositionInfo;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.MethodName;

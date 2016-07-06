@@ -21,7 +21,6 @@ import org.key_project.common.core.logic.op.AbstractSV;
 import org.key_project.common.core.logic.op.UpdateableOperator;
 import org.key_project.common.core.program.NameAbstractionTable;
 import org.key_project.common.core.program.Position;
-import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.*;

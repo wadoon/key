@@ -13,9 +13,8 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import org.key_project.common.core.program.PositionInfo;
-
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;

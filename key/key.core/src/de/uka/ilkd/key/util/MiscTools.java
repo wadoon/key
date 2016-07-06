@@ -27,7 +27,6 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.PositionInfo;
 import org.key_project.common.core.rule.Rule;
 import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -36,6 +35,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;

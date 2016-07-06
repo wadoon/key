@@ -15,9 +15,9 @@ package de.uka.ilkd.key.java.expression.literal;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.program.NameAbstractionTable;
-import org.key_project.common.core.program.PositionInfo;
 import org.key_project.util.ExtList;
 
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;

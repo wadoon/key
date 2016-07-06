@@ -76,9 +76,6 @@ public interface CCSourceElement<V extends ProgramVisitor, S extends CCSourceEle
      */
     Position getRelativePosition();
 
-    /** complete position information */
-    PositionInfo getPositionInfo();
-
     /**
      * calls the corresponding method of a visitor in order to perform some
      * action/transformation on this element
