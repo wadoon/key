@@ -33,7 +33,9 @@ import org.key_project.bytecode.core.logic.op.LocationVariable;
 import org.key_project.bytecode.core.services.TermServicesImpl;
 import org.key_project.bytecode.core.services.TheoryServices;
 import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.calculus.SequentFormula;
+import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Modality;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
@@ -62,6 +64,13 @@ public class BasicDatastructuresTest extends TestCase {
     public void testSimpleBytecodeSequentCreation() {
 
         TermServicesImpl.instance().getNamespaces().sorts().add(INT_SORT);
+        
+        Namespace funcNS = TermServicesImpl.instance().getNamespaces().functions();
+        funcNS.addSafely(new Function(new Name("#"), INT_SORT));
+        funcNS.addSafely(new Function(new Name("0"), INT_SORT));
+        funcNS.addSafely(new Function(new Name("1"), INT_SORT));
+        // ... have to add all int functions or read them in from a KeY file!
+        
         TheoryServices theories = new TheoryServices(
                 TermServicesImpl.instance());
 

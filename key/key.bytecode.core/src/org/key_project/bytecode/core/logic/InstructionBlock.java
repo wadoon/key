@@ -29,9 +29,9 @@ import org.key_project.common.core.program.NameAbstractionTable;
 public class InstructionBlock implements ModalContent<BytecodeSourceElement> {
 
     private int pc;
-    private LinkedList<Instruction> insns;
+    private LinkedList<Instruction> insns = new LinkedList<>();
 
-    private static InstructionBlock EMPTY_BLOCK = new InstructionBlock(
+    private static final InstructionBlock EMPTY_BLOCK = new InstructionBlock(
             new LinkedList<Instruction>());
 
     /**

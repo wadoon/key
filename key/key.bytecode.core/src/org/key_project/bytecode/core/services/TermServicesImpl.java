@@ -31,6 +31,8 @@ public class TermServicesImpl implements BCTermServices {
 
     private static final BCTermServices INSTANCE = new TermServicesImpl();
     
+    private NamespaceSet namspaces = new NamespaceSet();
+    
     public static BCTermServices instance() {
         return INSTANCE;
     }
@@ -55,8 +57,14 @@ public class TermServicesImpl implements BCTermServices {
 
     @Override
     public NamespaceSet getNamespaces() {
-        // TODO Auto-generated method stub
-        return null;
+        return namspaces;
+    }
+
+    /**
+     * @param namspaces the namspaces to set
+     */
+    public void setNamspaces(NamespaceSet namspaces) {
+        this.namspaces = namspaces;
     }
 
     @Override
