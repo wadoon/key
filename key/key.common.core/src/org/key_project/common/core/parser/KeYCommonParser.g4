@@ -1,11 +1,11 @@
 parser grammar KeYCommonParser;
 
-options {
-    tokenVocab = KeYCommonLexer;
+@header {
+    package org.key_project.common.core.parser;
 }
 
-@header {
-	package org.key_project.common.core.parser;
+options {
+    tokenVocab = KeYCommonLexer;
 }
 
 init: ID*? ;
