@@ -34,7 +34,8 @@ import org.key_project.common.core.logic.IntIterator;
  */
 public final class PosInTerm<T extends CCTerm<?, ?, ?, T>> {
 
-    private static final PosInTerm<?> TOP_LEVEL = new PosInTerm<>();
+    @SuppressWarnings("rawtypes")
+    private static final PosInTerm<?> TOP_LEVEL = new PosInTerm();
 
     // to save memory, we use 16bit integers (unsigned) instead of 32bit
     private final char[] positions;
