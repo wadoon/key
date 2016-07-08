@@ -1,9 +1,25 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2016 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License.
+// See LICENSE.TXT for details.
+//
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License.
+// See LICENSE.TXT for details.
+//
+//
+
 lexer grammar KeYCommonLexer ;
 
 @header {
-
 	package org.key_project.common.core.parser;
-
 }
 
 /**
@@ -565,24 +581,25 @@ fragment CHAR_LITERAL
 	: '\'' ((' '..'&')
 	| ('('..'[')
 	| (']'..'~')
-	| ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | 'u' HEX ))) '\'' ;
+	| ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"'/* | 'u' HEX */ ))) '\'' ;
 
 fragment QUOTED_STRING_LITERAL
 	: '"' ('\\' . | '\n' | ~('\n' | '"' | '\\') )* '"' ;
 
 SL_COMMENT
-	: '//'
-(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF)
--> channel(HIDDEN) ;
+	: '//' (~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF)
+      -> skip //channel(HIDDEN)
+    ;
 
 ML_COMMENT
-	: '/*' .*? '*/' ;
+	: '/*' .*? '*/'
+	  -> skip //channel(HIDDEN)
+    ;
 
 // A single Digit that is followed by a ( is an ident, otherwise it's a number
 
 DIGIT_DISPATCH
-	: DIGIT
-	| HEX_LITERAL
+	: HEX_LITERAL
 	| NUM_LITERAL ;
 
 fragment HEX_LITERAL
@@ -612,6 +629,6 @@ IDENT
 	: ( (LETTER | '_' | '#' | '$') (IDCHAR)*
 ) ;
 
-fragment NUM_LITERAL
+NUM_LITERAL
 	: (DIGIT)+ ;
 
