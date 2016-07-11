@@ -18,13 +18,13 @@ import java.util.Map;
 
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.common.core.logic.sort.ProxySort;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.ProxySort;
 
 /**
  * Generic removing lemma generator adds the default implementation only that all

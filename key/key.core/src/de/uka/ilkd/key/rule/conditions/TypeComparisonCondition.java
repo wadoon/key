@@ -20,6 +20,7 @@ import java.util.WeakHashMap;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.sort.ProxySort;
 import org.key_project.common.core.logic.sort.Sort;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 

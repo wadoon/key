@@ -63,6 +63,14 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      * @throws org.key_project.utils.collection.NotUniqueException if the element is already present
      */
     ImmutableSet<T> addUnique(T element) throws NotUniqueException;
+    
+    /**
+     * Adds the elements of the {@link Iterable} to the set.
+     *
+     * @param elements The elements to add.
+     * @return A new set also containing elements.
+     */
+    ImmutableSet<T> add(Iterable<T> elements);
 
     /**
      * Convert the set to a Java array

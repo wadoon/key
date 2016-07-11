@@ -75,18 +75,42 @@ func_decls
     ;
 
 one_sort_decl
-    : (   GENERIC sortIds = simple_ident_comma_list
-          ( ONEOF sortOneOf = oneof_sorts )?
-          ( EXTENDS sortExt = extends_sorts )?
-        | PROXY sortIds = simple_ident_comma_list
-          ( EXTENDS sortExt = extends_sorts )?
-        | (ABSTRACT )?
-          firstSort = simple_ident_dots
-          (   (EXTENDS sortExt = extends_sorts )
-            | ((COMMA) sortIds = simple_ident_comma_list )
-          )?
+    : (   generic_sort_decl
+        | proxy_sort_decl
+        | simple_sort_decl
       ) SEMI
     ;
+
+generic_sort_decl
+    : GENERIC sortIds = simple_ident_comma_list
+      ( ONEOF sortOneOf = oneof_sorts )?
+      ( EXTENDS sortExt = extends_sorts )?
+    ;
+
+proxy_sort_decl
+    : PROXY sortIds = simple_ident_comma_list
+      ( EXTENDS sortExt = extends_sorts )?
+    ;
+
+simple_sort_decl
+    : sortIds = simple_ident_comma_list  # comma_sort_decl
+    | firstSort = simple_ident
+      EXTENDS sortExt = extends_sorts    # extends_sort_decl
+    ;
+
+/*
+// Removed the program_type_sort_decl which matches,
+// for instance, \abstract java.lang.Cloneable \extends java.lang.Object;
+// since it is specific to a target programming language.
+// A new restricted version is simple_sort_decl.
+program_type_sort_decl
+    : (ABSTRACT )?
+      firstSort = simple_ident_dots
+      (   (EXTENDS sortExt = extends_sorts )
+        | ((COMMA) sortIds = simple_ident_comma_list )
+      )?
+    ;
+*/
 
 pred_decl
    : pred_name = funcpred_name
@@ -123,6 +147,7 @@ oneof_sorts
     ;
 
 // like arg_sorts but admits also the keyword "\formula"
+// XXX Not used???
 arg_sorts_or_formula
     : (   LPAREN
           (   s = sortId
@@ -150,22 +175,28 @@ where_to_bind
     :
         LBRACE
         (
-            TRUE | FALSE
+            boolean_value
         )
         (
            COMMA
            (
-               TRUE | FALSE
+               boolean_value
            )
         )*
         RBRACE
    ;
 
+boolean_value
+    : TRUE
+    | FALSE
+    ;
+
 funcpred_name
     : (
-        prefix = sort_name
-        DOUBLECOLON
         name = simple_ident
+        LESS
+        prefix = sort_name
+        GREATER
       )                      # GenericFunctionName
     | name = simple_ident    # SimpleIdentFunctionName
     // The following case is addressing the declaration of the
@@ -184,6 +215,10 @@ sort_name
       ( brackets = EMPTYBRACKETS )*
     ;
 
+simple_ident
+   : id = IDENT
+   ;
+
 simple_ident_dots
     : id = simple_ident
       (  DOT
@@ -196,8 +231,4 @@ simple_ident_dots
 simple_ident_comma_list
    : id = simple_ident
      (COMMA id = simple_ident )*
-   ;
-
-simple_ident
-   : id = IDENT
    ;

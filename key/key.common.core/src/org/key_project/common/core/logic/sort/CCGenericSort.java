@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableSet;
  * concrete sort, which has to be a subsort of the instantiations of the
  * supersorts of this sort
  */
-public abstract class CCGenericSort extends AbstractSort {
+public class CCGenericSort extends AbstractSort {
 
     /**
      * list of sorts this generic sort may be instantiated with; EMPTY_SORT_SORT
@@ -67,16 +67,21 @@ public abstract class CCGenericSort extends AbstractSort {
     }
 
     public CCGenericSort(Name name) {
-        super(name, DefaultImmutableSet.<Sort> nil(), false);
-        this.oneOf = DefaultImmutableSet.<Sort> nil();
+        super(name, DefaultImmutableSet.<Sort>nil(), false);
+        this.oneOf = DefaultImmutableSet.<Sort>nil();
     }
 
     /**
+     * Checks whether the super sorts ("<code>\extends ..."</code>) are
+     * admissible. In the Java case, for instance, this deals with the case of
+     * Array sorts. The default implementation is empty.
+     * 
      * @throws GenericSupersortException
      *             if this {@link CCGenericSort} has an illegal super sort.
      */
-    protected abstract void checkSupersorts()
-            throws GenericSupersortException;
+    protected void checkSupersorts()
+            throws GenericSupersortException {
+    }
 
     /**
      * @return possible instantiations

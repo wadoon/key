@@ -552,7 +552,7 @@ LESS_DISPATCH
 	| LGUILLEMETS
 	| LESS ;
 
-fragment LESS
+LESS
 	: '<' ;
 
 fragment LESSEQUAL

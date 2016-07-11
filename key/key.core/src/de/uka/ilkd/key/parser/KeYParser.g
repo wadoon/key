@@ -1704,7 +1704,7 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                         // attention: no expand to java.lang here!       
                         if (sorts().lookup(sort_name) == null) {
                             Sort s;
-			    if (isGenericSort) {
+                            if (isGenericSort) {
                                 int i;
                                 ImmutableSet<Sort>  ext   = DefaultImmutableSet.<Sort>nil();
                                 ImmutableSet<Sort>  oneOf = DefaultImmutableSet.<Sort>nil();
@@ -1733,7 +1733,7 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                 if(isProxySort) {
                                     s = new ProxySort(sort_name, ext);
                                 } else {
-                                s = new SortImpl(sort_name, ext, isAbstractSort);
+                                  s = new SortImpl(sort_name, ext, isAbstractSort);
                                 }
                             }
                             assert s != null;
@@ -2105,72 +2105,72 @@ location_ident returns [int kind = NORMAL_NONRIGID]
 
 func_decl
 @init{
-    boolean unique = false;
+  boolean unique = false;
 }
-    :
-        (
-            UNIQUE {unique=true;}
-        )?
-        
-        retSort = any_sortId_check[!skip_functions]
-        
-        func_name = funcpred_name 
-        
-	(
-	    whereToBind = where_to_bind
-	)?        
+:
+(
+ UNIQUE {unique=true;}
+ )?
 
-        argSorts = arg_sorts[!skip_functions]
-                
-        {
-            if (!skip_functions) {
-            
-	 	if(whereToBind != null 
-	 	   && whereToBind.length != argSorts.length) {
-                    semanticError("Where-to-bind list must have same length "
-                                  + "as argument list");
-                } 
-            
-                Function f = null;
-                
-	        int separatorIndex = func_name.indexOf("::"); 
-	        if (separatorIndex > 0) {
-	            String sortName = func_name.substring(0, separatorIndex);
-	            String baseName = func_name.substring(separatorIndex + 2);
-		    Sort genSort = lookupSort(sortName);
-		    
-		    if(genSort instanceof GenericSort) {	        	            	
-		    	f = SortDependingFunction.createFirstInstance(
-		    	    		(GenericSort)genSort,
-		    	    		new Name(baseName),
-		    	    		retSort,
-		    	    		argSorts,
-		    	    		unique,
-		    	    		SortImpl.ANY);
-		    }
-	        }
-	        
-	        if(f == null) {
-	            f = new Function(new Name(func_name), 
-	                             retSort, 
-	                             argSorts,
-	                             whereToBind,
-	                             unique);                    
-	        }
-		if (lookup(f.name()) != null) {
-		    if(!isProblemParser()) {
-		      throw new AmbigiousDeclException(f.name().toString(), 
-		                                     getSourceName(), 
-		                                     getLine(), 
-		                                     getColumn());
-		    }
-		}else{
-	    	    addFunction(f);
-	        }
-            } 
-        }
-        SEMI
-    ;
+retSort = any_sortId_check[!skip_functions]
+
+func_name = funcpred_name 
+
+(
+ whereToBind = where_to_bind
+ )?        
+
+argSorts = arg_sorts[!skip_functions]
+
+{
+  if (!skip_functions) {
+
+    if(whereToBind != null 
+        && whereToBind.length != argSorts.length) {
+      semanticError("Where-to-bind list must have same length "
+          + "as argument list");
+    } 
+
+    Function f = null;
+
+    int separatorIndex = func_name.indexOf("::"); 
+    if (separatorIndex > 0) {
+      String sortName = func_name.substring(0, separatorIndex);
+      String baseName = func_name.substring(separatorIndex + 2);
+      Sort genSort = lookupSort(sortName);
+
+      if(genSort instanceof GenericSort) {	        	            	
+        f = SortDependingFunction.createFirstInstance(
+            (GenericSort)genSort,
+            new Name(baseName),
+            retSort,
+            argSorts,
+            unique,
+            SortImpl.ANY);
+      }
+    }
+
+    if(f == null) {
+      f = new Function(new Name(func_name), 
+          retSort, 
+          argSorts,
+          whereToBind,
+          unique);                    
+    }
+    if (lookup(f.name()) != null) {
+      if(!isProblemParser()) {
+        throw new AmbigiousDeclException(f.name().toString(), 
+            getSourceName(), 
+            getLine(), 
+            getColumn());
+      }
+    }else{
+      addFunction(f);
+    }
+  } 
+}
+SEMI
+;
 
 func_decls
     :
