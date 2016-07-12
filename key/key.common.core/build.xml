@@ -44,9 +44,9 @@
 
 		<mkdir dir="${build.dir}" />
 
-		<uptodate property="keylexer.notRequired" targetFile="${gen.dir}/org/key_project/common/core/parser/KeYLexer.java" srcFile="${src.dir}/dorg/key_project/common/core/parser/KeYCommonLexer.g4" />
+		<uptodate property="keylexer.notRequired" targetFile="${gen.dir}/org/key_project/common/core/parser/KeYCommonLexer.java" srcFile="${src.dir}/dorg/key_project/common/core/parser/KeYCommonLexer.g4" />
 
-		<uptodate property="keyparser.notRequired" targetFile="${gen.dir}/org/key_project/common/core/parser/KeYParser.java">
+		<uptodate property="keyparser.notRequired" targetFile="${gen.dir}/org/key_project/common/core/parser/KeYCommonParser.java">
 			<srcfiles dir="${src.dir}/org/key_project/common/core/parser">
 				<include name="KeYCommonParser.g4" />
 				<include name="KeYCommonLexer.g4" />

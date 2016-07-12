@@ -18,10 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.*;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.NamespaceSet;
@@ -31,6 +28,7 @@ import org.key_project.common.core.logic.sort.*;
 import org.key_project.common.core.parser.KeYCommonParser.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -40,15 +38,18 @@ import org.key_project.util.collection.Pair;
  */
 public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
     private final NamespaceSet nss;
-    private final File file;
+    private File file;
+
+    // //////////////////////////////////////////// //
+    // Constructors, public (convenience) interface //
+    // //////////////////////////////////////////// //
 
     /**
      * TODO: Document.
      *
      * @param file
      */
-    public KeYParseTreeVisitor(File file) {
-        this.file = file;
+    public KeYParseTreeVisitor() {
         this.nss = new NamespaceSet();
     }
 
@@ -58,22 +59,51 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
      * @param file
      * @param nss
      */
-    public KeYParseTreeVisitor(File file, NamespaceSet nss) {
-        this.file = file;
+    public KeYParseTreeVisitor(NamespaceSet nss) {
         this.nss = nss;
     }
 
     /**
-     * Initiates the parsing process. Afterward, methods like {@link #sorts()}
-     * should return sensible results.
+     * Initiates the parsing process for a file. Afterward, methods like
+     * {@link #sorts()} should return sensible results.
      *
+     * @param file
+     *            the file to parse.
      * @throws IOException
      */
-    public void parse() throws IOException {
+    public void parse(File file) throws IOException {
+        this.file = file;
+
         // Create a CharStream that reads from an example file
         String fileName = file.getCanonicalPath();
         CharStream input = new ANTLRFileStream(fileName);
 
+        parse(input);
+    }
+
+    /**
+     * Initiates the parsing process for a file. Afterward, methods like
+     * {@link #sorts()} should return sensible results.
+     * 
+     * @param inputStr
+     *            the string to parse.
+     */
+    public void parse(String inputStr) {
+        this.file = null;
+
+        // Create a CharStream that reads from an the given input string
+        CharStream input = new ANTLRInputStream(inputStr);
+
+        parse(input);
+    }
+
+    /**
+     * Parses from the given input stream.
+     *
+     * @param input
+     *            the input stream to use for the parsing.
+     */
+    private void parse(CharStream input) {
         // Create the lexer
         KeYCommonLexer lexer = new KeYCommonLexer(input);
 
@@ -114,15 +144,19 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
         return nss.functions();
     }
 
+    // /////////////////////////// //
+    // Implemented visitor methods //
+    // /////////////////////////// //
+
     @Override
     public Function visitPred_decl(Pred_declContext ctx) {
 
         Function p = null;
 
-        final ImmutableArray<Boolean> whereToBind = new ImmutableArray<>(visitWhere_to_bind(ctx.where_to_bind()));
-        final ImmutableArray<Sort> argSorts = new ImmutableArray<>(visitArg_sorts(ctx.arg_sorts()));
+        final ImmutableArray<Boolean> whereToBind = visitWhere_to_bind(ctx.where_to_bind());
+        final ImmutableArray<Sort> argSorts = visitArg_sorts(ctx.arg_sorts());
 
-        if (whereToBind.size() > 0 && whereToBind.size() != argSorts.size()) {
+        if (whereToBind != null && whereToBind.size() != argSorts.size()) {
             semanticExc("Where-to-bind list must have same length as argument list", ctx);
         }
 
@@ -173,14 +207,14 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
         final boolean unique = ctx.UNIQUE() != null;
         final String retSortName = visitSort_name(ctx.sort_name());
         final Sort retSort = (Sort) sorts().lookup(retSortName);
-        final ImmutableArray<Boolean> whereToBind = new ImmutableArray<>(visitWhere_to_bind(ctx.where_to_bind()));
-        final ImmutableArray<Sort> argSorts = new ImmutableArray<>(visitArg_sorts(ctx.arg_sorts()));
+        final ImmutableArray<Boolean> whereToBind = visitWhere_to_bind(ctx.where_to_bind());
+        final ImmutableArray<Sort> argSorts = visitArg_sorts(ctx.arg_sorts());
 
         if (retSort == null) {
             notDeclExc("Sort", retSortName, ctx);
         }
 
-        if (whereToBind.size() > 0 && whereToBind.size() != argSorts.size()) {
+        if (whereToBind != null && whereToBind.size() != argSorts.size()) {
             semanticExc("Where-to-bind list must have same length as argument list", ctx);
         }
 
@@ -250,8 +284,8 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
 
                 if (sorts().lookup(sortName) == null) {
                     CCGenericSort s = new CCGenericSort(new Name(sortName),
-                            new DefaultImmutableSet<Sort>().add(visitExtends_sorts(ctx.extends_sorts())),
-                            new DefaultImmutableSet<Sort>().add(visitOneof_sorts(ctx.oneof_sorts())));
+                            visitExtends_sorts(ctx.extends_sorts()),
+                            visitOneof_sorts(ctx.oneof_sorts()));
 
                     sorts().add(s);
                     result.add(s);
@@ -261,7 +295,7 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
             return result;
         }
         catch (GenericSupersortException e) {
-            throw new GenericSortException("sort", "Illegal sort given", e.getIllegalSort(), file.getName(),
+            throw new GenericSortException("sort", "Illegal sort given", e.getIllegalSort(), getFileName(),
                     ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
         }
     }
@@ -275,7 +309,7 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
 
             if (sorts().lookup(sortName) == null) {
                 ProxySort s = new ProxySort(new Name(sortName),
-                        new DefaultImmutableSet<Sort>().add(visitExtends_sorts(ctx.extends_sorts())));
+                        visitExtends_sorts(ctx.extends_sorts()));
 
                 sorts().add(s);
                 result.add(s);
@@ -289,26 +323,31 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
     public Sort visitExtends_sort_decl(Extends_sort_declContext ctx) {
         // TODO: Maybe we could directly create an immutable set...
         return new SortImpl(new Name(visitSimple_ident(ctx.simple_ident())),
-                new DefaultImmutableSet<Sort>().add(visitExtends_sorts(ctx.extends_sorts())));
+                DefaultImmutableSet.<Sort>nil().add(visitExtends_sorts(ctx.extends_sorts())));
     }
 
     @Override
-    public ArrayList<Sort> visitExtends_sorts(Extends_sortsContext ctx) {
-        ArrayList<Sort> sortIds = new ArrayList<>();
+    public ImmutableSet<Sort> visitExtends_sorts(Extends_sortsContext ctx) {
+        ImmutableSet<Sort> sortIds = DefaultImmutableSet.<Sort>nil();
+
+        if (ctx == null) {
+            // No \extends_sorts given
+            return DefaultImmutableSet.<Sort>nil().add(SortImpl.ANY);
+        }
 
         for (Simple_ident_dotsContext context : ctx.simple_ident_dots()) {
             String sortName = visitSimple_ident_dots(context);
 
             if (sortName.equals("any")) {
-                sortIds.add(SortImpl.ANY);
+                sortIds = sortIds.add(SortImpl.ANY);
             }
             else {
                 Sort sort = (Sort) sorts().lookup(sortName);
                 if (sort == null) {
-                    throw new NotDeclException(file.getName(), ctx.start.getLine(), ctx.start.getCharPositionInLine(),
+                    throw new NotDeclException(getFileName(), ctx.start.getLine(), ctx.start.getCharPositionInLine(),
                             "Sort", sortName);
                 }
-                sortIds.add(sort);
+                sortIds = sortIds.add(sort);
             }
         }
 
@@ -316,13 +355,13 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
     }
 
     @Override
-    public ArrayList<Sort> visitOneof_sorts(Oneof_sortsContext ctx) {
+    public ImmutableSet<Sort> visitOneof_sorts(Oneof_sortsContext ctx) {
         if (ctx != null) {
-            return collectSorts(ctx.sortId(), ctx);
+            return DefaultImmutableSet.<Sort>nil().add(collectSorts(ctx.sortId(), ctx));
         }
         else {
             // No \oneof given
-            return new ArrayList<>();
+            return DefaultImmutableSet.<Sort>nil();
         }
     }
 
@@ -334,8 +373,14 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
     }
 
     @Override
-    public ArrayList<Sort> visitArg_sorts(Arg_sortsContext ctx) {
-        return collectSorts(ctx.sortId(), ctx);
+    public ImmutableArray<Sort> visitArg_sorts(Arg_sortsContext ctx) {
+        ArrayList<Sort> result = collectSorts(ctx.sortId(), ctx);
+
+        if (result == null) {
+            return null;
+        }
+
+        return new ImmutableArray<>(collectSorts(ctx.sortId(), ctx));
     }
 
     // ////////////////////////////////////////// //
@@ -344,18 +389,18 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
     // ////////////////////////////////////////// //
 
     @Override
-    public ArrayList<Boolean> visitWhere_to_bind(Where_to_bindContext ctx) {
+    public ImmutableArray<Boolean> visitWhere_to_bind(Where_to_bindContext ctx) {
         ArrayList<Boolean> result = new ArrayList<>();
 
         if (ctx == null) {
-            return result;
+            return null;
         }
 
         for (Boolean_valueContext context : ctx.boolean_value()) {
             result.add(visitBoolean_value(context));
         }
 
-        return result;
+        return new ImmutableArray<>(result);
     }
 
     @Override
@@ -417,16 +462,16 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
     // //////////////////////// //
 
     private void semanticExc(String message, ParserRuleContext ctx) {
-        throw new KeYSemanticException(file.getName(), message, ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        throw new KeYSemanticException(getFileName(), message, ctx.start.getLine(), ctx.start.getCharPositionInLine());
     }
 
     private void notDeclExc(String category, String undeclaredSymbol, ParserRuleContext ctx) {
-        throw new NotDeclException(file.getName(), ctx.start.getLine(), ctx.start.getCharPositionInLine(),
+        throw new NotDeclException(getFileName(), ctx.start.getLine(), ctx.start.getCharPositionInLine(),
                 category, undeclaredSymbol);
     }
 
     private void ambiguousDeclExc(String ambiguousSymbol, ParserRuleContext ctx) {
-        throw new AmbiguousDeclException(file.getName(), ctx.start.getLine(), ctx.start.getCharPositionInLine(),
+        throw new AmbiguousDeclException(getFileName(), ctx.start.getLine(), ctx.start.getCharPositionInLine(),
                 ambiguousSymbol);
     }
 
@@ -441,7 +486,7 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
             Sort sort = (Sort) sorts().lookup(sortName);
 
             if (sort == null) {
-                throw new NotDeclException(file.getName(), ctx.start.getLine(), ctx.start.getCharPositionInLine(),
+                throw new NotDeclException(getFileName(), ctx.start.getLine(), ctx.start.getCharPositionInLine(),
                         "Sort", sortName);
             }
 
@@ -450,14 +495,26 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
         return sortIds;
     }
 
+    private String getFileName() {
+        String fallback = "<no file given>";
+
+        if (file == null) {
+            return fallback;
+        }
+        else {
+            return file.getName();
+        }
+    }
+
     // Main method for quick-and-dirty testing.
     // XXX Remove before deploying
     public static void main(String[] args) throws IOException {
         // Create a CharStream that reads from an example file
         String fileName = "resources/org/key_project/common/core/proof/rules/integerHeader.key";
 
-        KeYParseTreeVisitor visitor = new KeYParseTreeVisitor(new File(fileName));
-        visitor.parse();
+        KeYParseTreeVisitor visitor = new KeYParseTreeVisitor();
+        visitor.parse(new File(fileName));
+        // visitor.parse("\\sorts { \\generic S; }");
 
         System.out.println(visitor.sorts().toString());
         System.out.println(visitor.functions().toString());

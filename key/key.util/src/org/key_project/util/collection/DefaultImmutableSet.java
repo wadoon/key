@@ -41,7 +41,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return (DefaultImmutableSet<T>) NILSet.NIL;
     }
 
-    public DefaultImmutableSet() {
+    private DefaultImmutableSet() {
         elementList = ImmutableSLList.<T>nil();
     }
 
