@@ -30,6 +30,7 @@ import org.key_project.bytecode.core.logic.calculus.Sequent;
 import org.key_project.bytecode.core.logic.calculus.SequentImpl;
 import org.key_project.bytecode.core.logic.factories.TermBuilder;
 import org.key_project.bytecode.core.logic.op.LocationVariable;
+import org.key_project.bytecode.core.services.BCTermServices;
 import org.key_project.bytecode.core.services.TermServicesImpl;
 import org.key_project.bytecode.core.services.TheoryServices;
 import org.key_project.common.core.logic.Name;
@@ -49,33 +50,33 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  */
 public class BasicDatastructuresTest extends TestCase {
-    private final Sort INT_SORT;
-    private final TermBuilder TB;
-    private final SortedType INT_TYPE;
-    
+    private final Sort intSort;
+    private final TermBuilder tb;
+    private final SortedType intType;
+    private final BCTermServices termServices;
+
     public BasicDatastructuresTest() {
-        INT_SORT = new SortImpl(new Name("int"));
-        TB = TermServicesImpl.instance()
-                .getTermBuilder();
-        INT_TYPE = PrimitiveType.JAVA_INT;
+        intSort = new SortImpl(new Name("int"));
+        termServices = new TermServicesImpl();
+        tb = termServices.getTermBuilder();
+        intType = PrimitiveType.JAVA_INT;
     }
-    
+
     @Test
     public void testSimpleBytecodeSequentCreation() {
 
-        TermServicesImpl.instance().getNamespaces().sorts().add(INT_SORT);
-        
-        Namespace funcNS = TermServicesImpl.instance().getNamespaces().functions();
-        funcNS.addSafely(new Function(new Name("#"), INT_SORT));
-        funcNS.addSafely(new Function(new Name("0"), INT_SORT));
-        funcNS.addSafely(new Function(new Name("1"), INT_SORT));
-        // ... have to add all int functions or read them in from a KeY file!
-        
-        TheoryServices theories = new TheoryServices(
-                TermServicesImpl.instance());
+        termServices.getNamespaces().sorts().add(intSort);
 
-        LocationVariable i = new LocationVariable(new Name("i"), INT_TYPE);
-        Term iTerm = TB.var(i);
+        Namespace funcNS = termServices.getNamespaces().functions();
+        funcNS.addSafely(new Function(new Name("#"), intSort));
+        funcNS.addSafely(new Function(new Name("0"), intSort));
+        funcNS.addSafely(new Function(new Name("1"), intSort));
+        // ... have to add all int functions or read them in from a KeY file!
+
+        TheoryServices theories = new TheoryServices(termServices);
+
+        LocationVariable i = new LocationVariable(new Name("i"), intType);
+        Term iTerm = tb.var(i);
 
         LinkedList<Instruction> insns = new LinkedList<Instruction>();
 
@@ -85,20 +86,20 @@ public class BasicDatastructuresTest extends TestCase {
         InstructionBlock program = new InstructionBlock(insns);
 
         Term anteForm =
-                TB.equals(iTerm, theories.getIntegerTheory().zero());
+                tb.equals(iTerm, theories.getIntegerTheory().zero());
 
         Term succForm =
-                TB.prog(Modality.DIA, program,
-                        TB.equals(iTerm, theories.getIntegerTheory()
+                tb.prog(Modality.DIA, program,
+                        tb.equals(iTerm, theories.getIntegerTheory()
                                 .one()));
 
         Semisequent ante =
                 new SemisequentImpl(ImmutableSLList
-                        .<SequentFormula<Term>> nil()
+                        .<SequentFormula<Term>>nil()
                         .prepend(new SequentFormula<Term>(anteForm)));
         Semisequent succ =
                 new SemisequentImpl(ImmutableSLList
-                        .<SequentFormula<Term>> nil()
+                        .<SequentFormula<Term>>nil()
                         .prepend(new SequentFormula<Term>(succForm)));
         Sequent seq = SequentImpl.createSequent(ante, succ);
 
