@@ -17,7 +17,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.CCSourceElement;
 import org.key_project.common.core.program.ProgramVisitor;
-import org.key_project.common.core.program.abstraction.SortedType;
+import org.key_project.common.core.program.abstraction.CCType;
 
 /**
  * Class representing a program variable. Program variables have a sorted type
@@ -28,16 +28,16 @@ import org.key_project.common.core.program.abstraction.SortedType;
 public abstract class CCProgramVariable<V extends ProgramVisitor, S extends CCSourceElement<V, S>> extends AbstractSortedOperator
         implements CCSourceElement<V, S> {
 
-    private final SortedType type;
+    private final CCType type;
     private final boolean isModel;
     private final boolean isGhost;
 
     protected CCProgramVariable(Name name,
             Sort s,
-            SortedType t,
+            CCType t,
             boolean isModel,
             boolean isGhost) {
-        super(name, s == null ? t.getSort() : s, false);
+        super(name, s, false);
         this.type = t;
         this.isModel = isModel;
         this.isGhost = isGhost;
@@ -78,7 +78,7 @@ public abstract class CCProgramVariable<V extends ProgramVisitor, S extends CCSo
         return name().toString().startsWith("<");
     }
 
-    public SortedType getType() {
+    public CCType getType() {
         return type;
     }
 }

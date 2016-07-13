@@ -138,7 +138,7 @@ public abstract class ProgramVariable extends CCProgramVariable<Visitor, SourceE
             typeName = javaType.getFullName();
         }
         else {
-            typeName = getType().getSort().name().toString();
+            typeName = sort().name().toString();
         }
         return typeName + " " + name() + ";\n";
     }

@@ -17,7 +17,6 @@ import java.util.Comparator;
 
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
-import org.key_project.common.core.program.abstraction.SortedType;
 
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
@@ -30,7 +29,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * In contrast to other classes the KeYJavaType is <emph>not</emph>
  * immutable, so use it with care. 
  */
-public class KeYJavaType implements SortedType, Type, PorgramType2SortEntry<Type> {
+public class KeYJavaType implements Type, PorgramType2SortEntry<Type> {
 
     /** Special return "type" for void methods. */
     public static final KeYJavaType VOID_TYPE = new KeYJavaType(null,SortImpl.ANY);
