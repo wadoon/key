@@ -13,15 +13,12 @@
 
 package org.key_project.bytecode.core.bytecode;
 
-import org.key_project.common.core.logic.Name;
+import org.key_project.common.core.logic.Named;
 
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
  */
-public interface Label {
-    
-    Name name();
-    
+public interface Label extends Named {
 }

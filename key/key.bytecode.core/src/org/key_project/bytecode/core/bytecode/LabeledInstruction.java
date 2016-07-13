@@ -19,7 +19,7 @@ package org.key_project.bytecode.core.bytecode;
  * @author Dominic Scheurer
  *
  */
-public interface LabeledInstruction extends Instruction {
+public interface LabeledInstruction<O extends Operand> extends Instruction<O> {
 
     Label label();
     

@@ -14,8 +14,6 @@
 package org.key_project.bytecode.core.bytecode.operands;
 
 import org.key_project.bytecode.core.bytecode.Operand;
-import org.key_project.bytecode.core.bytecode.abstraction.PrimitiveType;
-import org.key_project.bytecode.core.bytecode.abstraction.Type;
 import org.key_project.bytecode.core.logic.Term;
 
 /**
@@ -33,11 +31,6 @@ public class IntOperand extends OperandImpl implements Operand {
      */
     public IntOperand(Term value) {
         super(value);
-    }
-
-    @Override
-    public Type type() {
-        return PrimitiveType.JAVA_INT;
     }
 
 }

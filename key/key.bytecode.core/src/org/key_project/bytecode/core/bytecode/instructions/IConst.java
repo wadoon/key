@@ -13,7 +13,7 @@
 
 package org.key_project.bytecode.core.bytecode.instructions;
 
-import org.key_project.bytecode.core.bytecode.Operand;
+import org.key_project.bytecode.core.bytecode.operands.IntOperand;
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author Dominic Scheurer
  *
  */
-public class IConst extends UnaryInstruction {
+public class IConst extends UnaryInstruction<IntOperand> {
 
     private static final Name NAME = new Name("ICONST");
 
@@ -32,7 +32,7 @@ public class IConst extends UnaryInstruction {
      *
      * @param operand
      */
-    public IConst(Operand operand) {
+    public IConst(IntOperand operand) {
         super(operand);
     }
     
@@ -41,7 +41,7 @@ public class IConst extends UnaryInstruction {
      *
      * @param operands
      */
-    public IConst(ImmutableList<Operand> operands) {
+    public IConst(ImmutableList<IntOperand> operands) {
         super(operands);
     }
     
@@ -49,5 +49,4 @@ public class IConst extends UnaryInstruction {
     public Name name() {
         return NAME;
     }
-
 }

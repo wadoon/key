@@ -13,14 +13,11 @@
 
 package org.key_project.bytecode.core.bytecode;
 
-import org.key_project.bytecode.core.bytecode.abstraction.Type;
 /**
  * TODO: Document.
  *
  * @author Dominic Scheurer
  */
 public interface Operand {
-
-    Type type();
     
 }

@@ -22,7 +22,9 @@ import org.key_project.bytecode.core.bytecode.Instruction;
 import org.key_project.bytecode.core.bytecode.abstraction.PrimitiveType;
 import org.key_project.bytecode.core.bytecode.abstraction.Type;
 import org.key_project.bytecode.core.bytecode.instructions.IConst;
+import org.key_project.bytecode.core.bytecode.instructions.IStore;
 import org.key_project.bytecode.core.bytecode.operands.IntOperand;
+import org.key_project.bytecode.core.bytecode.operands.ProgVarOperand;
 import org.key_project.bytecode.core.logic.InstructionBlock;
 import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.logic.calculus.Semisequent;
@@ -66,6 +68,8 @@ public class BasicDatastructuresTest extends TestCase {
         KeYParseTreeVisitor parser = new KeYParseTreeVisitor(termServices.getNamespaces());
         try {
             parser.parse(
+                    new File("../key.common.core/resources/org/key_project/common/core/proof/rules/boolean.key"));
+            parser.parse(
                     new File("../key.common.core/resources/org/key_project/common/core/proof/rules/integerHeader.key"));
         }
         catch (ProofInputException | IOException e) {
@@ -78,10 +82,11 @@ public class BasicDatastructuresTest extends TestCase {
                 new LocationVariable(new Name("i"), (Sort) termServices.getNamespaces().sorts().lookup("int"), intType);
         Term iTerm = tb.var(i);
 
-        LinkedList<Instruction> insns = new LinkedList<Instruction>();
+        LinkedList<Instruction<?>> insns = new LinkedList<Instruction<?>>();
 
         insns.add(new IConst(new IntOperand(theories.getIntegerTheory()
                 .one())));
+        insns.add(new IStore(new ProgVarOperand(iTerm)));
 
         InstructionBlock program = new InstructionBlock(insns);
 
@@ -102,6 +107,8 @@ public class BasicDatastructuresTest extends TestCase {
                         .<SequentFormula<Term>>nil()
                         .prepend(new SequentFormula<Term>(succForm)));
         Sequent seq = SequentImpl.createSequent(ante, succ);
+
+        System.out.println(seq);
 
         assertNotNull(seq);
 

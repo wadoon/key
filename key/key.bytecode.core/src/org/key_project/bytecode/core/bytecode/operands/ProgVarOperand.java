@@ -11,37 +11,30 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.bytecode.core.bytecode;
+package org.key_project.bytecode.core.bytecode.operands;
 
-import org.key_project.common.core.logic.Name;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.bytecode.core.logic.Term;
+import org.key_project.bytecode.core.logic.op.ProgramVariable;
 
 /**
- * TODO: Document.
+ * Operand referring to a program variable (like needed for ISTORE, for
+ * instance). In classic Bytecode, this is an index number; in BytecodeDL, it is
+ * a program variable.
  *
  * @author Dominic Scheurer
  */
-public interface Instruction<O extends Operand> {
+public class ProgVarOperand extends OperandImpl {
 
     /**
      * TODO: Document.
      *
-     * @return
+     * @param value
      */
-    Name name();
-    
-    /**
-     * TODO: Document.
-     *
-     * @return
-     */
-    int arity();
-    
-    /**
-     * TODO: Document.
-     *
-     * @return
-     */
-    ImmutableList<O> operands();
-    
+    public ProgVarOperand(Term value) {
+        super(value);
+
+        assert value
+                .op() instanceof ProgramVariable : "Expecting a program variable for instantiation of ProgVarOperand";
+    }
+
 }

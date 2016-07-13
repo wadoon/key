@@ -13,7 +13,7 @@
 
 package org.key_project.bytecode.core.bytecode.instructions;
 
-import org.key_project.bytecode.core.bytecode.Operand;
+import org.key_project.bytecode.core.bytecode.operands.ProgVarOperand;
 import org.key_project.common.core.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
@@ -23,16 +23,16 @@ import org.key_project.util.collection.ImmutableList;
  * @author Dominic Scheurer
  *
  */
-public class IStore extends UnaryInstruction {
+public class IStore extends UnaryInstruction<ProgVarOperand> {
 
-    private static final Name NAME = new Name("BIPUSH");
+    private static final Name NAME = new Name("ISTORE");
 
     /**
      * TODO: Document.
      *
      * @param operand
      */
-    public IStore(Operand operand) {
+    public IStore(ProgVarOperand operand) {
         super(operand);
     }
     
@@ -41,7 +41,7 @@ public class IStore extends UnaryInstruction {
      *
      * @param operands
      */
-    public IStore(ImmutableList<Operand> operands) {
+    public IStore(ImmutableList<ProgVarOperand> operands) {
         super(operands);
     }
 

@@ -22,43 +22,49 @@ import org.key_project.common.core.logic.ModalContent;
 import org.key_project.common.core.program.NameAbstractionTable;
 
 /**
- * TODO: Document.
+ * An instruction block has a program counter and a list of instructions.
  *
  * @author Dominic Scheurer
  */
 public class InstructionBlock implements ModalContent<BytecodeSourceElement> {
 
     private int pc;
-    private LinkedList<Instruction> insns = new LinkedList<>();
+    private LinkedList<Instruction<?>> insns = new LinkedList<>();
 
     private static final InstructionBlock EMPTY_BLOCK = new InstructionBlock(
-            new LinkedList<Instruction>());
+            new LinkedList<Instruction<?>>());
 
     /**
-     * 
-     * TODO: Document.
-     *
+     * Construct a new {@link InstructionBlock} with a program counter pointing
+     * to the first instruction.
      */
-    public InstructionBlock(List<Instruction> insns) {
+    public InstructionBlock(List<Instruction<?>> insns) {
         this.insns.addAll(insns);
         this.pc = 0;
     }
 
     /**
-     * TODO: Document.
-     *
-     * @return
+     * @return The program counter.
      */
     public int pc() {
         return pc;
     }
 
     /**
-     * TODO: Document.
+     * Sets the program counter.
      *
-     * @return
+     * @param pc
+     *            The program counter.
      */
-    public Instruction insn() {
+    public void setPc(int pc) {
+        assert pc < insns.size();
+        this.pc = pc;
+    }
+
+    /**
+     * @return The instructions list.
+     */
+    public Instruction<?> insn() {
         return insns.get(pc);
     }
 
@@ -67,6 +73,9 @@ public class InstructionBlock implements ModalContent<BytecodeSourceElement> {
         return insns.isEmpty();
     }
 
+    /**
+     * @return The empty instruction block.
+     */
     public static InstructionBlock emptyBlock() {
         return EMPTY_BLOCK;
     }
@@ -76,6 +85,30 @@ public class InstructionBlock implements ModalContent<BytecodeSourceElement> {
             NameAbstractionTable<BytecodeSourceElement> nat) {
         // TODO implement
         throw new RuntimeException("Method still waiting for implementation");
+    }
+
+    @Override
+    public String toString() {
+        if (isEmpty()) {
+            return "";
+        }
+
+        final StringBuilder sb = new StringBuilder();
+        sb.append("[");
+
+        for (int i = 0; i < insns.size(); i++) {
+            if (i == pc) {
+                sb.append("# ");
+            }
+            sb.append(insns.get(i))
+                    .append(", ");
+        }
+
+        sb.delete(sb.length() - 2, sb.length() - 1);
+
+        sb.append("]");
+
+        return sb.toString();
     }
 
 }

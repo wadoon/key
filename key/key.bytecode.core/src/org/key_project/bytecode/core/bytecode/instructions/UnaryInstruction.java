@@ -24,19 +24,19 @@ import org.key_project.util.collection.ImmutableSLList;
  * @author Dominic Scheurer
  *
  */
-public abstract class UnaryInstruction implements Instruction {
+public abstract class UnaryInstruction<O extends Operand> implements Instruction<O> {
     
-    private final ImmutableList<Operand> operands;
+    private final ImmutableList<O> operands;
     
     /**
      * TODO: Document.
      *
      */
-    protected UnaryInstruction(Operand operand) {
-        this.operands = ImmutableSLList.<Operand>nil().prepend(operand);
+    protected UnaryInstruction(O operand) {
+        this.operands = ImmutableSLList.<O>nil().prepend(operand);
     }
     
-    protected UnaryInstruction(ImmutableList<Operand> operands) {
+    protected UnaryInstruction(ImmutableList<O> operands) {
         this.operands = operands;
     }
     
@@ -46,8 +46,18 @@ public abstract class UnaryInstruction implements Instruction {
     }
 
     @Override
-    public ImmutableList<Operand> operands() {
+    public ImmutableList<O> operands() {
         return operands;
     }
     
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append(name())
+            .append(" ")
+            .append(operands().head());
+        
+        return sb.toString();
+    }
 }

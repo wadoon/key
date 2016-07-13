@@ -42,4 +42,8 @@ public abstract class OperandImpl implements Operand {
         return value;
     }
 
+    @Override
+    public String toString() {
+        return value.toString();
+    }
 }
