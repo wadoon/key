@@ -14,7 +14,6 @@
 package org.key_project.bytecode.core.bytecode;
 
 import org.key_project.common.core.program.NameAbstractionTable;
-import org.key_project.common.core.program.Position;
 
 /**
  * TODO: Document.
@@ -26,52 +25,16 @@ public class BytecodeSourceElementImpl implements
         BytecodeSourceElement {
 
     @Override
-    public BytecodeSourceElementImpl getFirstElement() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public BytecodeSourceElementImpl getFirstElementIncludingBlocks() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public BytecodeSourceElementImpl getLastElement() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Position getStartPosition() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Position getEndPosition() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Position getRelativePosition() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public void visit(BytecodeVisitor v) {
-        // TODO Auto-generated method stub
-
+     // XXX implement
+        throw new UnsupportedOperationException("Method not yet implemented");
     }
 
     @Override
     public boolean equalsModRenaming(BytecodeSourceElement se,
             NameAbstractionTable<BytecodeSourceElement> nat) {
-        // TODO Auto-generated method stub
-        return false;
+        // XXX implement
+        throw new UnsupportedOperationException("Method not yet implemented");
     }
 
 }

@@ -19,7 +19,6 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.CCProgramVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.NameAbstractionTable;
-import org.key_project.common.core.program.Position;
 import org.key_project.common.core.program.abstraction.SortedType;
 
 /**
@@ -83,38 +82,8 @@ public abstract class ProgramVariable extends
     // ---------------------------------------------------
 
     @Override
-    public BytecodeSourceElement getFirstElement() {
-        return this;
-    }
-
-    @Override
-    public BytecodeSourceElement getFirstElementIncludingBlocks() {
-        return getFirstElement();
-    }
-
-    @Override
-    public BytecodeSourceElement getLastElement() {
-        return this;
-    }
-
-    @Override
     public void visit(BytecodeVisitor v) {
         v.performActionOnProgramVariable(this);
-    }
-
-    @Override
-    public Position getStartPosition() {
-        return Position.UNDEFINED;
-    }
-
-    @Override
-    public Position getEndPosition() {
-        return Position.UNDEFINED;
-    }
-
-    @Override
-    public Position getRelativePosition() {
-        return Position.UNDEFINED;
     }
 
     /**
