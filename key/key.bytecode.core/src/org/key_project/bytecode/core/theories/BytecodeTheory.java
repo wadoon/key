@@ -16,6 +16,7 @@ package org.key_project.bytecode.core.theories;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.services.BCTermServices;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
@@ -65,7 +66,7 @@ public class BytecodeTheory extends CCTheory {
         // to the natural order of its keys.
         Map<Name, CCTheory> ret = new TreeMap<Name, CCTheory>();
 
-        ret.put(CCIntegerTheory.NAME, new CCIntegerTheory(s));
+        ret.put(CCIntegerTheory.NAME, new CCIntegerTheory<Term>(s));
 
         return ret;
     }

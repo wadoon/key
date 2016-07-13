@@ -18,9 +18,9 @@ import java.util.Map;
 
 import org.key_project.bytecode.core.bytecode.IntOperandValue;
 import org.key_project.bytecode.core.bytecode.OperandValue;
-import org.key_project.bytecode.core.theories.IntegerTheory;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
+import org.key_project.common.core.theories.CCIntegerTheory;
 
 /**
  * A program model element representing primitive types.
@@ -49,7 +49,7 @@ public class PrimitiveType implements Type {
     }
     
     public static final PrimitiveType JAVA_INT =
-            new PrimitiveType("int", new IntOperandValue(0), IntegerTheory.NAME);
+            new PrimitiveType("int", new IntOperandValue(0), CCIntegerTheory.NAME);
 
     private final Name name;
     private final OperandValue defaultValue;

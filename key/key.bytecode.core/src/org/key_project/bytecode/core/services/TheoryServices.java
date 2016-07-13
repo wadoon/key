@@ -16,11 +16,12 @@ package org.key_project.bytecode.core.services;
 import java.util.Collections;
 import java.util.Map;
 
+import org.key_project.bytecode.core.logic.Term;
 import org.key_project.bytecode.core.theories.BytecodeTheory;
-import org.key_project.bytecode.core.theories.IntegerTheory;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.services.CCTheoryServices;
+import org.key_project.common.core.theories.CCIntegerTheory;
 import org.key_project.common.core.theories.CCTheory;
 
 /**
@@ -83,8 +84,9 @@ public class TheoryServices implements CCTheoryServices {
         return theories.values();
     }
     
-    public IntegerTheory getIntegerTheory() {
-        return (IntegerTheory) theories.get(new Name("int"));
+    @SuppressWarnings("unchecked")
+    public CCIntegerTheory<Term> getIntegerTheory() {
+        return (CCIntegerTheory<Term>) theories.get(new Name("int"));
     }
 
 }
