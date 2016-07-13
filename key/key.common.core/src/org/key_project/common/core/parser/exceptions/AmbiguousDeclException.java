@@ -11,20 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.parser;
+package org.key_project.common.core.parser.exceptions;
 
 @SuppressWarnings("serial")
-public class NotDeclException extends KeYSemanticException {
+public class AmbiguousDeclException extends KeYSemanticException {
 
-    public NotDeclException(String fileName, int line, int charPositionInLine, String category, String undeclared_symbol) {
-        super(fileName, getMessage(category, undeclared_symbol), line, charPositionInLine);
+    public AmbiguousDeclException(String fileName, int line, int charPositionInLine, String ambigious_symbol) {
+        super(fileName, getMessage(ambigious_symbol), line, charPositionInLine);
     }
 
-    /**
-     * Returns a clean error message (no line number/column information)
-     */
-    private static String getMessage(String cat, String undeclaredSymbol) {
-        return cat + "\n\t" + undeclaredSymbol + "\n" + "not declared";
+    public static String getMessage(String ambigious_symbol) {
+        return "The name \'" + ambigious_symbol + "\' is already in use.";
     }
 
 }

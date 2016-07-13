@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.parser;
+package org.key_project.common.core.parser.exceptions;
 
 @SuppressWarnings("serial")
 public class KeYSemanticException extends RuntimeException {

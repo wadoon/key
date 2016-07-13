@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package org.key_project.common.core.parser;
+package org.key_project.common.core.parser.exceptions;
 
 import org.antlr.v4.runtime.Token;
 import org.key_project.common.core.logic.sort.Sort;

@@ -26,6 +26,9 @@ import org.key_project.common.core.logic.sort.CCGenericSort;
 import org.key_project.common.core.logic.sort.ProxySort;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
+import org.key_project.common.core.parser.exceptions.AmbiguousDeclException;
+import org.key_project.common.core.parser.exceptions.GenericSortException;
+import org.key_project.common.core.parser.exceptions.ProofInputException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -37,7 +40,7 @@ public class TestDeclParser extends TestCase {
         super(name);
     }
 
-    public void setUp() {
+    public void setUp() throws ProofInputException {
         nss = new NamespaceSet();
 
         String sorts = "\\sorts{boolean;int;LocSet;}";
@@ -243,7 +246,7 @@ public class TestDeclParser extends TestCase {
                 "\\functions {\n" +
                 "  elem head(list);\n" +
                 "  list tail(list);\n" +
-                "  elem[] tailarray(elem[]);\n" +
+//                "  elem[] tailarray(elem[]);\n" +
                 "  list nil;\n" +
                 "  list cons(elem,list);\n" +
                 "}\n");
@@ -370,16 +373,17 @@ public class TestDeclParser extends TestCase {
 
     public void testAmbigiousDecls() {
         try {
-            String input = "\\sorts { elem; list; }\n" +
+            String input =
+                    "\\sorts { elem; list; }\n" +
                     "\\functions {" +
-                    "elem x;" +
-                    "elem fn;" +
-                    "elem p;" +
+                    "   elem x;" +
+                    "   elem fn;" +
+                    "   elem p;" +
                     "}" +
                     "\\predicates {" +
-                    "fn(elem);" +
-                    "y;" +
-                    "p;" +
+                    "   fn(elem);" +
+                    "   y;" +
+                    "   p;" +
                     "}"/* +
                     "\\schemaVariables {\n" +
                     "  \\program Statement #s ; \n" +
