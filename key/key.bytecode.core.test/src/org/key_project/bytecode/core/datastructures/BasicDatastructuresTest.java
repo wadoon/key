@@ -108,9 +108,9 @@ public class BasicDatastructuresTest extends TestCase {
                         .prepend(new SequentFormula<Term>(succForm)));
         Sequent seq = SequentImpl.createSequent(ante, succ);
 
-        System.out.println(seq);
-
-        assertNotNull(seq);
+        // This is a quite stupid test; but if we get here, there were no
+        // exceptions. Furthermore, it's at least a non-trivial assertion.
+        assertEquals("[equals(i,Z(0(#)))]==>[\\<[# ICONST Z(1(#)), ISTORE i]\\> (equals(i,Z(1(#))))]", seq.toString());
 
     }
 

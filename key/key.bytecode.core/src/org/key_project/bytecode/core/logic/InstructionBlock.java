@@ -104,7 +104,7 @@ public class InstructionBlock implements ModalContent<BytecodeSourceElement> {
                     .append(", ");
         }
 
-        sb.delete(sb.length() - 2, sb.length() - 1);
+        sb.delete(sb.length() - 2, sb.length());
 
         sb.append("]");
 
