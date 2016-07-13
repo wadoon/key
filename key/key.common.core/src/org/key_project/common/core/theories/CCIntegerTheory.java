@@ -166,7 +166,7 @@ public class CCIntegerTheory<T extends CCTerm<?, ?, ?, T>> extends CCTheory {
      * @param name
      * @param services
      */
-    protected CCIntegerTheory(TermServices<?, T, ?, ?> services) {
+    public CCIntegerTheory(TermServices<?, T, ?, ?> services) {
         super(NAME, services);
 
         // Initialize caches for function symbols from integerHeader.key
