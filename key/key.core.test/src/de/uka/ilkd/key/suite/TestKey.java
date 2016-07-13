@@ -49,6 +49,7 @@ public class TestKey extends TestSuite {
 
     static Class<? extends TestCase>[] parserTests = new Class[] {
         de.uka.ilkd.key.parser.TestDeclParser.class,
+        org.key_project.common.core.parser.TestDeclParser.class,
 //        de.uka.ilkd.key.parser.TestParallelParsing.class,
         de.uka.ilkd.key.parser.TestTermParser.class,
         de.uka.ilkd.key.parser.TestTermParserHeap.class,
