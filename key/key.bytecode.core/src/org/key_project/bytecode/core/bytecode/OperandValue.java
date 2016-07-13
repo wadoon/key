@@ -13,8 +13,8 @@
 
 package org.key_project.bytecode.core.bytecode;
 
+import org.key_project.bytecode.core.bytecode.abstraction.Type;
 import org.key_project.bytecode.core.services.TheoryServices;
-import org.key_project.common.core.program.abstraction.SortedType;
 import org.key_project.common.core.theories.CCTheory;
 
 /**
@@ -24,7 +24,7 @@ import org.key_project.common.core.theories.CCTheory;
  */
 public interface OperandValue {
 
-    SortedType type();
+    Type type();
     
     CCTheory theory(TheoryServices services);
     

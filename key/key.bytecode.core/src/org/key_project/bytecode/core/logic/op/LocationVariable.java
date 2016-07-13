@@ -17,7 +17,6 @@ import org.key_project.bytecode.core.bytecode.abstraction.Type;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.program.abstraction.SortedType;
 
 /**
  * TODO: Document.
@@ -67,7 +66,7 @@ public class LocationVariable extends ProgramVariable {
 
     @Override
     public Operator rename(Name name) {
-        return new LocationVariable(name, getType(), isModel(), isGhost(), isFinal(), isStatic());
+        return new LocationVariable(name, sort(), getType(), isModel(), isGhost(), isFinal(), isStatic());
     }
 
 }

@@ -76,6 +76,12 @@ public abstract class ProgramVariable extends
     public boolean isStatic() {
         return isStatic;
     }
+    
+    @Override
+    public Type getType() {
+        // TODO Auto-generated method stub
+        return (Type) super.getType();
+    }
 
     // ---------------------------------------------------
     // Methods defined in SourceElement

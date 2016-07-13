@@ -13,8 +13,7 @@
 
 package org.key_project.bytecode.core.bytecode;
 
-import org.key_project.common.core.program.abstraction.SortedType;
-
+import org.key_project.bytecode.core.bytecode.abstraction.Type;
 /**
  * TODO: Document.
  *
@@ -22,6 +21,6 @@ import org.key_project.common.core.program.abstraction.SortedType;
  */
 public interface Operand {
 
-    SortedType type();
+    Type type();
     
 }

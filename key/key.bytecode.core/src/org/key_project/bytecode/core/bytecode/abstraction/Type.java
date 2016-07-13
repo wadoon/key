@@ -15,6 +15,7 @@ package org.key_project.bytecode.core.bytecode.abstraction;
 
 import org.key_project.bytecode.core.bytecode.OperandValue;
 import org.key_project.common.core.logic.Named;
+import org.key_project.common.core.program.abstraction.CCType;
 
 /**
  * TODO: Document.
@@ -22,7 +23,7 @@ import org.key_project.common.core.logic.Named;
  * @author Dominic Scheurer
  *
  */
-public interface Type extends Named {
+public interface Type extends CCType, Named {
 
     OperandValue defaultValue();
     

@@ -37,9 +37,9 @@ import org.key_project.bytecode.core.services.TheoryServices;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.Modality;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.parser.KeYParseTreeVisitor;
 import org.key_project.common.core.parser.exceptions.ProofInputException;
-import org.key_project.common.core.program.abstraction.SortedType;
 import org.key_project.util.collection.ImmutableSLList;
 
 import junit.framework.TestCase;
@@ -74,7 +74,8 @@ public class BasicDatastructuresTest extends TestCase {
 
         TheoryServices theories = new TheoryServices(termServices);
 
-        LocationVariable i = new LocationVariable(new Name("i"), intType);
+        LocationVariable i =
+                new LocationVariable(new Name("i"), (Sort) termServices.getNamespaces().sorts().lookup("int"), intType);
         Term iTerm = tb.var(i);
 
         LinkedList<Instruction> insns = new LinkedList<Instruction>();

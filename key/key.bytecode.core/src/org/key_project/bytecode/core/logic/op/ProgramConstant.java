@@ -14,10 +14,11 @@
 package org.key_project.bytecode.core.logic.op;
 
 import org.key_project.bytecode.core.bytecode.BytecodeSourceElement;
+import org.key_project.bytecode.core.bytecode.abstraction.Type;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.NameAbstractionTable;
-import org.key_project.common.core.program.abstraction.SortedType;
 
 /**
  * TODO: Document.
@@ -36,8 +37,8 @@ public class ProgramConstant extends ProgramVariable {
      * @param isModel
      * @param isGhost
      */
-    protected ProgramConstant(Name name, SortedType t, boolean isStatic) {
-        super(name, t.getSort(), t, false, false, false, isStatic);
+    protected ProgramConstant(Name name, Sort s, Type t, boolean isStatic) {
+        super(name, s, t, false, false, false, isStatic);
     }
 
     @Override
@@ -48,7 +49,7 @@ public class ProgramConstant extends ProgramVariable {
 
     @Override
     public Operator rename(Name name) {
-        return new ProgramConstant(name, getType(), isStatic());
+        return new ProgramConstant(name, sort(), getType(), isStatic());
     }
     
 }

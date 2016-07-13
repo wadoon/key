@@ -32,8 +32,6 @@ public abstract class OperandImpl implements Operand {
      * @param value
      */
     public OperandImpl(Term value) {
-        assert value.sort() == type().getSort() : "Value has to be of matching type.";
-
         this.value = value;
     }
 

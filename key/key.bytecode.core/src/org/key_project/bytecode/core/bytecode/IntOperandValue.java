@@ -14,8 +14,8 @@
 package org.key_project.bytecode.core.bytecode;
 
 import org.key_project.bytecode.core.bytecode.abstraction.PrimitiveType;
+import org.key_project.bytecode.core.bytecode.abstraction.Type;
 import org.key_project.bytecode.core.services.TheoryServices;
-import org.key_project.common.core.program.abstraction.SortedType;
 import org.key_project.common.core.theories.CCTheory;
 
 /**
@@ -37,7 +37,7 @@ public class IntOperandValue implements OperandValue {
     }
 
     @Override
-    public SortedType type() {
+    public Type type() {
         return PrimitiveType.JAVA_INT;
     }
 
