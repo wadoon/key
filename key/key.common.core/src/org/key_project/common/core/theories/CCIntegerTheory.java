@@ -748,5 +748,40 @@ public class CCIntegerTheory<T extends CCTerm<?, ?, ?, T>> extends CCTheory {
     public T one() {
         return one;
     }
+    
+    public T toZTerm(String intStr, TermServices<?, T, ?, ?> services) {
+        int length = 0;
+        boolean minusFlag = false;
+
+        char[] int_ch = null;
+        assert sharp != null;
+        T result = services.getTermBuilder().func(sharp);
+
+        Function identifier = numbers;
+
+        if (intStr.charAt(0) == '-') {
+            minusFlag = true;
+            intStr =
+                    intStr.substring(1);
+        }
+        // We have to deal with literals coming both from programs and
+        // the logic. The former can have prefixes ("0" for octal,
+        // "0x" for hex) and suffixes ("L" for long literal). The latter
+        // do not have any of these but can have arbitrary length.
+
+        int_ch = intStr.toCharArray();
+        length = int_ch.length;
+
+        for (int i = 0; i < length; i++) {
+            result =
+                    services.getTermBuilder().func(
+                            numberSymbol[int_ch[i] - '0'], result);
+        }
+        if (minusFlag) {
+            result = services.getTermBuilder().func(neglit, result);
+        }
+
+        return services.getTermBuilder().func(identifier, result);
+    }
 
 }
