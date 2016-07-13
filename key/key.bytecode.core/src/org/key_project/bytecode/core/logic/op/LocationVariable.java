@@ -13,8 +13,10 @@
 
 package org.key_project.bytecode.core.logic.op;
 
+import org.key_project.bytecode.core.bytecode.abstraction.Type;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.Operator;
+import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.abstraction.SortedType;
 
 /**
@@ -34,9 +36,9 @@ public class LocationVariable extends ProgramVariable {
      * @param isModel
      * @param isGhost
      */
-    public LocationVariable(Name name, SortedType t,
+    public LocationVariable(Name name, Sort s, Type t,
             boolean isModel, boolean isGhost, boolean isFinal, boolean isStatic) {
-        super(name, t.getSort(), t, isModel, isGhost, isFinal, isStatic);
+        super(name, s, t, isModel, isGhost, isFinal, isStatic);
     }
 
     /**
@@ -48,9 +50,9 @@ public class LocationVariable extends ProgramVariable {
      * @param isModel
      * @param isGhost
      */
-    public LocationVariable(Name name, SortedType t,
+    public LocationVariable(Name name, Sort s, Type t,
             boolean isModel, boolean isGhost) {
-        super(name, t.getSort(), t, isModel, isGhost);
+        super(name, s, t, isModel, isGhost);
     }
 
     /**
@@ -59,8 +61,8 @@ public class LocationVariable extends ProgramVariable {
      * @param name
      * @param sortedType
      */
-    public LocationVariable(Name name, SortedType t) {
-        this(name, t, false, false);
+    public LocationVariable(Name name, Sort s, Type t) {
+        this(name, s, t, false, false);
     }
 
     @Override

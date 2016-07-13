@@ -19,7 +19,6 @@ import java.util.Map;
 import org.key_project.bytecode.core.bytecode.IntOperandValue;
 import org.key_project.bytecode.core.bytecode.OperandValue;
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.theories.CCIntegerTheory;
 
 /**
@@ -122,12 +121,6 @@ public class PrimitiveType implements Type {
      */
     public Name getCorrespondingTheoryName() {
         return theoryName;
-    }
-
-    @Override
-    public Sort getSort() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

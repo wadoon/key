@@ -15,11 +15,11 @@ package org.key_project.bytecode.core.logic.op;
 
 import org.key_project.bytecode.core.bytecode.BytecodeSourceElement;
 import org.key_project.bytecode.core.bytecode.BytecodeVisitor;
+import org.key_project.bytecode.core.bytecode.abstraction.Type;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.CCProgramVariable;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.program.NameAbstractionTable;
-import org.key_project.common.core.program.abstraction.SortedType;
 
 /**
  * TODO: Document.
@@ -42,7 +42,7 @@ public abstract class ProgramVariable extends
      * @param isModel
      * @param isGhost
      */
-    protected ProgramVariable(Name name, Sort s, SortedType t, boolean isModel,
+    protected ProgramVariable(Name name, Sort s, Type t, boolean isModel,
             boolean isGhost) {
         this(name, s, t, isModel, isGhost, false, false);
     }
@@ -56,7 +56,7 @@ public abstract class ProgramVariable extends
      * @param isModel
      * @param isGhost
      */
-    protected ProgramVariable(Name name, Sort s, SortedType t, boolean isModel,
+    protected ProgramVariable(Name name, Sort s, Type t, boolean isModel,
             boolean isGhost, boolean isFinal, boolean isStatic) {
         super(name, s, t, isModel, isGhost);
         this.isFinal = isFinal;

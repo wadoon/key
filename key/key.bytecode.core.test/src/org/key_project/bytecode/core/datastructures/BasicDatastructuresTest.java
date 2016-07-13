@@ -13,13 +13,14 @@
 
 package org.key_project.bytecode.core.datastructures;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
-
-import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.bytecode.core.bytecode.Instruction;
 import org.key_project.bytecode.core.bytecode.abstraction.PrimitiveType;
+import org.key_project.bytecode.core.bytecode.abstraction.Type;
 import org.key_project.bytecode.core.bytecode.instructions.IConst;
 import org.key_project.bytecode.core.bytecode.operands.IntOperand;
 import org.key_project.bytecode.core.logic.InstructionBlock;
@@ -34,14 +35,14 @@ import org.key_project.bytecode.core.services.BCTermServices;
 import org.key_project.bytecode.core.services.TermServicesImpl;
 import org.key_project.bytecode.core.services.TheoryServices;
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.calculus.SequentFormula;
-import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.Modality;
-import org.key_project.common.core.logic.sort.Sort;
-import org.key_project.common.core.logic.sort.SortImpl;
+import org.key_project.common.core.parser.KeYParseTreeVisitor;
+import org.key_project.common.core.parser.exceptions.ProofInputException;
 import org.key_project.common.core.program.abstraction.SortedType;
 import org.key_project.util.collection.ImmutableSLList;
+
+import junit.framework.TestCase;
 
 /**
  * TODO: Document.
@@ -50,13 +51,11 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  */
 public class BasicDatastructuresTest extends TestCase {
-    private final Sort intSort;
     private final TermBuilder tb;
-    private final SortedType intType;
+    private final Type intType;
     private final BCTermServices termServices;
 
     public BasicDatastructuresTest() {
-        intSort = new SortImpl(new Name("int"));
         termServices = new TermServicesImpl();
         tb = termServices.getTermBuilder();
         intType = PrimitiveType.JAVA_INT;
@@ -64,14 +63,14 @@ public class BasicDatastructuresTest extends TestCase {
 
     @Test
     public void testSimpleBytecodeSequentCreation() {
-
-        termServices.getNamespaces().sorts().add(intSort);
-
-        Namespace funcNS = termServices.getNamespaces().functions();
-        funcNS.addSafely(new Function(new Name("#"), intSort));
-        funcNS.addSafely(new Function(new Name("0"), intSort));
-        funcNS.addSafely(new Function(new Name("1"), intSort));
-        // ... have to add all int functions or read them in from a KeY file!
+        KeYParseTreeVisitor parser = new KeYParseTreeVisitor(termServices.getNamespaces());
+        try {
+            parser.parse(
+                    new File("../key.common.core/resources/org/key_project/common/core/proof/rules/integerHeader.key"));
+        }
+        catch (ProofInputException | IOException e) {
+            fail("Unexpected parse exception: " + e.getMessage());
+        }
 
         TheoryServices theories = new TheoryServices(termServices);
 
