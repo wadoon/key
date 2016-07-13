@@ -28,21 +28,22 @@ import org.key_project.common.core.logic.op.SortDependingFunction;
  * @author Dominic Scheurer
  */
 public class TermServicesImpl implements BCTermServices {
-
-    private static final BCTermServices INSTANCE = new TermServicesImpl();
     
-    private NamespaceSet namspaces = new NamespaceSet();
-    
-    public static BCTermServices instance() {
-        return INSTANCE;
-    }
+    private NamespaceSet namespaces;
     
     private final TermBuilder tb;
     private final TermFactory tf;
     
-    private TermServicesImpl() {
+    public TermServicesImpl() {
         tf = new TermFactory(new HashMap<Term, Term>());
         tb = new TermBuilder(tf, this);
+        namespaces = new NamespaceSet();
+    }
+    
+    public TermServicesImpl(NamespaceSet namespaces) {
+        tf = new TermFactory(new HashMap<Term, Term>());
+        tb = new TermBuilder(tf, this);
+        this.namespaces = namespaces;
     }
     
     @Override
@@ -57,14 +58,14 @@ public class TermServicesImpl implements BCTermServices {
 
     @Override
     public NamespaceSet getNamespaces() {
-        return namspaces;
+        return namespaces;
     }
 
     /**
      * @param namspaces the namspaces to set
      */
     public void setNamspaces(NamespaceSet namspaces) {
-        this.namspaces = namspaces;
+        this.namespaces = namspaces;
     }
 
     @Override
