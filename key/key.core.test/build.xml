@@ -26,6 +26,7 @@
 				<pathelement location="${basedir}/../key.util.test/lib/junit-4.12.jar"/>
 				<pathelement location="${basedir}/../key.util.test/lib/hamcrest-core-1.3.jar"/>
 				<pathelement path="${basedir}/../key.util.test/bin"/>
+            <pathelement path="${basedir}/../key.common.core.test/bin"/>
 				<pathelement path="${build.dir}"/>
 			</classpath>
 			<formatter type="xml"/>
@@ -70,6 +71,7 @@
 				<pathelement location="${basedir}/../key.util.test/lib/junit-4.12.jar"/>
 				<pathelement location="${basedir}/../key.util.test/lib/hamcrest-core-1.3.jar"/>
 				<pathelement path="${basedir}/../key.util.test/bin"/>
+            <pathelement path="${basedir}/../key.common.core.test/bin"/>
 				<pathelement path="${build.dir}"/>
 			</classpath>
 			<formatter type="brief" usefile="false" />
@@ -95,6 +97,7 @@
 				<pathelement location="${basedir}/../key.util.test/lib/junit-4.12.jar"/>
 				<pathelement location="${basedir}/../key.util.test/lib/hamcrest-core-1.3.jar"/>
 				<pathelement path="${basedir}/../key.util.test/bin"/>
+            <pathelement path="${basedir}/../key.common.core.test/bin"/>
 				<pathelement path="${build.dir}"/>
 			</classpath>
 			<formatter type="xml"/>
@@ -120,6 +123,7 @@
 				<pathelement location="${basedir}/../key.util.test/lib/junit-4.12.jar"/>
 				<pathelement location="${basedir}/../key.util.test/lib/hamcrest-core-1.3.jar"/>
 				<pathelement path="${basedir}/../key.util.test/bin"/>
+            <pathelement path="${basedir}/../key.common.core.test/bin"/>
 				<pathelement path="${build.dir}"/>
 			</classpath>
 			<formatter type="brief" usefile="false" />
@@ -150,6 +154,7 @@
             <pathelement path="${basedir}/../key.common.core/bin"/>
 				<pathelement path="${basedir}/../key.core/bin"/>
 				<pathelement path="${basedir}/../key.util.test/bin"/>
+            <pathelement path="${basedir}/../key.common.core.test/bin"/>
 				<pathelement path="${basedir}/../key.util/bin"/>
 				<pathelement location="${lib.dir}/recoderKey.jar"/>
 				<pathelement location="${lib.dir}/antlr.jar"/>

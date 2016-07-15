@@ -29,7 +29,6 @@
 		<javac srcdir="${src.dir}:${gen.dir}" destdir="${build.dir}" includeantruntime="false" source="1.7" target="1.7" deprecation="off" debug="on" depend="${build.depend}" optimize="off">
 			<classpath>
 				<pathelement location="${ext.dir}/antlr-v4.jar" />
-				<pathelement location="${ext.dir}/recoderKey.jar" />
 				<pathelement location="${basedir}/../key.util/bin/" />
 			</classpath>
 		</javac>
