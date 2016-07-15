@@ -100,8 +100,8 @@
 
 	<target name="runAllTests" depends="compileAllTests">
 		<ant antfile="${key.dir}/key.util.test/build.xml" target="runTests" dir="${key.dir}/key.util.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.test/build.xml" target="runTests" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.common.core.test/build.xml" target="runTests" dir="${key.dir}/key.common.core.test" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.test/build.xml" target="runTests" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="runTests" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="runTests" dir="${key.dir}/key.core.proof_references.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="runTests" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
@@ -110,8 +110,8 @@
 
 	<target name="test-deploy-all" depends="deployAll, compileAllTests">
 		<ant antfile="${key.dir}/key.util.test/build.xml" target="test-deploy" dir="${key.dir}/key.util.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.common.core.test/build.xml" target="test-deploy" dir="${key.dir}/key.common.core.test" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.proof_references.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
@@ -120,8 +120,8 @@
 
 	<target name="compileAllTests" depends="compileAll">
 		<ant antfile="${key.dir}/key.util.test/build.xml" target="compile" dir="${key.dir}/key.util.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.test/build.xml" target="compile" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.common.core.test/build.xml" target="compile" dir="${key.dir}/key.common.core.test" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.test/build.xml" target="compile" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="compile" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="compile" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
@@ -130,8 +130,8 @@
 
 	<target name="cleanAllTests">
 		<ant antfile="${key.dir}/key.util.test/build.xml" target="clean" dir="${key.dir}/key.util.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.test/build.xml" target="clean" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.common.core.test/build.xml" target="clean" dir="${key.dir}/key.common.core.test" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.test/build.xml" target="clean" dir="${key.dir}/key.core.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="clean" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="clean" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="clean" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
