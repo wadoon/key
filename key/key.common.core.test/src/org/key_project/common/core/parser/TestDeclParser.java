@@ -290,6 +290,14 @@ public class TestDeclParser extends TestCase {
         assertEquals("cons return sort", list,
                 ((Function) nss.functions().lookup(new Name("cons"))).sort());
     }
+    
+    public void testGenericDecl() {
+        parseDecls("\\sorts { \\generic G; }\n" +
+                "\\predicates {\n" +
+                "  p<G>;\n" +
+                "}\n");
+        
+    }
 
     public void testPredicateDecl() {
         parseDecls("\\sorts { elem; list; }\n" +
@@ -407,7 +415,6 @@ public class TestDeclParser extends TestCase {
                 fail("Unexpected recognition excpetion. Testcase failed." + re);
             }
         }
-
     }
 
 //    public void testHeurDecl() {
