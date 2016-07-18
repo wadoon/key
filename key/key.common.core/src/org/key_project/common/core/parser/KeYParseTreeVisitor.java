@@ -191,8 +191,12 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
                 semanticExc("Generic function must depend on generic sort", ctx);
             }
 
-            p = SortDependingFunction.createFirstInstance(genSort, new Name(sortAndFctName.second), Sort.FORMULA,
-                    argSorts.toArray(new Sort[argSorts.size()]), false,
+            p = SortDependingFunction.createFirstInstance(
+                    (CCGenericSort) genSort,
+                    new Name(sortAndFctName.second),
+                    Sort.FORMULA,
+                    argSorts.toArray(new Sort[argSorts.size()]),
+                    false,
                     SortImpl.ANY);
 
         }

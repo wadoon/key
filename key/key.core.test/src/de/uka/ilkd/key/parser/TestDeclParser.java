@@ -16,8 +16,6 @@ package de.uka.ilkd.key.parser;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import org.antlr.runtime.RecognitionException;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
@@ -36,6 +34,7 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import junit.framework.TestCase;
 
 
 public class TestDeclParser extends TestCase {

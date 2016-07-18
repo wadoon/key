@@ -192,12 +192,9 @@ boolean_value
     ;
 
 funcpred_name
-    : (
-        name = simple_ident
-        LESS
-        prefix = sort_name
-        GREATER
-      )                      # GenericFunctionName
+    : prefix = sort_name
+      DOUBLECOLON
+      name = simple_ident    # GenericFunctionName
     | name = simple_ident    # SimpleIdentFunctionName
     // The following case is addressing the declaration of the
     // single-digit "numbers" functions 0-9.
