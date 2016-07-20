@@ -41,6 +41,9 @@ decls
       ) * ;
 */
 
+// Entry point for parsing
+// =======================
+
 // This is a simplified version of the top-level declaration:
 // Only sorts, predicates and functions (sufficient for integerHeader.key).
 decls
@@ -49,6 +52,9 @@ decls
         | func_decls
       ) *
     ;
+
+// Top level decls
+// ===============
 
 sort_decls
     : SORTS
@@ -73,6 +79,9 @@ func_decls
       ( func_decl ) *
       RBRACE
     ;
+
+// Single declaration
+// ==================
 
 one_sort_decl
     : (   generic_sort_decl
@@ -130,6 +139,22 @@ func_decl
       SEMI
     ;
 
+// Complex identifiers
+// ===================
+
+funcpred_name
+    : prefix = sort_name
+      DOUBLECOLON
+      name = simple_ident    # GenericFunctionName
+    | name = simple_ident    # SimpleIdentFunctionName
+    // The following case is addressing the declaration of the
+    // single-digit "numbers" functions 0-9.
+    | name = digit           # DigitFunctionName
+    ;
+
+// Options, arguments, etc.
+// ========================
+
 extends_sorts
     : s = simple_ident_dots
       (
@@ -186,22 +211,15 @@ where_to_bind
         RBRACE
    ;
 
+// "Trivial" values: Names, numbers, IDs
+// =====================================
+
+digit : DIGIT_DISPATCH ;
+
 boolean_value
     : TRUE
     | FALSE
     ;
-
-funcpred_name
-    : prefix = sort_name
-      DOUBLECOLON
-      name = simple_ident    # GenericFunctionName
-    | name = simple_ident    # SimpleIdentFunctionName
-    // The following case is addressing the declaration of the
-    // single-digit "numbers" functions 0-9.
-    | name = digit           # DigitFunctionName
-    ;
-
-digit : DIGIT_DISPATCH ;
 
 sortId
     : s = simple_ident_dots
