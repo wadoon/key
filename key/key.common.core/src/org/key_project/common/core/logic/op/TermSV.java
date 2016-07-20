@@ -11,40 +11,40 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractSV;
 import org.key_project.common.core.logic.sort.Sort;
 
-
-/** 
+/**
  * A schema variable that is used as placeholder for terms.
- */  
+ */
 public final class TermSV extends AbstractSV {
 
-    /** 
-     * @param name the name of the schema variable
-     * @param sort the sort of the schema variable     
-     * @param isRigid true iff this schema variable may only match rigid
-     * terms
-     * @param isStrict boolean indicating if the schema variable is declared as 
-     * strict forcing exact type match
-     */    
-    TermSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {	
+    /**
+     * @param name
+     *            the name of the schema variable
+     * @param sort
+     *            the sort of the schema variable
+     * @param isRigid
+     *            true iff this schema variable may only match rigid terms
+     * @param isStrict
+     *            boolean indicating if the schema variable is declared as
+     *            strict forcing exact type match
+     */
+    public TermSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {
         super(name, sort, isRigid, isStrict);
         assert sort != Sort.FORMULA;
         assert sort != Sort.UPDATE;
     }
-    
+
     @Override
     public String toString() {
-        return toString(sort().toString()+" term");
+        return toString(sort().toString() + " term");
     }
-    
-    
+
     @Override
     public String proofToString() {
-	return "\\schemaVar \\term " + sort().name() + " " + name() + ";\n";
+        return "\\schemaVar \\term " + sort().name() + " " + name() + ";\n";
     }
 }

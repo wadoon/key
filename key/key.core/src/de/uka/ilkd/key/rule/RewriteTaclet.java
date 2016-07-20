@@ -26,7 +26,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;

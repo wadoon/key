@@ -17,10 +17,10 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.TermLabelSV;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 

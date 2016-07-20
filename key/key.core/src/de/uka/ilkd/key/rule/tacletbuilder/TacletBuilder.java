@@ -21,6 +21,7 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.calculus.SequentFormula;
 import org.key_project.common.core.logic.op.QuantifiableVariable;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.VariableSV;
 import org.key_project.common.core.rule.TacletOption;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -31,7 +32,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.*;
 
 /** 

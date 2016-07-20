@@ -15,9 +15,8 @@ package de.uka.ilkd.key.rule;
 
 import org.key_project.common.core.logic.op.FormulaSV;
 import org.key_project.common.core.logic.op.SchemaVariable;
-
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermSV;
+import org.key_project.common.core.logic.op.SkolemTermSV;
+import org.key_project.common.core.logic.op.TermSV;
 
 /**
  * class containing a pair of SchemaVariables, the first one being a

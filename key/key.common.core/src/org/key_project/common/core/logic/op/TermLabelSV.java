@@ -11,12 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.label.TermLabel;
-import org.key_project.common.core.logic.op.AbstractSV;
-import org.key_project.common.core.logic.op.SchemaVariable;
 import org.key_project.common.core.logic.sort.Sort;
 
 /**
@@ -24,7 +22,7 @@ import org.key_project.common.core.logic.sort.Sort;
  */
 public final class TermLabelSV extends AbstractSV implements SchemaVariable, TermLabel {
 
-    protected TermLabelSV(Name name) {
+    public TermLabelSV(Name name) {
         super(name, Sort.TERMLABEL, true, false);
     }
 

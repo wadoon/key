@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import org.key_project.common.core.logic.label.TermLabel;
+import org.key_project.common.core.logic.op.TermLabelSV;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermLabelInstantiationEntry;

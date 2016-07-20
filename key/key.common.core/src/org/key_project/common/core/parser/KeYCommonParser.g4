@@ -50,6 +50,7 @@ decls
     : (   sort_decls
         | pred_decls
         | func_decls
+        | schema_var_decls
       ) *
     ;
 
@@ -77,6 +78,13 @@ func_decls
     : FUNCTIONS
       LBRACE
       ( func_decl ) *
+      RBRACE
+    ;
+
+schema_var_decls
+    : SCHEMAVARIABLES
+      LBRACE
+      ( one_schema_var_decl ) *
       RBRACE
     ;
 
@@ -139,6 +147,88 @@ func_decl
       SEMI
     ;
 
+one_schema_var_decl
+    : MODALOPERATOR
+      one_schema_modal_op_decl
+      SEMI
+      # modal_op_sv_decl
+
+      // Took out program sv from key.common parser
+      // since this was too Java dependent.
+      /*
+    |
+      PROGRAM
+      ( schema_modifiers ) ?
+      id = simple_ident
+      (
+        LBRACKET
+        nameString = simple_ident
+        EQUALS
+        parameter = simple_ident_dots
+        RBRACKET
+      )?
+      ids = simple_ident_comma_list
+      SEMI
+      # program_sv_decl
+      */
+
+    | FORMULA
+      ( schema_modifiers ) ?
+      ids = simple_ident_comma_list 
+      SEMI
+      # formula_sv_decl
+
+    | TERMLABEL
+      ( schema_modifiers ) ?
+      ids = simple_ident_comma_list
+      SEMI
+      # termlabel_sv_decl
+
+    | UPDATE
+      ( schema_modifiers ) ?
+      ids = simple_ident_comma_list 
+      SEMI
+      # update_sv_decl
+
+    | SKOLEMFORMULA
+      ( schema_modifiers ) ?
+      ids = simple_ident_comma_list
+      SEMI
+      # skolemform_sv_decl
+
+    | TERM
+      ( schema_modifiers ) ?
+      s = sort_name
+      ids = simple_ident_comma_list 
+      SEMI
+      # term_sv_decl
+
+    | (
+            VARIABLES
+          | VARIABLE
+      )
+      ( schema_modifiers ) ?
+      s = sort_name
+      ids = simple_ident_comma_list 
+      SEMI
+      # variables_sv_decl
+
+    | SKOLEMTERM 
+      ( schema_modifiers ) ?
+      s = sort_name
+      ids = simple_ident_comma_list 
+      SEMI
+      # skolemterm_sv_decl
+    ;
+
+one_schema_modal_op_decl
+    : ( LPAREN sort = sort_name RPAREN )? 
+      LBRACE
+      ids = simple_ident_comma_list
+      RBRACE
+      id = simple_ident
+    ;
+
 // Complex identifiers
 // ===================
 
@@ -197,19 +287,24 @@ arg_sorts
     ;
 
 where_to_bind
-    :
-        LBRACE
+    : LBRACE
+      (
+        boolean_value
+      )
+      (
+        COMMA
         (
             boolean_value
         )
-        (
-           COMMA
-           (
-               boolean_value
-           )
-        )*
-        RBRACE
-   ;
+      )*
+      RBRACE
+    ;
+
+schema_modifiers
+    : LBRACKET
+      opts = simple_ident_comma_list         
+      RBRACKET
+    ;
 
 // "Trivial" values: Names, numbers, IDs
 // =====================================

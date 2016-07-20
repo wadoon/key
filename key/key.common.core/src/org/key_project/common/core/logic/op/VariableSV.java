@@ -11,32 +11,40 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package org.key_project.common.core.logic.op;
 
 import org.key_project.common.core.logic.Name;
-import org.key_project.common.core.logic.op.AbstractSV;
 import org.key_project.common.core.logic.sort.Sort;
 
+/**
+ * Schema variable that is instantiated with logical variables.
+ */
+public final class VariableSV extends AbstractSV implements QuantifiableVariable {
 
-/** 
- * A schema variable that is used as placeholder for updates.
- */  
-public final class UpdateSV extends AbstractSV {
-
-  
-    UpdateSV(Name name) {	
-        super(name, Sort.UPDATE, false, true);
+    /**
+     * Creates a new SchemaVariable that is used as placeholder for
+     * bound(quantified) variables.
+     * 
+     * @param name
+     *            the Name of the SchemaVariable
+     * @param sort
+     *            the Sort of the SchemaVariable and the matched type
+     */
+    public VariableSV(Name name, Sort sort) {
+        super(name, sort, true, false);
     }
-    
-    
+
     @Override
     public String toString() {
-        return toString("update");
+        return toString("variable");
     }
-    
-    
+
     @Override
     public String proofToString() {
-	return "\\schemaVar \\update " + name() + ";\n";
-    }    
+        return "\\schemaVar \\variables "
+                + sort().name()
+                + " "
+                + name()
+                + ";\n";
+    }
 }

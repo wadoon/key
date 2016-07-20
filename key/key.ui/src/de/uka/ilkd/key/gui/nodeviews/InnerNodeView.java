@@ -24,13 +24,13 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
-import de.uka.ilkd.key.proof.Goal;
-
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
 import org.key_project.common.core.logic.op.FormulaSV;
+import org.key_project.common.core.logic.op.ModalOperatorSV;
 import org.key_project.common.core.logic.op.Operator;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.parser.*;
 import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -38,27 +38,11 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermLabelSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
 public class InnerNodeView extends SequentView {

@@ -16,11 +16,11 @@ package de.uka.ilkd.key.rule.conditions;
 
 import org.key_project.common.core.logic.op.SVSubstitute;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.TermSV;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;

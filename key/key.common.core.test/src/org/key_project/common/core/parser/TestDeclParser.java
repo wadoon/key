@@ -20,6 +20,8 @@ import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Named;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.op.Function;
+import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.VariableSV;
 import org.key_project.common.core.logic.sort.CCGenericSort;
 import org.key_project.common.core.logic.sort.ProxySort;
 import org.key_project.common.core.logic.sort.Sort;
@@ -204,42 +206,42 @@ public class TestDeclParser extends TestCase {
      * asserts that the found object is a schemavariable and that the allowed
      * macthing type is QuantifiableVariable
      */
-//    public void assertVariableSV(String msg,
-//            Object o) {
-//        assertTrue("The named object: " + o + " is of type " + o.getClass() +
-//                ", but the type SchemaVariable was expected",
-//                o instanceof SchemaVariable);
-//
-//        assertTrue(msg, o instanceof VariableSV);
-//    }
+    public void assertVariableSV(String msg,
+            Object o) {
+        assertTrue("The named object: " + o + " is of type " + o.getClass() +
+                ", but the type SchemaVariable was expected",
+                o instanceof SchemaVariable);
+
+        assertTrue(msg, o instanceof VariableSV);
+    }
 
     /**
      * asserts that the SchemaVariable matches to term but not to a formula
      */
-//    public void assertTermSV(String msg,
-//            Object o) {
-//
-//        assertTrue("The named object: " + o + " is of type " + o.getClass() +
-//                ", but the type SchemaVariable was expected",
-//                o instanceof SchemaVariable);
-//        assertTrue("Schemavariable is not allowed to match a term of sort FORMULA.",
-//                ((SchemaVariable) o).sort() != Sort.FORMULA);
-//    }
+    public void assertTermSV(String msg,
+            Object o) {
+
+        assertTrue("The named object: " + o + " is of type " + o.getClass() +
+                ", but the type SchemaVariable was expected",
+                o instanceof SchemaVariable);
+        assertTrue("Schemavariable is not allowed to match a term of sort FORMULA.",
+                ((SchemaVariable) o).sort() != Sort.FORMULA);
+    }
 
     /**
      * asserts that the SchemaVariable matches to a formula and not to a term
      * (of sort != Sort.FORMULA)
      */
-//    public void assertFormulaSV(String msg,
-//            Object o) {
-//        assertTrue("The named object: " + o + " is of type " + o.getClass() +
-//                ", but the type SchemaVariable was expected",
-//                o instanceof SchemaVariable);
-//        assertSame("Only matches to terms of sort FORMULA allowed. " +
-//                "But term has sort " + ((SchemaVariable) o).sort(),
-//                ((SchemaVariable) o).sort(), Sort.FORMULA);
-//
-//    }
+    public void assertFormulaSV(String msg,
+            Object o) {
+        assertTrue("The named object: " + o + " is of type " + o.getClass() +
+                ", but the type SchemaVariable was expected",
+                o instanceof SchemaVariable);
+        assertSame("Only matches to terms of sort FORMULA allowed. " +
+                "But term has sort " + ((SchemaVariable) o).sort(),
+                ((SchemaVariable) o).sort(), Sort.FORMULA);
+
+    }
 
     public void testFunctionDecl() {
         parseDecls("\\sorts { elem; list; }\n" +
@@ -349,46 +351,45 @@ public class TestDeclParser extends TestCase {
                 ((Function) nss.functions().lookup(new Name("maybe"))).sort());
     }
 
-//    public void testSVDecl() {
-//        parseDecls("\\sorts { elem; list; }\n" +
-//                "\\schemaVariables {\n" +
-//                "  \\program Statement #s ; \n" +
-//                "  \\term elem x,y ;\n" +
-//                "  \\variables list lv ;\n" +
-//                "  \\formula b;\n" +
-//                "}\n");
-//
-//        Sort elem = (Sort) nss.sorts().lookup(new Name("elem"));
-//        Sort list = (Sort) nss.sorts().lookup(new Name("list"));
-//
-//        assertEquals("find SV x", new Name("x"),
-//                nss.variables().lookup(new Name("x")).name());
-//        assertTermSV("SV x type",
-//                nss.variables().lookup(new Name("x")));
-//        assertEquals("SV x sort", elem,
-//                ((SchemaVariable) nss.variables().lookup(new Name("x"))).sort());
-//
-//        assertEquals("find SV ", new Name("y"),
-//                nss.variables().lookup(new Name("y")).name());
-//        assertTermSV("SV y type",
-//                nss.variables().lookup(new Name("y")));
-//        assertEquals("SV y sort", elem,
-//                ((SchemaVariable) nss.variables().lookup(new Name("y"))).sort());
-//
-//        assertEquals("find SV ", new Name("lv"),
-//                nss.variables().lookup(new Name("lv")).name());
-//        assertVariableSV("SV lv type",
-//                nss.variables().lookup(new Name("lv")));
-//        assertEquals("SV lv sort", list,
-//                ((SchemaVariable) nss.variables().lookup(new Name("lv"))).sort());
-//
-//        assertEquals("find SV ", new Name("b"),
-//                nss.variables().lookup(new Name("b")).name());
-//        assertFormulaSV("SV b type",
-//                nss.variables().lookup(new Name("b")));
-//        assertEquals("SV b sort", Sort.FORMULA,
-//                ((SchemaVariable) nss.variables().lookup(new Name("b"))).sort());
-//    }
+    public void testSVDecl() {
+        parseDecls("\\sorts { elem; list; }\n" +
+                "\\schemaVariables {\n" +
+                "  \\term elem x,y ;\n" +
+                "  \\variables list lv ;\n" +
+                "  \\formula b;\n" +
+                "}\n");
+
+        Sort elem = (Sort) nss.sorts().lookup(new Name("elem"));
+        Sort list = (Sort) nss.sorts().lookup(new Name("list"));
+
+        assertEquals("find SV x", new Name("x"),
+                nss.variables().lookup(new Name("x")).name());
+        assertTermSV("SV x type",
+                nss.variables().lookup(new Name("x")));
+        assertEquals("SV x sort", elem,
+                ((SchemaVariable) nss.variables().lookup(new Name("x"))).sort());
+
+        assertEquals("find SV ", new Name("y"),
+                nss.variables().lookup(new Name("y")).name());
+        assertTermSV("SV y type",
+                nss.variables().lookup(new Name("y")));
+        assertEquals("SV y sort", elem,
+                ((SchemaVariable) nss.variables().lookup(new Name("y"))).sort());
+
+        assertEquals("find SV ", new Name("lv"),
+                nss.variables().lookup(new Name("lv")).name());
+        assertVariableSV("SV lv type",
+                nss.variables().lookup(new Name("lv")));
+        assertEquals("SV lv sort", list,
+                ((SchemaVariable) nss.variables().lookup(new Name("lv"))).sort());
+
+        assertEquals("find SV ", new Name("b"),
+                nss.variables().lookup(new Name("b")).name());
+        assertFormulaSV("SV b type",
+                nss.variables().lookup(new Name("b")));
+        assertEquals("SV b sort", Sort.FORMULA,
+                ((SchemaVariable) nss.variables().lookup(new Name("b"))).sort());
+    }
 
     public void testAmbigiousDecls() {
         try {
@@ -403,13 +404,13 @@ public class TestDeclParser extends TestCase {
                     "   fn(elem);" +
                     "   y;" +
                     "   p;" +
-                    "}"/* +
+                    "}" +
                     "\\schemaVariables {\n" +
                     "  \\program Statement #s ; \n" +
                     "  \\term elem x,y ;\n" +
                     "  \\variables list lv ;\n" +
                     "  \\formula b;\n" +
-                    "}\n"*/;
+                    "}\n";
             parser().parse(input);
 
             fail("Parsed in ambigious declaration");

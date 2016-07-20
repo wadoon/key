@@ -17,11 +17,11 @@ import junit.framework.TestCase;
 
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.UpdateSV;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletForTests;

@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
+import org.key_project.common.core.logic.op.TermSV;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 

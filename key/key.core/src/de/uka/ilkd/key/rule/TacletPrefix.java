@@ -22,9 +22,8 @@ package de.uka.ilkd.key.rule;
 import java.util.Iterator;
 
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.VariableSV;
 import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.op.VariableSV;
 
 public class TacletPrefix {
 

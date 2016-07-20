@@ -29,13 +29,13 @@ import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.op.FormulaSV;
 import org.key_project.common.core.logic.op.Function;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.TermSV;
 import org.key_project.common.core.logic.sort.ProxySort;
 import org.key_project.common.core.logic.sort.Sort;
 import org.key_project.common.core.logic.sort.SortImpl;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.pp.LogicPrinter;

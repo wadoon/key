@@ -19,6 +19,8 @@ import java.util.regex.Pattern;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.NamespaceSet;
 import org.key_project.common.core.logic.op.SchemaVariable;
+import org.key_project.common.core.logic.op.SkolemTermSV;
+import org.key_project.common.core.logic.op.VariableSV;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaDLTermServices;
@@ -28,8 +30,6 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.TacletApp;
 

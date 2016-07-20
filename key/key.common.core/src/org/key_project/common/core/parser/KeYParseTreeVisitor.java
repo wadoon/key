@@ -22,15 +22,11 @@ import org.antlr.v4.runtime.*;
 import org.key_project.common.core.logic.Name;
 import org.key_project.common.core.logic.Namespace;
 import org.key_project.common.core.logic.NamespaceSet;
-import org.key_project.common.core.logic.op.Function;
-import org.key_project.common.core.logic.op.SortDependingFunction;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.logic.sort.*;
 import org.key_project.common.core.parser.KeYCommonParser.*;
 import org.key_project.common.core.parser.exceptions.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
 /**
  * Front-end for {@link KeYCommonParser}, a parser for PL-independent KeY input
@@ -43,8 +39,27 @@ import org.key_project.util.collection.Pair;
  * @author Dominic Scheurer
  */
 public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
+    /**
+     * The contents of the namespace set are the main results of the parsing.
+     */
     private final NamespaceSet nss;
+
+    /**
+     * The file that's being parsed. May be null if a String is being parsed.
+     */
     private File file;
+
+    /**
+     * True the parser is in "schema mode".
+     */
+    private boolean schemaMode = false;
+
+    /**
+     * True if schema variables should be skipped.
+     * <p>
+     * Taken from old KeY parser. Currently unused!
+     */
+    private boolean skip_schemavariables = false;
 
     // //////////////////////////////////////////// //
     // Constructors, public (convenience) interface //
@@ -164,6 +179,14 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
     // /////////////////////////// //
     // Implemented visitor methods //
     // /////////////////////////// //
+    
+    @Override
+    public Object visitSchema_var_decls(Schema_var_declsContext ctx) {
+        switchToSchemaMode();
+        Object result = super.visitSchema_var_decls(ctx);
+        switchToNormalMode();
+        return result;
+    }
 
     @Override
     public Function visitPred_decl(Pred_declContext ctx) {
@@ -279,6 +302,123 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
         return f;
     }
 
+    // Schema variable declarations
+    @Override
+    public ImmutableList<SchemaVariable> visitOne_schema_modal_op_decl(One_schema_modal_op_declContext ctx) {
+        ImmutableSet<Modality> modalities = DefaultImmutableSet.<Modality>nil();
+        Sort sort = getExistingSort(visitSort_name(ctx.sort), ctx);
+
+        if (sort != Sort.FORMULA) {
+            semanticExc("Modal operator SV must be a FORMULA, not " + sort, ctx);
+        }
+
+        if (skip_schemavariables) {
+            return null;
+        }
+
+        for (String id : visitSimple_ident_comma_list(ctx.ids)) {
+            modalities = opSVHelper(id, modalities, ctx);
+        }
+
+        String id = visitSimple_ident(ctx.id);
+        SchemaVariable osv = (SchemaVariable) nss.variables().lookup(new Name(id));
+        if (osv != null) {
+            semanticExc("Schema variable " + id + " already defined.", ctx);
+        }
+
+        osv = CCSchemaVariableFactory.createModalOperatorSV(new Name(id),
+                sort, modalities);
+
+        if (schemaMode) {
+            nss.variables().add(osv);
+        }
+
+        return ImmutableSLList.<SchemaVariable>nil().prepend(osv);
+    }
+
+    @Override
+    public ImmutableList<SchemaVariable> visitFormula_sv_decl(Formula_sv_declContext ctx) {
+        return addSchemaVars(
+                visitSimple_ident_comma_list(ctx.ids),
+                visitSchema_modifiers(ctx.schema_modifiers()),
+                Sort.FORMULA,
+                new SchemaVariableModifierSet.FormulaSV(),
+                ctx);
+    }
+
+    @Override
+    public ImmutableList<SchemaVariable> visitTermlabel_sv_decl(Termlabel_sv_declContext ctx) {
+        return addSchemaVars(
+                visitSimple_ident_comma_list(ctx.ids),
+                visitSchema_modifiers(ctx.schema_modifiers()),
+                (Sort) null,
+                new SchemaVariableModifierSet.TermLabelSV(),
+                ctx,
+                false,
+                false,
+                true); // makeTermLabelSV
+    }
+
+    @Override
+    public ImmutableList<SchemaVariable> visitUpdate_sv_decl(Update_sv_declContext ctx) {
+        return addSchemaVars(
+                visitSimple_ident_comma_list(ctx.ids),
+                visitSchema_modifiers(ctx.schema_modifiers()),
+                Sort.UPDATE,
+                new SchemaVariableModifierSet.FormulaSV(),
+                ctx);
+    }
+
+    @Override
+    public ImmutableList<SchemaVariable> visitSkolemform_sv_decl(Skolemform_sv_declContext ctx) {
+        return addSchemaVars(
+                visitSimple_ident_comma_list(ctx.ids),
+                visitSchema_modifiers(ctx.schema_modifiers()),
+                Sort.FORMULA,
+                new SchemaVariableModifierSet.FormulaSV(),
+                ctx,
+                false,
+                true, // makeSkolemTermSV
+                false);
+    }
+
+    @Override
+    public ImmutableList<SchemaVariable> visitTerm_sv_decl(Term_sv_declContext ctx) {
+        return addSchemaVars(
+                visitSimple_ident_comma_list(ctx.ids),
+                visitSchema_modifiers(ctx.schema_modifiers()),
+                visitSort_name(ctx.sort_name()),
+                new SchemaVariableModifierSet.TermSV(),
+                ctx);
+    }
+
+    @Override
+    public ImmutableList<SchemaVariable> visitVariables_sv_decl(Variables_sv_declContext ctx) {
+        return addSchemaVars(
+                visitSimple_ident_comma_list(ctx.ids),
+                visitSchema_modifiers(ctx.schema_modifiers()),
+                visitSort_name(ctx.sort_name()),
+                new SchemaVariableModifierSet.VariableSV(),
+                ctx,
+                true, // makeVariableSV
+                false,
+                false);
+    }
+
+    @Override
+    public ImmutableList<SchemaVariable> visitSkolemterm_sv_decl(Skolemterm_sv_declContext ctx) {
+        return addSchemaVars(
+                visitSimple_ident_comma_list(ctx.ids),
+                visitSchema_modifiers(ctx.schema_modifiers()),
+                visitSort_name(ctx.sort_name()),
+                new SchemaVariableModifierSet.SkolemTermSV(),
+                ctx,
+                false,
+                true, // makeSkolemTermSV
+                false);
+    }
+    // END Schema variable declarations
+
     /**
      * Returns the list of specified sorts and adds each to the sorts namespace.
      */
@@ -338,6 +478,12 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
         }
 
         return result;
+    }
+
+    @Override
+    public ArrayList<String> visitSchema_modifiers(Schema_modifiersContext ctx) {
+        return ctx == null ? new ArrayList<String>()
+                : visitSimple_ident_comma_list(ctx.simple_ident_comma_list());
     }
 
     @Override
@@ -488,6 +634,36 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
                 ambiguousSymbol);
     }
 
+    /**
+     * Returns the sort with the given name from the namespace and throws an
+     * exception if such a sort does not exist.
+     *
+     * @param s
+     *            The {@link Sort} name.
+     * @param ctx
+     *            A {@link ParserRuleContext} for error information.
+     * @return The sort if it exists in the namespaces.
+     * @throws NotDeclException
+     *             if s does not exist in the namespaces.
+     */
+    private Sort getExistingSort(String s, ParserRuleContext ctx) {
+        Sort result;
+
+        if ((result = (Sort) nss.lookup(new Name(s))) == null) {
+            notDeclExc("sort", s, ctx);
+        }
+
+        return result;
+    }
+
+    /**
+     * Throws an exception if s is not a {@link CCGenericSort}.
+     *
+     * @param s
+     *            Sort to check.
+     * @param ctx
+     *            A {@link ParserRuleContext} for error information.
+     */
     private void assertNonGeneric(Sort s, ParserRuleContext ctx) {
         if (s instanceof CCGenericSort) {
             throw new GenericSortException(
@@ -533,6 +709,153 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
         else {
             return file.getName();
         }
+    }
+
+    // Helper methods for schema variables
+    private ImmutableList<SchemaVariable> addSchemaVars(Iterable<String> names, Iterable<String> options, String s,
+            SchemaVariableModifierSet mods,
+            ParserRuleContext ctx) {
+        return addSchemaVars(names, options, getExistingSort(s, ctx), mods, ctx);
+    }
+
+    private ImmutableList<SchemaVariable> addSchemaVars(Iterable<String> names, Iterable<String> options, Sort s,
+            SchemaVariableModifierSet mods,
+            ParserRuleContext ctx) {
+        return addSchemaVars(names, options, s, mods, ctx, false, false, false);
+    }
+
+    private ImmutableList<SchemaVariable> addSchemaVars(Iterable<String> names, Iterable<String> options, String s,
+            SchemaVariableModifierSet mods,
+            ParserRuleContext ctx,
+            boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV) {
+        return addSchemaVars(names, options, getExistingSort(s, ctx), mods, ctx, makeVariableSV, makeSkolemTermSV,
+                makeTermLabelSV);
+    }
+
+    private ImmutableList<SchemaVariable> addSchemaVars(Iterable<String> names, Iterable<String> options, Sort s,
+            SchemaVariableModifierSet mods,
+            ParserRuleContext ctx,
+            boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV) {
+        ImmutableList<SchemaVariable> result = ImmutableSLList.<SchemaVariable>nil();
+
+        for (String option : options) {
+            if (!mods.addModifier(option)) {
+                semanticExc(option +
+                        ": Illegal or unknown modifier in declaration of schema variable", ctx);
+            }
+        }
+
+        for (String name : names) {
+            result = result.prepend(
+                    schema_var_decl(name, s, makeVariableSV, makeSkolemTermSV, makeTermLabelSV, mods, ctx));
+        }
+
+        return result;
+    }
+
+    private SchemaVariable schema_var_decl(String name,
+            Sort s,
+            boolean makeVariableSV,
+            boolean makeSkolemTermSV,
+            boolean makeTermLabelSV,
+            SchemaVariableModifierSet mods,
+            ParserRuleContext ctx)
+            throws AmbiguousDeclException {
+        if (!skip_schemavariables) {
+            SchemaVariable v;
+            if (s == Sort.FORMULA && !makeSkolemTermSV) {
+                v = CCSchemaVariableFactory.createFormulaSV(new Name(name),
+                        mods.rigid());
+            }
+            else if (s == Sort.UPDATE) {
+                v = CCSchemaVariableFactory.createUpdateSV(new Name(name));
+            }
+            // else if (s instanceof ProgramSVSort) {
+            // v = CCSchemaVariableFactory.createProgramSV(
+            // new ProgramElementName(name),
+            // (ProgramSVSort) s,
+            // mods.list());
+            // }
+            else {
+                if (makeVariableSV) {
+                    v = CCSchemaVariableFactory.createVariableSV(new Name(name), s);
+                }
+                else if (makeSkolemTermSV) {
+                    v = CCSchemaVariableFactory.createSkolemTermSV(new Name(name),
+                            s);
+                }
+                else if (makeTermLabelSV) {
+                    v = CCSchemaVariableFactory.createTermLabelSV(new Name(name));
+                }
+                else {
+                    v = CCSchemaVariableFactory.createTermSV(
+                            new Name(name),
+                            s,
+                            mods.rigid(),
+                            mods.strict());
+                }
+            }
+
+            if (schemaMode) {
+                if (nss.variables().lookup(v.name()) != null) {
+                    ambiguousDeclExc(v.name().toString(), ctx);
+                }
+                nss.variables().add(v);
+            }
+
+            return v;
+        }
+
+        return null;
+    }
+
+    private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities,
+            ParserRuleContext ctx)
+            throws KeYSemanticException {
+        ModalOperatorSV osv = (ModalOperatorSV) nss.variables().lookup(new Name(opName));
+
+        if (osv == null) {
+            semanticExc("Schema variable " + opName + " not defined.", ctx);
+        }
+
+        modalities = modalities.union(osv.getModalities());
+        return modalities;
+    }
+
+    private ImmutableSet<Modality> opSVHelper(String opName,
+            ImmutableSet<Modality> modalities, ParserRuleContext ctx)
+            throws KeYSemanticException {
+        if (opName.charAt(0) == '#') {
+            return lookupOperatorSV(opName, modalities, ctx);
+        }
+        else {
+            switchToNormalMode();
+            Modality m = Modality.getModality(opName);
+            switchToSchemaMode();
+            if (m == null) {
+                semanticExc("Unrecognised operator: " + opName, ctx);
+            }
+            modalities = modalities.add(m);
+        }
+
+        return modalities;
+    }
+    // END Helper methods for schema variables
+
+    /**
+     * Activates schema mode. In the old KeY parser, also a perserConfig field
+     * was set; this is not done here yet.
+     */
+    private void switchToSchemaMode() {
+        schemaMode = true;
+    }
+
+    /**
+     * Deactivates schema mode. In the old KeY parser, also a perserConfig field
+     * was set; this is not done here yet.
+     */
+    private void switchToNormalMode() {
+        schemaMode = false;
     }
 
 }
