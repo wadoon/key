@@ -29,3 +29,29 @@ options {
 
 import KeYCommonDeclarationParser;
 
+formula 
+    :
+      NOT formula         
+    | formula AND formula 
+    | formula OR formula  
+    | formula IMP formula 
+    | formula EQV formula  
+    | comparisonFormula          
+    | sym=funcpred_name ( LPAREN term (COMMA term)* RPAREN )?     
+    | TRUE 
+    | FALSE
+    ;
+
+comparisonFormula
+    :
+      term op=(LESS | LESSEQUAL | EQUALS | NOT_EQUALS | GREATER | GREATEREQUAL) term
+    ;
+
+term 
+    : 
+      MINUS term                  # unaryMinusTerm
+    | term op=(PLUS | MINUS) term # addSubTerm 
+    | term op=(STAR | SLASH) term # mulDivTerm
+    | sym=funcpred_name ( LPAREN term (COMMA term)* RPAREN )?  # functionTerm
+    ;
+       

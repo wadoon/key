@@ -545,27 +545,27 @@ WS
 STRING_LITERAL
 	: '"' ('\\' . | ~( '"' | '\\') )* '"' ;
 
-LESS_DISPATCH
+/* LESS_DISPATCH
 	: IMPLICIT_IDENT
 	| EQV
 	| LESSEQUAL
 	| LGUILLEMETS
 	| LESS ;
-
+*/
 LESS
 	: '<' ;
 
-fragment LESSEQUAL
+LESSEQUAL
 	: '<' '='
 	| '\u2264' ;
 
-fragment LGUILLEMETS
+LGUILLEMETS
 	: '<' '<' ;
 
-fragment IMPLICIT_IDENT
+IMPLICIT_IDENT
 	: '<' (LETTER)+ '>' ;
 
-fragment EQV
+EQV
 	: '<->'
 	| '\u2194' ;
 
