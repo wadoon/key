@@ -26,11 +26,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 import org.key_project.common.core.logic.calculus.PosInOccurrence;
 import org.key_project.common.core.logic.calculus.PosInTerm;
-import org.key_project.common.core.logic.op.FormulaSV;
-import org.key_project.common.core.logic.op.ModalOperatorSV;
-import org.key_project.common.core.logic.op.Operator;
-import org.key_project.common.core.logic.op.SchemaVariable;
-import org.key_project.common.core.parser.*;
+import org.key_project.common.core.logic.op.*;
 import org.key_project.common.core.rule.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;

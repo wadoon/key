@@ -29,7 +29,7 @@
 		<link>
 			<name>genSrc</name>
 			<type>2</type>
-			<location>/home/dscheurer/key-workspace/GIT/key/key/key.common.core/genSrc</location>
+			<locationURI>PARENT-4-PROJECT_LOC/key/key.common.core/genSrc</locationURI>
 		</link>
 		<link>
 			<name>key.src</name>

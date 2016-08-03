@@ -34,7 +34,6 @@ options {
   import de.uka.ilkd.key.parser.InvalidFindException;
   import de.uka.ilkd.key.parser.KeYSemanticException;
   import de.uka.ilkd.key.parser.NotDeclException;
-  import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
   import de.uka.ilkd.key.parser.UnfittingReplacewithException;
   import de.uka.ilkd.key.parser.ParserMode;
   import de.uka.ilkd.key.parser.IdDeclaration;
@@ -64,6 +63,8 @@ options {
   import org.key_project.common.core.logic.op.*;
   import org.key_project.common.core.logic.sort.*;
   import org.key_project.common.core.rule.TacletOption;
+  import org.key_project.common.core.parser.SchemaVariableModifierSet;
+ 
   import org.key_project.util.collection.*;
 
   import de.uka.ilkd.key.java.*;
