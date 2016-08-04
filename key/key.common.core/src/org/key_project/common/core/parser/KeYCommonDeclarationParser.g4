@@ -309,8 +309,7 @@ schema_modifiers
 digit : DIGIT_DISPATCH ;
 
 boolean_value
-    : TRUE
-    | FALSE
+    : simple_ident
     ;
 
 sortId

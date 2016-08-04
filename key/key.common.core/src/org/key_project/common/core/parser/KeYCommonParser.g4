@@ -32,7 +32,7 @@ formula
     : 
       NOT formula  #negatedFormula
     | LBRACE SUBST logicalVariableDecl SEMI term RBRACE formula     #substitutionFormula
-    | LBRACE update RBRACE formula                                  #updateFormula
+    | LBRACE parallelUpdate RBRACE formula                                  #updateFormula
     | quantifier=(FORALL | EXISTS) logicalVariableDecl SEMI formula #quantifiedFormula
     | formula AND formula  #conjunctiveFormula 
     | formula OR formula   #disjunctiveFormula
@@ -52,12 +52,12 @@ term
     : 
       MINUS term                      #unaryMinusTerm
     | LBRACE SUBST logicalVariableDecl SEMI term RBRACE term #substitutionTerm
-    | LBRACE update RBRACE term       #updateTerm
-    | term op=(PLUS | MINUS) term     #addSubTerm
+    | LBRACE parallelUpdate RBRACE term       #updateTerm
     | term op=(STAR | SLASH) term     #mulDivTerm
+    | term op=(PLUS | MINUS) term     #addSubTerm
     | sym=funcpred_name arguments?    #functionTerm
     | funcpred_name (DOT funcpred_name)+ (AT funcpred_name)? #attributeTerm
-    | funcpred_name (LBRACKET term | elementaryUpdate RBRACKET)+ #heapStoreTerm
+    | funcpred_name (LBRACKET term | (simple_ident ASSIGN term RBRACKET))+ #heapStoreTerm
     | LPAREN term RPAREN              #parenthesizedTerm
     ;
 
@@ -71,15 +71,15 @@ argumentList
    term (COMMA term)*
    ;
 
-elementaryUpdate
-   :
-   loc=simple_ident ASSIGN term
+parallelUpdate
+   :        
+      update (PARALLEL parallelUpdate)*
    ;
- 
+   
 update
-   :
-     update PARALLEL update 
-   | LBRACE update RBRACE update 
-   | elementaryUpdate    
+   : 
+     LBRACE update RBRACE update   #updateOnUpdateApplication
+   | loc=simple_ident ASSIGN term  #elementaryUpdate
+   | LPAREN parallelUpdate RPAREN  #parenthesizedUpdate
    ;
 

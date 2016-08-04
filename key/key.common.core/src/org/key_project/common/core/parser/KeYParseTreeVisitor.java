@@ -564,7 +564,7 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
 
     @Override
     public Boolean visitBoolean_value(Boolean_valueContext ctx) {
-        return ctx.FALSE() == null ? true : false;
+        return "true".equals(ctx.simple_ident().getText()) ? true : false;
     }
 
     @Override

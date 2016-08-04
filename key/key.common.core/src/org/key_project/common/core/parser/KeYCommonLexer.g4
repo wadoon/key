@@ -275,11 +275,11 @@ PROFILE
 	: '\\profile' ;
 
 // Those guys can stay being keywords
-TRUE
-	: 'true' ;
+//TRUE
+//	: 'true' ;
 
-FALSE
-	: 'false' ;
+//FALSE
+//	: 'false' ;
 
 // Keywords related to taclets
 SAMEUPDATELEVEL
