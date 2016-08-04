@@ -63,17 +63,17 @@ term
 
 arguments
     :
-    LPAREN argumentList? RPAREN
+      LPAREN argumentList? RPAREN
     ;
 
 argumentList
    :
-   term (COMMA term)*
+     term (COMMA term)*
    ;
 
 parallelUpdate
    :        
-      update (PARALLEL parallelUpdate)*
+     update (PARALLEL parallelUpdate)*
    ;
    
 update

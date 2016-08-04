@@ -179,12 +179,27 @@ public class TestTermParser extends TestCase {
     public void testFunctionTerm() {
         TermContext result = parseTerm("f(a,b)");
         assertTrue(result instanceof FunctionTermContext);
-        assert(result instanceof FunctionTermContext);
         FunctionTermContext func = (FunctionTermContext) result;
         assertEquals("f", func.sym.getText());
         assertEquals(2, func.arguments().argumentList().term().size());
     }
 
+    public void testArithmeticTerm() {
+        TermContext result = parseTerm("a + b * c - 3/4");
+        assertTrue(result instanceof AddSubTermContext);
+        AddSubTermContext func = (AddSubTermContext) result;
+        assertTrue(func.term(0) instanceof AddSubTermContext);        
+        final AddSubTermContext fst = (AddSubTermContext) func.term(0);
+        
+        assertEquals("a", fst.term(0).getText());
+        assertTrue(fst.term(1) instanceof MulDivTermContext);
+        assertEquals("b*c", fst.term(1).getText());
+        
+        assertTrue(func.term(1) instanceof MulDivTermContext);
+        assertEquals("3/4", ((MulDivTermContext)func.term(1)).getText());
+    }
+
+    
     public void testAttributeTerm() {
         TermContext result = parseTerm("o.a.c");
         assertTrue(result instanceof AttributeTermContext);
