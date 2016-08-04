@@ -306,7 +306,7 @@ schema_modifiers
 // "Trivial" values: Names, numbers, IDs
 // =====================================
 
-digit : DIGIT_DISPATCH ;
+digit : NUM_LITERAL | HEX_LITERAL ;
 
 boolean_value
     : simple_ident

@@ -26,11 +26,9 @@ import junit.framework.TestCase;
  */
 public class TestTermParser extends TestCase {
 
-
     public TestTermParser(String name) {
         super(name);
     }
-
 
     private TermContext parseTerm(String inputStr) {
         // Create the lexer
@@ -243,11 +241,22 @@ public class TestTermParser extends TestCase {
         assertTrue(eqv.formula(0) instanceof IfThenElseFormulaContext);
     }
 
-
     public void testITETerm() {
         FormulaContext result = parseFormula("\\if (A) \\then (a) \\else (b) = c");
         assertTrue(result instanceof ComparisonFormulaContext);        
         ComparisonFormulaContext eq = (ComparisonFormulaContext) result;
         assertTrue(eq.term(0) instanceof IfThenElseTermContext);
     }
+    
+    public void testParseNumber() {
+        TermContext result = parseTerm("12345");
+        assertTrue(result instanceof NumberLiteralTermContext);
+        assertEquals("12345",((NumberLiteralTermContext)result).literal.getText());
+
+        result = parseTerm("0x44AF");
+        assertTrue(result instanceof NumberLiteralTermContext);
+        assertEquals("0x44AF",((NumberLiteralTermContext)result).literal.getText());
+
+    }
+    
 }

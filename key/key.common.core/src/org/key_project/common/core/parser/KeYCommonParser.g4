@@ -57,6 +57,7 @@ term
     | IF LPAREN condition=formula RPAREN THEN LPAREN thenTrm=term RPAREN ELSE LPAREN elseTrm=term RPAREN #ifThenElseTerm    
     | term op=(STAR | SLASH) term   #mulDivTerm
     | term op=(PLUS | MINUS) term   #addSubTerm
+    | literal=digit #numberLiteralTerm
     | sym=funcpred_name arguments?  #functionTerm
     | funcpred_name (DOT funcpred_name)+ (AT funcpred_name)?   #attributeTerm
     | funcpred_name (LBRACKET term | (simple_ident ASSIGN term RBRACKET))+ #heapStoreTerm

@@ -598,11 +598,7 @@ ML_COMMENT
 
 // A single Digit that is followed by a ( is an ident, otherwise it's a number
 
-DIGIT_DISPATCH
-	: HEX_LITERAL
-	| NUM_LITERAL ;
-
-fragment HEX_LITERAL
+HEX_LITERAL
 	: '0' 'x' (DIGIT | 'a'..'f' | 'A'..'F')+ ;
 
 fragment DIGIT
