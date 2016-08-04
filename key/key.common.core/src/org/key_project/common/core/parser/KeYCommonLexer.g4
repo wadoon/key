@@ -535,12 +535,15 @@ GREATEREQUAL
 RGUILLEMETS
 	: '>' '>' ;
 
+
+
 WS
 	: (' '
   |   '\t'
   |   '\n'
   |   '\r' )
   -> channel(HIDDEN) ;
+  
 
 STRING_LITERAL
 	: '"' ('\\' . | ~( '"' | '\\') )* '"' ;
@@ -627,4 +630,20 @@ IDENT
 
 NUM_LITERAL
 	: (DIGIT)+ ;
+
+BOX_BEGIN
+   :
+    '\\[' '{' -> pushMode(program)
+   ;
+
+DIAMOND_BEGIN 
+   : 
+    '\\<' '{' -> pushMode(program)
+   ;
+
+mode program; 
+
+BOX_END: (.)*?  '}' '\\]' -> popMode; 
+
+DIAMOND_END   : (.)*?  '}' '\\>' -> popMode;
 

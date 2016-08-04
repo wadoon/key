@@ -31,6 +31,7 @@ import KeYCommonDeclarationParser;
 formula 
     : 
       NOT formula  #negatedFormula
+    | programFml #programFormula
     | LBRACE SUBST logicalVariableDeclaration SEMI replacement=term RBRACE in=formula  #substitutionFormula
     | LBRACE parallelUpdate RBRACE formula   #updateFormula
     | IF LPAREN condition=formula RPAREN THEN LPAREN thenFml=formula RPAREN ELSE LPAREN elseFml=formula RPAREN #ifThenElseFormula
@@ -43,6 +44,13 @@ formula
     | sym=funcpred_name arguments? #predicateFormula
     | LPAREN formula RPAREN #parenthesizedFormula
     ;
+    
+programFml 
+   :
+      BOX_BEGIN BOX_END formula 
+     |
+      DIAMOND_BEGIN  DIAMOND_END formula 
+   ;
 
 logicalVariableDeclaration
     :

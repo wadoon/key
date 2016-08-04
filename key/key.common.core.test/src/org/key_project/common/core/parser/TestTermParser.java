@@ -259,4 +259,22 @@ public class TestTermParser extends TestCase {
 
     }
     
+    public void testBoxFml() {
+        FormulaContext result = parseFormula("\\[{this.a = this.b++; while (b) { };}\\]A");
+        assertTrue(result instanceof ProgramFormulaContext);
+        ProgramFormulaContext prgFml = (ProgramFormulaContext) result;
+        assertEquals("A", prgFml.programFml().formula().getText());
+        assertEquals("this.a = this.b++; while (b) { };", prgFml.programFml().BOX_END().getText().substring(0, 
+                prgFml.programFml().BOX_END().getText().length() - 3));     
+    } 
+    
+    public void testDiamondFml() {
+        FormulaContext result = parseFormula("\\<{this.a = this.b++; while (b) { };}\\>A");
+        assertTrue(result instanceof ProgramFormulaContext);
+        ProgramFormulaContext prgFml = (ProgramFormulaContext) result;
+        assertEquals("A", prgFml.programFml().formula().getText());
+        assertEquals("this.a = this.b++; while (b) { };", prgFml.programFml().DIAMOND_END().getText().substring(0, 
+                prgFml.programFml().DIAMOND_END().getText().length() - 3));
+        
+    }
 }
