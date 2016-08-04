@@ -33,6 +33,26 @@ public class TestTermParser extends TestCase {
     }
 
 
+    private TermContext parseTerm(String inputStr) {
+        // Create the lexer
+        KeYCommonLexer lexer = new KeYCommonLexer(new ANTLRInputStream(inputStr));
+
+        // Create a buffer of tokens pulled from the lexer
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        // Create the parser
+        KeYCommonParser parser = new KeYCommonParser(tokens);
+
+        // Traverse the parse tree
+        try {
+            return parser.term();
+        }
+        catch (Exception e) {
+            throw new ProofInputException(e.getMessage(), e);
+        }
+    }
+
+    
     private FormulaContext parseFormula(String inputStr) {
         // Create the lexer
         KeYCommonLexer lexer = new KeYCommonLexer(new ANTLRInputStream(inputStr));
@@ -133,7 +153,26 @@ public class TestTermParser extends TestCase {
         assertTrue(((DisjunctiveFormulaContext)result).formula(0) instanceof ConjunctiveFormulaContext);
         assertTrue(((ConjunctiveFormulaContext)((DisjunctiveFormulaContext)result).formula(0)).formula(1) instanceof ComparisonFormulaContext);
     }
-        
+    
+    
+    public void testPredicateFormula() {
+        FormulaContext result = parseFormula("p(a,b)");
+        assertTrue(result instanceof PredicateFormulaContext);
+        assert(result instanceof PredicateFormulaContext);
+        PredicateFormulaContext pred = (PredicateFormulaContext) result;
+        assertEquals("p", pred.sym.getText());
+        assertEquals(2, pred.arguments().argumentList().term().size());
+    }
+
+    public void testFunctionTerm() {
+        TermContext result = parseTerm("f(a,b)");
+        assertTrue(result instanceof FunctionTermContext);
+        assert(result instanceof FunctionTermContext);
+        FunctionTermContext func = (FunctionTermContext) result;
+        assertEquals("f", func.sym.getText());
+        assertEquals(2, func.arguments().argumentList().term().size());
+    }
+
     
 }
         

@@ -36,14 +36,24 @@ formula
     | formula IMP formula  #implicationFormula
     | formula EQV formula  #equivalenceFormula                                       
     | term op=(LESS | LESSEQUAL | EQUALS | NOT_EQUALS | GREATER | GREATEREQUAL) term #comparisonFormula 
-    | sym=funcpred_name ( LPAREN term (COMMA term)* RPAREN )? #predicateFormula
+    | sym=funcpred_name arguments? #predicateFormula
     | LPAREN formula RPAREN #parenthesizedFormula
     ;
 
 term 
     : 
-      MINUS term                  # unaryMinusTerm
-    | term op=(PLUS | MINUS) term # addSubTerm 
-    | term op=(STAR | SLASH) term # mulDivTerm
-    | sym = funcpred_name (LPAREN term (COMMA term)* RPAREN)?  # functionTerm
+      MINUS term                      # unaryMinusTerm
+    | term op=(PLUS | MINUS) term     # addSubTerm 
+    | term op=(STAR | SLASH) term     # mulDivTerm
+    | sym = funcpred_name arguments?  # functionTerm
     ;
+
+ arguments 
+    :
+    LPAREN argumentList? RPAREN
+    ;
+    
+ argumentList
+   :
+     term (COMMA term)*
+   ;
