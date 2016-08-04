@@ -47,6 +47,7 @@ public class TestDeclParser extends TestCase {
 
         String sorts = "\\sorts{boolean;int;LocSet;}";
         KeYParseTreeVisitor parser = new KeYParseTreeVisitor(nss);
+        
         parser.parse(sorts);
     }
 

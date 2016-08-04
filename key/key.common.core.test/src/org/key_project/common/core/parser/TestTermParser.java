@@ -13,8 +13,7 @@
 
 package org.key_project.common.core.parser;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.*;
 import org.key_project.common.core.parser.KeYCommonParser.*;
 import org.key_project.common.core.parser.exceptions.ProofInputException;
 
@@ -43,6 +42,9 @@ public class TestTermParser extends TestCase {
         // Create the parser
         KeYCommonParser parser = new KeYCommonParser(tokens);
 
+        // For testing: bail at error
+        parser.setErrorHandler(new BailErrorStrategy());
+
         // Traverse the parse tree
         try {
             return parser.term();
@@ -62,10 +64,12 @@ public class TestTermParser extends TestCase {
 
         // Create the parser
         KeYCommonParser parser = new KeYCommonParser(tokens);
-
+        // For testing: bail at error
+        parser.setErrorHandler(new BailErrorStrategy());
         // Traverse the parse tree
         try {
-            return parser.formula();
+            FormulaContext result = parser.formula();            
+            return result;   
         }
         catch (Exception e) {
             throw new ProofInputException(e.getMessage(), e);
@@ -164,7 +168,7 @@ public class TestTermParser extends TestCase {
     }
     
     public void testQuantifiedFormula() {
-        FormulaContext result = parseFormula("\\forall x:int; A & B");
+        FormulaContext result = parseFormula("\\forall int x; A & B");
 
         assertTrue(result instanceof ConjunctiveFormulaContext);
         QuantifiedFormulaContext qf = (QuantifiedFormulaContext) ((ConjunctiveFormulaContext)result).formula(0);
@@ -180,6 +184,21 @@ public class TestTermParser extends TestCase {
         assertEquals("f", func.sym.getText());
         assertEquals(2, func.arguments().argumentList().term().size());
     }
+
+    public void testAttributeTerm() {
+        TermContext result = parseTerm("o.a.c");
+        assertTrue(result instanceof AttributeTermContext);
+        result = parseTerm("o.a.c@heap");
+        assertTrue(result instanceof AttributeTermContext);
+
+        
+        result = parseTerm("org.key.Prover::instance(a)");
+        assertTrue(result instanceof FunctionTermContext);
+        result = parseTerm("org.key.Prover::FieldName");
+        assertTrue(result instanceof FunctionTermContext);
+    }
+    
+    
 
     
 }

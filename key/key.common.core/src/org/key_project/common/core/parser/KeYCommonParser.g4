@@ -30,12 +30,14 @@ import KeYCommonDeclarationParser;
 
 formula 
     : 
-      NOT formula  #negatedFormula       
+      NOT formula  #negatedFormula
+    | LBRACE SUBST logicalVariableDecl SEMI term RBRACE formula     #substitutionFormula
+    | LBRACE update RBRACE formula                                  #updateFormula
     | quantifier=(FORALL | EXISTS) logicalVariableDecl SEMI formula #quantifiedFormula
     | formula AND formula  #conjunctiveFormula 
     | formula OR formula   #disjunctiveFormula
     | formula IMP formula  #implicationFormula
-    | formula EQV formula  #equivalenceFormula                                       
+    | formula EQV formula  #equivalenceFormula
     | term op=(LESS | LESSEQUAL | EQUALS | NOT_EQUALS | GREATER | GREATEREQUAL) term #comparisonFormula 
     | sym=funcpred_name arguments? #predicateFormula
     | LPAREN formula RPAREN #parenthesizedFormula
@@ -43,24 +45,41 @@ formula
 
 logicalVariableDecl
     :
-    simple_ident COLON sort_name
+    sort_name simple_ident  
     ;
 
-term 
+term
     : 
-      MINUS term                      # unaryMinusTerm
-    | term op=(PLUS | MINUS) term     # addSubTerm 
-    | term op=(STAR | SLASH) term     # mulDivTerm
-    | sym = funcpred_name arguments?  # functionTerm
+      MINUS term                      #unaryMinusTerm
+    | LBRACE SUBST logicalVariableDecl SEMI term RBRACE term #substitutionTerm
+    | LBRACE update RBRACE term       #updateTerm
+    | term op=(PLUS | MINUS) term     #addSubTerm
+    | term op=(STAR | SLASH) term     #mulDivTerm
+    | sym=funcpred_name arguments?    #functionTerm
+    | funcpred_name (DOT funcpred_name)+ (AT funcpred_name)? #attributeTerm
+    | funcpred_name (LBRACKET term | elementaryUpdate RBRACKET)+ #heapStoreTerm
+    | LPAREN term RPAREN              #parenthesizedTerm
     ;
 
- arguments 
+arguments
     :
     LPAREN argumentList? RPAREN
     ;
-    
- argumentList
+
+argumentList
    :
    term (COMMA term)*
    ;
+
+elementaryUpdate
+   :
+   loc=simple_ident ASSIGN term
+   ;
  
+update
+   :
+     update PARALLEL update 
+   | LBRACE update RBRACE update 
+   | elementaryUpdate    
+   ;
+
