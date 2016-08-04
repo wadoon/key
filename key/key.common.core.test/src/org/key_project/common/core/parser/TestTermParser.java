@@ -54,7 +54,7 @@ public class TestTermParser extends TestCase {
         }
     }
 
-    
+
     private FormulaContext parseFormula(String inputStr) {
         // Create the lexer
         KeYCommonLexer lexer = new KeYCommonLexer(new ANTLRInputStream(inputStr));
@@ -75,7 +75,7 @@ public class TestTermParser extends TestCase {
             throw new ProofInputException(e.getMessage(), e);
         }
     }
-    
+
     public void testParseConjunction() {
         FormulaContext result = parseFormula("A & B");
         assertTrue("Expected a conjunction", result instanceof ConjunctiveFormulaContext);
@@ -107,7 +107,7 @@ public class TestTermParser extends TestCase {
         assertEquals("A", ((ConjunctiveFormulaContext)result).formula(0).getText());
         assertEquals("(B|C)", ((ConjunctiveFormulaContext)result).formula(1).getText());
     }
-    
+
     public void testPrecedencesProp() {
         FormulaContext result = parseFormula("A & (B | C) -> D <-> E | F");
         assertTrue("Equivalence should bind top level.", result instanceof EquivalenceFormulaContext);
@@ -115,7 +115,7 @@ public class TestTermParser extends TestCase {
         assertTrue("Implication on left side.", eqv.formula(0) instanceof ImplicationFormulaContext);
         assertTrue("Disjunction on right side.", eqv.formula(1) instanceof DisjunctiveFormulaContext);
     }
-    
+
     public void testPrecedencesPropWithNeg() {
         FormulaContext result = parseFormula("!A & (B | C) -> D <-> !E | F");
         assertTrue("Equivalence should bind top level, not " + result.getClass().getSimpleName(), result instanceof EquivalenceFormulaContext);
@@ -127,7 +127,7 @@ public class TestTermParser extends TestCase {
         assertTrue("Disjunction on right side.", eqv.formula(1) instanceof DisjunctiveFormulaContext);
         assertTrue("Negation !E.", ((DisjunctiveFormulaContext)eqv.formula(1)).formula(0) instanceof NegatedFormulaContext);
     }
-    
+
     public void testComparison() {
         FormulaContext result = parseFormula("a <= b");
         assertTrue(result instanceof ComparisonFormulaContext);
@@ -148,7 +148,7 @@ public class TestTermParser extends TestCase {
         assertTrue(result instanceof ComparisonFormulaContext);
         assertEquals(KeYCommonLexer.NOT_EQUALS, ((ComparisonFormulaContext)result).op.getType());
     }
-    
+
     public void testComparisonPrecedence() {
         FormulaContext result = parseFormula("a <= b & C");
         assertTrue(result instanceof ConjunctiveFormulaContext);
@@ -157,8 +157,8 @@ public class TestTermParser extends TestCase {
         assertTrue(((DisjunctiveFormulaContext)result).formula(0) instanceof ConjunctiveFormulaContext);
         assertTrue(((ConjunctiveFormulaContext)((DisjunctiveFormulaContext)result).formula(0)).formula(1) instanceof ComparisonFormulaContext);
     }
-    
-    
+
+
     public void testPredicateFormula() {
         FormulaContext result = parseFormula("p(a,b)");
         assertTrue(result instanceof PredicateFormulaContext);
@@ -166,7 +166,7 @@ public class TestTermParser extends TestCase {
         assertEquals("p", pred.sym.getText());
         assertEquals(2, pred.arguments().argumentList().term().size());
     }
-    
+
     public void testQuantifiedFormula() {
         FormulaContext result = parseFormula("\\forall int x; A & B");
 
@@ -190,29 +190,29 @@ public class TestTermParser extends TestCase {
         AddSubTermContext func = (AddSubTermContext) result;
         assertTrue(func.term(0) instanceof AddSubTermContext);        
         final AddSubTermContext fst = (AddSubTermContext) func.term(0);
-        
+
         assertEquals("a", fst.term(0).getText());
         assertTrue(fst.term(1) instanceof MulDivTermContext);
         assertEquals("b*c", fst.term(1).getText());
-        
+
         assertTrue(func.term(1) instanceof MulDivTermContext);
         assertEquals("3/4", ((MulDivTermContext)func.term(1)).getText());
     }
 
-    
+
     public void testAttributeTerm() {
         TermContext result = parseTerm("o.a.c");
         assertTrue(result instanceof AttributeTermContext);
         result = parseTerm("o.a.c@heap");
         assertTrue(result instanceof AttributeTermContext);
 
-        
+
         result = parseTerm("org.key.Prover::instance(a)");
         assertTrue(result instanceof FunctionTermContext);
         result = parseTerm("org.key.Prover::FieldName");
         assertTrue(result instanceof FunctionTermContext);
     }
-    
+
     public void testElementaryUpdate() {
         FormulaContext result = parseFormula("{c:=a}true");
         assertTrue(result instanceof UpdateFormulaContext);
@@ -234,8 +234,20 @@ public class TestTermParser extends TestCase {
 
         assertTrue(updateApp.parallelUpdate().parallelUpdate(0).update() instanceof ElementaryUpdateContext);
         assertEquals("c:=a", ((ElementaryUpdateContext)updateApp.parallelUpdate().parallelUpdate(0).update()).getText());
-        }
+    }
 
-    
+    public void testITEFormula() {
+        FormulaContext result = parseFormula("\\if (A) \\then (B) \\else (C) <-> D");
+        assertTrue(result instanceof EquivalenceFormulaContext);
+        EquivalenceFormulaContext eqv = (EquivalenceFormulaContext) result;
+        assertTrue(eqv.formula(0) instanceof IfThenElseFormulaContext);
+    }
+
+
+    public void testITETerm() {
+        FormulaContext result = parseFormula("\\if (A) \\then (a) \\else (b) = c");
+        assertTrue(result instanceof ComparisonFormulaContext);        
+        ComparisonFormulaContext eq = (ComparisonFormulaContext) result;
+        assertTrue(eq.term(0) instanceof IfThenElseTermContext);
+    }
 }
-        

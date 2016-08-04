@@ -31,9 +31,10 @@ import KeYCommonDeclarationParser;
 formula 
     : 
       NOT formula  #negatedFormula
-    | LBRACE SUBST logicalVariableDecl SEMI term RBRACE formula     #substitutionFormula
-    | LBRACE parallelUpdate RBRACE formula                                  #updateFormula
-    | quantifier=(FORALL | EXISTS) logicalVariableDecl SEMI formula #quantifiedFormula
+    | LBRACE SUBST logicalVariableDeclaration SEMI replacement=term RBRACE in=formula  #substitutionFormula
+    | LBRACE parallelUpdate RBRACE formula   #updateFormula
+    | IF LPAREN condition=formula RPAREN THEN LPAREN thenFml=formula RPAREN ELSE LPAREN elseFml=formula RPAREN #ifThenElseFormula
+    | quantifier=(FORALL | EXISTS) logicalVariableDeclaration SEMI formula #quantifiedFormula
     | formula AND formula  #conjunctiveFormula 
     | formula OR formula   #disjunctiveFormula
     | formula IMP formula  #implicationFormula
@@ -43,22 +44,23 @@ formula
     | LPAREN formula RPAREN #parenthesizedFormula
     ;
 
-logicalVariableDecl
+logicalVariableDeclaration
     :
     sort_name simple_ident  
     ;
 
 term
     : 
-      MINUS term                      #unaryMinusTerm
-    | LBRACE SUBST logicalVariableDecl SEMI term RBRACE term #substitutionTerm
-    | LBRACE parallelUpdate RBRACE term       #updateTerm
-    | term op=(STAR | SLASH) term     #mulDivTerm
-    | term op=(PLUS | MINUS) term     #addSubTerm
-    | sym=funcpred_name arguments?    #functionTerm
-    | funcpred_name (DOT funcpred_name)+ (AT funcpred_name)? #attributeTerm
+      MINUS term  #unaryMinusTerm
+    | LBRACE SUBST logicalVariableDeclaration SEMI replacement=term RBRACE in=term #substitutionTerm
+    | LBRACE parallelUpdate RBRACE term   #updateTerm
+    | IF LPAREN condition=formula RPAREN THEN LPAREN thenTrm=term RPAREN ELSE LPAREN elseTrm=term RPAREN #ifThenElseTerm    
+    | term op=(STAR | SLASH) term   #mulDivTerm
+    | term op=(PLUS | MINUS) term   #addSubTerm
+    | sym=funcpred_name arguments?  #functionTerm
+    | funcpred_name (DOT funcpred_name)+ (AT funcpred_name)?   #attributeTerm
     | funcpred_name (LBRACKET term | (simple_ident ASSIGN term RBRACKET))+ #heapStoreTerm
-    | LPAREN term RPAREN              #parenthesizedTerm
+    | LPAREN term RPAREN   #parenthesizedTerm
     ;
 
 arguments
@@ -79,7 +81,7 @@ parallelUpdate
 update
    : 
      LBRACE update RBRACE update   #updateOnUpdateApplication
-   | loc=simple_ident ASSIGN term  #elementaryUpdate
+   | loc=simple_ident ASSIGN value=term  #elementaryUpdate
    | LPAREN parallelUpdate RPAREN  #parenthesizedUpdate
    ;
 
