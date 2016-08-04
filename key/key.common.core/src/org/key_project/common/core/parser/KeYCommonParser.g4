@@ -22,7 +22,6 @@ parser grammar KeYCommonParser ;
     package org.key_project.common.core.parser;
 }
 
-
 options {
     tokenVocab = KeYCommonLexer ;
 }
@@ -30,21 +29,15 @@ options {
 import KeYCommonDeclarationParser;
 
 formula 
-    :
-      NOT formula         
-    | formula AND formula 
-    | formula OR formula  
-    | formula IMP formula 
-    | formula EQV formula  
-    | comparisonFormula          
-    | sym=funcpred_name ( LPAREN term (COMMA term)* RPAREN )?     
-    | TRUE 
-    | FALSE
-    ;
-
-comparisonFormula
-    :
-      term op=(LESS | LESSEQUAL | EQUALS | NOT_EQUALS | GREATER | GREATEREQUAL) term
+    : 
+      NOT formula  #negatedFormula       
+    | formula AND formula  #conjunctiveFormula 
+    | formula OR formula   #disjunctiveFormula
+    | formula IMP formula  #implicationFormula
+    | formula EQV formula  #equivalenceFormula                                       
+    | term op=(LESS | LESSEQUAL | EQUALS | NOT_EQUALS | GREATER | GREATEREQUAL) term #comparisonFormula 
+    | sym=funcpred_name ( LPAREN term (COMMA term)* RPAREN )? #predicateFormula
+    | LPAREN formula RPAREN #parenthesizedFormula
     ;
 
 term 
@@ -52,6 +45,5 @@ term
       MINUS term                  # unaryMinusTerm
     | term op=(PLUS | MINUS) term # addSubTerm 
     | term op=(STAR | SLASH) term # mulDivTerm
-    | sym=funcpred_name ( LPAREN term (COMMA term)* RPAREN )?  # functionTerm
+    | sym = funcpred_name (LPAREN term (COMMA term)* RPAREN)?  # functionTerm
     ;
-       
