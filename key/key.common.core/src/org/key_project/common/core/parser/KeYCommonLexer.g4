@@ -641,9 +641,15 @@ DIAMOND_BEGIN
     '\\<' '{' -> pushMode(program)
    ;
 
+MODALITY_BEGIN
+   :
+    '\\modality' '{' IDENT '}' '{' -> pushMode(program)
+   ;
+
 mode program; 
 
 BOX_END: (.)*?  '}' '\\]' -> popMode; 
 
 DIAMOND_END   : (.)*?  '}' '\\>' -> popMode;
 
+MODALITY_END :  (.)*? '}' '\\endmodality' ->popMode;

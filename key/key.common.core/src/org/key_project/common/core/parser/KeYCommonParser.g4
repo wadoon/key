@@ -47,9 +47,9 @@ formula
     
 programFml 
    :
-      BOX_BEGIN BOX_END formula 
-     |
-      DIAMOND_BEGIN  DIAMOND_END formula 
+       BOX_BEGIN BOX_END formula 
+     | DIAMOND_BEGIN  DIAMOND_END formula 
+     | MODALITY_BEGIN MODALITY_END formula
    ;
 
 logicalVariableDeclaration

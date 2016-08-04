@@ -277,4 +277,15 @@ public class TestTermParser extends TestCase {
                 prgFml.programFml().DIAMOND_END().getText().length() - 3));
         
     }
+    
+    public void testGenericFml() {
+        FormulaContext result = parseFormula("\\modality{box}{this.a = this.b++; while (b) { };}\\endmodality A");
+        assertTrue(result instanceof ProgramFormulaContext);
+        ProgramFormulaContext prgFml = (ProgramFormulaContext) result;
+        assertEquals("A", prgFml.programFml().formula().getText());
+        final String modalityHeader = prgFml.programFml().MODALITY_BEGIN().getText();
+        assertEquals("box", modalityHeader.substring(modalityHeader.indexOf('{') + 1, modalityHeader.indexOf('}')));     
+        assertEquals("this.a = this.b++; while (b) { };", prgFml.programFml().MODALITY_END().getText().substring(0, 
+                prgFml.programFml().MODALITY_END().getText().length() - 13));     
+    } 
 }
