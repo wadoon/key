@@ -31,6 +31,7 @@ import KeYCommonDeclarationParser;
 formula 
     : 
       NOT formula  #negatedFormula       
+    | quantifier=(FORALL | EXISTS) logicalVariableDecl SEMI formula #quantifiedFormula
     | formula AND formula  #conjunctiveFormula 
     | formula OR formula   #disjunctiveFormula
     | formula IMP formula  #implicationFormula
@@ -38,6 +39,11 @@ formula
     | term op=(LESS | LESSEQUAL | EQUALS | NOT_EQUALS | GREATER | GREATEREQUAL) term #comparisonFormula 
     | sym=funcpred_name arguments? #predicateFormula
     | LPAREN formula RPAREN #parenthesizedFormula
+    ;
+
+logicalVariableDecl
+    :
+    simple_ident COLON sort_name
     ;
 
 term 
@@ -55,5 +61,6 @@ term
     
  argumentList
    :
-     term (COMMA term)*
+   term (COMMA term)*
    ;
+ 

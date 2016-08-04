@@ -158,10 +158,18 @@ public class TestTermParser extends TestCase {
     public void testPredicateFormula() {
         FormulaContext result = parseFormula("p(a,b)");
         assertTrue(result instanceof PredicateFormulaContext);
-        assert(result instanceof PredicateFormulaContext);
         PredicateFormulaContext pred = (PredicateFormulaContext) result;
         assertEquals("p", pred.sym.getText());
         assertEquals(2, pred.arguments().argumentList().term().size());
+    }
+    
+    public void testQuantifiedFormula() {
+        FormulaContext result = parseFormula("\\forall x:int; A & B");
+
+        assertTrue(result instanceof ConjunctiveFormulaContext);
+        QuantifiedFormulaContext qf = (QuantifiedFormulaContext) ((ConjunctiveFormulaContext)result).formula(0);
+        assertEquals(KeYCommonLexer.FORALL, qf.quantifier.getType());
+        assertTrue(qf.formula() instanceof PredicateFormulaContext);
     }
 
     public void testFunctionTerm() {
