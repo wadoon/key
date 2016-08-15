@@ -7,13 +7,10 @@ import de.uka.ilkd.keyabs.abs.ABSTypeConverter;
 import de.uka.ilkd.keyabs.abs.ABSVisitor;
 import de.uka.ilkd.keyabs.abs.IABSPureExpression;
 
-public class ABSAddExp extends ABSBinaryOperatorPureExp {
+public class ABSModExp extends ABSBinaryOperatorPureExp {
 
-    private final boolean isRatType;
-
-	public ABSAddExp(IABSPureExpression left, IABSPureExpression right, boolean isRatType) {
+	public ABSModExp(IABSPureExpression left, IABSPureExpression right) {
         super(left, right);
-        this.isRatType = isRatType;
     }
 
     @Override
@@ -23,17 +20,11 @@ public class ABSAddExp extends ABSBinaryOperatorPureExp {
 
     @Override
     public void visit(ABSVisitor v) {
-        v.performActionOnABSAddExp(this);
+        v.performActionOnABSModExp(this);
     }
-    
+
     @Override
 	public String toString() {
-    	return getChildAt(0) + " + " + getChildAt(1);
+    	return getChildAt(0) + " % " + getChildAt(1);
     }
-
-	public boolean isRatType() {
-		return isRatType;
-	}
-
-
 }

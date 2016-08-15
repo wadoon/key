@@ -9,8 +9,11 @@ import de.uka.ilkd.keyabs.abs.IABSPureExpression;
 
 public class ABSMultExp extends ABSBinaryOperatorPureExp {
 
-    public ABSMultExp(IABSPureExpression left, IABSPureExpression right) {
+    private final boolean isRatType;
+
+	public ABSMultExp(IABSPureExpression left, IABSPureExpression right, boolean isRatType) {
         super(left, right);
+        this.isRatType = isRatType;
     }
 
     @Override
@@ -27,6 +30,10 @@ public class ABSMultExp extends ABSBinaryOperatorPureExp {
 	public String toString() {
     	return getChildAt(0) + " * " + getChildAt(1);
     }
+
+	public boolean isRatType() {
+		return isRatType;
+	}
 
     
 }

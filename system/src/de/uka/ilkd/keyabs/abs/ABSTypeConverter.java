@@ -21,6 +21,7 @@ import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDivExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
 import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
@@ -33,6 +34,7 @@ import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSSubExp;
 import de.uka.ilkd.keyabs.logic.ABSTermBuilder;
 import de.uka.ilkd.keyabs.logic.ldt.HeapLDT;
 import de.uka.ilkd.keyabs.logic.ldt.HistoryLDT;
@@ -97,11 +99,14 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 			    ((ABSBinaryOperatorPureExp) pe).getChildAt(0), ec);
 		    Term right = convertToLogicElement(
 			    ((ABSBinaryOperatorPureExp) pe).getChildAt(1), ec);
-
 		    if (pe instanceof ABSAddExp) {
-			return TB.add(services, left, right);
+			return ((ABSAddExp) pe).isRatType() ? null : TB.add(services, left, right);
+		    } else if (pe instanceof ABSSubExp) {
+			return ((ABSSubExp) pe).isRatType() ? null : TB.sub(services, left, right);
 		    } else if (pe instanceof ABSMultExp) {
-			return TB.mul(services, left, right);
+			return ((ABSMultExp) pe).isRatType() ? null : TB.mul(services, left, right);
+		    } else if (pe instanceof ABSDivExp) {
+			return ((ABSDivExp) pe).isRatType() ? tb.rational(services, left, right): TB.div(services, left, right); 			
 		    } else if (pe instanceof ABSAndBoolExp) {
 			return convertBool2Fml(Junctor.AND, left, right);
 		    } else if (pe instanceof ABSOrBoolExp) {
@@ -113,11 +118,19 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 		    } else if (pe instanceof ABSGEQExp) {
 			return tb.geq(left, right, services);
 		    } else if (pe instanceof ABSGTExp) {
-			return tb.gt(left, right, services);
+		    	if (left.sort() == integerLDT.targetSort()) {
+		    		return tb.gt(left, right, services);
+		    	} else {
+		    		return tb.gtRationals(left, right, services);		    		
+		    	}
 		    } else if (pe instanceof ABSLEQExp) {
 			return tb.leq(left, right, services);
 		    } else if (pe instanceof ABSLTExp) {
-			return tb.lt(left, right, services);
+		    	if (left.sort() == integerLDT.targetSort()) {
+		    		return tb.lt(left, right, services);
+		    	} else {
+		    		return tb.ltRationals(left, right, services);		    		
+		    	}
 		    }
 		} else if (pe instanceof ABSNullExp) {
 		    return TB.NULL(getServices());

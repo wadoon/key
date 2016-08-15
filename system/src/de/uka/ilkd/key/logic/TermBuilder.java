@@ -14,7 +14,15 @@
 package de.uka.ilkd.key.logic;
 
 
-import de.uka.ilkd.key.collection.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -22,16 +30,32 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SubstOp;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.logic.ldt.IHeapLDT;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * <p>Use this class if you intend to build complex terms by hand. It is
@@ -863,6 +887,18 @@ public abstract class TermBuilder<S extends IServices> {
         }
     }
 
+    public Term sub(S services, Term t1, Term t2) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final Term zero = integerLDT.zero();
+        if(t1.equals(zero)) {
+            return (t2.equals(zero) ? zero : func(integerLDT.getNeg(),zero));
+        } else if(t2.equals(zero)) {
+            return t1;
+        } else {
+            return func(integerLDT.getSub(), t1, t2);
+        }
+    }
+
     public Term mul(IServices services, Term t1, Term t2) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final Term one = integerLDT.one();
@@ -873,6 +909,11 @@ public abstract class TermBuilder<S extends IServices> {
         } else {
             return func(integerLDT.getMul(), t1, t2);
         }
+    }
+
+    public Term div(IServices services, Term t1, Term t2) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        return func(integerLDT.getDiv(), t1, t2);
     }
 
     public Term index(S services){
@@ -1310,6 +1351,23 @@ public abstract class TermBuilder<S extends IServices> {
        }
        return result;
     }
+
+
+	public Term ltRationals(Term left, Term right, ABSServices services) {
+		Function ltRat = (Function) services.getNamespaces().functions().lookup("ltRational");
+		return func(ltRat, left, right);
+	}
+
+	public Term gtRationals(Term left, Term right, ABSServices services) {
+		Function gtRat = (Function) services.getNamespaces().functions().lookup("gtRational");
+		return func(gtRat, left, right);
+	}
+
+
+	public Term rational(ABSServices services, Term left, Term right) {
+		Function rat = (Function) services.getNamespaces().functions().lookup("rat");
+		return func(rat, left, right);
+	}
 
 
 }

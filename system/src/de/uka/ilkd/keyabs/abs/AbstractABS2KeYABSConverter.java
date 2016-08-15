@@ -4,12 +4,12 @@ import java.math.BigInteger;
 import java.util.LinkedList;
 
 import abs.frontend.ast.ASTNode;
-import abs.frontend.ast.AddExp;
+import abs.frontend.ast.AddAddExp;
 import abs.frontend.ast.AndBoolExp;
+import abs.frontend.ast.AssertStmt;
 import abs.frontend.ast.AssignStmt;
 import abs.frontend.ast.AsyncCall;
 import abs.frontend.ast.AwaitStmt;
-import abs.frontend.ast.AssertStmt;
 import abs.frontend.ast.Binary;
 import abs.frontend.ast.Block;
 import abs.frontend.ast.CaseBranchStmt;
@@ -18,6 +18,7 @@ import abs.frontend.ast.ClaimGuard;
 import abs.frontend.ast.ConstructorPattern;
 import abs.frontend.ast.DataConstructor;
 import abs.frontend.ast.DataConstructorExp;
+import abs.frontend.ast.DivMultExp;
 import abs.frontend.ast.EqExp;
 import abs.frontend.ast.ExpGuard;
 import abs.frontend.ast.ExpressionStmt;
@@ -33,15 +34,17 @@ import abs.frontend.ast.LTEQExp;
 import abs.frontend.ast.LTExp;
 import abs.frontend.ast.LiteralPattern;
 import abs.frontend.ast.MinusExp;
-import abs.frontend.ast.MultExp;
-import abs.frontend.ast.NewExp;
+import abs.frontend.ast.ModMultExp;
+import abs.frontend.ast.MultMultExp;
 import abs.frontend.ast.NegExp;
+import abs.frontend.ast.NewExp;
 import abs.frontend.ast.NotEqExp;
 import abs.frontend.ast.NullExp;
 import abs.frontend.ast.OrBoolExp;
 import abs.frontend.ast.Pattern;
 import abs.frontend.ast.PureExp;
 import abs.frontend.ast.ReturnStmt;
+import abs.frontend.ast.SubAddExp;
 import abs.frontend.ast.ThisExp;
 import abs.frontend.ast.UnderscorePattern;
 import abs.frontend.ast.VarDeclStmt;
@@ -61,6 +64,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDivExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
 import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
@@ -70,12 +74,14 @@ import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSLiteralExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSModExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNegExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNewExpression;
 import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSNegExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSSubExp;
 import de.uka.ilkd.keyabs.logic.sort.programSV.ABSFieldSV;
 
 public abstract class AbstractABS2KeYABSConverter {
@@ -162,10 +168,16 @@ public abstract class AbstractABS2KeYABSConverter {
 
     protected ProgramElement convert(Binary x) {
         ProgramElement result = null;
-        if (x instanceof AddExp) {
-            result = convert((AddExp) x);
-        } else if (x instanceof MultExp) {
-            result = convert((MultExp) x);
+        if (x instanceof AddAddExp) {
+            result = convert((AddAddExp) x);
+        } else if (x instanceof SubAddExp) {
+            result = convert((SubAddExp) x);
+        } else if (x instanceof MultMultExp) {
+            result = convert((MultMultExp) x);
+        } else if (x instanceof DivMultExp) {
+            result = convert((DivMultExp) x);
+        } else if (x instanceof ModMultExp) {
+            result = convert((ModMultExp) x);
         } else if (x instanceof AndBoolExp) {
             result = convert((AndBoolExp) x);
         } else if (x instanceof OrBoolExp) {
@@ -296,13 +308,28 @@ public abstract class AbstractABS2KeYABSConverter {
         return new ABSLocalVariableReference(var);
     }
 
-    public ABSAddExp convert(AddExp x) {
+    public ABSAddExp convert(AddAddExp x) {
         return new ABSAddExp((IABSPureExpression) convert(x.getChild(0)),
-                (IABSPureExpression) convert(x.getChild(1)));
+                (IABSPureExpression) convert(x.getChild(1)), x.getType().isRatType());
     }
 
-    public ABSMultExp convert(MultExp x) {
+    public ABSSubExp convert(SubAddExp x) {
+        return new ABSSubExp((IABSPureExpression) convert(x.getChild(0)),
+                (IABSPureExpression) convert(x.getChild(1)), x.getType().isRatType());
+    }
+
+    public ABSMultExp convert(MultMultExp x) {
         return new ABSMultExp((IABSPureExpression) convert(x.getChild(0)),
+                (IABSPureExpression) convert(x.getChild(1)), x.getType().isRatType());
+    }
+
+    public ABSDivExp convert(DivMultExp x) {
+    	return new ABSDivExp((IABSPureExpression) convert(x.getChild(0)),
+                (IABSPureExpression) convert(x.getChild(1)), x.getType().isRatType());
+    }
+
+    public ABSModExp convert(ModMultExp x) {
+        return new ABSModExp((IABSPureExpression) convert(x.getChild(0)),
                 (IABSPureExpression) convert(x.getChild(1)));
     }
 

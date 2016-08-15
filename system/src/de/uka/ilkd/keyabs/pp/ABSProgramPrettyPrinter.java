@@ -145,9 +145,36 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
     }
 
     @Override
+    public void performActionOnABSSubExp(ABSSubExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "-");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void performActionOnABSMultExp(ABSMultExp x) {
         try {
             lp.printABSBinaryOpExp(x, "*");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void performActionOnABSDivExp(ABSDivExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void performActionOnABSModExp(ABSModExp x) {
+        try {
+            lp.printABSBinaryOpExp(x, "%");
         } catch (IOException e) {
             e.printStackTrace();
         }

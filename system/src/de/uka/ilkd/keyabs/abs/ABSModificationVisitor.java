@@ -17,6 +17,7 @@ import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.keyabs.abs.expression.ABSAddExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSAndBoolExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSDataConstructorExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSDivExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSEqExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSFnApp;
 import de.uka.ilkd.keyabs.abs.expression.ABSGEQExp;
@@ -26,12 +27,14 @@ import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSLiteralExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSModExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNegExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNewExpression;
 import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
-import de.uka.ilkd.keyabs.abs.expression.ABSNegExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSSubExp;
 
 public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
         IProgramASTModifyingVisitor, ABSVisitor {
@@ -196,7 +199,19 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             ExtList children = stack.peek();
             children.removeFirst();
             addNewChild(new ABSAddExp((IABSPureExpression) children.get(0),
-                    (IABSPureExpression) children.get(1)));
+                    (IABSPureExpression) children.get(1), x.isRatType()));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSSubExp(ABSSubExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            addNewChild(new ABSSubExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1), x.isRatType()));
         } else {
             addChild(x);
         }
@@ -208,12 +223,37 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
             ExtList children = stack.peek();
             children.removeFirst();
             addNewChild(new ABSMultExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1), x.isRatType()));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSDivExp(ABSDivExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            addNewChild(new ABSDivExp((IABSPureExpression) children.get(0),
+                    (IABSPureExpression) children.get(1), x.isRatType()));
+        } else {
+            addChild(x);
+        }
+    }
+
+    @Override
+    public void performActionOnABSModExp(ABSModExp x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            addNewChild(new ABSModExp((IABSPureExpression) children.get(0),
                     (IABSPureExpression) children.get(1)));
         } else {
             addChild(x);
         }
     }
 
+    
     @Override
     public void performActionOnABSOrBoolExp(ABSOrBoolExp x) {
         if (hasChanged()) {

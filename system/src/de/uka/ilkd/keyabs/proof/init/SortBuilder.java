@@ -68,6 +68,9 @@ public class SortBuilder {
                 if (names2type.containsKey(itfName)) {
                     extSort = names2type.get(itfName).getSort();
                 } else {
+                	if (ifdecl.getDecl() instanceof UnknownDecl) {
+                		System.out.println("Don't know " + ifdecl.getName());
+                	}
                     extSort = registerInterfaceType(initConfig, services,
                             names2type, anyInterfaceSort, itfName, (InterfaceDecl) ifdecl.getDecl());
                 }
