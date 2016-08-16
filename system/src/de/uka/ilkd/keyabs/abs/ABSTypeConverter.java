@@ -93,20 +93,20 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
         } else if (pe instanceof ABSMethodLabel) {
             return TB.func(((ABSMethodLabel)pe).getMethodLabel());
         } else {
-		final TermBuilder<ABSServices> tb = services.getTermBuilder();
+		final ABSTermBuilder tb = services.getTermBuilder();
 		if (pe instanceof ABSBinaryOperatorPureExp) {
 		    Term left = convertToLogicElement(
 			    ((ABSBinaryOperatorPureExp) pe).getChildAt(0), ec);
 		    Term right = convertToLogicElement(
 			    ((ABSBinaryOperatorPureExp) pe).getChildAt(1), ec);
 		    if (pe instanceof ABSAddExp) {
-			return ((ABSAddExp) pe).isRatType() ? null : TB.add(services, left, right);
+			return ((ABSAddExp) pe).isRatType() ? null : tb.add(services, left, right);
 		    } else if (pe instanceof ABSSubExp) {
-			return ((ABSSubExp) pe).isRatType() ? null : TB.sub(services, left, right);
+			return ((ABSSubExp) pe).isRatType() ? null : tb.sub(services, left, right);
 		    } else if (pe instanceof ABSMultExp) {
-			return ((ABSMultExp) pe).isRatType() ? null : TB.mul(services, left, right);
+			return ((ABSMultExp) pe).isRatType() ? null : tb.mul(services, left, right);
 		    } else if (pe instanceof ABSDivExp) {
-			return ((ABSDivExp) pe).isRatType() ? tb.rational(services, left, right): TB.div(services, left, right); 			
+			return ((ABSDivExp) pe).isRatType() ? tb.rational(services, left, right): tb.div(services, left, right); 			
 		    } else if (pe instanceof ABSAndBoolExp) {
 			return convertBool2Fml(Junctor.AND, left, right);
 		    } else if (pe instanceof ABSOrBoolExp) {
