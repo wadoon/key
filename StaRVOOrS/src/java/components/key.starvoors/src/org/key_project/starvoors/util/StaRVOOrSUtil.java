@@ -328,23 +328,31 @@ public final class StaRVOOrSUtil {
       private final List<ExecutionLoopInvariant> notInitiallyValidLoopInvariants = new LinkedList<ExecutionLoopInvariant>();
       
       private final List<ExecutionLoopInvariant> notPreservedLoopInvariants = new LinkedList<ExecutionLoopInvariant>();
-
+    
       public List<StaRVOOrSMethodContractApplication> getNotFulfilledPreconditions() {
-         List<StaRVOOrSMethodContractApplication> result = new ArrayList<StaRVOOrSMethodContractApplication>();
-         for (ExecutionOperationContract eoc : notFulfilledPreconditions) {
-            result.add(toStaRVOOrSMethodContractApplication(eoc));
-         }
-         return result;
-      }
+          try {
+              List<StaRVOOrSMethodContractApplication> result = new ArrayList<StaRVOOrSMethodContractApplication>();
+              for (ExecutionOperationContract eoc : notFulfilledPreconditions) {
+                 result.add(toStaRVOOrSMethodContractApplication(eoc));
+              }
+              return result;
+          } catch (NullPointerException e) {
+             return null ;
+          }
+       }
       
       public List<StaRVOOrSMethodContractApplication> getNotFulfilledNullChecks() {
-         List<StaRVOOrSMethodContractApplication> result = new ArrayList<StaRVOOrSMethodContractApplication>();
-         for (ExecutionOperationContract eoc : notFulfilledNullChecks) {
-            result.add(toStaRVOOrSMethodContractApplication(eoc));
-         }
-         return result;
-      }
-      
+          try {
+              List<StaRVOOrSMethodContractApplication> result = new ArrayList<StaRVOOrSMethodContractApplication>();
+              for (ExecutionOperationContract eoc : notFulfilledNullChecks) {
+                 result.add(toStaRVOOrSMethodContractApplication(eoc));
+              }
+              return result;
+          } catch (NullPointerException e) {
+             return null ;
+          }
+       }
+             
       protected StaRVOOrSMethodContractApplication toStaRVOOrSMethodContractApplication(ExecutionOperationContract eoc) {
          IExecutionNode<?> parent = eoc.getParent();
          while (parent instanceof IExecutionBranchCondition) {
@@ -362,20 +370,28 @@ public final class StaRVOOrSUtil {
       }
       
       public List<StaRVOOrSLoopInvariantApplication> getNotInitiallyValidLoopInvariants() {
-         List<StaRVOOrSLoopInvariantApplication> result = new ArrayList<StaRVOOrSLoopInvariantApplication>();
-         for (ExecutionLoopInvariant eli : notInitiallyValidLoopInvariants) {
-            result.add(toStaRVOOrSLoopInvariantApplication(eli));
-         }
-         return result;
-      }
+          try {
+              List<StaRVOOrSLoopInvariantApplication> result = new ArrayList<StaRVOOrSLoopInvariantApplication>();
+              for (ExecutionLoopInvariant eli : notInitiallyValidLoopInvariants) {
+                 result.add(toStaRVOOrSLoopInvariantApplication(eli));
+              }
+              return result;
+          } catch (NullPointerException e) {
+             return null ;
+          }
+       }
       
       public List<StaRVOOrSLoopInvariantApplication> getNotPreservedLoopInvariants() {
-         List<StaRVOOrSLoopInvariantApplication> result = new ArrayList<StaRVOOrSLoopInvariantApplication>();
-         for (ExecutionLoopInvariant eli : notPreservedLoopInvariants) {
-            result.add(toStaRVOOrSLoopInvariantApplication(eli));
-         }
-         return result;
-      }
+          try {
+              List<StaRVOOrSLoopInvariantApplication> result = new ArrayList<StaRVOOrSLoopInvariantApplication>();
+              for (ExecutionLoopInvariant eli : notPreservedLoopInvariants) {
+                 result.add(toStaRVOOrSLoopInvariantApplication(eli));
+              }
+              return result; 
+          } catch (NullPointerException e) {
+             return null ;
+          }
+       }
 
       protected StaRVOOrSLoopInvariantApplication toStaRVOOrSLoopInvariantApplication(ExecutionLoopInvariant eli) {
          PositionInfo info = eli.getLoopStatement().getGuardExpression().getPositionInfo();

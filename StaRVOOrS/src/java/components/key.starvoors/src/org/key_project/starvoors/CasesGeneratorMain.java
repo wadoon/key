@@ -31,7 +31,7 @@ public class CasesGeneratorMain {
             boolean useLoopInvarints = !ArrayUtil.contains(args, UNROLL_LOOPS);
             System.out.println("Setting the taclet options...");
             StaRVOOrSUtil.setDefaultTacletOptions(file);
-            System.out.println("Analizing the contracts...");
+            System.out.println("Analising the Hoare triples...");
             StaRVOOrSResult result;
             try {
                 result = StaRVOOrSUtil.start(file, false, useOperationContracts, useLoopInvarints);
@@ -60,7 +60,7 @@ public class CasesGeneratorMain {
          }
       }
       else {
-         System.out.println("The file to analyze and the path to the result file are expected as first two parameters.");
+         System.out.println("The file to analyse and the path to the result file are expected as first two parameters.");
          System.out.println();
          System.out.println("Additional parameters:");
          System.out.println(INLINE_METHODS + ": Inline method bodies instead of applying method contracts.");
