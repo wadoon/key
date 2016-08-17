@@ -31,6 +31,7 @@ import de.uka.ilkd.keyabs.abs.expression.ABSLEQExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSLTExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSMinusExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSMultExp;
+import de.uka.ilkd.keyabs.abs.expression.ABSNegExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNotEqExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSNullExp;
 import de.uka.ilkd.keyabs.abs.expression.ABSOrBoolExp;
@@ -157,7 +158,7 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 			    tb.zTerm(services, "-1"),
 			    convertToLogicElement(
 				    ((ABSMinusExp) pe).getChildAt(0), ec));
-		} else if (pe instanceof ABSMinusExp) {
+		} else if (pe instanceof ABSNegExp) {
 		    return tb.ife(tb.not(convertToLogicElement(
 					    ((ABSMinusExp) pe).getChildAt(0), ec)), tb.TRUE(services), tb.FALSE(services));
 		} else if (pe instanceof ThisExpression) {
