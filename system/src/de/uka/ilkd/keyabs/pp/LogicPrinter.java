@@ -2061,7 +2061,7 @@ public final class LogicPrinter implements ILogicPrinter {
     }
 
     public void printABSMinusExp(ABSMinusExp x) throws IOException {
-        layouter.print("-(");
+        layouter.print("~(");
         x.getChildAt(0).visit(programPrettyPrinter);
         layouter.print(")");
     }
@@ -2222,7 +2222,7 @@ public final class LogicPrinter implements ILogicPrinter {
     
 	public void printABSNegExp(ABSNegExp x) throws IOException {
         layouter.beginC(0);
-        layouter.print("~");
+        layouter.print("!");
         x.getExpression().visit(programPrettyPrinter);
         layouter.end();
 	}

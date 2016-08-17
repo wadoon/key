@@ -157,6 +157,9 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 			    tb.zTerm(services, "-1"),
 			    convertToLogicElement(
 				    ((ABSMinusExp) pe).getChildAt(0), ec));
+		} else if (pe instanceof ABSMinusExp) {
+		    return tb.ife(tb.not(convertToLogicElement(
+					    ((ABSMinusExp) pe).getChildAt(0), ec)), tb.TRUE(services), tb.FALSE(services));
 		} else if (pe instanceof ThisExpression) {
             return tb.func(getThisConstant());
         } else if (pe instanceof ABSFnApp) {
