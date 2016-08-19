@@ -22,6 +22,8 @@ import javax.xml.validation.ValidatorHandler;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.java.IOUtil;
 import org.xml.sax.*;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
@@ -64,12 +66,7 @@ public class RIFLTransformer {
 		JPF.initialize(new CrossReferenceServiceConfiguration());
 		assert JPF.getServiceConfiguration() != null;
 
-		String tmp = "";
-		BufferedReader br = new BufferedReader(
-				new InputStreamReader(getClass().getResourceAsStream("blueprint_rifl.key")));
-		while ((tmp = br.readLine()) != null) {
-			blueprint += tmp + "\n";
-		}
+		blueprint = IOUtil.readFrom(getClass().getResourceAsStream("blueprint_rifl.key"));
 	}
 
 	// private static final String TMP_PATH =
@@ -78,12 +75,14 @@ public class RIFLTransformer {
 
 	/**
 	 * Entry point for the stand-alone RIFL to JML* tool.
-	 * @throws ParserConfigurationException 
-	 * @throws ParserException 
-	 * @throws SAXException 
-	 * @throws IOException 
+	 * 
+	 * @throws ParserConfigurationException
+	 * @throws ParserException
+	 * @throws SAXException
+	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException, SAXException, ParserException, ParserConfigurationException {
+	public static void main(String[] args)
+			throws IOException, SAXException, ParserException, ParserConfigurationException {
 		if (args.length < 2 || "--help".equals(args[0])) {
 			System.out.println("This is the RIFL to JML* transformer.");
 			System.out.println("Usage: <RIFL file> <Java sources>");
@@ -94,7 +93,7 @@ public class RIFLTransformer {
 			transformer.doTransform(riflFilename, javaFilename);
 		}
 	}
-	
+
 	/**
 	 * Returns the default save path for transformed Java files.
 	 *
@@ -257,7 +256,7 @@ public class RIFLTransformer {
 	private void writeProblemFile(File problemFileName, String newJavaFolder, String poname) {
 		try {
 			FileWriter fw = new FileWriter(problemFileName);
-			fw.write(blueprint.replaceAll("%%JAVA_SOURCE%%", newJavaFolder).replaceAll("%%PO_NAME%%", poname));			
+			fw.write(blueprint.replaceAll("%%JAVA_SOURCE%%", newJavaFolder).replaceAll("%%PO_NAME%%", poname));
 			fw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
