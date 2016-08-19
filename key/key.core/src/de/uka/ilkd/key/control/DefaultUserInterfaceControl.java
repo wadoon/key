@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.control;
 
-import de.uka.ilkd.key.proof.init.IPersistablePO;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -80,7 +79,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     */
    @Override
    public boolean selectProofObligation(InitConfig initConfig) {
-      return false;
+      return false; // Not supported.
    }
 
    /**
