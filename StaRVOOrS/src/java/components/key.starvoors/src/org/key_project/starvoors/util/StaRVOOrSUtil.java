@@ -181,14 +181,22 @@ public final class StaRVOOrSUtil {
       }
    }
 
-   protected static void analyzeSymbolicExecutionTree(SymbolicExecutionTreeBuilder builder, Contract contract, StaRVOOrSProof proofResult) throws ProofInputException, IOException {
-      System.out.println();
-      System.out.println(contract.getName());
-      String line = StringUtil.createLine("=", contract.getName().length());
-      System.out.println(line);
-      System.out.println(contract.getPlainText(builder.getProof().getServices()));
-      System.out.println(line);
-
+   protected static void analyzeSymbolicExecutionTree(SymbolicExecutionTreeBuilder builder, Contract contract, StaRVOOrSProof proofResult) throws ProofInputException, IOException {      
+      String contractBody = contract.getPlainText(builder.getProof().getServices());
+      String[] aux1; //Use to split contractBody to get the name of the contract.  
+      String[] aux2; //Use to split contractBody to get the name of the contract.
+      
+      System.out.println();      
+      //System.out.println(contract.getName());
+      //String line = StringUtil.createLine("=", contract.getName().length());      
+      //System.out.println(line);
+      //System.out.println(contract.getPlainText(builder.getProof().getServices()));
+      //System.out.println(line);
+      aux1 = contractBody.split(proofResult.getType()+".");
+      aux2 = aux1[1].split(" ");
+      System.out.println("Analising Hoare triple " + aux2[0] + "...");       
+      
+      
       Map<LocationVariable, ProgramVariable> preStateMapping = getPreStateMapping(builder.getProof());
       
       IExecutionStart symRoot = builder.getStartNode();
@@ -203,6 +211,7 @@ public final class StaRVOOrSUtil {
          }
          // Check if node is a leaf node
          if (isLeaf(next)) {
+            //workWithLeafNode used to print the results of the verification
             StaRVOOrSExecutionPath path = workWithLeafNode(next, contract, contractResults, preStateMapping);
             if (path != null) {
                proofResult.addPath(path);
@@ -233,8 +242,8 @@ public final class StaRVOOrSUtil {
       Term pathCondition = leaf.getPathCondition();
       StringBuffer sb = transformTermPP(pathCondition, contractResults, preStateMapping, leaf.getServices());
       String pathConditionPP = sb.toString().trim();
-      System.out.println(leaf.getName() + " is " + leaf.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified + " (" + useInfo + ")");
-      System.out.println();
+      //System.out.println(leaf.getName() + " is " + leaf.getElementType() + " with path condition: " + pathConditionPP + " is verified = " + verified + " (" + useInfo + ")");
+      //System.out.println();
       // Compute new precondition
       String newPrecondtionPP = null;
       if (contract instanceof FunctionalOperationContract) {

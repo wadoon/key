@@ -31,7 +31,7 @@ public class CasesGeneratorMain {
             boolean useLoopInvarints = !ArrayUtil.contains(args, UNROLL_LOOPS);
             System.out.println("Setting the taclet options for KeY...");
             StaRVOOrSUtil.setDefaultTacletOptions(file);
-            System.out.println("Analising the Hoare triples...");
+            System.out.println("Analising the Hoare triple(s)...");
             StaRVOOrSResult result;
             try {
                 result = StaRVOOrSUtil.start(file, false, useOperationContracts, useLoopInvarints);
@@ -51,9 +51,8 @@ public class CasesGeneratorMain {
                   resultFile = new File(arg + "/out.xml");                  
                }
                StaRVOOrSWriter.write(result, resultFile);
-               System.out.printf("\nStatic verification completed.");
-            } else {System.out.printf("\nStatic verification aborted.");}
-            
+               System.out.println("\nStatic verification completed. See the generated report file for more details.");
+            } else {System.out.println("\nStatic verification aborted.");}            
          }
          else {
             System.out.println("The file \"" + file + "\" does not exist.");
