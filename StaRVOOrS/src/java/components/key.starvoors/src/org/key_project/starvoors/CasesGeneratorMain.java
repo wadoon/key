@@ -31,7 +31,7 @@ public class CasesGeneratorMain {
             boolean useLoopInvarints = !ArrayUtil.contains(args, UNROLL_LOOPS);
             System.out.println("Setting the taclet options for KeY...");
             StaRVOOrSUtil.setDefaultTacletOptions(file);
-            System.out.println("Analising the Hoare triple(s)...");
+            System.out.println("Analysing the Hoare triple(s)...");
             StaRVOOrSResult result;
             try {
                 result = StaRVOOrSUtil.start(file, false, useOperationContracts, useLoopInvarints);
