@@ -29,8 +29,16 @@ public class CasesGeneratorMain {
          if (file.exists()) {
             boolean useOperationContracts = !ArrayUtil.contains(args, INLINE_METHODS);
             boolean useLoopInvarints = !ArrayUtil.contains(args, UNROLL_LOOPS);
+            
             System.out.println("Setting the taclet options for KeY...");
+            try {
             StaRVOOrSUtil.setDefaultTacletOptions(file);
+            } catch (ProblemLoaderException e) {   
+                System.out.println("An error has occurred when setting the options:\n");
+                System.out.println(e.getCause().toString());                
+                return;
+            }
+            
             System.out.println("Analysing the Hoare triple(s)...");
             StaRVOOrSResult result;
             try {
