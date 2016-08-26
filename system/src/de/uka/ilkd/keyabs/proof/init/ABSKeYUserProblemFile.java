@@ -158,12 +158,15 @@ public class ABSKeYUserProblemFile extends ABSKeYFile implements ProofOblInput, 
 
             if (problemTerm == null) {
                 boolean chooseDLContract = problemParser.getChooseContract() != null;
-                if (chooseDLContract)
+                boolean proofObligation = problemParser.getProofObligation() != null;
+
+                if (chooseDLContract) {
                     searchS = "\\chooseContract";
-                else {
+                } else if (proofObligation) {
+       	            searchS = "\\proofObligation";
+       	        } else {
                     cinp.close();
-                    throw new ProofInputException(
-                            "No \\problem or \\chooseContract in the input file!");
+                    throw new ProofInputException("No \\problem or \\chooseContract or \\proofObligation in the input file!");
                 }
             }
             problemHeader = lexer.getText();

@@ -1,12 +1,16 @@
 package de.uka.ilkd.key.proof;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.JavaDLInitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
@@ -71,6 +75,23 @@ public class DefaultABSDLProblemLoader extends
         }    	
     	if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
     			return new IPersistablePO.LoadedPOContainer((ProofOblInput)envInput);
+        } else if (proofObligation != null && proofObligation.length() > 0) {
+            // Load proof obligation settings
+            Properties properties = new Properties();
+            properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
+            String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
+            if (poClass == null || poClass.isEmpty()) {
+                throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
+            }
+            try {
+                // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
+                Class<?> poClassInstance = Class.forName(poClass);
+                Method loadMethod = poClassInstance.getMethod("loadFrom", ABSInitConfig.class, Properties.class);
+                return (IPersistablePO.LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
+            }
+            catch (Exception e) {
+                throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
+            }
         }
         return null;
     }

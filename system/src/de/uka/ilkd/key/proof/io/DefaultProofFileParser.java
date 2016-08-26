@@ -28,7 +28,6 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
@@ -451,7 +450,7 @@ public class DefaultProofFileParser implements IProofFileParser {
    public static Term parseTerm(String value, Proof proof,
            Namespace<ParsableVariable> varNS, Namespace<IProgramVariable> progVar_ns) {
        try {
-           return new DefaultTermParser().
+           return proof.getServices().getTermParser().
                parse(new StringReader(value), null,
                      proof.getServices(),
                      varNS,
@@ -467,7 +466,7 @@ public class DefaultProofFileParser implements IProofFileParser {
    public static Term parseTerm(String value, IServices services,
            Namespace<ParsableVariable> varNS, Namespace<IProgramVariable> progVar_ns) {
        try { 
-           return new DefaultTermParser().
+    	   return services.getTermParser().
                parse(new StringReader(value), null,
                      services,
                      varNS,

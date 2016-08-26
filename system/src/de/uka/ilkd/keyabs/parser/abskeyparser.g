@@ -130,6 +130,8 @@ options {
     private ParserMode parserMode;
 
     private String chooseContract = null;
+    private String proofObligation = null;
+    
     private int savedGuessing = -1;
 
     private int lineOffset=0;
@@ -312,6 +314,10 @@ options {
 
     public String getChooseContract() {
       return chooseContract;
+    }
+    
+    public String getProofObligation() {
+      return proofObligation;
     }
     
     public String getFilename() {
@@ -844,7 +850,7 @@ options {
 	if (s.indexOf("methodframe") != -1) {
 	    int startBody = s.indexOf(":{") + 1;
 	    int endBody = s.lastIndexOf("}");
-	    String methodFrameHeader = s.substring(s.indexOf("(")+1, startBody - 2);
+	    String methodFrameHeader = s.substring(s.indexOf("(")+1, startBody - 2).trim();
 
 //	    System.out.println("MF Header:"+methodFrameHeader);
         int startLabel = methodFrameHeader.indexOf("<-") + 2;
@@ -3899,21 +3905,31 @@ problem returns [ Term a = null ]
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
         ) *
         ((PROBLEM LBRACE 
-            {switchToNormalMode(); 
-	     if (capturer != null) capturer.capture();}
-                a = formula 
-            RBRACE) 
+            { switchToNormalMode(); 
+	     		if (capturer != null) capturer.capture();
+	     	}
+            a = formula RBRACE) 
            | 
-           CHOOSECONTRACT (chooseContract=string_literal SEMI)?
+             ( CHOOSECONTRACT (chooseContract=string_literal SEMI)?
+               {
+	             if (capturer != null) {
+	               capturer.capture();
+	             }
+	             if(chooseContract == null) {
+	                chooseContract = "";
+	             }
+               })
+           | 
+           PROOFOBLIGATION  (proofObligation=string_literal SEMI)?
            {
-	       if (capturer != null) {
-	            capturer.capture();
-	       }
-	       if(chooseContract == null) {
-	           chooseContract = "";
-	       }
-           } 
-	)?
+               if (capturer != null) {
+                    capturer.capture();
+               }
+               if(proofObligation == null) {
+                   proofObligation = "";
+               }
+           }            
+	  )?
    ;
    
 bootClassPath returns [String id = null] :

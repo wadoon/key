@@ -22,6 +22,7 @@ import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class ABSSpecificationRepository implements ISpecificationRepository<ABSClassInvariant> {
 
@@ -323,8 +324,12 @@ public class ABSSpecificationRepository implements ISpecificationRepository<ABSC
 
     @Override
 	public ProofOblInput getProofOblInput(Proof proof) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    	for (Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
+    		if (entry.getValue().contains(proof)) {
+    			return entry.getKey();
+    		}
+    	}
+    	return null;
+    }
 
 }

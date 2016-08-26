@@ -14,10 +14,7 @@
 
 package de.uka.ilkd.key.speclang;
 
-import de.uka.ilkd.key.java.IServices;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 /**
  *

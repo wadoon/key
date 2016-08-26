@@ -91,7 +91,7 @@ public class ABSClassInvariantImpl implements ABSClassInvariant {
 
     @Override
     public String getName() {
-        return name;  //To change body of implemented methods use File | Settings | File Templates.
+        return name;  
     }
 
     @Override

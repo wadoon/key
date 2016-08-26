@@ -100,6 +100,15 @@ public class ABSInfo implements IProgramInfo {
         return null;
     }
 
+    public MethodImpl getMethod(String className, String methodName) {
+        for (MethodImpl m : absInfo.getClasses().get(new Name(className)).getMethods()) {
+              if (methodName.equals(m.getMethodSig().getName())) {
+                    return m;
+              }
+        }
+        return null;
+    }
+
     public Pair<ABSStatementBlock, ImmutableList<IProgramVariable>> getMethodBody(MethodImpl method) {
         ImmutableList<IProgramVariable> params = getMethodParameter(method.getMethodSig());
         Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables().copy();

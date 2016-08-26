@@ -356,8 +356,8 @@ public class ABSKeYFile implements IKeYFile<ABSServices, ABSInitConfig> {
                 specRepos.addInterfaceInvariants(problemParser.getInterfaceInvariants());
                 specRepos.addClassInvariants(problemParser.getClassInvariants());
                 //specRepos.addContracts(problemParser.getContracts());
-                //specRepos.addClassInvariants(problemParser.getInvariants());
                 chooseContract = problemParser.getChooseContract();
+                proofObligation = problemParser.getProofObligation();
                 Debug.out("Read ABSKeY file   ", file);
             } finally {
                 cinp.close();

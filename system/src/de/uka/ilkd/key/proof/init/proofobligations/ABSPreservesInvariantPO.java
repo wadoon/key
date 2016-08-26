@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.proof.init.proofobligations;
 
+import java.io.IOException;
+import java.util.Properties;
+
+import abs.frontend.ast.ClassDecl;
 import abs.frontend.ast.Decl;
 import abs.frontend.ast.InterfaceDecl;
-import abs.frontend.ast.ClassDecl;
 import abs.frontend.ast.MethodImpl;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -19,6 +22,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Taclet;
@@ -36,7 +41,11 @@ import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
  * generates a proof-obligation for proving that the class invariant is preserved by a given method
  */
 public class ABSPreservesInvariantPO extends ABSAbstractPO {
-    public static final String PRESERVES_INV_PO = "Preserves Invariant";
+    private static final String METHOD_TO_BE_VERIFIED = "METHOD_TO_BE_VERIFIED";
+
+	private static final String CLASS_TO_BE_VERIFIED = "CLASS_TO_BE_VERIFIED";
+
+	public static final String PRESERVES_INV_PO = "Preserves Invariant";
 
     private final ABSTermBuilder tb;
     private final String thisType;
@@ -229,4 +238,28 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
         return ABSPreservesInvariantPO.PRESERVES_INV_PO + "_" +
                 className + "_" + method.getMethodSig().getName();
     }
+    
+	@Override
+	public void fillSaveProperties(Properties properties) throws IOException {
+        super.fillSaveProperties(properties);
+		properties.setProperty(CLASS_TO_BE_VERIFIED, className.toString());
+        properties.setProperty(METHOD_TO_BE_VERIFIED, method.getMethodSig().getName());
+	}
+
+    
+    /**
+     * Instantiates a new proof obligation with the given settings.
+     * @param initConfig The already load {@link ABSInitConfig}.
+     * @param properties The settings of the proof obligation to instantiate.
+     * @return The instantiated proof obligation.
+     * @throws IOException Occurred Exception.
+     */
+    public static LoadedPOContainer loadFrom(ABSInitConfig initConfig, Properties properties) throws IOException {
+        String className = properties.getProperty(CLASS_TO_BE_VERIFIED);
+        String methodName = properties.getProperty(METHOD_TO_BE_VERIFIED);
+        
+    	return new LoadedPOContainer(new ABSPreservesInvariantPO(initConfig, new Name(className), 
+    			initConfig.getServices().getProgramInfo().getMethod(className, methodName)), 0);
+    }
+
 }

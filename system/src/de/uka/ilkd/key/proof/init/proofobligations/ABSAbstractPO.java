@@ -1,10 +1,14 @@
 package de.uka.ilkd.key.proof.init.proofobligations;
 
+import java.io.IOException;
+import java.util.Properties;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.keyabs.abs.ABSServices;
@@ -15,7 +19,7 @@ import de.uka.ilkd.keyabs.proof.mgt.ABSSpecificationRepository;
 import de.uka.ilkd.keyabs.speclang.dl.ABSClassInvariant;
 import de.uka.ilkd.keyabs.speclang.dl.InterfaceInvariant;
 
-public abstract class ABSAbstractPO implements ProofOblInput {
+public abstract class ABSAbstractPO implements ProofOblInput, IPersistablePO {
     protected final ABSInitConfig initConfig;
     protected final ABSServices services;
     protected final ABSSpecificationRepository repository;
@@ -81,5 +85,10 @@ public abstract class ABSAbstractPO implements ProofOblInput {
         return result;
     }
 
+	@Override
+	public void fillSaveProperties(Properties properties) throws IOException {
+        properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
+        properties.setProperty(IPersistablePO.PROPERTY_NAME, name());
+	}
 
 }
