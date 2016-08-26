@@ -846,33 +846,68 @@ options {
 	    int endBody = s.lastIndexOf("}");
 	    String methodFrameHeader = s.substring(s.indexOf("(")+1, startBody - 2);
 
-	    //System.out.println("MF Header:"+methodFrameHeader);
+//	    System.out.println("MF Header:"+methodFrameHeader);
         int startLabel = methodFrameHeader.indexOf("<-") + 2;
         int endLabel = methodFrameHeader.indexOf(",");
         String methodLabel = methodFrameHeader.substring(startLabel, endLabel).trim();
-        //System.out.println("MethodLabel:|"+methodLabel+"|"+ lookup(new Name(methodLabel)));
+//        System.out.println("MethodLabel:|"+methodLabel+"|"+ lookup(new Name(methodLabel)));
 
         methodFrameHeader = methodFrameHeader.substring(endLabel + 1);
         int startExecutionContext = methodFrameHeader.indexOf("(") + 1;
         int endExecutionContext = methodFrameHeader.indexOf(")");
         String executionContext = methodFrameHeader.substring(startExecutionContext, endExecutionContext).trim();
 
-        // System.out.println("Exec:|"+executionContext+"|");
+//      System.out.println("Exec:|"+executionContext+"|");
         String resultVar = executionContext.substring(executionContext.indexOf(":") + 1,
                                                       executionContext.indexOf(",")).trim();
-        //System.out.println("ResultVar:|"+resultVar+"|"+ lookup(new Name(resultVar)));
+//       System.out.println("ResultVar:|"+resultVar+"|"+ lookup(new Name(resultVar)));
 
         executionContext = executionContext.substring(executionContext.indexOf(",") + 1);
         String futureVar = executionContext.substring(executionContext.indexOf(":") + 1).trim();
-        //System.out.println("ResultVar:|"+futureVar+"|" + lookup(new Name(futureVar)));
+//      System.out.println("ResultVar:|"+futureVar+"|" + lookup(new Name(futureVar)));
 
-        context = new ABSExecutionContext((IABSMethodLabel) lookup(new Name(methodLabel)),
-                                          (IABSPureExpression) lookup(new Name(resultVar)),
-                                          (IABSPureExpression) lookup(new Name(futureVar)));
+           Named lookedupResultVar = lookup(new Name(resultVar));       
+		
+        IABSPureExpression res;
+        if (lookedupResultVar instanceof IABSPureExpression) {
+        	 res = (IABSPureExpression) lookedupResultVar;
+        } else if (lookedupResultVar instanceof IProgramVariable) {
+        	res = new ABSLocalVariableReference((IProgramVariable) lookedupResultVar);
+        } else {
+        	throw new SemanticException("The expression " + resultVar + " is not allowed as return variable in a method frame.");
+        }
+
+        Named lookedupResultFut = lookup(new Name(futureVar));       
+        IABSPureExpression resFut;
+
+        if (lookedupResultFut instanceof IABSPureExpression) {
+        	 resFut = (IABSPureExpression) lookedupResultFut;
+        } else if (lookedupResultFut instanceof IProgramVariable) {
+        	resFut = new ABSLocalVariableReference((IProgramVariable) lookedupResultFut);
+        } else {
+        	throw new SemanticException("The expression " + futureVar + " is not allowed as future variable in a method frame.");
+        }
+
+		Operator op_methodLabel = (Operator)lookup(new Name(methodLabel));
+		if (op_methodLabel == null) {
+			throw new SemanticException("Unknown method " + methodLabel);
+		}
+	
+		IABSMethodLabel lookupML;
+		if (op_methodLabel instanceof Function) {
+			lookupML = new ABSMethodLabel((Function)op_methodLabel);
+		} else if (op_methodLabel instanceof IABSMethodLabel) {
+			lookupML = (IABSMethodLabel) op_methodLabel;
+		} else {
+			throw new SemanticException("A symbol of type " + op_methodLabel.getClass().getSimpleName() + " cannot be a method label in a method frame");
+		}
+			
+		context = new ABSExecutionContext(lookupML,
+                                          res,
+                                          resFut);
 
 	    s = s.substring(startBody, endBody);
-	    //System.out.println("MF Body:"+s);
-
+	//    System.out.println("MF Body:"+s);
 	}
 
     JavaReader jr = javaReader;
@@ -2747,8 +2782,8 @@ modality_dl_term returns [Term a = null]
      // (2) \modality...\endmodality(post)
      // so that it is consistent with pretty printer that prints (1).
      // A term "(post)" seems to be parsed as "post" anyway
-      {
-            a = tf.createTerm(op, new Term[]{a1}, null, sjb.javaBlock);
+      {            
+            a = tf.createTerm(op, new Term[]{a1}, new ImmutableArray<QuantifiableVariable>(), sjb.javaBlock);
       }
    )
    ; exception
@@ -2767,7 +2802,7 @@ argument_list returns [Term[] result = null]
     :
         LPAREN 
         (p1 = argument { args.add(p1);  }
-
+        
             (COMMA p2 = argument { args.add(p2); } )* )?
 
         RPAREN
