@@ -204,12 +204,18 @@ public class ModelVariable {
      * variable.
      */
     public String getTypeName() {
-       try{
-          return variable.getKeYJavaType().getName();
-       }catch(Exception e){
-          return variable.sort().toString();
-       }
+    	if(variable!=null){   	
+	       try{
+	    	   return variable.getKeYJavaType().getName();
+	    	   
+	       }catch(Exception e){
+	    	   return variable.sort().toString();
+	          
+	       }
+    	}else
+    		return "null";
     }
+    	
 
     /**
      * Returns the value of the variable. Will have to be explicitly converted
@@ -271,6 +277,7 @@ public class ModelVariable {
 
    @Override
     public String toString() {
+	   
       String result = "";      
       result +=  identifier + "; select form: " + selectForm + "; type: " + getTypeName()+ "; symbolic value: " + symbolicValue + 
                 "; concrete value: " + getValue() + "; parent indentifier: " + parentIdentifier;             
@@ -278,6 +285,8 @@ public class ModelVariable {
          result += "; arrayIdxTerm: " + arrayIdxTerm;
       }
       return result;
+	   
+	   
     }
 
     public boolean isPrimitive() {
@@ -399,11 +408,15 @@ public class ModelVariable {
    public String getRuntimeType(){
       String runtimeType;
       if(symbolicValue!=null){
-         if(!TermParserTools.isNullSort(symbolicValue)){
-            runtimeType = symbolicValue.sort().toString();            
-         }else{
-            runtimeType = getTypeName();
-         }
+    	  if(isPrimitive())
+    		  return getTypeName();
+    	  else{
+	         if(!TermParserTools.isNullSort(symbolicValue)){
+	            runtimeType = symbolicValue.sort().toString();            	 
+	         }else{
+	            runtimeType = getTypeName();
+	         }
+    	  }
       }else{
          runtimeType = getTypeName();
       }

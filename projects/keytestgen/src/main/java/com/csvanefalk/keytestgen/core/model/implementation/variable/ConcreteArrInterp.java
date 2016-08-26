@@ -1,5 +1,6 @@
 package com.csvanefalk.keytestgen.core.model.implementation.variable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,6 +20,12 @@ public class ConcreteArrInterp {
       this.entries = entries;
       this.elseValue = elseValue;
    }
+   
+   public ConcreteArrInterp(){
+	 entries = new HashMap<int[],Object>();
+	 elseValue = null;
+   }
+   
    public Map<int[], Object> getEntries() {
       return entries;
    }

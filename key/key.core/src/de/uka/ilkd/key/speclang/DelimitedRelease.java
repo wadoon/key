@@ -27,7 +27,6 @@ public class DelimitedRelease {
    //private final Map<Term, Term> declassifications;
    public final ImmutableList<Term> conditions; //list of escape conditions
    public final ImmutableList<Term> escapeHatches;  //list of 
-   
    public final ImmutableList<Term> lowVars;
    /**
     * @param conditions, escapeHatches
