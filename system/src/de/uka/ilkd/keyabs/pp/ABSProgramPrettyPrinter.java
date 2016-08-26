@@ -236,6 +236,16 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
     }
 
     @Override
+    public void performActionOnABSSyncMethodCall(ABSSyncMethodCall x) {
+        try {
+            lp.printABSSyncMethodCall(x);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
+    @Override
     public void performActionOnABSNullExp(ABSNullExp x) {
         try {
             lp.printABSNullExp(x);

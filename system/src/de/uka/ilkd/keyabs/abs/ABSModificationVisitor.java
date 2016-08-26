@@ -363,6 +363,28 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
     }
 
     @Override
+    public void performActionOnABSSyncMethodCall(ABSSyncMethodCall x) {
+        if (hasChanged()) {
+            ExtList children = stack.peek();
+            children.removeFirst();
+            IABSPureExpression caller = children
+                    .removeFirstOccurrence(IABSPureExpression.class);
+            ProgramElementName methodName = children
+                    .removeFirstOccurrence(ProgramElementName.class);
+
+            IABSPureExpression[] arguments = new IABSPureExpression[children
+                    .size()];
+            for (int i = 0; i < children.size(); i++) {
+                arguments[i] = (IABSPureExpression) children.get(i);
+            }
+            addNewChild(new ABSSyncMethodCall(caller, methodName, arguments));
+        } else {
+            addChild(x);
+        }
+    }
+
+    
+    @Override
     public void performActionOnABSDataConstructorExp(ABSDataConstructorExp x) {
         if (hasChanged()) {
             ExtList children = stack.peek();

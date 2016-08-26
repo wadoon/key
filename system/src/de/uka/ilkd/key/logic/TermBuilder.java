@@ -1353,9 +1353,19 @@ public abstract class TermBuilder<S extends IServices> {
     }
 
 
+	public Term leqRationals(Term left, Term right, ABSServices services) {
+		Function ltRat = (Function) services.getNamespaces().functions().lookup("leqRational");
+		return func(ltRat, left, right);
+	}
+
 	public Term ltRationals(Term left, Term right, ABSServices services) {
 		Function ltRat = (Function) services.getNamespaces().functions().lookup("ltRational");
 		return func(ltRat, left, right);
+	}
+
+	public Term geqRationals(Term left, Term right, ABSServices services) {
+		Function gtRat = (Function) services.getNamespaces().functions().lookup("geqRational");
+		return func(gtRat, left, right);
 	}
 
 	public Term gtRationals(Term left, Term right, ABSServices services) {

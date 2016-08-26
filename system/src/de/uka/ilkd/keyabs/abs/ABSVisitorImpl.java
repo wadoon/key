@@ -194,6 +194,11 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     }
 
     @Override
+    public void performActionOnABSSyncMethodCall(ABSSyncMethodCall x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnABSNullExp(ABSNullExp x) {
         doDefaultAction(x);
     }

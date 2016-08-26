@@ -101,12 +101,12 @@ import de.uka.ilkd.keyabs.abs.ABSPatternVarUse;
 import de.uka.ilkd.keyabs.abs.ABSReturnStatement;
 import de.uka.ilkd.keyabs.abs.ABSServices;
 import de.uka.ilkd.keyabs.abs.ABSStatementBlock;
+import de.uka.ilkd.keyabs.abs.ABSSyncMethodCall;
 import de.uka.ilkd.keyabs.abs.ABSTypeReference;
 import de.uka.ilkd.keyabs.abs.ABSUnderscorePattern;
 import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
 import de.uka.ilkd.keyabs.abs.ABSWhileStatement;
 import de.uka.ilkd.keyabs.abs.CopyAssignment;
-import de.uka.ilkd.keyabs.abs.IABSCaseBranchStatement;
 import de.uka.ilkd.keyabs.abs.IABSMethodLabel;
 import de.uka.ilkd.keyabs.abs.ThisExpression;
 import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
@@ -2018,6 +2018,21 @@ public final class LogicPrinter implements ILogicPrinter {
         layouter.print(")").end();
     }
 
+    
+    public void printABSSyncMethodCall(ABSSyncMethodCall x)
+            throws IOException {
+        x.getChildAt(0).visit(programPrettyPrinter);
+        layouter.print(".");
+        x.getChildAt(1).visit(programPrettyPrinter);
+        layouter.beginC(0).print("(");
+        for (int i = 0; i < x.getArgumentCount(); i++) {
+            if (i != 0)
+                layouter.print(",").brk(1);
+            x.getArgumentAt(i).visit(programPrettyPrinter);
+        }
+        layouter.print(")").end();
+    }
+
     public void printABSNullExp(ABSNullExp x) throws IOException {
         layouter.print("null");
     }
@@ -2226,5 +2241,6 @@ public final class LogicPrinter implements ILogicPrinter {
         x.getExpression().visit(programPrettyPrinter);
         layouter.end();
 	}
+
 
 }

@@ -117,7 +117,11 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 		    } else if (pe instanceof ABSNotEqExp) {
 			return tb.not(tb.equals(left, right));
 		    } else if (pe instanceof ABSGEQExp) {
-			return tb.geq(left, right, services);
+		    	if (left.sort() == integerLDT.targetSort()) {
+		    		return tb.geq(left, right, services);
+		    	} else {
+		    		return tb.geqRationals(left, right, services);		    		
+		    	}
 		    } else if (pe instanceof ABSGTExp) {
 		    	if (left.sort() == integerLDT.targetSort()) {
 		    		return tb.gt(left, right, services);
@@ -125,7 +129,11 @@ public final class ABSTypeConverter extends AbstractTypeConverter<ABSServices> {
 		    		return tb.gtRationals(left, right, services);		    		
 		    	}
 		    } else if (pe instanceof ABSLEQExp) {
-			return tb.leq(left, right, services);
+		    	if (left.sort() == integerLDT.targetSort()) {
+		    		return tb.leq(left, right, services);
+		    	} else {
+		    		return tb.leqRationals(left, right, services);		    		
+		    	}
 		    } else if (pe instanceof ABSLTExp) {
 		    	if (left.sort() == integerLDT.targetSort()) {
 		    		return tb.lt(left, right, services);

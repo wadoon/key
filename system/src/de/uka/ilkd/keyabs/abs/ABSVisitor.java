@@ -58,6 +58,8 @@ public interface ABSVisitor extends ProgramVisitor {
 
     void performActionOnABSAsyncMethodCall(ABSAsyncMethodCall x);
 
+    void performActionOnABSSyncMethodCall(ABSSyncMethodCall x);
+
     void performActionOnABSNullExp(ABSNullExp x);
 
     void performActionOnABSDataConstructorExp(ABSDataConstructorExp x);
@@ -125,6 +127,7 @@ public interface ABSVisitor extends ProgramVisitor {
 	void performActionOnABSPatternVar(ABSPatternVar x);
 
 	void performActionOnABSPatternVarUse(ABSPatternVarUse x);
+
 
 
 }
