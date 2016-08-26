@@ -68,13 +68,9 @@ public class DefaultABSDLProblemLoader extends
         else {
             chooseContract = null;
             proofObligation = null;
-        }
-    	
+        }    	
     	if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
-    		if (envInput instanceof ABSKeYUserProblemFile &&
-    				((ABSKeYUserProblemFile)envInput).hasProblemTerm()) {
     			return new IPersistablePO.LoadedPOContainer((ProofOblInput)envInput);
-    		}
         }
         return null;
     }
