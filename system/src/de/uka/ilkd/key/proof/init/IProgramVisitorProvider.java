@@ -27,6 +27,8 @@ import de.uka.ilkd.key.rule.TacletVariableSVCollector;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.IReadPVCollector;
 import de.uka.ilkd.key.util.IWrittenPVCollector;
+import de.uka.ilkd.keyabs.abs.ABSCopyAssignment;
+import de.uka.ilkd.keyabs.abs.ABSLocalVariableReference;
 import de.uka.ilkd.keyabs.abs.ABSProgramContextAdder;
 import de.uka.ilkd.keyabs.abs.ABSProgramReplaceVisitor;
 import de.uka.ilkd.keyabs.abs.ABSProgramVariableCollector;
@@ -126,11 +128,11 @@ public class IProgramVisitorProvider {
 
         @Override
         protected void doDefaultAction(ProgramElement node) {
-            if (node instanceof Assignment) {
-                ProgramElement lhs = ((Assignment) node).getChildAt(0);
-                if (lhs instanceof ProgramVariable) {
-                    ProgramVariable pv = (ProgramVariable) lhs;
-                    if (!pv.isMember() && !declaredPVs.contains(pv)) {
+            if (node instanceof ABSCopyAssignment) {
+                ProgramElement lhs = ((ABSCopyAssignment) node).getChildAt(0);
+                if (lhs instanceof ABSLocalVariableReference) {
+                    ProgramVariable pv = (ProgramVariable) ((ABSLocalVariableReference) lhs).getProgramVariable();
+                    if (!declaredPVs.contains(pv)) {
                         result = result.add(pv);
                     }
                 }

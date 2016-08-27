@@ -106,7 +106,7 @@ import de.uka.ilkd.keyabs.abs.ABSTypeReference;
 import de.uka.ilkd.keyabs.abs.ABSUnderscorePattern;
 import de.uka.ilkd.keyabs.abs.ABSVariableDeclarationStatement;
 import de.uka.ilkd.keyabs.abs.ABSWhileStatement;
-import de.uka.ilkd.keyabs.abs.CopyAssignment;
+import de.uka.ilkd.keyabs.abs.ABSCopyAssignment;
 import de.uka.ilkd.keyabs.abs.IABSMethodLabel;
 import de.uka.ilkd.keyabs.abs.ThisExpression;
 import de.uka.ilkd.keyabs.abs.expression.ABSBinaryOperatorPureExp;
@@ -1923,7 +1923,7 @@ public final class LogicPrinter implements ILogicPrinter {
 
     private boolean markFirstStatement = false;
 
-    public void printABSCopyAssignment(CopyAssignment x) throws IOException {
+    public void printABSCopyAssignment(ABSCopyAssignment x) throws IOException {
         layouter.beginI(2);
         x.getChildAt(0).visit(programPrettyPrinter);
 

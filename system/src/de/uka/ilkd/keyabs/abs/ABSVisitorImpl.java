@@ -122,7 +122,7 @@ public abstract class ABSVisitorImpl implements ABSVisitor {
     }
 
     @Override
-    public void performActionOnCopyAssignment(CopyAssignment x) {
+    public void performActionOnCopyAssignment(ABSCopyAssignment x) {
         doDefaultAction(x);
     }
 

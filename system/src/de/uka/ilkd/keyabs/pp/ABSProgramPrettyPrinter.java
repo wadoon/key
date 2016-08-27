@@ -88,7 +88,7 @@ public class ABSProgramPrettyPrinter implements ABSVisitor {
     }
 
     @Override
-    public void performActionOnCopyAssignment(CopyAssignment x) {
+    public void performActionOnCopyAssignment(ABSCopyAssignment x) {
         try {
             lp.printABSCopyAssignment(x);
         } catch (IOException e) {

@@ -5,17 +5,17 @@ import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 
-public class CopyAssignment extends ABSNonTerminalProgramElement implements
+public class ABSCopyAssignment extends ABSNonTerminalProgramElement implements
         IABSStatement, ExpressionContainer {
 
-    public CopyAssignment(IABSLocationReference lhs, IABSExpression rhs,
+    public ABSCopyAssignment(IABSLocationReference lhs, IABSExpression rhs,
             PositionInfo pos) {
         super(pos);
         this.lhs = lhs;
         this.rhs = rhs;
     }
 
-    public CopyAssignment(IABSLocationReference lhs, IABSExpression rhs) {
+    public ABSCopyAssignment(IABSLocationReference lhs, IABSExpression rhs) {
         this(lhs, rhs, null);
     }
 

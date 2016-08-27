@@ -31,7 +31,7 @@ public interface ABSVisitor extends ProgramVisitor {
 
     void performActionOnThisExpression(ThisExpression x);
 
-    void performActionOnCopyAssignment(CopyAssignment x);
+    void performActionOnCopyAssignment(ABSCopyAssignment x);
 
     void performActionOnABSStatementBlock(ABSStatementBlock x);
 

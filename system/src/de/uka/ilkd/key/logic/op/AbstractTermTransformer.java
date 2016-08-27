@@ -60,6 +60,7 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.MetaSub;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.keyabs.rule.metaconstruct.ConstructorInvoc2ClassLabel;
 import de.uka.ilkd.keyabs.rule.metaconstruct.GetThisReference;
+import de.uka.ilkd.keyabs.rule.metaconstruct.LocalVariableAnonymizer;
 import de.uka.ilkd.keyabs.rule.metaconstruct.MethodArgsToSeq;
 import de.uka.ilkd.keyabs.rule.metaconstruct.MethodInvoc2MethodLabel;
 import de.uka.ilkd.keyabs.rule.metaconstruct.Retrieve;
@@ -149,6 +150,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer ABS_CONSTRUCTOR_INVOCATION_TO_METHOD_LABEL = 
 	    new ConstructorInvoc2ClassLabel();
 
+    public static final AbstractTermTransformer ABS_LOCAL_VARIABLES_ANONYMIZER = new LocalVariableAnonymizer();
+    
     public static final AbstractTermTransformer ABS_THIS_VARIABLE = 
 	    new GetThisReference();
 

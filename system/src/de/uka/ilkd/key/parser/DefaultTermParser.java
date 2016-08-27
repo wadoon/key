@@ -16,6 +16,7 @@ package de.uka.ilkd.key.parser;
 
 
 import java.io.Reader;
+import java.io.StringReader;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
@@ -105,5 +106,26 @@ public final class DefaultTermParser implements TermParser {
             throw new ParserException(tse.getMessage(), null);
         }
     }
+
+
+	@Override
+	public IdDeclaration parseId(StringReader stringReader, IServices services, NamespaceSet nss, AbbrevMap scm) 
+	        throws ParserException {
+        KeYParser parser =
+                new KeYParser (ParserMode.DECLARATION, new KeYLexer ( stringReader,
+                                 services.getExceptionHandler() ), "",
+                                 (Services) services,
+                                 nss );
+        try {
+			return parser.id_declaration();
+		} catch (RecognitionException re) {
+            throw new ParserException(re.getMessage(),
+                    new Location(re.getFilename(),
+                                 re.getLine(),
+                                 re.getColumn()));
+		} catch (TokenStreamException tse) {
+            throw new ParserException(tse.getMessage(), null);
+		}
+	}
     
 }

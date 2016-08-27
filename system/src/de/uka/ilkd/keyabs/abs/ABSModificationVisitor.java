@@ -181,11 +181,11 @@ public abstract class ABSModificationVisitor extends ABSVisitorImpl implements
     }
 
     @Override
-    public void performActionOnCopyAssignment(CopyAssignment x) {
+    public void performActionOnCopyAssignment(ABSCopyAssignment x) {
         if (hasChanged()) {
             ExtList children = stack.peek();
             children.removeFirst();
-            addNewChild(new CopyAssignment(
+            addNewChild(new ABSCopyAssignment(
                     (IABSLocationReference) children.get(0),
                     (IABSPureExpression) children.get(1)));
         } else {

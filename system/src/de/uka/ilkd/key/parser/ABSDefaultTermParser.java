@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.Reader;
+import java.io.StringReader;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
@@ -76,6 +77,27 @@ public class ABSDefaultTermParser implements TermParser {
             throw new ParserException(tse.getMessage(), null);
         }
     }
+
+
+	@Override
+	public IdDeclaration parseId(StringReader stringReader, IServices services, NamespaceSet nss, AbbrevMap scm) 
+	        throws ParserException {
+        ABSKeYParser parser =
+                new ABSKeYParser (ParserMode.DECLARATION, new ABSKeYLexer ( stringReader,
+                                 services.getExceptionHandler() ), "",
+                                 (ABSServices) services,
+                                 nss );
+        try {
+			return parser.id_declaration();
+		} catch (RecognitionException re) {
+            throw new ParserException(re.getMessage(),
+                    new Location(re.getFilename(),
+                                 re.getLine(),
+                                 re.getColumn()));
+		} catch (TokenStreamException tse) {
+            throw new ParserException(tse.getMessage(), null);
+		}
+	}
 
 
 }

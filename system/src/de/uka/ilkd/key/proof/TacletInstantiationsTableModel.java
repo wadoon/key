@@ -206,21 +206,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      */
     public IdDeclaration parseIdDeclaration ( String s )
         throws ParserException {
-        try {
-            KeYParser parser =
-                new KeYParser (ParserMode.DECLARATION, new KeYLexer ( new StringReader ( s ),
-                                 services.getExceptionHandler() ), "",
-                                 (Services) services,   // should not be needed
-                                 nss );
-            return parser.id_declaration ();
-        } catch (antlr.RecognitionException re) {
-            throw new ParserException(re.getMessage(),
-                                      new Location(re.getFilename(),
-                                                   re.getLine(),
-                                                   re.getColumn()));
-        } catch (antlr.TokenStreamException tse) {
-            throw new ParserException(tse.getMessage(), null);
-        }
+    	return services.getTermParser().parseId(new StringReader(s), services, nss, scm);
     }
 
     /**

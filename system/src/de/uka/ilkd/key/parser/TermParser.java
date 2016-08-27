@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.Reader;
+import java.io.StringReader;
 
 import de.uka.ilkd.key.java.IServices;
 import de.uka.ilkd.key.logic.Namespace;
@@ -36,5 +37,15 @@ public interface TermParser {
      * invalid sort. */
     public abstract Term parse(Reader in, Sort sort, IServices services,
             NamespaceSet nss, AbbrevMap scm) throws ParserException;
+
+    /**
+     * Parses an id declaration
+     * @param stringReader the string to parse
+     * @param services the services
+     * @param nss the namespaceset
+     * @param scm the abbreviation map
+     * @throws ParserException 
+     */
+	public abstract IdDeclaration parseId(StringReader stringReader, IServices services, NamespaceSet nss, AbbrevMap scm) throws ParserException;
 
 }

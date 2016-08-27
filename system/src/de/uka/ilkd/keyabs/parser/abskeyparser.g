@@ -1486,6 +1486,7 @@ keyjavatype returns [KeYJavaType kjt=null]
 :
     type = simple_ident_dots  (LESS id = simple_ident_dots GREATER { /* type += "<" + id + ">"; */})?
     {   
+          	
         kjt = getProgramInfo().getKeYJavaType(type);
             
         //expand to "ABS.StdLib"            

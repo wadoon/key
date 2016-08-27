@@ -247,11 +247,11 @@ public abstract class AbstractABS2KeYABSConverter {
         return new ABSStatementBlock(bodyStmnts);
     }
 
-    public CopyAssignment convert(AssignStmt x) {
+    public ABSCopyAssignment convert(AssignStmt x) {
         IABSLocationReference lhs = (IABSLocationReference) convert(x.getVar());
         
         IABSExpression rhs = (IABSExpression) convert(x.getValue());
-        return new CopyAssignment(lhs, rhs);
+        return new ABSCopyAssignment(lhs, rhs);
     }
 
     public ABSIfStatement convert(IfStmt x) {
