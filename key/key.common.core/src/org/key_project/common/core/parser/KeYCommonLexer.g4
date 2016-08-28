@@ -18,10 +18,6 @@
 
 lexer grammar KeYCommonLexer ;
 
-@header {
-	package org.key_project.common.core.parser;
-}
-
 /**
  * The common lexer for declarations, terms, formulae, Taclets, etc.
  */
@@ -534,8 +530,6 @@ GREATEREQUAL
 
 RGUILLEMETS
 	: '>' '>' ;
-
-
 
 WS
 	: (' '

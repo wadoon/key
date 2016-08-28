@@ -215,23 +215,21 @@ public class TestTermParser extends TestCase {
         FormulaContext result = parseFormula("{c:=a}true");
         assertTrue(result instanceof UpdateFormulaContext);
         UpdateFormulaContext updateApp = (UpdateFormulaContext) result;
-        assertNotNull(updateApp.parallelUpdate().update() instanceof ElementaryUpdateContext);
-        assertEquals("c", ((ElementaryUpdateContext)updateApp.parallelUpdate().update()).loc.getText());
-        assertEquals("a", ((ElementaryUpdateContext)updateApp.parallelUpdate().update()).term().getText());
+        assertNotNull(updateApp.parallelUpdate().update().elementaryUpdate());
+        assertEquals("c", updateApp.parallelUpdate().update().elementaryUpdate().loc.getText());
+        assertEquals("a", updateApp.parallelUpdate().update().elementaryUpdate().term().getText());
     }
 
     public void testUpdateOnUpdate() {
         FormulaContext result = parseFormula("{{a:=1}b:=a+1 || c:=a}true");
         assertTrue(result instanceof UpdateFormulaContext);
         UpdateFormulaContext updateApp = (UpdateFormulaContext) result;
-        assertTrue(updateApp.parallelUpdate().update() instanceof UpdateOnUpdateApplicationContext);
-        UpdateOnUpdateApplicationContext updOnUpd = (UpdateOnUpdateApplicationContext) updateApp.parallelUpdate().update();
-        assertEquals("b", ((ElementaryUpdateContext)updOnUpd.update(1)).loc.getText());
-        assertEquals("a+1", ((ElementaryUpdateContext)updOnUpd.update(1)).term().getText()); 
-        assertTrue(updateApp.parallelUpdate() instanceof ParallelUpdateContext);
-
-        assertTrue(updateApp.parallelUpdate().parallelUpdate(0).update() instanceof ElementaryUpdateContext);
-        assertEquals("c:=a", ((ElementaryUpdateContext)updateApp.parallelUpdate().parallelUpdate(0).update()).getText());
+        assertNotNull(updateApp.parallelUpdate());
+        assertNotNull(updateApp.parallelUpdate().update());
+        UpdateOnUpdateApplicationContext updOnUpd = (UpdateOnUpdateApplicationContext) updateApp.parallelUpdate().update().updateOnUpdateApplication();
+        assertEquals("b", updOnUpd.update(1).elementaryUpdate().loc.getText());
+        assertEquals("a+1", updOnUpd.update(1).elementaryUpdate().term().getText()); 
+        assertEquals("c:=a", updateApp.parallelUpdate().parallelUpdate(0).getText());
     }
 
     public void testITEFormula() {
