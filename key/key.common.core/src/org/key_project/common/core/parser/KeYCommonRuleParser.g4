@@ -36,9 +36,15 @@ taclet
   :
   name=rulename 
   LBRACE
+      // TODO: add local schema variable conditions here
+  
       ( ASSUMES LPAREN sequent RPAREN )?
         FIND LPAREN formulaTermOrSequent RPAREN
       ( applicationRestrictions )*      
+      // TODO: add variable conditions here
+      //    - allow names of conditions to start with backslash (for backward compatibility)
+      //      but use a token BACKSLASHALLOWEDIDENT or similar
+      //      hence cond. do not need to be backslahed and we do not need lexer keywords 
       goalList
       ( ADDPROGVARS LPAREN simple_ident_comma_list RPAREN )?
       ( DISPLAYNAME displayname=STRING_LITERAL) ? 
@@ -49,7 +55,7 @@ taclet
 
 goalList
   :
-  ( singleGoal ( SEMI singleGoal )* )?
+    singleGoal ( SEMI singleGoal )*
   ;
 
 singleGoal

@@ -13,8 +13,9 @@
 
 package org.key_project.common.core.parser;
 
-import org.antlr.v4.runtime.*;
-import org.key_project.common.core.parser.KeYCommonParser.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.key_project.common.core.parser.KeYCommonRuleParser.TacletContext;
 import org.key_project.common.core.parser.exceptions.ProofInputException;
 
