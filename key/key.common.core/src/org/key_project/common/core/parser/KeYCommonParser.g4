@@ -37,7 +37,7 @@ formula
     | quantifier=(FORALL | EXISTS) logicalVariableDeclaration SEMI formula #quantifiedFormula
     | formula AND formula  #conjunctiveFormula 
     | formula OR formula   #disjunctiveFormula
-    | formula IMP formula  #implicationFormula
+    |<assoc=right> formula IMP formula  #implicationFormula
     | formula EQV formula  #equivalenceFormula
     | term op=(LESS | LESSEQUAL | EQUALS | NOT_EQUALS | GREATER | GREATEREQUAL) term #comparisonFormula 
     | sym=funcpred_name arguments? #predicateFormula

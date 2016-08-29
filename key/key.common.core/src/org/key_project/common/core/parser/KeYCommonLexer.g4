@@ -90,6 +90,7 @@ PROGRAMVARIABLES
 VARCOND
 	: '\\varcond' ;
 
+/* variable condiitons are no explicit keywords anymore
 APPLY_UPDATE_ON_RIGID
 	: '\\applyUpdateOnRigid' ;
 
@@ -188,28 +189,33 @@ NEWLABEL
 
 CONTAINS_ASSIGNMENT
 	: '\\containsAssignment' ;
+	
+NOTFREEIN
+        : '\\notFreeIn' ;
+
+SAME
+        : '\\same' ;
+
+STATIC
+        : '\\static' ;
+
+STATICMETHODREFERENCE
+        : '\\staticMethodReference' ;
+	
+STRICT
+        : '\\strict' ;
+
+TYPEOF
+        : '\\typeof' ;
+
+*/
+
 
 // label occurs again for character `!'
 NOT_
 	: '\\not' ;
 
-NOTFREEIN
-	: '\\notFreeIn' ;
 
-SAME
-	: '\\same' ;
-
-STATIC
-	: '\\static' ;
-
-STATICMETHODREFERENCE
-	: '\\staticMethodReference' ;
-
-STRICT
-	: '\\strict' ;
-
-TYPEOF
-	: '\\typeof' ;
 
 INSTANTIATE_GENERIC
 	: '\\instantiateGeneric' ;
@@ -561,6 +567,9 @@ LGUILLEMETS
 
 IMPLICIT_IDENT
 	: '<' (LETTER)+ '>' ;
+
+KEYWORD_IDENT
+        : '\\' (LETTER)+ ;
 
 EQV
 	: '<->'

@@ -36,19 +36,15 @@ taclet
   :
   name=rulename 
   LBRACE
-      // TODO: add local schema variable conditions here
-  
+      ( SCHEMAVAR one_schema_var_decl )*  
       ( ASSUMES LPAREN sequent RPAREN )?
-        FIND LPAREN formulaTermOrSequent RPAREN
+      ( FIND LPAREN formulaTermOrSequent RPAREN )?
       ( applicationRestrictions )*      
-      // TODO: add variable conditions here
-      //    - allow names of conditions to start with backslash (for backward compatibility)
-      //      but use a token BACKSLASHALLOWEDIDENT or similar
-      //      hence cond. do not need to be backslahed and we do not need lexer keywords 
+      ( VARCOND LPAREN variablecondition (COMMA variablecondition)* RPAREN )?
       goalList
       ( ADDPROGVARS LPAREN simple_ident_comma_list RPAREN )?
-      ( DISPLAYNAME displayname=STRING_LITERAL) ? 
-      ( HELPTEXT helptext=STRING_LITERAL) ? 
+      ( DISPLAYNAME displayname=STRING_LITERAL )? 
+      ( HELPTEXT helptext=STRING_LITERAL )? 
       ( TRIGGER LBRACE triggerVariableDeclaration RBRACE (formula | term) AVOID formula )? 
   RBRACE
   ;
@@ -82,7 +78,29 @@ formulaTermOrSequent
      sequent | formula | term 
   ;
     
+logicalVariableDeclaration  // overrides inherited rule; local variable should not be declared (use \schemaVar \variable T x; and use x in quantifiers, subst etc.)
+  :
+     schemaVariable=simple_ident 
+  ;    
+    
  sequent
   : 
     ( formula (COMMA formula)* )? SEQARROW ( formula (COMMA formula)* )?
   ;
+  
+ variablecondition
+  :
+    NOT_? condition=varcondKind LPAREN varcondExpr (COMMA varcondExpr)* RPAREN    
+  ;
+  
+varcondKind
+  :
+     KEYWORD_IDENT
+  ;
+  
+varcondExpr
+  :
+       KEYWORD_IDENT LPAREN varcondExpr (COMMA varcondExpr)* RPAREN 
+     | formula | term
+  ;  
+  

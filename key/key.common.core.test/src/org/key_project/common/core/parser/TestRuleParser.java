@@ -59,4 +59,23 @@ public class TestRuleParser extends TestCase {
         assertEquals("andLeft", result.name.getText());    
         // needs to be extended
     }
+
+    public void testSimpleTacletWithLocalSchemaVarDeclarations() {
+        TacletContext result = parseRule("andLeft { \\schemaVar \\formula A, B; \n \\find ( A & B ==> ) \n \\replacewith (A, B ==>)  }");        
+        assertEquals("andLeft", result.name.getText());    
+        // needs to be extended
+    }
+
+    public void testSimpleTacletWithVariableConditions() {
+        TacletContext result = parseRule("exLeft {\n"+ 
+                    "\\schemaVar \\formula phi;\n"+
+                    "\\schemaVar \\term G x;\n" + 
+                    "\\schemaVar \\skolemTerm G sk;\n" + 
+                    "\\find ( \\exists x; phi ==> )\n"+
+                    "\\varcond (\\new(sk, \\dependingOn(phi)))\n" + 
+                    "\\replacewith ({\\subst x; sk} phi ==>)  \n}");        
+        assertEquals("exLeft", result.name.getText());
+        // needs to be extended
+    }
+
 }
