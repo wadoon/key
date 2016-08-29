@@ -43,9 +43,11 @@ taclet
       ( VARCOND LPAREN variablecondition (COMMA variablecondition)* RPAREN )?
       goalList
       ( ADDPROGVARS LPAREN simple_ident_comma_list RPAREN )?
-      ( DISPLAYNAME displayname=STRING_LITERAL )? 
-      ( HELPTEXT helptext=STRING_LITERAL )? 
-      ( TRIGGER LBRACE triggerVariableDeclaration RBRACE (formula | term) AVOID formula )? 
+      (   ( HEURISTICS LPAREN IDENT (COMMA IDENT)* RPAREN )
+        | ( TRIGGER LBRACE triggerVariableDeclaration RBRACE (formula | term) (AVOID formula (COMMA formula)*)? )
+        | ( DISPLAYNAME displayname=STRING_LITERAL )
+        | ( HELPTEXT helptext=STRING_LITERAL )         
+      )*
   RBRACE
   ;
 

@@ -78,4 +78,25 @@ public class TestRuleParser extends TestCase {
         // needs to be extended
     }
 
+    public void testComplexTaclet() {
+        TacletContext result = 
+                parseRule("subst_to_eq_for { \\schemaVar \\formula phi;\n"+
+                    "\\find ({\\subst u; t} phi) \\sameUpdateLevel\n"+
+                    "\\varcond (\\new(sk, \\dependingOn(t)))\n"+
+                    "\\replacewith ({\\subst u; sk} phi)\n"+
+                    "\\add (sk = t ==>)\n"+
+                    "\\heuristics (simplify)\n"+
+                    "\\displayname \"subst_to_eq\""+
+                    "}");
+        assertEquals(("subst_to_eq_for { \\schemaVar \\formula phi;\n"+
+                    "\\find ({\\subst u; t} phi) \\sameUpdateLevel\n"+
+                    "\\varcond (\\new(sk, \\dependingOn(t)))\n"+
+                    "\\replacewith ({\\subst u; sk} phi)\n"+
+                    "\\add (sk = t ==>)\n"+
+                    "\\heuristics (simplify)\n"+
+                    "\\displayname \"subst_to_eq\" }").replaceAll("\\s", ""), result.getText());
+    }
+    
+    
+    
 }
