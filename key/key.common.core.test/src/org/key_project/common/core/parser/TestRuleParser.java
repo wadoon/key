@@ -79,24 +79,39 @@ public class TestRuleParser extends TestCase {
     }
 
     public void testComplexTaclet() {
+        final String substEqTacletStr = "subst_to_eq_for { \\schemaVar \\formula phi;\n"+
+            "\\find ({\\subst u; t} phi) \\sameUpdateLevel\n"+
+            "\\varcond (\\new(sk, \\dependingOn(t)))\n"+
+            "\\replacewith ({\\subst u; sk} phi)\n"+
+            "\\add (sk = t ==>)\n"+
+            "\\heuristics (simplify)\n"+
+            "\\displayname \"subst_to_eq\""+
+            "}";
         TacletContext result = 
-                parseRule("subst_to_eq_for { \\schemaVar \\formula phi;\n"+
-                    "\\find ({\\subst u; t} phi) \\sameUpdateLevel\n"+
-                    "\\varcond (\\new(sk, \\dependingOn(t)))\n"+
-                    "\\replacewith ({\\subst u; sk} phi)\n"+
-                    "\\add (sk = t ==>)\n"+
-                    "\\heuristics (simplify)\n"+
-                    "\\displayname \"subst_to_eq\""+
-                    "}");
-        assertEquals(("subst_to_eq_for { \\schemaVar \\formula phi;\n"+
-                    "\\find ({\\subst u; t} phi) \\sameUpdateLevel\n"+
-                    "\\varcond (\\new(sk, \\dependingOn(t)))\n"+
-                    "\\replacewith ({\\subst u; sk} phi)\n"+
-                    "\\add (sk = t ==>)\n"+
-                    "\\heuristics (simplify)\n"+
-                    "\\displayname \"subst_to_eq\" }").replaceAll("\\s", ""), result.getText());
+                parseRule(substEqTacletStr);
+        assertEquals(substEqTacletStr.replaceAll("\\s", ""), result.getText().replaceAll("\\s", ""));
     }
     
-    
+
+    public void testComplexTacletWithSeveralGoals() {
+        String tftTaclet = "tryFinallyThrow {\n"+ 
+                "\\find (\\modality{#allmodal}{.. try { throw #se; #slist }\n"+
+                "finally { #slist2 } ...}\\endmodality(post))\n"+
+                "\\varcond(\\new(#v0, \\typeof(#se)))\n"+
+                "\\replacewith (\\modality{#allmodal}{.. if ( #se == null ) {\n"+
+                "{ #slist2 }\n"+
+                "throw new java.lang.NullPointerException ();\n"+
+                "} else {\n"+
+                "#typeof(#se) #v0 = #se;\n"+
+                "{ #slist2 }\n"+
+                "throw #v0;\n"+
+                "} ...}\\endmodality(post))\n"+
+                "\\heuristics(simplify_prog)\n"+
+                "\\displayname \"tryFinallyThrow\"\n}";
+        
+        TacletContext result = parseRule(tftTaclet);    
+        assertEquals(tftTaclet.replaceAll("\\s", ""), result.getText().replaceAll("\\s", ""));
+    }
+
     
 }
