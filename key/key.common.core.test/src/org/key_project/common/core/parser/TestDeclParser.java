@@ -407,7 +407,6 @@ public class TestDeclParser extends TestCase {
                     "   p;" +
                     "}" +
                     "\\schemaVariables {\n" +
-                    "  \\program Statement #s ; \n" +
                     "  \\term elem x,y ;\n" +
                     "  \\variables list lv ;\n" +
                     "  \\formula b;\n" +

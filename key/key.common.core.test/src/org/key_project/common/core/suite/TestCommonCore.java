@@ -34,7 +34,9 @@ public class TestCommonCore extends TestSuite {
     };
 
     static Class<? extends TestCase>[] parserTests = new Class[] {
-            org.key_project.common.core.parser.TestDeclParser.class
+            org.key_project.common.core.parser.TestDeclParser.class,
+            org.key_project.common.core.parser.TestTermParser.class,
+            org.key_project.common.core.parser.TestRuleParser.class,
     };
 
     static Class<? extends TestCase>[] ruleTests = new Class[] {

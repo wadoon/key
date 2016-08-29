@@ -90,135 +90,9 @@ PROGRAMVARIABLES
 VARCOND
 	: '\\varcond' ;
 
-/* variable condiitons are no explicit keywords anymore
-APPLY_UPDATE_ON_RIGID
-	: '\\applyUpdateOnRigid' ;
-
-DEPENDINGON
-	: '\\dependingOn' ;
-
-DISJOINTMODULONULL
-	: '\\disjointModuloNull' ;
-
-DROP_EFFECTLESS_ELEMENTARIES
-	: '\\dropEffectlessElementaries' ;
-
-DROP_EFFECTLESS_STORES
-	: '\\dropEffectlessStores' ;
-
-SIMPLIFY_IF_THEN_ELSE_UPDATE
-	: '\\simplifyIfThenElseUpdate' ;
-
-ENUM_CONST
-	: '\\enumConstant' ;
-
-FREELABELIN
-	: '\\freeLabelIn' ;
-
-HASSORT
-	: '\\hasSort' ;
-
-FIELDTYPE
-	: '\\fieldType' ;
-
-FINAL
-	: '\\final' ;
-
-ELEMSORT
-	: '\\elemSort' ;
-
-HASLABEL
-	: '\\hasLabel' ;
-
-HASSUBFORMULAS
-	: '\\hasSubFormulas' ;
-
-ISARRAY
-	: '\\isArray' ;
-
-ISARRAYLENGTH
-	: '\\isArrayLength' ;
-
-ISCONSTANT
-	: '\\isConstant' ;
-
-ISENUMTYPE
-	: '\\isEnumType' ;
-
-ISINDUCTVAR
-	: '\\isInductVar' ;
-
-ISLOCALVARIABLE
-	: '\\isLocalVariable' ;
-
-ISOBSERVER
-	: '\\isObserver' ;
-
-DIFFERENT
-	: '\\different' ;
-
-METADISJOINT
-	: '\\metaDisjoint' ;
-
-ISTHISREFERENCE
-	: '\\isThisReference' ;
-
-DIFFERENTFIELDS
-	: '\\differentFields' ;
-
-ISREFERENCE
-	: '\\isReference' ;
-
-ISREFERENCEARRAY
-	: '\\isReferenceArray' ;
-
-ISSTATICFIELD
-	: '\\isStaticField' ;
-
-ISSUBTYPE
-	: '\\sub' ;
-
-EQUAL_UNIQUE
-	: '\\equalUnique' ;
-
-NEW
-	: '\\new' ;
-
-NEWLABEL
-	: '\\newLabel' ;
-
-CONTAINS_ASSIGNMENT
-	: '\\containsAssignment' ;
-	
-NOTFREEIN
-        : '\\notFreeIn' ;
-
-SAME
-        : '\\same' ;
-
-STATIC
-        : '\\static' ;
-
-STATICMETHODREFERENCE
-        : '\\staticMethodReference' ;
-	
-STRICT
-        : '\\strict' ;
-
-TYPEOF
-        : '\\typeof' ;
-
-*/
-
-
 // label occurs again for character `!'
 NOT_
 	: '\\not' ;
-
-
-
-INSTANTIATE_GENERIC
-	: '\\instantiateGeneric' ;
 
 // Quantifiers, binding, substitution
 FORALL
@@ -531,11 +405,11 @@ GREATER
 	: '>' ;
 
 GREATEREQUAL
-	: '>' '='
+	: '>='
 	| '\u2265' ;
 
 RGUILLEMETS
-	: '>' '>' ;
+	: '>>' ;
 
 WS
 	: (' '
@@ -548,22 +422,15 @@ WS
 STRING_LITERAL
 	: '"' ('\\' . | ~( '"' | '\\') )* '"' ;
 
-/* LESS_DISPATCH
-	: IMPLICIT_IDENT
-	| EQV
-	| LESSEQUAL
-	| LGUILLEMETS
-	| LESS ;
-*/
 LESS
 	: '<' ;
 
 LESSEQUAL
-	: '<' '='
+	: '<='
 	| '\u2264' ;
 
 LGUILLEMETS
-	: '<' '<' ;
+	: '<<' ;
 
 IMPLICIT_IDENT
 	: '<' (LETTER)+ '>' ;

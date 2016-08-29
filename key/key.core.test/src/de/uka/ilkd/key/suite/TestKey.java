@@ -57,8 +57,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.parser.TestJMLParserAssociativity.class,
         de.uka.ilkd.key.parser.TestTacletParser.class,
     };
-
-
+    
+    
     static Class<? extends TestCase>[] ruleTests = new Class[] {
         de.uka.ilkd.key.rule.TestSchemaModalOperators.class,
         de.uka.ilkd.key.rule.tacletbuilder.TestTacletBuild.class,

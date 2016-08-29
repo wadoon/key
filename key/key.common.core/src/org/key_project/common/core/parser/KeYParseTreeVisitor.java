@@ -140,6 +140,9 @@ public class KeYParseTreeVisitor extends KeYCommonParserBaseVisitor<Object> {
         // Create the parser
         KeYCommonParser parser = new KeYCommonParser(tokens);
 
+        // Bail at error
+        parser.setErrorHandler(new BailErrorStrategy());
+        
         // Traverse the parse tree
         try {
             visit(parser.decls());
