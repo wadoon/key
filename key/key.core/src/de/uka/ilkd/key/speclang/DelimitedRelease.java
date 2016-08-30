@@ -3,14 +3,11 @@
  */
 package de.uka.ilkd.key.speclang;
 
-import java.util.LinkedList;
-import java.util.List;
-
 //import de.uka.ilkd.key.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableList;
-
 //import de.uka.ilkd.key.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.logic.Term;
 
 
@@ -54,6 +51,9 @@ public class DelimitedRelease {
    public DelimitedRelease(ImmutableList<Term> conditions,
          ImmutableList<Term> escapeHatches, ImmutableList<Term> lowVars) {
       super();
+      assert conditions != null : "conditions should not be null";
+      assert escapeHatches != null;
+      assert lowVars != null;
       this.conditions = conditions;
       this.escapeHatches = escapeHatches;
       this.lowVars = lowVars;

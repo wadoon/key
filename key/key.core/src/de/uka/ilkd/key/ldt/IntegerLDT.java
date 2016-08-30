@@ -83,7 +83,9 @@ public final class IntegerLDT extends LDT {
     private final Function mod;
     private final Function pow;
     private final Function bsum;
+    private final Function sum;
     private final Function bprod;
+    private final Function prod;
 //    private final Function min; // handled by the \ifEx operator
 //    private final Function max;
     private final Function jdiv;
@@ -194,7 +196,9 @@ public final class IntegerLDT extends LDT {
         div                 = addFunction(services, "div");
         mod                 = addFunction(services, "mod");
         bsum                = addFunction(services, "bsum");
+        sum                 = addFunction(services, "sum");
         bprod               = addFunction(services, "bprod");
+        prod                = addFunction(services, "prod");
         jdiv                = addFunction(services, "jdiv");
         jmod                = addFunction(services, "jmod");    
         pow                 = addFunction(services, "pow");
@@ -1084,4 +1088,8 @@ public final class IntegerLDT extends LDT {
 	public Function getFloor() {
 		return floor;
 	}
+
+    public Function getSum() {
+        return sum;
+    }
 }
