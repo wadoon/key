@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="all" name="pSEC Alfred">
+	<property name="libs" value="lib" />
+    <property name="src" value="src" />
+    <property name="bin" value="bin" />
+    <property name="destfile" value="pSEC.jar" />
+    
+    <path id="classpath">
+        <fileset dir="${libs}" includes="commons-cli-1.3.1.jar"/>
+    </path>
+
+    <target name="build" >
+        <mkdir dir="${bin}" />
+        <javac
+            srcdir="${src}"
+            destdir="${bin}"
+            includes="**/*.java"
+            classpathref="classpath"
+            includeantruntime="false"
+            deprecation="true"
+            source="1.6"
+            />
+    </target>
+
+    <target name="jar" depends="build">
+        <jar destfile="${destfile}" basedir="${bin}" includes="**/*.class">
+            <zipgroupfileset dir="${libs}" includes="*.jar" />
+            <!--<fileset dir="." includes="gpl.txt" />-->
+            <manifest>
+                <attribute name="Main-Class" value="de.tud.cs.se.ds.psec.cli.Main"/>
+            </manifest>
+        </jar>
+        <chmod file="${destfile}" perm="ugo+x"/>
+    </target>
+
+    <target name="clean" >
+        <delete dir="${bin}"/>
+        <delete file="${destfile}"/>
+    </target>
+    
+    <target name="run" depends="jar">
+        <java jar="${destfile}" fork="true">
+            <classpath>
+                <pathelement location="${destfile}"/>
+            </classpath>
+        </java>
+    </target>
+    
+    <target name="all" depends="build,jar" />
+</project>
