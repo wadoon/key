@@ -1,0 +1,92 @@
+package de.tud.cs.se.ds.psec.cli;
+
+import de.tud.cs.se.ds.psec.compiler.Compiler;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
+/**
+ * TODO
+ *
+ * @author Dominic Scheurer
+ */
+public class Main {
+    private static final String INFO_STRING =
+              "==========================================\n"
+            + "        This is pSEC v0.1 \"Alfred\"\n"
+            + " prototypical Symbolic Execution Compiler\n"
+            + "Better Compilation with Symbolic Execution\n"
+            + "==========================================\n\n";
+
+    /**
+     * TODO
+     * 
+     * @param args
+     */
+    public static void main(String[] args) {
+        Options options = new Options();
+
+        Option helpOpt = Option.builder("h").longOpt("help")
+                .desc("Display help (this text) and terminate").required(false)
+                .build();
+
+        options.addOption(helpOpt);
+
+        CommandLineParser parser = new DefaultParser();
+        try {
+            // parse the command line arguments
+            CommandLine line = parser.parse(options, args);
+
+            if (line.getArgList().size() < 1 || line.hasOption("h")) {
+                printHelp(options);
+                System.exit(0);
+            }
+
+            String inputFileName = line.getArgList().get(0);
+            File inputFile = new File(inputFileName);
+
+            if (!inputFileName.endsWith(".java") || !inputFile.exists()
+                    || !inputFile.isFile()) {
+                System.out.println("Invalid file name or not existing file: "
+                        + inputFileName);
+                System.out.println("Please supply an existing Java file.\n");
+                printHelp(options);
+            }
+
+            Compiler compiler = new Compiler(inputFile);
+            
+            String outputFileName = inputFile.getAbsolutePath().replaceAll(".java$", ".class");
+            Files.write(new File(outputFileName).toPath(), compiler.compile());
+        }
+        catch (ParseException exp) {
+            printHelp(options);
+            System.exit(0);
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (ProblemLoaderException e) {
+            // Created in Compiler
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private static void printHelp(Options options) {
+        System.out.println(INFO_STRING);
+        HelpFormatter helpFormatter = new HelpFormatter();
+        helpFormatter.printHelp("java -jar pSEC.jar [input Java file]", options);
+    }
+
+}
