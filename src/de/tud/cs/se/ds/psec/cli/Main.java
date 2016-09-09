@@ -1,6 +1,7 @@
 package de.tud.cs.se.ds.psec.cli;
 
 import de.tud.cs.se.ds.psec.compiler.Compiler;
+import de.tud.cs.se.ds.psec.compiler.JavaTypeCompilationResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 import java.io.File;
@@ -22,11 +23,13 @@ import org.apache.commons.cli.ParseException;
  */
 public class Main {
     private static final String INFO_STRING =
+            // @formatter:off
               "==========================================\n"
-            + "        This is pSEC v0.1 \"Alfred\"\n"
-            + " prototypical Symbolic Execution Compiler\n"
+            + "        This is pSEC v0.1 \"Alfred\"      \n"
+            + " prototypical Symbolic Execution Compiler \n"
             + "Better Compilation with Symbolic Execution\n"
             + "==========================================\n\n";
+            // @formatter:on
 
     /**
      * TODO
@@ -64,9 +67,20 @@ public class Main {
             }
 
             Compiler compiler = new Compiler(inputFile);
-            
-            String outputFileName = inputFile.getAbsolutePath().replaceAll(".java$", ".class");
-            Files.write(new File(outputFileName).toPath(), compiler.compile());
+
+            for (JavaTypeCompilationResult compilationResult : compiler
+                    .compile()) {
+                // TODO: Manage directory structures for packages
+
+                Files.write(
+                        new File(
+                                compilationResult.getInternalTypeName()
+                                        .substring(compilationResult
+                                                .getInternalTypeName()
+                                                .lastIndexOf('/') + 1)
+                                        + ".class").toPath(),
+                        compilationResult.getBytecode());
+            }
         }
         catch (ParseException exp) {
             printHelp(options);
@@ -86,7 +100,8 @@ public class Main {
     private static void printHelp(Options options) {
         System.out.println(INFO_STRING);
         HelpFormatter helpFormatter = new HelpFormatter();
-        helpFormatter.printHelp("java -jar pSEC.jar [input Java file]", options);
+        helpFormatter.printHelp("java -jar pSEC.jar [input Java file]",
+                options);
     }
 
 }

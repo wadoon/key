@@ -17,6 +17,7 @@ import org.objectweb.asm.MethodVisitor;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.Extends;
 import de.uka.ilkd.key.java.declaration.Implements;
@@ -53,27 +54,33 @@ public class Compiler {
      * 
      * @return
      */
-    public byte[] compile() {
-//        getDeclaredTypes().forEach(
-//                t -> getProgramMethods(t).forEach(m -> environment.getServices()
-//                        .getSpecificationRepository().getContracts(t, m)
-//                        .forEach(c -> System.out.println(c.createProofObl(
-//                                environment.getInitConfig())))));
+    public List<JavaTypeCompilationResult> compile() {
+        // getDeclaredTypes().forEach(
+        // t -> getProgramMethods(t).forEach(m -> environment.getServices()
+        // .getSpecificationRepository().getContracts(t, m)
+        // .forEach(c -> System.out.println(c.createProofObl(
+        // environment.getInitConfig())))));
 
         List<KeYJavaType> declaredTypes = getDeclaredTypes();
 
         assert declaredTypes
                 .size() > 0 : "Unexpectedly, no type is declared in the supplied Java file.";
 
-        if (declaredTypes.size() != 1) {
-            throw new RuntimeException(
-                    "Currently only supporting one Java class per file, given: "
-                            + declaredTypes.size());
+        return toStream(declaredTypes).map(t -> compile(t.getJavaType()))
+                .collect(Collectors.toList());
+    }
+
+    private JavaTypeCompilationResult compile(Type typeDecl) {
+        if (typeDecl instanceof ClassDeclaration) {
+            return compile((ClassDeclaration) typeDecl);
         }
-
-        KeYJavaType t = declaredTypes.get(0);
-
-        return compile(t);
+        else if (typeDecl instanceof InterfaceDeclaration) {
+            return compile((InterfaceDeclaration) typeDecl);
+        }
+        else {
+            throw new UnsupportedOperationException(
+                    "Unexpected top level type: " + typeDecl.getFullName());
+        }
     }
 
     /**
@@ -82,30 +89,23 @@ public class Compiler {
      * @param t
      * @return
      */
-    private byte[] compile(KeYJavaType t) {
-        if (!(t.getJavaType() instanceof ClassDeclaration)) {
-            throw new RuntimeException(
-                    "Currently only supporting class declarations");
-        }
-
-        ClassDeclaration classDecl = (ClassDeclaration) t.getJavaType();
-
+    private JavaTypeCompilationResult compile(ClassDeclaration classDecl) {
         ClassWriter cw = new ClassWriter(
                 ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
         FieldVisitor fv;
         MethodVisitor mv;
         AnnotationVisitor av0;
-        
-        String   extending    = getExtending(classDecl);
-        String[] implementing = getImplementing(classDecl);
 
-        cw.visit(CLASS_VERSION, createClassOpcode(classDecl),
-                toInternalName(classDecl.getFullName()), null,
-                extending, implementing);
-        
+        String extending = getExtending(classDecl);
+        String[] implementing = getImplementing(classDecl);
+        String internalName = toInternalName(classDecl.getFullName());
+
+        cw.visit(CLASS_VERSION, createClassOpcode(classDecl), internalName,
+                null, extending, implementing);
+
         cw.visitEnd();
 
-        return cw.toByteArray();
+        return new JavaTypeCompilationResult(cw.toByteArray(), internalName);
     }
 
     /**
@@ -114,17 +114,47 @@ public class Compiler {
      * @param t
      * @return
      */
-    private String getExtending(ClassDeclaration classDecl) {
-        Extends ext = classDecl.getExtendedTypes();
-        String extending;
+    private JavaTypeCompilationResult compile(InterfaceDeclaration ifDecl) {
+        //TODO: Probably it's possible to unify this with #comile(ClassDeclaration)
         
+        ClassWriter cw = new ClassWriter(
+                ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
+        FieldVisitor fv;
+        MethodVisitor mv;
+        AnnotationVisitor av0;
+
+        String extending = getExtending(ifDecl);
+        String internalName = toInternalName(ifDecl.getFullName());
+
+        cw.visit(CLASS_VERSION, createClassOpcode(ifDecl) + ACC_INTERFACE, internalName, null,
+                extending, null);
+
+        cw.visitEnd();
+
+        return new JavaTypeCompilationResult(cw.toByteArray(), internalName);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param t
+     * @return
+     */
+    private String getExtending(TypeDeclaration classDecl) {
+        Extends ext = classDecl instanceof InterfaceDeclaration
+                ? ((InterfaceDeclaration) classDecl).getExtendedTypes()
+                : ((ClassDeclaration) classDecl).getExtendedTypes();
+        String extending;
+
         if (ext != null) {
             ImmutableArray<TypeReference> supertypes = ext.getSupertypes();
-            extending = toInternalName(supertypes.get(0).getKeYJavaType().getFullName());
-        } else {
+            extending = toInternalName(
+                    supertypes.get(0).getKeYJavaType().getFullName());
+        }
+        else {
             extending = "java/lang/Object";
         }
-        
+
         return extending;
     }
 
@@ -137,19 +167,20 @@ public class Compiler {
     private String[] getImplementing(ClassDeclaration classDecl) {
         Implements impl = classDecl.getImplementedTypes();
         String[] implementing = null;
-        
+
         if (impl != null) {
             ImmutableArray<TypeReference> supertypes = impl.getSupertypes();
             implementing = new String[supertypes.size()];
-            
+
             for (int i = 0; i < supertypes.size(); i++) {
-                implementing[i] = toInternalName(supertypes.get(i).getKeYJavaType().getFullName());
+                implementing[i] = toInternalName(
+                        supertypes.get(i).getKeYJavaType().getFullName());
             }
         }
-        
+
         return implementing;
     }
-    
+
     private String toInternalName(String javaClassName) {
         return javaClassName.replaceAll("\\.", "/");
     }
@@ -160,7 +191,7 @@ public class Compiler {
      * @param classDecl
      * @return
      */
-    private int createClassOpcode(ClassDeclaration classDecl) {
+    private int createClassOpcode(TypeDeclaration classDecl) {
         int opcode = 0;
 
         if (classDecl.isPublic()) {
