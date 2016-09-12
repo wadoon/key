@@ -70,14 +70,16 @@ public class Compiler {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * TODO
+     *
+     * @param typeDecl
+     * @return
+     */
     private JavaTypeCompilationResult compile(Type typeDecl) {
-        if (typeDecl instanceof ClassDeclaration) {
-            return compile((ClassDeclaration) typeDecl);
-        }
-        else if (typeDecl instanceof InterfaceDeclaration) {
-            return compile((InterfaceDeclaration) typeDecl);
-        }
-        else {
+        if (typeDecl instanceof ClassDeclaration || typeDecl instanceof InterfaceDeclaration) {
+            return compile((TypeDeclaration) typeDecl);
+        } else {
             throw new UnsupportedOperationException(
                     "Unexpected top level type: " + typeDecl.getFullName());
         }
@@ -89,45 +91,19 @@ public class Compiler {
      * @param t
      * @return
      */
-    private JavaTypeCompilationResult compile(ClassDeclaration classDecl) {
+    private JavaTypeCompilationResult compile(TypeDeclaration typeDecl) {
         ClassWriter cw = new ClassWriter(
                 ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
         FieldVisitor fv;
         MethodVisitor mv;
         AnnotationVisitor av0;
 
-        String extending = getExtending(classDecl);
-        String[] implementing = getImplementing(classDecl);
-        String internalName = toInternalName(classDecl.getFullName());
+        String extending = getExtending(typeDecl);
+        String[] implementing = getImplementing(typeDecl);
+        String internalName = toInternalName(typeDecl.getFullName());
 
-        cw.visit(CLASS_VERSION, createClassOpcode(classDecl), internalName,
+        cw.visit(CLASS_VERSION, createClassOpcode(typeDecl), internalName,
                 null, extending, implementing);
-
-        cw.visitEnd();
-
-        return new JavaTypeCompilationResult(cw.toByteArray(), internalName);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param t
-     * @return
-     */
-    private JavaTypeCompilationResult compile(InterfaceDeclaration ifDecl) {
-        //TODO: Probably it's possible to unify this with #comile(ClassDeclaration)
-        
-        ClassWriter cw = new ClassWriter(
-                ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
-        FieldVisitor fv;
-        MethodVisitor mv;
-        AnnotationVisitor av0;
-
-        String extending = getExtending(ifDecl);
-        String internalName = toInternalName(ifDecl.getFullName());
-
-        cw.visit(CLASS_VERSION, createClassOpcode(ifDecl) + ACC_INTERFACE, internalName, null,
-                extending, null);
 
         cw.visitEnd();
 
@@ -164,7 +140,13 @@ public class Compiler {
      * @param t
      * @return
      */
-    private String[] getImplementing(ClassDeclaration classDecl) {
+    private String[] getImplementing(TypeDeclaration typeDecl) {
+        if (!(typeDecl instanceof ClassDeclaration)) {
+            return null;
+        }
+        
+        ClassDeclaration classDecl = (ClassDeclaration) typeDecl;
+        
         Implements impl = classDecl.getImplementedTypes();
         String[] implementing = null;
 
@@ -210,6 +192,10 @@ public class Compiler {
 
         if (classDecl.isFinal()) {
             opcode += ACC_FINAL;
+        }
+        
+        if (classDecl.isInterface()) {
+            opcode += ACC_INTERFACE;
         }
 
         return opcode;
