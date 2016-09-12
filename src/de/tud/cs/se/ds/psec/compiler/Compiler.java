@@ -3,30 +3,30 @@ package de.tud.cs.se.ds.psec.compiler;
 import static org.objectweb.asm.Opcodes.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 
+import de.tud.cs.se.ds.psec.se.SymbolicExecutionInterface;
+import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
@@ -36,8 +36,9 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  */
 public class Compiler {
     private static final int CLASS_VERSION = 52;
+
     private KeYEnvironment<DefaultUserInterfaceControl> environment;
-    private Services services;
+    private File javaFile;
 
     /**
      * TODO
@@ -46,10 +47,24 @@ public class Compiler {
      * @throws ProblemLoaderException
      */
     public Compiler(File javaFile) throws ProblemLoaderException {
+        this.javaFile = javaFile;
+
+        if (!ProofSettings.isChoiceSettingInitialised()) {
+            // Ensure that Taclets are parsed
+            KeYEnvironment<?> env = KeYEnvironment.load(javaFile, null, null,
+                    null);
+            env.dispose();
+        }
+
+        // @formatter:off
         environment = KeYEnvironment.load(
-                SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile,
-                null, null, null, true);
-        services = environment.getServices();
+                SymbolicExecutionJavaProfile.getDefaultInstance(),
+                javaFile, // location
+                null,     // class path
+                null,     // boot class path
+                null,     // includes
+                true);    // forceNewProfileOfNewProofs
+        // @formatter:on
     }
 
     /**
@@ -58,18 +73,14 @@ public class Compiler {
      * @return
      */
     public List<JavaTypeCompilationResult> compile() {
-        // getDeclaredTypes().forEach(
-        // t -> getProgramMethods(t).forEach(m -> environment.getServices()
-        // .getSpecificationRepository().getContracts(t, m)
-        // .forEach(c -> System.out.println(c.createProofObl(
-        // environment.getInitConfig())))));
-
-        List<KeYJavaType> declaredTypes = getDeclaredTypes();
+        List<KeYJavaType> declaredTypes = InformationExtraction
+                .getDeclaredTypes(environment);
 
         assert declaredTypes
                 .size() > 0 : "Unexpectedly, no type is declared in the supplied Java file.";
 
-        return toStream(declaredTypes).map(t -> compile(t.getJavaType()))
+        return declaredTypes.stream()
+                .map(t -> compile(t.getJavaType()))
                 .collect(Collectors.toList());
     }
 
@@ -83,8 +94,7 @@ public class Compiler {
         if (typeDecl instanceof ClassDeclaration
                 || typeDecl instanceof InterfaceDeclaration) {
             return compile((TypeDeclaration) typeDecl);
-        }
-        else {
+        } else {
             throw new UnsupportedOperationException(
                     "Unexpected top level type: " + typeDecl.getFullName());
         }
@@ -100,22 +110,23 @@ public class Compiler {
         ClassWriter cw = new ClassWriter(
                 ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
 
-        String extending = getExtending(typeDecl);
-        String[] implementing = getImplementing(typeDecl);
-        String internalName = toInternalName(typeDecl.getFullName());
+        String extending = InformationExtraction.getExtending(typeDecl);
+        String[] implementing = InformationExtraction.getImplementing(typeDecl);
+        String internalName = InformationExtraction
+                .toInternalName(typeDecl.getFullName());
 
-        cw.visit(CLASS_VERSION, createOpcode(typeDecl), internalName, null,
+        cw.visit(CLASS_VERSION, InformationExtraction.createOpcode(typeDecl),
+                internalName, null,
                 extending, implementing);
 
         ImmutableArray<MemberDeclaration> members = typeDecl.getMembers();
         members.forEach(m -> {
             if (m.getClass().equals(FieldDeclaration.class)) {
                 compile(cw, (FieldDeclaration) m);
-            }
-            else if (m.getClass().equals(ProgramMethod.class)) {
+            } else if (m.getClass().equals(ProgramMethod.class)
+                    && !((ProgramMethod) m).getName().endsWith(">")) {
                 compile(cw, (ProgramMethod) m);
-            }
-            else {
+            } else {
                 // TODO: Throw exception
             }
         });
@@ -125,40 +136,44 @@ public class Compiler {
         return new JavaTypeCompilationResult(cw.toByteArray(), internalName);
     }
 
+    /**
+     * TODO
+     *
+     * @param cw
+     * @param mDecl
+     */
     private void compile(ClassWriter cw, ProgramMethod mDecl) {
-        KeYJavaType classType = environment.getJavaInfo()
-                .getTypeByClassName(
-                        mDecl.getContainerType().getFullName());
+        MethodVisitor mv = cw.visitMethod(
+                InformationExtraction.createOpcode(mDecl), mDecl.getName(),
+                InformationExtraction.getMethodTypeDescriptor(mDecl), null,
+                null);
 
-        ImmutableSet<FunctionalOperationContract> contracts = services
-                .getSpecificationRepository()
-                .getOperationContracts(classType, mDecl);
+        if (!mDecl.isAbstract()) {
+            mv.visitCode();
 
-        if (contracts.size() > 0) {
-            // We only consider one (the first!) contract
-            if (contracts.size() > 1) {
-                // TODO: There may be implicit contracts, e.g. for
-                // overridden methods. Should be careful to use the
-                // most specific one, probably..
-                System.out
-                        .println("[WARNING] Second contract of method "
-                                + mDecl.getName() + " ignored.");
+            SymbolicExecutionInterface seInterface = new SymbolicExecutionInterface(
+                    environment, javaFile);
+            SymbolicExecutionTreeBuilder builder = seInterface.execute(mDecl);
+
+            System.out.println(mDecl.getName() + ": "
+                    + builder.getProof().openGoals().size());
+            try {
+                builder.getProof().saveToFile(
+                        new File(mDecl.getContainerType().getFullName()
+                                + "::" + mDecl.getName() + ".proof"));
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
 
-            MethodVisitor mv = cw.visitMethod(createOpcode(mDecl),
-                    mDecl.getName(), getMethodTypeDescriptor(mDecl),
-                    null, null);
-            if (!mDecl.isAbstract()) {
-                mv.visitCode();
-                mv.visitInsn(RETURN);
-            }
-            mv.visitEnd();
+            mv.visitInsn(RETURN);
         }
+
+        mv.visitEnd();
     }
 
     private void compile(ClassWriter cw, FieldDeclaration f) {
-        String fieldName = f.getFieldSpecifications().last()
-                .getProgramName();
+        String fieldName = f.getFieldSpecifications().last().getProgramName();
         fieldName = fieldName.substring(fieldName.lastIndexOf(':') + 1);
 
         // Check whether field is automatically generated, like
@@ -166,229 +181,10 @@ public class Compiler {
         if (!fieldName.endsWith(">")) {
             // TODO: Should we really skip the fields generated by KeY?
             // TODO: Change from "I" to actual type
-            FieldVisitor fv = cw.visitField(createOpcode(f), fieldName,
-                    "I", null, null);
+            FieldVisitor fv = cw.visitField(
+                    InformationExtraction.createOpcode(f), fieldName, "I",
+                    null, null);
             fv.visitEnd();
         }
-    }
-
-    /**
-     * TODO
-     *
-     * @param m
-     * @return
-     */
-    private String getMethodTypeDescriptor(ProgramMethod m) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("(");
-        // TODO varargs parameters
-        m.getParameters().forEach(s -> sb.append(
-                typeToTypeDescriptor(s.getTypeReference().getKeYJavaType())));
-        sb.append(")");
-        sb.append(typeToTypeDescriptor(m.getReturnType()));
-
-        return sb.toString();
-    }
-
-    /**
-     * TODO
-     *
-     * @param type
-     * @return
-     */
-    private String typeToTypeDescriptor(KeYJavaType type) {
-        if (type.equals(KeYJavaType.VOID_TYPE)) {
-            return "V";
-        }
-
-        String fullName = type.getFullName();
-        switch (fullName) {
-        case "int":
-            return "I";
-        case "boolean":
-            return "Z";
-        // TODO: short, long?
-        default:
-            return "L" + toInternalName(fullName) + ";";
-        }
-    }
-
-    /**
-     * TODO
-     * 
-     * @param t
-     * @return
-     */
-    private String getExtending(TypeDeclaration classDecl) {
-        Extends ext = classDecl instanceof InterfaceDeclaration
-                ? ((InterfaceDeclaration) classDecl).getExtendedTypes()
-                : ((ClassDeclaration) classDecl).getExtendedTypes();
-        String extending;
-
-        if (ext != null) {
-            ImmutableArray<TypeReference> supertypes = ext.getSupertypes();
-            extending = toInternalName(
-                    supertypes.get(0).getKeYJavaType().getFullName());
-        }
-        else {
-            extending = "java/lang/Object";
-        }
-
-        return extending;
-    }
-
-    /**
-     * TODO
-     * 
-     * @param t
-     * @return
-     */
-    private String[] getImplementing(TypeDeclaration typeDecl) {
-        if (!(typeDecl instanceof ClassDeclaration)) {
-            return null;
-        }
-
-        ClassDeclaration classDecl = (ClassDeclaration) typeDecl;
-
-        Implements impl = classDecl.getImplementedTypes();
-        String[] implementing = null;
-
-        if (impl != null) {
-            ImmutableArray<TypeReference> supertypes = impl.getSupertypes();
-            implementing = new String[supertypes.size()];
-
-            for (int i = 0; i < supertypes.size(); i++) {
-                implementing[i] = toInternalName(
-                        supertypes.get(i).getKeYJavaType().getFullName());
-            }
-        }
-
-        return implementing;
-    }
-
-    private String toInternalName(String javaClassName) {
-        return javaClassName.replaceAll("\\.", "/");
-    }
-
-    /**
-     * TODO
-     *
-     * @param fieldDecl
-     * @return
-     */
-    private int createOpcode(FieldDeclaration fieldDecl) {
-        return createOpcode(fieldDecl.isPublic(), fieldDecl.isProtected(),
-                fieldDecl.isPrivate(), false, fieldDecl.isFinal(), fieldDecl.isStatic(), false);
-    }
-
-    /**
-     * TODO
-     *
-     * @param methodDecl
-     * @return
-     */
-    private int createOpcode(ProgramMethod methodDecl) {
-        return createOpcode(methodDecl.isPublic(), methodDecl.isProtected(),
-                methodDecl.isPrivate(), methodDecl.isAbstract(),
-                methodDecl.isFinal(), methodDecl.isStatic(), false);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param classDecl
-     * @return
-     */
-    private int createOpcode(TypeDeclaration classDecl) {
-        return createOpcode(classDecl.isPublic(), classDecl.isProtected(),
-                classDecl.isPrivate(), classDecl.isAbstract(),
-                classDecl.isFinal(), classDecl.isStatic(), classDecl.isInterface());
-    }
-
-    /**
-     * TODO
-     *
-     * @param isPublic
-     * @param isProtected
-     * @param isPrivate
-     * @param isAbstract
-     * @param isFinal
-     * @param isStatic TODO
-     * @param isInterface
-     * @return
-     */
-    private int createOpcode(boolean isPublic, boolean isProtected,
-            boolean isPrivate, boolean isAbstract, boolean isFinal,
-            boolean isStatic, boolean isInterface) {
-        int opcode = 0;
-
-        if (isPublic) {
-            opcode += ACC_PUBLIC;
-        }
-        else if (isProtected) {
-            opcode += ACC_PROTECTED;
-        }
-        else if (isPrivate) {
-            opcode += ACC_PRIVATE;
-        }
-
-        if (isAbstract) {
-            opcode += ACC_ABSTRACT;
-        }
-
-        if (isFinal) {
-            opcode += ACC_FINAL;
-        }
-
-        if (isStatic) {
-            opcode += ACC_STATIC;
-        }
-
-        if (isInterface) {
-            opcode += ACC_INTERFACE;
-        }
-
-        return opcode;
-    }
-
-    /**
-     * TODO
-     * 
-     * @param environment
-     * @return
-     */
-    private List<KeYJavaType> getDeclaredTypes() {
-        // @formatter:off
-        return environment.getJavaInfo().getAllKeYJavaTypes().parallelStream()
-                .filter(t -> t.getJavaType() instanceof InterfaceDeclaration
-                          || t.getJavaType() instanceof ClassDeclaration)
-                .filter(t -> !((TypeDeclaration) t.getJavaType()).isLibraryClass())
-                .collect(Collectors.toList());
-        // @formatter:on
-    }
-
-    /**
-     * TODO
-     * 
-     * @param t
-     * @return
-     */
-    private List<IProgramMethod> getProgramMethods(KeYJavaType t) {
-        return toStream(environment.getServices().getSpecificationRepository()
-                .getContractTargets(t))
-                        .filter(m -> (m instanceof IProgramMethod))
-                        .map(m -> (IProgramMethod) m)
-                        .collect(Collectors.toList());
-    }
-
-    /**
-     * TODO
-     * 
-     * @param it
-     * @return
-     */
-    private static <T> Stream<T> toStream(Iterable<T> it) {
-        return StreamSupport.stream(it.spliterator(), false);
     }
 }
