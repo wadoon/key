@@ -149,7 +149,7 @@ public class Compiler {
             mv.visitCode();
 
             //@formatter:off
-            new MethodBodyCompiler(mv).compile(
+            new MethodBodyCompiler(mv, mDecl.getParameters()).compile(
                     new SymbolicExecutionInterface(
                             environment, javaFile)
                     .execute(mDecl));

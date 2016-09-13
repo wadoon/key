@@ -184,6 +184,16 @@ public class InformationExtraction {
             return "V";
         }
 
+        // 'V' - void
+        // 'Z' - boolean
+        // 'C' - char
+        // 'B' - byte
+        // 'S' - short
+        // 'I' - int
+        // 'F' - float
+        // 'J' - long
+        // 'D' - double
+
         String fullName;
         switch (fullName = type.getFullName()) {
         case "int":
@@ -217,12 +227,15 @@ public class InformationExtraction {
 
     /**
      * TODO
-     * @param environment TODO
+     * 
+     * @param environment
+     *            TODO
      * @param environment
      * 
      * @return
      */
-    public static List<KeYJavaType> getDeclaredTypes(KeYEnvironment<DefaultUserInterfaceControl> environment) {
+    public static List<KeYJavaType> getDeclaredTypes(
+            KeYEnvironment<DefaultUserInterfaceControl> environment) {
         // @formatter:off
         return environment.getJavaInfo().getAllKeYJavaTypes().parallelStream()
                 .filter(t -> t.getJavaType() instanceof InterfaceDeclaration
