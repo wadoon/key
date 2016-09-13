@@ -4,25 +4,29 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.operator.GreaterThan;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 /**
@@ -33,6 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 public class MethodBodyCompiler implements Opcodes {
     private MethodVisitor mv;
     private HashMap<IProgramVariable, Integer> progVarOffsetMap = new HashMap<>();
+    private String currentStatement;
 
     /**
      * TODO
@@ -56,7 +61,27 @@ public class MethodBodyCompiler implements Opcodes {
      *            of the method's body.
      */
     public void compile(SymbolicExecutionTreeBuilder builder) {
-        compile(builder.getStartNode());
+        // Forward until after call of this method
+        IExecutionNode<?> startNode = ffUntilAfterFirstMethodCall(builder);
+
+        compile(startNode);
+    }
+
+    /**
+     * "Fast-forwards" the tree until the first statement after the first method
+     * call in the tree.
+     *
+     * @param builder
+     * @return
+     */
+    private IExecutionNode<?> ffUntilAfterFirstMethodCall(
+            SymbolicExecutionTreeBuilder builder) {
+        IExecutionNode<?> startNode = builder.getStartNode();
+        while (!(startNode instanceof IExecutionMethodCall)) {
+            startNode = startNode.getChildren()[0];
+        }
+        startNode = startNode.getChildren()[0];
+        return startNode;
     }
 
     /**
@@ -66,6 +91,8 @@ public class MethodBodyCompiler implements Opcodes {
      * @return
      */
     private int getNrForProgramVar(IProgramVariable progVar) {
+        //XXX: Static methods don't have the "this" field as first variable!
+        
         if (progVarOffsetMap.containsKey(progVar)) {
             return progVarOffsetMap.get(progVar);
         } else {
@@ -85,32 +112,97 @@ public class MethodBodyCompiler implements Opcodes {
      * @param startNode
      */
     private void compile(IExecutionNode<?> startNode) {
+        //TODO Note to self: Use a different approach. Start with an IExecutionNode, but
+        //     compile using the intermediate steps by translating the taclet apps for
+        //     nodes with node.getNodeInfo().getActiveStatement() until the next IExecutionNode.
+        //     Use SymbolicExecutionUtil#isSymbolicExecutionTreeNode(...) for checking whether
+        //     we arrived at the next node already.
+        //     Have to take care of program variables introduced by KeY; however, we can treat
+        //     local variables as equivalent if their names are equal, since KeY does the renaming
+        //     for disambiguation.
+        
         Deque<IExecutionNode<?>> executionStack = new ArrayDeque<IExecutionNode<?>>();
 
         IExecutionNode<?> currentNode = startNode;
         while (currentNode != null && currentNode.getChildren().length > 0) {
             if (currentNode.getChildren().length > 1) {
+                // Note: Stack Map Frames are not generated manually here;
+                // we're trying to leave it to the ASM framework to generate
+                // them automatically. Computing the right values of these
+                // frames is very difficult...
+                // http://chrononsystems.com/blog/java-7-design-flaw-leads-to-huge-backward-step-for-the-jvm
+                // http://asm.ow2.org/doc/developer-guide.html#classwriter
+
+                currentStatement = currentNode.toString();
+
                 // TODO: Treat all branches
                 if (currentNode instanceof IExecutionLoopInvariant) {
                     IExecutionLoopInvariant loopInvNode = ((IExecutionLoopInvariant) currentNode);
                     IGuard guard = loopInvNode.getLoopStatement().getGuard();
+                    
+                    // Jump-back label
+                    Label l0 = new Label();
+                    mv.visitLabel(l0);
 
-                    Node preservesInvBranch = loopInvNode.getChildren()[0]
-                            .getProofNode();
-                    Node useCaseBranch = loopInvNode.getChildren()[1]
-                            .getProofNode();
-                    System.err.println(
-                            "[WARNING] Uncovered branching statement type: " + currentNode.getElementType());
+                    // Loop guard
+                    Label l1 = new Label();
+
+                    if (guard instanceof Guard && ((Guard) guard)
+                            .getExpression() instanceof GreaterThan) {
+                        GreaterThan gt = (GreaterThan) ((Guard) guard)
+                                .getExpression();
+
+                        Expression first = gt.getArguments().get(0);
+                        Expression second = gt.getArguments().get(1);
+
+                        if (first instanceof LocationVariable
+                                && second instanceof IntLiteral) {
+                            mv.visitVarInsn(ILOAD, getNrForProgramVar((LocationVariable) first));
+                            
+                            int cmpTo = Integer.parseInt(((IntLiteral) second).getValue());
+                            if (cmpTo != 0) {
+                                intConstInstruction((IntLiteral) second);
+                                mv.visitInsn(IF_ICMPLE);
+                            } else {
+                                mv.visitInsn(IFLE);
+                            }
+                        } else {
+                            System.err.println(
+                                    "[WARNING] Uncovered loop guard expression: "
+                                            + guard
+                                            + ", only considering pairs of loc vars "
+                                            + "and int literals currently");
+                        }
+                    } else {
+                        System.err.println(
+                                "[WARNING] Uncovered loop guard expression: "
+                                        + guard);
+                    }
+
+                    // Loop body
+                    compile(loopInvNode.getChildren()[0]);
+
+                    // End while
+                    mv.visitJumpInsn(GOTO, l0);
+                    mv.visitLabel(l1);
+
+                    // Code after the loop
+                    compile(loopInvNode.getChildren()[1]);
+                    
                     // TODO
                 } else if (currentNode instanceof IExecutionBranchStatement) {
                     // TODO
                     System.err.println(
-                            "[WARNING] Uncovered branching statement type: " + currentNode.getElementType());
+                            "[WARNING] Uncovered branching statement type: "
+                                    + currentNode.getElementType()
+                                    + ", statement: " + currentStatement);
                 } else {
                     // ...
                     // TODO Is there more to support?
                     System.err.println(
-                            "[WARNING] Uncovered branching statement type: " + currentNode.getElementType());
+                            "[WARNING] Uncovered branching statement type: "
+                                    + currentNode.getElementType()
+                                    + ", statement: " + currentStatement);
                 }
 
                 currentNode = null;
@@ -122,6 +214,8 @@ public class MethodBodyCompiler implements Opcodes {
         }
 
         while ((currentNode = executionStack.pollFirst()) != null) {
+            currentStatement = currentNode.toString();
+
             // Compile the node
             SourceElement src = currentNode.getProofNode().getNodeInfo()
                     .getActiveStatement();
@@ -152,7 +246,8 @@ public class MethodBodyCompiler implements Opcodes {
                     // TODO: Other types
                     System.err.println(
                             "[WARING] Only integer types considered so far, given: "
-                                    + typeRef.toString());
+                                    + typeRef.toString() + ", statement: "
+                                    + currentStatement);
                 }
 
                 LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
@@ -176,13 +271,15 @@ public class MethodBodyCompiler implements Opcodes {
                 // TODO Support more taclets
                 System.err.println(
                         "[WARNING] Did not translate the following taclet app: "
-                                + app.rule().name());
+                                + app.rule().name() + ", statement: "
+                                + currentStatement);
             }
         } else {
             // TODO What other cases to support?
             System.err.println(
                     "[WARNING] Did not translate the following taclet app: "
-                            + app.rule().name());
+                            + app.rule().name() + ", statement: "
+                            + currentStatement);
         }
     }
 
