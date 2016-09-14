@@ -93,6 +93,19 @@ public class MethodBodyCompiler implements Opcodes {
      * @param branchStatement
      */
     private void compile(IExecutionBranchStatement branchStatement) {
+
+        // Currently considering ifSplit, ifElseSplit.
+        // We assume that the guard is a boolean location variable that can be
+        // loaded on to of the stack to decide about the split.
+        // NOTE: We don't incorporate joining at the moment, so there will be
+        // duplicate parts of code after the compilation of a split.
+
+        Node branchNode = compileSequentialBlock(
+                branchStatement.getProofNode());
+        
+        System.out.println(branchNode.serialNr() + ": "
+                + branchNode.getAppliedRuleApp().rule().name());
+
         System.err.println(
                 "[WARNING] Uncovered branching statement type: "
                         + branchStatement.getElementType()
@@ -179,8 +192,13 @@ public class MethodBodyCompiler implements Opcodes {
 
         IExecutionNode<?> currentNode = startNode;
         while (currentNode != null && currentNode.getChildren().length > 0) {
+            
+            // XXX Special case: "Use Operation Contract" has only one
+            // *abstract* SET child, but two in the KeY proof tree. Have
+            // to consider this. Maybe somehow deactivate all non-SE branches...
+            
             if (currentNode.getChildren().length > 1) {
-                
+
                 // Note: Stack Map Frames are not generated manually here;
                 // we're trying to leave it to the ASM framework to generate
                 // them automatically. Computing the right values of these
@@ -192,7 +210,7 @@ public class MethodBodyCompiler implements Opcodes {
 
                 // TODO: Treat all branches
                 if (currentNode instanceof IExecutionLoopInvariant) {
-                    // compile((IExecutionLoopInvariant) currentNode);
+                    compile((IExecutionLoopInvariant) currentNode);
                 } else if (currentNode instanceof IExecutionBranchStatement) {
                     compile((IExecutionBranchStatement) currentNode);
                 } else {
@@ -204,28 +222,11 @@ public class MethodBodyCompiler implements Opcodes {
                 }
 
                 currentNode = null;
-                
+
             } else {
-                
+
                 currentStatement = currentNode.toString();
-
-                Node currentProofNode = currentNode.getProofNode();
-
-                do {
-                    RuleApp app = currentProofNode.getAppliedRuleApp();
-                    if (hasNonEmptyActiveStatement(currentProofNode)) {
-                        compile(app);
-                    }
-
-                    if (currentProofNode.childrenCount() > 0) {
-                        currentProofNode = currentProofNode.child(0);
-                    } else {
-                        currentProofNode = null;
-                    }
-                } while (currentProofNode != null
-                        && !SymbolicExecutionUtil.isSymbolicExecutionTreeNode(
-                                currentProofNode,
-                                currentProofNode.getAppliedRuleApp()));
+                compileSequentialBlock(currentNode.getProofNode());
 
                 // Stop after return; in KeY, there might be one more SE
                 // statement where the result variable is assigned the return
@@ -236,9 +237,62 @@ public class MethodBodyCompiler implements Opcodes {
                 } else {
                     currentNode = currentNode.getChildren()[0];
                 }
-                
+
             }
         }
+    }
+
+    /**
+     * Compiles all SE statements until the next node that's part of the
+     * abstract SET, where the last compiled node must have exactly one child.
+     * That is, compilation stops at a splitting rule and at the end of the
+     * proof tree.
+     *
+     * @param currentProofNode
+     *            The starting point for compilation of the block.
+     * @return The successor of the node that was processed at last.
+     */
+    private Node compileSequentialBlock(Node currentProofNode) {
+        if (getOpenChildrenCount(currentProofNode) > 1) {
+            return currentProofNode;
+        }
+
+        do {
+            RuleApp app = currentProofNode.getAppliedRuleApp();
+            if (hasNonEmptyActiveStatement(currentProofNode)) {
+                compile(app);
+            }
+
+            if (currentProofNode.childrenCount() > 0) {
+                currentProofNode = currentProofNode.child(0);
+            } else {
+                currentProofNode = null;
+            }
+        } while (currentProofNode != null
+                && currentProofNode.childrenCount() < 2
+                && !SymbolicExecutionUtil.isSymbolicExecutionTreeNode(
+                        currentProofNode,
+                        currentProofNode.getAppliedRuleApp()));
+
+        return currentProofNode;
+    }
+
+    /**
+     * Computes the number of open child branches of the given {@link Node}.
+     *
+     * @param node
+     *            The {@link Node} whose open child branches to count.
+     * @return The number of open child branches of the given {@link Node}.
+     */
+    private int getOpenChildrenCount(Node node) {
+        int result = 0;
+        for (int i = 0; i < node.childrenCount(); i++) {
+            if (!node.child(i).isClosed()) {
+                result++;
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -267,7 +321,7 @@ public class MethodBodyCompiler implements Opcodes {
             translationFactory
                     .getTranslationForTacletApp(app).compile(app);
         } else {
-            // TODO What other cases to support?
+            // TODO Are there other cases to support?
             System.err.println(
                     "[WARNING] Did not translate the following app: "
                             + ruleApp.rule().name() + ", statement: "
