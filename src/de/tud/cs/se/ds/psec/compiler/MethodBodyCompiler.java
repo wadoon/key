@@ -4,6 +4,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import de.tud.cs.se.ds.psec.compiler.taclet_translation.TacletTranslation;
 import de.tud.cs.se.ds.psec.compiler.taclet_translation.TacletTranslationFactory;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.SourceElement;
@@ -93,23 +94,51 @@ public class MethodBodyCompiler implements Opcodes {
      * @param branchStatement
      */
     private void compile(IExecutionBranchStatement branchStatement) {
-
         // Currently considering ifSplit, ifElseSplit.
         // We assume that the guard is a boolean location variable that can be
         // loaded on to of the stack to decide about the split.
-        // NOTE: We don't incorporate joining at the moment, so there will be
+        // NOTE: We don't incorporate merging at the moment, so there will be
         // duplicate parts of code after the compilation of a split.
+        // Furthermore, all if-split rules have two descendants, even if there
+        // is no explicit else part.
 
         Node branchNode = compileSequentialBlock(
                 branchStatement.getProofNode());
-        
-        System.out.println(branchNode.serialNr() + ": "
-                + branchNode.getAppliedRuleApp().rule().name());
 
-        System.err.println(
-                "[WARNING] Uncovered branching statement type: "
-                        + branchStatement.getElementType()
-                        + ", statement: " + currentStatement);
+        TacletApp app = (TacletApp) branchNode.getAppliedRuleApp();
+
+        String ruleName = branchNode.getAppliedRuleApp().rule().name()
+                .toString();
+
+        if (!ruleName.equals("ifSplit") && !ruleName.equals("ifElseSplit")) {
+            System.err.println(
+                    "[WARNING] Uncovered branching statement type: "
+                            + branchStatement.getElementType()
+                            + ", statement: " + currentStatement);
+        }
+
+        System.out.println(branchNode.serialNr() + ": "
+                + ruleName);
+
+        LocationVariable simpleBranchCondition = (LocationVariable) TacletTranslation
+                .getTacletAppInstValue(app, "#se");
+
+        mv.visitVarInsn(ILOAD, pvHelper.progVarNr(simpleBranchCondition));
+
+        Label l1 = new Label();
+        mv.visitJumpInsn(IFEQ, l1);
+
+        // then-part. Don't have to GOTO the block after the if since state
+        // merging is not yet incorporated.
+        // XXX Make sure that the code doesn't reach the ELSE part if no
+        // explicit return statement is there (void methods)
+
+        compile(branchStatement.getChildren()[0]);
+        
+        // else-part.
+        mv.visitLabel(l1);
+        compile(branchStatement.getChildren()[1]);
+        
         // TODO
     }
 
@@ -192,11 +221,11 @@ public class MethodBodyCompiler implements Opcodes {
 
         IExecutionNode<?> currentNode = startNode;
         while (currentNode != null && currentNode.getChildren().length > 0) {
-            
+
             // XXX Special case: "Use Operation Contract" has only one
             // *abstract* SET child, but two in the KeY proof tree. Have
             // to consider this. Maybe somehow deactivate all non-SE branches...
-            
+
             if (currentNode.getChildren().length > 1) {
 
                 // Note: Stack Map Frames are not generated manually here;
