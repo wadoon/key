@@ -1,7 +1,5 @@
 package de.tud.cs.se.ds.psec.compiler;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
 
 import org.objectweb.asm.Label;
@@ -201,8 +199,6 @@ public class MethodBodyCompiler implements Opcodes {
         //     for disambiguation.
         //@formatter:on
 
-        Deque<IExecutionNode<?>> executionStack = new ArrayDeque<IExecutionNode<?>>();
-
         IExecutionNode<?> currentNode = startNode;
         while (currentNode != null && currentNode.getChildren().length > 0) {
             if (currentNode.getChildren().length > 1) {
@@ -230,36 +226,27 @@ public class MethodBodyCompiler implements Opcodes {
 
                 currentNode = null;
             } else {
-                // Store for later
-                executionStack.push(currentNode);
+                currentStatement = currentNode.toString();
+
+                Node currentProofNode = currentNode.getProofNode();
+
+                do {
+                    RuleApp app = currentProofNode.getAppliedRuleApp();
+                    if (hasNonEmptyActiveStatement(currentProofNode)) {
+                        compile(app);
+                    }
+
+                    if (currentProofNode.childrenCount() > 0) {
+                        currentProofNode = currentProofNode.child(0);
+                    } else {
+                        currentProofNode = null;
+                    }
+                } while (currentProofNode != null
+                        && !SymbolicExecutionUtil.isSymbolicExecutionTreeNode(
+                                currentProofNode,
+                                currentProofNode.getAppliedRuleApp()));
+
                 currentNode = currentNode.getChildren()[0];
-            }
-        }
-
-        while ((currentNode = executionStack.pollFirst()) != null) {
-            currentStatement = currentNode.toString();
-
-            Deque<RuleApp> appStack = new ArrayDeque<RuleApp>();
-            Node currentProofNode = currentNode.getProofNode();
-
-            do {
-                RuleApp app = currentProofNode.getAppliedRuleApp();
-                if (hasNonEmptyActiveStatement(currentProofNode)) {
-                    appStack.push(app);
-                }
-
-                if (currentProofNode.childrenCount() > 0) {
-                    currentProofNode = currentProofNode.child(0);
-                } else {
-                    currentProofNode = null;
-                }
-            } while (currentProofNode != null
-                    && !SymbolicExecutionUtil.isSymbolicExecutionTreeNode(
-                            currentProofNode,
-                            currentProofNode.getAppliedRuleApp()));
-
-            while (!appStack.isEmpty()) {
-                compile(appStack.pop());
             }
         }
     }
@@ -289,89 +276,103 @@ public class MethodBodyCompiler implements Opcodes {
             TacletApp app = (TacletApp) ruleApp;
 
             if (tacletHasName(app, "assignment")) {
-                LocationVariable locVar = (LocationVariable) InformationExtraction
-                        .getTacletAppInstValue(
-                                app, "#loc");
-                Expression assgnExpr = (Expression) InformationExtraction
-                        .getTacletAppInstValue(
-                                app, "#se");
-
-                // assgnExpr should either be a LocationVariable, a literal or a
-                // field / object reference
-
-                if (locVar.getKeYJavaType().getJavaType().toString().equals("int")) {
-
-                    if (assgnExpr instanceof IntLiteral) {
-                        intConstInstruction((IntLiteral) assgnExpr);
-                    } else if (assgnExpr instanceof LocationVariable) {
-                        mv.visitVarInsn(ILOAD, progVarNr((LocationVariable) assgnExpr));
-                    } else {
-                        System.err.println(
-                                "[WARNING] Currently not supporting the type "
-                                        + assgnExpr.getClass()
-                                        + "in assignments, statement: "
-                                        + currentStatement);
-                    }
-                    
-                    mv.visitVarInsn(ISTORE, progVarNr(locVar));
-
-                } else {
-                    System.err.println(
-                            "[WARNING] Only integer types considered so far, given: "
-                                    + locVar.getKeYJavaType() + ", statement: "
-                                    + currentStatement);
-                }
+                compileAssignment(app);
+            } else if (tacletHasName(app, "assignmentSubtractionInt")) {
+                compileAssignmentSubtractionInt(app);
             } else {
                 // ...
                 // TODO
-            }
-
-            //@formatter:off
-//            if (tApp.taclet().name()
-//                    .equals(new Name("variableDeclarationAssign"))) {
-//                TypeRef typeRef = (TypeRef) InformationExtraction
-//                        .getTacletAppInstValue(tApp, "#t");
-//
-//                if (!typeRef.toString().equals("int")) {
-//                    // TODO: Other types
-//                    System.err.println(
-//                            "[WARNING] Only integer types considered so far, given: "
-//                                    + typeRef.toString() + ", statement: "
-//                                    + currentStatement);
-//                }
-//
-//                LocationVariable locVar = (LocationVariable) InformationExtraction
-//                        .getTacletAppInstValue(
-//                                tApp, "#v0");
-//
-//                if (InformationExtraction.getTacletAppInstValue(tApp,
-//                        "#vi") instanceof LocationVariable) {
-//                    // Assigning the value of a location variable
-//                    // TODO
-//                } else if (InformationExtraction.getTacletAppInstValue(tApp,
-//                        "#vi") instanceof IntLiteral) {
-//                    // Assigning the value of a constant
-//                    intConstInstruction(
-//                            (IntLiteral) InformationExtraction
-//                                    .getTacletAppInstValue(tApp, "#vi"));
-//                } else {
-//                    // TODO
-//                }
-//
-//                mv.visitVarInsn(ISTORE, getNrForProgramVar(locVar));
-//            } else {
-//                // TODO Support more taclets
+                //@formatter:off
 //                System.err.println(
 //                        "[WARNING] Did not translate the following taclet app: "
 //                                + app.rule().name() + ", statement: "
 //                                + currentStatement);
-//            }
-            //@formatter:on
+                //@formatter:on
+            }
         } else {
             // TODO What other cases to support?
             System.err.println(
-                    "[WARNING] Did not translate the following taclet app: "
+                    "[WARNING] Did not translate the following app: "
                             + ruleApp.rule().name() + ", statement: "
+                            + currentStatement);
+        }
+    }
+
+    /**
+     * Compiles an expression <code>#loc = #expr1 - #expr2</code>. Currently, only
+     * Integers are supported, and no Objects.
+     *
+     * @param app An "AssignmentSubtractionInt" rule application.
+     */
+    private void compileAssignmentSubtractionInt(TacletApp app) {
+        LocationVariable locVar = (LocationVariable) InformationExtraction
+                .getTacletAppInstValue(
+                        app, "#loc");
+        Expression assgnExpr1 = (Expression) InformationExtraction
+                .getTacletAppInstValue(
+                        app, "#seCharByteShortInt0");
+        Expression assgnExpr2 = (Expression) InformationExtraction
+                .getTacletAppInstValue(
+                        app, "#seCharByteShortInt1");
+
+        if (locVar.getKeYJavaType().getJavaType().toString().equals("int")) {
+
+            loadIntVarOrConst(assgnExpr1);
+            loadIntVarOrConst(assgnExpr2);
+            mv.visitInsn(ISUB);
+            mv.visitVarInsn(ISTORE, progVarNr(locVar));
+
+        } else {
+            System.err.println(
+                    "[WARNING] Only integer types considered so far, given: "
+                            + locVar.getKeYJavaType() + ", statement: "
+                            + currentStatement);
+        }
+    }
+
+    /**
+     * Compiles an expression <code>#loc = #expr</code>. Currently, only
+     * Integers are supported, and no Objects.
+     *
+     * @param app An "Assignment" rule application.
+     */
+    private void compileAssignment(TacletApp app) {
+        LocationVariable locVar = (LocationVariable) InformationExtraction
+                .getTacletAppInstValue(
+                        app, "#loc");
+        Expression assgnExpr = (Expression) InformationExtraction
+                .getTacletAppInstValue(
+                        app, "#se");
+
+        if (locVar.getKeYJavaType().getJavaType().toString().equals("int")) {
+
+            loadIntVarOrConst(assgnExpr);
+            mv.visitVarInsn(ISTORE, progVarNr(locVar));
+
+        } else {
+            System.err.println(
+                    "[WARNING] Only integer types considered so far, given: "
+                            + locVar.getKeYJavaType() + ", statement: "
+                            + currentStatement);
+        }
+    }
+
+    /**
+     * Loads the supplied IntLiteral or (Integer) LocationVariable onto the
+     * stack.
+     *
+     * @param expr
+     */
+    private void loadIntVarOrConst(Expression expr) {
+        if (expr instanceof IntLiteral) {
+            intConstInstruction((IntLiteral) expr);
+        } else if (expr instanceof LocationVariable) {
+            mv.visitVarInsn(ILOAD, progVarNr((LocationVariable) expr));
+        } else {
+            System.err.println(
+                    "[WARNING] Currently not supporting the type "
+                            + expr.getClass()
+                            + "in assignments, statement: "
                             + currentStatement);
         }
     }
