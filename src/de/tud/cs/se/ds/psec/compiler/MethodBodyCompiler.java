@@ -1,12 +1,10 @@
 package de.tud.cs.se.ds.psec.compiler;
 
-import java.util.HashMap;
-
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import de.tud.cs.se.ds.psec.util.InformationExtraction;
+import de.tud.cs.se.ds.psec.compiler.taclet_translation.TacletTranslationFactory;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -16,7 +14,6 @@ import de.uka.ilkd.key.java.expression.operator.GreaterThan;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.IGuard;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -25,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -35,9 +33,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class MethodBodyCompiler implements Opcodes {
     private MethodVisitor mv;
-    private HashMap<IProgramVariable, Integer> progVarOffsetMap = new HashMap<>();
     private String currentStatement;
-    private boolean isStatic = false;
+    private ProgVarHelper pvHelper;
+    private TacletTranslationFactory translationFactory;
 
     /**
      * TODO
@@ -49,8 +47,10 @@ public class MethodBodyCompiler implements Opcodes {
     public MethodBodyCompiler(MethodVisitor mv,
             Iterable<ParameterDeclaration> methodParameters, boolean isStatic) {
         this.mv = mv;
-        this.isStatic = isStatic;
-        methodParameters.forEach(p -> progVarNr(
+        this.pvHelper = new ProgVarHelper(isStatic);
+        this.translationFactory = new TacletTranslationFactory(mv, pvHelper);
+
+        methodParameters.forEach(p -> pvHelper.progVarNr(
                 p.getVariables().get(0).getProgramVariable()));
     }
 
@@ -85,28 +85,6 @@ public class MethodBodyCompiler implements Opcodes {
         }
         startNode = startNode.getChildren()[0];
         return startNode;
-    }
-
-    /**
-     * TODO
-     *
-     * @param progVar
-     * @return
-     */
-    private int progVarNr(IProgramVariable progVar) {
-        // XXX: Static methods don't have the "this" field as first variable!
-
-        if (progVarOffsetMap.containsKey(progVar)) {
-            return progVarOffsetMap.get(progVar);
-        } else {
-            // Offset 0 for "this" pointer, following ones for method
-            // parameters, then for local variables.
-            // XXX: Does this also work for variables with the same name
-            // declared in different scopes?
-            int offset = progVarOffsetMap.size() + (isStatic ? 0 : 1);
-            progVarOffsetMap.put(progVar, offset);
-            return offset;
-        }
     }
 
     /**
@@ -147,7 +125,7 @@ public class MethodBodyCompiler implements Opcodes {
 
             if (first instanceof LocationVariable
                     && second instanceof IntLiteral) {
-                mv.visitVarInsn(ILOAD, progVarNr(
+                mv.visitVarInsn(ILOAD, pvHelper.progVarNr(
                         (LocationVariable) first));
 
                 int cmpTo = Integer
@@ -202,6 +180,7 @@ public class MethodBodyCompiler implements Opcodes {
         IExecutionNode<?> currentNode = startNode;
         while (currentNode != null && currentNode.getChildren().length > 0) {
             if (currentNode.getChildren().length > 1) {
+                
                 // Note: Stack Map Frames are not generated manually here;
                 // we're trying to leave it to the ASM framework to generate
                 // them automatically. Computing the right values of these
@@ -225,7 +204,9 @@ public class MethodBodyCompiler implements Opcodes {
                 }
 
                 currentNode = null;
+                
             } else {
+                
                 currentStatement = currentNode.toString();
 
                 Node currentProofNode = currentNode.getProofNode();
@@ -246,7 +227,16 @@ public class MethodBodyCompiler implements Opcodes {
                                 currentProofNode,
                                 currentProofNode.getAppliedRuleApp()));
 
-                currentNode = currentNode.getChildren()[0];
+                // Stop after return; in KeY, there might be one more SE
+                // statement where the result variable is assigned the return
+                // value.
+                // XXX: Is that really sound???
+                if (currentNode instanceof IExecutionMethodReturn) {
+                    currentNode = null;
+                } else {
+                    currentNode = currentNode.getChildren()[0];
+                }
+                
             }
         }
     }
@@ -274,21 +264,8 @@ public class MethodBodyCompiler implements Opcodes {
     private void compile(RuleApp ruleApp) {
         if (ruleApp instanceof TacletApp) {
             TacletApp app = (TacletApp) ruleApp;
-
-            if (tacletHasName(app, "assignment")) {
-                compileAssignment(app);
-            } else if (tacletHasName(app, "assignmentSubtractionInt")) {
-                compileAssignmentSubtractionInt(app);
-            } else {
-                // ...
-                // TODO
-                //@formatter:off
-//                System.err.println(
-//                        "[WARNING] Did not translate the following taclet app: "
-//                                + app.rule().name() + ", statement: "
-//                                + currentStatement);
-                //@formatter:on
-            }
+            translationFactory
+                    .getTranslationForTacletApp(app).compile(app);
         } else {
             // TODO What other cases to support?
             System.err.println(
@@ -296,96 +273,6 @@ public class MethodBodyCompiler implements Opcodes {
                             + ruleApp.rule().name() + ", statement: "
                             + currentStatement);
         }
-    }
-
-    /**
-     * Compiles an expression <code>#loc = #expr1 - #expr2</code>. Currently, only
-     * Integers are supported, and no Objects.
-     *
-     * @param app An "AssignmentSubtractionInt" rule application.
-     */
-    private void compileAssignmentSubtractionInt(TacletApp app) {
-        LocationVariable locVar = (LocationVariable) InformationExtraction
-                .getTacletAppInstValue(
-                        app, "#loc");
-        Expression assgnExpr1 = (Expression) InformationExtraction
-                .getTacletAppInstValue(
-                        app, "#seCharByteShortInt0");
-        Expression assgnExpr2 = (Expression) InformationExtraction
-                .getTacletAppInstValue(
-                        app, "#seCharByteShortInt1");
-
-        if (locVar.getKeYJavaType().getJavaType().toString().equals("int")) {
-
-            loadIntVarOrConst(assgnExpr1);
-            loadIntVarOrConst(assgnExpr2);
-            mv.visitInsn(ISUB);
-            mv.visitVarInsn(ISTORE, progVarNr(locVar));
-
-        } else {
-            System.err.println(
-                    "[WARNING] Only integer types considered so far, given: "
-                            + locVar.getKeYJavaType() + ", statement: "
-                            + currentStatement);
-        }
-    }
-
-    /**
-     * Compiles an expression <code>#loc = #expr</code>. Currently, only
-     * Integers are supported, and no Objects.
-     *
-     * @param app An "Assignment" rule application.
-     */
-    private void compileAssignment(TacletApp app) {
-        LocationVariable locVar = (LocationVariable) InformationExtraction
-                .getTacletAppInstValue(
-                        app, "#loc");
-        Expression assgnExpr = (Expression) InformationExtraction
-                .getTacletAppInstValue(
-                        app, "#se");
-
-        if (locVar.getKeYJavaType().getJavaType().toString().equals("int")) {
-
-            loadIntVarOrConst(assgnExpr);
-            mv.visitVarInsn(ISTORE, progVarNr(locVar));
-
-        } else {
-            System.err.println(
-                    "[WARNING] Only integer types considered so far, given: "
-                            + locVar.getKeYJavaType() + ", statement: "
-                            + currentStatement);
-        }
-    }
-
-    /**
-     * Loads the supplied IntLiteral or (Integer) LocationVariable onto the
-     * stack.
-     *
-     * @param expr
-     */
-    private void loadIntVarOrConst(Expression expr) {
-        if (expr instanceof IntLiteral) {
-            intConstInstruction((IntLiteral) expr);
-        } else if (expr instanceof LocationVariable) {
-            mv.visitVarInsn(ILOAD, progVarNr((LocationVariable) expr));
-        } else {
-            System.err.println(
-                    "[WARNING] Currently not supporting the type "
-                            + expr.getClass()
-                            + "in assignments, statement: "
-                            + currentStatement);
-        }
-    }
-
-    /**
-     * TODO
-     *
-     * @param app
-     * @param name
-     * @return
-     */
-    private static boolean tacletHasName(TacletApp app, String name) {
-        return app.taclet().name().toString().equals(name);
     }
 
     /**

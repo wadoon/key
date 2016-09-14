@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * Utility methods for extracting information about type, method and field
@@ -243,18 +242,6 @@ public class InformationExtraction implements Opcodes {
                 .filter(t -> !((TypeDeclaration) t.getJavaType()).isLibraryClass())
                 .collect(Collectors.toList());
         // @formatter:on
-    }
-
-    /**
-     * TODO
-     *
-     * @param app
-     * @param sv
-     * @return
-     */
-    public static Object getTacletAppInstValue(TacletApp app, String sv) {
-        return app.instantiations()
-                .lookupValue(new de.uka.ilkd.key.logic.Name(sv));
     }
 
 }
