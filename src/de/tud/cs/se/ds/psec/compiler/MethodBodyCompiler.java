@@ -117,9 +117,6 @@ public class MethodBodyCompiler implements Opcodes {
                             + ", statement: " + currentStatement);
         }
 
-        System.out.println(branchNode.serialNr() + ": "
-                + ruleName);
-
         LocationVariable simpleBranchCondition = (LocationVariable) TacletTranslation
                 .getTacletAppInstValue(app, "#se");
 
@@ -138,8 +135,6 @@ public class MethodBodyCompiler implements Opcodes {
         // else-part.
         mv.visitLabel(l1);
         compile(branchStatement.getChildren()[1]);
-        
-        // TODO
     }
 
     /**

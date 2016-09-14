@@ -1,5 +1,6 @@
 package de.tud.cs.se.ds.psec.compiler.taclet_translation;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.objectweb.asm.MethodVisitor;
@@ -17,6 +18,27 @@ public class TacletTranslationFactory {
     private ProgVarHelper pvHelper;
     private HashMap<String, TacletTranslation> translations = new HashMap<>();
     private final DummyTranslation DUMMY_TRANSLATION;
+
+    /**
+     * List of taclets that are not meant to be translated, for instance because
+     * they have no correspondant in bytecode or because they are followed by
+     * decomposed simpler statements in the proof tree.<br>
+     * 
+     * <strong>NOTE:</strong> The entries in this list have to be alphabetically
+     * sorted, since we perform a binary search on them.
+     */
+    private final static String[] UNTRANSLATED_TACLETS = {
+            "compound_addition_2",
+            "compound_assignment_op_plus",
+            "compound_greater_than_comparison_1",
+            "compound_int_cast_expression",
+            "ifUnfold",
+            "postincrement_assignment",
+            "remove_parentheses_right",
+            "variableDeclaration",
+            "variableDeclarationAssign",
+            "widening_identity_cast_5",
+    };
 
     /**
      * TODO
@@ -67,10 +89,19 @@ public class TacletTranslationFactory {
         case "methodCallEmptyReturn":
             result = new MethodCallEmptyReturn(mv, pvHelper);
             break;
+        // Arithmetic operations
+        case "assignmentAdditionInt":
+            //XXX Implement translator
+            break;
+        case "greater_than_comparison_simple":
+            //XXX Implement translator
+            break;
         default:
-            System.out.println(
-                    "[INFO] Did not translate the following taclet app: "
-                            + app.rule().name());
+            if (!isUntranslatedTaclet(tacletName)) {
+                System.out.println(
+                        "[INFO] Did not translate the following taclet app: "
+                                + app.rule().name());
+            }
         }
 
         if (result != null) {
@@ -78,6 +109,19 @@ public class TacletTranslationFactory {
         }
 
         return result;
+    }
+
+    /**
+     * Returns true iff the given taclet name corresponds to a taclet that
+     * should not be translated into bytecode.
+     *
+     * @param tacletName
+     *            Name of the taclet to check.
+     * @return iff the given taclet name corresponds to a taclet that should not
+     *         be translated into bytecode.
+     */
+    private static boolean isUntranslatedTaclet(String tacletName) {
+        return Arrays.binarySearch(UNTRANSLATED_TACLETS, tacletName) > -1;
     }
 
     /**
@@ -103,6 +147,5 @@ public class TacletTranslationFactory {
         public void compile(TacletApp app) {
             // Dummy translation does not do anything
         }
-
     }
 }
