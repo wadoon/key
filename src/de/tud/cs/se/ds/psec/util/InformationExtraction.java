@@ -1,11 +1,10 @@
 package de.tud.cs.se.ds.psec.util;
 
-import static org.objectweb.asm.Opcodes.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
+import org.objectweb.asm.Opcodes;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * Utility methods for extracting information about type, method and field
@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
  *
  * @author Dominic Scheurer
  */
-public class InformationExtraction {
+public class InformationExtraction implements Opcodes {
 
     /**
      * TODO
@@ -243,6 +243,18 @@ public class InformationExtraction {
                 .filter(t -> !((TypeDeclaration) t.getJavaType()).isLibraryClass())
                 .collect(Collectors.toList());
         // @formatter:on
+    }
+
+    /**
+     * TODO
+     *
+     * @param app
+     * @param sv
+     * @return
+     */
+    public static Object getTacletAppInstValue(TacletApp app, String sv) {
+        return app.instantiations()
+                .lookupValue(new de.uka.ilkd.key.logic.Name(sv));
     }
 
 }
