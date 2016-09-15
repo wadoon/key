@@ -3,6 +3,8 @@ package de.tud.cs.se.ds.psec.compiler.taclet_translation;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
@@ -14,6 +16,8 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Dominic Scheurer
  */
 public class TacletTranslationFactory {
+    private static final Logger logger = LogManager.getFormatterLogger();
+
     private MethodVisitor mv;
     private ProgVarHelper pvHelper;
     private HashMap<String, TacletTranslation> translations = new HashMap<>();
@@ -66,6 +70,7 @@ public class TacletTranslationFactory {
      */
     public TacletTranslation getTranslationForTacletApp(TacletApp app) {
         String tacletName = app.taclet().name().toString();
+        logger.trace("Translating taclet %s", tacletName);
 
         if (translations.containsKey(tacletName)) {
             return translations.get(tacletName);
@@ -91,16 +96,17 @@ public class TacletTranslationFactory {
             break;
         // Arithmetic operations
         case "assignmentAdditionInt":
-            //XXX Implement translator
+            result = new AssignmentAdditionInt(mv, pvHelper);
             break;
         case "greater_than_comparison_simple":
-            //XXX Implement translator
+            result = new GreaterThanComparisonSimple(mv, pvHelper);
             break;
         default:
             if (!isUntranslatedTaclet(tacletName)) {
-                System.out.println(
-                        "[INFO] Did not translate the following taclet app: "
-                                + app.rule().name());
+                logger.error("Don't know a translation of the following taclet app: %s",
+                        app.rule().name());
+            } else {
+                logger.debug("Ignoring taclet %s", app.rule().name());
             }
         }
 
