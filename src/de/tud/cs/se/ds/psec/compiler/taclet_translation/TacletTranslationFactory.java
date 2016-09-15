@@ -101,6 +101,9 @@ public class TacletTranslationFactory {
         case "greater_than_comparison_simple":
             result = new GreaterThanComparisonSimple(mv, pvHelper);
             break;
+        case "preincrement_assignment":
+            result = new PreIncrementAssignment(mv, pvHelper);
+            break;
         default:
             if (!isUntranslatedTaclet(tacletName)) {
                 logger.error("Don't know a translation of the following taclet app: %s",
@@ -138,7 +141,7 @@ public class TacletTranslationFactory {
      *
      * @author Dominic Scheurer
      */
-    static class DummyTranslation extends TacletTranslation {
+    static class DummyTranslation extends NonTerminatingTranslation {
         /**
          * TODO
          * 
@@ -150,7 +153,7 @@ public class TacletTranslationFactory {
         }
 
         @Override
-        public void compile(TacletApp app) {
+        public void doCompile(TacletApp app) {
             // Dummy translation does not do anything
         }
     }

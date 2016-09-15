@@ -186,7 +186,8 @@ public class Compiler {
             }
             //@formatter:on
         }
-
+        
+        mv.visitMaxs(-1, -1);
         mv.visitEnd();
     }
 

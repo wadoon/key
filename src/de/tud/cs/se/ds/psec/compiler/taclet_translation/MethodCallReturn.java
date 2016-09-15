@@ -11,7 +11,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class MethodCallReturn extends TacletTranslation {
+class MethodCallReturn extends TerminatingTranslation {
     /**
      * TODO
      * 
@@ -23,7 +23,7 @@ class MethodCallReturn extends TacletTranslation {
     }
 
     @Override
-    public void compile(TacletApp app) {
+    public void doCompile(TacletApp app) {
         Expression returnExpr = (Expression) getTacletAppInstValue(
                 app, "#se");
 

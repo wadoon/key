@@ -6,12 +6,13 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /**
  * Helper class to establish a mapping between program variables and their
- * indices.
+ * indices. We use the <b>names</b> of the program variables since KeY will
+ * do the disambiguation for us.
  *
  * @author Dominic Scheurer
  */
 public class ProgVarHelper {
-    private HashMap<IProgramVariable, Integer> progVarOffsetMap = new HashMap<>();
+    private HashMap<String, Integer> progVarOffsetMap = new HashMap<>();
     private boolean isStatic;
 
     /**
@@ -30,16 +31,15 @@ public class ProgVarHelper {
      * @return
      */
     public int progVarNr(IProgramVariable progVar) {
-
-        if (progVarOffsetMap.containsKey(progVar)) {
-            return progVarOffsetMap.get(progVar);
+        String progVarName = progVar.toString();
+        
+        if (progVarOffsetMap.containsKey(progVarName)) {
+            return progVarOffsetMap.get(progVarName);
         } else {
             // Offset 0 for "this" pointer, following ones for method
             // parameters, then for local variables.
-            // XXX: Does this also work for variables with the same name
-            // declared in different scopes?
             int offset = progVarOffsetMap.size() + (isStatic ? 0 : 1);
-            progVarOffsetMap.put(progVar, offset);
+            progVarOffsetMap.put(progVarName, offset);
 
             return offset;
         }

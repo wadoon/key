@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class GreaterThanComparisonSimple extends TacletTranslation {
+class GreaterThanComparisonSimple extends NonTerminatingTranslation {
     
     /**
      * TODO
@@ -26,9 +26,9 @@ class GreaterThanComparisonSimple extends TacletTranslation {
     }
 
     @Override
-    public void compile(TacletApp app) {
+    public void doCompile(TacletApp app) {
         LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
-                app, "#loc");
+                app, "#lhs");
         Expression expr1 = (Expression) getTacletAppInstValue(
                 app, "#se0");
         Expression expr2 = (Expression) getTacletAppInstValue(

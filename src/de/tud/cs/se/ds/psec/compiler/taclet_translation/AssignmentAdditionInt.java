@@ -12,7 +12,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class AssignmentAdditionInt extends TacletTranslation {
+class AssignmentAdditionInt extends NonTerminatingTranslation {
     
     /**
      * TODO
@@ -25,7 +25,7 @@ class AssignmentAdditionInt extends TacletTranslation {
     }
 
     @Override
-    public void compile(TacletApp app) {
+    public void doCompile(TacletApp app) {
         LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
                 app, "#loc");
         Expression assgnExpr1 = (Expression) getTacletAppInstValue(

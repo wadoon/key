@@ -1,10 +1,13 @@
 package de.tud.cs.se.ds.psec.compiler.taclet_translation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -16,16 +19,21 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Dominic Scheurer
  */
 public abstract class TacletTranslation implements Opcodes {
+    private static final Logger logger = LogManager.getFormatterLogger();
+    
     private MethodVisitor mv;
     private ProgVarHelper pvHelper;
 
     /**
-     * TODO
+     * Translates the given {@link TacletApp} to bytecode.
      *
      * @param app
+     *            The {@link TacletApp} to translate.
+     * @return <code>true</code> iff the {@link TacletApp} should terminate the
+     *         translation, i.e. it is some kind of return statement.
      */
-    public abstract void compile(TacletApp app);
-    
+    public abstract boolean compile(TacletApp app);
+
     /**
      * TODO
      * 
@@ -72,6 +80,15 @@ public abstract class TacletTranslation implements Opcodes {
                             + expr.getClass()
                             + " in assignments, returns etc.");
         }
+    }
+    
+    /**
+     * TODO
+     *
+     * @param typeGiven
+     */
+    protected void onlyIntegerTypesError(KeYJavaType typeGiven) {
+        logger.error("Only integer types considered so far, given: %s", typeGiven);
     }
 
     /**
@@ -120,5 +137,5 @@ public abstract class TacletTranslation implements Opcodes {
         return app.instantiations()
                 .lookupValue(new de.uka.ilkd.key.logic.Name(sv));
     }
-    
+
 }

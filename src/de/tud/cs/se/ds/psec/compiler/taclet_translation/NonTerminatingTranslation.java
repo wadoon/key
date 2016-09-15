@@ -10,20 +10,25 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class MethodCallEmptyReturn extends TerminatingTranslation {
+public abstract class NonTerminatingTranslation extends TacletTranslation {
+
     /**
      * TODO
      * 
      * @param mv
      * @param pvHelper
      */
-    public MethodCallEmptyReturn(MethodVisitor mv, ProgVarHelper pvHelper) {
+    public NonTerminatingTranslation(MethodVisitor mv, ProgVarHelper pvHelper) {
         super(mv, pvHelper);
     }
 
+    protected abstract void doCompile(TacletApp app);
+    
     @Override
-    public void doCompile(TacletApp app) {
-        mv().visitInsn(RETURN);
+    public boolean compile(TacletApp app) {
+        doCompile(app);
+        
+        return false;
     }
-
+    
 }

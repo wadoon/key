@@ -105,6 +105,8 @@ public class MethodBodyCompiler implements Opcodes {
         // duplicate parts of code after the compilation of a split.
         // Furthermore, all if-split rules have two descendants, even if there
         // is no explicit else part.
+        
+        logger.trace("Compiling %s", branchStatement);
 
         Node branchNode = compileSequentialBlock(
                 branchStatement.getProofNode());
@@ -146,6 +148,10 @@ public class MethodBodyCompiler implements Opcodes {
      * @param loopInvNode
      */
     private void compile(IExecutionLoopInvariant loopInvNode) {
+        logger.trace("Compiling %s", loopInvNode);
+        
+        // XXX Not yet working!!!
+        
         IGuard guard = loopInvNode.getLoopStatement().getGuard();
 
         // Jump-back label
@@ -206,18 +212,8 @@ public class MethodBodyCompiler implements Opcodes {
      * @param startNode
      */
     private void compile(IExecutionNode<?> startNode) {
-        //@formatter:off
-        //TODO Note to self: Use a different approach. Start with an IExecutionNode, but
-        //     compile using the intermediate steps by translating the taclet apps for
-        //     nodes with node.getNodeInfo().getActiveStatement() until the next IExecutionNode.
-        //     Use SymbolicExecutionUtil#isSymbolicExecutionTreeNode(...) for checking whether
-        //     we arrived at the next node already.
-        //     Have to take care of program variables introduced by KeY; however, we can treat
-        //     local variables as equivalent if their names are equal, since KeY does the renaming
-        //     for disambiguation.
-        //@formatter:on
-
         IExecutionNode<?> currentNode = startNode;
+        
         while (currentNode != null && currentNode.getChildren().length > 0) {
 
             // XXX Special case: "Use Operation Contract" has only one
@@ -286,7 +282,10 @@ public class MethodBodyCompiler implements Opcodes {
         do {
             RuleApp app = currentProofNode.getAppliedRuleApp();
             if (hasNonEmptyActiveStatement(currentProofNode)) {
-                compile(app);
+                if (compile(app)) {
+                    // Stop after terminating sequent
+                    break;
+                }
             }
 
             if (currentProofNode.childrenCount() > 0) {
@@ -341,16 +340,17 @@ public class MethodBodyCompiler implements Opcodes {
      *
      * @param ruleApp
      */
-    private void compile(RuleApp ruleApp) {
+    private boolean compile(RuleApp ruleApp) {
         if (ruleApp instanceof TacletApp) {
             TacletApp app = (TacletApp) ruleApp;
-            translationFactory
+            return translationFactory
                     .getTranslationForTacletApp(app).compile(app);
         } else {
             // TODO Are there other cases to support?
             logger.error(
                     "Did not translate the following app: %s, statement: %s",
                     ruleApp.rule().name(), currentStatement);
+            return false;
         }
     }
 

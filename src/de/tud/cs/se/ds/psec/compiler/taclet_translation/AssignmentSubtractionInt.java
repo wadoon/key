@@ -12,7 +12,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class AssignmentSubtractionInt extends TacletTranslation {
+class AssignmentSubtractionInt extends NonTerminatingTranslation {
     /**
      * TODO
      * 
@@ -24,7 +24,7 @@ class AssignmentSubtractionInt extends TacletTranslation {
     }
 
     @Override
-    public void compile(TacletApp app) {
+    public void doCompile(TacletApp app) {
         LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
                 app, "#loc");
         Expression assgnExpr1 = (Expression) getTacletAppInstValue(
@@ -32,18 +32,10 @@ class AssignmentSubtractionInt extends TacletTranslation {
         Expression assgnExpr2 = (Expression) getTacletAppInstValue(
                 app, "#seCharByteShortInt1");
 
-        if (locVar.getKeYJavaType().getJavaType().toString().equals("int")) {
-
-            loadIntVarOrConst(assgnExpr1);
-            loadIntVarOrConst(assgnExpr2);
-            mv().visitInsn(ISUB);
-            mv().visitVarInsn(ISTORE, pvHelper().progVarNr(locVar));
-
-        } else {
-            System.err.println(
-                    "[WARNING] Only integer types considered so far, given: "
-                            + locVar.getKeYJavaType());
-        }
+        loadIntVarOrConst(assgnExpr1);
+        loadIntVarOrConst(assgnExpr2);
+        mv().visitInsn(ISUB);
+        mv().visitVarInsn(ISTORE, pvHelper().progVarNr(locVar));
     }
 
 }

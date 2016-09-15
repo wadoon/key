@@ -12,7 +12,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class Assignment extends TacletTranslation {
+class Assignment extends NonTerminatingTranslation {
     
     /**
      * TODO
@@ -25,7 +25,7 @@ class Assignment extends TacletTranslation {
     }
 
     @Override
-    public void compile(TacletApp app) {
+    public void doCompile(TacletApp app) {
         LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
                 app, "#loc");
         Expression assgnExpr = (Expression) getTacletAppInstValue(
@@ -37,9 +37,7 @@ class Assignment extends TacletTranslation {
             mv().visitVarInsn(ISTORE, pvHelper().progVarNr(locVar));
 
         } else {
-            System.err.println(
-                    "[WARNING] Only integer types considered so far, given: "
-                            + locVar.getKeYJavaType());
+            onlyIntegerTypesError(locVar.getKeYJavaType());
         }
     }
 
