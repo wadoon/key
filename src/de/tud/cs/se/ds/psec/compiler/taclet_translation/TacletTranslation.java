@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public abstract class TacletTranslation implements Opcodes {
     private static final Logger logger = LogManager.getFormatterLogger();
-    
+
     private MethodVisitor mv;
     private ProgVarHelper pvHelper;
 
@@ -69,26 +69,37 @@ public abstract class TacletTranslation implements Opcodes {
      *
      * @param expr
      */
-    protected void loadIntVarOrConst(Expression expr) {
+    protected void loadIntVarOrConst(Expression expr, boolean negative) {
         if (expr instanceof IntLiteral) {
-            intConstInstruction((IntLiteral) expr);
+            intConstInstruction((negative ? -1 : 1)
+                    * Integer.parseInt(((IntLiteral) expr).toString()));
         } else if (expr instanceof LocationVariable) {
             mv.visitVarInsn(ILOAD, pvHelper.progVarNr((LocationVariable) expr));
         } else {
-            System.err.println(
-                    "[WARNING] Currently not supporting the type "
-                            + expr.getClass()
-                            + " in assignments, returns etc.");
+            logger.error(
+                    "Currently not supporting the type %s in assignments, returns etc.",
+                    expr.getClass());
         }
     }
-    
+
+    /**
+     * Loads the supplied IntLiteral or (Integer) LocationVariable onto the
+     * stack.
+     *
+     * @param expr
+     */
+    protected void loadIntVarOrConst(Expression expr) {
+        loadIntVarOrConst(expr, false);
+    }
+
     /**
      * TODO
      *
      * @param typeGiven
      */
     protected void onlyIntegerTypesError(KeYJavaType typeGiven) {
-        logger.error("Only integer types considered so far, given: %s", typeGiven);
+        logger.error("Only integer types considered so far, given: %s",
+                typeGiven);
     }
 
     /**
@@ -96,18 +107,16 @@ public abstract class TacletTranslation implements Opcodes {
      *
      * @param lit
      */
-    private void intConstInstruction(IntLiteral lit) {
-        int theInt = Integer.parseInt(lit.toString());
-
+    private void intConstInstruction(int theInt) {
         if (theInt < -1 || theInt > 5) {
             if (theInt >= Byte.MIN_VALUE && theInt <= Byte.MAX_VALUE) {
                 mv.visitIntInsn(BIPUSH, theInt);
             } else if (theInt >= Short.MIN_VALUE && theInt <= Short.MAX_VALUE) {
                 mv.visitIntInsn(SIPUSH, theInt);
             } else {
-                System.err.println(
-                        "[WARNING] Constants in full Integer range not yet covered, given: "
-                                + theInt);
+                logger.error(
+                        "Constants in full Integer range not yet covered, given: %s",
+                        theInt);
             }
         } else if (theInt == -1) {
             mv.visitInsn(ICONST_M1);

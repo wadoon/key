@@ -38,6 +38,7 @@ public class TacletTranslationFactory {
             "compound_int_cast_expression",
             "ifUnfold",
             "postincrement_assignment",
+            "preincrement_assignment",
             "remove_parentheses_right",
             "variableDeclaration",
             "variableDeclarationAssign",
@@ -101,8 +102,8 @@ public class TacletTranslationFactory {
         case "greater_than_comparison_simple":
             result = new GreaterThanComparisonSimple(mv, pvHelper);
             break;
-        case "preincrement_assignment":
-            result = new PreIncrementAssignment(mv, pvHelper);
+        case "unaryMinusInt":
+            result = new UnaryMinusInt(mv, pvHelper);
             break;
         default:
             if (!isUntranslatedTaclet(tacletName)) {
