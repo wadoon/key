@@ -1,5 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -33,6 +35,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Dominic Scheurer
  */
 public class MethodBodyCompiler implements Opcodes {
+    private static final Logger logger = LogManager.getFormatterLogger();
+
     private MethodVisitor mv;
     private String currentStatement;
     private ProgVarHelper pvHelper;
@@ -111,10 +115,9 @@ public class MethodBodyCompiler implements Opcodes {
                 .toString();
 
         if (!ruleName.equals("ifSplit") && !ruleName.equals("ifElseSplit")) {
-            System.err.println(
-                    "[WARNING] Uncovered branching statement type: "
-                            + branchStatement.getElementType()
-                            + ", statement: " + currentStatement);
+            logger.error(
+                    "Uncovered branching statement type: %s, statement: %s",
+                    branchStatement.getElementType(), currentStatement);
         }
 
         LocationVariable simpleBranchCondition = (LocationVariable) TacletTranslation
@@ -131,7 +134,7 @@ public class MethodBodyCompiler implements Opcodes {
         // explicit return statement is there (void methods)
 
         compile(branchStatement.getChildren()[0]);
-        
+
         // else-part.
         mv.visitLabel(l1);
         compile(branchStatement.getChildren()[1]);
@@ -174,16 +177,16 @@ public class MethodBodyCompiler implements Opcodes {
                     mv.visitInsn(IFLE);
                 }
             } else {
-                System.err.println(
-                        "[WARNING] Uncovered loop guard expression: "
-                                + guard
-                                + ", only considering pairs of loc vars "
-                                + "and int literals currently");
+                logger.error(
+                        "Uncovered loop guard expression: %s, only "
+                                + "considering pairs of loc vars and int "
+                                + "literals currently",
+                        guard);
             }
         } else {
-            System.err.println(
-                    "[WARNING] Uncovered loop guard expression: "
-                            + guard);
+            logger.error(
+                    "Uncovered loop guard expression: %s",
+                    guard);
         }
 
         // Loop body
@@ -239,10 +242,9 @@ public class MethodBodyCompiler implements Opcodes {
                     compile((IExecutionBranchStatement) currentNode);
                 } else {
                     // TODO Is there more to support?
-                    System.err.println(
-                            "[ERROR] Unexpected branching statement type: "
-                                    + currentNode.getElementType()
-                                    + ", statement: " + currentStatement);
+                    logger.error(
+                            "Unexpected branching statement type: %s, statement: %s",
+                            currentNode.getElementType(), currentStatement);
                 }
 
                 currentNode = null;
@@ -346,10 +348,9 @@ public class MethodBodyCompiler implements Opcodes {
                     .getTranslationForTacletApp(app).compile(app);
         } else {
             // TODO Are there other cases to support?
-            System.err.println(
-                    "[WARNING] Did not translate the following app: "
-                            + ruleApp.rule().name() + ", statement: "
-                            + currentStatement);
+            logger.error(
+                    "Did not translate the following app: %s, statement: %s",
+                    ruleApp.rule().name(), currentStatement);
         }
     }
 
@@ -367,9 +368,9 @@ public class MethodBodyCompiler implements Opcodes {
             } else if (theInt >= Short.MIN_VALUE && theInt <= Short.MAX_VALUE) {
                 mv.visitIntInsn(SIPUSH, theInt);
             } else {
-                System.err.println(
-                        "[WARNING] Constants in full Integer range not yet covered, given: "
-                                + theInt);
+                logger.warn(
+                        "Constants in full Integer range not yet covered, given: %s, statement: %s",
+                        theInt, currentStatement);
             }
         } else if (theInt == -1) {
             mv.visitInsn(ICONST_M1);

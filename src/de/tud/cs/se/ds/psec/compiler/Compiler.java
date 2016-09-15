@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableArray;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
@@ -33,6 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  */
 public class Compiler {
     private static final int CLASS_VERSION = 52;
+    private static final Logger logger = LogManager.getFormatterLogger();
 
     private KeYEnvironment<DefaultUserInterfaceControl> environment;
     private File javaFile;
@@ -44,15 +47,20 @@ public class Compiler {
      * @throws ProblemLoaderException
      */
     public Compiler(File javaFile) throws ProblemLoaderException {
+        logger.info("Compiling Java file %s", javaFile);
+
         this.javaFile = javaFile;
 
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Ensure that Taclets are parsed
+            logger.trace("Loading taclets...");
             KeYEnvironment<?> env = KeYEnvironment.load(javaFile, null, null,
                     null);
             env.dispose();
+            logger.trace("Taclets loaded.");
         }
 
+        logger.trace("Building KeY environment for file %s", javaFile);
         // @formatter:off
         environment = KeYEnvironment.load(
                 SymbolicExecutionJavaProfile.getDefaultInstance(),
@@ -62,6 +70,7 @@ public class Compiler {
                 null,     // includes
                 true);    // forceNewProfileOfNewProofs
         // @formatter:on
+        logger.trace("Built up environment.");
     }
 
     /**
@@ -88,6 +97,8 @@ public class Compiler {
      * @return
      */
     private JavaTypeCompilationResult compile(Type typeDecl) {
+        logger.debug("Compiling type %s", typeDecl.getFullName());
+
         if (typeDecl instanceof ClassDeclaration
                 || typeDecl instanceof InterfaceDeclaration) {
             return compile((TypeDeclaration) typeDecl);
@@ -140,6 +151,10 @@ public class Compiler {
      * @param mDecl
      */
     private void compile(ClassWriter cw, ProgramMethod mDecl) {
+        logger.debug("Compiling method %s::%s",
+                mDecl.getContainerType().getJavaType().getFullName(),
+                mDecl.getName());
+
         MethodVisitor mv = cw.visitMethod(
                 InformationExtraction.createOpcode(mDecl), mDecl.getName(),
                 InformationExtraction.getMethodTypeDescriptor(mDecl), null,
@@ -148,19 +163,20 @@ public class Compiler {
         if (!mDecl.isAbstract()) {
             mv.visitCode();
 
-            //@formatter:off
-            new MethodBodyCompiler(mv, mDecl.getParameters(), mDecl.isStatic()).compile(
-                    new SymbolicExecutionInterface(
-                            environment, javaFile)
-                    .execute(mDecl));
-            //@formatter:on
-
-            // TODO: Remove following test code if no longer needed
-            //@formatter:off
+            logger.trace("Running symbolic execution on method %s::%s",
+                    mDecl.getContainerType().getJavaType().getFullName(),
+                    mDecl.getName());
             SymbolicExecutionTreeBuilder builder = new SymbolicExecutionInterface(
                     environment, javaFile).execute(mDecl);
-//            System.out.println(mDecl.getName() + ": "
-//                    + builder.getProof().openGoals().size());
+
+            logger.trace("Translating SET of method %s::%s to bytecode",
+                    mDecl.getContainerType().getJavaType().getFullName(),
+                    mDecl.getName());
+            new MethodBodyCompiler(mv, mDecl.getParameters(), mDecl.isStatic())
+                    .compile(builder);
+
+            //TODO Remove test code after no longer needed
+            //@formatter:off
             try {
                 builder.getProof().saveToFile(
                         new File(mDecl.getContainerType().getFullName()
@@ -181,6 +197,8 @@ public class Compiler {
      * @param f
      */
     private void compile(ClassWriter cw, FieldDeclaration f) {
+        logger.trace("Compiling field declaration %s", f);
+
         String fieldName = f.getFieldSpecifications().last().getProgramName();
         fieldName = fieldName.substring(fieldName.lastIndexOf(':') + 1);
 
