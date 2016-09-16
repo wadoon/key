@@ -1,31 +1,23 @@
 package de.tud.cs.se.ds.psec.compiler;
 
+import java.util.Optional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletTranslationFactory;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.operator.GreaterThan;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.IGuard;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -41,6 +33,7 @@ public class MethodBodyCompiler implements Opcodes {
     private String currentStatement;
     private ProgVarHelper pvHelper;
     private TacletTranslationFactory translationFactory;
+    private TacletASTNode astRoot;
 
     /**
      * TODO
@@ -71,8 +64,9 @@ public class MethodBodyCompiler implements Opcodes {
     public void compile(SymbolicExecutionTreeBuilder builder) {
         // Forward until after call of this method
         IExecutionNode<?> startNode = ffUntilAfterFirstMethodCall(builder);
-
-        compile(startNode);
+        findASTRoot(startNode);
+        
+        compile(startNode, astRoot);
     }
 
     /**
@@ -95,115 +89,22 @@ public class MethodBodyCompiler implements Opcodes {
     /**
      * TODO
      *
-     * @param branchStatement
+     * @param rootOfSET
      */
-    private void compile(IExecutionBranchStatement branchStatement) {
-        // Currently considering ifSplit, ifElseSplit.
-        // We assume that the guard is a boolean location variable that can be
-        // loaded on to of the stack to decide about the split.
-        // NOTE: We don't incorporate merging at the moment, so there will be
-        // duplicate parts of code after the compilation of a split.
-        // Furthermore, all if-split rules have two descendants, even if there
-        // is no explicit else part.
-        
-        logger.trace("Compiling %s", branchStatement);
-
-        Node branchNode = compileSequentialBlock(
-                branchStatement.getProofNode());
-
-        TacletApp app = (TacletApp) branchNode.getAppliedRuleApp();
-
-        String ruleName = branchNode.getAppliedRuleApp().rule().name()
-                .toString();
-
-        if (!ruleName.equals("ifSplit") && !ruleName.equals("ifElseSplit")) {
-            logger.error(
-                    "Uncovered branching statement type: %s, statement: %s",
-                    branchStatement.getElementType(), currentStatement);
+    private void findASTRoot(IExecutionNode<?> rootOfSET) {
+        // TODO Unchecked conversion to TacletApp... Problematic if there is a
+        // RuleApp like LoopInvariant first. In this case, also have to support
+        // more general translations for that case...
+        Node currentProofNode = rootOfSET.getProofNode();
+        while (!translationFactory.getTranslationForTacletApp(
+                (TacletApp) currentProofNode.getAppliedRuleApp()).isPresent()) {
+            // TODO Assume that there is a child, and exactly one. Insert more
+            // checks.
+            currentProofNode = currentProofNode.child(0);
         }
 
-        LocationVariable simpleBranchCondition = (LocationVariable) TacletASTNode
-                .getTacletAppInstValue("#se");
-
-        mv.visitVarInsn(ILOAD, pvHelper.progVarNr(simpleBranchCondition));
-
-        Label l1 = new Label();
-        mv.visitJumpInsn(IFEQ, l1);
-
-        // then-part. Don't have to GOTO the block after the if since state
-        // merging is not yet incorporated.
-        // XXX Make sure that the code doesn't reach the ELSE part if no
-        // explicit return statement is there (void methods)
-
-        compile(branchStatement.getChildren()[0]);
-
-        // else-part.
-        mv.visitLabel(l1);
-        compile(branchStatement.getChildren()[1]);
-    }
-
-    /**
-     * TODO
-     *
-     * @param loopInvNode
-     */
-    private void compile(IExecutionLoopInvariant loopInvNode) {
-        logger.trace("Compiling %s", loopInvNode);
-        
-        // XXX Not yet working!!!
-        
-        IGuard guard = loopInvNode.getLoopStatement().getGuard();
-
-        // Jump-back label
-        Label l0 = new Label();
-        mv.visitLabel(l0);
-
-        // Loop guard
-        Label l1 = new Label();
-
-        if (guard instanceof Guard && ((Guard) guard)
-                .getExpression() instanceof GreaterThan) {
-            GreaterThan gt = (GreaterThan) ((Guard) guard)
-                    .getExpression();
-
-            Expression first = gt.getArguments().get(0);
-            Expression second = gt.getArguments().get(1);
-
-            if (first instanceof LocationVariable
-                    && second instanceof IntLiteral) {
-                mv.visitVarInsn(ILOAD, pvHelper.progVarNr(
-                        (LocationVariable) first));
-
-                int cmpTo = Integer
-                        .parseInt(((IntLiteral) second).getValue());
-                if (cmpTo != 0) {
-                    intConstInstruction((IntLiteral) second);
-                    mv.visitInsn(IF_ICMPLE);
-                } else {
-                    mv.visitInsn(IFLE);
-                }
-            } else {
-                logger.error(
-                        "Uncovered loop guard expression: %s, only "
-                                + "considering pairs of loc vars and int "
-                                + "literals currently",
-                        guard);
-            }
-        } else {
-            logger.error(
-                    "Uncovered loop guard expression: %s",
-                    guard);
-        }
-
-        // Loop body
-        compile(loopInvNode.getChildren()[0]);
-
-        // End while
-        mv.visitJumpInsn(GOTO, l0);
-        mv.visitLabel(l1);
-
-        // Code after the loop
-        compile(loopInvNode.getChildren()[1]);
+        astRoot = translationFactory.getTranslationForTacletApp(
+                (TacletApp) currentProofNode.getAppliedRuleApp()).get();
     }
 
     /**
@@ -211,14 +112,19 @@ public class MethodBodyCompiler implements Opcodes {
      *
      * @param startNode
      */
-    private void compile(IExecutionNode<?> startNode) {
+    private void compile(IExecutionNode<?> startNode, TacletASTNode astStartNode) {
         IExecutionNode<?> currentNode = startNode;
-        
+
         while (currentNode != null && currentNode.getChildren().length > 0) {
 
             // XXX Special case: "Use Operation Contract" has only one
             // *abstract* SET child, but two in the KeY proof tree. Have
             // to consider this. Maybe somehow deactivate all non-SE branches...
+            
+            TacletASTNode currentASTNode = 
+                    compileSequentialBlock(currentNode.getProofNode(), astStartNode);
+
+            currentStatement = currentNode.toString();
 
             if (currentNode.getChildren().length > 1) {
 
@@ -228,37 +134,12 @@ public class MethodBodyCompiler implements Opcodes {
                 // frames is very difficult...
                 // http://chrononsystems.com/blog/java-7-design-flaw-leads-to-huge-backward-step-for-the-jvm
                 // http://asm.ow2.org/doc/developer-guide.html#classwriter
-
-                currentStatement = currentNode.toString();
-
-                // TODO: Treat all branches
-                if (currentNode instanceof IExecutionLoopInvariant) {
-                    compile((IExecutionLoopInvariant) currentNode);
-                } else if (currentNode instanceof IExecutionBranchStatement) {
-                    compile((IExecutionBranchStatement) currentNode);
-                } else {
-                    // TODO Is there more to support?
-                    logger.error(
-                            "Unexpected branching statement type: %s, statement: %s",
-                            currentNode.getElementType(), currentStatement);
+                
+                for (IExecutionNode<?> child : currentNode.getChildren()) {
+                    compile(child, currentASTNode);
                 }
 
                 currentNode = null;
-
-            } else {
-
-                currentStatement = currentNode.toString();
-                compileSequentialBlock(currentNode.getProofNode());
-
-                // Stop after return; in KeY, there might be one more SE
-                // statement where the result variable is assigned the return
-                // value.
-                // XXX: Is that really sound???
-                if (currentNode instanceof IExecutionMethodReturn) {
-                    currentNode = null;
-                } else {
-                    currentNode = currentNode.getChildren()[0];
-                }
 
             }
         }
@@ -274,22 +155,27 @@ public class MethodBodyCompiler implements Opcodes {
      *            The starting point for compilation of the block.
      * @return The successor of the node that was processed at last.
      */
-    private Node compileSequentialBlock(Node currentProofNode) {
+    private TacletASTNode compileSequentialBlock(Node currentProofNode, TacletASTNode astStartNode) {
         if (getOpenChildrenCount(currentProofNode) > 1) {
-            return currentProofNode;
+            return astStartNode;
         }
+        
+        TacletASTNode astCurrentNode = astStartNode;
 
         do {
             RuleApp app = currentProofNode.getAppliedRuleApp();
+            Optional<TacletASTNode> newNode = Optional.empty();
             if (hasNonEmptyActiveStatement(currentProofNode)) {
-                if (compile(app)) {
-                    // Stop after terminating sequent
-                    break;
-                }
+                newNode = toASTNode(app);
             }
 
             if (currentProofNode.childrenCount() > 0) {
                 currentProofNode = currentProofNode.child(0);
+                
+                if (newNode.isPresent()) {
+                    astCurrentNode.addChild(newNode.get());
+                    astCurrentNode = newNode.get();
+                }
             } else {
                 currentProofNode = null;
             }
@@ -299,8 +185,143 @@ public class MethodBodyCompiler implements Opcodes {
                         currentProofNode,
                         currentProofNode.getAppliedRuleApp()));
 
-        return currentProofNode;
+        return astCurrentNode;
     }
+
+    /**
+     * TODO
+     *
+     * @param ruleApp
+     */
+    private Optional<TacletASTNode> toASTNode(RuleApp ruleApp) {
+        if (ruleApp instanceof TacletApp) {
+            TacletApp app = (TacletApp) ruleApp;
+            return translationFactory
+                    .getTranslationForTacletApp(app);
+        } else {
+            // TODO Are there other cases to support?
+            logger.error(
+                    "Did not translate the following app: %s, statement: %s",
+                    ruleApp.rule().name(), currentStatement);
+            return Optional.empty();
+        }
+    }
+
+    //@formatter:off
+//    /**
+//     * TODO
+//     *
+//     * @param branchStatement
+//     */
+//    private void compile(IExecutionBranchStatement branchStatement) {
+//        // Currently considering ifSplit, ifElseSplit.
+//        // We assume that the guard is a boolean location variable that can be
+//        // loaded on to of the stack to decide about the split.
+//        // NOTE: We don't incorporate merging at the moment, so there will be
+//        // duplicate parts of code after the compilation of a split.
+//        // Furthermore, all if-split rules have two descendants, even if there
+//        // is no explicit else part.
+//
+//        logger.trace("Compiling %s", branchStatement);
+//
+//        Node branchNode = compileSequentialBlock(
+//                branchStatement.getProofNode());
+//
+//        TacletApp app = (TacletApp) branchNode.getAppliedRuleApp();
+//
+//        String ruleName = branchNode.getAppliedRuleApp().rule().name()
+//                .toString();
+//
+//        if (!ruleName.equals("ifSplit") && !ruleName.equals("ifElseSplit")) {
+//            logger.error(
+//                    "Uncovered branching statement type: %s, statement: %s",
+//                    branchStatement.getElementType(), currentStatement);
+//        }
+//
+//        LocationVariable simpleBranchCondition = (LocationVariable) TacletASTNode
+//                .getTacletAppInstValue("#se");
+//
+//        mv.visitVarInsn(ILOAD, pvHelper.progVarNr(simpleBranchCondition));
+//
+//        Label l1 = new Label();
+//        mv.visitJumpInsn(IFEQ, l1);
+//
+//        // then-part. Don't have to GOTO the block after the if since state
+//        // merging is not yet incorporated.
+//        // XXX Make sure that the code doesn't reach the ELSE part if no
+//        // explicit return statement is there (void methods)
+//
+//        compile(branchStatement.getChildren()[0]);
+//
+//        // else-part.
+//        mv.visitLabel(l1);
+//        compile(branchStatement.getChildren()[1]);
+//    }
+//
+//    /**
+//     * TODO
+//     *
+//     * @param loopInvNode
+//     */
+//    private void compile(IExecutionLoopInvariant loopInvNode) {
+//        logger.trace("Compiling %s", loopInvNode);
+//
+//        // XXX Not yet working!!!
+//
+//        IGuard guard = loopInvNode.getLoopStatement().getGuard();
+//
+//        // Jump-back label
+//        Label l0 = new Label();
+//        mv.visitLabel(l0);
+//
+//        // Loop guard
+//        Label l1 = new Label();
+//
+//        if (guard instanceof Guard && ((Guard) guard)
+//                .getExpression() instanceof GreaterThan) {
+//            GreaterThan gt = (GreaterThan) ((Guard) guard)
+//                    .getExpression();
+//
+//            Expression first = gt.getArguments().get(0);
+//            Expression second = gt.getArguments().get(1);
+//
+//            if (first instanceof LocationVariable
+//                    && second instanceof IntLiteral) {
+//                mv.visitVarInsn(ILOAD, pvHelper.progVarNr(
+//                        (LocationVariable) first));
+//
+//                int cmpTo = Integer
+//                        .parseInt(((IntLiteral) second).getValue());
+//                if (cmpTo != 0) {
+//                    intConstInstruction((IntLiteral) second);
+//                    mv.visitInsn(IF_ICMPLE);
+//                } else {
+//                    mv.visitInsn(IFLE);
+//                }
+//            } else {
+//                logger.error(
+//                        "Uncovered loop guard expression: %s, only "
+//                                + "considering pairs of loc vars and int "
+//                                + "literals currently",
+//                        guard);
+//            }
+//        } else {
+//            logger.error(
+//                    "Uncovered loop guard expression: %s",
+//                    guard);
+//        }
+//
+//        // Loop body
+//        compile(loopInvNode.getChildren()[0]);
+//
+//        // End while
+//        mv.visitJumpInsn(GOTO, l0);
+//        mv.visitLabel(l1);
+//
+//        // Code after the loop
+//        compile(loopInvNode.getChildren()[1]);
+//    }
+    //@formatter:on
 
     /**
      * Computes the number of open child branches of the given {@link Node}.
@@ -333,59 +354,5 @@ public class MethodBodyCompiler implements Opcodes {
         return src != null && !src.getClass().equals(EmptyStatement.class)
                 && !(src instanceof StatementBlock
                         && ((StatementBlock) src).isEmpty());
-    }
-
-    /**
-     * TODO
-     *
-     * @param ruleApp
-     */
-    private boolean compile(RuleApp ruleApp) {
-        if (ruleApp instanceof TacletApp) {
-            TacletApp app = (TacletApp) ruleApp;
-            return translationFactory
-                    .getTranslationForTacletApp(app).compile();
-        } else {
-            // TODO Are there other cases to support?
-            logger.error(
-                    "Did not translate the following app: %s, statement: %s",
-                    ruleApp.rule().name(), currentStatement);
-            return false;
-        }
-    }
-
-    /**
-     * TODO
-     *
-     * @param lit
-     */
-    private void intConstInstruction(IntLiteral lit) {
-        int theInt = Integer.parseInt(lit.toString());
-
-        if (theInt < -1 || theInt > 5) {
-            if (theInt >= Byte.MIN_VALUE && theInt <= Byte.MAX_VALUE) {
-                mv.visitIntInsn(BIPUSH, theInt);
-            } else if (theInt >= Short.MIN_VALUE && theInt <= Short.MAX_VALUE) {
-                mv.visitIntInsn(SIPUSH, theInt);
-            } else {
-                logger.warn(
-                        "Constants in full Integer range not yet covered, given: %s, statement: %s",
-                        theInt, currentStatement);
-            }
-        } else if (theInt == -1) {
-            mv.visitInsn(ICONST_M1);
-        } else if (theInt == 0) {
-            mv.visitInsn(ICONST_0);
-        } else if (theInt == 1) {
-            mv.visitInsn(ICONST_1);
-        } else if (theInt == 2) {
-            mv.visitInsn(ICONST_2);
-        } else if (theInt == 3) {
-            mv.visitInsn(ICONST_3);
-        } else if (theInt == 4) {
-            mv.visitInsn(ICONST_4);
-        } else if (theInt == 5) {
-            mv.visitInsn(ICONST_5);
-        }
     }
 }

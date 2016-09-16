@@ -1,6 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler.ast;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,9 +57,9 @@ public class TacletTranslationFactory {
     }
 
     /**
-     * Returns a {@link TacletASTNode} class for the given
-     * {@link TacletApp}. May return a {@link DummyTranslation} if no suitable
-     * translation is found.
+     * Returns a {@link TacletASTNode} class for the given {@link TacletApp}.
+     * May return a {@link DummyTranslation} if no suitable translation is
+     * found.
      *
      * @param app
      *            The {@link TacletApp} for which to create a translation
@@ -67,11 +68,11 @@ public class TacletTranslationFactory {
      *         {@link DummyTranslation} if there is no suitable such
      *         {@link TacletASTNode}.
      */
-    public TacletASTNode getTranslationForTacletApp(TacletApp app) {
+    public Optional<TacletASTNode> getTranslationForTacletApp(TacletApp app) {
         String tacletName = app.taclet().name().toString();
         logger.trace("Translating taclet %s", tacletName);
 
-        TacletASTNode result = new DummyTranslation(mv, pvHelper);
+        TacletASTNode result = null;
 
         switch (tacletName) {
         // Assignments
@@ -104,14 +105,15 @@ public class TacletTranslationFactory {
             break;
         default:
             if (!isUntranslatedTaclet(tacletName)) {
-                logger.error("Don't know a translation of the following taclet app: %s",
+                logger.error(
+                        "Don't know a translation of the following taclet app: %s",
                         app.rule().name());
             } else {
                 logger.debug("Ignoring taclet %s", app.rule().name());
             }
         }
 
-        return result;
+        return result == null ? Optional.empty() : Optional.of(result);
     }
 
     /**
@@ -125,32 +127,5 @@ public class TacletTranslationFactory {
      */
     private static boolean isUntranslatedTaclet(String tacletName) {
         return Arrays.binarySearch(UNTRANSLATED_TACLETS, tacletName) > -1;
-    }
-
-    /**
-     * A translation that does not do anything; in the preliminary state of
-     * Alfred, this is partly used for taclets not yet supported; however, it
-     * may also be used for taclets that are not meant to be translated, like
-     * complex expressions or variable initializations.
-     *
-     * @author Dominic Scheurer
-     */
-    static class DummyTranslation extends TacletASTNode {
-        /**
-         * TODO
-         * 
-         * @param mv
-         * @param pvHelper
-         */
-        public DummyTranslation(MethodVisitor mv, ProgVarHelper pvHelper) {
-            super(mv, pvHelper, null);
-        }
-
-        @Override
-        public void compile() {
-            // Dummy translation does not do anything special
-            
-            compileFirstChild();
-        }
     }
 }
