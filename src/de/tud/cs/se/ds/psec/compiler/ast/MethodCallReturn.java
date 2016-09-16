@@ -1,4 +1,4 @@
-package de.tud.cs.se.ds.psec.compiler.taclet_translation;
+package de.tud.cs.se.ds.psec.compiler.ast;
 
 import org.objectweb.asm.MethodVisitor;
 
@@ -11,21 +11,21 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class MethodCallReturn extends TerminatingTranslation {
+class MethodCallReturn extends TacletASTNode {
     /**
      * TODO
      * 
      * @param mv
      * @param pvHelper
      */
-    public MethodCallReturn(MethodVisitor mv, ProgVarHelper pvHelper) {
-        super(mv, pvHelper);
+    public MethodCallReturn(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
+        super(mv, pvHelper, app);
     }
 
     @Override
-    public void doCompile(TacletApp app) {
+    public void compile() {
         Expression returnExpr = (Expression) getTacletAppInstValue(
-                app, "#se");
+                "#se");
 
         loadIntVarOrConst(returnExpr);
         mv().visitInsn(IRETURN);

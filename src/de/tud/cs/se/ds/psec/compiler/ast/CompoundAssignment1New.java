@@ -1,0 +1,43 @@
+package de.tud.cs.se.ds.psec.compiler.ast;
+
+import org.objectweb.asm.MethodVisitor;
+
+import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.rule.TacletApp;
+
+/**
+ * XXX Unfinished!!!
+ * 
+ * Assignment of the form <code>#lhs = !#boolExpr</code>.
+ *
+ * @author Dominic Scheurer
+ */
+class CompoundAssignment1New extends TacletASTNode {
+    /**
+     * TODO
+     * 
+     * @param mv
+     * @param pvHelper
+     */
+    public CompoundAssignment1New(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
+        super(mv, pvHelper, app);
+    }
+
+    @Override
+    public void compile() {
+        LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
+                "#lhs");
+        Expression assgnExpr = (Expression) getTacletAppInstValue(
+                "#seBool");
+
+        loadBooleanVarOrConst(assgnExpr);
+
+        // TODO negate
+
+        mv().visitVarInsn(ISTORE, pvHelper().progVarNr(locVar));
+        
+        compileFirstChild();
+    }
+}

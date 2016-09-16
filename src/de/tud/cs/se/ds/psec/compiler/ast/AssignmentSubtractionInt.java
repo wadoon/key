@@ -1,4 +1,4 @@
-package de.tud.cs.se.ds.psec.compiler.taclet_translation;
+package de.tud.cs.se.ds.psec.compiler.ast;
 
 import org.objectweb.asm.MethodVisitor;
 
@@ -12,31 +12,32 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class AssignmentAdditionInt extends NonTerminatingTranslation {
-    
+class AssignmentSubtractionInt extends TacletASTNode {
     /**
      * TODO
      * 
      * @param mv
      * @param pvHelper
      */
-    public AssignmentAdditionInt(MethodVisitor mv, ProgVarHelper pvHelper) {
-        super(mv, pvHelper);
+    public AssignmentSubtractionInt(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
+        super(mv, pvHelper, app);
     }
 
     @Override
-    public void doCompile(TacletApp app) {
+    public void compile() {
         LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
-                app, "#loc");
+                "#loc");
         Expression assgnExpr1 = (Expression) getTacletAppInstValue(
-                app, "#seCharByteShortInt0");
+                "#seCharByteShortInt0");
         Expression assgnExpr2 = (Expression) getTacletAppInstValue(
-                app, "#seCharByteShortInt1");
+                "#seCharByteShortInt1");
 
         loadIntVarOrConst(assgnExpr1);
         loadIntVarOrConst(assgnExpr2);
-        mv().visitInsn(IADD);
+        mv().visitInsn(ISUB);
         mv().visitVarInsn(ISTORE, pvHelper().progVarNr(locVar));
+        
+        compileFirstChild();
     }
 
 }

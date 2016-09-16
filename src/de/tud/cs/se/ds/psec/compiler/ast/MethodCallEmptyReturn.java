@@ -1,4 +1,4 @@
-package de.tud.cs.se.ds.psec.compiler.taclet_translation;
+package de.tud.cs.se.ds.psec.compiler.ast;
 
 import org.objectweb.asm.MethodVisitor;
 
@@ -10,19 +10,19 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class MethodCallEmptyReturn extends TerminatingTranslation {
+class MethodCallEmptyReturn extends TacletASTNode {
     /**
      * TODO
      * 
      * @param mv
      * @param pvHelper
      */
-    public MethodCallEmptyReturn(MethodVisitor mv, ProgVarHelper pvHelper) {
-        super(mv, pvHelper);
+    public MethodCallEmptyReturn(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
+        super(mv, pvHelper, null);
     }
 
     @Override
-    public void doCompile(TacletApp app) {
+    public void compile() {
         mv().visitInsn(RETURN);
     }
 

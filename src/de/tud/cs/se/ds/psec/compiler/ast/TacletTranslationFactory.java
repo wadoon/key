@@ -1,7 +1,6 @@
-package de.tud.cs.se.ds.psec.compiler.taclet_translation;
+package de.tud.cs.se.ds.psec.compiler.ast;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,8 +19,6 @@ public class TacletTranslationFactory {
 
     private MethodVisitor mv;
     private ProgVarHelper pvHelper;
-    private HashMap<String, TacletTranslation> translations = new HashMap<>();
-    private final DummyTranslation DUMMY_TRANSLATION;
 
     /**
      * List of taclets that are not meant to be translated, for instance because
@@ -33,9 +30,11 @@ public class TacletTranslationFactory {
      */
     private final static String[] UNTRANSLATED_TACLETS = {
             "compound_addition_2",
+            "compound_assignment_3_nonsimple",
             "compound_assignment_op_plus",
             "compound_greater_than_comparison_1",
             "compound_int_cast_expression",
+            "ifElseUnfold",
             "ifUnfold",
             "postincrement_assignment",
             "preincrement_assignment",
@@ -54,56 +53,54 @@ public class TacletTranslationFactory {
     public TacletTranslationFactory(MethodVisitor mv, ProgVarHelper pvHelper) {
         this.mv = mv;
         this.pvHelper = pvHelper;
-        this.DUMMY_TRANSLATION = new DummyTranslation(mv, pvHelper);
     }
 
     /**
-     * Returns a {@link TacletTranslation} class for the given
+     * Returns a {@link TacletASTNode} class for the given
      * {@link TacletApp}. May return a {@link DummyTranslation} if no suitable
      * translation is found.
      *
      * @param app
      *            The {@link TacletApp} for which to create a translation
      *            object.
-     * @return A {@link TacletTranslation} for the given {@link TacletApp} or a
+     * @return A {@link TacletASTNode} for the given {@link TacletApp} or a
      *         {@link DummyTranslation} if there is no suitable such
-     *         {@link TacletTranslation}.
+     *         {@link TacletASTNode}.
      */
-    public TacletTranslation getTranslationForTacletApp(TacletApp app) {
+    public TacletASTNode getTranslationForTacletApp(TacletApp app) {
         String tacletName = app.taclet().name().toString();
         logger.trace("Translating taclet %s", tacletName);
 
-        if (translations.containsKey(tacletName)) {
-            return translations.get(tacletName);
-        }
-
-        TacletTranslation result = DUMMY_TRANSLATION;
+        TacletASTNode result = new DummyTranslation(mv, pvHelper);
 
         switch (tacletName) {
         // Assignments
         case "assignment":
-            result = new Assignment(mv, pvHelper);
+            result = new Assignment(mv, pvHelper, app);
             break;
         case "assignmentSubtractionInt":
-            result = new AssignmentSubtractionInt(mv, pvHelper);
+            result = new AssignmentSubtractionInt(mv, pvHelper, app);
             break;
         // Return Statements
         // TODO: Support also returnUnfold and STOP EXECUTING afterward.
         case "methodCallReturn":
-            result = new MethodCallReturn(mv, pvHelper);
+            result = new MethodCallReturn(mv, pvHelper, app);
             break;
         case "methodCallEmptyReturn":
-            result = new MethodCallEmptyReturn(mv, pvHelper);
+            result = new MethodCallEmptyReturn(mv, pvHelper, app);
             break;
         // Arithmetic operations
         case "assignmentAdditionInt":
-            result = new AssignmentAdditionInt(mv, pvHelper);
+            result = new AssignmentAdditionInt(mv, pvHelper, app);
+            break;
+        case "compound_assignment_1_new":
+            result = new CompoundAssignment1New(mv, pvHelper, app);
             break;
         case "greater_than_comparison_simple":
-            result = new GreaterThanComparisonSimple(mv, pvHelper);
+            result = new GreaterThanComparisonSimple(mv, pvHelper, app);
             break;
         case "unaryMinusInt":
-            result = new UnaryMinusInt(mv, pvHelper);
+            result = new UnaryMinusInt(mv, pvHelper, app);
             break;
         default:
             if (!isUntranslatedTaclet(tacletName)) {
@@ -112,10 +109,6 @@ public class TacletTranslationFactory {
             } else {
                 logger.debug("Ignoring taclet %s", app.rule().name());
             }
-        }
-
-        if (result != null) {
-            translations.put(tacletName, result);
         }
 
         return result;
@@ -142,7 +135,7 @@ public class TacletTranslationFactory {
      *
      * @author Dominic Scheurer
      */
-    static class DummyTranslation extends NonTerminatingTranslation {
+    static class DummyTranslation extends TacletASTNode {
         /**
          * TODO
          * 
@@ -150,12 +143,14 @@ public class TacletTranslationFactory {
          * @param pvHelper
          */
         public DummyTranslation(MethodVisitor mv, ProgVarHelper pvHelper) {
-            super(mv, pvHelper);
+            super(mv, pvHelper, null);
         }
 
         @Override
-        public void doCompile(TacletApp app) {
-            // Dummy translation does not do anything
+        public void compile() {
+            // Dummy translation does not do anything special
+            
+            compileFirstChild();
         }
     }
 }

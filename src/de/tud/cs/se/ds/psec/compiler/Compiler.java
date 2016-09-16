@@ -47,8 +47,6 @@ public class Compiler {
      * @throws ProblemLoaderException
      */
     public Compiler(File javaFile) throws ProblemLoaderException {
-        logger.info("Compiling Java file %s", javaFile);
-
         this.javaFile = javaFile;
 
         if (!ProofSettings.isChoiceSettingInitialised()) {
@@ -79,15 +77,21 @@ public class Compiler {
      * @return
      */
     public List<JavaTypeCompilationResult> compile() {
+        logger.info("Compiling Java file %s", javaFile);
+        
         List<KeYJavaType> declaredTypes = InformationExtraction
                 .getDeclaredTypes(environment);
 
         assert declaredTypes
                 .size() > 0 : "Unexpectedly, no type is declared in the supplied Java file.";
 
-        return declaredTypes.stream()
+        List<JavaTypeCompilationResult> result = declaredTypes.stream()
                 .map(t -> compile(t.getJavaType()))
                 .collect(Collectors.toList());
+        
+        logger.info("Finished compilation of Java file %s", javaFile);
+        
+        return result;
     }
 
     /**

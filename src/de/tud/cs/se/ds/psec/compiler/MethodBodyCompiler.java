@@ -6,8 +6,8 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import de.tud.cs.se.ds.psec.compiler.taclet_translation.TacletTranslation;
-import de.tud.cs.se.ds.psec.compiler.taclet_translation.TacletTranslationFactory;
+import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.compiler.ast.TacletTranslationFactory;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -122,8 +122,8 @@ public class MethodBodyCompiler implements Opcodes {
                     branchStatement.getElementType(), currentStatement);
         }
 
-        LocationVariable simpleBranchCondition = (LocationVariable) TacletTranslation
-                .getTacletAppInstValue(app, "#se");
+        LocationVariable simpleBranchCondition = (LocationVariable) TacletASTNode
+                .getTacletAppInstValue("#se");
 
         mv.visitVarInsn(ILOAD, pvHelper.progVarNr(simpleBranchCondition));
 
@@ -344,7 +344,7 @@ public class MethodBodyCompiler implements Opcodes {
         if (ruleApp instanceof TacletApp) {
             TacletApp app = (TacletApp) ruleApp;
             return translationFactory
-                    .getTranslationForTacletApp(app).compile(app);
+                    .getTranslationForTacletApp(app).compile();
         } else {
             // TODO Are there other cases to support?
             logger.error(

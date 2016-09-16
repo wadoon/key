@@ -1,4 +1,4 @@
-package de.tud.cs.se.ds.psec.compiler.taclet_translation;
+package de.tud.cs.se.ds.psec.compiler.ast;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,37 +15,42 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class UnaryMinusInt extends NonTerminatingTranslation {
+class UnaryMinusInt extends TacletASTNode {
     private static final Logger logger = LogManager.getFormatterLogger();
-    
+
     /**
      * TODO
      * 
      * @param mv
      * @param pvHelper
      */
-    public UnaryMinusInt(MethodVisitor mv, ProgVarHelper pvHelper) {
-        super(mv, pvHelper);
+    public UnaryMinusInt(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
+        super(mv, pvHelper, app);
     }
 
     @Override
-    public void doCompile(TacletApp app) {
+    public void compile() {
         LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
-                app, "#loc");
+                "#loc");
         Expression assgnExpr = (Expression) getTacletAppInstValue(
-                app, "#seCharByteShortInt");
-        
+                "#seCharByteShortInt");
+
         if (assgnExpr instanceof LocationVariable) {
-            mv().visitVarInsn(ILOAD, pvHelper().progVarNr((LocationVariable) assgnExpr));
+            mv().visitVarInsn(ILOAD,
+                    pvHelper().progVarNr((LocationVariable) assgnExpr));
             mv().visitInsn(INEG);
         } else if (assgnExpr instanceof IntLiteral) {
             loadIntVarOrConst(assgnExpr, true);
         } else {
-            logger.error("Unknown expression type for right-hand side of assignment: %s", assgnExpr.getClass());
+            logger.error(
+                    "Unknown expression type for right-hand side of assignment: %s",
+                    assgnExpr.getClass());
             return;
         }
-        
+
         mv().visitVarInsn(ISTORE, pvHelper().progVarNr(locVar));
+        
+        compileFirstChild();
     }
 
 }
