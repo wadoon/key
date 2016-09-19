@@ -35,11 +35,15 @@ public class MethodBodyCompiler implements Opcodes {
     private TacletASTNode astRoot = null;
 
     /**
-     * TODO
+     * Constructs a new {@link MethodBodyCompiler}.
      * 
      * @param mv
+     *            The {@link MethodVisitor} to be used for compilation.
+     * @param methodParameters
+     *            The parameters of this method.
      * @param isStatic
-     *            TODO
+     *            true iff the method to be compiled is a static method, i.e.
+     *            should have no "this" field as first local variable.
      */
     public MethodBodyCompiler(MethodVisitor mv,
             Iterable<ParameterDeclaration> methodParameters, boolean isStatic) {
@@ -74,7 +78,9 @@ public class MethodBodyCompiler implements Opcodes {
      * call in the tree.
      *
      * @param builder
-     * @return
+     *            {@link SymbolicExecutionTreeBuilder} resulting from execution
+     *            of the method's body.
+     * @return The {@link IExecutionNode} following the call to this method.
      */
     private IExecutionNode<?> ffUntilAfterFirstMethodCall(
             SymbolicExecutionTreeBuilder builder) {
@@ -87,9 +93,13 @@ public class MethodBodyCompiler implements Opcodes {
     }
 
     /**
-     * TODO
+     * Translates the set with root <code>startNode</code> to a taclet AST,
+     * where each node is a compilable {@link TacletASTNode}.
      *
      * @param startNode
+     *            The root node for the SET to translate.
+     * @param astStartNode
+     *            The root node for the corresponding taclet AST.
      */
     private void translateToTacletTree(IExecutionNode<?> startNode,
             TacletASTNode astStartNode) {
@@ -171,9 +181,11 @@ public class MethodBodyCompiler implements Opcodes {
     }
 
     /**
-     * TODO
+     * Bridge to {@link TacletTranslationFactory} throwing an error if there is
+     * an unexpected type of {@link RuleApp}.
      *
      * @param ruleApp
+     *            The {@link RuleApp} to translate; usually a {@link TacletApp}.
      */
     private Optional<TacletASTNode> toASTNode(RuleApp ruleApp) {
         if (ruleApp instanceof TacletApp) {
@@ -257,10 +269,13 @@ public class MethodBodyCompiler implements Opcodes {
     //@formatter:on
 
     /**
-     * TODO
+     * Determines whether the given {@link Node} is a symbolic execution node in
+     * the sense that it contains a non-empty active statement.
      *
      * @param node
-     * @return
+     *            The {@link Node} to check.
+     * @return true iff the given {@link Node} contains a non-empty active
+     *         statement.
      */
     private static boolean hasNonEmptyActiveStatement(Node node) {
         SourceElement src = node.getNodeInfo()
