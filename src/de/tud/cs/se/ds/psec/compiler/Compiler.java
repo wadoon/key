@@ -44,17 +44,20 @@ public class Compiler {
     private KeYEnvironment<DefaultUserInterfaceControl> environment;
     private File javaFile;
     private boolean debug = false;
+    private boolean dumpSET = false;
 
     /**
      * TODO
      * 
      * @param javaFile
      * @param debug 
+     * @param dumpSET TODO
      * @throws ProblemLoaderException
      */
-    public Compiler(File javaFile, boolean debug) throws ProblemLoaderException {
+    public Compiler(File javaFile, boolean debug, boolean dumpSET) throws ProblemLoaderException {
         this.javaFile = javaFile;
         this.debug = debug;
+        this.dumpSET = dumpSET;
 
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Ensure that Taclets are parsed
@@ -207,20 +210,29 @@ public class Compiler {
             new MethodBodyCompiler(mv, mDecl.getParameters(), mDecl.isStatic())
                     .compile(builder);
 
-            //TODO Remove test code after no longer needed
-            //@formatter:off
-            try {
-                builder.getProof().saveToFile(
-                        new File(mDecl.getContainerType().getFullName()
-                                + "::" + mDecl.getName() + ".proof"));
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
+            if (dumpSET) {
+                try {
+                    builder.getProof().saveToFile(
+                            new File(proofFileNameForProgramMethod(mDecl)));
+                } catch (java.io.IOException e) {
+                    e.printStackTrace();
+                }
             }
-            //@formatter:on
         }
         
         mv.visitMaxs(-1, -1);
         mv.visitEnd();
+    }
+
+    /**
+     * TODO
+     *
+     * @param mDecl
+     * @return
+     */
+    private String proofFileNameForProgramMethod(ProgramMethod mDecl) {
+        return mDecl.getContainerType().getFullName()
+                + "::" + mDecl.getName() + ".proof";
     }
 
     /**

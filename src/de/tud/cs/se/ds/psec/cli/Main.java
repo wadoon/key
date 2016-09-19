@@ -39,6 +39,10 @@ public class Main {
     public static void main(String[] args) {
         Options options = new Options();
 
+        Option dumpSETOpt = Option.builder("d").longOpt("dumpset")
+                .desc("Dump a .proof file containing the KeY SET for each compiled method")
+                .required(false).build();
+
         Option debugOpt = Option.builder("X").longOpt("debug")
                 .desc("Print additional bytecode verifier output if compilation fails")
                 .required(false).build();
@@ -47,6 +51,7 @@ public class Main {
                 .desc("Display help (this text) and terminate").required(false)
                 .build();
 
+        options.addOption(dumpSETOpt);
         options.addOption(debugOpt);
         options.addOption(helpOpt);
 
@@ -71,7 +76,7 @@ public class Main {
                 printHelp(options);
             }
 
-            Compiler compiler = new Compiler(inputFile, line.hasOption("X"));
+            Compiler compiler = new Compiler(inputFile, line.hasOption("X"), false);
 
             for (JavaTypeCompilationResult compilationResult : compiler
                     .compile()) {
