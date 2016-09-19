@@ -92,6 +92,11 @@ public abstract class TacletASTNode implements Opcodes {
         this.children = children;
     }
     
+    /**
+     * Adds a child to this {@link TacletASTNode}.
+     *
+     * @param child
+     */
     public void addChild(TacletASTNode child) {
         children.add(child);
     }

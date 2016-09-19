@@ -1,5 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler.ast;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
@@ -13,6 +15,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Dominic Scheurer
  */
 class AssignmentAdditionInt extends TacletASTNode {
+    private static final Logger logger = LogManager.getFormatterLogger();
 
     /**
      * TODO
@@ -26,6 +29,8 @@ class AssignmentAdditionInt extends TacletASTNode {
 
     @Override
     public void compile() {
+        logger.trace("Compiling AssignmentAdditionInt");
+        
         LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
                 "#loc");
         Expression assgnExpr1 = (Expression) getTacletAppInstValue(

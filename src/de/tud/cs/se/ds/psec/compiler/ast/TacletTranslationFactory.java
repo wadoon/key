@@ -33,6 +33,7 @@ public class TacletTranslationFactory {
             "compound_addition_2",
             "compound_assignment_3_nonsimple",
             "compound_assignment_op_plus",
+            "compound_binary_AND_2",
             "compound_greater_than_comparison_1",
             "compound_int_cast_expression",
             "ifElseUnfold",
@@ -55,6 +56,15 @@ public class TacletTranslationFactory {
         this.mv = mv;
         this.pvHelper = pvHelper;
     }
+    
+    /**
+     * Creates a root node for the AST.
+     *
+     * @return A root node for the AST.
+     */
+    public TacletASTNode getASTRootNode() {
+        return new ASTRoot(mv, pvHelper, null);
+    }
 
     /**
      * Returns a {@link TacletASTNode} class for the given {@link TacletApp}.
@@ -75,6 +85,19 @@ public class TacletTranslationFactory {
         TacletASTNode result = null;
 
         switch (tacletName) {
+        // Arithmetic operations
+        case "assignmentAdditionInt":
+            result = new AssignmentAdditionInt(mv, pvHelper, app);
+            break;
+        case "compound_assignment_1_new":
+            result = new CompoundAssignment1New(mv, pvHelper, app);
+            break;
+        case "greater_than_comparison_simple":
+            result = new GreaterThanComparisonSimple(mv, pvHelper, app);
+            break;
+        case "unaryMinusInt":
+            result = new UnaryMinusInt(mv, pvHelper, app);
+            break;
         // Assignments
         case "assignment":
             result = new Assignment(mv, pvHelper, app);
@@ -90,18 +113,10 @@ public class TacletTranslationFactory {
         case "methodCallEmptyReturn":
             result = new MethodCallEmptyReturn(mv, pvHelper, app);
             break;
-        // Arithmetic operations
-        case "assignmentAdditionInt":
-            result = new AssignmentAdditionInt(mv, pvHelper, app);
-            break;
-        case "compound_assignment_1_new":
-            result = new CompoundAssignment1New(mv, pvHelper, app);
-            break;
-        case "greater_than_comparison_simple":
-            result = new GreaterThanComparisonSimple(mv, pvHelper, app);
-            break;
-        case "unaryMinusInt":
-            result = new UnaryMinusInt(mv, pvHelper, app);
+        // Branch Statements
+        case "ifElseSplit":
+        case "ifSplit":
+            result = new IfElseSplit(mv, pvHelper, app);
             break;
         default:
             if (!isUntranslatedTaclet(tacletName)) {

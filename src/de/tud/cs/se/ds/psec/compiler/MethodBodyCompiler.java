@@ -29,11 +29,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 public class MethodBodyCompiler implements Opcodes {
     private static final Logger logger = LogManager.getFormatterLogger();
 
-    private MethodVisitor mv;
     private String currentStatement;
     private ProgVarHelper pvHelper;
     private TacletTranslationFactory translationFactory;
-    private TacletASTNode astRoot;
+    private TacletASTNode astRoot = null;
 
     /**
      * TODO
@@ -44,7 +43,6 @@ public class MethodBodyCompiler implements Opcodes {
      */
     public MethodBodyCompiler(MethodVisitor mv,
             Iterable<ParameterDeclaration> methodParameters, boolean isStatic) {
-        this.mv = mv;
         this.pvHelper = new ProgVarHelper(isStatic);
         this.translationFactory = new TacletTranslationFactory(mv, pvHelper);
 
@@ -64,9 +62,10 @@ public class MethodBodyCompiler implements Opcodes {
     public void compile(SymbolicExecutionTreeBuilder builder) {
         // Forward until after call of this method
         IExecutionNode<?> startNode = ffUntilAfterFirstMethodCall(builder);
-        findASTRoot(startNode);
-        
+
+        astRoot = translationFactory.getASTRootNode();
         translateToTacletTree(startNode, astRoot);
+
         astRoot.compile();
     }
 
@@ -92,38 +91,40 @@ public class MethodBodyCompiler implements Opcodes {
      *
      * @param rootOfSET
      */
-    private void findASTRoot(IExecutionNode<?> rootOfSET) {
-        // TODO Unchecked conversion to TacletApp... Problematic if there is a
-        // RuleApp like LoopInvariant first. In this case, also have to support
-        // more general translations for that case...
-        Node currentProofNode = rootOfSET.getProofNode();
-        while (!translationFactory.getTranslationForTacletApp(
-                (TacletApp) currentProofNode.getAppliedRuleApp()).isPresent()) {
-            // TODO Assume that there is a child, and exactly one. Insert more
-            // checks.
-            currentProofNode = currentProofNode.child(0);
-        }
-
-        astRoot = translationFactory.getTranslationForTacletApp(
-                (TacletApp) currentProofNode.getAppliedRuleApp()).get();
-    }
+    // private void findASTRoot(IExecutionNode<?> rootOfSET) {
+    // // TODO Unchecked conversion to TacletApp... Problematic if there is a
+    // // RuleApp like LoopInvariant first. In this case, also have to support
+    // // more general translations for that case...
+    // Node currentProofNode = rootOfSET.getProofNode();
+    // while (!translationFactory.getTranslationForTacletApp(
+    // (TacletApp) currentProofNode.getAppliedRuleApp()).isPresent()) {
+    // // TODO Assume that there is a child, and exactly one. Insert more
+    // // checks.
+    // currentProofNode = currentProofNode.child(0);
+    // }
+    //
+    // astRoot = translationFactory.getTranslationForTacletApp(
+    // (TacletApp) currentProofNode.getAppliedRuleApp()).get();
+    // }
 
     /**
      * TODO
      *
      * @param startNode
      */
-    private void translateToTacletTree(IExecutionNode<?> startNode, TacletASTNode astStartNode) {
+    private void translateToTacletTree(IExecutionNode<?> startNode,
+            TacletASTNode astStartNode) {
         IExecutionNode<?> currentNode = startNode;
+        TacletASTNode currentASTNode = astStartNode;
 
         while (currentNode != null && currentNode.getChildren().length > 0) {
 
             // XXX Special case: "Use Operation Contract" has only one
             // *abstract* SET child, but two in the KeY proof tree. Have
             // to consider this. Maybe somehow deactivate all non-SE branches...
-            
-            TacletASTNode currentASTNode = 
-                    translateSequentialBlock(currentNode.getProofNode(), astStartNode);
+
+            currentASTNode = translateSequentialBlock(
+                    currentNode.getProofNode(), currentASTNode);
 
             currentStatement = currentNode.toString();
 
@@ -135,7 +136,7 @@ public class MethodBodyCompiler implements Opcodes {
                 // frames is very difficult...
                 // http://chrononsystems.com/blog/java-7-design-flaw-leads-to-huge-backward-step-for-the-jvm
                 // http://asm.ow2.org/doc/developer-guide.html#classwriter
-                
+
                 for (IExecutionNode<?> child : currentNode.getChildren()) {
                     translateToTacletTree(child, currentASTNode);
                 }
@@ -143,9 +144,9 @@ public class MethodBodyCompiler implements Opcodes {
                 currentNode = null;
 
             } else {
-                
+
                 currentNode = currentNode.getChildren()[0];
-                
+
             }
         }
     }
@@ -160,11 +161,8 @@ public class MethodBodyCompiler implements Opcodes {
      *            The starting point for compilation of the block.
      * @return The successor of the node that was processed at last.
      */
-    private TacletASTNode translateSequentialBlock(Node currentProofNode, TacletASTNode astStartNode) {
-        if (getOpenChildrenCount(currentProofNode) > 1) {
-            return astStartNode;
-        }
-        
+    private TacletASTNode translateSequentialBlock(Node currentProofNode,
+            TacletASTNode astStartNode) {
         TacletASTNode astCurrentNode = astStartNode;
 
         do {
@@ -173,7 +171,7 @@ public class MethodBodyCompiler implements Opcodes {
             if (hasNonEmptyActiveStatement(currentProofNode)) {
                 newNode = toASTNode(app);
             }
-            
+
             if (newNode.isPresent()) {
                 astCurrentNode.addChild(newNode.get());
                 astCurrentNode = newNode.get();
@@ -360,5 +358,17 @@ public class MethodBodyCompiler implements Opcodes {
         return src != null && !src.getClass().equals(EmptyStatement.class)
                 && !(src instanceof StatementBlock
                         && ((StatementBlock) src).isEmpty());
+    }
+    
+    private static int test(int i, boolean cpn) {
+        i = i - 5;
+
+        if (cpn && !cpn) {
+            i = 0;
+        } else {
+            i = 9999;
+        }
+        
+        return i;
     }
 }

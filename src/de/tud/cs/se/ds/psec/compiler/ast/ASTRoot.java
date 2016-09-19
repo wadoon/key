@@ -5,14 +5,15 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * TODO
+ * The root of the {@link Taclet} AST.
  *
  * @author Dominic Scheurer
  */
-class MethodCallEmptyReturn extends TacletASTNode {
+class ASTRoot extends TacletASTNode {
     private static final Logger logger = LogManager.getFormatterLogger();
     
     /**
@@ -21,15 +22,14 @@ class MethodCallEmptyReturn extends TacletASTNode {
      * @param mv
      * @param pvHelper
      */
-    public MethodCallEmptyReturn(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
-        super(mv, pvHelper, null);
+    public ASTRoot(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
+        super(mv, pvHelper, app);
     }
 
     @Override
     public void compile() {
-        logger.trace("Compiling MethodCallEmptyReturn");
+        logger.trace("Compiling ASTRoot");
         
-        mv().visitInsn(RETURN);
+        compileFirstChild();
     }
-
 }

@@ -1,15 +1,22 @@
 package de.tud.cs.se.ds.psec.compiler;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableArray;
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.util.CheckClassAdapter;
 
 import de.tud.cs.se.ds.psec.se.SymbolicExecutionInterface;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
@@ -127,23 +134,46 @@ public class Compiler {
         String internalName = InformationExtraction
                 .toInternalName(typeDecl.getFullName());
 
-        cw.visit(CLASS_VERSION, InformationExtraction.createOpcode(typeDecl),
-                internalName, null,
-                extending, implementing);
-
-        ImmutableArray<MemberDeclaration> members = typeDecl.getMembers();
-        members.forEach(m -> {
-            if (m.getClass().equals(FieldDeclaration.class)) {
-                compile(cw, (FieldDeclaration) m);
-            } else if (m.getClass().equals(ProgramMethod.class)
-                    && !((ProgramMethod) m).getName().endsWith(">")) {
-                compile(cw, (ProgramMethod) m);
-            } else {
-                // TODO: Throw exception
+        try {
+            
+            cw.visit(CLASS_VERSION, InformationExtraction.createOpcode(typeDecl),
+                    internalName, null,
+                    extending, implementing);
+    
+            ImmutableArray<MemberDeclaration> members = typeDecl.getMembers();
+            members.forEach(m -> {
+                if (m.getClass().equals(FieldDeclaration.class)) {
+                    compile(cw, (FieldDeclaration) m);
+                } else if (m.getClass().equals(ProgramMethod.class)
+                        && !((ProgramMethod) m).getName().endsWith(">")) {
+                    compile(cw, (ProgramMethod) m);
+                } else {
+                    // TODO: Throw exception
+                }
+            });
+    
+            cw.visitEnd();
+            
+        } catch (Exception e) {
+            
+            // DEBUG CODE.
+            //TODO: Should be set on/off with flag, and also should be polished
+            StringWriter sw = new StringWriter();
+            CheckClassAdapter.verify(new ClassReader(cw.toByteArray()), false, new PrintWriter(sw));
+            if (sw.toString().length() != 0) {
+                System.err.println("Verify Output for Test:");
+                try {
+                    BufferedWriter out = new BufferedWriter(new FileWriter("ByteCodeOutput.txt"));
+                                out.write(sw.toString());
+                                out.close();
+                } catch (IOException e1) {
+                    System.out.println("Exception " + e1);
+                }
+                System.err.println(sw);
+                throw new IllegalStateException("Bytecode failed verification", e);
             }
-        });
-
-        cw.visitEnd();
+            
+        }
 
         return new JavaTypeCompilationResult(cw.toByteArray(), internalName);
     }

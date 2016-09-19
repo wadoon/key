@@ -30,6 +30,8 @@ class UnaryMinusInt extends TacletASTNode {
 
     @Override
     public void compile() {
+        logger.trace("Compiling UnaryMinusInt");
+        
         LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
                 "#loc");
         Expression assgnExpr = (Expression) getTacletAppInstValue(

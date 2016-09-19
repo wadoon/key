@@ -1,5 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler.ast;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
@@ -14,6 +16,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Dominic Scheurer
  */
 class CompoundAssignment1New extends TacletASTNode {
+    private static final Logger logger = LogManager.getFormatterLogger();
     /**
      * TODO
      * 
@@ -26,6 +29,8 @@ class CompoundAssignment1New extends TacletASTNode {
 
     @Override
     public void compile() {
+        logger.trace("Compiling CompoundAssignment1New");
+        
         LocationVariable locVar = (LocationVariable) getTacletAppInstValue(
                 "#lhs");
         Expression assgnExpr = (Expression) getTacletAppInstValue(
@@ -47,6 +52,7 @@ class CompoundAssignment1New extends TacletASTNode {
         mv().visitInsn(ICONST_1);
 
         // Store negated result
+        mv().visitLabel(l2);
         mv().visitVarInsn(ISTORE, pvHelper().progVarNr(locVar));
         
         compileFirstChild();
