@@ -66,7 +66,8 @@ public class MethodBodyCompiler implements Opcodes {
         IExecutionNode<?> startNode = ffUntilAfterFirstMethodCall(builder);
         findASTRoot(startNode);
         
-        compile(startNode, astRoot);
+        translateToTacletTree(startNode, astRoot);
+        astRoot.compile();
     }
 
     /**
@@ -112,7 +113,7 @@ public class MethodBodyCompiler implements Opcodes {
      *
      * @param startNode
      */
-    private void compile(IExecutionNode<?> startNode, TacletASTNode astStartNode) {
+    private void translateToTacletTree(IExecutionNode<?> startNode, TacletASTNode astStartNode) {
         IExecutionNode<?> currentNode = startNode;
 
         while (currentNode != null && currentNode.getChildren().length > 0) {
@@ -122,7 +123,7 @@ public class MethodBodyCompiler implements Opcodes {
             // to consider this. Maybe somehow deactivate all non-SE branches...
             
             TacletASTNode currentASTNode = 
-                    compileSequentialBlock(currentNode.getProofNode(), astStartNode);
+                    translateSequentialBlock(currentNode.getProofNode(), astStartNode);
 
             currentStatement = currentNode.toString();
 
@@ -136,11 +137,15 @@ public class MethodBodyCompiler implements Opcodes {
                 // http://asm.ow2.org/doc/developer-guide.html#classwriter
                 
                 for (IExecutionNode<?> child : currentNode.getChildren()) {
-                    compile(child, currentASTNode);
+                    translateToTacletTree(child, currentASTNode);
                 }
 
                 currentNode = null;
 
+            } else {
+                
+                currentNode = currentNode.getChildren()[0];
+                
             }
         }
     }
@@ -155,7 +160,7 @@ public class MethodBodyCompiler implements Opcodes {
      *            The starting point for compilation of the block.
      * @return The successor of the node that was processed at last.
      */
-    private TacletASTNode compileSequentialBlock(Node currentProofNode, TacletASTNode astStartNode) {
+    private TacletASTNode translateSequentialBlock(Node currentProofNode, TacletASTNode astStartNode) {
         if (getOpenChildrenCount(currentProofNode) > 1) {
             return astStartNode;
         }
