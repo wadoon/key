@@ -173,19 +173,19 @@ public class MethodBodyCompiler implements Opcodes {
             if (hasNonEmptyActiveStatement(currentProofNode)) {
                 newNode = toASTNode(app);
             }
+            
+            if (newNode.isPresent()) {
+                astCurrentNode.addChild(newNode.get());
+                astCurrentNode = newNode.get();
+            }
 
-            if (currentProofNode.childrenCount() > 0) {
+            if (currentProofNode.childrenCount() == 1) {
                 currentProofNode = currentProofNode.child(0);
-                
-                if (newNode.isPresent()) {
-                    astCurrentNode.addChild(newNode.get());
-                    astCurrentNode = newNode.get();
-                }
             } else {
+                // No children, or this is a branching node
                 currentProofNode = null;
             }
         } while (currentProofNode != null
-                && currentProofNode.childrenCount() < 2
                 && !SymbolicExecutionUtil.isSymbolicExecutionTreeNode(
                         currentProofNode,
                         currentProofNode.getAppliedRuleApp()));
