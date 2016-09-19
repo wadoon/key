@@ -22,11 +22,22 @@ import de.uka.ilkd.key.util.MiscTools;
  * Bridge to KeY's symbolic execution engine.
  *
  * @author Dominic Scheurer
+ * @see SymbolicExecutionTreeBuilder
  */
 public class SymbolicExecutionInterface {
     private KeYEnvironment<DefaultUserInterfaceControl> environment;
     private File javaFile;
-    
+
+    /**
+     * Constructs a new {@link SymbolicExecutionInterface} for the given
+     * {@link KeYEnvironment} and Java {@link File}.
+     * 
+     * @param environment
+     *            The {@link KeYEnvironment} generated for the given
+     *            {@link File} comprising the method to execute.
+     * @param javaFile
+     *            The {@link File} containing the method to execute.
+     */
     public SymbolicExecutionInterface(
             KeYEnvironment<DefaultUserInterfaceControl> environment,
             File javaFile) {
@@ -35,10 +46,14 @@ public class SymbolicExecutionInterface {
     }
 
     /**
-     * TODO
+     * Symbolically executes the given {@link ProgramMethod} and returns the
+     * created symbolic execution tree, which can be accessed through
+     * {@link SymbolicExecutionTreeBuilder#getStartNode()} and
+     * {@link SymbolicExecutionTreeBuilder#getProof()}.
      *
      * @param pm
-     * @return
+     *            The {@link ProgramMethod} to symbolically execute.
+     * @return The generated Symbolic Execution Tree (SET).
      */
     public SymbolicExecutionTreeBuilder execute(ProgramMethod pm) {
         try {

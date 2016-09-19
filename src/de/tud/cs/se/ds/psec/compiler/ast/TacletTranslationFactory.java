@@ -11,7 +11,15 @@ import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * Factory class for creating taclet translations.
+ * Factory class for creating {@link TacletASTNode}s in course of the execution
+ * of a particular method. Main methods are:
+ * 
+ * <ul>
+ * <li>{@link #getTranslationForTacletApp(TacletApp)}<br>
+ * returns a {@link TacletASTNode} for the given {@link TacletApp}.</li>
+ * <li>{@link #getASTRootNode()}<br>
+ * returns a root node for a taclet AST.</li>
+ * </ul>
  *
  * @author Dominic Scheurer
  */
@@ -47,16 +55,20 @@ public class TacletTranslationFactory {
     };
 
     /**
-     * TODO
+     * Creates a new {@link TacletTranslationFactory}.
      * 
      * @param mv
+     *            The {@link MethodVisitor} used in compilation of the
+     *            corresponding method.
      * @param pvHelper
+     *            The {@link ProgVarHelper} for obtaining indices for program
+     *            variables.
      */
     public TacletTranslationFactory(MethodVisitor mv, ProgVarHelper pvHelper) {
         this.mv = mv;
         this.pvHelper = pvHelper;
     }
-    
+
     /**
      * Creates a root node for the AST.
      *

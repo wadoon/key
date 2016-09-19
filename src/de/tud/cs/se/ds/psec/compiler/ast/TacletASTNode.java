@@ -14,6 +14,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -36,11 +38,17 @@ public abstract class TacletASTNode implements Opcodes {
     public abstract void compile();
 
     /**
-     * TODO
+     * Constructs a new {@link TacletASTNode} for a given {@link TacletApp}.
      * 
      * @param mv
+     *            The {@link MethodVisitor} for compiling the
+     *            {@link TacletASTNode}.
      * @param pvHelper
+     *            The {@link ProgVarHelper} of the corresponding method.
      * @param app
+     *            The {@link TacletApp} to construct this {@link TacletASTNode}
+     *            from.
+     * @see TacletTranslationFactory
      */
     public TacletASTNode(MethodVisitor mv, ProgVarHelper pvHelper,
             TacletApp app) {
@@ -50,23 +58,20 @@ public abstract class TacletASTNode implements Opcodes {
     }
 
     /**
-     * TODO
-     *
-     * @return
+     * @return The {@link MethodVisitor} for compiling this
+     *         {@link TacletASTNode} to bytecode.
      */
     protected MethodVisitor mv() {
         return mv;
     }
 
     /**
-     * TODO
-     *
-     * @return
+     * @return The {@link ProgVarHelper} of the corresponding method.
      */
     protected ProgVarHelper pvHelper() {
         return pvHelper;
     }
-    
+
     /**
      * @return The {@link TacletApp} for this {@link TacletASTNode}.
      */
@@ -75,32 +80,33 @@ public abstract class TacletASTNode implements Opcodes {
     }
 
     /**
-     * TODO
-     *
-     * @return
+     * @return The children of this {@link TacletASTNode}.
      */
     public List<TacletASTNode> children() {
         return children;
     }
-    
+
     /**
-     * TODO
+     * Sets the children of this {@link TacletASTNode}.
      *
      * @param children
+     *            The {@link List} of children of this {@link TacletASTNode}.
+     * @see #addChild(TacletASTNode)
      */
     public void setChildren(List<TacletASTNode> children) {
         this.children = children;
     }
-    
+
     /**
      * Adds a child to this {@link TacletASTNode}.
      *
      * @param child
+     *            The {@link TacletASTNode} to add as a child to this one.
      */
     public void addChild(TacletASTNode child) {
         children.add(child);
     }
-    
+
     /**
      * Recursively compiles the first child of this AST node.
      */
@@ -115,6 +121,7 @@ public abstract class TacletASTNode implements Opcodes {
      * stack.
      *
      * @param expr
+     *            The expression to load onto the stack.
      */
     protected void loadIntVarOrConst(Expression expr) {
         loadIntVarOrConst(expr, false);
@@ -125,6 +132,9 @@ public abstract class TacletASTNode implements Opcodes {
      * {@link LocationVariable} onto the stack.
      *
      * @param expr
+     *            The expression to load onto the stack.
+     * @param negative
+     *            Set to true iff the given expression should be negated.
      */
     protected void loadIntVarOrConst(Expression expr, boolean negative) {
         if (expr instanceof IntLiteral) {
@@ -145,6 +155,7 @@ public abstract class TacletASTNode implements Opcodes {
      * {@link LocationVariable} onto the stack.
      *
      * @param expr
+     *            The expression to load onto the stack.
      */
     protected void loadBooleanVarOrConst(Expression expr) {
         if (expr instanceof BooleanLiteral) {
@@ -164,11 +175,14 @@ public abstract class TacletASTNode implements Opcodes {
     }
 
     /**
-     * TODO
+     * Displays an error expressing that only the types in
+     * <code>acceptedTypesString</code> are expected, but <code>typeGiven</code>
+     * is actually supplied.
      * 
      * @param acceptedTypesString
-     *            TODO
+     *            A summary of the accepted types.
      * @param typeGiven
+     *            The actually given type.
      */
     protected void unsupportedTypeError(String acceptedTypesString,
             KeYJavaType typeGiven) {
@@ -179,10 +193,12 @@ public abstract class TacletASTNode implements Opcodes {
     }
 
     /**
-     * TODO
-     * @param sv
+     * Returns the value instantiated for the {@link SchemaVariable}
+     * <code>sv</code> in the {@link TacletApp} for this {@link TacletASTNode}.
      *
-     * @return
+     * @param sv
+     *            The name of the {@link SchemaVariable} in the {@link Taclet}.
+     * @return The instantiation for <code>sv</code>.
      */
     protected Object getTacletAppInstValue(String sv) {
         return app.instantiations()
@@ -190,9 +206,10 @@ public abstract class TacletASTNode implements Opcodes {
     }
 
     /**
-     * TODO
+     * Writes a bytecode instruction to load the given integer constant.
      *
-     * @param lit
+     * @param theInt
+     *            The integer to load on the stack.
      */
     private void intConstInstruction(int theInt) {
         if (theInt < -1 || theInt > 5) {

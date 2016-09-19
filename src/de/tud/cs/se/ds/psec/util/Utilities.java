@@ -11,10 +11,11 @@ import java.util.stream.StreamSupport;
 public class Utilities {
 
     /**
-     * TODO
+     * Converts the given {@link Iterable} to a {@link Stream}.<br/>
+     * TODO is this method needed? Currently seems to be unused.
      * 
-     * @param it
-     * @return
+     * @param it The {@link Iterable} to convert to a {@link Stream}.
+     * @return The {@link Stream} for the given {@link Iterable}.
      */
     public static <T> Stream<T> toStream(Iterable<T> it) {
         return StreamSupport.stream(it.spliterator(), false);
