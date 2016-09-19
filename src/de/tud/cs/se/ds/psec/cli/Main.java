@@ -17,8 +17,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 /**
- * TODO
+ * The main class for running Alfred from command line.
  *
+ * @see #main(String[])
  * @author Dominic Scheurer
  */
 public class Main {
@@ -32,9 +33,11 @@ public class Main {
             // @formatter:on
 
     /**
-     * TODO
+     * The main method for running Alfred from command line.
      * 
      * @param args
+     *            Command line options; run with -h flag for obtaining
+     *            information about available options.
      */
     public static void main(String[] args) {
         Options options = new Options();
@@ -76,7 +79,8 @@ public class Main {
                 printHelp(options);
             }
 
-            Compiler compiler = new Compiler(inputFile, line.hasOption("X"), false);
+            Compiler compiler = new Compiler(inputFile, line.hasOption("X"),
+                    false);
 
             for (JavaTypeCompilationResult compilationResult : compiler
                     .compile()) {
@@ -104,6 +108,12 @@ public class Main {
         }
     }
 
+    /**
+     * Prints a standard help line for Alfred.
+     *
+     * @param options
+     *            Command line options supplied.
+     */
     private static void printHelp(Options options) {
         System.out.println(INFO_STRING);
         HelpFormatter helpFormatter = new HelpFormatter();
