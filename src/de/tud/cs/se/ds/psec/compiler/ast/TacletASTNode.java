@@ -131,6 +131,7 @@ public abstract class TacletASTNode implements Opcodes {
             logger.error(
                     "Currently not supporting the type %s in assignments, returns etc.",
                     expr.getClass());
+            System.exit(1);
         }
     }
 
@@ -153,6 +154,7 @@ public abstract class TacletASTNode implements Opcodes {
             logger.error(
                     "Currently not supporting the type %s in assignments, returns etc.",
                     expr.getClass());
+            System.exit(1);
         }
     }
 
@@ -168,6 +170,7 @@ public abstract class TacletASTNode implements Opcodes {
         logger.error(
                 "Only %s types considered so far, given: %s, translation %s",
                 acceptedTypesString, typeGiven, getClass().getSimpleName());
+        System.exit(1);
     }
 
     /**
@@ -196,6 +199,7 @@ public abstract class TacletASTNode implements Opcodes {
                 logger.error(
                         "Constants in full Integer range not yet covered, given: %s",
                         theInt);
+                System.exit(1);
             }
         } else if (theInt == -1) {
             mv.visitInsn(ICONST_M1);

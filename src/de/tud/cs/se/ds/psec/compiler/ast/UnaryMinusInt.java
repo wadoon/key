@@ -45,7 +45,7 @@ class UnaryMinusInt extends TacletASTNode {
             logger.error(
                     "Unknown expression type for right-hand side of assignment: %s",
                     assgnExpr.getClass());
-            return;
+            System.exit(1);
         }
 
         mv().visitVarInsn(ISTORE, pvHelper().progVarNr(locVar));

@@ -208,6 +208,7 @@ public class MethodBodyCompiler implements Opcodes {
             logger.error(
                     "Did not translate the following app: %s, statement: %s",
                     ruleApp.rule().name(), currentStatement);
+            System.exit(1);
             return Optional.empty();
         }
     }

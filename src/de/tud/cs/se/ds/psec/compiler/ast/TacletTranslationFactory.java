@@ -108,6 +108,7 @@ public class TacletTranslationFactory {
                 logger.error(
                         "Don't know a translation of the following taclet app: %s",
                         app.rule().name());
+                System.exit(1);
             } else {
                 logger.debug("Ignoring taclet %s", app.rule().name());
             }
