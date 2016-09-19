@@ -39,10 +39,15 @@ public class Main {
     public static void main(String[] args) {
         Options options = new Options();
 
+        Option debugOpt = Option.builder("X").longOpt("debug")
+                .desc("Print additional bytecode verifier output if compilation fails")
+                .required(false).build();
+
         Option helpOpt = Option.builder("h").longOpt("help")
                 .desc("Display help (this text) and terminate").required(false)
                 .build();
 
+        options.addOption(debugOpt);
         options.addOption(helpOpt);
 
         CommandLineParser parser = new DefaultParser();
@@ -66,7 +71,7 @@ public class Main {
                 printHelp(options);
             }
 
-            Compiler compiler = new Compiler(inputFile);
+            Compiler compiler = new Compiler(inputFile, line.hasOption("X"));
 
             for (JavaTypeCompilationResult compilationResult : compiler
                     .compile()) {
@@ -81,16 +86,13 @@ public class Main {
                                         + ".class").toPath(),
                         compilationResult.getBytecode());
             }
-        }
-        catch (ParseException exp) {
+        } catch (ParseException exp) {
             printHelp(options);
             System.exit(0);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
-        catch (ProblemLoaderException e) {
+        } catch (ProblemLoaderException e) {
             // Created in Compiler
             // TODO Auto-generated catch block
             e.printStackTrace();

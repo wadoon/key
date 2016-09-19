@@ -1,9 +1,6 @@
 package de.tud.cs.se.ds.psec.compiler;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
@@ -46,15 +43,18 @@ public class Compiler {
 
     private KeYEnvironment<DefaultUserInterfaceControl> environment;
     private File javaFile;
+    private boolean debug = false;
 
     /**
      * TODO
      * 
      * @param javaFile
+     * @param debug 
      * @throws ProblemLoaderException
      */
-    public Compiler(File javaFile) throws ProblemLoaderException {
+    public Compiler(File javaFile, boolean debug) throws ProblemLoaderException {
         this.javaFile = javaFile;
+        this.debug = debug;
 
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Ensure that Taclets are parsed
@@ -154,23 +154,21 @@ public class Compiler {
     
             cw.visitEnd();
             
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             
-            // DEBUG CODE.
-            //TODO: Should be set on/off with flag, and also should be polished
-            StringWriter sw = new StringWriter();
-            CheckClassAdapter.verify(new ClassReader(cw.toByteArray()), false, new PrintWriter(sw));
-            if (sw.toString().length() != 0) {
-                System.err.println("Verify Output for Test:");
-                try {
-                    BufferedWriter out = new BufferedWriter(new FileWriter("ByteCodeOutput.txt"));
-                                out.write(sw.toString());
-                                out.close();
-                } catch (IOException e1) {
-                    System.out.println("Exception " + e1);
+            if (debug) {
+                // DEBUG CODE.
+                StringWriter sw = new StringWriter();
+                CheckClassAdapter.verify(new ClassReader(cw.toByteArray()), false, new PrintWriter(sw));
+                
+                if (sw.toString().length() != 0) {
+                    logger.error("Bytecode failed verification:");
+                    logger.error(sw);
                 }
-                System.err.println(sw);
-                throw new IllegalStateException("Bytecode failed verification", e);
+            } else {
+                logger.error("Compilation failed. This is probably due to an error in one of "
+                        + "the translation methods. Run with argument --debug "
+                        + "to obtain additional information.");
             }
             
         }

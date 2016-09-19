@@ -89,27 +89,6 @@ public class MethodBodyCompiler implements Opcodes {
     /**
      * TODO
      *
-     * @param rootOfSET
-     */
-    // private void findASTRoot(IExecutionNode<?> rootOfSET) {
-    // // TODO Unchecked conversion to TacletApp... Problematic if there is a
-    // // RuleApp like LoopInvariant first. In this case, also have to support
-    // // more general translations for that case...
-    // Node currentProofNode = rootOfSET.getProofNode();
-    // while (!translationFactory.getTranslationForTacletApp(
-    // (TacletApp) currentProofNode.getAppliedRuleApp()).isPresent()) {
-    // // TODO Assume that there is a child, and exactly one. Insert more
-    // // checks.
-    // currentProofNode = currentProofNode.child(0);
-    // }
-    //
-    // astRoot = translationFactory.getTranslationForTacletApp(
-    // (TacletApp) currentProofNode.getAppliedRuleApp()).get();
-    // }
-
-    /**
-     * TODO
-     *
      * @param startNode
      */
     private void translateToTacletTree(IExecutionNode<?> startNode,
@@ -215,56 +194,6 @@ public class MethodBodyCompiler implements Opcodes {
 //    /**
 //     * TODO
 //     *
-//     * @param branchStatement
-//     */
-//    private void compile(IExecutionBranchStatement branchStatement) {
-//        // Currently considering ifSplit, ifElseSplit.
-//        // We assume that the guard is a boolean location variable that can be
-//        // loaded on to of the stack to decide about the split.
-//        // NOTE: We don't incorporate merging at the moment, so there will be
-//        // duplicate parts of code after the compilation of a split.
-//        // Furthermore, all if-split rules have two descendants, even if there
-//        // is no explicit else part.
-//
-//        logger.trace("Compiling %s", branchStatement);
-//
-//        Node branchNode = compileSequentialBlock(
-//                branchStatement.getProofNode());
-//
-//        TacletApp app = (TacletApp) branchNode.getAppliedRuleApp();
-//
-//        String ruleName = branchNode.getAppliedRuleApp().rule().name()
-//                .toString();
-//
-//        if (!ruleName.equals("ifSplit") && !ruleName.equals("ifElseSplit")) {
-//            logger.error(
-//                    "Uncovered branching statement type: %s, statement: %s",
-//                    branchStatement.getElementType(), currentStatement);
-//        }
-//
-//        LocationVariable simpleBranchCondition = (LocationVariable) TacletASTNode
-//                .getTacletAppInstValue("#se");
-//
-//        mv.visitVarInsn(ILOAD, pvHelper.progVarNr(simpleBranchCondition));
-//
-//        Label l1 = new Label();
-//        mv.visitJumpInsn(IFEQ, l1);
-//
-//        // then-part. Don't have to GOTO the block after the if since state
-//        // merging is not yet incorporated.
-//        // XXX Make sure that the code doesn't reach the ELSE part if no
-//        // explicit return statement is there (void methods)
-//
-//        compile(branchStatement.getChildren()[0]);
-//
-//        // else-part.
-//        mv.visitLabel(l1);
-//        compile(branchStatement.getChildren()[1]);
-//    }
-//
-//    /**
-//     * TODO
-//     *
 //     * @param loopInvNode
 //     */
 //    private void compile(IExecutionLoopInvariant loopInvNode) {
@@ -328,24 +257,6 @@ public class MethodBodyCompiler implements Opcodes {
     //@formatter:on
 
     /**
-     * Computes the number of open child branches of the given {@link Node}.
-     *
-     * @param node
-     *            The {@link Node} whose open child branches to count.
-     * @return The number of open child branches of the given {@link Node}.
-     */
-    private int getOpenChildrenCount(Node node) {
-        int result = 0;
-        for (int i = 0; i < node.childrenCount(); i++) {
-            if (!node.child(i).isClosed()) {
-                result++;
-            }
-        }
-
-        return result;
-    }
-
-    /**
      * TODO
      *
      * @param node
@@ -358,17 +269,5 @@ public class MethodBodyCompiler implements Opcodes {
         return src != null && !src.getClass().equals(EmptyStatement.class)
                 && !(src instanceof StatementBlock
                         && ((StatementBlock) src).isEmpty());
-    }
-    
-    private static int test(int i, boolean cpn) {
-        i = i - 5;
-
-        if (cpn && !cpn) {
-            i = 0;
-        } else {
-            i = 9999;
-        }
-        
-        return i;
     }
 }
