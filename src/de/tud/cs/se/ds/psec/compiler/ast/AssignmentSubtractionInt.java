@@ -10,17 +10,15 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * TODO
+ * Assignment of the form <code>#loc = #seCharByteShortInt0 - #seCharByteShortInt1;</code>.
  *
  * @author Dominic Scheurer
  */
 class AssignmentSubtractionInt extends TacletASTNode {
     private static final Logger logger = LogManager.getFormatterLogger();
+    
     /**
-     * TODO
-     * 
-     * @param mv
-     * @param pvHelper
+     * @see TacletASTNode#TacletASTNode(MethodVisitor, ProgVarHelper, TacletApp)
      */
     public AssignmentSubtractionInt(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
         super(mv, pvHelper, app);

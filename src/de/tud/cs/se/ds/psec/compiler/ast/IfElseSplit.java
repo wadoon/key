@@ -19,10 +19,7 @@ class IfElseSplit extends TacletASTNode {
     private static final Logger logger = LogManager.getFormatterLogger();
 
     /**
-     * TODO
-     * 
-     * @param mv
-     * @param pvHelper
+     * @see TacletASTNode#TacletASTNode(MethodVisitor, ProgVarHelper, TacletApp)
      */
     public IfElseSplit(MethodVisitor mv, ProgVarHelper pvHelper,
             TacletApp app) {

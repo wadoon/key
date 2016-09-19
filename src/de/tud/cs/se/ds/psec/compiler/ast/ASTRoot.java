@@ -17,10 +17,7 @@ class ASTRoot extends TacletASTNode {
     private static final Logger logger = LogManager.getFormatterLogger();
     
     /**
-     * TODO
-     * 
-     * @param mv
-     * @param pvHelper
+     * @see TacletASTNode#TacletASTNode(MethodVisitor, ProgVarHelper, TacletApp)
      */
     public ASTRoot(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
         super(mv, pvHelper, app);

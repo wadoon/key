@@ -8,7 +8,7 @@ import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * TODO
+ * A <code>return;</code> statement without argument.
  *
  * @author Dominic Scheurer
  */
@@ -16,10 +16,7 @@ class MethodCallEmptyReturn extends TacletASTNode {
     private static final Logger logger = LogManager.getFormatterLogger();
     
     /**
-     * TODO
-     * 
-     * @param mv
-     * @param pvHelper
+     * @see TacletASTNode#TacletASTNode(MethodVisitor, ProgVarHelper, TacletApp)
      */
     public MethodCallEmptyReturn(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
         super(mv, pvHelper, null);

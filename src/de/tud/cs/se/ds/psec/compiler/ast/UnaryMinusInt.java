@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * TODO
+ * An assignment of the form <code>#loc = -#seCharByteShortInt;</code>
  *
  * @author Dominic Scheurer
  */
@@ -19,10 +19,7 @@ class UnaryMinusInt extends TacletASTNode {
     private static final Logger logger = LogManager.getFormatterLogger();
 
     /**
-     * TODO
-     * 
-     * @param mv
-     * @param pvHelper
+     * @see TacletASTNode#TacletASTNode(MethodVisitor, ProgVarHelper, TacletApp)
      */
     public UnaryMinusInt(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
         super(mv, pvHelper, app);
