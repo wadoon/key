@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -27,20 +28,26 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 public class InformationExtraction implements Opcodes {
 
     /**
-     * TODO
+     * Internally (in bytecode), fully qualified class names are spelled out
+     * with slashes instead of dots as separators. This method converts normal
+     * class names to these internal representations.
      *
      * @param javaClassName
-     * @return
+     *            The class name to convert.
+     * @return An internal representation of the class name.
      */
     public static String toInternalName(String javaClassName) {
         return javaClassName.replaceAll("\\.", "/");
     }
 
     /**
-     * TODO
+     * Returns all implemented interfaces for a given {@link TypeDeclaration}.
      * 
      * @param t
-     * @return
+     *            The {@link TypeDeclaration} to return the implemented
+     *            interfaces for.
+     * @return The array of interface names for the {@link TypeDeclaration}. May
+     *         be null if there is no implemented interface.
      */
     public static String[] getImplementing(TypeDeclaration typeDecl) {
         if (!(typeDecl instanceof ClassDeclaration)) {
@@ -66,10 +73,41 @@ public class InformationExtraction implements Opcodes {
     }
 
     /**
-     * TODO
+     * Returns the internal name of the super class of a
+     * {@link TypeDeclaration}. The fallback is "java/lang/Object".
+     * 
+     * @param t
+     *            The {@link TypeDeclaration} to return the internal name of the
+     *            superclass for.
+     * @return The super class of the given {@link TypeDeclaration} (defaults to
+     *         "java/lang/Object").
+     */
+    public static String getExtending(TypeDeclaration classDecl) {
+        Extends ext = classDecl instanceof InterfaceDeclaration
+                ? ((InterfaceDeclaration) classDecl).getExtendedTypes()
+                : ((ClassDeclaration) classDecl).getExtendedTypes();
+        String extending;
+
+        if (ext != null) {
+            ImmutableArray<TypeReference> supertypes = ext.getSupertypes();
+            extending = toInternalName(
+                    supertypes.get(0).getKeYJavaType().getFullName());
+        } else {
+            extending = "java/lang/Object";
+        }
+
+        return extending;
+    }
+
+    /**
+     * Creates an ASM opcode for the given {@link TypeDeclaration}. An opcode
+     * specifies the visibility and other characteristics, like whether the
+     * {@link TypeDeclaration} is static.
      * 
      * @param classDecl
-     * @return
+     *            The {@link TypeDeclaration} to create an ASM opcode for.
+     * @return The generated ASM opcode corresponding to the given
+     *         {@link TypeDeclaration}.
      */
     public static int createOpcode(TypeDeclaration classDecl) {
         return InformationExtraction.createOpcode(classDecl.isPublic(),
@@ -80,10 +118,14 @@ public class InformationExtraction implements Opcodes {
     }
 
     /**
-     * TODO
+     * Creates an ASM opcode for the given {@link ProgramMethod}. An opcode
+     * specifies the visibility and other characteristics, like whether the
+     * {@link ProgramMethod} is static.
      *
      * @param methodDecl
-     * @return
+     *            The {@link ProgramMethod} to create an ASM opcode for.
+     * @return The generated ASM opcode corresponding to the given
+     *         {@link ProgramMethod}.
      */
     public static int createOpcode(ProgramMethod methodDecl) {
         return InformationExtraction.createOpcode(methodDecl.isPublic(),
@@ -93,17 +135,39 @@ public class InformationExtraction implements Opcodes {
     }
 
     /**
-     * TODO
+     * Creates an ASM opcode for the given {@link FieldDeclaration}. An opcode
+     * specifies the visibility and other characteristics, like whether the
+     * {@link FieldDeclaration} is static.
+     *
+     * @param fieldDecl
+     *            The {@link FieldDeclaration} to create an ASM opcode for.
+     * @return The generated ASM opcode corresponding to the given
+     *         {@link FieldDeclaration}.
+     */
+    public static int createOpcode(FieldDeclaration fieldDecl) {
+        return createOpcode(fieldDecl.isPublic(), fieldDecl.isProtected(),
+                fieldDecl.isPrivate(), false, fieldDecl.isFinal(),
+                fieldDecl.isStatic(), false);
+    }
+
+    /**
+     * Creates an ASM opcode for the given boolean characteristics.
      *
      * @param isPublic
+     *            true iff the opcode should have the "public" flag.
      * @param isProtected
+     *            true iff the opcode should have the "protected" flag.
      * @param isPrivate
+     *            true iff the opcode should have the "private" flag.
      * @param isAbstract
+     *            true iff the opcode should have the "abstract" flag.
      * @param isFinal
+     *            true iff the opcode should have the "final" flag.
      * @param isStatic
-     *            TODO
+     *            true iff the opcode should have the "static" flag.
      * @param isInterface
-     * @return
+     *            true iff the opcode should have the "interface" flag.
+     * @return An ASM opcode for the given boolean parameters.
      */
     public static int createOpcode(boolean isPublic, boolean isProtected,
             boolean isPrivate, boolean isAbstract, boolean isFinal,
@@ -138,45 +202,16 @@ public class InformationExtraction implements Opcodes {
     }
 
     /**
-     * TODO
-     *
-     * @param fieldDecl
-     * @return
-     */
-    public static int createOpcode(FieldDeclaration fieldDecl) {
-        return createOpcode(fieldDecl.isPublic(), fieldDecl.isProtected(),
-                fieldDecl.isPrivate(), false, fieldDecl.isFinal(),
-                fieldDecl.isStatic(), false);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param t
-     * @return
-     */
-    public static String getExtending(TypeDeclaration classDecl) {
-        Extends ext = classDecl instanceof InterfaceDeclaration
-                ? ((InterfaceDeclaration) classDecl).getExtendedTypes()
-                : ((ClassDeclaration) classDecl).getExtendedTypes();
-        String extending;
-
-        if (ext != null) {
-            ImmutableArray<TypeReference> supertypes = ext.getSupertypes();
-            extending = toInternalName(
-                    supertypes.get(0).getKeYJavaType().getFullName());
-        } else {
-            extending = "java/lang/Object";
-        }
-
-        return extending;
-    }
-
-    /**
-     * TODO
+     * Returns a bytecode type descriptor for a given {@link KeYJavaType}.
+     * <p>
+     * For instance, a descriptor for <code>de.tud.Test</code> would be
+     * <code>Lde/tud/Test;</code>. For an int, it would be <code>I</code>.
      *
      * @param type
-     * @return
+     *            The {@link KeYJavaType} to return a bytecode type descriptor
+     *            for.
+     * @return A bytecode type descriptor for the given {@link KeYJavaType}.
+     * @see Type#getDescriptor(Class)
      */
     public static String typeToTypeDescriptor(KeYJavaType type) {
         if (type.equals(KeYJavaType.VOID_TYPE)) {
@@ -189,9 +224,9 @@ public class InformationExtraction implements Opcodes {
         // 'B' - byte
         // 'S' - short
         // 'I' - int
-        // 'F' - float
+        // 'F' - float (unsupported)
         // 'J' - long
-        // 'D' - double
+        // 'D' - double (unsupported)
 
         String fullName;
         switch (fullName = type.getFullName()) {
@@ -206,10 +241,15 @@ public class InformationExtraction implements Opcodes {
     }
 
     /**
-     * TODO
+     * Computes a bytecode method type descriptor for the given
+     * {@link ProgramMethod}. An example is <code>(ILjava/lang/Object;)Z</code>
+     * for a method taking an int and an Object, and returning a boolean.
      *
      * @param m
-     * @return
+     *            The {@link ProgramMethod} for the signature of which a method
+     *            type descriptor should be created.
+     * @return A method type descriptor describing the signature of the given
+     *         {@link ProgramMethod}.
      */
     public static String getMethodTypeDescriptor(ProgramMethod m) {
         StringBuilder sb = new StringBuilder();
@@ -225,13 +265,14 @@ public class InformationExtraction implements Opcodes {
     }
 
     /**
-     * TODO
+     * Retrieves all {@link KeYJavaType}s declared in the given
+     * {@link KeYEnvironment}.
      * 
      * @param environment
-     *            TODO
-     * @param environment
-     * 
-     * @return
+     *            The {@link KeYEnvironment} to retrieve all declared
+     *            {@link KeYJavaType}s from.
+     * @return A {@link List} of all declared {@link KeYJavaType}s in the given
+     *         {@link KeYEnvironment}.
      */
     public static List<KeYJavaType> getDeclaredTypes(
             KeYEnvironment<DefaultUserInterfaceControl> environment) {
