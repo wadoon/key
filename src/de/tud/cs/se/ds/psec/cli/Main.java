@@ -42,7 +42,7 @@ public class Main {
     public static void main(String[] args) {
         Options options = new Options();
 
-        Option dumpSETOpt = Option.builder("d").longOpt("dumpset")
+        Option dumpSETOpt = Option.builder("d").longOpt("dump-set")
                 .desc("Dump a .proof file containing the KeY SET for each compiled method")
                 .required(false).build();
 
@@ -80,7 +80,7 @@ public class Main {
             }
 
             Compiler compiler = new Compiler(inputFile, line.hasOption("X"),
-                    false);
+                    line.hasOption("d"));
 
             for (JavaTypeCompilationResult compilationResult : compiler
                     .compile()) {

@@ -46,6 +46,7 @@ public class TacletTranslationFactory {
             "compound_int_cast_expression",
             "ifElseUnfold",
             "ifUnfold",
+            "loopComplexToSimple",
             "postincrement_assignment",
             "preincrement_assignment",
             "remove_parentheses_right",
@@ -129,6 +130,9 @@ public class TacletTranslationFactory {
         case "ifElseSplit":
         case "ifSplit":
             result = new IfElseSplit(mv, pvHelper, app);
+            break;
+        case "removeLoopForCompilation":
+            result = new RemoveLoopForCompilation(mv, pvHelper, app);
             break;
         default:
             if (!isUntranslatedTaclet(tacletName)) {

@@ -234,20 +234,23 @@ public class Compiler {
             SymbolicExecutionTreeBuilder builder = new SymbolicExecutionInterface(
                     environment, javaFile).execute(mDecl);
 
+            if (dumpSET) {
+                try {
+                    String proofFileName = proofFileNameForProgramMethod(mDecl);
+                    builder.getProof().saveToFile(
+                            new File(proofFileName));
+                    logger.info("Dumping proof tree to file %s", proofFileName);
+                    
+                } catch (java.io.IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
             logger.trace("Translating SET of method %s::%s to bytecode",
                     mDecl.getContainerType().getJavaType().getFullName(),
                     mDecl.getName());
             new MethodBodyCompiler(mv, mDecl.getParameters(), mDecl.isStatic())
                     .compile(builder);
-
-            if (dumpSET) {
-                try {
-                    builder.getProof().saveToFile(
-                            new File(proofFileNameForProgramMethod(mDecl)));
-                } catch (java.io.IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
         mv.visitMaxs(-1, -1);
