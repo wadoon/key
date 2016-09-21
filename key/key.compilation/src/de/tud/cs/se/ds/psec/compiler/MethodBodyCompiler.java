@@ -1,0 +1,288 @@
+package de.tud.cs.se.ds.psec.compiler;
+
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+
+import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.compiler.ast.TacletTranslationFactory;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+/**
+ * Compiles the body of a method by Symbolic Execution.
+ *
+ * @author Dominic Scheurer
+ */
+public class MethodBodyCompiler implements Opcodes {
+    private static final Logger logger = LogManager.getFormatterLogger();
+
+    private String currentStatement;
+    private ProgVarHelper pvHelper;
+    private TacletTranslationFactory translationFactory;
+    private TacletASTNode astRoot = null;
+
+    /**
+     * Constructs a new {@link MethodBodyCompiler}.
+     * 
+     * @param mv
+     *            The {@link MethodVisitor} to be used for compilation.
+     * @param methodParameters
+     *            The parameters of this method.
+     * @param isStatic
+     *            true iff the method to be compiled is a static method, i.e.
+     *            should have no "this" field as first local variable.
+     */
+    public MethodBodyCompiler(MethodVisitor mv,
+            Iterable<ParameterDeclaration> methodParameters, boolean isStatic) {
+        this.pvHelper = new ProgVarHelper(isStatic);
+        this.translationFactory = new TacletTranslationFactory(mv, pvHelper);
+
+        methodParameters.forEach(p -> pvHelper.progVarNr(
+                p.getVariables().get(0).getProgramVariable()));
+    }
+
+    /**
+     * Compiles the content of the symbolic execution tree given by
+     * {@link SymbolicExecutionTreeBuilder} using the {@link MethodVisitor}
+     * supplied to the constructor {@link #MethodBodyCompiler(MethodVisitor)}.
+     *
+     * @param builder
+     *            {@link SymbolicExecutionTreeBuilder} resulting from execution
+     *            of the method's body.
+     */
+    public void compile(SymbolicExecutionTreeBuilder builder) {
+        // Forward until after call of this method
+        IExecutionNode<?> startNode = ffUntilAfterFirstMethodCall(builder);
+
+        astRoot = translationFactory.getASTRootNode();
+        translateToTacletTree(startNode, astRoot);
+
+        astRoot.compile();
+    }
+
+    /**
+     * "Fast-forwards" the tree until the first statement after the first method
+     * call in the tree.
+     *
+     * @param builder
+     *            {@link SymbolicExecutionTreeBuilder} resulting from execution
+     *            of the method's body.
+     * @return The {@link IExecutionNode} following the call to this method.
+     */
+    private IExecutionNode<?> ffUntilAfterFirstMethodCall(
+            SymbolicExecutionTreeBuilder builder) {
+        IExecutionNode<?> startNode = builder.getStartNode();
+        while (!(startNode instanceof IExecutionMethodCall)) {
+            startNode = startNode.getChildren()[0];
+        }
+        startNode = startNode.getChildren()[0];
+        return startNode;
+    }
+
+    /**
+     * Translates the set with root <code>startNode</code> to a taclet AST,
+     * where each node is a compilable {@link TacletASTNode}.
+     *
+     * @param startNode
+     *            The root node for the SET to translate.
+     * @param astStartNode
+     *            The root node for the corresponding taclet AST.
+     */
+    private void translateToTacletTree(IExecutionNode<?> startNode,
+            TacletASTNode astStartNode) {
+        IExecutionNode<?> currentNode = startNode;
+        TacletASTNode currentASTNode = astStartNode;
+
+        while (currentNode != null && currentNode.getChildren().length > 0) {
+
+            // XXX Special case: "Use Operation Contract" has only one
+            // *abstract* SET child, but two in the KeY proof tree. Have
+            // to consider this. Maybe somehow deactivate all non-SE branches...
+
+            currentASTNode = translateSequentialBlock(
+                    currentNode.getProofNode(), currentASTNode);
+
+            currentStatement = currentNode.toString();
+
+            if (currentNode.getChildren().length > 1) {
+
+                // Note: Stack Map Frames are not generated manually here;
+                // we're trying to leave it to the ASM framework to generate
+                // them automatically. Computing the right values of these
+                // frames is very difficult...
+                // http://chrononsystems.com/blog/java-7-design-flaw-leads-to-huge-backward-step-for-the-jvm
+                // http://asm.ow2.org/doc/developer-guide.html#classwriter
+
+                for (IExecutionNode<?> child : currentNode.getChildren()) {
+                    translateToTacletTree(child, currentASTNode);
+                }
+
+                currentNode = null;
+
+            } else {
+
+                currentNode = currentNode.getChildren()[0];
+
+            }
+        }
+    }
+
+    /**
+     * Compiles all SE statements until the next node that's part of the
+     * abstract SET, where the last compiled node must have exactly one child.
+     * That is, compilation stops at a splitting rule and at the end of the
+     * proof tree.
+     *
+     * @param currentProofNode
+     *            The starting point for compilation of the block.
+     * @return The successor of the node that was processed at last.
+     */
+    private TacletASTNode translateSequentialBlock(Node currentProofNode,
+            TacletASTNode astStartNode) {
+        TacletASTNode astCurrentNode = astStartNode;
+
+        do {
+            RuleApp app = currentProofNode.getAppliedRuleApp();
+            Optional<TacletASTNode> newNode = Optional.empty();
+            if (hasNonEmptyActiveStatement(currentProofNode)) {
+                newNode = toASTNode(app);
+            }
+
+            if (newNode.isPresent()) {
+                astCurrentNode.addChild(newNode.get());
+                astCurrentNode = newNode.get();
+            }
+
+            if (currentProofNode.childrenCount() == 1) {
+                currentProofNode = currentProofNode.child(0);
+            } else {
+                // No children, or this is a branching node
+                currentProofNode = null;
+            }
+        } while (currentProofNode != null
+                && !SymbolicExecutionUtil.isSymbolicExecutionTreeNode(
+                        currentProofNode,
+                        currentProofNode.getAppliedRuleApp()));
+
+        return astCurrentNode;
+    }
+
+    /**
+     * Bridge to {@link TacletTranslationFactory} throwing an error if there is
+     * an unexpected type of {@link RuleApp}.
+     *
+     * @param ruleApp
+     *            The {@link RuleApp} to translate; usually a {@link TacletApp}.
+     */
+    private Optional<TacletASTNode> toASTNode(RuleApp ruleApp) {
+        if (ruleApp instanceof TacletApp) {
+            TacletApp app = (TacletApp) ruleApp;
+            return translationFactory
+                    .getTranslationForTacletApp(app);
+        } else {
+            // TODO Are there other cases to support?
+            logger.error(
+                    "Did not translate the following app: %s, statement: %s",
+                    ruleApp.rule().name(), currentStatement);
+            System.exit(1);
+            return Optional.empty();
+        }
+    }
+
+    //@formatter:off
+//    /**
+//     * TODO
+//     *
+//     * @param loopInvNode
+//     */
+//    private void compile(IExecutionLoopInvariant loopInvNode) {
+//        logger.trace("Compiling %s", loopInvNode);
+//
+//        // XXX Not yet working!!!
+//
+//        IGuard guard = loopInvNode.getLoopStatement().getGuard();
+//
+//        // Jump-back label
+//        Label l0 = new Label();
+//        mv.visitLabel(l0);
+//
+//        // Loop guard
+//        Label l1 = new Label();
+//
+//        if (guard instanceof Guard && ((Guard) guard)
+//                .getExpression() instanceof GreaterThan) {
+//            GreaterThan gt = (GreaterThan) ((Guard) guard)
+//                    .getExpression();
+//
+//            Expression first = gt.getArguments().get(0);
+//            Expression second = gt.getArguments().get(1);
+//
+//            if (first instanceof LocationVariable
+//                    && second instanceof IntLiteral) {
+//                mv.visitVarInsn(ILOAD, pvHelper.progVarNr(
+//                        (LocationVariable) first));
+//
+//                int cmpTo = Integer
+//                        .parseInt(((IntLiteral) second).getValue());
+//                if (cmpTo != 0) {
+//                    intConstInstruction((IntLiteral) second);
+//                    mv.visitInsn(IF_ICMPLE);
+//                } else {
+//                    mv.visitInsn(IFLE);
+//                }
+//            } else {
+//                logger.error(
+//                        "Uncovered loop guard expression: %s, only "
+//                                + "considering pairs of loc vars and int "
+//                                + "literals currently",
+//                        guard);
+//            }
+//        } else {
+//            logger.error(
+//                    "Uncovered loop guard expression: %s",
+//                    guard);
+//        }
+//
+//        // Loop body
+//        compile(loopInvNode.getChildren()[0]);
+//
+//        // End while
+//        mv.visitJumpInsn(GOTO, l0);
+//        mv.visitLabel(l1);
+//
+//        // Code after the loop
+//        compile(loopInvNode.getChildren()[1]);
+//    }
+    //@formatter:on
+
+    /**
+     * Determines whether the given {@link Node} is a symbolic execution node in
+     * the sense that it contains a non-empty active statement.
+     *
+     * @param node
+     *            The {@link Node} to check.
+     * @return true iff the given {@link Node} contains a non-empty active
+     *         statement.
+     */
+    private static boolean hasNonEmptyActiveStatement(Node node) {
+        SourceElement src = node.getNodeInfo()
+                .getActiveStatement();
+
+        return src != null && !src.getClass().equals(EmptyStatement.class)
+                && !(src instanceof StatementBlock
+                        && ((StatementBlock) src).isEmpty());
+    }
+}
