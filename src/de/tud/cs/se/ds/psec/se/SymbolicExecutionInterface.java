@@ -94,8 +94,9 @@ public class SymbolicExecutionInterface {
                 // Optionally, create an SymbolicExecutionEnvironment which
                 // provides access to all relevant objects for symbolic
                 // execution
-                SymbolicExecutionEnvironment<DefaultUserInterfaceControl> symbolicEnv = new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(
-                        environment, builder);
+                SymbolicExecutionEnvironment<DefaultUserInterfaceControl> symbolicEnv =
+                        new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(
+                                environment, builder);
 
                 // Configure strategy for full exploration
                 SymbolicExecutionUtil.initializeStrategy(builder);
@@ -111,7 +112,8 @@ public class SymbolicExecutionInterface {
 
                 // Optionally, add a more advanced stop conditions like
                 // breakpoints
-                CompoundStopCondition stopCondition = new CompoundStopCondition();
+                CompoundStopCondition stopCondition =
+                        new CompoundStopCondition();
 
                 //@formatter:off
                 // Stop after 100 nodes have been explored on each branch.
