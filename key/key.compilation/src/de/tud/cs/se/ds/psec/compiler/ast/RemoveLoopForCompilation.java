@@ -34,32 +34,22 @@ class RemoveLoopForCompilation extends TacletASTNode {
     public void compile() {
         logger.trace("Compiling removeLoopForCompilation");
 
-        // Note: In some cases, one branch of the split is already closed. In
-        // this case, it has no effect on symbolic execution, and we don't
-        // compile a split, but just continue translating the children.
-
         LocationVariable simpleLoopCondition =
                 (LocationVariable) getTacletAppInstValue(
                         "#se");
         
-        //TODO: Rest is copied from IfElse
-
-        mv().visitVarInsn(ILOAD,
-                pvHelper().progVarNr(simpleLoopCondition));
-
-        Label l0 = new Label();
-        mv().visitJumpInsn(IFEQ, l0);
-
-        // then-part. Don't have to GOTO the block after the if since state
-        // merging is not yet incorporated.
-        // XXX Make sure that the code doesn't reach the ELSE part if no
-        // explicit return statement is there (void methods)
-
+        Label l1 = new Label();
+        Label l2 = new Label();
+        
+        mv().visitJumpInsn(GOTO, l1);
+        mv().visitLabel(l2);
+        
         children().get(0).compile();
-
-        // else-part.
-        mv().visitLabel(l0);
+        
+        mv().visitLabel(l1);
+        mv().visitVarInsn(ILOAD, pvHelper().progVarNr(simpleLoopCondition));
+        mv().visitJumpInsn(IFNE, l2);
+        
         children().get(1).compile();
-
     }
 }

@@ -156,7 +156,7 @@ public class MethodBodyCompiler implements Opcodes {
 
         do {
             RuleApp app = currentProofNode.getAppliedRuleApp();
-            Optional<TacletASTNode> newNode = Optional.empty();
+             Optional<TacletASTNode> newNode = Optional.empty();
             if (hasNonEmptyActiveStatement(currentProofNode)) {
                 newNode = toASTNode(app);
             }
