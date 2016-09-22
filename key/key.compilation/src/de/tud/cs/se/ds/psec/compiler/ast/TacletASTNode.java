@@ -38,6 +38,11 @@ public abstract class TacletASTNode implements Opcodes {
     public abstract void compile();
 
     /**
+     * @return The maximum number of children for this {@link TacletASTNode}.
+     */
+    protected abstract int maxNumberOfChildren();
+
+    /**
      * Constructs a new {@link TacletASTNode} for a given {@link TacletApp}.
      * 
      * @param mv
@@ -95,6 +100,7 @@ public abstract class TacletASTNode implements Opcodes {
      */
     public void setChildren(List<TacletASTNode> children) {
         this.children = children;
+        complainIfInvalidNumOfChildren();
     }
 
     /**
@@ -105,6 +111,17 @@ public abstract class TacletASTNode implements Opcodes {
      */
     public void addChild(TacletASTNode child) {
         children.add(child);
+        complainIfInvalidNumOfChildren();
+    }
+
+    private void complainIfInvalidNumOfChildren() {
+        if (children().size() > maxNumberOfChildren()) {
+            logger.error("Unexpected number of children for AST element %s. Expected: %s, Actually: %s",
+                    getClass().getSimpleName(), maxNumberOfChildren(), children().size());
+
+            // TODO Create own exception hierarchy
+            throw new RuntimeException("Unexpected number of children.");
+        }
     }
 
     /**
@@ -140,9 +157,11 @@ public abstract class TacletASTNode implements Opcodes {
         if (expr instanceof IntLiteral) {
             intConstInstruction((negative ? -1 : 1)
                     * Integer.parseInt(((IntLiteral) expr).toString()));
-        } else if (expr instanceof LocationVariable) {
+        }
+        else if (expr instanceof LocationVariable) {
             mv.visitVarInsn(ILOAD, pvHelper.progVarNr((LocationVariable) expr));
-        } else {
+        }
+        else {
             logger.error(
                     "Currently not supporting the type %s in assignments, returns etc.",
                     expr.getClass());
@@ -161,12 +180,15 @@ public abstract class TacletASTNode implements Opcodes {
         if (expr instanceof BooleanLiteral) {
             if (expr.toString().equals("true")) {
                 mv.visitInsn(ICONST_1);
-            } else {
+            }
+            else {
                 mv.visitInsn(ICONST_0);
             }
-        } else if (expr instanceof LocationVariable) {
+        }
+        else if (expr instanceof LocationVariable) {
             mv.visitVarInsn(ILOAD, pvHelper.progVarNr((LocationVariable) expr));
-        } else {
+        }
+        else {
             logger.error(
                     "Currently not supporting the type %s in assignments, returns etc.",
                     expr.getClass());
@@ -215,27 +237,36 @@ public abstract class TacletASTNode implements Opcodes {
         if (theInt < -1 || theInt > 5) {
             if (theInt >= Byte.MIN_VALUE && theInt <= Byte.MAX_VALUE) {
                 mv.visitIntInsn(BIPUSH, theInt);
-            } else if (theInt >= Short.MIN_VALUE && theInt <= Short.MAX_VALUE) {
+            }
+            else if (theInt >= Short.MIN_VALUE && theInt <= Short.MAX_VALUE) {
                 mv.visitIntInsn(SIPUSH, theInt);
-            } else {
+            }
+            else {
                 logger.error(
                         "Constants in full Integer range not yet covered, given: %s",
                         theInt);
                 System.exit(1);
             }
-        } else if (theInt == -1) {
+        }
+        else if (theInt == -1) {
             mv.visitInsn(ICONST_M1);
-        } else if (theInt == 0) {
+        }
+        else if (theInt == 0) {
             mv.visitInsn(ICONST_0);
-        } else if (theInt == 1) {
+        }
+        else if (theInt == 1) {
             mv.visitInsn(ICONST_1);
-        } else if (theInt == 2) {
+        }
+        else if (theInt == 2) {
             mv.visitInsn(ICONST_2);
-        } else if (theInt == 3) {
+        }
+        else if (theInt == 3) {
             mv.visitInsn(ICONST_3);
-        } else if (theInt == 4) {
+        }
+        else if (theInt == 4) {
             mv.visitInsn(ICONST_4);
-        } else if (theInt == 5) {
+        }
+        else if (theInt == 5) {
             mv.visitInsn(ICONST_5);
         }
     }

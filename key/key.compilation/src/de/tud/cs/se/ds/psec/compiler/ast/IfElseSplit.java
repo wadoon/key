@@ -67,4 +67,9 @@ class IfElseSplit extends TacletASTNode {
         }
         
     }
+
+    @Override
+    protected int maxNumberOfChildren() {
+        return 2;
+    }
 }

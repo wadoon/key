@@ -1,5 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -7,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import de.tud.cs.se.ds.psec.compiler.ast.MethodCallEmptyReturn;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletTranslationFactory;
 import de.uka.ilkd.key.java.SourceElement;
@@ -33,6 +36,8 @@ public class MethodBodyCompiler implements Opcodes {
     private ProgVarHelper pvHelper;
     private TacletTranslationFactory translationFactory;
     private TacletASTNode astRoot = null;
+    private boolean isVoid = false;
+    private MethodVisitor mv = null;
 
     /**
      * Constructs a new {@link MethodBodyCompiler}.
@@ -44,14 +49,19 @@ public class MethodBodyCompiler implements Opcodes {
      * @param isStatic
      *            true iff the method to be compiled is a static method, i.e.
      *            should have no "this" field as first local variable.
+     * @param isVoid
+     *            TODO
      */
     public MethodBodyCompiler(MethodVisitor mv,
-            Iterable<ParameterDeclaration> methodParameters, boolean isStatic) {
+            Iterable<ParameterDeclaration> methodParameters, boolean isStatic,
+            boolean isVoid) {
+        this.mv = mv;
         this.pvHelper = new ProgVarHelper(isStatic);
         this.translationFactory = new TacletTranslationFactory(mv, pvHelper);
+        this.isVoid = isVoid;
 
-        methodParameters.forEach(p -> pvHelper.progVarNr(
-                p.getVariables().get(0).getProgramVariable()));
+        methodParameters.forEach(p -> pvHelper
+                .progVarNr(p.getVariables().get(0).getProgramVariable()));
     }
 
     /**
@@ -70,7 +80,33 @@ public class MethodBodyCompiler implements Opcodes {
         astRoot = translationFactory.getASTRootNode();
         translateToTacletTree(startNode, astRoot);
 
+        if (isVoid) {
+            addReturnAfterAllLeaves();
+        }
+
         astRoot.compile();
+    }
+
+    /**
+     * Adds a return instruction (for void methods) to all leaves in the AST
+     * where there is not already one present.
+     */
+    private void addReturnAfterAllLeaves() {
+        Deque<TacletASTNode> stack = new LinkedList<>();
+        stack.push(astRoot);
+        
+        while (!stack.isEmpty()) {
+           TacletASTNode currentNode = stack.pop();
+           
+           currentNode.children().forEach(child -> {
+               if (child.children().size() == 0 && !(child instanceof MethodCallEmptyReturn)) {
+                   // child is a leaf that is not a return
+                   child.addChild(new MethodCallEmptyReturn(mv, pvHelper, null));
+               } else {
+                   stack.push(child);
+               }
+           });
+        }
     }
 
     /**
@@ -132,7 +168,8 @@ public class MethodBodyCompiler implements Opcodes {
 
                 currentNode = null;
 
-            } else {
+            }
+            else {
 
                 currentNode = currentNode.getChildren()[0];
 
@@ -156,7 +193,7 @@ public class MethodBodyCompiler implements Opcodes {
 
         do {
             RuleApp app = currentProofNode.getAppliedRuleApp();
-             Optional<TacletASTNode> newNode = Optional.empty();
+            Optional<TacletASTNode> newNode = Optional.empty();
             if (hasNonEmptyActiveStatement(currentProofNode)) {
                 newNode = toASTNode(app);
             }
@@ -168,16 +205,37 @@ public class MethodBodyCompiler implements Opcodes {
 
             if (currentProofNode.childrenCount() == 1) {
                 currentProofNode = currentProofNode.child(0);
-            } else {
+            }
+            else {
                 // No children, or this is a branching node
                 currentProofNode = null;
             }
-        } while (currentProofNode != null
-                && !SymbolicExecutionUtil.isSymbolicExecutionTreeNode(
-                        currentProofNode,
-                        currentProofNode.getAppliedRuleApp()));
+        }
+        while (currentProofNode != null
+                && !isSymbolicExecutionTreeNode(currentProofNode));
 
         return astCurrentNode;
+    }
+
+    /**
+     * Checks whether the given {@link Node} is part of the abstract SET.
+     * Basically delegates to
+     * {@link SymbolicExecutionUtil#isSymbolicExecutionTreeNode(Node, RuleApp)},
+     * but also has a check to include applications of "loopComplexToSimple",
+     * since there the loop condition is simplified before actually touching the
+     * actual loop.
+     * 
+     * @param currentProofNode
+     *            The {@link Node} to check
+     * @return true iff the given {@link Node} is a symbolic execution node
+     *         <b>and</b> its {@link RuleApp} is not an instance of
+     *         <code>loopComplexToSimple</code>.
+     */
+    private static boolean isSymbolicExecutionTreeNode(Node currentProofNode) {
+        return SymbolicExecutionUtil.isSymbolicExecutionTreeNode(
+                currentProofNode, currentProofNode.getAppliedRuleApp())
+                && !currentProofNode.getAppliedRuleApp().rule().name()
+                        .toString().equals("loopComplexToSimple");
     }
 
     /**
@@ -190,9 +248,9 @@ public class MethodBodyCompiler implements Opcodes {
     private Optional<TacletASTNode> toASTNode(RuleApp ruleApp) {
         if (ruleApp instanceof TacletApp) {
             TacletApp app = (TacletApp) ruleApp;
-            return translationFactory
-                    .getTranslationForTacletApp(app);
-        } else {
+            return translationFactory.getTranslationForTacletApp(app);
+        }
+        else {
             // TODO Are there other cases to support?
             logger.error(
                     "Did not translate the following app: %s, statement: %s",
@@ -201,72 +259,6 @@ public class MethodBodyCompiler implements Opcodes {
             return Optional.empty();
         }
     }
-
-    //@formatter:off
-//    /**
-//     * TODO
-//     *
-//     * @param loopInvNode
-//     */
-//    private void compile(IExecutionLoopInvariant loopInvNode) {
-//        logger.trace("Compiling %s", loopInvNode);
-//
-//        // XXX Not yet working!!!
-//
-//        IGuard guard = loopInvNode.getLoopStatement().getGuard();
-//
-//        // Jump-back label
-//        Label l0 = new Label();
-//        mv.visitLabel(l0);
-//
-//        // Loop guard
-//        Label l1 = new Label();
-//
-//        if (guard instanceof Guard && ((Guard) guard)
-//                .getExpression() instanceof GreaterThan) {
-//            GreaterThan gt = (GreaterThan) ((Guard) guard)
-//                    .getExpression();
-//
-//            Expression first = gt.getArguments().get(0);
-//            Expression second = gt.getArguments().get(1);
-//
-//            if (first instanceof LocationVariable
-//                    && second instanceof IntLiteral) {
-//                mv.visitVarInsn(ILOAD, pvHelper.progVarNr(
-//                        (LocationVariable) first));
-//
-//                int cmpTo = Integer
-//                        .parseInt(((IntLiteral) second).getValue());
-//                if (cmpTo != 0) {
-//                    intConstInstruction((IntLiteral) second);
-//                    mv.visitInsn(IF_ICMPLE);
-//                } else {
-//                    mv.visitInsn(IFLE);
-//                }
-//            } else {
-//                logger.error(
-//                        "Uncovered loop guard expression: %s, only "
-//                                + "considering pairs of loc vars and int "
-//                                + "literals currently",
-//                        guard);
-//            }
-//        } else {
-//            logger.error(
-//                    "Uncovered loop guard expression: %s",
-//                    guard);
-//        }
-//
-//        // Loop body
-//        compile(loopInvNode.getChildren()[0]);
-//
-//        // End while
-//        mv.visitJumpInsn(GOTO, l0);
-//        mv.visitLabel(l1);
-//
-//        // Code after the loop
-//        compile(loopInvNode.getChildren()[1]);
-//    }
-    //@formatter:on
 
     /**
      * Determines whether the given {@link Node} is a symbolic execution node in
@@ -278,8 +270,7 @@ public class MethodBodyCompiler implements Opcodes {
      *         statement.
      */
     private static boolean hasNonEmptyActiveStatement(Node node) {
-        SourceElement src = node.getNodeInfo()
-                .getActiveStatement();
+        SourceElement src = node.getNodeInfo().getActiveStatement();
 
         return src != null && !src.getClass().equals(EmptyStatement.class)
                 && !(src instanceof StatementBlock

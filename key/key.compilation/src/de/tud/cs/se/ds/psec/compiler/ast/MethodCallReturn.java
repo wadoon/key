@@ -34,4 +34,9 @@ class MethodCallReturn extends TacletASTNode {
         mv().visitInsn(IRETURN);
     }
 
+    @Override
+    protected int maxNumberOfChildren() {
+        return 1;
+    }
+
 }

@@ -12,7 +12,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-class MethodCallEmptyReturn extends TacletASTNode {
+public class MethodCallEmptyReturn extends TacletASTNode {
     private static final Logger logger = LogManager.getFormatterLogger();
     
     /**
@@ -27,6 +27,11 @@ class MethodCallEmptyReturn extends TacletASTNode {
         logger.trace("Compiling MethodCallEmptyReturn");
         
         mv().visitInsn(RETURN);
+    }
+
+    @Override
+    protected int maxNumberOfChildren() {
+        return 1;
     }
 
 }

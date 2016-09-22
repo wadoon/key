@@ -43,4 +43,9 @@ class AssignmentSubtractionInt extends TacletASTNode {
         compileFirstChild();
     }
 
+    @Override
+    protected int maxNumberOfChildren() {
+        return 1;
+    }
+
 }

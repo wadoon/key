@@ -34,22 +34,32 @@ class RemoveLoopForCompilation extends TacletASTNode {
     public void compile() {
         logger.trace("Compiling removeLoopForCompilation");
 
-        LocationVariable simpleLoopCondition =
-                (LocationVariable) getTacletAppInstValue(
-                        "#se");
-        
+        LocationVariable simpleLoopCondition = (LocationVariable) getTacletAppInstValue(
+                "#se");
+
         Label l1 = new Label();
         Label l2 = new Label();
-        
+
         mv().visitJumpInsn(GOTO, l1);
         mv().visitLabel(l2);
-        
+
         children().get(0).compile();
-        
+
         mv().visitLabel(l1);
         mv().visitVarInsn(ILOAD, pvHelper().progVarNr(simpleLoopCondition));
         mv().visitJumpInsn(IFNE, l2);
-        
-        children().get(1).compile();
+
+        if (children().size() < 2) {
+            // This loop is the last statement of a void method (otherwise, we
+            // have some problem), so we add a return statement
+            new MethodCallEmptyReturn(mv(), pvHelper(), null).compile();
+        } else {
+            children().get(1).compile();
+        }
+    }
+
+    @Override
+    protected int maxNumberOfChildren() {
+        return 2;
     }
 }

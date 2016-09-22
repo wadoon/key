@@ -132,6 +132,7 @@ public class TacletTranslationFactory {
             result = new IfElseSplit(mv, pvHelper, app);
             break;
         case "removeLoopForCompilation":
+        case "removeLoopForCompilationVoid":
             result = new RemoveLoopForCompilation(mv, pvHelper, app);
             break;
         default:

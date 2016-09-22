@@ -55,5 +55,10 @@ class CompoundAssignment1New extends TacletASTNode {
         
         compileFirstChild();
     }
+
+    @Override
+    protected int maxNumberOfChildren() {
+        return 1;
+    }
     
 }

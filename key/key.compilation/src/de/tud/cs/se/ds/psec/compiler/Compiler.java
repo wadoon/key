@@ -249,7 +249,7 @@ public class Compiler {
             logger.trace("Translating SET of method %s::%s to bytecode",
                     mDecl.getContainerType().getJavaType().getFullName(),
                     mDecl.getName());
-            new MethodBodyCompiler(mv, mDecl.getParameters(), mDecl.isStatic())
+            new MethodBodyCompiler(mv, mDecl.getParameters(), mDecl.isStatic(), mDecl.isVoid())
                     .compile(builder);
         }
 
