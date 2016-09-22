@@ -826,13 +826,18 @@ public class SymbolicExecutionTreeBuilder {
          updateCallStack(node, statement);
          // Update block map
          RuleApp currentOrFutureRuleApplication = node.getAppliedRuleApp();
+         
          if (currentOrFutureRuleApplication == null && 
              node != proof.root()) { // Executing peekNext() on the root crashes the tests for unknown reasons.
             Goal goal = proof.getGoal(node);
             if (goal != null) {
                currentOrFutureRuleApplication = goal.getRuleAppManager().peekNext();
             }
+         } else if (currentOrFutureRuleApplication != null &&
+        		 currentOrFutureRuleApplication.rule().name().toString().equals("loopComplexToSimple")) {
+        	 return parentToAddTo;
          }
+         
          if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, currentOrFutureRuleApplication)) {
             Map<JavaPair, ImmutableList<IExecutionNode<?>>> completedBlocks = updateAfterBlockMap(node, currentOrFutureRuleApplication);
             if (completedBlocks != null) {
