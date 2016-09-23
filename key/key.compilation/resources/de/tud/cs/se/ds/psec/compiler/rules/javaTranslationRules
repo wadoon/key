@@ -1,0 +1,121 @@
+// ###########################
+// ### Splitting and loops ###
+// ###########################
+
+if_split {
+	\taclets ("IfElseSplit", "IfSplit")
+	\translation (
+		\if (#has-child-2)
+		(
+			\load (#se)
+			IFEQ l0
+			#child-1
+			l0: child-2
+		)
+		(#child-1)
+	)
+}
+
+while_loop {
+	\taclets ("removeLoopForCompilation", "removeLoopForCompilationVoid")
+	\translation (
+		GOTO l1
+		l2: #child-1
+		l1: \load (#se)
+		IFNE l2
+		\if (#has-child-2)
+			(#child-2)
+			(RETURN)
+	)
+}
+
+// ###############
+// ### Returns ###
+// ############### 
+
+// TODO Check that really in int is returned!!!
+return_int {
+	\taclets ("MethodCallReturn")
+	\translation (
+		\load (#se)
+		IRETURN
+	)
+}
+
+return_void {
+	\taclets ("MethodCallReturn")
+	\translation (
+		RETURN
+	)
+}
+
+// ##########################
+// ### Integer arithmetic ###
+// ##########################
+
+assignment {
+	\taclets ("assignment")
+	\translation (
+		\load (#se)
+		ISTORE #loc
+		#child-1
+	)
+}
+
+assignment_subtraction_int {
+	\taclets ("assignment_subtraction_int")
+	\translation (
+		\load (#seCharByteShortInt0)
+		\load (#seCharByteShortInt1)
+		ISUB
+		ISTORE #loc
+		#child-1
+	)
+}
+
+assignment_addition_int {
+	\taclets ("assignment_addition_int")
+	\translation (
+		\load (#seCharByteShortInt0)
+		\load (#seCharByteShortInt1)
+		IADD
+		ISTORE #loc
+		#child-1
+	)
+}
+
+compound_assignment {
+	\taclets ("CompoundAssignment1New")
+	\translation (
+		\load (#seBool)
+		IFEQ l1
+		ICONST_0
+		GOTO l2
+		l1: ICONST_1
+		l2: ISTORE #lhs
+		#child-1
+	)
+}
+
+greater_than_comparison {
+	\taclets ("GreaterThanComparisonSimple")
+	\translation (
+		\load (#se0)
+		\load (#se1)
+		IF_ICMPLE l1
+		ICONST_1
+		GOTO l2
+		l1: ICONST_0
+		l2: ISTORE #lhs
+		#child-1
+	)
+}
+
+unary_minus_int {
+	\taclets ("unary_minus_int")
+	\translation (
+		\load (\negate (#seCharByteShortInt))
+		ISTORE #loc
+		#child-1
+	)
+}
