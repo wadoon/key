@@ -100,9 +100,12 @@ public class SymbolicExecutionInterface {
 
                 // Configure strategy for full exploration
                 SymbolicExecutionUtil.initializeStrategy(builder);
+                
+                //TODO: Better if we get away without a static boundary on the number of steps...
+                
                 //@formatter:off
                 SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 
-                                                                                100, 
+                                                                                1000, 
                                                                                 true,   // true to apply method contracts instead of inlining, 
                                                                                 false,  // true to apply loop invariants instead of unrolling, 
                                                                                 false,  // true to apply block contracts instead of expanding.
@@ -118,7 +121,7 @@ public class SymbolicExecutionInterface {
                 //@formatter:off
                 // Stop after 100 nodes have been explored on each branch.
                 //TODO: Check whether this stop condition is really practical
-                stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(500));
+                stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(10000));
                 //@formatter:on
 
                 proof.getSettings().getStrategySettings()

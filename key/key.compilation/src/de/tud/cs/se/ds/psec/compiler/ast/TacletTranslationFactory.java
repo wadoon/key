@@ -44,6 +44,7 @@ public class TacletTranslationFactory {
             "compound_binary_AND_2",
             "compound_greater_than_comparison_1",
             "compound_int_cast_expression",
+            "for_to_while",
             "ifElseUnfold",
             "ifUnfold",
             "loopComplexToSimple",
