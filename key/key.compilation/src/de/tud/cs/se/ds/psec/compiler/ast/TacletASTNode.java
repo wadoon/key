@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
@@ -160,6 +161,8 @@ public abstract class TacletASTNode implements Opcodes {
         }
         else if (expr instanceof LocationVariable) {
             mv.visitVarInsn(ILOAD, pvHelper.progVarNr((LocationVariable) expr));
+        } else if (expr instanceof Negative) {
+            loadIntVarOrConst((Expression) ((Negative) expr).getChildAt(0), true);
         }
         else {
             logger.error(

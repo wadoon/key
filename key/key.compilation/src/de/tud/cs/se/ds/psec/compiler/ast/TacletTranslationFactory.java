@@ -106,6 +106,9 @@ public class TacletTranslationFactory {
         case "compound_assignment_1_new":
             result = new CompoundAssignment1New(mv, pvHelper, app);
             break;
+        case "equality_comparison_simple":
+            result = new EqualityComparisonSimple(mv, pvHelper, app);
+            break;
         case "greater_than_comparison_simple":
             result = new GreaterThanComparisonSimple(mv, pvHelper, app);
             break;

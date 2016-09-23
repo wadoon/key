@@ -33,7 +33,7 @@ while_loop {
 // ### Returns ###
 // ############### 
 
-// TODO Check that really in int is returned!!!
+// TODO Check that really an int is returned!!!
 return_int {
 	\taclets ("MethodCallReturn")
 	\translation (
