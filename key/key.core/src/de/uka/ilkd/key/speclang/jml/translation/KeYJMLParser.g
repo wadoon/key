@@ -1507,18 +1507,18 @@ integerliteral returns [SLExpression ret=null] throws SLTranslationException
 
 floatliteral returns [SLExpression result=null] throws SLTranslationException
 :
-    f:FLOAT_LITERAL
+    f=FLOAT_LITERAL
     {
-        String fs = f.getText().replace("_",".");
+        String fs = f.getText();
 
         result = new SLExpression(services.getTypeConverter().convertToLogicElement(
 		                  new FloatLiteral(fs)),
                                   javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_FLOAT));
     }
   |
-    d:DOUBLE_LITERAL
+    d=DOUBLE_LITERAL
     {
-        String fs = d.getText().replace("_",".");
+        String fs = d.getText();
 
         result = new SLExpression(services.getTypeConverter().convertToLogicElement(
 		                  new DoubleLiteral(fs)),
@@ -1836,19 +1836,19 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         | INDEXOF)
          => result = sequence    
 
-    |   (   fpnan:FP_NAN        LPAREN e1=expression RPAREN { tk = fpnan; }
-        |   fpzero:FP_ZERO      LPAREN e1=expression RPAREN { tk = fpzero; }
-        |   fpnormal:FP_NORMAL  LPAREN e1=expression RPAREN { tk = fpnormal; }
-        |   fpsubnormal:FP_SUBNORMAL LPAREN e1=expression RPAREN { tk = fpsubnormal; }
-        |   fpinf:FP_INFINITE   LPAREN e1=expression RPAREN { tk = fpinf; }
-        |   fppos:FP_POSITIVE   LPAREN e1=expression RPAREN { tk = fppos; }
-        |   fpneg:FP_NEGATIVE   LPAREN e1=expression RPAREN { tk = fpneg; }
-        |   fpabs:FP_ABS        LPAREN e1=expression RPAREN { tk = fpabs; }
-        |   fpeq:FP_EQ         LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpeq; }
-        |   fpadd:FP_ADD        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpadd; }
-        |   fpsub:FP_SUB        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpsub; }
-        |   fpmul:FP_MUL        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpmul; }
-        |   fpdiv:FP_DIV        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpdiv; }
+    |   (   fpnan=FP_NAN        LPAREN e1=expression RPAREN { tk = fpnan; }
+        |   fpzero=FP_ZERO      LPAREN e1=expression RPAREN { tk = fpzero; }
+        |   fpnormal=FP_NORMAL  LPAREN e1=expression RPAREN { tk = fpnormal; }
+        |   fpsubnormal=FP_SUBNORMAL LPAREN e1=expression RPAREN { tk = fpsubnormal; }
+        |   fpinf=FP_INFINITE   LPAREN e1=expression RPAREN { tk = fpinf; }
+        |   fppos=FP_POSITIVE   LPAREN e1=expression RPAREN { tk = fppos; }
+        |   fpneg=FP_NEGATIVE   LPAREN e1=expression RPAREN { tk = fpneg; }
+        |   fpabs=FP_ABS        LPAREN e1=expression RPAREN { tk = fpabs; }
+        |   fpeq=FP_EQ         LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpeq; }
+        |   fpadd=FP_ADD        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpadd; }
+        |   fpsub=FP_SUB        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpsub; }
+        |   fpmul=FP_MUL        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpmul; }
+        |   fpdiv=FP_DIV        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpdiv; }
         ) {
             Function f = null;
 

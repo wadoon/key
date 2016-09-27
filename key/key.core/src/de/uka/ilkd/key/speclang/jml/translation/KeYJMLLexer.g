@@ -242,17 +242,6 @@ HEXDIGIT
               | 'A' .. 'F'
 ;
 
-
-FLOAT_LITERAL
-    :
-    '_'! 'f'! (DIGIT)+ '_' (DIGIT)+ 'f'
-;
-
-DOUBLE_LITERAL
-    :
-    '_'! 'd'! (DIGIT)+ '_' (DIGIT)+ ('d')?
-    ;
-
 fragment
 LETTERORDIGIT
     :
@@ -289,6 +278,16 @@ DIGITS
         (DIGIT)+
 ;
 
+FLOAT_LITERAL
+    :
+     (DIGIT)+ '.' (DIGIT)+ ('f' | 'F')
+;
+
+DOUBLE_LITERAL
+    :
+     (DIGIT)+ '.' (DIGIT)+ ('d' | 'D')?
+    ; 
+       
 CHAR_LITERAL:
         '\''
                 ((' '..'&') |
