@@ -158,8 +158,11 @@ BITWISENOT : '~';
 COLON : ':';
 COMMA : ',';
 DIV : '/';
-DOT : '.';
+
+DOT : '.' ;
 DOTDOT : '..';
+
+
 EQUAL_SINGLE : '=';
 EQV_ANTIV: '<==>' | '<=!=>';
 EQ_NEQ : '==' | '!=';
@@ -278,16 +281,29 @@ DIGITS
         (DIGIT)+
 ;
 
-FLOAT_LITERAL
+fragment EXPONENT    
+    :   ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ 
+    ;
+
+
+fragment FLOAT_LITERAL
     :
-     (DIGIT)+ '.' (DIGIT)+ ('f' | 'F')
+   (DIGIT)+ '.' (DIGIT)+ ('f' | 'F')
 ;
 
-DOUBLE_LITERAL
+fragment DOUBLE_LITERAL
     :
-     (DIGIT)+ '.' (DIGIT)+ ('d' | 'D')?
+      (DIGIT)+ '.' (DIGIT)+ ('d' | 'D')?
     ; 
        
+FLOAT_OR_DOUBLE_LITERAL:
+   ((DIGIT)+ '.' (DIGIT)+)  =>
+      ( (('f' | 'F')) => FLOAT_LITERAL {$type = FLOAT_LITERAL;} 
+       |
+        DOUBLE_LITERAL {$type = FLOAT_LITERAL;} 
+      ) 
+      ;
+    
 CHAR_LITERAL:
         '\''
                 ((' '..'&') |

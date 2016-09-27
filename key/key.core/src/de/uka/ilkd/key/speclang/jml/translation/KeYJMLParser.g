@@ -974,8 +974,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 		opToken = geq;
 	    }
      ) {
-		 if (right.getType().getSort().equals(
-				floatLDT.targetSort())) {
+     if (right.getType().getSort() == floatLDT.targetSort()) {
                     if (f == intLDT.getLessThan()) {
                         f = floatLDT.getLessThan();
                     } else if (f == intLDT.getGreaterThan()) {
@@ -985,8 +984,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
                     } else if (f == intLDT.getGreaterOrEquals()) {
                         f = floatLDT.getGreaterOrEquals();
                     }
-                } else if (right.getType().getSort().equals(
-				doubleLDT.targetSort())) {
+                    } else if (right.getType().getSort().equals(doubleLDT.targetSort())) {
                     if (f == intLDT.getLessThan()) {
                         f = doubleLDT.getLessThan();
                     } else if (f == intLDT.getGreaterThan()) {

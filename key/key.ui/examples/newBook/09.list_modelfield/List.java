@@ -9,7 +9,7 @@ public interface List {
 
     /*@ public normal_behavior
       @ requires !empty();
-      @ ensures theList == \old(theList[1..theList.length]);
+      @ ensures theList == \old(theList[1   .. theList.length]);
       @*/
     public void remFirst ();
 
