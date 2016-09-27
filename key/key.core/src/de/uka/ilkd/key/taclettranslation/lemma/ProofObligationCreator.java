@@ -69,7 +69,7 @@ public class ProofObligationCreator {
 
               for (Taclet taclet : taclets) {
                  InitConfig initConfig = initConfigs[i];
-                 initConfig.setTaclets(initConfig.getTaclets().union(axioms));
+                 initConfig.setTaclets(initConfig.getTaclets().prepend(axioms));
                  UserDefinedSymbols symbolsForAxioms = analyzeTaclets(axioms, initConfig.namespaces());
 
                  symbolsForAxioms.addSymbolsToNamespaces(initConfig.namespaces());
@@ -162,10 +162,7 @@ public class ProofObligationCreator {
                 // (MU 2013-08)
                 // String header = userDefinedSymbols.createHeader(initConfig.getServices());
           
-                Proof proof = new Proof(name, formula, "" /*header*/,
-                                initConfig.createTacletIndex(),
-                                initConfig.createBuiltInRuleIndex(),
-                                initConfig);
+                Proof proof = new Proof(name, formula, "" /*header*/, initConfig);
          
                      
                 userDefinedSymbols.addSymbolsToNamespaces(proof.getNamespaces());

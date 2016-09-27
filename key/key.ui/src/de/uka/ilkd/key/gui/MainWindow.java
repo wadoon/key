@@ -32,11 +32,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.EventObject;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
@@ -67,9 +64,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -87,7 +83,9 @@ import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
+import de.uka.ilkd.key.gui.actions.MacroKeyBinding;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
 import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
 import de.uka.ilkd.key.gui.actions.OpenExampleAction;
@@ -108,6 +106,7 @@ import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
+import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
 import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
@@ -131,7 +130,6 @@ import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -207,7 +205,7 @@ public final class MainWindow extends JFrame  {
     private final AutoModeAction autoModeAction;
 
     /** action for opening a KeY file */
-    private MainWindowAction openFileAction;
+    private OpenFileAction openFileAction;
 
     /** action for opening an example */
     private OpenExampleAction openExampleAction;
@@ -238,9 +236,6 @@ public final class MainWindow extends JFrame  {
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
-    /** for locking of threads waiting for the prover to exit */
-    public final Object monitor = new Object();
-
     private final NotificationManager notificationManager;
     
     private final PreferenceSaver prefSaver =
@@ -259,7 +254,7 @@ public final class MainWindow extends JFrame  {
     
     private final TermLabelMenu termLabelMenu;
     
-    public VisibleTermLabels getVisibleTermLabels(){
+    public TermLabelVisibilityManager getVisibleTermLabels(){
         return termLabelMenu.getVisibleTermLabels();
     }
 
@@ -290,10 +285,14 @@ public final class MainWindow extends JFrame  {
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
         addWindowListener(exitMainAction.windowListener);
-        setVisible(true);
+        MacroKeyBinding.registerMacroKeyBindings(mediator, currentGoalView, getRootPane());
     }
 
     public static MainWindow getInstance() {
+       return getInstance(true);
+    }
+
+    public static MainWindow getInstance(boolean ensureIsVisible) {
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
             System.err.println("Please use the --auto option to start KeY in batch mode.");
@@ -302,6 +301,9 @@ public final class MainWindow extends JFrame  {
         }
         if (instance == null) {
             instance = new MainWindow();
+            if (ensureIsVisible) {
+               instance.setVisible(true);
+            }
         }
         return instance;
     }
@@ -704,6 +706,7 @@ public final class MainWindow extends JFrame  {
         
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
+        view.add(new JCheckBoxMenuItem(new SyntaxHighlightingToggleAction(this)));
         view.add(termLabelMenu);
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
 
@@ -726,8 +729,6 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        final JMenuItem macros = new ProofMacroMenu(mediator);
-        proof.add(macros);
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
@@ -771,6 +772,7 @@ public final class MainWindow extends JFrame  {
         help.add(new AboutAction(this));
         help.add(new KeYProjectHomepageAction(this));
 //        help.add(new SystemInfoAction(this));
+           help.add(new MenuSendFeedackAction(this));
         help.add(new LicenseAction(this));
         return help;
     }
@@ -897,7 +899,7 @@ public final class MainWindow extends JFrame  {
                 updateSequentView();
             }
         };
-        ThreadUtilities.invokeAndWait(guiUpdater);
+        ThreadUtilities.invokeOnEventQueue(guiUpdater);
     }
 
     private Proof setUpNewProof(Proof proof) {
@@ -1054,7 +1056,9 @@ public final class MainWindow extends JFrame  {
         /** focused node has changed */
         @Override
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
-            if (getMediator().isInAutoMode()) return;
+            if (getMediator().isInAutoMode()) {
+                return;
+            }
             updateSequentView();
         }
 
@@ -1246,8 +1250,9 @@ public final class MainWindow extends JFrame  {
             // components, but it scales well ;-)
             while ( c != null ) {
                 if ( (c instanceof JComponent) &&
-                        AUTO_MODE_TEXT.equals(((JComponent)c).getToolTipText()) )
+                        AUTO_MODE_TEXT.equals(((JComponent)c).getToolTipText()) ) {
                     return true;
+                }
                 c = c.getParent ();
             }
             return false;
@@ -1379,7 +1384,7 @@ public final class MainWindow extends JFrame  {
      */
     public void notify(NotificationEvent event) {
         if (notificationManager != null) {
-            notificationManager.notify(event);
+            notificationManager.handleNotificationEvent(event);
         }
     }
 
@@ -1527,35 +1532,39 @@ public final class MainWindow extends JFrame  {
         getUserInterface().loadProblem(file);
     }
 
-   public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      getUserInterface().loadProblem(file, classPath, bootClassPath);
+   public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {
+      getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
    }
 
     /*
      * Retrieves supported term label names from profile and returns a sorted
      * list of them.
-     * TODO: Maybe there is a better place to put this than MainWindow.
      */
     public List<Name> getSortedTermLabelNames() {
         /* 
          * Get list of labels from profile. This list is not always identical,
          * since the used Profile may change during execution.
          */
-        ImmutableList<Name> labelNamesFromProfile = getMediator()
-                .getProfile().getTermLabelManager().getSupportedTermLabelNames();
-
-        List<Name> labelNames = new LinkedList<Name>();
-        for (Name labelName : labelNamesFromProfile) {
-            labelNames.add(labelName);
-        }
-        Collections.sort(labelNames, new Comparator<Name>() {
-
-            @Override
-            public int compare(Name t, Name t1) {
-                return String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString());
-            }
-
-        });
-        return labelNames;
+        return TermLabelVisibilityManager.getSortedTermLabelNames(getMediator().getProfile());
     }
+
+   /**
+    * Returns the {@link JToolBar} with the proof control.
+    * <p>
+    * This method is used by the Eclipse world to add additional features!
+    * @return The {@link JToolBar} with the proof control.
+    */
+   public JToolBar getControlToolBar() {
+      return controlToolBar;
+   }
+   
+   /**
+    * Defines if talcet infos are shown or not.
+    * <p>
+    * Used by the Eclipse integration.
+    * @param show {@code true} show taclet infos, {@code false} hide taclet infos.
+    */
+   public void setShowTacletInfo(boolean show) {
+      mainWindowTabbedPane.getProofTreeView().tacletInfoToggle.setSelected(show);
+   }
 }

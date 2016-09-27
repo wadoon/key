@@ -23,8 +23,9 @@ import java.util.TreeMap;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 
-import antlr.Token;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -122,11 +123,14 @@ public final class JMLTranslator {
         ASSIGNABLE ("assignable"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
+        ENSURES_FREE ("ensures_free"),
         MODEL_METHOD_AXIOM ("model_method_axiom"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
+        REQUIRES_FREE ("requires_free"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
+        JOIN_PROC ("join_proc"),
 
         // quantifiers and "generalized quantifiers"
         FORALL ("\\forall"),
@@ -307,29 +311,22 @@ public final class JMLTranslator {
                         mby == null ? null : mby.getTerm());
             }
         });
-        translationMethods.put(JMLKeyWord.ENSURES, new JMLTranslationMethod() {
+        JMLTranslationMethod termTranslationMethod = new JMLTranslationMethod() {
 
             @Override
             public Term translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
-                Term ensuresTerm = (Term) params[0];
+                Term term = (Term) params[0];
+        	    @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[1];
-                return tb.convertToFormula(ensuresTerm);
-            }
-        });
-        translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, new JMLTranslationMethod() {
-
-        	@Override
-        	public Term translate(SLTranslationExceptionManager excManager, Object... params)
-        	              throws SLTranslationException {
-        	    checkParameters(params, Term.class, Services.class);
-        	    Term axiomsTerm = (Term) params[0];
-        	    TermServices services = (TermServices) params[1];
-        	    return tb.convertToFormula(axiomsTerm);
+                return tb.convertToFormula(term);
         	}
-       });
+        };
+        translationMethods.put(JMLKeyWord.ENSURES, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.ENSURES_FREE, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, termTranslationMethod);
        translationMethods.put(JMLKeyWord.REPRESENTS,
                                new JMLTranslationMethod() {
 
@@ -347,18 +344,19 @@ public final class JMLTranslator {
                         t);
             }
         });
-        translationMethods.put(JMLKeyWord.REQUIRES, new JMLTranslationMethod() {
-
+        translationMethods.put(JMLKeyWord.REQUIRES, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.REQUIRES_FREE, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.JOIN_PROC, new JMLTranslationMethod() {
+            
             @Override
-            public Term translate(SLTranslationExceptionManager excManager,
-                                  Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, Term.class, Services.class);
-                Term requiresTerm = (Term) params[0];
-                TermServices services = (TermServices) params[1];
-                return tb.convertToFormula(requiresTerm);
+            public Object translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                // TODO Auto-generated method stub
+                System.out.println("XXX");
+                return null;
             }
         });
+
         translationMethods.put(JMLKeyWord.SIGNALS, new JMLTranslationMethod() {
 
             @Override
@@ -402,6 +400,7 @@ public final class JMLTranslator {
                 checkParameters(params,
                                 ImmutableList.class, ProgramVariable.class,
                                 Services.class);
+                @SuppressWarnings("unchecked")
                 ImmutableList<KeYJavaType> signalsonly =
                         (ImmutableList<KeYJavaType>) params[0];
                 ProgramVariable excVar = (ProgramVariable) params[1];
@@ -432,6 +431,7 @@ public final class JMLTranslator {
                 checkParameters(params, Term.class, String.class, Services.class);
                 Term term = (Term) params[0];
                 String label = (String) params[1];
+                @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[2];
                 Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
                 return new Pair<Label, Term>(label == null ? null : new ProgramElementName(label), formula);
@@ -446,6 +446,8 @@ public final class JMLTranslator {
                 checkParameters(params, Term.class, String.class, Services.class);
                 Term term = (Term) params[0];
                 String label = (String) params[1];
+                
+                @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[2];
                 Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
                 return new Pair<Label, Term>(label == null ? null : new ProgramElementName(label), formula);
@@ -459,6 +461,7 @@ public final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
                 Term term = (Term) params[0];
+                @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[1];
                 return term == null ? tb.tt() : tb.convertToFormula(term);
             }
@@ -826,6 +829,7 @@ public final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager,
                     Object... params) throws SLTranslationException {
                 checkParameters(params, Services.class, Term.class, KeYJavaType.class);
+                @SuppressWarnings("unused")// please keep it for documentation purposes
                 final TermServices services = (TermServices)params[0];
                 final Term selfVar = (Term)params[1];
                 final KeYJavaType targetType = (KeYJavaType)params[2];
@@ -946,6 +950,7 @@ public final class JMLTranslator {
                                     Object... params)
                     throws SLTranslationException {
                 checkParameters(params, ImmutableList.class, Services.class);
+                @SuppressWarnings("unchecked")
                 ImmutableList<SLExpression> exprList =
                         (ImmutableList<SLExpression>) params[0];
                 Services services = (Services) params[1];
@@ -973,6 +978,7 @@ public final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class,
                                 SLExpression.class);
+                @SuppressWarnings("unused")// please keep it for documentation purposes
                 final TermServices services = (TermServices) params[0];
                 final Term seq = ((SLExpression) params[1]).getTerm();
                 final Term idx = ((SLExpression) params[2]).getTerm();
@@ -1085,7 +1091,9 @@ public final class JMLTranslator {
                                 ImmutableList.class, 
                                 Map.class,
                                 Services.class);
+                @SuppressWarnings("unchecked")
                 final ImmutableList<SLExpression> list = (ImmutableList<SLExpression>) params[0];
+                @SuppressWarnings("unchecked")
                 final Map<LocationVariable,Term> atPres = (Map<LocationVariable, Term>) params[1];
                 final Services services = (Services) params[2];
                 final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
@@ -1367,6 +1375,7 @@ public final class JMLTranslator {
                 Token desc = (Token) params[1];
                 LocationVariable selfVar = (LocationVariable) params[2];
                 LocationVariable resultVar = (LocationVariable) params[3];
+                @SuppressWarnings("unchecked")
                 ImmutableList<LocationVariable> paramVars =
                     (ImmutableList<LocationVariable>) params[4];
                 Term heapAtPre = (Term) params[5];
@@ -1418,8 +1427,13 @@ public final class JMLTranslator {
                                 Services.class);
 
                 Token escape = (Token) params[0];
+                @SuppressWarnings("unchecked")
                 ImmutableList<SLExpression> list =
                         (ImmutableList<SLExpression>) params[1];
+                if(list == null) {
+                    // it may be that there were no arguments and the list is null
+                    list = ImmutableSLList.<SLExpression>nil();
+                }
                 Services services = (Services) params[2];
 
                 // strip leading "\dl_"
@@ -1662,8 +1676,10 @@ public final class JMLTranslator {
                     Object... params)
                     throws SLTranslationException {
                 checkParameters(params, ImmutableList.class, Services.class);
+                @SuppressWarnings("unchecked")
                 ImmutableList<Term> list =
                         (ImmutableList<Term>) params[0];
+                @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[1];
 
                 ImmutableList<Term> disTerms = ImmutableSLList.<Term>nil();
@@ -1740,8 +1756,9 @@ public final class JMLTranslator {
         Object result = null;
         try {
             result = parser.top();
-            List<PositionedString> warnings = parser.getWarnings();
-        } catch (antlr.ANTLRException e) {
+            // maybe return pair<T, Warnings>?
+            //List<PositionedString> warnings = parser.getWarnings();            
+        } catch (RecognitionException e) {
             throw parser.getExceptionManager().convertException(e);
         }
         if (resultClass.equals(Term.class)) {
@@ -1954,6 +1971,7 @@ public final class JMLTranslator {
      * Used for features with semantics (currently) not supported in KeY/DL.
      * @param feature
      */
+    @SuppressWarnings("unused")
     private void addUnderspecifiedWarning(String feature) {
         String msg = feature + "is not supported and translated to an underspecified term or formula.";
         addWarning(msg);
@@ -2371,11 +2389,7 @@ public final class JMLTranslator {
             checkNotType(e1,man);
             checkNotType(e2,man);
             SLExpression result = null;
-            try {
-                result = translate(jish,e1,e2);
-            } catch (SLTranslationException cause){
-                throw man.createException("Cannot create JML arithmetic expression", cause);
-            }
+            result = translate(jish,e1,e2);
             return result;
         }
 
@@ -2403,30 +2417,28 @@ public final class JMLTranslator {
 
             Term[] args;
             if (list == null) {
-                // empty parameter list
-                args = new Term[0];
+                list = ImmutableSLList.<SLExpression>nil();
+            }
+
+            Term heap = tb.getBaseHeap();
+
+            // special casing "implicit heap" arguments:
+            // omitting one argument means first argument is "heap"
+            int i = 0;
+            if (function.arity() == list.size() + 1
+                    && function.argSort(0) == heap.sort()) {
+                args = new Term[list.size() + 1];
+                args[i++] = heap;
             } else {
+                args = new Term[list.size()];
+            }
 
-                Term heap = tb.getBaseHeap();
-
-                        // special casing "implicit heap" arguments:
-                // omitting one argument means first argument is "heap"
-                int i = 0;
-                if (function.arity() == list.size() + 1
-                        && function.argSort(0) == heap.sort()) {
-                    args = new Term[list.size() + 1];
-                    args[i++] = heap;
-                } else {
-                    args = new Term[list.size()];
+            for (SLExpression expr : list) {
+                if (!expr.isTerm()) {
+                    throw new SLTranslationException("Expecting a term here, not: "
+                            + expr);
                 }
-
-                for (SLExpression expr : list) {
-                    if (!expr.isTerm()) {
-                        throw new SLTranslationException("Expecting a term here, not: "
-                                + expr);
-                    }
-                    args[i++] = expr.getTerm();
-                }
+                args[i++] = expr.getTerm();
             }
 
             try {

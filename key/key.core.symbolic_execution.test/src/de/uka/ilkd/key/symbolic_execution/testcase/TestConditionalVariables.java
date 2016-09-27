@@ -34,11 +34,13 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
                                                                         false, 
                                                                         false, 
                                                                         false, 
+                                                                        false,
                                                                         false, 
                                                                         false, 
                                                                         false, 
                                                                         false,
-                                                                        false);
+                                                                        false,
+                                                                        true);
       try {
          // Find nodes in tree
          IExecutionStart start = env.getBuilder().getStartNode();

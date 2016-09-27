@@ -125,7 +125,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     private boolean subset(ImmutableMap<SchemaVariable,InstantiationEntry<?>> insts0,
                            ImmutableMap<SchemaVariable,InstantiationEntry<?>> insts1) {
         final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it =
-            insts0.entryIterator ();
+            insts0.iterator ();
 
         while ( it.hasNext () ) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> entry0 = it.next ();
@@ -154,7 +154,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     protected boolean noDuplicateFindTaclet(TacletApp app,
                                             PosInOccurrence pos,
                                             Goal goal) {
-        final SequentFormula focusFor = pos.constrainedFormula ();
+        final SequentFormula focusFor = pos.sequentFormula ();
         final boolean antec = pos.isInAntec ();
     
         Node node = goal.node ();

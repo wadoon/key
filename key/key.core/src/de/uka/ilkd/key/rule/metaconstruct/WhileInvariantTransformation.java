@@ -21,6 +21,7 @@ import org.key_project.util.ExtList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -251,7 +252,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if (breakInnerLabel != null) {
                 // an unlabeled continue needs to be handled with (replaced)
 		body = KeYJavaASTFactory.labeledStatement(
-			breakInnerLabel.getLabel(), body);
+			breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
             }
 	    StatementBlock block = KeYJavaASTFactory.block(body);
             Statement newBody = block;
@@ -259,7 +260,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 // an unlabeled break occurs in the
                 // while loop therefore we need a labeled statement
 		newBody = KeYJavaASTFactory.labeledStatement(
-			breakOuterLabel.getLabel(), block);
+			breakOuterLabel.getLabel(), block, PositionInfo.UNDEFINED);
 
             }
 
@@ -285,8 +286,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 Statement body =
                         (Statement) (changeList.isEmpty() ? null
                                 : changeList.removeFirst());
-		addChild(KeYJavaASTFactory.whileLoop(guard, body,
-			x.getPositionInfo()));
+                While newLoop = KeYJavaASTFactory.whileLoop(guard, body,
+                        x.getPositionInfo());
+                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                addChild(newLoop);
                 changed();
             } else {
                 doDefaultAction(x);
@@ -328,7 +331,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             // label statement if there are returns / continue / breaks
             if (breakOuterLabel != null) {
 		body = KeYJavaASTFactory.labeledStatement(
-			breakOuterLabel.getLabel(), body);
+			breakOuterLabel.getLabel(), body, PositionInfo.UNDEFINED);
 
             }
             

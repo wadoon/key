@@ -18,7 +18,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugElement;
+import org.key_project.sed.core.model.ISEDebugElement;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
@@ -46,7 +46,7 @@ public class SWTBotDebugViewHierarchyTest extends AbstractSetupTestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view
@@ -85,7 +85,7 @@ public class SWTBotDebugViewHierarchyTest extends AbstractSetupTestCase {
    
    /**
     * Makes sure that the defined hierarchy by the interface
-    * {@link ISEDDebugElement} and his sub interfaces is correctly shown
+    * {@link ISEDebugElement} and his sub interfaces is correctly shown
     * in the debug view of the Eclipse debug API with activated
     * compact symbolic execution tree option.
     */
@@ -101,7 +101,7 @@ public class SWTBotDebugViewHierarchyTest extends AbstractSetupTestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view
@@ -124,7 +124,7 @@ public class SWTBotDebugViewHierarchyTest extends AbstractSetupTestCase {
    
    /**
     * Makes sure that the defined hierarchy by the interface
-    * {@link ISEDDebugElement} and his sub interfaces is correctly shown
+    * {@link ISEDebugElement} and his sub interfaces is correctly shown
     * in the debug view of the Eclipse debug API.
     */
    @Test
@@ -139,7 +139,7 @@ public class SWTBotDebugViewHierarchyTest extends AbstractSetupTestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view

@@ -24,19 +24,19 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.sed.core.model.ISEDBaseMethodReturn;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEBaseMethodReturn;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.util.java.StringUtil;
 
 /**
- * This composite provides the content shown in {@link SEDDebugNodePropertySection}
+ * This composite provides the content shown in {@link SENodePropertySection}
  * and in {@code GraphitiDebugNodePropertySection}.
  * @author Martin Hentschel
  */
-public class NodeTabComposite implements ISEDDebugNodeTabContent {
+public class NodeTabComposite implements ISENodeTabContent {
    /**
     * The parent {@link Composite};
     */
@@ -71,7 +71,7 @@ public class NodeTabComposite implements ISEDDebugNodeTabContent {
     * {@inheritDoc}
     */
    @Override
-   public void updateContent(ISEDDebugNode node) {
+   public void updateContent(ISENode node) {
       String name = null;
       String type = null;
       String path = null;
@@ -83,8 +83,8 @@ public class NodeTabComposite implements ISEDDebugNodeTabContent {
             if (!node.getDebugTarget().isTerminated()) {
                path = node.getPathCondition();
             }
-            if (node instanceof ISEDBaseMethodReturn) {
-               ISEDBranchCondition returnBranchCondition = ((ISEDBaseMethodReturn) node).getMethodReturnCondition();
+            if (node instanceof ISEBaseMethodReturn) {
+               ISEBranchCondition returnBranchCondition = ((ISEBaseMethodReturn) node).getMethodReturnCondition();
                if (returnBranchCondition != null) {
                   returnCondition = returnBranchCondition.getName();
                }
@@ -165,20 +165,23 @@ public class NodeTabComposite implements ISEDDebugNodeTabContent {
       data.top = new FormAttachment(typeCLabel, 0, SWT.CENTER);
       typeLabel.setLayoutData(data);
 
-      Text pathText = factory.createText(composite, path != null ? path : StringUtil.EMPTY_STRING);
-      pathText.setEditable(false);
-      data = new FormData();
-      data.left = new FormAttachment(0, labelWidth);
-      data.right = new FormAttachment(100, 0);
-      data.top = new FormAttachment(typeCLabel, 0, ITabbedPropertyConstants.VSPACE);
-      pathText.setLayoutData(data);
-      
-      CLabel pathLabel = factory.createCLabel(composite, "Path:");
-      data = new FormData();
-      data.left = new FormAttachment(0, 0);
-      data.right = new FormAttachment(pathText, -ITabbedPropertyConstants.HSPACE);
-      data.top = new FormAttachment(pathText, 0, SWT.CENTER);
-      pathLabel.setLayoutData(data);
+      CLabel pathLabel = null;
+      if (path != null) {
+         Text pathText = factory.createText(composite, path != null ? path : StringUtil.EMPTY_STRING);
+         pathText.setEditable(false);
+         data = new FormData();
+         data.left = new FormAttachment(0, labelWidth);
+         data.right = new FormAttachment(100, 0);
+         data.top = new FormAttachment(typeCLabel, 0, ITabbedPropertyConstants.VSPACE);
+         pathText.setLayoutData(data);
+         
+         pathLabel = factory.createCLabel(composite, "Path:");
+         data = new FormData();
+         data.left = new FormAttachment(0, 0);
+         data.right = new FormAttachment(pathText, -ITabbedPropertyConstants.HSPACE);
+         data.top = new FormAttachment(pathText, 0, SWT.CENTER);
+         pathLabel.setLayoutData(data);
+      }
 
       if (returnCondition != null) {
          Text methodReturnText = factory.createText(composite, returnCondition);
@@ -186,7 +189,7 @@ public class NodeTabComposite implements ISEDDebugNodeTabContent {
          data = new FormData();
          data.left = new FormAttachment(0, labelWidth);
          data.right = new FormAttachment(100, 0);
-         data.top = new FormAttachment(pathLabel, 0, ITabbedPropertyConstants.VSPACE);
+         data.top = new FormAttachment(pathLabel != null ? pathLabel : typeCLabel, 0, ITabbedPropertyConstants.VSPACE);
          methodReturnText.setLayoutData(data);
          
          CLabel methodReturnLabel = factory.createCLabel(composite, "Return Condition:");

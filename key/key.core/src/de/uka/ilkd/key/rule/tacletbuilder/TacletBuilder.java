@@ -37,6 +37,7 @@ import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletAnnotation;
 import de.uka.ilkd.key.rule.TacletAttributes;
 import de.uka.ilkd.key.rule.Trigger;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -45,7 +46,7 @@ import de.uka.ilkd.key.rule.VariableCondition;
  * abstract taclet builder class to be inherited from taclet builders
  * specialised for their concrete taclet variant 
  */
-public abstract class TacletBuilder {
+public abstract class TacletBuilder<T extends Taclet> {
 
     protected final static Name NONAME = new Name("unnamed");
 
@@ -66,8 +67,11 @@ public abstract class TacletBuilder {
     protected ImmutableList<VariableCondition> variableConditions       = ImmutableSLList.<VariableCondition>nil(); 
     protected HashMap<TacletGoalTemplate, ImmutableSet<Choice>> goal2Choices          = null;
     protected ImmutableSet<Choice> choices           = DefaultImmutableSet.<Choice>nil();
+    protected ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
 
-    
+    public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {
+       this.tacletAnnotations = tacletAnnotations;
+    }
 
     private static boolean containsFreeVarSV(Term t) {
 	for (final QuantifiableVariable var : t.freeVars()) {
@@ -307,15 +311,15 @@ public abstract class TacletBuilder {
      * No specified find part for Taclets that require a find part
      * causes an IllegalStateException. 
      */
-    public abstract Taclet getTaclet();
+    public abstract T getTaclet();
 
-    public Taclet getTacletWithoutInactiveGoalTemplates(ImmutableSet<Choice> active){
+    public T getTacletWithoutInactiveGoalTemplates(ImmutableSet<Choice> active){
        if(goal2Choices==null || goals.isEmpty()){
           return getTaclet();
        }else{
           ImmutableList<TacletGoalTemplate> oldGoals = goals;
           Iterator<TacletGoalTemplate> it = oldGoals.iterator();
-          Taclet result;
+          T result;
           while(it.hasNext()){
              TacletGoalTemplate goal = it.next();
              if(goal2Choices.get(goal) != null && 

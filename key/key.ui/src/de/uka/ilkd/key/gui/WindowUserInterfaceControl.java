@@ -41,13 +41,16 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.joinrule.JoinRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -60,6 +63,7 @@ import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
@@ -94,9 +98,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
+        completions.add(JoinRuleCompletion.INSTANCE);
     }
 
-    protected MediatorProofControl createProofControl() {
+    @Override
+   protected MediatorProofControl createProofControl() {
        return new MediatorProofControl(this) {
           /**
            * {@inheritDoc}
@@ -105,7 +111,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
           public boolean isAutoModeSupported(Proof proof) {
              return super.isAutoModeSupported(proof) &&
                     mainWindow.getProofList().containsProof(proof);
-          }          
+          }
        };
     }
     
@@ -116,15 +122,17 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param classPath the class path entries to use.
      * @param bootClassPath the boot class path to use.
      */
-    public void loadProblem(File file, List<File> classPath,
-                            File bootClassPath) {
+    public void loadProblem(File file, 
+                            List<File> classPath,
+                            File bootClassPath,
+                            List<File> includes) {
         mainWindow.addRecentFile(file.getAbsolutePath());
-        getProblemLoader(file, classPath, bootClassPath, getMediator()).runAsynchronously();
+        getProblemLoader(file, classPath, bootClassPath, includes, getMediator()).runAsynchronously();
     }
 
     @Override
     public void loadProblem(File file) {
-        loadProblem(file, null, null);
+        loadProblem(file, null, null, null);
     }
 
     @Override
@@ -168,7 +176,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (!proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
+            if (proof != null && !proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
                     g = proof.openGoals().head();
@@ -189,7 +197,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 resetStatus(this);
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
-                if (!proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
+                if (proof != null && !proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
                     Goal g = proof.openGoals().head();
                     mainWindow.getMediator().goalChosen(g);
                     if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
@@ -212,7 +220,20 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                if (macroChosen()) {
+                ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+                if(problemLoader.hasProofScript()) {
+                    Pair<String, Location> scriptAndLoc;
+                    try {
+                        scriptAndLoc = problemLoader.readProofScript();
+                        ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
+                                scriptAndLoc.first, scriptAndLoc.second);
+                        psw.init();
+                        psw.execute();
+                    } catch (ProofInputException e) {
+                        // TODO
+                        e.printStackTrace();
+                    }
+                } else if (macroChosen()) {
                     applyMacro();
                 }
             }
@@ -319,6 +340,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                                     File file,
                                     List<File> classPath,
                                     File bootClassPath,
+                                    List<File> includes,
                                     Properties poPropertiesToForce,
                                     boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
       if (file != null) {
@@ -326,7 +348,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       }
       try {
          getMediator().stopInterface(true);
-         return super.load(profile, file, classPath, bootClassPath, poPropertiesToForce, forceNewProfileOfNewProofs);
+         return super.load(profile, file, classPath, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs);
       }
       finally {
          getMediator().startInterface(true);
@@ -407,12 +429,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       ThreadUtilities.invokeAndWait(new Runnable() {
          @Override
          public void run() {
-            mainWindow.getProofList().removeProof(e.getSource());
+            mainWindow.getProofList().removeProof(e.getSource());            
          }
       });
-      // Run the garbage collector.
-      Runtime r = Runtime.getRuntime();
-      r.gc();
     }
 
    @Override
@@ -439,24 +458,26 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       if (proofList != null) {
          getMediator().setProof(loader.getProof());
          if (result != null) {
-            getMediator().getSelectionModel().setSelectedNode(result.getNode());
+             if ("".equals(result.getStatus())) {
+                 this.resetStatus(this);
+              } else {
+                 this.reportStatus(this, result.getStatus());                         
+              }
+             getMediator().getSelectionModel().setSelectedNode(result.getNode());
+             if (result.hasErrors()) {
+                 throw new ProblemLoaderException(loader,
+                       "Proof could only be loaded partially.\n" +
+                             "In summary " + result.getErrorList().size() +
+                             " not loadable rule application(s) have been detected.\n" +
+                             "The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
+             }
          } else {
             // should never happen as replay always returns a result object
+             //TODO (DS): Why is it then there? If this happens, we will get\\
+             // a NullPointerException just a line below...
             getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());                         
          }
 
-         if ("".equals(result.getStatus())) {
-            this.resetStatus(this);
-         } else {
-            this.reportStatus(this, result.getStatus());                         
-         }
-         if (result.hasErrors()) {
-            throw new ProblemLoaderException(loader,
-                  "Proof could only be loaded partially.\n" +
-                        "In summary " + result.getErrorList().size() +
-                        " not loadable rule application(s) have been detected.\n" +
-                        "The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
-         }
       }
         getMediator().resetNrGoalsClosedByHeuristics();
         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
@@ -474,15 +495,17 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
+    * @param includes Optional includes to consider.
     * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
    public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
-                                                                      List<File> classPaths,
-                                                                      File bootClassPath,
-                                                                      boolean makeMainWindowVisible) throws ProblemLoaderException {
-      return loadInMainWindow(null, location, classPaths, bootClassPath, false, makeMainWindowVisible);
+                                                                             List<File> classPaths,
+                                                                             File bootClassPath,
+                                                                             List<File> includes,
+                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
+      return loadInMainWindow(null, location, classPaths, bootClassPath, includes, false, makeMainWindowVisible);
    }
    
    /**
@@ -492,22 +515,24 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
+    * @param includes Optional includes to consider.
     * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
    public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(Profile profile,
-                                                                      File location,
-                                                                      List<File> classPaths,
-                                                                      File bootClassPath,
-                                                                      boolean forceNewProfileOfNewProofs,
-                                                                      boolean makeMainWindowVisible) throws ProblemLoaderException {
+                                                                             File location,
+                                                                             List<File> classPaths,
+                                                                             File bootClassPath,
+                                                                             List<File> includes,
+                                                                             boolean forceNewProfileOfNewProofs,
+                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
       MainWindow main = MainWindow.getInstance();
       if (makeMainWindowVisible && !main.isVisible()) {
           main.setVisible(true);
       }
-      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null, forceNewProfileOfNewProofs);
+      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
    }
@@ -544,6 +569,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      //ok button
      final JButton button = new JButton("OK");
      button.addActionListener(new ActionListener() {
+         @Override
          public void actionPerformed(ActionEvent e) {
              dialog.setVisible(false);
          }
@@ -558,7 +584,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      
      button.registerKeyboardAction(
          new ActionListener() {
-             public void actionPerformed(ActionEvent event) {
+             @Override
+            public void actionPerformed(ActionEvent event) {
                  if(event.getActionCommand().equals("ESC")) {
                      button.doClick();
                  }
@@ -572,5 +599,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      dialog.setLocationRelativeTo(MainWindow.getInstance());
      dialog.setVisible(true);
      dialog.dispose();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      return mainWindow.getVisibleTermLabels();
    }
 }

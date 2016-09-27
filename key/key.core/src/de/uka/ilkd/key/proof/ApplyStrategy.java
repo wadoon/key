@@ -299,18 +299,18 @@ public class ApplyStrategy {
 
         private final Throwable error;
 
-        private final long time;
+        private final long timeInMillis;
         private final int appliedRuleAppsCount;
         private final int nrClosedGoals;
         private final Proof proof;
 
         public ApplyStrategyInfo(String message, Proof proof, Throwable error, Goal nonCloseableGoal,
-                long time, int appliedRuleAppsCount, int nrClosedGoals) {
+                long timeInMillis, int appliedRuleAppsCount, int nrClosedGoals) {
             this.message = message;
             this.proof = proof;
             this.error   = error;
             this.nonCloseableGoal = nonCloseableGoal;
-            this.time    = time;
+            this.timeInMillis    = timeInMillis;
             this.appliedRuleAppsCount = appliedRuleAppsCount;
             this.nrClosedGoals = nrClosedGoals;
         }
@@ -332,7 +332,7 @@ public class ApplyStrategy {
         }
 
         public long getTime() {
-            return time;
+            return timeInMillis;
         }
 
         public int getClosedGoals() {
@@ -356,7 +356,7 @@ public class ApplyStrategy {
                 sb.append("\n ").append(error.getMessage());
             }
             sb.append("\n Applied Rules: ").append(appliedRuleAppsCount);
-            sb.append("\n Time: ").append(time);
+            sb.append("\n Time: ").append(timeInMillis);
             sb.append("\n Closed Goals: ").append(nrClosedGoals);
             return sb.toString();
         }
@@ -495,7 +495,7 @@ public class ApplyStrategy {
             return new ApplyStrategyInfo("Error.", proof, t, null, System.currentTimeMillis()-time,
                                          countApplied, closedGoals);
         } finally{
-            time = System.currentTimeMillis()-time;
+            time = (System.currentTimeMillis()-time);
             Debug.out("Strategy stopped.");
             Debug.out("Applied ", countApplied);
             Debug.out("Time elapsed: ", time);

@@ -270,7 +270,9 @@ public final class DLSpecFactory {
 	if(heapAtPreVar != null) {
 	    final OpCollector oc = new OpCollector();
 	    pre.execPostOrder(oc);
+	    
 	    modifies.execPostOrder(oc);
+	    
 	    if(oc.contains(heapAtPreVar)) {
 		throw new ProofInputException(
 		    "variable \"" + heapAtPreVar + "\" used for pre-state heap" 
@@ -316,28 +318,34 @@ public final class DLSpecFactory {
         posts.put(heapLDT.getHeap(), post);
       	
         Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
-        hasMod.put(heapLDT.getHeap(), true);
-        hasMod.put(heapLDT.getSavedHeap(), true);
+        hasMod.put(heapLDT.getHeap(), modifies.op() != tb.ff().op());
+        for (LocationVariable h : heapLDT.getAllHeaps()) {
+            if (h != heapLDT.getHeap()) {
+                hasMod.put(heapLDT.getSavedHeap(), true); // different heaps not supported yet in DL contracts
+            }
+        }
         
 	final boolean isLibraryClass 
 		= ((TypeDeclaration)pm.getContainerType() 
 			              .getJavaType()).isLibraryClass();
 	return cf.func(name,
-					 pm.getContainerType(),		
-					 pm, 
-					 modality, 
-					 pres,
-					 null,// TODO measured_by in DL contracts not supported yet
-					 posts,
-					 null, // TODO no model methods in DL contracts
-					 mods,
-					 new LinkedHashMap<ProgramVariable,Term>(),
-					 hasMod, // TODO strictly pure in DL contracts not supported yet
-					 selfVar, 
-					 paramVars, 
-					 resultVar, 
-					 excVar,
-					 atPreVars,
-					 !isLibraryClass);
+	               pm.getContainerType(),
+	               pm,
+	               modality,
+	               pres,
+	               new LinkedHashMap<LocationVariable,Term>(),
+	               null,// TODO measured_by in DL contracts not supported yet
+	               posts,
+	               new LinkedHashMap<LocationVariable,Term>(),
+	               null, // TODO no model methods in DL contracts
+	               mods,
+	               new LinkedHashMap<ProgramVariable,Term>(),
+	               hasMod, // TODO strictly pure in DL contracts not supported yet
+	               selfVar,
+	               paramVars,
+	               resultVar,
+	               excVar,
+	               atPreVars,
+	               !isLibraryClass);
     }
 }

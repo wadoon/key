@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -607,7 +608,7 @@ public abstract class AbstractUpdateExtractor {
     * </p>
     * @author Martin Hentschel
     */
-   protected class ExtractLocationParameter {
+   public class ExtractLocationParameter {
       /**
        * The {@link ProgramVariable} or {@code null} if an array index is used instead.
        */
@@ -644,6 +645,21 @@ public abstract class AbstractUpdateExtractor {
        * Defines if this location should explicitly be shown on the state.
        */
       private final boolean stateMember;
+
+      /**
+       * Constructor for cloning purpose.
+       * @param original The original {@link ExtractLocationParameter} to clone.
+       * @param newParent The new parent {@link Term} to be used instead of the original one.
+       */
+      public ExtractLocationParameter(ExtractLocationParameter original, Term newParent) {
+         this.programVariable = original.programVariable;
+         this.arrayIndex = original.arrayIndex;
+         this.parentTerm = newParent;
+         this.parentTermIndexInStatePredicate = original.parentTermIndexInStatePredicate;
+         this.valueTermIndexInStatePredicate = original.valueTermIndexInStatePredicate;
+         this.preVariable = original.preVariable;
+         this.stateMember = original.stateMember;
+      }
 
       /**
        * Constructor.
@@ -735,6 +751,22 @@ public abstract class AbstractUpdateExtractor {
       public Term getArrayIndex() {
          return arrayIndex;
       }
+      
+      /**
+       * Returns the pre variable.
+       * @return The pre variable.
+       */
+      public LocationVariable getPreVariable() {
+         return preVariable;
+      }
+
+      /**
+       * Returns the right side of the update created by {@link #createPreUpdate()}.
+       * @return The right side of the update created by {@link #createPreUpdate()}.
+       */
+      public Term getPreUpdateTarget() {
+         return parentTerm != null ? parentTerm : getServices().getTermBuilder().var(programVariable);
+      }
 
       /**
        * Creates the pre update to make sure that the parent object defined
@@ -743,7 +775,7 @@ public abstract class AbstractUpdateExtractor {
        * @return The created {@link Term} with the pre update.
        */
       public Term createPreUpdate() {
-         Term originalTerm = parentTerm != null ? parentTerm : getServices().getTermBuilder().var(programVariable);
+         Term originalTerm = getPreUpdateTarget();
          return getServices().getTermBuilder().elementary(preVariable, originalTerm);
       }
       
@@ -895,36 +927,31 @@ public abstract class AbstractUpdateExtractor {
     * @param layoutTerm The result term to use in side proof.
     * @param locations The locations to compute in side proof.
     * @param currentLayout {@code true} current layout, {@code false} initial layout.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     * @return The computed {@link ExecutionVariableValuePair}s.
     * @throws ProofInputException Occurred Exception.
     */
    protected Set<ExecutionVariableValuePair> computeVariableValuePairs(Term layoutCondition,
                                                                        Term layoutTerm, 
                                                                        Set<ExtractLocationParameter> locations,
-                                                                       boolean currentLayout) throws ProofInputException {
+                                                                       boolean currentLayout,
+                                                                       boolean simplifyConditions) throws ProofInputException {
       // Get original updates
-      ImmutableList<Term> originalUpdates;
-      if (!currentLayout) {
-         originalUpdates = ImmutableSLList.nil();
-      }
-      else {
-         if (node.proof().root() == node) {
-            originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
-         }
-         else {
-            Term originalModifiedFormula = modalityPio.subTerm();
-            originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
-         }
-      }
+      ImmutableList<Term> originalUpdates = computeOriginalUpdates(modalityPio, currentLayout);
       // Combine memory layout with original updates
+      Map<LocationVariable, Term> preUpdateMap = new HashMap<LocationVariable, Term>();
       ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
       for (ExtractLocationParameter evp : locations) {
          additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
+         preUpdateMap.put(evp.getPreVariable(), evp.getPreUpdateTarget());
       }
       // Apply updates
       TermBuilder tb = getServices().getTermBuilder();
       Term updateLayoutTerm = tb.applyParallel(originalUpdates, layoutTerm);
       updateLayoutTerm = tb.applyParallel(additionalUpdates, updateLayoutTerm);
+      for (Term additionalUpdate : collectAdditionalUpdates()) {
+         updateLayoutTerm = tb.apply(additionalUpdate, updateLayoutTerm);
+      }      
       final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, updateLayoutTerm, null, false);
       // Instantiate and run proof
@@ -950,6 +977,23 @@ public abstract class AbstractUpdateExtractor {
                }
                Term value = resultTerm.sub(param.getValueTermIndexInStatePredicate());
                value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, getServices());
+               // Replace pre variable with original target
+               if (value.op() instanceof LocationVariable) {
+                  Term originalTarget = preUpdateMap.get(value.op());
+                  if (originalTarget != null) {
+                     value = originalTarget;
+                  }
+               }
+               else if (SymbolicExecutionUtil.isSelect(goal.proof().getServices(), value)) {
+                  Term object = value.sub(1);
+                  if (object.op() instanceof LocationVariable) {
+                     Term originalTarget = preUpdateMap.get(object.op());
+                     if (originalTarget != null) {
+                        value = goal.proof().getServices().getTermBuilder().select(value.sort(), value.sub(0), originalTarget, value.sub(2));
+                     }
+                  }
+               }
+               // Update value list
                Set<Goal> valueList = valueMap.get(value);
                if (valueList == null) {
                   valueList = new LinkedHashSet<Goal>();
@@ -965,7 +1009,7 @@ public abstract class AbstractUpdateExtractor {
          int i = 0;
          for (ExtractLocationParameter param : locations) {
             for (Entry<Term, Set<Goal>> valueEntry : paramValueMap[i].entrySet()) {
-               Map<Goal, Term> conditionsMap = computeValueConditions(valueEntry.getValue(), branchConditionCache);
+               Map<Goal, Term> conditionsMap = computeValueConditions(valueEntry.getValue(), branchConditionCache, simplifyConditions);
                if (param.isArrayIndex()) {
                   for (Goal goal : valueEntry.getValue()) {
                      ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), valueEntry.getKey(), conditionsMap.get(goal), param.isStateMember(), goal.node());
@@ -986,6 +1030,37 @@ public abstract class AbstractUpdateExtractor {
       finally {
          SymbolicExecutionSideProofUtil.disposeOrStore("Layout computation on node " + node.serialNr() + " with layout term " + ProofSaver.printAnything(layoutTerm, getServices()) + ".", info);
       }
+   }
+   
+   /**
+    * Collects additional updates.
+    * @return The additional updates.
+    */
+   protected List<Term> collectAdditionalUpdates() {
+      return Collections.emptyList();
+   }
+   
+   /**
+    * Computes the original updates.
+    * @param pio The {@link PosInOccurrence}.
+    * @param currentLayout Is current layout?
+    * @return The original updates.
+    */
+   protected ImmutableList<Term> computeOriginalUpdates(PosInOccurrence pio, boolean currentLayout) {
+      ImmutableList<Term> originalUpdates;
+      if (!currentLayout) {
+         originalUpdates = ImmutableSLList.nil();
+      }
+      else {
+         if (node.proof().root() == node) {
+            originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
+         }
+         else {
+            Term originalModifiedFormula = pio.subTerm();
+            originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
+         }
+      }
+      return originalUpdates;
    }
 
    /**
@@ -1028,11 +1103,13 @@ public abstract class AbstractUpdateExtractor {
     * </ol>
     * @param valueGoals All {@link Goal}s of the side proof which provide the same value (result).
     * @param branchConditionCache A cache of already computed branch conditions.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     * @return A {@link Map} which contains for each {@link Goal} the computed path condition consisting of only required splits.
     * @throws ProofInputException Occurred Exception
     */
    protected Map<Goal, Term> computeValueConditions(Set<Goal> valueGoals, 
-                                                    Map<Node, Term> branchConditionCache) throws ProofInputException {
+                                                    Map<Node, Term> branchConditionCache,
+                                                    boolean simplifyConditions) throws ProofInputException {
       Comparator<NodeGoal> comparator = new Comparator<NodeGoal>() {
          @Override
          public int compare(NodeGoal o1, NodeGoal o2) {
@@ -1069,7 +1146,7 @@ public abstract class AbstractUpdateExtractor {
                if (childGoals.size() != childGoal.getParent().childrenCount()) {
                   // Add branch condition to conditions of all child goals
                   for (NodeGoal nodeGoal : childGoals) {
-                     Term branchCondition = computeBranchCondition(nodeGoal.getCurrentNode(), branchConditionCache);
+                     Term branchCondition = computeBranchCondition(nodeGoal.getCurrentNode(), branchConditionCache, simplifyConditions);
                      for (Goal goal : nodeGoal.getStartingGoals()) {
                         Set<Term> conditions = goalConditions.get(goal);
                         conditions.add(branchCondition);
@@ -1244,14 +1321,16 @@ public abstract class AbstractUpdateExtractor {
     * cache it is returned from it.
     * @param node The {@link Node} to compute its branch condition.
     * @param branchConditionCache The cache of already computed branch conditions.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
    protected Term computeBranchCondition(Node node, 
-                                         Map<Node, Term> branchConditionCache) throws ProofInputException {
+                                         Map<Node, Term> branchConditionCache,
+                                         boolean simplifyConditions) throws ProofInputException {
       Term result = branchConditionCache.get(node);
       if (result == null) {
-         result = SymbolicExecutionUtil.computeBranchCondition(node, true, true);
+         result = SymbolicExecutionUtil.computeBranchCondition(node, simplifyConditions, true);
          branchConditionCache.put(node, result);
       }
       return result;
@@ -1270,7 +1349,7 @@ public abstract class AbstractUpdateExtractor {
     * </p>
     * @author Martin Hentschel
     */
-   protected static class ExecutionVariableValuePair {
+   public static class ExecutionVariableValuePair {
       /**
        * The {@link ProgramVariable} or {@code null} if an array index is used instead.
        */

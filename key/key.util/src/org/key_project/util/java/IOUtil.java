@@ -31,6 +31,7 @@ import java.nio.charset.Charset;
 import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -250,10 +251,35 @@ public final class IOUtil {
     * @throws IOException Occurred Exception.
     */
    public static void writeTo(OutputStream out, String content) throws IOException {
+      writeTo(out, content, (String) null);
+   }
+
+   /**
+    * Writes the given content into the given {@link OutputStream} and closes it.
+    * Nothing will be written if the content is {@code null}, but the stream will be closed.
+    * @param out The {@link OutputStream} to write to.
+    * @param content The content to write.
+    * @throws IOException Occurred Exception.
+    */
+   public static void writeTo(OutputStream out, String content, Charset encoding) throws IOException {
+      writeTo(out, content, encoding != null ? encoding.displayName() : null);
+   }
+
+   /**
+    * Writes the given content into the given {@link OutputStream} and closes it.
+    * Nothing will be written if the content is {@code null}, but the stream will be closed.
+    * @param out The {@link OutputStream} to write to.
+    * @param content The content to write.
+    * @param encoding The encoding to use.
+    * @throws IOException Occurred Exception.
+    */
+   public static void writeTo(OutputStream out, String content, String encoding) throws IOException {
       PrintStream printStream = null;
       try {
          if (out != null && content != null) {
-            printStream = new PrintStream(out);
+            printStream = encoding != null ? 
+                          new PrintStream(out, false, encoding) : 
+                          new PrintStream(out);
             printStream.print(content);
          }
       }
@@ -717,8 +743,8 @@ public final class IOUtil {
    }
 
    public static File toFile(URL url) {
-      URI uri = toURI(url);
-      return uri != null ? new File(uri) : null;
+       URI uri = toURI(url);
+       return uri != null ? new File(uri) : null;
    }
    
    public static String toFileString(URL url) {
@@ -732,6 +758,8 @@ public final class IOUtil {
             String protocol = url.getProtocol();
             String userInfo = url.getUserInfo();
             String host = url.getHost();
+            // A '+' in file names is not supported, since it is converted
+            // into a space ('%20') according to the URI standard.
             String path = URLDecoder.decode(url.getPath(), "UTF-8");
             String query = url.getQuery();
             String ref = url.getRef();
@@ -766,5 +794,33 @@ public final class IOUtil {
     */
    public static File getTempDirectory() {
       return new File(System.getProperty("java.io.tmpdir"));
+   }
+   
+   /**
+    * Ensures that the segment is a valid OS independent path segment meaning
+    * that it is a valid file/folder name. Each invalid sign will be replaced
+    * by {@code '_'}.
+    * @param segment The segment to validate.
+    * @return The validated OS independent path segment in which each invalid sign is replaced.
+    */
+   public static String validateOSIndependentFileName(String name) {
+      if (name != null) {
+         char[] latinBig = StringUtil.LATIN_ALPHABET_BIG.toCharArray();
+         char[] latinSmall = StringUtil.LATIN_ALPHABET_SMALL.toCharArray();
+         char[] numerals = StringUtil.NUMERALS.toCharArray();
+         char[] content = name.toCharArray();
+         for (int i = 0; i < content.length; i++) {
+            if (Arrays.binarySearch(latinBig, content[i]) < 0 &&
+                Arrays.binarySearch(latinSmall, content[i]) < 0 &&
+                Arrays.binarySearch(numerals, content[i]) < 0 &&
+                Arrays.binarySearch(StringUtil.ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS, content[i]) < 0) {
+               content[i] = '_';
+            }
+         }
+         return new String(content);
+      }
+      else {
+         return name;
+      }
    }
 }

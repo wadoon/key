@@ -36,7 +36,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -51,7 +51,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionE
 @SuppressWarnings("restriction")
 public final class TestBreakpointsUtil {
    
-   public static void addSomeBreakpoints(String path, SWTWorkbenchBot bot, Object... exceptions) {
+   public static void addSomeBreakpoints(String path, SWTWorkbenchBot bot, Object... exceptions) throws Exception {
       IPath callerPath = new Path(path);
       IFile callerFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(callerPath);
       openPerspective("Java", bot);
@@ -153,15 +153,8 @@ public final class TestBreakpointsUtil {
       }
       return lineBreakpoints;
    }
-   
-   public static boolean checkProofContainsSomeBreakpoints(ISEDDebugTarget target,
-         int numberOfLines, int numberOfExceptions, int numberOfMethods, int numberOfWatchpoints) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListContainsSomeBreakpoints(getBreakpointStopConditions(stopCondition), numberOfLines, numberOfExceptions, numberOfMethods, numberOfWatchpoints);
-   }
 
-   public static boolean checkTargetContainsSomeBreakpoints(ISEDDebugTarget target,
+   public static boolean checkTargetContainsSomeBreakpoints(ISEDebugTarget target,
          int numberOfLines, int numberOfExceptions, int numberOfMethods, int numberOfWatchpoints) {
       KeYDebugTarget keyTarget = (KeYDebugTarget)target;
       SymbolicExecutionBreakpointStopCondition stopCondition = keyTarget.getBreakpointStopCondition();
@@ -195,17 +188,10 @@ public final class TestBreakpointsUtil {
    }
 
    public static boolean checkTargetHitCountofAllBreakpoints(
-         ISEDDebugTarget target, int hitCount) {
+         ISEDebugTarget target, int hitCount) {
       KeYDebugTarget keyTarget = (KeYDebugTarget)target;
       SymbolicExecutionBreakpointStopCondition stopCondition = keyTarget.getBreakpointStopCondition();
       return checkListHitCountOfAllBreakpoints(stopCondition.getBreakpoints(), hitCount);
-   }
-
-   public static boolean checkProofHitCountofAllBreakpoints(
-         ISEDDebugTarget target, int hitCount) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListHitCountOfAllBreakpoints(getBreakpointStopConditions(stopCondition), hitCount);
    }
 
    private static boolean checkListHitCountOfAllBreakpoints(
@@ -255,17 +241,10 @@ public final class TestBreakpointsUtil {
    }
 
    public static boolean checkTargetEnabledofAllBreakpoints(
-         ISEDDebugTarget target, boolean enabled) {
+         ISEDebugTarget target, boolean enabled) {
       KeYDebugTarget keyTarget = (KeYDebugTarget)target;
       SymbolicExecutionBreakpointStopCondition stopCondition = keyTarget.getBreakpointStopCondition();
       return checkListEnabledOfAllBreakpoints(stopCondition.getBreakpoints(), enabled);
-   }
-
-   public static boolean checkProofEnabledofAllBreakpoints(
-         ISEDDebugTarget target, boolean enabled) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListEnabledOfAllBreakpoints(getBreakpointStopConditions(stopCondition), enabled);
    }
 
    private static boolean checkListEnabledOfAllBreakpoints(
@@ -316,17 +295,10 @@ public final class TestBreakpointsUtil {
    }
 
    public static boolean checkTargetConditiondofAllBreakpoints(
-         ISEDDebugTarget target, String condition, boolean enabled) {
+         ISEDebugTarget target, String condition, boolean enabled) {
       KeYDebugTarget keyTarget = (KeYDebugTarget)target;
       SymbolicExecutionBreakpointStopCondition stopCondition = keyTarget.getBreakpointStopCondition();
       return checkListConditionOfAllBreakpoints(stopCondition.getBreakpoints(), condition, enabled);
-   }
-
-   public static boolean checkProofConditionofAllBreakpoints(
-         ISEDDebugTarget target, String condition, boolean enabled) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListConditionOfAllBreakpoints(getBreakpointStopConditions(stopCondition), condition, enabled);
    }
 
    private static boolean checkListConditionOfAllBreakpoints(
@@ -415,17 +387,10 @@ public final class TestBreakpointsUtil {
       }
 
    public static boolean checkTargetAccessAndModificationofAllBreakpoints(
-         ISEDDebugTarget target, int numberOfAccesses, int numberOfModifications) {
+         ISEDebugTarget target, int numberOfAccesses, int numberOfModifications) {
       KeYDebugTarget keyTarget = (KeYDebugTarget)target;
       SymbolicExecutionBreakpointStopCondition stopCondition = keyTarget.getBreakpointStopCondition();
       return checkListAccessAndModificationofAllBreakpoints(stopCondition.getBreakpoints(), numberOfAccesses, numberOfModifications);
-   }
-
-   public static boolean checkProofAccessAndModificationofAllBreakpoints(
-         ISEDDebugTarget target, int numberOfAccesses, int numberOfModifications) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListAccessAndModificationofAllBreakpoints(getBreakpointStopConditions(stopCondition), numberOfAccesses, numberOfModifications);
    }
 
    private static boolean checkListAccessAndModificationofAllBreakpoints(
@@ -448,15 +413,8 @@ public final class TestBreakpointsUtil {
             &&numberOfModifications==localNumberOfModifications;
    }
 
-   public static boolean checkProofEntryAndExitofAllBreakpoints(
-         ISEDDebugTarget target, int entries, int exits) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListEntryAndExitofAllBreakpoints(getBreakpointStopConditions(stopCondition), entries, exits);
-   }
-
    public static boolean checkTargetEntryAndExitofAllBreakpoints(
-         ISEDDebugTarget target, int entries, int exits) {
+         ISEDebugTarget target, int entries, int exits) {
       KeYDebugTarget keyTarget = (KeYDebugTarget)target;
       SymbolicExecutionBreakpointStopCondition stopCondition = keyTarget.getBreakpointStopCondition();
       return checkListEntryAndExitofAllBreakpoints(stopCondition.getBreakpoints(), entries, exits);
@@ -504,7 +462,7 @@ public final class TestBreakpointsUtil {
    }
 
    public static boolean checkTargetCaughtUncaughtSubclass(
-         ISEDDebugTarget target, int numberOfCaught, int numberOfUncaught, int numberOfSubclass) {
+         ISEDebugTarget target, int numberOfCaught, int numberOfUncaught, int numberOfSubclass) {
       KeYDebugTarget keyTarget = (KeYDebugTarget)target;
       SymbolicExecutionBreakpointStopCondition stopCondition = keyTarget.getBreakpointStopCondition();
       return checkListCaughtUncaughtSubclassofAllBreakpoints(stopCondition.getBreakpoints(), numberOfCaught, numberOfUncaught, numberOfSubclass);
@@ -533,12 +491,5 @@ public final class TestBreakpointsUtil {
       return numberOfCaught==localNumberOfCaught
             &&numberOfUncaught==localNumberOfUncaught
             &&numberOfSubclass==localNumberOfSubclass;
-   }
-
-   public static boolean checkProofCaughtUncaughtSubclass(
-         ISEDDebugTarget target, int numberOfCaught, int numberOfUncaught, int numberOfSubclass) {
-      KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-      IStopCondition stopCondition = keyTarget.getProof().getSettings().getStrategySettings().getCustomApplyStrategyStopCondition();
-      return checkListCaughtUncaughtSubclassofAllBreakpoints(getBreakpointStopConditions(stopCondition), numberOfCaught, numberOfUncaught, numberOfSubclass);
    }
 }

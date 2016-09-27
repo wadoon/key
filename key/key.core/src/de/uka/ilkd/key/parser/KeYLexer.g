@@ -177,11 +177,11 @@ lexer grammar KeYLexer;
 
       }
       newText.append(modName+"\n");
-      Debug.out("Modality name :", modName);
+      //Debug.out("Modality name :", modName);
       last = s.lastIndexOf(modalityEnd);
       newText.append(s.substring(index,last));
       setText(newText.toString());
-      Debug.out("Lexer: recognised Java block string: ", getText());
+      //Debug.out("Lexer: recognised Java block string: ", getText());
    }
 
 }
@@ -259,6 +259,7 @@ lexer grammar KeYLexer;
 	EQUAL_UNIQUE : '\\equalUnique';
         NEW : '\\new';
         NEWLABEL : '\\newLabel';
+   CONTAINS_ASSIGNMENT : '\\containsAssignment';
 // label occurs again for character `!'
 	NOT_ : '\\not';
         NOTFREEIN : '\\notFreeIn';
@@ -326,8 +327,12 @@ lexer grammar KeYLexer;
         CHOOSECONTRACT : '\\chooseContract';
         PROOFOBLIGATION : '\\proofObligation';
         PROOF : '\\proof';
+        PROOFSCRIPT : '\\proofScript';
         CONTRACTS : '\\contracts';
         INVARIANTS : '\\invariants';
+
+   // Taclet annotations (see TacletAnnotations.java for more details)
+   LEMMA : '\\lemma';
 
         // The first two guys are not really meta operators, treated separately
 	IN_TYPE : '\\inType';
@@ -502,13 +507,7 @@ WS
       ;
 
 STRING_LITERAL
-@init {StringBuilder _literal = new StringBuilder(); }
-@after {setText('"' + _literal.toString() + '"'); }
-: '"' (  ESC { _literal.append(getText()); }
-       | newline='\n' {  _literal.appendCodePoint(newline); }
-       | normal=~('\n' | '"' | '\\' | '\uFFFF') { _literal.appendCodePoint(normal); }
-      )*
-  '"' ;
+  :'"' ('\\' . | ~( '"' | '\\') )* '"' ;
 
 
 LESS_DISPATCH
@@ -576,22 +575,6 @@ CHAR_LITERAL
                 )
       '\''
  ;
-
-fragment
-ESC
-:	'\\'
-    (	'n'         { setText("\n"); }
-	|	'r' { setText("\r"); }
-	|	't' { setText("\t"); }
-	|	'b' { setText("\b"); }
-	|	'f' { setText("\f"); }
-	|	'"' { setText("\""); }
-	|	'\'' { setText("'"); }
-	|	'\\' { setText("\\"); }
-	|	':' { setText ("\\:"); }
-	|	' ' { setText ("\\ "); }
-    )
-    ;
 
 fragment
 QUOTED_STRING_LITERAL

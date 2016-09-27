@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic;
 
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -896,14 +898,16 @@ public class TermBuilder {
                                 "It seems that there are definitions missing from the .key files.");
         return func(f, mby);
     }
-
+    public Function getMeasuredByEmpty(){
+       final Namespace funcNS = services.getNamespaces().functions();
+       final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
+       if (f == null)
+               throw new RuntimeException("LDT: Function measuredByEmpty not found.\n" +
+                               "It seems that there are definitions missing from the .key files.");
+       return f;
+    }
     public Term measuredByEmpty() {
-        final Namespace funcNS = services.getNamespaces().functions();
-        final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
-        if (f == null)
-                throw new RuntimeException("LDT: Function measuredByEmpty not found.\n" +
-                                "It seems that there are definitions missing from the .key files.");
-        return func(f);
+        return func(getMeasuredByEmpty());
     }
 
     /**
@@ -916,7 +920,7 @@ public class TermBuilder {
         } else if (a.sort() == booleanLDT.targetSort()) {
             // special case where a is the result of convertToBoolean
             if (a.op() == IfThenElse.IF_THEN_ELSE) {
-                assert a.subs().size() == 3;
+                assert a.arity() == 3;
                 assert a.sub(0).sort() == Sort.FORMULA;
                 if (a.sub(1).op() == booleanLDT.getTrueConst() && a.sub(2).op() == booleanLDT.getFalseConst())
                     return a.sub(0);
@@ -1278,7 +1282,7 @@ public class TermBuilder {
      * @param number an integer
      * @return Term in Z-Notation representing the given number
      */
-    public Term zTerm(int number) {
+    public Term zTerm(long number) {
         return zTerm(""+number);
     }
 
@@ -1593,8 +1597,7 @@ public class TermBuilder {
     }
 
     public Term wellFormed(Term heap) {
-        return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()),
-                heap);
+        return func(services.getTypeConverter().getHeapLDT().getWellFormed(), heap);
     }
 
     public Term wellFormed(LocationVariable heap) {
@@ -1708,25 +1711,18 @@ public class TermBuilder {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
         } else {
-            ImmutableList<TermLabel> newLabelList = ImmutableSLList.<TermLabel>nil();
+            ArrayList<TermLabel> newLabelList = new ArrayList<TermLabel>();           
+            for (TermLabel l: term.getLabels()) {
+                newLabelList.add(l);                
+            }
             for (TermLabel l: labels) {
-                if (!term.getLabels().contains(l)) {
-                    newLabelList = newLabelList.append(l);
+                if (!newLabelList.contains(l)) {
+                    newLabelList.add(l);
                 }
             }
-            TermLabel[] newLabelArr = new TermLabel[newLabelList.size()];
-            Iterator<TermLabel> it = newLabelList.iterator();
-            for (int i = 0; i < newLabelArr.length; i++) {
-                assert it.hasNext();
-                newLabelArr[i] = it.next();
-            }
-            TermLabel[] newLabels = new TermLabel[labels.size() + newLabelArr.length];
-            labels.arraycopy(0, newLabels, 0, labels.size());
-            new ImmutableArray<TermLabel>(newLabelArr).arraycopy(0, newLabels, labels.size(),
-                                                                  newLabelArr.length);
             return tf.createTerm(term.op(), term.subs(),
-                                                  term.boundVars(), term.javaBlock(),
-                                                  new ImmutableArray<TermLabel>(newLabels));
+                    term.boundVars(), term.javaBlock(),
+                    new ImmutableArray<TermLabel>(newLabelList));
         }
     }
 
@@ -1776,7 +1772,7 @@ public class TermBuilder {
     }
 
     public Term unlabelRecursive(Term term) {
-        Term[] subs = new Term[term.subs().size()];
+        Term[] subs = new Term[term.arity()];
         for (int i = 0; i < subs.length; i++) {
             subs[i] = unlabelRecursive(term.sub(i));
         }
@@ -1914,7 +1910,7 @@ public class TermBuilder {
         final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
         final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-        if(s.extendsTrans(services.getJavaInfo().objectSort())) {
+        if (s.extendsTrans(services.getJavaInfo().objectSort())) {
             return orSC(equals(t, NULL()), created(h, t));
         } else if(s.equals(setLDT.targetSort())) {
             return createdInHeap(t, h);
@@ -2210,13 +2206,9 @@ public class TermBuilder {
     * @return The created {@link Term}.
     */
    public Term impPreserveLabels(Term t1, Term t2) {
-      if (t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
-         if (!t1.hasLabels()) {
-            return t2;
-         }
-         else {
-            return tf.createTerm(Junctor.IMP, t1, t2);
-         }
+      if ((t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) &&
+          (!t1.hasLabels() && !t2.hasLabels())) {
+         return tt();
       }
       else if (t1.op() == Junctor.TRUE && !t1.hasLabels()) {
          return t2;
@@ -2272,16 +2264,9 @@ public class TermBuilder {
     * @return The created {@link Term}.
     */
    public Term andPreserveLabels(Term t1, Term t2) {
-      if (t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) {
-         if (!t1.hasLabels() && !t2.hasLabels()) {
-            return ff();
-         }
-         else if (!t1.hasLabels()) {
-            return t2;
-         }
-         else {
-            return t1;
-         }
+      if ((t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) &&
+          (!t1.hasLabels() && !t2.hasLabels())) {
+         return ff();
       }
       else if (t1.op() == Junctor.TRUE && !t1.hasLabels()) {
          return t2;
@@ -2316,16 +2301,9 @@ public class TermBuilder {
     * @return The created {@link Term}.
     */
    public Term orPreserveLabels(Term t1, Term t2) {
-      if (t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
-         if (!t1.hasLabels() && !t2.hasLabels()) {
-            return tt();
-         }
-         else if (!t1.hasLabels()) {
-            return t2;
-         }
-         else {
-            return t1;
-         }
+      if ((t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) &&
+          (!t1.hasLabels() && !t2.hasLabels())) {
+         return tt();
       }
       else if (t1.op() == Junctor.FALSE && !t1.hasLabels()) {
          return t2;

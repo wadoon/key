@@ -22,7 +22,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
  * A feature that returns a constant value
  */
 public class ConstFeature implements Feature {
-    public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         return val;
     }
     
@@ -34,5 +34,9 @@ public class ConstFeature implements Feature {
         return new ConstFeature(p_val);
     }
 
+    public final RuleAppCost getValue() {
+        return val;
+    }
+    
     private final RuleAppCost val;
 }

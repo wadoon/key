@@ -16,6 +16,8 @@ package org.key_project.util.java;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import javax.swing.JFileChooser;
+
 /**
  * Provides static methods to work with strings.
  * @author Martin Hentschel
@@ -42,6 +44,13 @@ public final class StringUtil {
    public static final String LATIN_ALPHABET_SMALL = LATIN_ALPHABET_BIG.toLowerCase();
    
    /**
+    * Additional characters allowed in file systems.
+    * <p>
+    * It is important that {@code ':'} is not contained because {@code "::"} is replaced with a {@code '/'} by the {@link JFileChooser} under Mac OS.
+    */
+   public static final char[] ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS = {'(', ')', '[', ']', '-', '+', '_', '$', ',', '%'};
+ 
+   /**
     * The numerals.
     */
    public static final String NUMERALS = "0123456789";
@@ -50,6 +59,13 @@ public final class StringUtil {
     * All characters representing whitespace.
     */
    public static final String WHITESPACE = " \n\r\t";
+   
+   /**
+    * Static constructor.
+    */
+   static {
+      Arrays.sort(ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS);
+   }
    
    /**
     * Forbid instances by this private constructor.
@@ -317,5 +333,17 @@ public final class StringUtil {
       else {
          return text;
       }
+   }
+   
+   /**
+    * Checks if the given {@link Object} is a {@link String} which starts with the given prefix.
+    * @param obj The {@link Object} to check.
+    * @param prefix The prefix to check for.
+    * @return {@code true} {@link Object} is {@link String} with given prefix, {@code false} otherwise.
+    */
+   public static boolean startsWith(Object obj, String prefix) {
+      return obj instanceof String 
+             && prefix != null 
+             && ((String) obj).startsWith(prefix);
    }
 }

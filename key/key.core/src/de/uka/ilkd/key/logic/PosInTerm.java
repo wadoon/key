@@ -36,7 +36,7 @@ public final class PosInTerm {
     // to save memory, we use 16bit integers (unsigned) instead of 32bit
     private final char[] positions;
     private final char size;
-    private char hash = (char)-1;
+    private volatile char hash = (char)-1;
     private boolean copy;
 
     
@@ -157,19 +157,26 @@ public final class PosInTerm {
     public PosInTerm down(int i) {
         if (i > Character.MAX_VALUE) throw new ArithmeticException("Position "+i+" out of bounds");
         
-        final PosInTerm result; 
-        synchronized(positions) { 
-            if (copy) {        
-                final char[] newPositions = 
-                        new char[positions.length <= size ? size + 4 : positions.length];
-                System.arraycopy(positions, 0, newPositions, 0, size);
-                newPositions[size] = (char)i;
-                result = new PosInTerm(newPositions, (char)(size + 1), false);
-            } else {
-                positions[size] = (char)i;
-                copy   = true;
-                result = new PosInTerm(positions, (char)(size + 1), true);            
+        boolean localCopy = true;
+        if (!copy) { // at most one thread is allowed to enter the non-copy branch
+            synchronized (positions) {
+                localCopy = copy; 
+                if (copy == false) {
+                    copy = true;
+                }
             }
+        }
+        final PosInTerm result;        
+        if (localCopy) {        
+            final char[] newPositions = 
+                    new char[positions.length <= size ? size + 4 : positions.length];
+            System.arraycopy(positions, 0, newPositions, 0, size);
+            newPositions[size] = (char)i;
+            result = new PosInTerm(newPositions, (char)(size + 1), false);
+        } else {
+            copy   = true;
+            positions[size] = (char)i;
+            result = new PosInTerm(positions, (char)(size + 1), size >= positions.length - 1);            
         }
         return result;
     }
@@ -193,14 +200,35 @@ public final class PosInTerm {
     public int getIndex() {
         return size == 0 ? -1 : positions[size - 1];
     }
+    
+    
+    /**
+     * navigate to the subterm described by this position and return it
+     * if the described position does not exist in the term an {@link IndexOutOfBoundsException}
+     * is thrown
+     * @param t the {@link Term} 
+     * @return the sub term of term {@code t} at this position   
+     * @throws an {@link IndexOutOfBoundsException} if no subterm exists at this position
+     */
+    public Term getSubTerm(Term t) {
+        Term sub = t;
+        for (int i = 0; i<size; i++) {  
+            sub = sub.sub(positions[i]);
+        }
+        return sub;
+    }
 
     public int hashCode() {        
         if (hash == (char)-1) {
-            hash = 13;
-            for (int i = 0; i < size; i++) {
-                hash = (char) (13 * hash + positions[i]);
-            }        
-            hash = hash == -1 ? 0 : hash;
+            synchronized(this) {
+                if (hash == (char)-1) {
+                    hash = 13;
+                    for (int i = 0; i < size; i++) {
+                        hash = (char) (13 * hash + positions[i]);
+                    }        
+                    hash = hash == -1 ? 0 : hash;
+                }
+            }
         } 
         return hash;
     }

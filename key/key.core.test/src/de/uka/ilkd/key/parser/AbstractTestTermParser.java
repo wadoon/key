@@ -9,8 +9,8 @@ import junit.framework.TestCase;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -29,20 +29,16 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
- * Scaffold for antlr {@link Parser} testing.
+ * Class providing methods for parser tests.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public abstract class AbstractTestTermParser extends TestCase {
+public class AbstractTestTermParser extends TestCase {
 
     protected final TermFactory tf;
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
     protected final Services services;
-    
-    static final String javaPath = HelperClassForTests.TESTCASE_DIRECTORY + 
-                                   File.separator + "termParser" + 
-                                   File.separator + "parserTest.key";
 
     AbstractTestTermParser(String name) {
         super(name);
@@ -91,7 +87,7 @@ public abstract class AbstractTestTermParser extends TestCase {
                     new ParserConfig(services, nss),
                     new ParserConfig(services, nss),
                     null,
-                    DefaultImmutableSet.<Taclet>nil()).problem();
+                    ImmutableSLList.<Taclet>nil()).problem();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -214,10 +210,10 @@ public abstract class AbstractTestTermParser extends TestCase {
         }
     }
 
-    protected Services getServices() {
-        JavaInfo javaInfo = new HelperClassForTests().parse(
-                new File(javaPath)).getFirstProof().getJavaInfo();
-        return javaInfo.getServices();
-    }
+   protected Services getServices() {
+      File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
+            + File.separator + "termParser" + File.separator + "parserTest.key");
+      return HelperClassForTests.createServices(keyFile);
+   }
 
 }

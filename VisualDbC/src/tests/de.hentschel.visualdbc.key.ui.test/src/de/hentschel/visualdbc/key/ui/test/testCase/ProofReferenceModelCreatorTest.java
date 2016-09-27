@@ -182,7 +182,7 @@ public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelC
          IFile javaFile = project.getFile(new Path(javaFileInProject));
          assertTrue(javaFile.exists());
          // Create Proof
-         environment = KeYEnvironment.load(ResourceUtil.getLocation(javaFile), null, null);
+         environment = KeYEnvironment.load(ResourceUtil.getLocation(javaFile), null, null, null);
          // Search type
          KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName);
          assertNotNull(containerKJT);
@@ -207,7 +207,7 @@ public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelC
          creator.updateModel(ProofReferenceUtil.computeProofReferences(proof), new NullProgressMonitor());
          compareWithOracle(oracleDirectory, creator.getModel(), Activator.PLUGIN_ID, initialOracleFileInBundle);
          // Start auto mode
-         StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, useContracts, false, false, false);
+         StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, useContracts, false, false, false, false);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
          environment.getProofControl().startAndWaitForAutoMode(proof);
          // Compare final model

@@ -41,6 +41,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 
@@ -143,7 +145,7 @@ public class TestApplyTaclet extends TestCase{
     public void testSuccTacletWithoutIf() {
 	Term fma = proof[0].root().sequent().succedent().getFirst().formula();
 	NoPosTacletApp impright=TacletForTests.getRules().lookup("imp_right");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( impright );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
@@ -169,7 +171,7 @@ public class TestApplyTaclet extends TestCase{
 	Term fma=proof[0].root().sequent().succedent().getFirst().formula();
 	NoPosTacletApp imprightadd 
 	    = TacletForTests.getRules().lookup("TestApplyTaclet_imp_right_add");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( imprightadd );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
@@ -218,7 +220,7 @@ public class TestApplyTaclet extends TestCase{
     
     public void testSuccTacletAllRight() {
 	NoPosTacletApp allright = TacletForTests.getRules().lookup("all_right");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( allright );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	PosInOccurrence applyPos
@@ -243,7 +245,7 @@ public class TestApplyTaclet extends TestCase{
     
     public void testTacletWithIf() {
         NoPosTacletApp close = TacletForTests.getRules().lookup("close_goal");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( close );
 	Goal goal = createGoal ( proof[2].root(), tacletIndex );
 	PosInOccurrence applyPos=new PosInOccurrence
@@ -283,7 +285,7 @@ public class TestApplyTaclet extends TestCase{
     public void testAntecTacletWithoutIf() {
 	Term fma=proof[3].root().sequent().antecedent().getFirst().formula();
 	NoPosTacletApp impleft = TacletForTests.getRules().lookup("imp_left");
- 	TacletIndex tacletIndex = new TacletIndex ();
+ 	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( impleft );
  	Goal goal = createGoal ( proof[3].root(), tacletIndex );
 	PosInOccurrence applyPos= new PosInOccurrence
@@ -326,7 +328,7 @@ public class TestApplyTaclet extends TestCase{
     public void testRewriteTacletWithoutIf() {
 	NoPosTacletApp contradiction = TacletForTests.getRules().lookup
 	    ("TestApplyTaclet_contradiction");
-	TacletIndex tacletIndex = new TacletIndex();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( contradiction );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
 	PosInOccurrence pos
@@ -349,7 +351,7 @@ public class TestApplyTaclet extends TestCase{
 
     public void testNoFindTacletWithoutIf() {
 	NoPosTacletApp cut = TacletForTests.getRules().lookup("TestApplyTaclet_cut");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	Term t_c=TacletForTests.parseTerm("D");
  	tacletIndex.add ( cut );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
@@ -528,7 +530,7 @@ public class TestApplyTaclet extends TestCase{
 	PosInOccurrence pio=new PosInOccurrence(seq.succedent().get(0),
 						       PosInTerm.getTopLevel(),
 						false);
-	TacletIndex tacletIndex = new TacletIndex();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( wh0 );
 	Goal goal = createGoal ( proof[4].root(), tacletIndex );
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
@@ -558,7 +560,7 @@ public class TestApplyTaclet extends TestCase{
 	PosInOccurrence pio = new PosInOccurrence(seq.succedent().get(0),
 						  PosInTerm.getTopLevel(),
 						  false);
-	TacletIndex tacletIndex = new TacletIndex();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( cdr );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
@@ -595,7 +597,7 @@ public class TestApplyTaclet extends TestCase{
 	PosInOccurrence pio = new PosInOccurrence(seq.succedent().get(0),
 						  PosInTerm.getTopLevel(),
 						  false);
-	TacletIndex tacletIndex = new TacletIndex();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( hide_r );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 
@@ -621,7 +623,7 @@ public class TestApplyTaclet extends TestCase{
 	PosInOccurrence pio = new PosInOccurrence(seq.antecedent().get(0),
 				  PosInTerm.getTopLevel(),
 				  true);
-	TacletIndex tacletIndex = new TacletIndex();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( al );
 	Goal goal = createGoal ( proof[5].root(), tacletIndex );
 
@@ -651,7 +653,7 @@ public class TestApplyTaclet extends TestCase{
 				    PosInTerm.getTopLevel(),
 				    true);
 
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( al );
 
 	Goal goal = createGoal ( proof[7].root(), tacletIndex );
@@ -667,7 +669,7 @@ public class TestApplyTaclet extends TestCase{
 	pio = new PosInOccurrence ( seq.antecedent().get(1),
 				    PosInTerm.getTopLevel(),
 				    true);
-	tacletIndex = new TacletIndex ();
+	tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( al );
 
 	goal = createGoal ( goals.head().node(), tacletIndex );
@@ -697,7 +699,7 @@ public class TestApplyTaclet extends TestCase{
 	Services services = TacletForTests.services();
         NoPosTacletApp apply_eq_nonrigid = TacletForTests.getRules().lookup
 	    ("apply_eq_nonrigid");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( apply_eq_nonrigid );
 	Goal goal = createGoal ( proof[8].root(), tacletIndex );
 	PosInOccurrence pos
@@ -730,7 +732,7 @@ public class TestApplyTaclet extends TestCase{
         Services services = TacletForTests.services();
 	NoPosTacletApp apply_eq_nonrigid = TacletForTests.getRules().lookup    
 	    ("apply_eq_nonrigid");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( apply_eq_nonrigid );
 	Goal goal = createGoal ( proof[10].root(), tacletIndex );
 	PosInOccurrence pos
@@ -797,7 +799,7 @@ public class TestApplyTaclet extends TestCase{
         Services services = TacletForTests.services();
         NoPosTacletApp make_insert_eq_nonrigid = TacletForTests.getRules().lookup
 	    ("make_insert_eq_nonrigid");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( make_insert_eq_nonrigid );
 	Goal goal = createGoal ( proof[12].root(), tacletIndex );
 	PosInOccurrence pos
@@ -837,7 +839,7 @@ public class TestApplyTaclet extends TestCase{
     public void testBugEmptyBlock () {
 	NoPosTacletApp testApplyTaclet_wrap_blocks_two_empty_lists =
 	    TacletForTests.getRules().lookup ("TestApplyTaclet_wrap_blocks_two_empty_lists");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( testApplyTaclet_wrap_blocks_two_empty_lists );
 	Goal goal = createGoal ( proof[14].root(), tacletIndex );
 	PosInOccurrence pos
@@ -873,7 +875,7 @@ public class TestApplyTaclet extends TestCase{
 	    TacletForTests.getRules().lookup ("test_catch_list0");
 	NoPosTacletApp test_catch_list1 =
 	    TacletForTests.getRules().lookup ("test_catch_list1");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
  	tacletIndex.add ( test_catch_list0 );
  	tacletIndex.add ( test_catch_list1 );
 	Goal goal = createGoal ( proof[p_proof].root(), tacletIndex );
@@ -897,7 +899,10 @@ public class TestApplyTaclet extends TestCase{
 	Term resultFormula  = goals.head().sequent().getFormulabyNr ( 1 ).formula ();
 	Term correctFormula = correctSeq.getFormulabyNr ( 1 ).formula ();
 
-	assertTrue("Wrong result", resultFormula.equalsModRenaming ( correctFormula ) );
+	assertTrue("Wrong result. Expected:" + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + 
+	        " But was:"+ 
+	        ProofSaver.printAnything(resultFormula,TacletForTests.services()), 
+	            resultFormula.equalsModRenaming ( correctFormula ) );
     }
 
     private Goal createGoal ( Node n, TacletIndex tacletIndex ) {
@@ -949,7 +954,7 @@ public class TestApplyTaclet extends TestCase{
     public void testCompleteContextAddBug() {
         NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_allPullOutBehindDiamond" );
 
-        TacletIndex tacletIndex = new TacletIndex ();
+        TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add ( app );
         Goal goal = createGoal ( proof[22].root(), tacletIndex );
         PosInOccurrence pos
@@ -980,7 +985,7 @@ public class TestApplyTaclet extends TestCase{
     public void testContextAdding() {
         NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_addEmptyStatement" );
 
-        TacletIndex tacletIndex = new TacletIndex ();
+        TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add ( app );
         Goal goal = createGoal ( proof[22].root(), tacletIndex );
         PosInOccurrence pos
@@ -1012,7 +1017,7 @@ public class TestApplyTaclet extends TestCase{
     public void testRemoveEmptyBlock() {
         NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_removeEmptyBlock" );
 
-        TacletIndex tacletIndex = new TacletIndex ();
+        TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add ( app );
         Goal goal = createGoal ( proof[23].root(), tacletIndex );
         PosInOccurrence pos

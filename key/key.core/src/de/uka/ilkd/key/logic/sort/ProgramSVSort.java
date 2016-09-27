@@ -19,12 +19,7 @@ import java.util.Map;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.NamedProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -41,17 +36,11 @@ import de.uka.ilkd.key.java.expression.operator.Intersect;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
-import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
-import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.ConstructorReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.MetaClassReference;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -101,13 +90,16 @@ public abstract class ProgramSVSort extends AbstractSort {
     
     public static final ProgramSVSort LOCALVARIABLE
         = new LocalVariableSort();
-    
+
     public static final ProgramSVSort SIMPLEEXPRESSION 
 	= new SimpleExpressionSort();
 
     public static final ProgramSVSort NONSIMPLEEXPRESSION 
 	= new NonSimpleExpressionSort();
-    
+
+    public static final ProgramSVSort NONSIMPLEEXPRESSIONNOCLASSREFERENCE
+    = new NonSimpleExpressionNoClassReferenceSort();
+
     public static final ProgramSVSort EXPRESSION
 	= new ExpressionSort();
 
@@ -157,6 +149,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     public static final ProgramSVSort TYPENOTPRIMITIVE
 	= new TypeReferenceNotPrimitiveSort();
+
+    public static final ProgramSVSort CLASSREFERENCE
+    = new MetaClassReferenceSort();
 
 
     //-----------Others-------------------------------------------------------
@@ -521,7 +516,6 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
     }
-    
 
 
     /**
@@ -551,7 +545,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 		Services services) {
 	    if (pe instanceof Negative) {
 		return ((Negative)pe).getChildAt(0) instanceof Literal;
-	    }	   
+	    }
 
 	    if (pe instanceof StringLiteral)
 		return false;
@@ -559,28 +553,60 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    if (pe instanceof Literal) {
 		return true;
 	    }
+	    
 	    if (pe instanceof Instanceof) {
-		ProgramElement v = ((Instanceof) pe).getChildAt(0);
-		return VARIABLE.canStandFor(v, services); 
+	        ProgramElement v = ((Instanceof) pe).getChildAt(0);
+	        return VARIABLE.canStandFor(v, services); 
 	    }
 
-	    if(pe instanceof SetUnion 
-		|| pe instanceof Singleton		    
-		|| pe instanceof Intersect 
+	    if(pe instanceof SetUnion
+		|| pe instanceof Singleton
+		|| pe instanceof Intersect
 		|| pe instanceof SetMinus
 		|| pe instanceof AllFields
 		|| pe instanceof SeqSingleton
 		|| pe instanceof SeqConcat
+        || pe instanceof SeqLength
+        || pe instanceof SeqGet
+        || pe instanceof SeqIndexOf
+        || pe instanceof SeqConcat
 		|| pe instanceof SeqSub
-		|| pe instanceof SeqReverse
-		|| pe instanceof DLEmbeddedExpression) {
-		return true;
+		|| pe instanceof SeqReverse) {		
+	        if (pe instanceof NonTerminalProgramElement) {
+	            final NonTerminalProgramElement npe = (NonTerminalProgramElement) pe;
+	            for (int i = 0, childCount = npe.getChildCount(); i<childCount; i++) {
+	                if (!canStandFor(npe.getChildAt(i), services)) {
+	                    return false;
+	                }
+	            }
+	        }
+	        return true;
+	    } else if (pe instanceof DLEmbeddedExpression) {        
+	        // this is a not so nice special case (all expressiosn within embedded expressions are considered to 
+	        // be side effect free; to handle it properly we need some meta constructs to decompose these expressions
+	        return true;	        
 	    }
-	    
 	    return VARIABLE.canStandFor(pe, services);    
 	}
     }
 
+
+    private static class NonSimpleExpressionNoClassReferenceSort extends NonSimpleExpressionSort {
+
+        public NonSimpleExpressionNoClassReferenceSort() {
+            super(new Name("NonSimpleExpressionNoClassReference"));
+        }
+
+        /* Will not match on MetaClassReference variables */
+        public boolean canStandFor(ProgramElement check,
+                                   Services services) {
+            if (!super.canStandFor(check, services)
+                    || CLASSREFERENCE.canStandFor(check, services)) {
+                return false;
+            }
+            return true;
+        }
+    }
 
 
     /**
@@ -943,7 +969,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    return (check instanceof TypeReference);
 	}
     }
-    
+
 
     /**
      * This sort represents a type of program schema variables that
@@ -975,6 +1001,21 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         public ProgramSVSort createInstance(String parameter) {
           return new TypeReferenceNotPrimitiveSort(parameter);
+        }
+    }
+
+    /**
+     * This sort represents a type of program schema variables that
+     * match only on meta class references.
+     */
+    private static final class MetaClassReferenceSort extends ProgramSVSort {
+
+        public MetaClassReferenceSort() {
+            super(new Name("ClassReference"));
+        }
+
+        protected boolean canStandFor(ProgramElement check, Services services) {
+            return (check instanceof MetaClassReference);
         }
     }
 

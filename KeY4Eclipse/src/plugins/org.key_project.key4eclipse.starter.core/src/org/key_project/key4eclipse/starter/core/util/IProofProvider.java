@@ -13,10 +13,12 @@
 
 package org.key_project.key4eclipse.starter.core.util;
 
+import org.eclipse.core.resources.IProject;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -67,4 +69,10 @@ public interface IProofProvider {
     * @param l The {@link IProofProviderListener} to remove.
     */
    public void removeProofProviderListener(IProofProviderListener l);
+   
+   /**
+    * Returns the project which provides the proof or the source code.
+    * @return The {@link IProject} if known or {@code null} if unknown.
+    */
+   public IProject getProject();
 }

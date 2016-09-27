@@ -60,11 +60,6 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         return goals != null && !goals.isEmpty();
     }
 
-    @Override
-    public boolean isApplicableWithoutPosition() {
-        return true;
-    }
-
     /**
      * Subclasses can use this method to do some postprocessing on the
      * proof-object after the strategy has finished.
@@ -97,17 +92,10 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         final ImmutableList<Goal> ignoredOpenGoals =
                 setDifference(proof.openGoals(), goals);
 
-        final ProofMacro macroAdapter = new SkipMacro() {
-            @Override
-            public String getName() { return ""; }
-            @Override
-            public String getDescription() { return "Anonymous macro"; }
-        };
-        macroAdapter.setNumberSteps(getNumberSteps());
         //
         // The observer to handle the progress bar
-        final ProofMacroListener pml =  new ProgressBarListener(macroAdapter, goals.size(),
-                                                                getNumberSteps(), listener);
+        final ProofMacroListener pml =  new ProgressBarListener(goals.size(),
+                                                                getMaxSteps(proof), listener);
         applyStrategy.addProverTaskObserver(pml);
         // add a focus manager if there is a focus
         if(posInOcc != null && goals != null) {
@@ -142,10 +130,8 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             for (final Goal openGoal : proof.openGoals()) {
                 AutomatedRuleApplicationManager manager = openGoal.getRuleAppManager();
                 // touch the manager only if necessary
-                if(manager.getDelegate() != null) {
-                    while(manager.getDelegate() != null) {
-                        manager = manager.getDelegate();
-                    }
+                if(manager instanceof FocussedRuleApplicationManager) {
+                    manager = ((FocussedRuleApplicationManager) manager).rootManager;
                     manager.clearCache();
                     openGoal.setRuleAppManager(manager);
                 }

@@ -92,6 +92,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
@@ -233,10 +234,12 @@ public final class KeYUtil {
             final File location;
             final File bootClassPath;
             final List<File> classPaths;
+            final List<File> includes;
             if (locationToLoad instanceof IFile) {
                 location = ResourceUtil.getLocation(locationToLoad);
                 bootClassPath = null;
                 classPaths = null;
+                includes = null;
             }
             else {
                 // Make sure that the location is contained in a Java project
@@ -249,6 +252,7 @@ public final class KeYUtil {
                 // Get KeY project settings
                 bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                 classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+                includes = KeYResourceProperties.getKeYIncludes(project);
             }
             Assert.isNotNull(location, "The resource \"" + locationToLoad + "\" is not local.");
             IRunnableWithException run = new AbstractRunnableWithException() {
@@ -267,7 +271,7 @@ public final class KeYUtil {
                         }
                         else {
                             // Load local file
-                            MainWindow.getInstance().loadProblem(location, classPaths, bootClassPath);
+                            MainWindow.getInstance().loadProblem(location, classPaths, bootClassPath, includes);
                         }
                     }
                     catch (Exception e) {
@@ -360,6 +364,7 @@ public final class KeYUtil {
             // Get KeY project settings
             final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
             final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+            final List<File> includes = KeYResourceProperties.getKeYIncludes(project);
             Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
             // Open main window to avoid repaint bugs
             openMainWindow();
@@ -376,7 +381,7 @@ public final class KeYUtil {
                             main.setVisible(true);
                         }
                         // Check if location is already loaded
-                        AbstractProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, null, false);
+                        AbstractProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, includes, null, false);
                         InitConfig initConfig = loader.getInitConfig();
                         // Get method to proof in KeY
                         IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
@@ -716,10 +721,7 @@ public final class KeYUtil {
           NotificationTask task = null;
           try {
              // Deactivate proof closed dialog
-             task = main.getNotificationManager().getNotificationTask(NotificationEventID.PROOF_CLOSED);
-             if (task != null) {
-                main.getNotificationManager().removeNotificationTask(task);
-             }
+             task = main.getNotificationManager().removeNotificationTask(NotificationEventID.PROOF_CLOSED);
              // Execute runnable.
              run.run(main);
           }
@@ -1411,14 +1413,17 @@ public final class KeYUtil {
       Assert.isNotNull(proof);
       Assert.isNotNull(file);
       try {
-         File location = ResourceUtil.getLocation(file);
+         final File location = ResourceUtil.getLocation(file);
          // Create proof file content
-         ProofSaver saver = new ProofSaver(proof, location.getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
+         OutputStreamProofSaver saver = new OutputStreamProofSaver(proof, KeYConstants.INTERNAL_VERSION) {
+            @Override
+            protected String getBasePath() throws IOException {
+                return ProofSaver.computeBasePath(location);
+            }
+         };
          ByteArrayOutputStream out = new ByteArrayOutputStream();
-         String errorMessage = saver.save(out);
-         if (errorMessage != null) {
-            throw new CoreException(LogUtil.getLogger().createErrorStatus(errorMessage));
-         }
+         saver.save(out);
+         proof.setProofFile(location);
          // Save proof file content
          if (file.exists()) {
             file.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);

@@ -11,13 +11,14 @@ public final class SideProofStatistics extends Statistics {
                                 int interactiveSteps,
                                 int quantifierInstantiations,
                                 int ossApps,
+                                int joinRuleApps,
                                 int totalRuleApps,
                                 int smtSolverApps,
                                 int dependencyContractApps,
                                 int operationContractApps,
                                 int loopInvApps,
                                 long autoModeTime) {
-        super(nodes, branches, interactiveSteps, quantifierInstantiations, ossApps, totalRuleApps, smtSolverApps, dependencyContractApps, 
+        super(nodes, branches, interactiveSteps, quantifierInstantiations, ossApps, joinRuleApps, totalRuleApps, smtSolverApps, dependencyContractApps, 
                 operationContractApps, loopInvApps, autoModeTime, 
                 -1, 
                 nodes<=sideProofs? .0f: (autoModeTime/(float)(nodes-sideProofs)));
@@ -30,12 +31,13 @@ public final class SideProofStatistics extends Statistics {
                                        stat.interactiveSteps,
                                        stat.quantifierInstantiations,
                                        stat.ossApps,
+                                       stat.joinRuleApps,
                                        stat.totalRuleApps,
                                        stat.smtSolverApps,
                                        stat.dependencyContractApps,
                                        stat.operationContractApps,
                                        stat.loopInvApps,
-                                       stat.autoModeTime);
+                                       stat.autoModeTimeInMillis);
     }
 
     static SideProofStatistics create(Statistics stat) {
@@ -44,12 +46,13 @@ public final class SideProofStatistics extends Statistics {
                                        stat.interactiveSteps,
                                        stat.quantifierInstantiations,
                                        stat.ossApps,
+                                       stat.joinRuleApps,
                                        stat.totalRuleApps,
                                        stat.smtSolverApps,
                                        stat.dependencyContractApps,
                                        stat.operationContractApps,
                                        stat.loopInvApps,
-                                       stat.autoModeTime);
+                                       stat.autoModeTimeInMillis);
     }
 
     SideProofStatistics add(SideProofStatistics stat) {
@@ -59,12 +62,13 @@ public final class SideProofStatistics extends Statistics {
                                            this.interactiveSteps + stat.interactiveSteps,
                                            this.quantifierInstantiations + stat.quantifierInstantiations,
                                            this.ossApps + stat.ossApps,
+                                           this.joinRuleApps + stat.joinRuleApps,
                                            this.totalRuleApps + stat.totalRuleApps,
                                            this.smtSolverApps + stat.smtSolverApps,
                                            this.dependencyContractApps + stat.dependencyContractApps,
                                            this.operationContractApps + stat.operationContractApps,
                                            this.loopInvApps + stat.loopInvApps,
-                                           this.autoModeTime + stat.autoModeTime);
+                                           this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
     }
 
     public SideProofStatistics add(Statistics stat) {
@@ -73,17 +77,18 @@ public final class SideProofStatistics extends Statistics {
                                            this.interactiveSteps + stat.interactiveSteps,
                                            this.quantifierInstantiations + stat.quantifierInstantiations,
                                            this.ossApps + stat.ossApps,
+                                           this.joinRuleApps + stat.joinRuleApps,
                                            this.totalRuleApps + stat.totalRuleApps,
                                            this.smtSolverApps + stat.smtSolverApps,
                                            this.dependencyContractApps + stat.dependencyContractApps,
                                            this.operationContractApps + stat.operationContractApps,
                                            this.loopInvApps + stat.loopInvApps,
-                                           this.autoModeTime + stat.autoModeTime);
+                                           this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
     }
 
     public SideProofStatistics setAutoModeTime(long autoTime) {
         return new SideProofStatistics(sideProofs, nodes, branches, interactiveSteps,
-                        quantifierInstantiations, ossApps, totalRuleApps, smtSolverApps,
+                        quantifierInstantiations, ossApps, joinRuleApps, totalRuleApps, smtSolverApps,
                         dependencyContractApps, operationContractApps, loopInvApps, autoTime);
     }
 }

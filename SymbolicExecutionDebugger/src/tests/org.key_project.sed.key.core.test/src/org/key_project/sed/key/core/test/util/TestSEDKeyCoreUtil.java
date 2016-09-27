@@ -29,10 +29,10 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
-import org.key_project.sed.core.model.memory.SEDMemoryThread;
-import org.key_project.sed.core.model.serialization.SEDXMLReader;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.memory.SEMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEMemoryThread;
+import org.key_project.sed.core.model.serialization.SEXMLReader;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
@@ -65,7 +65,9 @@ public final class TestSEDKeyCoreUtil {
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
-    * @param truthValueEvaluationEnabled Truth value evaluation enabled?
+    * @param truthValueTracingEnabled Truth value tracing enabled?
+    * @param simplifyConditions Simplify conditions?
+    * @param hideFullBranchConditionIfAdditionalLabelIsAvailable Hide full branch conditions if additional label is available?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IFile file,
@@ -74,7 +76,9 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean showKeYMainWindow,
                                 final Boolean mergeBranchConditions,
                                 final Boolean usePrettyPrinting,
-                                final Boolean truthValueEvaluationEnabled) throws Exception {
+                                final Boolean truthValueTracingEnabled,
+                                final Boolean simplifyConditions,
+                                final Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -91,7 +95,9 @@ public final class TestSEDKeyCoreUtil {
                                                   usePrettyPrinting, 
                                                   Boolean.FALSE, 
                                                   Boolean.FALSE,
-                                                  truthValueEvaluationEnabled);
+                                                  truthValueTracingEnabled,
+                                                  simplifyConditions,
+                                                  hideFullBranchConditionIfAdditionalLabelIsAvailable);
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
             catch (Exception e) {
@@ -136,7 +142,8 @@ public final class TestSEDKeyCoreUtil {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
-    * @param truthValueEvaluationEnabled Truth value evaluation enabled?
+    * @param truthValueTracingEnabled Truth value tracing enabled?
+    * @param simplifyConditions Simplify conditions?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
@@ -150,7 +157,9 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean usePrettyPrinting,
                                 final Boolean showSignatureOnMethodReturnNodes,
                                 final Boolean higlightReachedSourceCode,
-                                final Boolean truthValueEvaluationEnabled) throws Exception {
+                                final Boolean truthValueTracingEnabled,
+                                final Boolean simplifyConditions,
+                                final Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -167,7 +176,9 @@ public final class TestSEDKeyCoreUtil {
                                                   usePrettyPrinting, 
                                                   showSignatureOnMethodReturnNodes, 
                                                   higlightReachedSourceCode,
-                                                  truthValueEvaluationEnabled);
+                                                  truthValueTracingEnabled,
+                                                  simplifyConditions,
+                                                  hideFullBranchConditionIfAdditionalLabelIsAvailable);
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
             catch (Exception e) {
@@ -192,7 +203,9 @@ public final class TestSEDKeyCoreUtil {
                                                                    Boolean usePrettyPrinting,
                                                                    Boolean showSignatureOnMethodReturnNodes,
                                                                    Boolean higlightReachedSourceCode,
-                                                                   Boolean truthValueEvaluationEnabled) throws CoreException {
+                                                                   Boolean truthValueTracingEnabled,
+                                                                   Boolean simplifyConditions,
+                                                                   Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable) throws CoreException {
       ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
       if (useExistingContract != null) {
          wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
@@ -234,8 +247,14 @@ public final class TestSEDKeyCoreUtil {
       if (higlightReachedSourceCode != null) {
          wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
       }
-      if (truthValueEvaluationEnabled != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
+      if (truthValueTracingEnabled != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_TRACING_ENABLED, truthValueTracingEnabled);
+      }
+      if (simplifyConditions != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS, simplifyConditions);
+      }
+      if (hideFullBranchConditionIfAdditionalLabelIsAvailable != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, hideFullBranchConditionIfAdditionalLabelIsAvailable);
       }
       config = wc.doSave();
       return config;
@@ -259,17 +278,17 @@ public final class TestSEDKeyCoreUtil {
    }
 
    /**
-    * Creates an expected {@link ISEDDebugTarget} defined by the given bundle file.
+    * Creates an expected {@link ISEDebugTarget} defined by the given bundle file.
     * @param bundleId The plug-in ID which contains the expected model path.
     * @param expectedModelPathInBundle The path to the oracle file in the bundle.
-    * @return The expected {@link ISEDDebugTarget}.
+    * @return The expected {@link ISEDebugTarget}.
     * @throws IOException Occurred Exception.
     * @throws SAXException Occurred Exception.
     * @throws ParserConfigurationException Occurred Exception.
     */   
-   public static ISEDDebugTarget createExpectedModel(String bundleId, String expectedModelPathInBundle) throws ParserConfigurationException, SAXException, IOException {
-      SEDXMLReader reader = new SEDXMLReader();
-      List<ISEDDebugTarget> targets = reader.read(BundleUtil.openInputStream(bundleId, expectedModelPathInBundle));
+   public static ISEDebugTarget createExpectedModel(String bundleId, String expectedModelPathInBundle) throws ParserConfigurationException, SAXException, IOException {
+      SEXMLReader reader = new SEXMLReader();
+      List<ISEDebugTarget> targets = reader.read(BundleUtil.openInputStream(bundleId, expectedModelPathInBundle));
       TestCase.assertNotNull(targets);
       TestCase.assertEquals(1, targets.size());
       return targets.get(0);
@@ -278,16 +297,16 @@ public final class TestSEDKeyCoreUtil {
    /**
     * Creates the expected initial model that represents the state after
     * connecting to KeY with only one symbolic thread without any children.
-    * @param targetName The expected name of the {@link ISEDDebugTarget}. 
+    * @param targetName The expected name of the {@link ISEDebugTarget}. 
     * @return The created expected model.
     */
-   public static ISEDDebugTarget createExpectedInitialModel(String targetName, boolean disposed) {
+   public static ISEDebugTarget createExpectedInitialModel(String targetName, boolean disposed) {
       // Create debug target
-      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null, false);
+      SEMemoryDebugTarget target = new SEMemoryDebugTarget(null, false);
       target.setModelIdentifier(KeYDebugTarget.MODEL_IDENTIFIER);
       target.setName(targetName);
       // Add thread
-      SEDMemoryThread thread = new SEDMemoryThread(target, false);
+      SEMemoryThread thread = new SEMemoryThread(target, false);
       thread.setName(IExecutionStart.DEFAULT_START_NODE_NAME);
       if (!disposed) {
          thread.setPathCondition("true");
@@ -297,37 +316,37 @@ public final class TestSEDKeyCoreUtil {
    }
    
    /**
-    * Makes sure that the given {@link ISEDDebugTarget} is
+    * Makes sure that the given {@link ISEDebugTarget} is
     * in the initial state.
-    * @param target The give {@link ISEDDebugTarget} to check.
-    * @param targetName The expected name of the {@link ISEDDebugTarget}. 
+    * @param target The give {@link ISEDebugTarget} to check.
+    * @param targetName The expected name of the {@link ISEDebugTarget}. 
     * @throws DebugException Occurred Exception.
     */
-   public static void assertDisposedInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
+   public static void assertDisposedInitialTarget(ISEDebugTarget target, String targetName) throws DebugException {
       TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, true), target, false, false, false, false);
    }
    
    /**
-    * Makes sure that the given {@link ISEDDebugTarget} is
+    * Makes sure that the given {@link ISEDebugTarget} is
     * in the initial state.
-    * @param target The give {@link ISEDDebugTarget} to check.
-    * @param targetName The expected name of the {@link ISEDDebugTarget}. 
+    * @param target The give {@link ISEDebugTarget} to check.
+    * @param targetName The expected name of the {@link ISEDebugTarget}. 
     * @throws DebugException Occurred Exception.
     */
-   public static void assertInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
+   public static void assertInitialTarget(ISEDebugTarget target, String targetName) throws DebugException {
       TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, false), target, false, false, false, false);
    }
    
    /**
-    * Makes sure that the given {@link ISEDDebugTarget} contains the
+    * Makes sure that the given {@link ISEDebugTarget} contains the
     * symbolic execution tree of the statement example.
-    * @param target The give {@link ISEDDebugTarget} to check.
+    * @param target The give {@link ISEDebugTarget} to check.
     * @throws DebugException Occurred Exception.
     * @throws IOException Occurred Exception.
     * @throws SAXException Occurred Exception.
     * @throws ParserConfigurationException Occurred Exception.
     */
-   public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
+   public static void assertFlatStepsExample(ISEDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
       TestSedCoreUtil.compareDebugTarget(createExpectedModel(Activator.PLUGIN_ID, "data/statements/oracle/FlatSteps.xml"), target, false, false, false, false);
    }
    

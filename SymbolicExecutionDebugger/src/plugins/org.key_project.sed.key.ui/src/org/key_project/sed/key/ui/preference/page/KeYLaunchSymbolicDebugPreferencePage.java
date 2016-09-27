@@ -73,10 +73,12 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       });
       BooleanFieldEditor sigEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, "Show signature instead of only the name on method &return nodes", SWT.NONE, spacer);
       addField(sigEdit);
-      BooleanFieldEditor truthEvaluationEdit = new BooleanFieldEditor(KeYSEDPreferences.TRUTH_VALUE_EVALUATION_ENABLED, "Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.NONE, spacer);
-      addField(truthEvaluationEdit);
+      BooleanFieldEditor truthTracingEdit = new BooleanFieldEditor(KeYSEDPreferences.TRUTH_VALUE_TRACING_ENABLED, "Truth status tracing enabled", SWT.NONE, spacer);
+      addField(truthTracingEdit);
       BooleanFieldEditor groupingEdit = new BooleanFieldEditor(KeYSEDPreferences.GROUPING_ENABLED, "Group nodes", SWT.NONE, spacer);
       addField(groupingEdit);
+      BooleanFieldEditor hideFullConditions = new BooleanFieldEditor(KeYSEDPreferences.HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, "Hide full branch conditions when an alternative label is available", SWT.NONE, spacer);
+      addField(hideFullConditions);
 
       group = SWTFactory.createGroup(getFieldEditorParent(), "Variables", 1, 1, GridData.FILL_HORIZONTAL);
       final Composite variablesSpacer = SWTFactory.createComposite(group, 2, 1, GridData.FILL_HORIZONTAL);
@@ -101,6 +103,9 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       Composite keySpacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);
       BooleanFieldEditor mainWindowEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_KEY_MAIN_WINDOW, "Show &KeY's main window (only for experienced user)", SWT.NONE, keySpacer);
       addField(mainWindowEdit);
+
+      BooleanFieldEditor simplifyConditionsEdit = new BooleanFieldEditor(KeYSEDPreferences.SIMPLIFY_CONDITIONS, "Simplify conditions (recommended)", SWT.NONE, keySpacer);
+      addField(simplifyConditionsEdit);
    }
 
    /**

@@ -35,6 +35,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
@@ -53,16 +54,20 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
-import org.key_project.sed.core.slicing.ISEDSlicer;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.impl.AbstractSEDebugTarget;
+import org.key_project.sed.core.slicing.ISESlicer;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
 import org.key_project.sed.key.core.launch.KeYLaunchSettings;
+import org.key_project.sed.key.core.launch.KeYSourceLookupDirector;
+import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant.SourceRequest;
 import org.key_project.sed.key.core.slicing.KeYThinBackwardSlicer;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.IOUtil;
@@ -70,24 +75,26 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.util.ProofUserManager;
 
 /**
- * Implementation if {@link ISEDDebugTarget} which uses KeY to symbolically
+ * Implementation if {@link ISEDebugTarget} which uses KeY to symbolically
  * debug a program.
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public class KeYDebugTarget extends AbstractSEDDebugTarget {
+public class KeYDebugTarget extends AbstractSEDebugTarget {
    /**
     * The {@link KeYBreakpointManager} that manages breakpoints for this target.
     */
@@ -127,7 +134,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    /**
     * Maps an {@link IExecutionNode} to its representation in the debug model.
     */
-   private final Map<IExecutionNode<?>, IKeYSEDDebugNode<?>> executionToDebugMapping = new HashMap<IExecutionNode<?>, IKeYSEDDebugNode<?>>();
+   private final Map<IExecutionNode<?>, IKeYSENode<?>> executionToDebugMapping = new HashMap<IExecutionNode<?>, IKeYSENode<?>>();
    
    /**
     * Observes the proof.
@@ -166,17 +173,22 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
       Proof proof = environment.getProof();
       proof.addProofDisposedListener(proofDisposedListener);
       ProofUserManager.getInstance().addUser(proof, environment, this);
+      // Hide symbolic execution labels by default
+      ImmutableList<TermLabelConfiguration> configurations = SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(launchSettings.isTruthValueTracingEnabled());
+      for (TermLabelConfiguration config : configurations) {
+         environment.getUi().getTermLabelVisibilityManager().setHidden(config.getTermLabelName(), true);
+      }
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
       // Initialize breakpoints
       initBreakpoints();
+      // Initialize proof with default symbolic execution strategy settings
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
+      ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
       // Add thread
       KeYThread thread = new KeYThread(this, environment.getBuilder().getStartNode());
       threads = new KeYThread[] {thread};
-      // Initialize proof to use the symbolic execution strategy
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
-      ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
    }
 
    /**
@@ -208,9 +220,9 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
     */
    @SuppressWarnings("unchecked")
    @Override
-   protected boolean checkBreakpointHit(IBreakpoint breakpoint, ISEDDebugNode node) {
-      if (node instanceof IKeYSEDDebugNode) {
-         return breakpointManager.checkBreakpointHit(breakpoint, ((IKeYSEDDebugNode<IExecutionNode<?>>)node));
+   protected boolean checkBreakpointHit(IBreakpoint breakpoint, ISENode node) {
+      if (node instanceof IKeYSENode) {
+         return breakpointManager.checkBreakpointHit(breakpoint, ((IKeYSENode<IExecutionNode<?>>)node));
       }
       else {
          return false;
@@ -259,15 +271,37 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    }
    
    /**
-    * Registers the given {@link IKeYSEDDebugNode} as child of this {@link KeYDebugTarget}.
-    * @param node The {@link IKeYSEDDebugNode} to register as child.
+    * Registers the given {@link IKeYSENode} as child of this {@link KeYDebugTarget}.
+    * @param node The {@link IKeYSENode} to register as child.
     * @throws DebugException Occurred Exception
     */
-   public void registerDebugNode(IKeYSEDDebugNode<?> node) throws DebugException {
+   public void registerDebugNode(IKeYSENode<?> node) throws DebugException {
       if (node != null) {
-         IKeYSEDDebugNode<?> oldNode = executionToDebugMapping.put(node.getExecutionNode(), node);
+         IKeYSENode<?> oldNode = executionToDebugMapping.put(node.getExecutionNode(), node);
          Assert.isTrue(oldNode == null);
          addToSourceModel(node);
+         if (node instanceof KeYMethodContract) {
+            registerContractSourceLocation((KeYMethodContract) node);
+         }
+      }
+   }
+   
+   protected void registerContractSourceLocation(KeYMethodContract node) throws DebugException {
+      String path = node.getContractSourcePath();
+      if (path != null) {
+         SourceLocation contractLocation = node.getContractSourceLocation();
+         if (contractLocation != null) {
+            ISourceLocator locator = getLaunch().getSourceLocator();
+            if (locator instanceof KeYSourceLookupDirector) {
+               KeYSourceLookupDirector keyLocator = (KeYSourceLookupDirector) locator;
+               Object source = keyLocator.getSourceElement(new SourceRequest(this, path));
+               addToSourceModel(node, 
+                                source, 
+                                contractLocation.getLineNumber(), 
+                                contractLocation.getCharStart(), 
+                                contractLocation.getCharEnd());
+            }
+         }
       }
    }
    
@@ -286,35 +320,35 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    }
    
    /**
-    * Returns the child {@link IKeYSEDDebugNode} for the given {@link Node}.
+    * Returns the child {@link IKeYSENode} for the given {@link Node}.
     * @param node The {@link Node} for that the debug model representation is needed.
-    * @return The found {@link IKeYSEDDebugNode} representation of the given {@link Node} or {@code null} if no one is available.
+    * @return The found {@link IKeYSENode} representation of the given {@link Node} or {@code null} if no one is available.
     */
-   public IKeYSEDDebugNode<?> getDebugNode(Node node) {
+   public IKeYSENode<?> getDebugNode(Node node) {
       IExecutionNode<?> executionNode = getExecutionNode(node);
       return executionNode != null ? getDebugNode(executionNode) : null;
    }
    
    /**
-    * Returns the child {@link IKeYSEDDebugNode} for the given {@link IExecutionNode}.
+    * Returns the child {@link IKeYSENode} for the given {@link IExecutionNode}.
     * @param executionNode The {@link IExecutionNode} for that the debug model representation is needed.
-    * @return The found {@link IKeYSEDDebugNode} representation of the given {@link IExecutionNode} or {@code null} if no one is available.
+    * @return The found {@link IKeYSENode} representation of the given {@link IExecutionNode} or {@code null} if no one is available.
     */
-   public IKeYSEDDebugNode<?> getDebugNode(IExecutionNode<?> executionNode) {
+   public IKeYSENode<?> getDebugNode(IExecutionNode<?> executionNode) {
       return executionToDebugMapping.get(executionNode);
    }
 
    /**
     * Ensures that the debug model presentation of the given {@link IExecutionNode} and all its parents are created.
     * @param executionNode The {@link IExecutionNode}.
-    * @return The {@link IKeYSEDDebugNode} which represents the given {@link IExecutionNode}.
+    * @return The {@link IKeYSENode} which represents the given {@link IExecutionNode}.
     * @throws DebugException Occurred Exception.
     */
-   public IKeYSEDDebugNode<?> ensureDebugNodeIsCreated(IExecutionNode<?> executionNode) throws DebugException {
+   public IKeYSENode<?> ensureDebugNodeIsCreated(IExecutionNode<?> executionNode) throws DebugException {
       // Collect unknown parents
       Deque<IExecutionNode<?>> parentStack = new LinkedList<IExecutionNode<?>>();
       while (executionNode != null) {
-         IKeYSEDDebugNode<?> keyNode = getDebugNode(executionNode);
+         IKeYSENode<?> keyNode = getDebugNode(executionNode);
          parentStack.addFirst(executionNode);
          if (keyNode == null) {
             executionNode = executionNode.getParent();
@@ -324,7 +358,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
          }
       }
       // Ensure that children are loaded
-      IKeYSEDDebugNode<?> keyNode = null;
+      IKeYSENode<?> keyNode = null;
       for (IExecutionNode<?> parent : parentStack) {
          keyNode = getDebugNode(parent);
          keyNode.getChildren();
@@ -595,7 +629,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
       };
       Display.getDefault().asyncExec(run);
    }
-
+   
    /**
     * When the proof is disposed.
     * @param e The event.
@@ -679,12 +713,12 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
     * {@inheritDoc}
     */
    @Override
-   public ISEDSlicer[] getSlicer(ISEDDebugNode seedNode, IVariable seedVariable) {
+   public ISESlicer[] getSlicer(ISENode seedNode, IVariable seedVariable) {
       if (!(seedNode instanceof KeYThread) && seedVariable instanceof KeYVariable) {
-         return new ISEDSlicer[] {new KeYThinBackwardSlicer()};
+         return new ISESlicer[] {new KeYThinBackwardSlicer()};
       }
       else {
-         return new ISEDSlicer[0];
+         return new ISESlicer[0];
       }
    }
    
@@ -694,5 +728,15 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    @Override
    public boolean isGroupingSupported() {
       return launchSettings.isGroupingEnabled();
+   }
+   
+   /**
+    * Deletes the given {@link IExecutionNode} from the map containing references between {@link IExecutionNode}'s 
+    * and their corresponding {@link IKeYSENode}'s.
+    * @param executionNode The {@link IExecutionNode} to be removed.
+    * @author Anna Filighera
+    */
+   public void removeExecutionNode(IExecutionNode<?> executionNode) {
+	   executionToDebugMapping.remove(executionNode);
    }
 }

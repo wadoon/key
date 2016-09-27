@@ -150,13 +150,8 @@ public class InfFlowContractAppFeature implements Feature {
     private boolean subset(
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-                insts0.entryIterator();
 
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 =
-                    it.next();
-
+        for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
             if (entry0.key() instanceof SkolemTermSV ||
                 entry0.key() instanceof VariableSV) {
                 continue;
@@ -189,7 +184,7 @@ public class InfFlowContractAppFeature implements Feature {
         assert app.ifFormulaInstantiations().size() >= 1 :
                 "Featureis only applicable to rules with at least one assumes.";
 
-        final SequentFormula focusFor = pos.constrainedFormula();
+        final SequentFormula focusFor = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
         final SequentFormula assumesFor =
                 app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
@@ -238,7 +233,7 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost compute(RuleApp ruleApp,
+    public RuleAppCost computeCost(RuleApp ruleApp,
                                PosInOccurrence pos,
                                Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
@@ -249,16 +244,17 @@ public class InfFlowContractAppFeature implements Feature {
         if (!app.ifInstsComplete()) {
             return NumberRuleAppCost.getZeroCost();
         }
-        
-        if (app.ifFormulaInstantiations().size() < 1 ||
-            !isInfFlowProof(goal.proof()) ||
-            duplicateFindTaclet(app, pos, goal)) {
+
+        if (!isInfFlowProof(goal.proof())
+                || app.ifFormulaInstantiations() == null
+                || app.ifFormulaInstantiations().size() < 1
+                || duplicateFindTaclet(app, pos, goal)) {
             return TopRuleAppCost.INSTANCE;
         }
 
         // only relate the n-th called method in execution A with the n-th
         // called method in execution B automatically
-        final SequentFormula focusFor = pos.constrainedFormula();
+        final SequentFormula focusFor = pos.sequentFormula();
         final SequentFormula assumesFor =
                 app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 

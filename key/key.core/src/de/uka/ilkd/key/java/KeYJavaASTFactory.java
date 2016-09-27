@@ -30,16 +30,7 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.Equals;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.LogicalAnd;
-import de.uka.ilkd.key.java.expression.operator.LogicalOr;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.expression.operator.NotEquals;
-import de.uka.ilkd.key.java.expression.operator.PostIncrement;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
@@ -2518,8 +2509,8 @@ public abstract class KeYJavaASTFactory {
      *         <code>statement</code>
      */
     public static LabeledStatement labeledStatement(final Label label,
-	    final Statement statement) {
-	final LabeledStatement labeled = new LabeledStatement(label, statement);
+	    final Statement statement, PositionInfo pos) {
+	final LabeledStatement labeled = new LabeledStatement(label, statement, pos);
 
 	return labeled;
     }
@@ -2541,10 +2532,10 @@ public abstract class KeYJavaASTFactory {
      *         <code>statements</code>
      */
     public static Statement labeledStatement(final Label label,
-	    final Statement[] statements) {
+	    final Statement[] statements, PositionInfo pos) {
 	final StatementBlock block = KeYJavaASTFactory.block(statements);
 	final LabeledStatement labeled = KeYJavaASTFactory.labeledStatement(
-		label, block);
+		label, block, pos);
 
 	return labeled;
     }
@@ -3140,5 +3131,10 @@ public abstract class KeYJavaASTFactory {
 	final IntLiteral literal = KeYJavaASTFactory.intLiteral(0);
 
 	return literal;
+    }
+
+    public static TypeCast cast(final Expression expression,
+            final KeYJavaType targetType) {
+        return new TypeCast(expression, new TypeRef(targetType));
     }
 }

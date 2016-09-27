@@ -60,7 +60,7 @@ public class TreeViewerIteratorTest extends AbstractSetupTestCase {
       // Get local file in operating system of folder src 
       File location = ResourceUtil.getLocation(src);
       // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
-      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
       IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
       ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
       FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
@@ -76,7 +76,7 @@ public class TreeViewerIteratorTest extends AbstractSetupTestCase {
          shell.setLayout(new FillLayout());
          TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
          viewer.setUseHashlookup(true);
-         viewer.setContentProvider(new LazyProofTreeContentProvider());
+         viewer.setContentProvider(new LazyProofTreeContentProvider(environment.getProofControl()));
          viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
          viewer.setInput(proof);
          shell.setVisible(true);

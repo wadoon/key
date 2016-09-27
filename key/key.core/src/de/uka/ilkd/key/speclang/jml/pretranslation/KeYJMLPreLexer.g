@@ -22,16 +22,6 @@ lexer grammar KeYJMLPreLexer;
 
 @annotateclass{ @SuppressWarnings("all") } 
 
-@members {
-    private void newline() {
-      Debug.out("newline() was called but ANTLRv3 does not implement it anymore.");
-    }
-
-    private void append(final String text) {
-      setText(getText() + text);
-    }
-}
-
     ABSTRACT 			: 'abstract';
     ACCESSIBLE                  : 'accessible';
     ACCESSIBLE_REDUNDANTLY      : 'accessible_redundantly';
@@ -71,6 +61,7 @@ lexer grammar KeYJMLPreLexer;
     DURATION 			: 'duration';
     DURATION_RED 		: 'duration_redundantly';
     ENSURES 			: 'ensures';
+    ENSURES_FREE  : 'ensures_free';
     ENSURES_RED 		: 'ensures_redundantly';
     EXCEPTIONAL_BEHAVIOR 	: 'exceptional_behavior';
     EXCEPTIONAL_BEHAVIOUR 	: 'exceptional_behaviour';
@@ -88,6 +79,7 @@ lexer grammar KeYJMLPreLexer;
     INSTANCE 			: 'instance';
     INVARIANT 			: 'invariant';
     INVARIANT_RED 		: 'invariant_redundantly';
+    JOIN_PROC           : 'join_proc';
     LOOP_INVARIANT  		: 'loop_invariant';
     LOOP_INVARIANT_RED  	: 'loop_invariant_redundantly';
     MAINTAINING  		: 'maintaining';
@@ -122,11 +114,11 @@ lexer grammar KeYJMLPreLexer;
     PROTECTED 			: 'protected';
     PUBLIC			: 'public';
     PURE 			: 'pure';
-    STRICTLY_PURE               : 'strictly_pure';
     READABLE			: 'readable';
     REPRESENTS			: 'represents';
     REPRESENTS_RED		: 'represents_redundantly';
     REQUIRES 			: 'requires';
+    REQUIRES_FREE : 'requires_free';
     REQUIRES_RED 		: 'requires_redundantly';
 	RETURNS				: 'returns';
 	RETURN_BEHAVIOR 	: 'return_behavior';
@@ -146,6 +138,7 @@ lexer grammar KeYJMLPreLexer;
     SPEC_SAFE_MATH 		: 'spec_safe_math';
     STATIC 			: 'static';
     STRICTFP 			: 'strictfp';
+    STRICTLY_PURE : 'strictly_pure';
     SYNCHRONIZED 		: 'synchronized';
     TRANSIENT 			: 'transient';
     TWO_STATE			: 'two_state' ;
@@ -180,13 +173,13 @@ fragment ML_COMMENT
     (
         (~('*').|'*'~'/')
         =>
-        (	'\n'         { newline(); }
+        (	'\n'         { /*newline();*/ }
             | 	~('@' | '\n')
         )
 	(
 	    options { greedy = false; }
             :
-                '\n'     { newline(); }
+                '\n'     { /*newline();*/ }
             |	~'\n'
 	)*
     )?
@@ -217,7 +210,7 @@ WS
     (
 	    ' '
 	|   '\t'
-	|   '\n'  { newline(); acceptAt = true; }
+	|   '\n'  { /*newline();*/ acceptAt = true; }
 	|   '\r'
 	|   {acceptAt}? '@'
 	|   ('//@') => '//@'
@@ -252,23 +245,23 @@ fragment BODY
 @init {
     int braceCounter = 0;
     boolean ignoreAt = false;
-    String s = null;
+    StringBuilder sb = new StringBuilder("{");
 }
 :
-   '{'
-      (
-	   '{'                    { braceCounter++; ignoreAt = false; }
-    	|  {braceCounter > 0}?=> '}'  { braceCounter--; ignoreAt = false; }
-    	|  '\n'                     { newline(); ignoreAt = true; }
-    	|  ' '
-    	|  '\u000C'
-    	|  '\t'
-    	|  '\r'
-    	|  {!ignoreAt}? '@'
-    	|  {ignoreAt}? { s = getText(); } '@'	    { setText(s); ignoreAt = false; }
-    	|  ~('{' | '}' | '\n' | ' ' | '\u000C' | '\t' | '\r' | '@' )    { ignoreAt = false; }
-    )* {braceCounter == 0}?=> '}'
+  '{'
+  (
+    '{'                          { braceCounter++; ignoreAt = false; sb.append("{"); }
+  | {braceCounter > 0}? => '}'   { braceCounter--; ignoreAt = false; sb.append("}");}
+  | '\n'                         { ignoreAt = true; sb.append("\n"); }
+  | '@'                          { sb.append(ignoreAt ? " " : "@"); ignoreAt = false; }
+  | c = (' '|'\t'|'\r'|'\u000c') { sb.append((char)c); }
+  | c = ~(' '|'\t'|'\r'|'\u000c' | '{' | '}' | '\n' | '@')
+                                 { ignoreAt = false; sb.append((char)c); }
+  )* 
+  {braceCounter == 0}? => '}' 
+     { sb.append("}"); setText(sb.toString()); }
 ;
+
 
 BRACE_DISPATCH :
    ( '{' ~ '|') => BODY { $type = BODY; }
@@ -281,12 +274,6 @@ SEMICOLON
 ;
 
 STRING_LITERAL
-@after {
-    // strip quotation marks
-    final String text = getText();
-    final int length = text.length();
-    setText(text.substring(1, length - 1));
-}
     : '"' ( ESC | ~('"'|'\\') )* '"'
     ;
 

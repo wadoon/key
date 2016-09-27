@@ -15,7 +15,12 @@ package org.key_project.key4eclipse.common.ui.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotCompleteAndApplyTacletMatchWizardPageTest;
+import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotExportProjectFileWizardTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotKeYExampleNewWizardTest;
+import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotKeYIncludesPropertyPageTest;
+import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotKeYStubGenerationCustomizationTest;
+import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotLoopInvariantRuleCompletionTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotNodeCounterExampleGeneratorJobTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotProofFileGenerateTestsJobTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotProofGenerateTestsJobTest;
@@ -28,12 +33,17 @@ import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotTacletOp
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   SWTBotExportProjectFileWizardTest.class,
    SWTBotKeYExampleNewWizardTest.class,
+   SWTBotKeYIncludesPropertyPageTest.class,
+   SWTBotKeYStubGenerationCustomizationTest.class,
    SWTBotNodeCounterExampleGeneratorJobTest.class,
    SWTBotProofFileGenerateTestsJobTest.class,
    SWTBotProofGenerateTestsJobTest.class,
    SWTBotStarterTest.class,
-   SWTBotTacletOptionsPreferencePageTest.class
+   SWTBotTacletOptionsPreferencePageTest.class,
+   SWTBotLoopInvariantRuleCompletionTest.class,
+   SWTBotCompleteAndApplyTacletMatchWizardPageTest.class
 })
 public class SWTBotAllCommonUiTests {
 }

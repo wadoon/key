@@ -5,9 +5,9 @@
 package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
@@ -33,6 +33,11 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
     @Override
     public String getName() {
         return "Finish auxiliary computation";
+    }
+
+    @Override
+    public String getCategory() {
+        return "Auxiliary Computation";
     }
 
     @Override
@@ -106,7 +111,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
                                                         Proof symbExecProof) {
         final ImmutableList<Goal> openGoals = symbExecProof.openGoals();
         for (final Goal openGoal : openGoals) {
-            final ImmutableSet<NoPosTacletApp> ruleApps =
+            final Set<NoPosTacletApp> ruleApps =
                     openGoal.indexOfTaclets().allNoPosTacletApps();
             for (final NoPosTacletApp ruleApp : ruleApps) {
                 final Taclet t = ruleApp.taclet();

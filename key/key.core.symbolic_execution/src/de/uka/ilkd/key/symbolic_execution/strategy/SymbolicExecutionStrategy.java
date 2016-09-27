@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -39,6 +41,7 @@ import de.uka.ilkd.key.strategy.termfeature.ContainsLabelFeature;
 import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * {@link Strategy} to use for symbolic execution.
@@ -55,7 +58,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
    public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY = new IDefaultStrategyPropertiesFactory() {
       @Override
       public StrategyProperties createDefaultStrategyProperties() {
-          return SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, false, false);
+          return SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, false, false, false);
       }
    };
    
@@ -175,6 +178,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
     * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
     * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
+    * @param blockTreatmentContract Block contracts or expand otherwise?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @return The default {@link StrategyProperties} for symbolic execution.
@@ -182,6 +186,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
    public static StrategyProperties getSymbolicExecutionStrategyProperties(boolean quantifierInstantiationWithSplitting,
                                                                            boolean methodTreatmentContract, 
                                                                            boolean loopTreatmentInvariant,
+                                                                           boolean blockTreatmentContract,
                                                                            boolean nonExecutionBranchHidingSideProofs,
                                                                            boolean aliasChecks) {
       StrategyProperties sp = new StrategyProperties();
@@ -189,6 +194,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                                                       quantifierInstantiationWithSplitting, 
                                                       methodTreatmentContract, 
                                                       loopTreatmentInvariant, 
+                                                      blockTreatmentContract,
                                                       nonExecutionBranchHidingSideProofs, 
                                                       aliasChecks);
       return sp;
@@ -202,22 +208,32 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       /**
        * Shown string for method treatment "Expand".
        */
-      public static final String METHOD_TREATMENT_EXPAND = "Expand";
+      public static final String METHOD_TREATMENT_EXPAND = "Inline Methods";
 
       /**
        * Shown string for method treatment "Contract".
        */
-      public static final String METHOD_TREATMENT_CONTRACT = "Contract";
+      public static final String METHOD_TREATMENT_CONTRACT = "Use Contracts";
 
       /**
        * Shown string for loop treatment "Expand".
        */
-      public static final String LOOP_TREATMENT_EXPAND = "Expand";
+      public static final String LOOP_TREATMENT_EXPAND = "Unroll Loops";
 
       /**
        * Shown string for loop treatment "Invariant".
        */
-      public static final String LOOP_TREATMENT_INVARIANT = "Invariant";
+      public static final String LOOP_TREATMENT_INVARIANT = "Use Loop Invariants";
+
+      /**
+       * Shown string for block treatment "Expand".
+       */
+      public static final String BLOCK_TREATMENT_EXPAND = "Expand Blocks";
+
+      /**
+       * Shown string for block treatment "Invariant".
+       */
+      public static final String BLOCK_TREATMENT_INVARIANT = "Use Contracts";
 
       /**
        * Shown string for alias check "Never".
@@ -227,7 +243,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       /**
        * Shown string for alias check "Immediately".
        */
-      public static final String NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "Via Side Proofs";
+      public static final String NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "On";
 
       /**
        * Shown string for alias check "Never".
@@ -269,6 +285,10 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                "Loop Treatment",
                new StrategyPropertyValueDefinition(StrategyProperties.LOOP_EXPAND, LOOP_TREATMENT_EXPAND, null),
                new StrategyPropertyValueDefinition(StrategyProperties.LOOP_INVARIANT, LOOP_TREATMENT_INVARIANT, null));
+         OneOfStrategyPropertyDefinition blockTreatment = new OneOfStrategyPropertyDefinition(StrategyProperties.BLOCK_OPTIONS_KEY,
+               "Block Treatment",
+               new StrategyPropertyValueDefinition(StrategyProperties.BLOCK_EXPAND, BLOCK_TREATMENT_EXPAND, null),
+               new StrategyPropertyValueDefinition(StrategyProperties.BLOCK_CONTRACT, BLOCK_TREATMENT_INVARIANT, null));
          OneOfStrategyPropertyDefinition branchHiding = new OneOfStrategyPropertyDefinition(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
                "Non Execution Branch Hiding",
                new StrategyPropertyValueDefinition(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF, NON_EXECUTION_BRANCH_HIDING_OFF, null),
@@ -283,8 +303,10 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                                                1000,
                                                "Symbolic Execution Options",
                                                SymbolicExecutionStrategy.DEFAULT_FACTORY,
+                                               new ArrayList<Triple<String,Integer,IDefaultStrategyPropertiesFactory>>(),
                                                methodTreatment,
                                                loopTreatment,
+                                               blockTreatment,
                                                branchHiding,
                                                aliasChecks);
       }
