@@ -80,8 +80,13 @@ GEQ : '>=' ;
 LEQ : '<=' ;
 EQ  : '==' ;
 
+// Arithmetics
+
+MINUS : '-' ;
+
 // Bytecode directives
 
+BIPUSH    : 'BIPUSH';
 GOTO      : 'GOTO';
 IADD      : 'IADD';
 ICONST    : 'ICONST';
@@ -113,6 +118,10 @@ fragment LETTER
 NUMBER
     : DIGIT +
     ;
+
+INTEGER
+	: MINUS ? DIGIT +
+	;
 
 STRING_LITERAL
 	: '"' ('\\' . | ~( '"' | '\\') )* '"' ;

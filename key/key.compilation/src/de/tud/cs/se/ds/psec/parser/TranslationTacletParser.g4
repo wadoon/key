@@ -83,26 +83,33 @@ nullary_bytecode_instr
 
 unary_bytecode_instr
     :
-        (
-            GOTO
-        |
-            ICONST
-        |
-            IF_ICMPLE
-        |
-            IFEQ
-        |
-            IFNE
-        |
-            ISTORE
-        )
-        
-        (
-            LOC_REF
-        |
-            LABEL
-        )
+        loc_var_unary_instrs LOC_REF   # locVarUnaryBytecodeInstr
+    |
+    	label_unary_instrs LABEL       # labelUnaryBytecodeInstr
+    |
+    	int_const_unary_instrs INTEGER # intUnaryBytecodeInstr
     ;
+
+loc_var_unary_instrs
+	:
+		ISTORE
+	;
+
+label_unary_instrs
+	:
+		GOTO
+	|
+		IF_ICMPLE
+	|
+		IFEQ
+	|
+		IFNE
+	;
+
+int_const_unary_instrs
+	:
+		BIPUSH
+	;
 
 load_instr
     :
@@ -140,7 +147,7 @@ simple_expression
     :
         meta_var
         comparator
-        NUMBER
+        INTEGER
     ;
 
 meta_var
