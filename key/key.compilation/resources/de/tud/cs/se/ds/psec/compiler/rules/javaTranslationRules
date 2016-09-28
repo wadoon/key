@@ -2,30 +2,46 @@
 // ### Splitting and loops ###
 // ###########################
 
-if_split {
+if_split_1_child {
 	\taclets ("IfElseSplit", "IfSplit")
+	\condition (#num-children == 1)
 	\translation (
-		\if (#has-child-2)
-		(
-			\load (#se)
-			IFEQ l0
-			#child-1
-			l0: child-2
-		)
-		(#child-1)
+		#child-1
 	)
 }
 
-while_loop {
+if_split_2_children {
+	\taclets ("IfElseSplit", "IfSplit")
+	\condition (#num-children == 2)
+	\translation (
+		\load (#se)
+		IFEQ l0
+		#child-1
+		l0: #child-2
+	)
+}
+
+while_loop_1_child {
 	\taclets ("removeLoopForCompilation", "removeLoopForCompilationVoid")
+	\condition (#num-children == 1)
 	\translation (
 		GOTO l1
 		l2: #child-1
 		l1: \load (#se)
 		IFNE l2
-		\if (#has-child-2)
-			(#child-2)
-			(RETURN)
+		RETURN
+	)
+}
+
+while_loop_2_children {
+	\taclets ("removeLoopForCompilation", "removeLoopForCompilationVoid")
+	\condition (#num-children == 2)
+	\translation (
+		GOTO l1
+		l2: #child-1
+		l1: \load (#se)
+		IFNE l2
+		#child-2
 	)
 }
 
