@@ -2,6 +2,7 @@ package de.tud.cs.se.ds.psec.parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Function;
@@ -40,7 +41,7 @@ import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationTacletASTElement;
-import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 
 /**
  * Front-end for {@link TranslationTacletParser}, a parser for taclets defining
@@ -55,7 +56,7 @@ public class TranslationTacletParserFE extends
     /**
      * The file that's being parsed. May be null if a String is being parsed.
      */
-    private File file;
+    private String fileName;
 
     /**
      * Map for remembering label objects by their name in the taclet definition.
@@ -73,13 +74,13 @@ public class TranslationTacletParserFE extends
      *            the file to parse.
      * @throws IOException
      *             if the file cannot be read.
-     * @throws ProofInputException
+     * @throws TranslationTacletInputException
      *             if an error occurs while parsing.
      * @return The parsed {@link TranslationDefinitions}.
      */
     public TranslationDefinitions parse(File file)
-            throws IOException, ProofInputException {
-        this.file = file;
+            throws IOException, TranslationTacletInputException {
+        this.fileName = file.getAbsolutePath();
 
         // Create a CharStream that reads from an example file
         String fileName = file.getCanonicalPath();
@@ -93,16 +94,38 @@ public class TranslationTacletParserFE extends
      * 
      * @param inputStr
      *            the string to parse.
-     * @throws ProofInputException
+     * @throws TranslationTacletInputException
      *             if an error occurs while parsing.
      * @return The parsed {@link TranslationDefinitions}.
      */
     public TranslationDefinitions parse(String inputStr)
-            throws ProofInputException {
-        this.file = null;
+            throws TranslationTacletInputException {
+        this.fileName = null;
 
         // Create a CharStream that reads from an the given input string
         CharStream input = new ANTLRInputStream(inputStr);
+
+        return parse(input);
+    }
+
+    /**
+     * Initiates the parsing process for a {@link URL}.
+     * 
+     * @param url
+     *            the {@link URL} to parse from.
+     * @throws TranslationTacletInputException
+     *             if an error occurs while parsing.
+     * @throws IOException
+     *             If there's a problem by opening the resource from the
+     *             {@link URL}.
+     * @return The parsed {@link TranslationDefinitions}.
+     */
+    public TranslationDefinitions parse(URL url)
+            throws TranslationTacletInputException, IOException {
+        this.fileName = url.getFile();
+
+        // Create a CharStream that reads from an the given input string
+        CharStream input = new ANTLRInputStream(url.openStream());
 
         return parse(input);
     }
@@ -112,12 +135,12 @@ public class TranslationTacletParserFE extends
      *
      * @param input
      *            the input stream to use for the parsing.
-     * @throws ProofInputException
+     * @throws TranslationTacletInputException
      *             if an error occurs while parsing.
      * @return The parsed {@link TranslationDefinitions}.
      */
     private TranslationDefinitions parse(CharStream input)
-            throws ProofInputException {
+            throws TranslationTacletInputException {
         // Create the lexer
         TranslationTacletLexer lexer = new TranslationTacletLexer(input);
 
@@ -138,7 +161,7 @@ public class TranslationTacletParserFE extends
             return new TranslationDefinitions(definitions);
         }
         catch (Exception e) {
-            throw new ProofInputException(e.getMessage(), e);
+            throw new TranslationTacletInputException(e.getMessage(), e);
         }
     }
 
@@ -150,7 +173,7 @@ public class TranslationTacletParserFE extends
     public TranslationDefinition visitDefinition(DefinitionContext ctx) {
         ArrayList<String> symbExTacletReferences = new ArrayList<>();
         ctx.taclets_reference().STRING_LITERAL()
-                .forEach(s -> symbExTacletReferences.add(s.getText()));
+                .forEach(s -> symbExTacletReferences.add(s.getText().replaceAll("\"", "")));
 
         Function<ApplicabilityCheckInput, Boolean> applicabilityCheck = (input -> {
             return ctx.condition().stream()
@@ -172,7 +195,7 @@ public class TranslationTacletParserFE extends
             Simple_expressionContext ctx) {
         final String cmp = ctx.comparator().getText();
         final String metaVar = ctx.meta_var().getText();
-        final int param2 = Integer.parseInt(ctx.INTEGER().getText());
+        final int param2 = Integer.parseInt(ctx.integer().getText());
 
         // TODO it would be more efficient to do the case distinctions outside
         // the lambda and return simple lambdas. The checks will be done more
@@ -252,7 +275,7 @@ public class TranslationTacletParserFE extends
             IntUnaryBytecodeInstrContext ctx) {
         return new IntegerUnaryBytecodeInstr(
                 ctx.int_const_unary_instrs().getText(),
-                Integer.parseInt(ctx.INTEGER().getText()));
+                Integer.parseInt(ctx.integer().getText()));
     }
 
     @Override
@@ -310,11 +333,11 @@ public class TranslationTacletParserFE extends
         // TODO This method should be used to provide useful feedback.
         String fallback = "<no file given>";
 
-        if (file == null) {
+        if (fileName == null) {
             return fallback;
         }
         else {
-            return file.getName();
+            return fileName;
         }
     }
 }

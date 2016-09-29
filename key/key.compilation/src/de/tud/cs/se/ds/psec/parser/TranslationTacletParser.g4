@@ -87,7 +87,7 @@ unary_bytecode_instr
     |
     	label_unary_instrs LABEL       # labelUnaryBytecodeInstr
     |
-    	int_const_unary_instrs INTEGER # intUnaryBytecodeInstr
+    	int_const_unary_instrs integer # intUnaryBytecodeInstr
     ;
 
 loc_var_unary_instrs
@@ -142,12 +142,17 @@ child_call
         CHILD NUMBER
     ;
 
+integer
+	:
+		MINUS ? NUMBER
+	;
+
 // Condition expressions
 simple_expression
     :
         meta_var
         comparator
-        INTEGER
+        integer
     ;
 
 meta_var

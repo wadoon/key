@@ -119,10 +119,6 @@ NUMBER
     : DIGIT +
     ;
 
-INTEGER
-	: MINUS ? DIGIT +
-	;
-
 STRING_LITERAL
 	: '"' ('\\' . | ~( '"' | '\\') )* '"' ;
 
