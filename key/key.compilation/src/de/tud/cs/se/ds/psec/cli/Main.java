@@ -50,12 +50,19 @@ public class Main {
                 .desc("Print additional bytecode verifier output if compilation fails")
                 .required(false).build();
 
+        Option bailAtParseErrorOpt = Option.builder("b")
+                .longOpt("bail-at-parser-error")
+                .desc("Don't try to recover from syntax errors in the "
+                        + "translation taclet definition file. Stop instead.")
+                .required(false).build();
+
         Option helpOpt = Option.builder("h").longOpt("help")
                 .desc("Display help (this text) and terminate").required(false)
                 .build();
 
         options.addOption(dumpSETOpt);
         options.addOption(debugOpt);
+        options.addOption(bailAtParseErrorOpt);
         options.addOption(helpOpt);
 
         CommandLineParser parser = new DefaultParser();
@@ -80,28 +87,27 @@ public class Main {
             }
 
             Compiler compiler = new Compiler(inputFile, line.hasOption("X"),
-                    line.hasOption("d"));
+                    line.hasOption("d"), line.hasOption('b'));
 
             for (JavaTypeCompilationResult compilationResult : compiler
                     .compile()) {
                 // TODO: Manage directory structures for packages
 
-                Files.write(
-                        new File(
-                                compilationResult.getInternalTypeName()
-                                        .substring(compilationResult
-                                                .getInternalTypeName()
-                                                .lastIndexOf('/') + 1)
-                                        + ".class").toPath(),
-                        compilationResult.getBytecode());
+                Files.write(new File(compilationResult.getInternalTypeName()
+                        .substring(compilationResult.getInternalTypeName()
+                                .lastIndexOf('/') + 1)
+                        + ".class").toPath(), compilationResult.getBytecode());
             }
-        } catch (ParseException exp) {
+        }
+        catch (ParseException exp) {
             printHelp(options);
             System.exit(0);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (ProblemLoaderException e) {
+        }
+        catch (ProblemLoaderException e) {
             // Created in Compiler
             // TODO Auto-generated catch block
             e.printStackTrace();

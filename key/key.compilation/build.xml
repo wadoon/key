@@ -24,7 +24,6 @@
 
 		<mkdir dir="${build.dir}" />
 
-		<!--
 		<uptodate property="tacletlexer.notRequired"
 			targetFile="${gen.dir}/de/tud/cs/se/ds/psec/parser/TranslationTacletLexer.java"
 			srcFile="${src.dir}/de/tud/cs/se/ds/psec/parser/TranslationTacletLexer.g4" />
@@ -35,7 +34,6 @@
 				<include name="TranslationTacletLexer.g4" />
 			</srcfiles>
 		</uptodate>
-		-->
 	</target>
 
 	<target name="copy" depends="prepare" description="Copy all resources into the binary directory.">
@@ -51,8 +49,8 @@
 		description="Copies resources into the bin folder and generates the parser code.">
 	</target>
 
-	<!--<target name="tacletlexer" unless="tacletlexer.notRequired">-->
-	<target name="tacletlexer">
+	<target name="tacletlexer" unless="tacletlexer.notRequired">
+	<!--<target name="tacletlexer">-->
 		<echo message="Running antlr ..." />
 		<java jar="${ext.dir}/antlr-v4.jar" fork="true" failonerror="true">
 			<arg value="-package" />
@@ -63,8 +61,8 @@
 		</java>
 	</target>
 
-	<!--<target name="tacletparser" depends="tacletlexer" unless="tacletparser.notRequired">-->
-	<target name="tacletparser" depends="tacletlexer">
+	<target name="tacletparser" depends="tacletlexer" unless="tacletparser.notRequired">
+	<!--<target name="tacletparser" depends="tacletlexer">-->
 		<echo message="Running antlr ..." />
 		<java jar="${ext.dir}/antlr-v4.jar" fork="true" failonerror="true">
 			<arg value="-no-listener" />

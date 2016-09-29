@@ -57,7 +57,7 @@ public class LoadIntInstruction
         else if (expr instanceof Negative) {
             //TODO Is there a double negation case to consider?
             intConstInstruction(mv,
-                    -1 * Integer.parseInt(((IntLiteral) expr).toString()));
+                    -1 * Integer.parseInt(((Negative) expr).getChildAt(0).toString()));
         }
         else {
             logger.error(

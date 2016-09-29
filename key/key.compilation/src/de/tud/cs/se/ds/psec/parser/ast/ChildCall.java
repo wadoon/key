@@ -30,7 +30,7 @@ public class ChildCall extends Instruction {
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             TacletApp app, List<TacletASTNode> children) {
-        children.get(childNo).compile();
+        children.get(childNo - 1).compile();
     }
 
 }

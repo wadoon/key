@@ -1,8 +1,10 @@
 package de.tud.cs.se.ds.psec.compiler;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,8 +17,13 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;
 
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParserFE;
+import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
+import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.tud.cs.se.ds.psec.se.SymbolicExecutionInterface;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
+import de.tud.cs.se.ds.psec.util.ResourceManager;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -39,12 +46,14 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaCompilati
  */
 public class Compiler {
     private static final int CLASS_VERSION = 52;
+    private static final String TRANSLATION_RULES_PATH = "/de/tud/cs/se/ds/psec/compiler/rules/javaTranslationRules.cmp";
     private static final Logger logger = LogManager.getFormatterLogger();
 
     private KeYEnvironment<DefaultUserInterfaceControl> environment;
     private File javaFile;
     private boolean debug = false;
     private boolean dumpSET = false;
+    private TranslationDefinitions definitions;
 
     /**
      * Creates a new Compiler object for the given Java type. Be aware that each
@@ -61,15 +70,31 @@ public class Compiler {
      * @param dumpSET
      *            Set to true to save a .proof file to disk for each compiled
      *            method.
+     * @param bailAtParseError
+     *            Set to true if the parsing process should stop and not try to
+     *            recover in case of a syntax error in the parsed file.
      * @throws ProblemLoaderException
      *             In case an exception occurred while loading the file into
      *             KeY.
+     * @throws IOException
+     *             If there is an I/O problem while loading the translation
+     *             taclets.
+     * @throws TranslationTacletInputException
+     *             In case that an exception occurred while parsing the
+     *             translation taclets.
      */
-    public Compiler(File javaFile, boolean debug, boolean dumpSET)
-            throws ProblemLoaderException {
+    public Compiler(File javaFile, boolean debug, boolean dumpSET,
+            boolean bailAtParseError) throws ProblemLoaderException,
+            TranslationTacletInputException, IOException {
         this.javaFile = javaFile;
         this.debug = debug;
         this.dumpSET = dumpSET;
+
+        logger.trace("Loading translation definitions...");
+        URL url = ResourceManager.instance().getResourceFile(
+                TranslationTacletParser.class, TRANSLATION_RULES_PATH);
+        definitions = new TranslationTacletParserFE(bailAtParseError)
+                .parse(url);
 
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Ensure that Taclets are parsed
@@ -132,7 +157,8 @@ public class Compiler {
         if (typeDecl instanceof ClassDeclaration
                 || typeDecl instanceof InterfaceDeclaration) {
             return compile((TypeDeclaration) typeDecl);
-        } else {
+        }
+        else {
             throw new UnsupportedOperationException(
                     "Unexpected top level type: " + typeDecl.getFullName());
         }
@@ -162,27 +188,31 @@ public class Compiler {
         try {
 
             cw.visit(CLASS_VERSION,
-                    InformationExtraction.createOpcode(typeDecl),
-                    internalName, null,
-                    extending, implementing);
+                    InformationExtraction.createOpcode(typeDecl), internalName,
+                    null, extending, implementing);
 
             ImmutableArray<MemberDeclaration> members = typeDecl.getMembers();
             members.forEach(m -> {
                 if (m.getClass().equals(FieldDeclaration.class)) {
                     compile(cw, (FieldDeclaration) m);
-                } else if (m.getClass().equals(ProgramMethod.class)
+                }
+                else if (m.getClass().equals(ProgramMethod.class)
                         && !((ProgramMethod) m).getName().endsWith(">")) {
                     compile(cw, (ProgramMethod) m);
-                } else {
+                }
+                else {
                     // TODO: Throw exception
                 }
             });
 
             cw.visitEnd();
 
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e) {
 
             if (debug) {
+                logger.error(e.getMessage());
+
                 // DEBUG CODE.
                 StringWriter sw = new StringWriter();
                 CheckClassAdapter.verify(new ClassReader(cw.toByteArray()),
@@ -192,7 +222,8 @@ public class Compiler {
                     logger.error("Bytecode failed verification:");
                     logger.error(sw);
                 }
-            } else {
+            }
+            else {
                 logger.error(
                         "Compilation failed. This is probably due to an error in one of "
                                 + "the translation methods. Run with argument --debug "
@@ -237,11 +268,11 @@ public class Compiler {
             if (dumpSET) {
                 try {
                     String proofFileName = proofFileNameForProgramMethod(mDecl);
-                    builder.getProof().saveToFile(
-                            new File(proofFileName));
+                    builder.getProof().saveToFile(new File(proofFileName));
                     logger.info("Dumping proof tree to file %s", proofFileName);
-                    
-                } catch (java.io.IOException e) {
+
+                }
+                catch (java.io.IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -249,8 +280,8 @@ public class Compiler {
             logger.trace("Translating SET of method %s::%s to bytecode",
                     mDecl.getContainerType().getJavaType().getFullName(),
                     mDecl.getName());
-            new MethodBodyCompiler(mv, mDecl.getParameters(), mDecl.isStatic(), mDecl.isVoid())
-                    .compile(builder);
+            new MethodBodyCompiler(mv, mDecl.getParameters(), definitions,
+                    mDecl.isStatic(), mDecl.isVoid()).compile(builder);
         }
 
         mv.visitMaxs(-1, -1);
@@ -276,11 +307,12 @@ public class Compiler {
         // "...::<classPrepared>" etc.
         if (!fieldName.endsWith(">")) {
             // TODO: Should we really skip the fields generated by KeY?
-            FieldVisitor fv = cw.visitField(
-                    InformationExtraction.createOpcode(f), fieldName,
-                    InformationExtraction.typeToTypeDescriptor(
-                            f.getTypeReference().getKeYJavaType()),
-                    null, null);
+            FieldVisitor fv = cw
+                    .visitField(InformationExtraction.createOpcode(f),
+                            fieldName,
+                            InformationExtraction.typeToTypeDescriptor(
+                                    f.getTypeReference().getKeYJavaType()),
+                            null, null);
             fv.visitEnd();
         }
     }
@@ -295,7 +327,7 @@ public class Compiler {
      *         {@link ProgramMethod}.
      */
     private static String proofFileNameForProgramMethod(ProgramMethod mDecl) {
-        return mDecl.getContainerType().getFullName()
-                + "::" + mDecl.getName() + ".proof";
+        return mDecl.getContainerType().getFullName() + "::" + mDecl.getName()
+                + ".proof";
     }
 }

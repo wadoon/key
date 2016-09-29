@@ -3,6 +3,8 @@ package de.tud.cs.se.ds.psec.parser.ast;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
@@ -17,6 +19,8 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Dominic Scheurer
  */
 public class LabelUnaryBytecodeInstr extends Instruction {
+    private static final Logger logger = LogManager.getFormatterLogger();
+    
     private Label label;
     private int opcode;
 
@@ -25,6 +29,7 @@ public class LabelUnaryBytecodeInstr extends Instruction {
     static {
         OPCODES_MAP.put("GOTO", GOTO);
         OPCODES_MAP.put("IF_ICMPLE", IF_ICMPLE);
+        OPCODES_MAP.put("IF_ICMPNE", IF_ICMPNE);
         OPCODES_MAP.put("IFEQ", IFEQ);
         OPCODES_MAP.put("IFNE", IFNE);
     }
@@ -40,6 +45,12 @@ public class LabelUnaryBytecodeInstr extends Instruction {
      */
     public LabelUnaryBytecodeInstr(String insn, Label label) {
         this.label = label;
+        
+        if (!OPCODES_MAP.containsKey(insn)) {
+            logger.error("Unknown instruction %s", insn);
+            System.exit(1);
+        }
+        
         opcode = OPCODES_MAP.get(insn);
     }
 

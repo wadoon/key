@@ -63,9 +63,20 @@ public class TranslationTacletParserFE extends
      */
     private HashMap<String, Label> labelMap = new HashMap<>();
 
+    private boolean bailAtError = false;
+
     // //////////////////////////////////////////// //
     // Constructors, public (convenience) interface //
     // //////////////////////////////////////////// //
+
+    /**
+     * @param bailAtError
+     *            Set to true if the parsing process should stop and not try to
+     *            recover in case of a syntax error in the parsed file.
+     */
+    public TranslationTacletParserFE(boolean bailAtError) {
+        this.bailAtError = bailAtError;
+    }
 
     /**
      * Initiates the parsing process for a file.
@@ -151,7 +162,9 @@ public class TranslationTacletParserFE extends
         TranslationTacletParser parser = new TranslationTacletParser(tokens);
 
         // Bail at error
-        parser.setErrorHandler(new BailErrorStrategy());
+        if (bailAtError) {
+            parser.setErrorHandler(new BailErrorStrategy());
+        }
 
         // Traverse the parse tree
         try {
@@ -173,7 +186,8 @@ public class TranslationTacletParserFE extends
     public TranslationDefinition visitDefinition(DefinitionContext ctx) {
         ArrayList<String> symbExTacletReferences = new ArrayList<>();
         ctx.taclets_reference().STRING_LITERAL()
-                .forEach(s -> symbExTacletReferences.add(s.getText().replaceAll("\"", "")));
+                .forEach(s -> symbExTacletReferences
+                        .add(s.getText().replaceAll("\"", "")));
 
         Function<ApplicabilityCheckInput, Boolean> applicabilityCheck = (input -> {
             return ctx.condition().stream()

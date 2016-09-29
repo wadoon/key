@@ -26,29 +26,29 @@ public class ParserTest extends TestCase {
         URL url = ResourceManager.instance().getResourceFile(
                 TranslationTacletParser.class, TRANSLATION_RULES_PATH);
 
-        definitions = new TranslationTacletParserFE().parse(url);
+        definitions = new TranslationTacletParserFE(true).parse(url);
     }
 
     @Test
     public void testRulesExist() {
         ArrayList<TranslationDefinition> defn = definitions
-                .getDefinitionsFor("IfSplit");
+                .getDefinitionsFor("ifSplit");
 
-        assertNotNull("No rule for IfSplit", defn);
-        assertEquals("There should be two rules for IfSplit", defn.size(), 2);
+        assertNotNull("No rule for ifSplit", defn);
+        assertEquals("There should be two rules for ifSplit", defn.size(), 2);
     }
 
     @Test
     public void testRuleFiltering() {
-        assertNotNull("No single rule for IfSplit with two children",
-                definitions.getDefinitionFor("IfSplit",
+        assertNotNull("No single rule for ifSplit with two children",
+                definitions.getDefinitionFor("ifSplit",
                         new ApplicabilityCheckInput(2)));
     }
 
     @Test
     public void testApplicability() {
         TranslationDefinition ifSplitDefn = definitions
-                .getDefinitionFor("IfSplit", new ApplicabilityCheckInput(2));
+                .getDefinitionFor("ifSplit", new ApplicabilityCheckInput(2));
         
         assertNotNull(ifSplitDefn);
 
@@ -59,15 +59,15 @@ public class ParserTest extends TestCase {
     @Test
     public void testSameTranslationForIfSplitAndIfElseSplit() {
         TranslationDefinition ifSplitDefn = definitions
-                .getDefinitionFor("IfSplit", new ApplicabilityCheckInput(2));
+                .getDefinitionFor("ifSplit", new ApplicabilityCheckInput(2));
         TranslationDefinition ifElseSplitDefn = definitions.getDefinitionFor(
-                "IfElseSplit", new ApplicabilityCheckInput(2));
+                "ifElseSplit", new ApplicabilityCheckInput(2));
 
         assertNotNull(ifSplitDefn);
         assertNotNull(ifElseSplitDefn);
 
         assertEquals(
-                "Different rules for IfSplit and IfElseSplit, equal expected",
+                "Different rules for ifSplit and ifElseSplit, equal expected",
                 ifSplitDefn, ifElseSplitDefn);
     }
 

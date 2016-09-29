@@ -101,6 +101,8 @@ label_unary_instrs
 	|
 		IF_ICMPLE
 	|
+		IF_ICMPNE
+	|
 		IFEQ
 	|
 		IFNE
