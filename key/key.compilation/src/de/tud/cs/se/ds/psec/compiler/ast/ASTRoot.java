@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -15,23 +16,19 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 class ASTRoot extends TacletASTNode {
     private static final Logger logger = LogManager.getFormatterLogger();
-    
+
     /**
-     * @see TacletASTNode#TacletASTNode(MethodVisitor, ProgVarHelper, TacletApp)
+     * @see TacletASTNode#TacletASTNode(MethodVisitor, ProgVarHelper,
+     *      TranslationDefinitions, TacletApp)
      */
-    public ASTRoot(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app) {
-        super(mv, pvHelper, app);
+    public ASTRoot() {
+        super(null, null, null, null, null);
     }
 
     @Override
     public void compile() {
         logger.trace("Compiling ASTRoot");
-        
-        compileFirstChild();
-    }
 
-    @Override
-    protected int maxNumberOfChildren() {
-        return 1;
+        compileFirstChild();
     }
 }

@@ -3,7 +3,7 @@
 // ###########################
 
 if_split_1_child {
-	\taclets ("IfElseSplit", "IfSplit")
+	\taclets ("ifElseSplit", "ifSplit")
 	\condition (#num-children == 1)
 	\translation (
 		#child-1
@@ -11,7 +11,7 @@ if_split_1_child {
 }
 
 if_split_2_children {
-	\taclets ("IfElseSplit", "IfSplit")
+	\taclets ("ifElseSplit", "ifSplit")
 	\condition (#num-children == 2)
 	\translation (
 		\load (#se)
@@ -51,7 +51,7 @@ while_loop_2_children {
 
 // TODO Check that really an int is returned!!!
 return_int {
-	\taclets ("MethodCallReturn")
+	\taclets ("methodCallReturn")
 	\translation (
 		\load (#se)
 		IRETURN
@@ -59,7 +59,7 @@ return_int {
 }
 
 return_void {
-	\taclets ("MethodCallReturn")
+	\taclets ("methodCallEmptyReturn")
 	\translation (
 		RETURN
 	)
@@ -79,7 +79,7 @@ assignment {
 }
 
 assignment_subtraction_int {
-	\taclets ("assignment_subtraction_int")
+	\taclets ("assignmentSubtractionInt")
 	\translation (
 		\load (#seCharByteShortInt0)
 		\load (#seCharByteShortInt1)
@@ -90,7 +90,7 @@ assignment_subtraction_int {
 }
 
 assignment_addition_int {
-	\taclets ("assignment_addition_int")
+	\taclets ("assignmentAdditionInt")
 	\translation (
 		\load (#seCharByteShortInt0)
 		\load (#seCharByteShortInt1)
@@ -101,7 +101,7 @@ assignment_addition_int {
 }
 
 compound_assignment {
-	\taclets ("CompoundAssignment1New")
+	\taclets ("compound_assignment_1_new")
 	\translation (
 		\load (#seBool)
 		IFEQ l1
@@ -113,8 +113,22 @@ compound_assignment {
 	)
 }
 
+equality_comparison {
+	\taclets ("equality_comparison_simple")
+	\translation (
+		\load (#se0)
+	    \load (#se1)
+	    IF_ICMPNE l1
+	    ICONST_1
+	    GOTO l2
+	    l1: ICONST_0
+	   	l2: ISTORE #lhs
+	   	#child-1
+	)
+}
+
 greater_than_comparison {
-	\taclets ("GreaterThanComparisonSimple")
+	\taclets ("greater_than_comparison_simple")
 	\translation (
 		\load (#se0)
 		\load (#se1)
@@ -128,7 +142,7 @@ greater_than_comparison {
 }
 
 unary_minus_int {
-	\taclets ("unary_minus_int")
+	\taclets ("unaryMinusInt")
 	\translation (
 		\load (\negate (#seCharByteShortInt))
 		ISTORE #loc

@@ -9,9 +9,9 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import de.tud.cs.se.ds.psec.compiler.ast.MethodCallEmptyReturn;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletTranslationFactory;
+import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -37,8 +37,6 @@ public class MethodBodyCompiler implements Opcodes {
     private TacletTranslationFactory translationFactory;
     private TacletASTNode astRoot = null;
     private boolean isVoid = false;
-    private MethodVisitor mv = null;
-
     /**
      * Constructs a new {@link MethodBodyCompiler}.
      * 
@@ -46,6 +44,8 @@ public class MethodBodyCompiler implements Opcodes {
      *            The {@link MethodVisitor} to be used for compilation.
      * @param methodParameters
      *            The parameters of this method.
+     * @param definitions
+     *            TODO
      * @param isStatic
      *            true iff the method to be compiled is a static method, i.e.
      *            should have no "this" field as first local variable.
@@ -53,11 +53,12 @@ public class MethodBodyCompiler implements Opcodes {
      *            TODO
      */
     public MethodBodyCompiler(MethodVisitor mv,
-            Iterable<ParameterDeclaration> methodParameters, boolean isStatic,
+            Iterable<ParameterDeclaration> methodParameters,
+            TranslationDefinitions definitions, boolean isStatic,
             boolean isVoid) {
-        this.mv = mv;
         this.pvHelper = new ProgVarHelper(isStatic);
-        this.translationFactory = new TacletTranslationFactory(mv, pvHelper);
+        this.translationFactory = new TacletTranslationFactory(mv, pvHelper,
+                definitions);
         this.isVoid = isVoid;
 
         methodParameters.forEach(p -> pvHelper
@@ -94,18 +95,23 @@ public class MethodBodyCompiler implements Opcodes {
     private void addReturnAfterAllLeaves() {
         Deque<TacletASTNode> stack = new LinkedList<>();
         stack.push(astRoot);
-        
+
         while (!stack.isEmpty()) {
-           TacletASTNode currentNode = stack.pop();
-           
-           currentNode.children().forEach(child -> {
-               if (child.children().size() == 0 && !(child instanceof MethodCallEmptyReturn)) {
-                   // child is a leaf that is not a return
-                   child.addChild(new MethodCallEmptyReturn(mv, pvHelper, null));
-               } else {
-                   stack.push(child);
-               }
-           });
+            TacletASTNode currentNode = stack.pop();
+
+            currentNode.children().forEach(child -> {
+                if (child.children().size() == 0 && !(child.seTacletName()
+                        .equals("methodCallEmptyReturn"))) {
+                    // child is a leaf that is not a return
+                    child.addChild(translationFactory
+                            .getTranslationForTacletWithoutArgs(
+                                    "methodCallEmptyReturn")
+                            .get());
+                }
+                else {
+                    stack.push(child);
+                }
+            });
         }
     }
 

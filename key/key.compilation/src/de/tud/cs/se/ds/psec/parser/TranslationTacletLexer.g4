@@ -80,13 +80,19 @@ GEQ : '>=' ;
 LEQ : '<=' ;
 EQ  : '==' ;
 
+// Arithmetics
+
+MINUS : '-' ;
+
 // Bytecode directives
 
+BIPUSH    : 'BIPUSH';
 GOTO      : 'GOTO';
 IADD      : 'IADD';
 ICONST    : 'ICONST';
 ICONST_D  : 'ICONST_' DIGIT;
 IF_ICMPLE : 'IF_ICMPLE';
+IF_ICMPNE : 'IF_ICMPNE';
 IFEQ      : 'IFEQ';
 IFNE      : 'IFNE';
 IRETURN   : 'IRETURN';
