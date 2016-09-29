@@ -281,28 +281,37 @@ DIGITS
         (DIGIT)+
 ;
 
-fragment EXPONENT    
-    :   ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ 
+fragment
+NonIntegerNumber
+    :   ('0' .. '9')+ '.' ('0' .. '9')* Exponent?
+    |   '.' ( '0' .. '9' )+ Exponent?
+    |   ('0' .. '9')+ Exponent
+    |   (DIGIT)+
     ;
 
+fragment
+Exponent
+    :   ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+    ;
 
-fragment FLOAT_LITERAL
-    :
-   (DIGIT)+ '.' (DIGIT)+ ('f' | 'F')
-;
+fragment
+FloatSuffix
+    :   'f' | 'F'
+    ;
 
-fragment DOUBLE_LITERAL
-    :
-      (DIGIT)+ '.' (DIGIT)+ ('d' | 'D')?
-    ; 
-       
-FLOAT_OR_DOUBLE_LITERAL:
-   ((DIGIT)+ '.' (DIGIT)+)  =>
-      ( (('f' | 'F')) => FLOAT_LITERAL {$type = FLOAT_LITERAL;} 
-       |
-        DOUBLE_LITERAL {$type = FLOAT_LITERAL;} 
-      ) 
-      ;
+fragment
+DoubleSuffix
+    :   'd' | 'D'
+    ;
+
+FLOAT_LITERAL
+    :   NonIntegerNumber FloatSuffix
+    ;
+
+DOUBLE_LITERAL
+    :   ( (DIGIT)+ '.' '.' ) => DIGITS { $type = DIGITS; }
+    |   NonIntegerNumber DoubleSuffix?
+    ;
     
 CHAR_LITERAL:
         '\''
