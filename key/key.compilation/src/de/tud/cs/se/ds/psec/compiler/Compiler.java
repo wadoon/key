@@ -51,6 +51,7 @@ public class Compiler {
 
     private KeYEnvironment<DefaultUserInterfaceControl> environment;
     private File javaFile;
+    private String outputDir;
     private boolean debug = false;
     private boolean dumpSET = false;
     private TranslationDefinitions definitions;
@@ -64,6 +65,7 @@ public class Compiler {
      * @param javaFile
      *            The file to compile (will compile all contained classes, and
      *            all contained methods with a JML specification).
+     * @param outputDir TODO
      * @param debug
      *            Set to true to display further debug output in case of a
      *            bytecode verification error.
@@ -83,10 +85,11 @@ public class Compiler {
      *             In case that an exception occurred while parsing the
      *             translation taclets.
      */
-    public Compiler(File javaFile, boolean debug, boolean dumpSET,
-            boolean bailAtParseError) throws ProblemLoaderException,
+    public Compiler(File javaFile, String outputDir, boolean debug,
+            boolean dumpSET, boolean bailAtParseError) throws ProblemLoaderException,
             TranslationTacletInputException, IOException {
         this.javaFile = javaFile;
+        this.outputDir = outputDir;
         this.debug = debug;
         this.dumpSET = dumpSET;
 
@@ -326,8 +329,8 @@ public class Compiler {
      * @return A file name for the .proof file containing the SET of the
      *         {@link ProgramMethod}.
      */
-    private static String proofFileNameForProgramMethod(ProgramMethod mDecl) {
-        return mDecl.getContainerType().getFullName() + "::" + mDecl.getName()
+    private String proofFileNameForProgramMethod(ProgramMethod mDecl) {
+        return outputDir + mDecl.getContainerType().getFullName() + "::" + mDecl.getName()
                 + ".proof";
     }
 }

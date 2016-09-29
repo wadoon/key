@@ -58,15 +58,8 @@ public class LabelUnaryBytecodeInstr extends Instruction {
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             TacletApp app, List<TacletASTNode> children) {
 
-        switch (opcode) {
-        case GOTO:
-        case IF_ICMPLE:
-        case IFEQ:
-        case IFNE:
-            mv.visitJumpInsn(opcode, label);
-            break;
-        }
+        mv.visitJumpInsn(opcode, label);
 
     }
-
+    
 }

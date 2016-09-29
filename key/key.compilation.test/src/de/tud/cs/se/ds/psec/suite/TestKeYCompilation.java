@@ -16,6 +16,11 @@ public class TestKeYCompilation extends TestSuite {
             de.tud.cs.se.ds.psec.parser.ParserTest.class
     };
 
+    @SuppressWarnings("unchecked")
+    static Class<? extends TestCase>[] compilerTests = new Class[] {
+            de.tud.cs.se.ds.psec.compiler.CompilerFunctionalTests.class
+    };
+
     public static TestSuite createSuite(Class<? extends TestCase>[] testClasses, final String msg) {
         TestSuite suite = new TestSuite() {
             @Override
@@ -36,6 +41,7 @@ public class TestKeYCompilation extends TestSuite {
     public static junit.framework.Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTest(createSuite(parserTests, "Testing Parsers"));
+        suite.addTest(createSuite(compilerTests, "Testing Compiler"));
 
         return suite;
     }

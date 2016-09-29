@@ -1,12 +1,10 @@
 package de.tud.cs.se.ds.psec.cli;
 
-import de.tud.cs.se.ds.psec.compiler.Compiler;
-import de.tud.cs.se.ds.psec.compiler.JavaTypeCompilationResult;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -15,6 +13,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import de.tud.cs.se.ds.psec.compiler.Compiler;
+import de.tud.cs.se.ds.psec.compiler.JavaTypeCompilationResult;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
  * The main class for running Alfred from command line.
@@ -42,6 +44,10 @@ public class Main {
     public static void main(String[] args) {
         Options options = new Options();
 
+        Option outputDirOpt = Option.builder("o").longOpt("output-dir")
+                .desc("The directory to which files should be written").hasArg()
+                .required(false).build();
+
         Option dumpSETOpt = Option.builder("d").longOpt("dump-set")
                 .desc("Dump a .proof file containing the KeY SET for each compiled method")
                 .required(false).build();
@@ -60,6 +66,7 @@ public class Main {
                 .desc("Display help (this text) and terminate").required(false)
                 .build();
 
+        options.addOption(outputDirOpt);
         options.addOption(dumpSETOpt);
         options.addOption(debugOpt);
         options.addOption(bailAtParseErrorOpt);
@@ -86,17 +93,23 @@ public class Main {
                 printHelp(options);
             }
 
-            Compiler compiler = new Compiler(inputFile, line.hasOption("X"),
-                    line.hasOption("d"), line.hasOption('b'));
+            String outputDir = line.hasOption('o') ? line.getOptionValue('o')
+                    : ".";
+            if (!outputDir.endsWith("/")) {
+                outputDir = outputDir + "/";
+            }
+
+            Compiler compiler = new Compiler(inputFile, outputDir,
+                    line.hasOption("X"), line.hasOption("d"), line.hasOption('b'));
 
             for (JavaTypeCompilationResult compilationResult : compiler
                     .compile()) {
-                // TODO: Manage directory structures for packages
 
-                Files.write(new File(compilationResult.getInternalTypeName()
-                        .substring(compilationResult.getInternalTypeName()
-                                .lastIndexOf('/') + 1)
-                        + ".class").toPath(), compilationResult.getBytecode());
+                Path path = Paths.get(outputDir
+                        + compilationResult.getInternalTypeName() + ".class");
+                Files.createDirectories(path.getParent());
+                Files.write(path, compilationResult.getBytecode());
+
             }
         }
         catch (ParseException exp) {
