@@ -1,4 +1,4 @@
-package de.tud.test.simple.loops;
+package de.tud.test.simple.loops.whileLoops;
 
 /**
  * Simple test methods with while loops.

@@ -100,13 +100,13 @@ public class CompilerFunctionalTests extends TestCase {
             ProblemLoaderException, IOException {
 
         Compiler compiler = new Compiler(
-                new File(functionalTestsDir, "simple/loops/SimpleWhile.java"),
+                new File(functionalTestsDir, "simple/loops/whileLoops/SimpleWhile.java"),
                 TMP_OUT_DIR, true, true, false);
 
         compiler.compile();
 
         File outputClassFile = new File(TMP_OUT_DIR,
-                "de/tud/test/simple/loops/SimpleWhile.class");
+                "de/tud/test/simple/loops/whileLoops/SimpleWhile.class");
 
         assertTrue("Class file was not written to expected destination",
                 outputClassFile.exists());
@@ -116,7 +116,7 @@ public class CompilerFunctionalTests extends TestCase {
             URL[] urls = new URL[] { url };
 
             URLClassLoader cl = new URLClassLoader(urls);
-            Class<?> cls = cl.loadClass("de.tud.test.simple.loops.SimpleWhile");
+            Class<?> cls = cl.loadClass("de.tud.test.simple.loops.whileLoops.SimpleWhile");
             cl.close();
 
             assertNotNull("Compiled class could not be loaded", cls);
@@ -130,6 +130,57 @@ public class CompilerFunctionalTests extends TestCase {
                 new Pair<>(100, 0),
                 new Pair<>(42, 0),
                 new Pair<>(-1, -1)
+            };
+            //@formatter:on
+
+            for (Pair<Integer, Integer> triple : testData) {
+                assertEquals((int) triple.second,
+                        (int) method.invoke(null, triple.first));
+            }
+        }
+        catch (MalformedURLException | NoSuchMethodException | SecurityException
+                | IllegalArgumentException | ClassNotFoundException
+                | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSimpleFor() throws TranslationTacletInputException,
+            ProblemLoaderException, IOException {
+
+        Compiler compiler = new Compiler(
+                new File(functionalTestsDir, "simple/loops/forLoops/SimpleFor.java"),
+                TMP_OUT_DIR, true, true, false);
+
+        compiler.compile();
+
+        File outputClassFile = new File(TMP_OUT_DIR,
+                "de/tud/test/simple/loops/forLoops/SimpleFor.class");
+
+        assertTrue("Class file was not written to expected destination",
+                outputClassFile.exists());
+
+        try {
+            URL url = Paths.get(TMP_OUT_DIR).toFile().toURI().toURL();
+            URL[] urls = new URL[] { url };
+
+            URLClassLoader cl = new URLClassLoader(urls);
+            Class<?> cls = cl.loadClass("de.tud.test.simple.loops.forLoops.SimpleFor");
+            cl.close();
+
+            assertNotNull("Compiled class could not be loaded", cls);
+
+            Method method = cls.getMethod("test", int.class);
+
+            //@formatter:off
+            @SuppressWarnings("unchecked")
+            Pair<Integer, Integer>[] testData = new Pair[] {
+                new Pair<>(10, 20),
+                new Pair<>(100, 110),
+                new Pair<>(42, 52),
+                new Pair<>(-1, 9)
             };
             //@formatter:on
 
