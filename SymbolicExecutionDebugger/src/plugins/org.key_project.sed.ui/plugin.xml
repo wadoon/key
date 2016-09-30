@@ -368,6 +368,18 @@
                text="New Comment"
                toolTipText="Adds a new comment to the selected node.">
          </action>
+         <action
+               class="org.key_project.sed.ui.action.AlgorithmicDebugCorrectAnnotationLinkAction"
+               icon="icons/signed_yes.gif"
+               text="Correct"
+               toolTipText="Mark the paritial tree as right.">
+         </action>
+         <action
+               class="org.key_project.sed.ui.action.AlgorithmicDebugFalseAnnotationLinkAction"
+               icon="icons/signed_no.gif"
+               text="False"
+               toolTipText="Mark the partial tree as false.">
+         </action>
       </extension>
       <extension
             point="org.key_project.sed.ui.annotationLinkEditActions">
@@ -393,6 +405,14 @@
          <image
                annotationTypeID="org.key_project.sed.core.annotationType.slice"
                icon="icons/slice.gif">
+         </image>
+         <image
+               annotationTypeID="org.key_project.sed.core.annotationType.AlgorithmicDebugCorrect"
+               icon="icons/signed_yes.gif">
+         </image>
+         <image
+               annotationTypeID="org.key_project.sed.core.annotationType.AlgorithmicDebugFalse"
+               icon="icons/signed_no.gif">
          </image>
       </extension>
       <extension

@@ -46,5 +46,11 @@
          <annotationType
                class="org.key_project.sed.core.annotation.impl.SliceAnnotationType">
          </annotationType>
+         <annotationType
+               class="org.key_project.sed.core.annotation.impl.AlgorithmicDebugCorrectAnnotationType">
+         </annotationType>
+         <annotationType
+               class="org.key_project.sed.core.annotation.impl.AlgorithmicDebugFalseAnnotationType">
+         </annotationType>
       </extension>
 </plugin>
