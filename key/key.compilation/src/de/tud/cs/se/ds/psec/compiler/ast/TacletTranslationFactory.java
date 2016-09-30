@@ -56,6 +56,7 @@ public class TacletTranslationFactory {
         "ifUnfold",
         "loopComplexToSimple",
         "postdecrement",
+        "postincrement",
         "postincrement_assignment",
         "preincrement_assignment",
         "remove_parentheses_right",
@@ -64,6 +65,7 @@ public class TacletTranslationFactory {
         "widening_identity_cast_5",
      };
     //@formatter:on
+    // NOTE: Can replace above array with syntactic recognization of taclets not changing the symbolic state
 
     /**
      * Creates a new {@link TacletTranslationFactory}.

@@ -177,10 +177,10 @@ public class CompilerFunctionalTests extends TestCase {
             //@formatter:off
             @SuppressWarnings("unchecked")
             Pair<Integer, Integer>[] testData = new Pair[] {
-                new Pair<>(10, 20),
-                new Pair<>(100, 110),
-                new Pair<>(42, 52),
-                new Pair<>(-1, 9)
+                new Pair<>(10, 16),
+                new Pair<>(100, 106),
+                new Pair<>(42, 48),
+                new Pair<>(-1, 5)
             };
             //@formatter:on
 
