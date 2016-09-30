@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,7 +68,8 @@ public class Compiler {
      * @param javaFile
      *            The file to compile (will compile all contained classes, and
      *            all contained methods with a JML specification).
-     * @param outputDir TODO
+     * @param outputDir
+     *            TODO
      * @param debug
      *            Set to true to display further debug output in case of a
      *            bytecode verification error.
@@ -86,8 +90,9 @@ public class Compiler {
      *             translation taclets.
      */
     public Compiler(File javaFile, String outputDir, boolean debug,
-            boolean dumpSET, boolean bailAtParseError) throws ProblemLoaderException,
-            TranslationTacletInputException, IOException {
+            boolean dumpSET, boolean bailAtParseError)
+            throws ProblemLoaderException, TranslationTacletInputException,
+            IOException {
         this.javaFile = javaFile;
         this.outputDir = outputDir;
         this.debug = debug;
@@ -122,7 +127,7 @@ public class Compiler {
     }
 
     /**
-     * Starts compiling the given file.
+     * Compiles the supplied Java file and writes it to disk.
      * 
      * @return A {@link List} of {@link JavaTypeCompilationResult}s, one for
      *         each contained class.
@@ -139,6 +144,20 @@ public class Compiler {
         List<JavaTypeCompilationResult> result = declaredTypes.stream()
                 .map(t -> compile(t.getJavaType()))
                 .collect(Collectors.toList());
+
+        result.forEach(compilationResult -> {
+            Path path = Paths.get(outputDir
+                    + compilationResult.getInternalTypeName() + ".class");
+            try {
+                Files.createDirectories(path.getParent());
+                Files.write(path, compilationResult.getBytecode());
+            }
+            catch (IOException e) {
+                logger.error(
+                        "I/O exception in writing compiled file to disk, message:\n%s",
+                        e.getMessage());
+            }
+        });
 
         logger.info("Finished compilation of Java file %s", javaFile);
 
@@ -214,7 +233,7 @@ public class Compiler {
         catch (RuntimeException e) {
 
             if (debug) {
-                logger.error(e.getMessage());
+                logger.error("%s, message: %s", e.getClass().getName(), e.getMessage());
 
                 // DEBUG CODE.
                 StringWriter sw = new StringWriter();
@@ -330,7 +349,7 @@ public class Compiler {
      *         {@link ProgramMethod}.
      */
     private String proofFileNameForProgramMethod(ProgramMethod mDecl) {
-        return outputDir + mDecl.getContainerType().getFullName() + "::" + mDecl.getName()
-                + ".proof";
+        return outputDir + mDecl.getContainerType().getFullName() + "::"
+                + mDecl.getName() + ".proof";
     }
 }

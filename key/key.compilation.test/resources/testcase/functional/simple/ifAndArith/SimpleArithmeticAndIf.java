@@ -1,3 +1,5 @@
+package de.tud.test.simple.arith;
+
 /**
  * Simple test methods with some case distinctions and arithmetic operations.
  *
@@ -9,7 +11,7 @@ public class SimpleArithmeticAndIf {
       @ requires true;
       @ ensures true;
       @*/
-    protected static int test(int i, boolean cpn) {
+    public static int test(int i, boolean cpn) {
         i = i - 5;
 
         if (i == -1) {

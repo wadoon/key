@@ -30,7 +30,10 @@ public class ChildCall extends Instruction {
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             TacletApp app, List<TacletASTNode> children) {
-        children.get(childNo - 1).compile();
+        //XXX Remove this hack!!!
+        if (children.size() > childNo - 1) {
+            children.get(childNo - 1).compile();
+        }
     }
 
 }

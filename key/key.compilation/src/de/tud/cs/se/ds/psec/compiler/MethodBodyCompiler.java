@@ -157,7 +157,9 @@ public class MethodBodyCompiler implements Opcodes {
             currentASTNode = translateSequentialBlock(
                     currentNode.getProofNode(), currentASTNode);
 
-            currentStatement = currentNode.toString();
+            //XXX The following statement leads to an assertion error
+            // when compilation is started from within a Junit test case.
+//            currentStatement = currentNode.toString();
 
             if (currentNode.getChildren().length > 1) {
 

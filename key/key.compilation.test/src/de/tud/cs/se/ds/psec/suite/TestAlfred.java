@@ -9,7 +9,7 @@ import junit.framework.TestSuite;
  *
  * @author Dominic Scheurer
  */
-public class TestKeYCompilation extends TestSuite {
+public class TestAlfred extends TestSuite {
 
     @SuppressWarnings("unchecked")
     static Class<? extends TestCase>[] parserTests = new Class[] {
@@ -46,7 +46,7 @@ public class TestKeYCompilation extends TestSuite {
         return suite;
     }
     
-    public TestKeYCompilation(String name) {
+    public TestAlfred(String name) {
         super(name);
     }
 

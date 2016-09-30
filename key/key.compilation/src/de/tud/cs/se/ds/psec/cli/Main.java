@@ -2,9 +2,6 @@ package de.tud.cs.se.ds.psec.cli;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -13,9 +10,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.tud.cs.se.ds.psec.compiler.Compiler;
-import de.tud.cs.se.ds.psec.compiler.JavaTypeCompilationResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
@@ -25,6 +23,8 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  * @author Dominic Scheurer
  */
 public class Main {
+    private static final Logger logger = LogManager.getFormatterLogger();
+
     private static final String INFO_STRING =
             // @formatter:off
               "==========================================\n"
@@ -102,28 +102,18 @@ public class Main {
             Compiler compiler = new Compiler(inputFile, outputDir,
                     line.hasOption("X"), line.hasOption("d"), line.hasOption('b'));
 
-            for (JavaTypeCompilationResult compilationResult : compiler
-                    .compile()) {
-
-                Path path = Paths.get(outputDir
-                        + compilationResult.getInternalTypeName() + ".class");
-                Files.createDirectories(path.getParent());
-                Files.write(path, compilationResult.getBytecode());
-
-            }
+            compiler.compile();
+            
         }
         catch (ParseException exp) {
             printHelp(options);
             System.exit(0);
         }
         catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("I/O error in reading translation taclets, message:\n%s", e.getMessage());
         }
         catch (ProblemLoaderException e) {
-            // Created in Compiler
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Problem in loading the file to compile, message:\n%s", e.getMessage());
         }
     }
 
