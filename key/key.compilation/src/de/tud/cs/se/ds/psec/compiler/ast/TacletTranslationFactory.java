@@ -36,21 +36,34 @@ public class TacletTranslationFactory {
 
     /**
      * List of taclets that are not meant to be translated, for instance because
-     * they have no correspondant in bytecode or because they are followed by
+     * they have no correspondent in bytecode or because they are followed by
      * decomposed simpler statements in the proof tree.<br>
      * 
      * <strong>NOTE:</strong> The entries in this list have to be alphabetically
      * sorted, since we perform a binary search on them.
      */
     private final static String[] UNTRANSLATED_TACLETS = {
-            "compound_addition_2", "compound_assignment_3_nonsimple",
-            "compound_assignment_op_plus", "compound_binary_AND_2",
-            "compound_greater_than_comparison_1",
-            "compound_int_cast_expression", "for_to_while", "ifElseUnfold",
-            "ifUnfold", "loopComplexToSimple", "postincrement_assignment",
-            "preincrement_assignment", "remove_parentheses_right",
-            "variableDeclaration", "variableDeclarationAssign",
-            "widening_identity_cast_5", };
+    //@formatter:off
+        "compound_addition_2",
+        "compound_assignment_3_nonsimple",
+        "compound_assignment_op_plus",
+        "compound_binary_AND_2",
+        "compound_greater_than_comparison_1",
+        "compound_int_cast_expression",
+        "compound_subtraction_1",
+        "for_to_while",
+        "ifElseUnfold",
+        "ifUnfold",
+        "loopComplexToSimple",
+        "postdecrement",
+        "postincrement_assignment",
+        "preincrement_assignment",
+        "remove_parentheses_right",
+        "variableDeclaration",
+        "variableDeclarationAssign",
+        "widening_identity_cast_5",
+     };
+    //@formatter:on
 
     /**
      * Creates a new {@link TacletTranslationFactory}.

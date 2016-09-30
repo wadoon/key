@@ -5,12 +5,11 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
-import de.tud.cs.se.ds.psec.parser.exceptions.SemanticException;
+import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -20,14 +19,15 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public class LabelUnaryBytecodeInstr extends Instruction {
     private static final Logger logger = LogManager.getFormatterLogger();
-    
-    private Label label;
+
+    private String labelName;
     private int opcode;
 
     private static final HashMap<String, Integer> OPCODES_MAP = new HashMap<>();
 
     static {
         OPCODES_MAP.put("GOTO", GOTO);
+        OPCODES_MAP.put("IF_ICMPGE", IF_ICMPGE);
         OPCODES_MAP.put("IF_ICMPLE", IF_ICMPLE);
         OPCODES_MAP.put("IF_ICMPNE", IF_ICMPNE);
         OPCODES_MAP.put("IFEQ", IFEQ);
@@ -35,31 +35,30 @@ public class LabelUnaryBytecodeInstr extends Instruction {
     }
 
     /**
+     * 
      * @param insn
      *            The bytecode instruction.
-     * @param locVarSV
-     *            The location variable that is the argument of this
-     *            {@link LabelUnaryBytecodeInstr}.
-     * @throws SemanticException
-     *             if a wrong bytecode instruction is given.
+     * @param labelName
+     *            The name of the label. This name has to be unique per
+     *            translation definition.
      */
-    public LabelUnaryBytecodeInstr(String insn, Label label) {
-        this.label = label;
-        
+    public LabelUnaryBytecodeInstr(String insn, String labelName) {
+        this.labelName = labelName;
+
         if (!OPCODES_MAP.containsKey(insn)) {
             logger.error("Unknown instruction %s", insn);
             System.exit(1);
         }
-        
+
         opcode = OPCODES_MAP.get(insn);
     }
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            TacletApp app, List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, TacletApp app, List<TacletASTNode> children) {
 
-        mv.visitJumpInsn(opcode, label);
+        mv.visitJumpInsn(opcode, labelManager.getLabelForName(labelName));
 
     }
-    
+
 }

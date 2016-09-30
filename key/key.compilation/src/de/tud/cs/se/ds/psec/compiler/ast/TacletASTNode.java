@@ -12,6 +12,7 @@ import org.objectweb.asm.Opcodes;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
+import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -91,8 +92,10 @@ public class TacletASTNode implements Opcodes {
                     candidates.size(), applCheckInput);
             System.exit(1);
         }
+        
+        UniqueLabelManager labelManager = new UniqueLabelManager();
 
-        candidates.get(0).translate(mv, pvHelper, app, children);
+        candidates.get(0).translate(mv, pvHelper, labelManager, app, children);
     }
 
     /**

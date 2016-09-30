@@ -7,6 +7,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -40,7 +41,7 @@ public class LocVarUnaryBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            TacletApp app, List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, TacletApp app, List<TacletASTNode> children) {
 
         switch (opcode) {
         case ISTORE:

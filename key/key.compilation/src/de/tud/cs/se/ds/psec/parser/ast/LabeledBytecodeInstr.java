@@ -2,11 +2,11 @@ package de.tud.cs.se.ds.psec.parser.ast;
 
 import java.util.List;
 
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -15,27 +15,28 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Dominic Scheurer
  */
 public class LabeledBytecodeInstr extends Instruction {
-    private Label label;
+    private String labelName;
     private TranslationTacletASTElement labeledInstruction;
 
     /**
-     * @param label
-     *            The {@link Label} to add to the bytecode.
+     * @param labelName
+     *            The name of the label. This name has to be unique per
+     *            translation definition.
      * @param labeledInstruction
      *            The {@link TranslationTacletASTElement} that is labeled.
      */
-    public LabeledBytecodeInstr(Label label,
+    public LabeledBytecodeInstr(String labelName,
             TranslationTacletASTElement labeledInstruction) {
-        this.label = label;
+        this.labelName = labelName;
         this.labeledInstruction = labeledInstruction;
     }
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            TacletApp app, List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, TacletApp app, List<TacletASTNode> children) {
 
-        mv.visitLabel(label);
-        labeledInstruction.translate(mv, pvHelper, app, children);
+        mv.visitLabel(labelManager.getLabelForName(labelName));
+        labeledInstruction.translate(mv, pvHelper, labelManager, app, children);
 
     }
 

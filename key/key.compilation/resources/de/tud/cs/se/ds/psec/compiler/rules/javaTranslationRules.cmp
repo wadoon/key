@@ -128,6 +128,20 @@ equality_comparison {
 	)
 }
 
+less_than_comparison {
+	\taclets ("less_than_comparison_simple")
+	\translation (
+		\load (#se0)
+		\load (#se1)
+		IF_ICMPGE l1
+		ICONST_1
+		GOTO l2
+		l1: ICONST_0
+		l2: ISTORE #lhs
+		#child-1
+	)
+}
+
 greater_than_comparison {
 	\taclets ("greater_than_comparison_simple")
 	\translation (

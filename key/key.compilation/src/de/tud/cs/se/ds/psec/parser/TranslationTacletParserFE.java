@@ -12,7 +12,6 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.objectweb.asm.Label;
 
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Child_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.ConditionContext;
@@ -59,9 +58,10 @@ public class TranslationTacletParserFE extends
     private String fileName;
 
     /**
-     * Map for remembering label objects by their name in the taclet definition.
+     * Map for making label references in definitions unique
      */
-    private HashMap<String, Label> labelMap = new HashMap<>();
+    private HashMap<String, String> labelMap = new HashMap<>();
+    private int labelCounter = 0;
 
     private boolean bailAtError = false;
 
@@ -263,7 +263,7 @@ public class TranslationTacletParserFE extends
     @Override
     public LabeledBytecodeInstr visitLabeled_bytecode_instr(
             Labeled_bytecode_instrContext ctx) {
-        return new LabeledBytecodeInstr(getLabelForName(ctx.LABEL().getText()),
+        return new LabeledBytecodeInstr(getUniquePerTranslationLabelName(ctx.LABEL().getText()),
                 visit(ctx.bytecode_instr()));
     }
 
@@ -284,7 +284,7 @@ public class TranslationTacletParserFE extends
     public LabelUnaryBytecodeInstr visitLabelUnaryBytecodeInstr(
             LabelUnaryBytecodeInstrContext ctx) {
         return new LabelUnaryBytecodeInstr(ctx.label_unary_instrs().getText(),
-                getLabelForName(ctx.LABEL().getText()));
+                getUniquePerTranslationLabelName(ctx.LABEL().getText()));
     }
 
     @Override
@@ -327,14 +327,14 @@ public class TranslationTacletParserFE extends
      *            The name of the label, e.g. "l0".
      * @return The label for the given label name.
      */
-    private Label getLabelForName(String labelName) {
-        Label result = null;
+    private String getUniquePerTranslationLabelName(String labelName) {
+        String result = null;
 
         if (labelMap.containsKey(labelName)) {
             result = labelMap.get(labelName);
         }
         else {
-            result = new Label();
+            result = "l" + labelCounter++;
             labelMap.put(labelName, result);
         }
 

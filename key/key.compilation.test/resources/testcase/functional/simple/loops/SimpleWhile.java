@@ -12,11 +12,10 @@ public class SimpleWhile {
       @ ensures true;
       @*/
     public static int test(int i) {
-        while (i++ > 0) {
-            //i--;
-            i = i - 2;
+        while (i > 0) {
+            i--;
         }
-
+        
         return i;
     }
 }

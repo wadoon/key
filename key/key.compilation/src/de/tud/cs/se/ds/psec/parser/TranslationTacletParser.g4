@@ -99,6 +99,8 @@ label_unary_instrs
 	:
 		GOTO
 	|
+		IF_ICMPGE
+	|
 		IF_ICMPLE
 	|
 		IF_ICMPNE

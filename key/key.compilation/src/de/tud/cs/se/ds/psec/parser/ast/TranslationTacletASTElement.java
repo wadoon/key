@@ -4,11 +4,13 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -32,6 +34,9 @@ public abstract class TranslationTacletASTElement implements Opcodes {
      * @param pvHelper
      *            A {@link ProgVarHelper} for resolving references to program
      *            variables.
+     * @param labelManager
+     *            The {@link UniqueLabelManager} for keeping track of the
+     *            connection between {@link Label} names and objects.
      * @param app
      *            The {@link TacletApp} being used for obtaining instantiations
      *            of schema variables.
@@ -39,7 +44,8 @@ public abstract class TranslationTacletASTElement implements Opcodes {
      *            The children of in the taclet AST to be taken into account for
      *            translation.
      */
-    public abstract void translate(MethodVisitor mv, ProgVarHelper pvHelper, TacletApp app,
+    public abstract void translate(MethodVisitor mv, ProgVarHelper pvHelper,
+            UniqueLabelManager labelManager, TacletApp app,
             List<TacletASTNode> children);
 
     /**

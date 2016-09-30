@@ -63,5 +63,26 @@ public class ProgVarHelper {
             return offset;
         }
     }
+    
+    public static int test(int i) {
+        boolean x;
+        int x_1;
+        int x_2 = i;
+        int x_3 = i+1;
+        i = x_3;
+        x_1 = x_2;
+        x = x_1 > 0;
+        
+        while (x) {
+            i = i - 2;
+            int x_5 = i;
+            int x_6 = i + 1;
+            i = x_6;
+            int x_4 = x_5;
+            x = x_4 > 0;
+        }
+
+        return i;
+    }
 
 }

@@ -8,6 +8,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -20,7 +21,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  * </ol>
  * 
  * If all constraints are met, call
- * {@link #translate(MethodVisitor, ProgVarHelper, TacletApp, List)} to start
+ * {@link #translate(MethodVisitor, ProgVarHelper, UniqueLabelManager, TacletApp, List)} to start
  * the translation.
  *
  * @author Dominic Scheurer
@@ -75,8 +76,8 @@ public class TranslationDefinition extends TranslationTacletASTElement {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            TacletApp app, List<TacletASTNode> children) {
-        instructions.translate(mv, pvHelper, app, children);
+            UniqueLabelManager labelManager, TacletApp app, List<TacletASTNode> children) {
+        instructions.translate(mv, pvHelper, labelManager, app, children);
     }
 
 }
