@@ -28,8 +28,9 @@ public class Instructions extends TranslationTacletASTElement {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            TacletApp app, List<TacletASTNode> children) {
-        instructions.forEach(i -> i.translate(mv, pvHelper, app, children));
+            final TacletApp app, List<TacletASTNode> children) {
+        instructions.forEach(i ->
+            i.translate(mv, pvHelper, app, children));
     }
 
 }

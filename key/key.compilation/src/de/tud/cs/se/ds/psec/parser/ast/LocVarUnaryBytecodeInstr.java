@@ -44,7 +44,7 @@ public class LocVarUnaryBytecodeInstr extends Instruction {
 
         switch (opcode) {
         case ISTORE:
-            mv.visitIntInsn(opcode, pvHelper.progVarNr(
+            mv.visitVarInsn(opcode, pvHelper.progVarNr(
                     (LocationVariable) getTacletAppInstValue(app, locVarSV)));
             break;
         }

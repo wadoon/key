@@ -1,6 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler;
 
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -20,9 +21,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Compiles the body of a method by Symbolic Execution.
@@ -56,7 +56,7 @@ public class MethodBodyCompiler implements Opcodes {
             Iterable<ParameterDeclaration> methodParameters,
             TranslationDefinitions definitions, boolean isStatic,
             boolean isVoid) {
-        this.pvHelper = new ProgVarHelper(isStatic);
+        this.pvHelper = new ProgVarHelper(isStatic, methodParameters);
         this.translationFactory = new TacletTranslationFactory(mv, pvHelper,
                 definitions);
         this.isVoid = isVoid;
@@ -76,7 +76,7 @@ public class MethodBodyCompiler implements Opcodes {
      */
     public void compile(SymbolicExecutionTreeBuilder builder) {
         // Forward until after call of this method
-        IExecutionNode<?> startNode = ffUntilAfterFirstMethodCall(builder);
+        Node startNode = ffUntilAfterFirstMethodCall(builder);
 
         astRoot = translationFactory.getASTRootNode();
         translateToTacletTree(startNode, astRoot);
@@ -124,14 +124,14 @@ public class MethodBodyCompiler implements Opcodes {
      *            of the method's body.
      * @return The {@link IExecutionNode} following the call to this method.
      */
-    private IExecutionNode<?> ffUntilAfterFirstMethodCall(
+    private Node ffUntilAfterFirstMethodCall(
             SymbolicExecutionTreeBuilder builder) {
-        IExecutionNode<?> startNode = builder.getStartNode();
-        while (!(startNode instanceof IExecutionMethodCall)) {
-            startNode = startNode.getChildren()[0];
+        Node currentNode = builder.getStartNode().getProofNode();
+        while (!(currentNode.getAppliedRuleApp().rule().name().toString().equals("methodBodyExpand"))) {
+            currentNode = currentNode.child(0);
         }
-        startNode = startNode.getChildren()[0];
-        return startNode;
+        
+        return currentNode.child(0);
     }
 
     /**
@@ -140,48 +140,40 @@ public class MethodBodyCompiler implements Opcodes {
      *
      * @param startNode
      *            The root node for the SET to translate.
-     * @param astStartNode
+     * @param currentASTNode
      *            The root node for the corresponding taclet AST.
      */
-    private void translateToTacletTree(IExecutionNode<?> startNode,
-            TacletASTNode astStartNode) {
-        IExecutionNode<?> currentNode = startNode;
-        TacletASTNode currentASTNode = astStartNode;
+    private void translateToTacletTree(Node currentNode,
+            TacletASTNode currentASTNode) {
 
-        while (currentNode != null && currentNode.getChildren().length > 0) {
+        // XXX Special case: "Use Operation Contract" has only one
+        // *abstract* SET child, but two in the KeY proof tree. Have
+        // to consider this. Maybe somehow deactivate all non-SE branches...
 
-            // XXX Special case: "Use Operation Contract" has only one
-            // *abstract* SET child, but two in the KeY proof tree. Have
-            // to consider this. Maybe somehow deactivate all non-SE branches...
+        Pair<Node, TacletASTNode> endNode = translateSequentialBlock(
+                currentNode, currentASTNode);
 
-            currentASTNode = translateSequentialBlock(
-                    currentNode.getProofNode(), currentASTNode);
+        currentNode = endNode.first;
+        currentASTNode = endNode.second;
 
-            //XXX The following statement leads to an assertion error
-            // when compilation is started from within a Junit test case.
+        //XXX The following statement leads to an assertion error
+        // when compilation is started from within a Junit test case.
 //            currentStatement = currentNode.toString();
+        
+        if (currentNode.childrenCount() > 0) {
 
-            if (currentNode.getChildren().length > 1) {
+            // Note: Stack Map Frames are not generated manually here;
+            // we're trying to leave it to the ASM framework to generate
+            // them automatically. Computing the right values of these
+            // frames is very difficult...
+            // http://chrononsystems.com/blog/java-7-design-flaw-leads-to-huge-backward-step-for-the-jvm
+            // http://asm.ow2.org/doc/developer-guide.html#classwriter
 
-                // Note: Stack Map Frames are not generated manually here;
-                // we're trying to leave it to the ASM framework to generate
-                // them automatically. Computing the right values of these
-                // frames is very difficult...
-                // http://chrononsystems.com/blog/java-7-design-flaw-leads-to-huge-backward-step-for-the-jvm
-                // http://asm.ow2.org/doc/developer-guide.html#classwriter
-
-                for (IExecutionNode<?> child : currentNode.getChildren()) {
-                    translateToTacletTree(child, currentASTNode);
-                }
-
-                currentNode = null;
-
+            Iterator<Node> childIt = currentNode.childrenIterator();
+            while (childIt.hasNext()) {
+                translateToTacletTree(childIt.next(), currentASTNode);
             }
-            else {
 
-                currentNode = currentNode.getChildren()[0];
-
-            }
         }
     }
 
@@ -195,7 +187,7 @@ public class MethodBodyCompiler implements Opcodes {
      *            The starting point for compilation of the block.
      * @return The successor of the node that was processed at last.
      */
-    private TacletASTNode translateSequentialBlock(Node currentProofNode,
+    private Pair<Node, TacletASTNode> translateSequentialBlock(Node currentProofNode,
             TacletASTNode astStartNode) {
         TacletASTNode astCurrentNode = astStartNode;
 
@@ -213,37 +205,14 @@ public class MethodBodyCompiler implements Opcodes {
 
             if (currentProofNode.childrenCount() == 1) {
                 currentProofNode = currentProofNode.child(0);
-            }
-            else {
+            }else {
                 // No children, or this is a branching node
-                currentProofNode = null;
+                break;
             }
         }
-        while (currentProofNode != null
-                && !isSymbolicExecutionTreeNode(currentProofNode));
+        while (true);
 
-        return astCurrentNode;
-    }
-
-    /**
-     * Checks whether the given {@link Node} is part of the abstract SET.
-     * Basically delegates to
-     * {@link SymbolicExecutionUtil#isSymbolicExecutionTreeNode(Node, RuleApp)},
-     * but also has a check to include applications of "loopComplexToSimple",
-     * since there the loop condition is simplified before actually touching the
-     * actual loop.
-     * 
-     * @param currentProofNode
-     *            The {@link Node} to check
-     * @return true iff the given {@link Node} is a symbolic execution node
-     *         <b>and</b> its {@link RuleApp} is not an instance of
-     *         <code>loopComplexToSimple</code>.
-     */
-    private static boolean isSymbolicExecutionTreeNode(Node currentProofNode) {
-        return SymbolicExecutionUtil.isSymbolicExecutionTreeNode(
-                currentProofNode, currentProofNode.getAppliedRuleApp())
-                && !currentProofNode.getAppliedRuleApp().rule().name()
-                        .toString().equals("loopComplexToSimple");
+        return new Pair<>(currentProofNode, astCurrentNode);
     }
 
     /**

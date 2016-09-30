@@ -21,6 +21,7 @@ if_split_2_children {
 	)
 }
 
+// This rule applies when the loop is the last statement in the program
 while_loop_1_child {
 	\taclets ("removeLoopForCompilation", "removeLoopForCompilationVoid")
 	\condition (#num-children == 1)

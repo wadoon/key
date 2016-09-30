@@ -246,6 +246,9 @@ public class TranslationTacletParserFE extends
 
     @Override
     public Instructions visitTranslation(TranslationContext ctx) {
+        // Reset the label map
+        labelMap = new HashMap<>();
+        
         ArrayList<Instruction> instructions = new ArrayList<>();
         ctx.instruction().forEach(i -> instructions.add(visitInstruction(i)));
 

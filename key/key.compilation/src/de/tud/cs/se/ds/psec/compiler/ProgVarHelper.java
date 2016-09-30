@@ -2,6 +2,7 @@ package de.tud.cs.se.ds.psec.compiler;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /**
@@ -23,9 +24,17 @@ public class ProgVarHelper {
      * @param isStatic
      *            true iff the method using this {@link ProgVarHelper} is
      *            static.
+     * @param methodParameters
+     *            The method parameters, for choosing the right indeces
      */
-    public ProgVarHelper(boolean isStatic) {
+    public ProgVarHelper(boolean isStatic,
+            Iterable<ParameterDeclaration> methodParameters) {
         this.isStatic = isStatic;
+
+        for (ParameterDeclaration param : methodParameters) {
+            progVarOffsetMap.put(param.getVariables().get(0).toString(),
+                    progVarOffsetMap.size() + (isStatic ? 0 : 1));
+        }
     }
 
     /**
@@ -44,7 +53,8 @@ public class ProgVarHelper {
 
         if (progVarOffsetMap.containsKey(progVarName)) {
             return progVarOffsetMap.get(progVarName);
-        } else {
+        }
+        else {
             // Offset 0 for "this" pointer, following ones for method
             // parameters, then for local variables.
             int offset = progVarOffsetMap.size() + (isStatic ? 0 : 1);

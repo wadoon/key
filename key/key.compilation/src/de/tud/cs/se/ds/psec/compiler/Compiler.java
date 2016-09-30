@@ -233,7 +233,8 @@ public class Compiler {
         catch (RuntimeException e) {
 
             if (debug) {
-                logger.error("%s, message: %s", e.getClass().getName(), e.getMessage());
+                logger.error("%s, message: %s", e.getClass().getName(),
+                        e.getMessage());
 
                 // DEBUG CODE.
                 StringWriter sw = new StringWriter();
@@ -273,11 +274,19 @@ public class Compiler {
                 mDecl.getContainerType().getJavaType().getFullName(),
                 mDecl.getName());
 
-        MethodVisitor mv = cw.visitMethod(
-                InformationExtraction.createOpcode(mDecl), mDecl.getName(),
-                InformationExtraction.getMethodTypeDescriptor(mDecl), null,
-                null);
+        int accessFlags = InformationExtraction.createOpcode(mDecl);
+        String descriptor = InformationExtraction
+                .getMethodTypeDescriptor(mDecl);
+        MethodVisitor mv = cw.visitMethod(accessFlags, mDecl.getName(),
+                descriptor, null, null);
 
+        //@formatter:off
+        // The following structure could be used to simplicfy the allocation
+        // of new local variables, if other things fail.
+//        LocalVariablesSorter sorter = new LocalVariablesSorter(accessFlags,
+//                descriptor, mv);
+        //@formatter:on
+        
         if (!mDecl.isAbstract()) {
             mv.visitCode();
 
