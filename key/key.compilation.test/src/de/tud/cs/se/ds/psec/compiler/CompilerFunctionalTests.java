@@ -46,7 +46,6 @@ public class CompilerFunctionalTests extends TestCase {
 
     @Test
     public void testSimpleArithmeticAndIf() {
-        fail();
 
         List<TestData<Integer>> testData = Arrays.asList(
                 new TestData<Integer>(5, 10, true),
