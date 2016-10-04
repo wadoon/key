@@ -4,19 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 import org.key_project.util.java.IOUtil;
 
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 import junit.framework.TestCase;
 
 /**
@@ -45,155 +44,145 @@ public class CompilerFunctionalTests extends TestCase {
     }
 
     @Test
-    public void testSimpleArithmeticAndIf() throws TranslationTacletInputException,
-            ProblemLoaderException, IOException {
+    public void testSimpleArithmeticAndIf() {
 
-        Compiler compiler = new Compiler(
-                new File(functionalTestsDir, "simple/ifAndArith/SimpleArithmeticAndIf.java"),
-                TMP_OUT_DIR, true, true, false);
+        List<TestData<Integer>> testData = Arrays.asList(
+                new TestData<Integer>(5, 10, true),
+                new TestData<Integer>(5, 10, false),
+                new TestData<Integer>(42, 4, true),
+                new TestData<Integer>(42, 4, false));
 
-        compiler.compile();
+        //@formatter:off
+        compileAndTest(
+                "simple/ifAndArith/SimpleArithmeticAndIf.java",
+                "de.tud.test.simple.arith.SimpleArithmeticAndIf",
+                "test",
+                new Class<?>[] { int.class, boolean.class },
+                testData);
+        //@formatter:on
 
-        File outputClassFile = new File(TMP_OUT_DIR,
-                "de/tud/test/simple/arith/SimpleArithmeticAndIf.class");
-
-        assertTrue("Class file was not written to expected destination",
-                outputClassFile.exists());
-
-        try {
-            URL url = Paths.get(TMP_OUT_DIR).toFile().toURI().toURL();
-            URL[] urls = new URL[] { url };
-
-            URLClassLoader cl = new URLClassLoader(urls);
-            Class<?> cls = cl.loadClass("de.tud.test.simple.arith.SimpleArithmeticAndIf");
-            cl.close();
-
-            assertNotNull("Compiled class could not be loaded", cls);
-
-            Method method = cls.getMethod("test", int.class, boolean.class);
-
-            //@formatter:off
-            @SuppressWarnings("unchecked")
-            Triple<Integer, Boolean, Integer>[] testData = new Triple[] {
-                new Triple<>(10, true, 5),
-                new Triple<>(10, false, 5),
-                new Triple<>(4, true, 42),
-                new Triple<>(4, false, 42)
-            };
-            //@formatter:on
-
-            for (Triple<Integer, Boolean, Integer> triple : testData) {
-                assertEquals((int) triple.third,
-                        (int) method.invoke(null, triple.first, triple.second));
-            }
-        }
-        catch (MalformedURLException | NoSuchMethodException | SecurityException
-                | IllegalArgumentException | ClassNotFoundException
-                | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
     }
 
     @Test
-    public void testSimpleWhile() throws TranslationTacletInputException,
-            ProblemLoaderException, IOException {
+    public void testSimpleWhile() {
 
-        Compiler compiler = new Compiler(
-                new File(functionalTestsDir, "simple/loops/whileLoops/SimpleWhile.java"),
-                TMP_OUT_DIR, true, true, false);
+        List<TestData<Integer>> testData = Arrays.asList(
+                new TestData<Integer>(0, 10), new TestData<Integer>(0, 100),
+                new TestData<Integer>(0, 42), new TestData<Integer>(-1, -1));
 
-        compiler.compile();
+        //@formatter:off
+        compileAndTest(
+                "simple/loops/whileLoops/SimpleWhile.java",
+                "de.tud.test.simple.loops.whileLoops.SimpleWhile",
+                "test",
+                new Class<?>[] { int.class },
+                testData);
+        //@formatter:on
 
-        File outputClassFile = new File(TMP_OUT_DIR,
-                "de/tud/test/simple/loops/whileLoops/SimpleWhile.class");
-
-        assertTrue("Class file was not written to expected destination",
-                outputClassFile.exists());
-
-        try {
-            URL url = Paths.get(TMP_OUT_DIR).toFile().toURI().toURL();
-            URL[] urls = new URL[] { url };
-
-            URLClassLoader cl = new URLClassLoader(urls);
-            Class<?> cls = cl.loadClass("de.tud.test.simple.loops.whileLoops.SimpleWhile");
-            cl.close();
-
-            assertNotNull("Compiled class could not be loaded", cls);
-
-            Method method = cls.getMethod("test", int.class);
-
-            //@formatter:off
-            @SuppressWarnings("unchecked")
-            Pair<Integer, Integer>[] testData = new Pair[] {
-                new Pair<>(10, 0),
-                new Pair<>(100, 0),
-                new Pair<>(42, 0),
-                new Pair<>(-1, -1)
-            };
-            //@formatter:on
-
-            for (Pair<Integer, Integer> triple : testData) {
-                assertEquals((int) triple.second,
-                        (int) method.invoke(null, triple.first));
-            }
-        }
-        catch (MalformedURLException | NoSuchMethodException | SecurityException
-                | IllegalArgumentException | ClassNotFoundException
-                | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
     }
 
     @Test
     public void testSimpleFor() throws TranslationTacletInputException,
             ProblemLoaderException, IOException {
 
-        Compiler compiler = new Compiler(
-                new File(functionalTestsDir, "simple/loops/forLoops/SimpleFor.java"),
-                TMP_OUT_DIR, true, true, false);
+        List<TestData<Integer>> testData = Arrays.asList(
+                new TestData<Integer>(16, 10), new TestData<Integer>(106, 100),
+                new TestData<Integer>(48, 42), new TestData<Integer>(5, -1));
 
-        compiler.compile();
+        //@formatter:off
+        compileAndTest(
+                "simple/loops/forLoops/SimpleFor.java",
+                "de.tud.test.simple.loops.forLoops.SimpleFor",
+                "test",
+                new Class<?>[] { int.class },
+                testData);
+        //@formatter:on
 
-        File outputClassFile = new File(TMP_OUT_DIR,
-                "de/tud/test/simple/loops/forLoops/SimpleFor.class");
+    }
 
-        assertTrue("Class file was not written to expected destination",
-                outputClassFile.exists());
+    /**
+     * Compiles, loads and tests a static method.
+     * 
+     * @param relPathToJavaFile
+     *            The path to the Java file to test, relative to
+     *            {@link #FUNCTIONAL_TESTS_RELATIVE_DIR}.
+     * @param className
+     *            The fully qualified class name of the class to test.
+     * @param testMethodName
+     *            The name of the method to test.
+     * @param argTypes
+     *            An array of {@link Class}es of the arguments for the method to
+     *            test.
+     * @param testData
+     *            The {@link TestData} object.
+     * @param <C>
+     *            The type for the expected results in the test data.
+     */
+    private <C> void compileAndTest(String relPathToJavaFile, String className,
+            String testMethodName, Class<?>[] argTypes,
+            List<TestData<C>> testData) {
 
         try {
+            Compiler compiler = new Compiler(
+                    new File(functionalTestsDir, relPathToJavaFile),
+                    TMP_OUT_DIR, true, true, false);
+
+            compiler.compile();
+
+            File outputClassFile = new File(TMP_OUT_DIR,
+                    className.replace('.', '/') + ".class");
+
+            assertTrue("Class file was not written to expected destination",
+                    outputClassFile.exists());
+
             URL url = Paths.get(TMP_OUT_DIR).toFile().toURI().toURL();
             URL[] urls = new URL[] { url };
 
             URLClassLoader cl = new URLClassLoader(urls);
-            Class<?> cls = cl.loadClass("de.tud.test.simple.loops.forLoops.SimpleFor");
+            Class<?> cls = cl.loadClass(className);
             cl.close();
 
             assertNotNull("Compiled class could not be loaded", cls);
 
-            Method method = cls.getMethod("test", int.class);
+            Method method = cls.getMethod(testMethodName, argTypes);
 
-            //@formatter:off
-            @SuppressWarnings("unchecked")
-            Pair<Integer, Integer>[] testData = new Pair[] {
-                new Pair<>(10, 16),
-                new Pair<>(100, 106),
-                new Pair<>(42, 48),
-                new Pair<>(-1, 5)
-            };
-            //@formatter:on
-
-            for (Pair<Integer, Integer> triple : testData) {
-                assertEquals((int) triple.second,
-                        (int) method.invoke(null, triple.first));
+            for (TestData<C> testItem : testData) {
+                assertEquals(testItem.getExpectedResult(),
+                        method.invoke(null, testItem.getArguments()));
             }
         }
-        catch (MalformedURLException | NoSuchMethodException | SecurityException
+        catch (NoSuchMethodException | SecurityException
                 | IllegalArgumentException | ClassNotFoundException
-                | IllegalAccessException | InvocationTargetException e) {
+                | IllegalAccessException | InvocationTargetException
+                | TranslationTacletInputException | ProblemLoaderException
+                | IOException e) {
             e.printStackTrace();
             fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Encapsulates data for testing a method.
+     *
+     * @author Dominic Scheurer
+     * @param <C>
+     *            The type of the expected result.
+     */
+    private static class TestData<C> {
+        private C expectedResult;
+        private Object[] arguments;
+
+        public TestData(C expectedResult, Object... arguments) {
+            this.expectedResult = expectedResult;
+            this.arguments = arguments;
+        }
+
+        public C getExpectedResult() {
+            return expectedResult;
+        }
+
+        public Object[] getArguments() {
+            return arguments;
         }
     }
 
