@@ -10,9 +10,11 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.tud.cs.se.ds.psec.compiler.exceptions.UnexpectedTranslationSituationException;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -62,10 +64,14 @@ public class TacletASTNode implements Opcodes {
 
     /**
      * Recursively translates this node and its children to bytecode.
+     * 
+     * @throws UnexpectedTranslationSituationException
+     *             if not exactly one {@link TranslationDefinition} is
+     *             applicable in the present situation.
      */
-    public void compile() {
+    public void compile() throws UnexpectedTranslationSituationException {
         logger.trace("Compiling %s", seTacletName);
-        
+
         ApplicabilityCheckInput applCheckInput = new ApplicabilityCheckInput(
                 children.size());
 
@@ -74,17 +80,21 @@ public class TacletASTNode implements Opcodes {
                 .collect(Collectors.toList());
 
         if (candidates.size() < 1) {
-            logger.error("No suitable translation found for the situation %s",
+            String message = Utilities.format(
+                    "No suitable translation found for the situation %s",
                     applCheckInput);
-            System.exit(1);
+
+            logger.error(message);
+            throw new UnexpectedTranslationSituationException(message);
         }
         else if (candidates.size() > 1) {
-            logger.error(
+            String message = Utilities.format(
                     "Too many translations (%s) found for the situation %s",
                     candidates.size(), applCheckInput);
-            System.exit(1);
+            logger.error(message);
+            throw new UnexpectedTranslationSituationException(message);
         }
-        
+
         UniqueLabelManager labelManager = new UniqueLabelManager();
 
         candidates.get(0).translate(mv, pvHelper, labelManager, app, children);
@@ -140,8 +150,12 @@ public class TacletASTNode implements Opcodes {
 
     /**
      * Recursively compiles the first child of this AST node.
+     * 
+     * @throws UnexpectedTranslationSituationException
+     *             if not exactly one {@link TranslationDefinition} is
+     *             applicable in the present situation for the first child.
      */
-    protected void compileFirstChild() {
+    protected void compileFirstChild() throws UnexpectedTranslationSituationException {
         if (!children.isEmpty()) {
             children.get(0).compile();
         }

@@ -12,7 +12,9 @@ import org.objectweb.asm.Opcodes;
 
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletTranslationFactory;
+import de.tud.cs.se.ds.psec.compiler.exceptions.NoTranslationException;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -37,6 +39,7 @@ public class MethodBodyCompiler implements Opcodes {
     private TacletTranslationFactory translationFactory;
     private TacletASTNode astRoot = null;
     private boolean isVoid = false;
+
     /**
      * Constructs a new {@link MethodBodyCompiler}.
      * 
@@ -127,10 +130,11 @@ public class MethodBodyCompiler implements Opcodes {
     private Node ffUntilAfterFirstMethodCall(
             SymbolicExecutionTreeBuilder builder) {
         Node currentNode = builder.getStartNode().getProofNode();
-        while (!(currentNode.getAppliedRuleApp().rule().name().toString().equals("methodBodyExpand"))) {
+        while (!(currentNode.getAppliedRuleApp().rule().name().toString()
+                .equals("methodBodyExpand"))) {
             currentNode = currentNode.child(0);
         }
-        
+
         return currentNode.child(0);
     }
 
@@ -156,10 +160,10 @@ public class MethodBodyCompiler implements Opcodes {
         currentNode = endNode.first;
         currentASTNode = endNode.second;
 
-        //XXX The following statement leads to an assertion error
+        // XXX The following statement leads to an assertion error
         // when compilation is started from within a Junit test case.
-//            currentStatement = currentNode.toString();
-        
+        // currentStatement = currentNode.toString();
+
         if (currentNode.childrenCount() > 0) {
 
             // Note: Stack Map Frames are not generated manually here;
@@ -187,8 +191,8 @@ public class MethodBodyCompiler implements Opcodes {
      *            The starting point for compilation of the block.
      * @return The successor of the node that was processed at last.
      */
-    private Pair<Node, TacletASTNode> translateSequentialBlock(Node currentProofNode,
-            TacletASTNode astStartNode) {
+    private Pair<Node, TacletASTNode> translateSequentialBlock(
+            Node currentProofNode, TacletASTNode astStartNode) {
         TacletASTNode astCurrentNode = astStartNode;
 
         do {
@@ -205,7 +209,8 @@ public class MethodBodyCompiler implements Opcodes {
 
             if (currentProofNode.childrenCount() == 1) {
                 currentProofNode = currentProofNode.child(0);
-            }else {
+            }
+            else {
                 // No children, or this is a branching node
                 break;
             }
@@ -229,11 +234,12 @@ public class MethodBodyCompiler implements Opcodes {
         }
         else {
             // TODO Are there other cases to support?
-            logger.error(
+            String message = Utilities.format(
                     "Did not translate the following app: %s, statement: %s",
                     ruleApp.rule().name(), currentStatement);
-            System.exit(1);
-            return Optional.empty();
+
+            logger.error(message);
+            throw new NoTranslationException(message);
         }
     }
 

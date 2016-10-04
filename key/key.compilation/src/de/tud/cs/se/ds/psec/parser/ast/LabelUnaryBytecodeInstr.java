@@ -9,7 +9,9 @@ import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.parser.exceptions.UnknownInstructionException;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -46,8 +48,10 @@ public class LabelUnaryBytecodeInstr extends Instruction {
         this.labelName = labelName;
 
         if (!OPCODES_MAP.containsKey(insn)) {
-            logger.error("Unknown instruction %s", insn);
-            System.exit(1);
+            String message = Utilities.format("Unknown instruction %s", insn);
+            logger.error(message);
+            
+            throw new UnknownInstructionException(message);
         }
 
         opcode = OPCODES_MAP.get(insn);

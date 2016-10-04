@@ -8,8 +8,10 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.tud.cs.se.ds.psec.compiler.exceptions.NoTranslationException;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -90,10 +92,12 @@ public class TacletTranslationFactory {
         }
         else {
             if (!isSimplificationSETaclet(app.taclet())) {
-                logger.error(
+                String message = Utilities.format(
                         "Don't know a translation of the following taclet app: %s",
                         app.rule().name());
-                System.exit(1);
+
+                logger.error(message);
+                throw new NoTranslationException(message);
             }
             else {
                 logger.debug("Ignoring taclet %s", app.rule().name());

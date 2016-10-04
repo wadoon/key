@@ -8,7 +8,9 @@ import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.parser.exceptions.UnknownInstructionException;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -24,8 +26,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-public class LoadIntInstruction
-        extends Instruction {
+public class LoadIntInstruction extends Instruction {
     private static final Logger logger = LogManager.getFormatterLogger();
 
     private String schemaVar;
@@ -46,7 +47,8 @@ public class LoadIntInstruction
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, TacletApp app,
+            List<TacletASTNode> children) {
         Expression expr = (Expression) getTacletAppInstValue(app, schemaVar);
 
         if (expr instanceof IntLiteral) {
@@ -57,7 +59,8 @@ public class LoadIntInstruction
             BooleanLiteral bExpr = (BooleanLiteral) expr;
             if (bExpr.toString().equals("false")) {
                 mv.visitInsn(ICONST_0);
-            } else if (bExpr.toString().equals("true")) {
+            }
+            else if (bExpr.toString().equals("true")) {
                 mv.visitInsn(ICONST_1);
             }
             else {
@@ -68,15 +71,17 @@ public class LoadIntInstruction
             mv.visitVarInsn(ILOAD, pvHelper.progVarNr((LocationVariable) expr));
         }
         else if (expr instanceof Negative) {
-            //TODO Is there a double negation case to consider?
-            intConstInstruction(mv,
-                    -1 * Integer.parseInt(((Negative) expr).getChildAt(0).toString()));
+            // TODO Is there a double negation case to consider?
+            intConstInstruction(mv, -1 * Integer
+                    .parseInt(((Negative) expr).getChildAt(0).toString()));
         }
         else {
-            logger.error(
+            String message = Utilities.format(
                     "Currently not supporting the type %s in assignments, returns etc.",
                     expr.getClass());
-            System.exit(1);
+            logger.error(message);
+
+            throw new UnknownInstructionException(message);
         }
     }
 

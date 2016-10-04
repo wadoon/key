@@ -115,6 +115,9 @@ public class Main {
         catch (ProblemLoaderException e) {
             logger.error("Problem in loading the file to compile, message:\n%s", e.getMessage());
         }
+        catch (RuntimeException e) {
+            logger.error("Problem occurred during compilation:\n%s", e.getMessage()); 
+        }
     }
 
     /**

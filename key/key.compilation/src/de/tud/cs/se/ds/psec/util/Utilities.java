@@ -6,6 +6,8 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.Formatter;
+import java.util.Locale;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -60,6 +62,28 @@ public class Utilities {
         }
 
         return true;
+    }
+
+    /**
+     * printf-style formats the given {@link String} with the given parameter
+     * {@link Object}s. The syntax of {@link Formatter} applies.
+     * 
+     * @param s
+     *            The format {@link String}.
+     * @param args
+     *            The argument {@link Object}s to insert into the format
+     *            {@link String}.
+     * @return The formatted {@link String}.
+     * @see Formatter
+     */
+    public static String format(String s, Object... args) {
+        StringBuilder sb = new StringBuilder();
+
+        Formatter formatter = new Formatter(sb, Locale.US);
+        formatter.format(s, args);
+        formatter.close();
+
+        return sb.toString();
     }
 
 }

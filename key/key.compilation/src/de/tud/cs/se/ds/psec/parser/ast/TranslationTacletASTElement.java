@@ -10,7 +10,9 @@ import org.objectweb.asm.Opcodes;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.parser.exceptions.UnsupportedFeatureException;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -76,10 +78,12 @@ public abstract class TranslationTacletASTElement implements Opcodes {
                 mv.visitIntInsn(SIPUSH, theInt);
             }
             else {
-                logger.error(
+                String message = Utilities.format(
                         "Constants in full Integer range not yet covered, given: %s",
                         theInt);
-                System.exit(1);
+                logger.error(message);
+
+                throw new UnsupportedFeatureException(message);
             }
         }
         else if (theInt == -1) {
