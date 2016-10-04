@@ -11,10 +11,14 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.key_project.util.java.IOUtil;
 
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import junit.framework.TestCase;
 
@@ -29,6 +33,7 @@ public class CompilerFunctionalTests extends TestCase {
     private static final String TMP_OUT_DIR = "./testTmp/";
 
     private String functionalTestsDir;
+    private boolean testFailed = false;
 
     @Override
     protected void setUp() throws Exception {
@@ -40,8 +45,24 @@ public class CompilerFunctionalTests extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        // Files.delete(Paths.get(TMP_OUT_DIR));
+        // We only delete the tests directory if no test failed. Otherwise, we
+        // leave it there for diagnosis.
+        if (!testFailed) {
+            Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
+        }
     }
+
+    @Rule
+    public TestWatcher watchman = new TestWatcher() {
+        @Override
+        protected void failed(Throwable e, Description description) {
+            testFailed = true;
+        }
+
+        @Override
+        protected void succeeded(Description description) {
+        }
+    };
 
     @Test
     public void testSimpleArithmeticAndIf() {
