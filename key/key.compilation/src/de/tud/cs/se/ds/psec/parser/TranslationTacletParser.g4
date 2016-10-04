@@ -78,6 +78,8 @@ nullary_bytecode_instr
     |
         ISUB
     |
+        IXOR
+    |
         RETURN
     ;
 

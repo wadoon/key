@@ -61,5 +61,10 @@ public class Utilities {
 
         return true;
     }
+    
+    private static void test(boolean b1, boolean b2) {
+        boolean test = false;
+        boolean b3 = b1 ^ b2;
+    }
 
 }

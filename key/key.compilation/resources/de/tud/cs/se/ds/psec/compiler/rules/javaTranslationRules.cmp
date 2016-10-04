@@ -66,6 +66,21 @@ return_void {
 	)
 }
 
+// ################
+// ### Booleans ###
+// ################
+
+xor {
+	\taclets ("compound_assignment_xor_simple")
+	\translation (
+		\load (#seBool0)
+	    \load (#seBool1)
+	    IXOR
+	    ISTORE #lhs
+		#child-1
+	)
+}
+
 // ##########################
 // ### Integer arithmetic ###
 // ##########################

@@ -35,13 +35,14 @@ public class SimpleCompilerFunctionalTests extends TestCase {
     protected void setUp() throws Exception {
         Files.createDirectories(Paths.get(TMP_OUT_DIR));
 
-        File projectRoot = IOUtil.getProjectRoot(SimpleCompilerFunctionalTests.class);
+        File projectRoot = IOUtil
+                .getProjectRoot(SimpleCompilerFunctionalTests.class);
         functionalTestsDir = projectRoot + FUNCTIONAL_TESTS_RELATIVE_DIR;
     }
 
     @Override
     protected void tearDown() throws Exception {
-        Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
+//        Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
     }
 
     @Test
@@ -96,6 +97,26 @@ public class SimpleCompilerFunctionalTests extends TestCase {
                 "de.tud.test.simple.loops.forLoops.SimpleFor",
                 "test",
                 new Class<?>[] { int.class },
+                testData);
+        //@formatter:on
+
+    }
+
+    @Test
+    public void testSimpleBolean() {
+
+        List<TestData<Boolean>> testData = Arrays.asList(
+                new TestData<Boolean>(false, false, false),
+                new TestData<Boolean>(false, false, true),
+                new TestData<Boolean>(false, true, false),
+                new TestData<Boolean>(true, true, true));
+
+        //@formatter:off
+        compileAndTest(
+                "simple/boolean/SimpleBoolean.java",
+                "de.tud.test.simple.bool.SimpleBoolean",
+                "test",
+                new Class<?>[] { boolean.class, boolean.class },
                 testData);
         //@formatter:on
 

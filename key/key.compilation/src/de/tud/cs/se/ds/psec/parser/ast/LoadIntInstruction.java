@@ -11,6 +11,7 @@ import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -51,6 +52,17 @@ public class LoadIntInstruction
         if (expr instanceof IntLiteral) {
             intConstInstruction(mv, (negative ? -1 : 1)
                     * Integer.parseInt(((IntLiteral) expr).toString()));
+        }
+        else if (expr instanceof BooleanLiteral) {
+            BooleanLiteral bExpr = (BooleanLiteral) expr;
+            if (bExpr.toString().equals("false")) {
+                mv.visitInsn(ICONST_0);
+            } else if (bExpr.toString().equals("true")) {
+                mv.visitInsn(ICONST_1);
+            }
+            else {
+                logger.error("Unexpected value for BooleanLiteral: %s", bExpr);
+            }
         }
         else if (expr instanceof LocationVariable) {
             mv.visitVarInsn(ILOAD, pvHelper.progVarNr((LocationVariable) expr));

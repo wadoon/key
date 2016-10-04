@@ -99,6 +99,7 @@ IFNE      : 'IFNE';
 IRETURN   : 'IRETURN';
 ISTORE    : 'ISTORE';
 ISUB      : 'ISUB';
+IXOR      : 'IXOR';
 RETURN    : 'RETURN';
 
 // Meta variables
