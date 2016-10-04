@@ -103,7 +103,7 @@ public class SimpleCompilerFunctionalTests extends TestCase {
     }
 
     @Test
-    public void testSimpleBolean() {
+    public void testSimpleBoolean() {
 
         List<TestData<Boolean>> testData = Arrays.asList(
                 new TestData<Boolean>(false, false, false),
@@ -118,6 +118,46 @@ public class SimpleCompilerFunctionalTests extends TestCase {
                 "test",
                 new Class<?>[] { boolean.class, boolean.class },
                 testData);
+        //@formatter:on
+
+    }
+
+    @Test
+    public void testSimpleObjects() {
+
+        Object o1 = new Object();
+        Object o2 = new Object();
+        
+        List<TestData<Boolean>> testDataIdentical = Arrays.asList(
+                new TestData<Boolean>(true, "test", "test"),
+                new TestData<Boolean>(true, o1, o1),
+                new TestData<Boolean>(true, o2, o2),
+                new TestData<Boolean>(false, o1, o2),
+                new TestData<Boolean>(false, o1, "test"));
+        
+//        List<TestData<Boolean>> testDataEquals = Arrays.asList(
+//                new TestData<Boolean>(true, "test", "test"),
+//                new TestData<Boolean>(true, o1, o1),
+//                new TestData<Boolean>(true, o2, o2),
+//                new TestData<Boolean>(false, o1, o2),
+//                new TestData<Boolean>(false, o1, "test"));
+
+        //@formatter:off
+        compileAndTest(
+                "simple/objects/SimpleObjects.java",
+                "de.tud.test.simple.objects.SimpleObjects",
+                "identical",
+                new Class<?>[] { Object.class, Object.class },
+                testDataIdentical);
+        //@formatter:on
+
+        //@formatter:off
+//        compileAndTest(
+//                "simple/objects/SimpleObjects.java",
+//                "de.tud.test.simple.objects.SimpleObjects",
+//                "equals",
+//                new Class<?>[] { Object.class, Object.class },
+//                testDataEquals);
         //@formatter:on
 
     }
