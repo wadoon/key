@@ -29,6 +29,7 @@ public class LabelUnaryBytecodeInstr extends Instruction {
 
     static {
         OPCODES_MAP.put("GOTO", GOTO);
+        OPCODES_MAP.put("IF_ACMPNE", IF_ACMPNE);
         OPCODES_MAP.put("IF_ICMPGE", IF_ICMPGE);
         OPCODES_MAP.put("IF_ICMPLE", IF_ICMPLE);
         OPCODES_MAP.put("IF_ICMPNE", IF_ICMPNE);

@@ -24,6 +24,7 @@ public class LocVarUnaryBytecodeInstr extends Instruction {
     private static final HashMap<String, Integer> OPCODES_MAP = new HashMap<>();
 
     static {
+        OPCODES_MAP.put("ALOAD", ALOAD);
         OPCODES_MAP.put("ISTORE", ISTORE);
     }
 
@@ -41,14 +42,11 @@ public class LocVarUnaryBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, TacletApp app,
+            List<TacletASTNode> children) {
 
-        switch (opcode) {
-        case ISTORE:
-            mv.visitVarInsn(opcode, pvHelper.progVarNr(
-                    (LocationVariable) getTacletAppInstValue(app, locVarSV)));
-            break;
-        }
+        mv.visitVarInsn(opcode, pvHelper.progVarNr(
+                (LocationVariable) getTacletAppInstValue(app, locVarSV)));
 
     }
 

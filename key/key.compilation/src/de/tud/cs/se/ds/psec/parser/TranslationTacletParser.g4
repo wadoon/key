@@ -94,12 +94,16 @@ unary_bytecode_instr
 
 loc_var_unary_instrs
 	:
+		ALOAD
+	|
 		ISTORE
 	;
 
 label_unary_instrs
 	:
 		GOTO
+	|
+		IF_ACMPNE
 	|
 		IF_ICMPGE
 	|

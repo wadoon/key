@@ -83,7 +83,7 @@ return_void {
 // ### Objects ###
 // ###############
 
-/*equality_comparison_objects {
+equality_comparison_objects {
 	\taclets ("equality_comparison_simple")
 	\condition (!isSimpleType(#se0))
 	\condition (!isSimpleType(#se1))
@@ -97,7 +97,7 @@ return_void {
 	    l2: ISTORE #lhs
 	    #child-1
 	)
-}*/
+}
 
 // #######################
 // ### Primitive Types ###

@@ -92,11 +92,13 @@ MINUS : '-' ;
 
 // Bytecode directives
 
+ALOAD     : 'ALOAD';
 BIPUSH    : 'BIPUSH';
 GOTO      : 'GOTO';
 IADD      : 'IADD';
 ICONST    : 'ICONST';
 ICONST_D  : 'ICONST_' DIGIT;
+IF_ACMPNE : 'IF_ACMPNE';
 IF_ICMPGE : 'IF_ICMPGE';
 IF_ICMPLE : 'IF_ICMPLE';
 IF_ICMPNE : 'IF_ICMPNE';
