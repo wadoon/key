@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<project name="key.util.test" default="runTests" basedir=".">
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/bin" />
+	<property name="dist.dir" value="${basedir}/../deployment/components" />
+	<property name="ext.dir" value="${basedir}/lib" />
+	<property name="comp.ext.dir" value="${basedir}/../key.compilation/lib" />
+	<property name="test.reports" value="${basedir}/testresults/" />
+
+
+	<target name="test-deploy" depends="compile">
+		<mkdir dir="${test.reports}" />
+		<junit printsummary="withOutAndErr" haltonfailure="no" fork="yes" forkMode="once" haltonerror="no" enableTestListenerEvents="false" showoutput="yes" dir="${basedir}">
+			<jvmarg value="-Xmx2048m" />
+			<jvmarg value="-XX:MaxPermSize=256m" />
+			<jvmarg value="-ea" />
+			<classpath>
+				<pathelement path="${basedir}/../key.core/bin" />
+				<pathelement path="${basedir}/../key.util/bin" />
+				<pathelement path="${basedir}/../key.core.symbolic_execution/bin" />
+				<pathelement path="${basedir}/../key.core/lib/recoderKey.jar" />
+				<pathelement location="${ext.dir}/junit-4.12.jar" />
+				<pathelement location="${comp.ext.dir}/log4j-api-2.6.2.jar" />
+				<pathelement location="${comp.ext.dir}/log4j-core-2.6.2.jar" />
+				<pathelement location="${comp.ext.dir}/asm-5.1.jar" />
+				<pathelement path="${basedir}/../key.compilation/bin" />
+				<pathelement path="${build.dir}" />
+			</classpath>
+			<formatter type="xml" />
+			<test name="de.tud.cs.se.ds.psec.suite.TestAlfred" todir="${test.reports}" />
+		</junit>
+		<fail message="Test failure detected, check test results." if="test.failedOrError" />
+	</target>
+
+
+	<target name="runTests" depends="compile">
+		<junit printsummary="withOutAndErr" haltonfailure="no" fork="yes" forkMode="once" haltonerror="no" enableTestListenerEvents="false" showoutput="yes" dir="${basedir}">
+			<jvmarg value="-Xmx2048m" />
+			<jvmarg value="-XX:MaxPermSize=256m" />
+			<jvmarg value="-ea" />
+			<classpath>
+				<pathelement path="${basedir}/../key.core/bin" />
+				<pathelement path="${basedir}/../key.util/bin" />
+				<pathelement path="${basedir}/../key.core.symbolic_execution/bin" />
+				<pathelement path="${basedir}/../key.core/lib/recoderKey.jar" />
+				<pathelement location="${ext.dir}/junit-4.12.jar" />
+				<pathelement location="${comp.ext.dir}/log4j-api-2.6.2.jar" />
+				<pathelement location="${comp.ext.dir}/log4j-core-2.6.2.jar" />
+				<pathelement location="${comp.ext.dir}/asm-5.1.jar" />
+				<pathelement path="${basedir}/../key.compilation/bin" />
+				<pathelement path="${build.dir}" />
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<test name="de.tud.cs.se.ds.psec.suite.TestAlfred" />
+		</junit>
+	</target>
+
+
+	<target name="compile" description="Compile all source files into the build directory.">
+		<mkdir dir="${build.dir}" />
+		<javac srcdir="${src.dir}" destdir="${build.dir}" sourcepath="${src.dir}" includeantruntime="false" source="1.8" target="1.8" deprecation="off" debug="on" depend="${build.depend}" optimize="off">
+			<classpath>
+				<pathelement path="${basedir}/../key.compilation/bin" />
+				<pathelement location="${ext.dir}/junit-4.12.jar" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="clean" description="Deletes all generated files and folders.">
+		<delete failonerror="false" includeemptydirs="true">
+			<fileset dir="${build.dir}" includes="**/*" />
+			<fileset dir="${test.reports}" includes="**/*" />
+		</delete>
+	</target>
+</project>
