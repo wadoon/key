@@ -1,6 +1,5 @@
 package de.tud.cs.se.ds.psec.compiler.ast;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +10,9 @@ import org.objectweb.asm.MethodVisitor;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -33,39 +35,6 @@ public class TacletTranslationFactory {
     private MethodVisitor mv;
     private TranslationDefinitions definitions = null;
     private ProgVarHelper pvHelper;
-
-    /**
-     * List of taclets that are not meant to be translated, for instance because
-     * they have no correspondent in bytecode or because they are followed by
-     * decomposed simpler statements in the proof tree.<br>
-     * 
-     * <strong>NOTE:</strong> The entries in this list have to be alphabetically
-     * sorted, since we perform a binary search on them.
-     */
-    private final static String[] UNTRANSLATED_TACLETS = {
-    //@formatter:off
-        "compound_addition_2",
-        "compound_assignment_3_nonsimple",
-        "compound_assignment_op_plus",
-        "compound_binary_AND_2",
-        "compound_greater_than_comparison_1",
-        "compound_int_cast_expression",
-        "compound_subtraction_1",
-        "for_to_while",
-        "ifElseUnfold",
-        "ifUnfold",
-        "loopComplexToSimple",
-        "postdecrement",
-        "postincrement",
-        "postincrement_assignment",
-        "preincrement_assignment",
-        "remove_parentheses_right",
-        "variableDeclaration",
-        "variableDeclarationAssign",
-        "widening_identity_cast_5",
-     };
-    //@formatter:on
-    // NOTE: Can replace above array with syntactic recognization of taclets not changing the symbolic state
 
     /**
      * Creates a new {@link TacletTranslationFactory}.
@@ -120,7 +89,7 @@ public class TacletTranslationFactory {
                     app);
         }
         else {
-            if (!isUntranslatedTaclet(tacletName)) {
+            if (!isSimplificationSETaclet(app.taclet())) {
                 logger.error(
                         "Don't know a translation of the following taclet app: %s",
                         app.rule().name());
@@ -132,6 +101,37 @@ public class TacletTranslationFactory {
         }
 
         return result == null ? Optional.empty() : Optional.of(result);
+    }
+
+    /**
+     * Checks whether a symbolic execution taclet is only simplifying the Java
+     * expression and therefore may be ignored in compilation (there will be
+     * further {@link TacletApp}s generated from those ignored
+     * {@link TacletApp}s that are actually compiled).
+     * <p>
+     * 
+     * We ignore a {@link Taclet} iff:
+     * <ul>
+     * <li>It has a <code>\replacewith</code> part generating exactly one new
+     * sequent, <strong>and</strong></li>
+     * <li>It does not change the symbolic state, i.e. the top level
+     * {@link Operator} of the <code>\replacewith</code> part is
+     * <strong>not</strong> an {@link UpdateApplication}.</li>
+     * </ul>
+     * 
+     * @param taclet
+     *            The {@link Taclet} to check.
+     * @return true iff this {@link Taclet} may be ignored in compilation.
+     */
+    private static boolean isSimplificationSETaclet(Taclet taclet) {
+        if (taclet.goalTemplates().size() != 1) {
+            return false;
+        }
+
+        Operator replTermTopLevelOp = ((Term) taclet.goalTemplates().head()
+                .replaceWithExpressionAsObject()).op();
+
+        return !(replTermTopLevelOp instanceof UpdateApplication);
     }
 
     /**
@@ -153,18 +153,5 @@ public class TacletTranslationFactory {
                 definitions.getDefinitionsFor(tacletName), mv, pvHelper, null);
 
         return result == null ? Optional.empty() : Optional.of(result);
-    }
-
-    /**
-     * Returns true iff the given taclet name corresponds to a taclet that
-     * should not be translated into bytecode.
-     *
-     * @param tacletName
-     *            Name of the taclet to check.
-     * @return iff the given taclet name corresponds to a taclet that should not
-     *         be translated into bytecode.
-     */
-    private static boolean isUntranslatedTaclet(String tacletName) {
-        return Arrays.binarySearch(UNTRANSLATED_TACLETS, tacletName) > -1;
     }
 }
