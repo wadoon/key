@@ -100,11 +100,11 @@ public class ParserTest extends TestCase {
         //@formatter:off
         sb
             .append("test {")
-            .append("  taclets (\"testTaclet\")")
+            .append("  \\taclets (\"testTaclet\")")
             // This should define an unsatisfiable condition
             .append("  \\condition (!#num-children >= 2)")
             .append("  \\condition ( #num-children >= 2)")
-            .append("  translation ()")
+            .append("  \\translation ( RETURN )")
             .append("}");
         //@formatter:on
 
