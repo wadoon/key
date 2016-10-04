@@ -25,7 +25,7 @@ import junit.framework.TestCase;
  *
  * @author Dominic Scheurer
  */
-public class CompilerFunctionalTests extends TestCase {
+public class SimpleCompilerFunctionalTests extends TestCase {
     private static final String FUNCTIONAL_TESTS_RELATIVE_DIR = "/resources/testcase/functional/";
     private static final String TMP_OUT_DIR = "./testTmp/";
 
@@ -35,7 +35,7 @@ public class CompilerFunctionalTests extends TestCase {
     protected void setUp() throws Exception {
         Files.createDirectories(Paths.get(TMP_OUT_DIR));
 
-        File projectRoot = IOUtil.getProjectRoot(CompilerFunctionalTests.class);
+        File projectRoot = IOUtil.getProjectRoot(SimpleCompilerFunctionalTests.class);
         functionalTestsDir = projectRoot + FUNCTIONAL_TESTS_RELATIVE_DIR;
     }
 

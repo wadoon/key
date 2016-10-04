@@ -18,7 +18,7 @@ public class TestAlfred extends TestSuite {
 
     @SuppressWarnings("unchecked")
     static Class<? extends TestCase>[] compilerTests = new Class[] {
-            de.tud.cs.se.ds.psec.compiler.CompilerFunctionalTests.class
+            de.tud.cs.se.ds.psec.compiler.SimpleCompilerFunctionalTests.class
     };
 
     public static TestSuite createSuite(Class<? extends TestCase>[] testClasses, final String msg) {
