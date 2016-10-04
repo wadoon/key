@@ -6,7 +6,7 @@ options {
 
 definitions
     :
-	definition +
+		definition +
         EOF
     ;
 
@@ -33,7 +33,7 @@ condition
     :
         CONDITION
         LPAREN
-        simple_expression
+        expression_atom
         RPAREN
     ;
 
@@ -154,7 +154,22 @@ integer
 	;
 
 // Condition expressions
-simple_expression
+expression_atom
+	:
+		NOT ? simple_arithmetic_expression # arithmeticExpressionAtom
+	|
+		NOT ? special_expression           # specialExpressionAtom
+	;
+
+special_expression
+	:
+		IS_SIMPLE_TYPE
+		LPAREN
+			LOC_REF
+		RPAREN          # simpleTypeExpression
+	;
+
+simple_arithmetic_expression
     :
         meta_var
         comparator

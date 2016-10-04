@@ -80,6 +80,12 @@ GEQ : '>=' ;
 LEQ : '<=' ;
 EQ  : '==' ;
 
+AND : '&';
+OR  : '|';
+NOT : '!';
+
+IS_SIMPLE_TYPE : 'isSimpleType';
+
 // Arithmetics
 
 MINUS : '-' ;

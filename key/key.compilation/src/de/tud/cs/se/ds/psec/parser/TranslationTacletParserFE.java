@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.ArithmeticExpressionAtomContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Child_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.ConditionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.DefinitionContext;
@@ -23,8 +24,10 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Labeled_bytecode_inst
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Negated_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Nullary_bytecode_instrContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_expressionContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SimpleTypeExpressionContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_arithmetic_expressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialExpressionAtomContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.TranslationContext;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
@@ -41,6 +44,10 @@ import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationTacletASTElement;
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 
 /**
  * Front-end for {@link TranslationTacletParser}, a parser for taclets defining
@@ -201,12 +208,59 @@ public class TranslationTacletParserFE extends
 
     @Override
     public ApplicabilityCondition visitCondition(ConditionContext ctx) {
-        return visitSimple_expression(ctx.simple_expression());
+        return (ApplicabilityCondition) visit(ctx.expression_atom());
+    }
+    
+    @Override
+    public ApplicabilityCondition visitArithmeticExpressionAtom(
+            ArithmeticExpressionAtomContext ctx) {
+        if (ctx.NOT() == null) {
+            return (ApplicabilityCondition) visit(ctx.simple_arithmetic_expression());
+        }
+        else {
+            final ApplicabilityCondition subCondition = (ApplicabilityCondition) visit(
+                    ctx.simple_arithmetic_expression());
+            return new ApplicabilityCondition(info -> {
+                return !subCondition.isApplicable(info);
+            });
+        }
+    }
+    
+    @Override
+    public ApplicabilityCondition visitSpecialExpressionAtom(
+            SpecialExpressionAtomContext ctx) {
+        if (ctx.NOT() == null) {
+            return (ApplicabilityCondition) visit(ctx.special_expression());
+        }
+        else {
+            final ApplicabilityCondition subCondition = (ApplicabilityCondition) visit(
+                    ctx.special_expression());
+            return new ApplicabilityCondition(info -> {
+                return !subCondition.isApplicable(info);
+            });
+        }
     }
 
     @Override
-    public ApplicabilityCondition visitSimple_expression(
-            Simple_expressionContext ctx) {
+    public ApplicabilityCondition visitSimpleTypeExpression(
+            SimpleTypeExpressionContext ctx) {
+        return new ApplicabilityCondition(info -> {
+            Expression expr = (Expression) info.getSchemaVarInstantiations()
+                    .lookupValue(new Name(ctx.LOC_REF().getText()));
+
+            if (!(expr instanceof LocationVariable)) {
+                return true;
+            }
+
+            LocationVariable locVar = (LocationVariable) expr;
+            return locVar.getKeYJavaType()
+                    .getJavaType() instanceof PrimitiveType;
+        });
+    }
+
+    @Override
+    public ApplicabilityCondition visitSimple_arithmetic_expression(
+            Simple_arithmetic_expressionContext ctx) {
         final String cmp = ctx.comparator().getText();
         final String metaVar = ctx.meta_var().getText();
         final int param2 = Integer.parseInt(ctx.integer().getText());
@@ -248,7 +302,7 @@ public class TranslationTacletParserFE extends
     public Instructions visitTranslation(TranslationContext ctx) {
         // Reset the label map
         labelMap = new HashMap<>();
-        
+
         ArrayList<Instruction> instructions = new ArrayList<>();
         ctx.instruction().forEach(i -> instructions.add(visitInstruction(i)));
 
@@ -263,7 +317,8 @@ public class TranslationTacletParserFE extends
     @Override
     public LabeledBytecodeInstr visitLabeled_bytecode_instr(
             Labeled_bytecode_instrContext ctx) {
-        return new LabeledBytecodeInstr(getUniquePerTranslationLabelName(ctx.LABEL().getText()),
+        return new LabeledBytecodeInstr(
+                getUniquePerTranslationLabelName(ctx.LABEL().getText()),
                 visit(ctx.bytecode_instr()));
     }
 

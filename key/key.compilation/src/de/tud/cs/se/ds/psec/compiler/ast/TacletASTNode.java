@@ -73,7 +73,7 @@ public class TacletASTNode implements Opcodes {
         logger.trace("Compiling %s", seTacletName);
 
         ApplicabilityCheckInput applCheckInput = new ApplicabilityCheckInput(
-                children.size());
+                children.size(), app.instantiations());
 
         List<TranslationDefinition> candidates = definitions.stream()
                 .filter(d -> d.isApplicable(applCheckInput))

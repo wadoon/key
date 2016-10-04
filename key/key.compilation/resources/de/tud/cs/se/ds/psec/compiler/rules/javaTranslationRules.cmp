@@ -46,6 +46,19 @@ while_loop_2_children {
 	)
 }
 
+// ####################
+// ### Method Calls ###
+// ####################
+
+/*
+methodCallWithAssignment {
+	\taclets ("methodCallWithAssignment")
+	\translation (
+		ALOAD //TODO 
+	)
+}
+*/
+
 // ###############
 // ### Returns ###
 // ############### 
@@ -63,6 +76,46 @@ return_void {
 	\taclets ("methodCallEmptyReturn")
 	\translation (
 		RETURN
+	)
+}
+
+// ###############
+// ### Objects ###
+// ###############
+
+/*equality_comparison_objects {
+	\taclets ("equality_comparison_simple")
+	\condition (!isSimpleType(#se0))
+	\condition (!isSimpleType(#se1))
+	\translation (
+		ALOAD #se0
+		ALOAD #se1
+	    IF_ACMPNE l1
+	    ICONST_1
+	    GOTO l2
+	    l1: ICONST_0
+	    l2: ISTORE #lhs
+	    #child-1
+	)
+}*/
+
+// #######################
+// ### Primitive Types ###
+// #######################
+
+equality_comparison_primitive {
+	\taclets ("equality_comparison_simple")
+	\condition (isSimpleType(#se0))
+	\condition (isSimpleType(#se1))
+	\translation (
+		\load (#se0)
+	    \load (#se1)
+	    IF_ICMPNE l1
+	    ICONST_1
+	    GOTO l2
+	    l1: ICONST_0
+	   	l2: ISTORE #lhs
+	   	#child-1
 	)
 }
 
@@ -126,20 +179,6 @@ compound_assignment {
 		l1: ICONST_1
 		l2: ISTORE #lhs
 		#child-1
-	)
-}
-
-equality_comparison {
-	\taclets ("equality_comparison_simple")
-	\translation (
-		\load (#se0)
-	    \load (#se1)
-	    IF_ICMPNE l1
-	    ICONST_1
-	    GOTO l2
-	    l1: ICONST_0
-	   	l2: ISTORE #lhs
-	   	#child-1
 	)
 }
 
