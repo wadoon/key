@@ -42,7 +42,7 @@ public class SimpleCompilerFunctionalTests extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-//        Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
+        Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
     }
 
     @Test
