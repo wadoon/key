@@ -21,13 +21,14 @@ public class SimpleObjects {
         this.i = i;
     }
     
+    //TODO: Compile following method.
     /*@ public normal_behavior
       @ requires true;
       @ ensures true;
       @*/
-    public boolean equals(SimpleObjects o1, SimpleObjects o2) {
-        return o1.i = o2.i;
-    }
+//    public boolean equals(SimpleObjects o1, SimpleObjects o2) {
+//        return o1.i = o2.i;
+//    }
     
     /*@ public normal_behavior
       @ requires true;

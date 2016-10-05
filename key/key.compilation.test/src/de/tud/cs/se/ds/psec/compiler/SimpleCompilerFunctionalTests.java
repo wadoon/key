@@ -1,10 +1,14 @@
 package de.tud.cs.se.ds.psec.compiler;
 
+import static org.junit.Assert.assertNotEquals;
+
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -43,7 +47,7 @@ public class SimpleCompilerFunctionalTests extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        // Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
+         Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
     }
 
     @Test
@@ -150,14 +154,32 @@ public class SimpleCompilerFunctionalTests extends TestCase {
     @Test
     public void testObjectConstructionAndMemberAccess() {
 
-        //@formatter:off
-//        compileAndTest(
-//                "simple/objects/SimpleObjects.java",
-//                "de.tud.test.simple.objects.SimpleObjects",
-//                "equals",
-//                new Class<?>[] { Object.class, Object.class },
-//                testDataEquals);
-        //@formatter:on
+        Class<?> simpleObjects = compile("simple/objects/SimpleObjects.java",
+                "de.tud.test.simple.objects.SimpleObjects");
+
+        try {
+
+            Constructor<?> ctor = simpleObjects.getConstructor(int.class);
+            final int paramArg = 3;
+            Object obj = ctor.newInstance(paramArg);
+
+            Field f = obj.getClass().getDeclaredField("i");
+
+            // Assert that the field was correctly compiled as a private one
+            assertNotEquals(0, f.getModifiers() & Modifier.PRIVATE);
+
+            // Make the field public to retrieve its value
+            f.setAccessible(true);
+
+            assertEquals("Field not initialized as expected", paramArg, f.getInt(obj));
+
+        } catch (NoSuchMethodException | SecurityException
+                | InstantiationException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException
+                | NoSuchFieldException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
     }
 
@@ -189,8 +211,7 @@ public class SimpleCompilerFunctionalTests extends TestCase {
                 assertEquals(testItem.getExpectedResult(),
                         method.invoke(null, testItem.getArguments()));
             }
-        }
-        catch (NoSuchMethodException | SecurityException
+        } catch (NoSuchMethodException | SecurityException
                 | IllegalArgumentException | IllegalAccessException
                 | InvocationTargetException
                 | TranslationTacletInputException e) {
@@ -235,8 +256,7 @@ public class SimpleCompilerFunctionalTests extends TestCase {
 
             return cls;
 
-        }
-        catch (TranslationTacletInputException | ProblemLoaderException
+        } catch (TranslationTacletInputException | ProblemLoaderException
                 | IOException | ClassNotFoundException e) {
             e.printStackTrace();
             fail(e.getMessage());
