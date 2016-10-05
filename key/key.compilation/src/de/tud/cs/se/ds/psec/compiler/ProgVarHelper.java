@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
  */
 public class ProgVarHelper {
     private HashMap<String, Integer> progVarOffsetMap = new HashMap<>();
-    private boolean isStatic;
 
     /**
      * Constructs a new {@link ProgVarHelper}. The helper has to know whether
@@ -29,11 +28,13 @@ public class ProgVarHelper {
      */
     public ProgVarHelper(boolean isStatic,
             Iterable<ParameterDeclaration> methodParameters) {
-        this.isStatic = isStatic;
-
+        if (!isStatic) {
+            progVarOffsetMap.put("this", 0);
+        }
+        
         for (ParameterDeclaration param : methodParameters) {
             progVarOffsetMap.put(param.getVariables().get(0).toString(),
-                    progVarOffsetMap.size() + (isStatic ? 0 : 1));
+                    progVarOffsetMap.size());
         }
     }
 
@@ -57,32 +58,11 @@ public class ProgVarHelper {
         else {
             // Offset 0 for "this" pointer, following ones for method
             // parameters, then for local variables.
-            int offset = progVarOffsetMap.size() + (isStatic ? 0 : 1);
+            int offset = progVarOffsetMap.size();
             progVarOffsetMap.put(progVarName, offset);
 
             return offset;
         }
-    }
-    
-    public static int test(int i) {
-        boolean x;
-        int x_1;
-        int x_2 = i;
-        int x_3 = i+1;
-        i = x_3;
-        x_1 = x_2;
-        x = x_1 > 0;
-        
-        while (x) {
-            i = i - 2;
-            int x_5 = i;
-            int x_6 = i + 1;
-            i = x_6;
-            int x_4 = x_5;
-            x = x_4 > 0;
-        }
-
-        return i;
     }
 
 }

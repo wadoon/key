@@ -15,6 +15,7 @@ import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.tud.cs.se.ds.psec.util.Utilities;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -32,6 +33,7 @@ public class TacletASTNode implements Opcodes {
     private TacletApp app;
     private List<TranslationDefinition> definitions;
     private String seTacletName;
+    private Services services;
 
     /**
      * Constructs a new {@link TacletASTNode} for a given {@link TacletApp}.
@@ -54,12 +56,13 @@ public class TacletASTNode implements Opcodes {
      */
     public TacletASTNode(String seTacletName,
             List<TranslationDefinition> definitions, MethodVisitor mv,
-            ProgVarHelper pvHelper, TacletApp app) {
+            ProgVarHelper pvHelper, TacletApp app, Services services) {
         this.app = app;
         this.mv = mv;
         this.pvHelper = pvHelper;
         this.definitions = definitions;
         this.seTacletName = seTacletName;
+        this.services = services;
     }
 
     /**
@@ -72,8 +75,12 @@ public class TacletASTNode implements Opcodes {
     public void compile() throws UnexpectedTranslationSituationException {
         logger.trace("Compiling %s", seTacletName);
 
+        // We allow the app to be null; this may happen e.g. in calls to
+        // TacletTranslationFactory#getTranslationForTacletWithoutArgs(String).
+        // If this is actually caused by an error, there will be a succeeding
+        // NullPointerException during the applicability check.
         ApplicabilityCheckInput applCheckInput = new ApplicabilityCheckInput(
-                children.size(), app.instantiations());
+                children.size(), (app == null ? null : app.instantiations()));
 
         List<TranslationDefinition> candidates = definitions.stream()
                 .filter(d -> d.isApplicable(applCheckInput))
@@ -86,8 +93,7 @@ public class TacletASTNode implements Opcodes {
 
             logger.error(message);
             throw new UnexpectedTranslationSituationException(message);
-        }
-        else if (candidates.size() > 1) {
+        } else if (candidates.size() > 1) {
             String message = Utilities.format(
                     "Too many translations (%s) found for the situation %s",
                     candidates.size(), applCheckInput);
@@ -97,7 +103,7 @@ public class TacletASTNode implements Opcodes {
 
         UniqueLabelManager labelManager = new UniqueLabelManager();
 
-        candidates.get(0).translate(mv, pvHelper, labelManager, app, children);
+        candidates.get(0).translate(mv, pvHelper, labelManager, app, services, children);
     }
 
     /**
@@ -155,7 +161,8 @@ public class TacletASTNode implements Opcodes {
      *             if not exactly one {@link TranslationDefinition} is
      *             applicable in the present situation for the first child.
      */
-    protected void compileFirstChild() throws UnexpectedTranslationSituationException {
+    protected void compileFirstChild()
+            throws UnexpectedTranslationSituationException {
         if (!children.isEmpty()) {
             children.get(0).compile();
         }

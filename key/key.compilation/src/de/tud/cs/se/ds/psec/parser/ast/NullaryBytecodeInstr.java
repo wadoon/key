@@ -8,6 +8,7 @@ import org.objectweb.asm.MethodVisitor;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -45,7 +46,8 @@ public class NullaryBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, TacletApp app, Services services,
+            List<TacletASTNode> children) {
 
         mv.visitInsn(opcode);
 

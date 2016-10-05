@@ -8,6 +8,7 @@ import org.objectweb.asm.MethodVisitor;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -29,9 +30,10 @@ public class Instructions extends TranslationTacletASTElement {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, final TacletApp app, List<TacletASTNode> children) {
-        instructions.forEach(i ->
-            i.translate(mv, pvHelper, labelManager, app, children));
+            UniqueLabelManager labelManager, final TacletApp app,
+            Services services, List<TacletASTNode> children) {
+        instructions.forEach(i -> i.translate(mv, pvHelper, labelManager, app,
+                services, children));
     }
 
 }

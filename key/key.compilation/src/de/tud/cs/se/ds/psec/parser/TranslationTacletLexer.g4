@@ -14,11 +14,11 @@ CONDITION
 LOAD
     : '\\load';
 
+METHOD_CALL
+	: '\\methodCall';
+
 NEGATE
     : '\\negate';
-
-IF
-    : '\\if';
 
 CHILD
     : '#child-'
@@ -108,6 +108,7 @@ IRETURN   : 'IRETURN';
 ISTORE    : 'ISTORE';
 ISUB      : 'ISUB';
 IXOR      : 'IXOR';
+PUTFIELD  : 'PUTFIELD';
 RETURN    : 'RETURN';
 
 // Meta variables

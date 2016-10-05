@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.declaration.Implements;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 /**
@@ -38,6 +39,20 @@ public class InformationExtraction implements Opcodes {
      */
     public static String toInternalName(String javaClassName) {
         return javaClassName.replaceAll("\\.", "/");
+    }
+
+    /**
+     * Internally (in bytecode), fully qualified class names are spelled out
+     * with slashes instead of dots as separators. This method returns an
+     * internal representation for the name of the supplied {@link KeYJavaType}.
+     *
+     * @param javaType
+     *            The type to return an internal name for.
+     * @return An internal representation of the class name of the given
+     *         {@link KeYJavaType}.
+     */
+    public static String toInternalName(KeYJavaType javaType) {
+        return toInternalName(javaType.getFullName());
     }
 
     /**
@@ -111,10 +126,9 @@ public class InformationExtraction implements Opcodes {
      */
     public static int createOpcode(TypeDeclaration classDecl) {
         return InformationExtraction.createOpcode(classDecl.isPublic(),
-                classDecl.isProtected(),
-                classDecl.isPrivate(), classDecl.isAbstract(),
-                classDecl.isFinal(), classDecl.isStatic(),
-                classDecl.isInterface());
+                classDecl.isProtected(), classDecl.isPrivate(),
+                classDecl.isAbstract(), classDecl.isFinal(),
+                classDecl.isStatic(), classDecl.isInterface());
     }
 
     /**
@@ -129,9 +143,9 @@ public class InformationExtraction implements Opcodes {
      */
     public static int createOpcode(ProgramMethod methodDecl) {
         return InformationExtraction.createOpcode(methodDecl.isPublic(),
-                methodDecl.isProtected(),
-                methodDecl.isPrivate(), methodDecl.isAbstract(),
-                methodDecl.isFinal(), methodDecl.isStatic(), false);
+                methodDecl.isProtected(), methodDecl.isPrivate(),
+                methodDecl.isAbstract(), methodDecl.isFinal(),
+                methodDecl.isStatic(), false);
     }
 
     /**
@@ -251,7 +265,7 @@ public class InformationExtraction implements Opcodes {
      * @return A method type descriptor describing the signature of the given
      *         {@link ProgramMethod}.
      */
-    public static String getMethodTypeDescriptor(ProgramMethod m) {
+    public static String getMethodTypeDescriptor(IProgramMethod m) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("(");

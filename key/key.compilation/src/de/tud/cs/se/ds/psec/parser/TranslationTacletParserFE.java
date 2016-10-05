@@ -22,8 +22,10 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstr
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Labeled_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeInstrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Method_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Negated_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Nullary_bytecode_instrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Putfield_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SimpleTypeExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_arithmetic_expressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrContext;
@@ -37,9 +39,11 @@ import de.tud.cs.se.ds.psec.parser.ast.Instructions;
 import de.tud.cs.se.ds.psec.parser.ast.IntegerUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LabelUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LabeledBytecodeInstr;
-import de.tud.cs.se.ds.psec.parser.ast.LoadIntInstruction;
+import de.tud.cs.se.ds.psec.parser.ast.LoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.LocVarUnaryBytecodeInstr;
+import de.tud.cs.se.ds.psec.parser.ast.MethodCallInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
+import de.tud.cs.se.ds.psec.parser.ast.PutfieldInstr;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationTacletASTElement;
@@ -179,8 +183,7 @@ public class TranslationTacletParserFE extends
             parser.definitions().definition()
                     .forEach(defn -> definitions.add(visitDefinition(defn)));
             return new TranslationDefinitions(definitions);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new TranslationTacletInputException(e.getMessage(), e);
         }
     }
@@ -210,14 +213,14 @@ public class TranslationTacletParserFE extends
     public ApplicabilityCondition visitCondition(ConditionContext ctx) {
         return (ApplicabilityCondition) visit(ctx.expression_atom());
     }
-    
+
     @Override
     public ApplicabilityCondition visitArithmeticExpressionAtom(
             ArithmeticExpressionAtomContext ctx) {
         if (ctx.NOT() == null) {
-            return (ApplicabilityCondition) visit(ctx.simple_arithmetic_expression());
-        }
-        else {
+            return (ApplicabilityCondition) visit(
+                    ctx.simple_arithmetic_expression());
+        } else {
             final ApplicabilityCondition subCondition = (ApplicabilityCondition) visit(
                     ctx.simple_arithmetic_expression());
             return new ApplicabilityCondition(info -> {
@@ -225,14 +228,13 @@ public class TranslationTacletParserFE extends
             });
         }
     }
-    
+
     @Override
     public ApplicabilityCondition visitSpecialExpressionAtom(
             SpecialExpressionAtomContext ctx) {
         if (ctx.NOT() == null) {
             return (ApplicabilityCondition) visit(ctx.special_expression());
-        }
-        else {
+        } else {
             final ApplicabilityCondition subCondition = (ApplicabilityCondition) visit(
                     ctx.special_expression());
             return new ApplicabilityCondition(info -> {
@@ -321,6 +323,12 @@ public class TranslationTacletParserFE extends
                 getUniquePerTranslationLabelName(ctx.LABEL().getText()),
                 visit(ctx.bytecode_instr()));
     }
+    
+    @Override
+    public TranslationTacletASTElement visitMethod_call(
+            Method_callContext ctx) {
+        return new MethodCallInstruction(ctx.call.getText());
+    }
 
     @Override
     public NullaryBytecodeInstr visitNullary_bytecode_instr(
@@ -351,15 +359,22 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
-    public LoadIntInstruction visitSimple_load_instr(
-            Simple_load_instrContext ctx) {
-        return new LoadIntInstruction(ctx.LOC_REF().getText(), false);
+    public PutfieldInstr visitPutfield_instr(
+            Putfield_instrContext ctx) {
+        return new PutfieldInstr(ctx.PUTFIELD().getText(), ctx.object.getText(),
+                ctx.field.getText());
     }
 
     @Override
-    public LoadIntInstruction visitNegated_load_instr(
+    public LoadInstruction visitSimple_load_instr(
+            Simple_load_instrContext ctx) {
+        return new LoadInstruction(ctx.LOC_REF().getText(), false);
+    }
+
+    @Override
+    public LoadInstruction visitNegated_load_instr(
             Negated_load_instrContext ctx) {
-        return new LoadIntInstruction(ctx.LOC_REF().getText(), true);
+        return new LoadInstruction(ctx.LOC_REF().getText(), true);
     }
 
     @Override
@@ -387,8 +402,7 @@ public class TranslationTacletParserFE extends
 
         if (labelMap.containsKey(labelName)) {
             result = labelMap.get(labelName);
-        }
-        else {
+        } else {
             result = "l" + labelCounter++;
             labelMap.put(labelName, result);
         }
@@ -407,8 +421,7 @@ public class TranslationTacletParserFE extends
 
         if (fileName == null) {
             return fallback;
-        }
-        else {
+        } else {
             return fileName;
         }
     }

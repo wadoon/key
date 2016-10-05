@@ -1,3 +1,10 @@
+// IMPORTANT
+// =========
+//
+// For any translation that should *not* be a final one in the
+// execution, remember to call the next node by "#child-1".
+
+
 // ###########################
 // ### Splitting and loops ###
 // ###########################
@@ -54,7 +61,8 @@ while_loop_2_children {
 methodCallWithAssignment {
 	\taclets ("methodCallWithAssignment")
 	\translation (
-		ALOAD //TODO 
+		ALOAD //TODO
+		#child-1
 	)
 }
 */
@@ -63,9 +71,9 @@ methodCallWithAssignment {
 // ### Returns ###
 // ############### 
 
-// TODO Check that really an int is returned!!!
 return_int {
 	\taclets ("methodCallReturn")
+	\condition (isSimpleType(#se))
 	\translation (
 		\load (#se)
 		IRETURN
@@ -83,6 +91,16 @@ return_void {
 // ### Objects ###
 // ###############
 
+assignment_write_attribute_this {
+	\taclets ("assignment_write_attribute_this")
+	\translation (
+		\load (#v)
+		\load (#se)
+		PUTFIELD #v.#a
+		#child-1
+	)
+}
+
 equality_comparison_objects {
 	\taclets ("equality_comparison_simple")
 	\condition (!isSimpleType(#se0))
@@ -96,6 +114,23 @@ equality_comparison_objects {
 	    l1: ICONST_0
 	    l2: ISTORE #lhs
 	    #child-1
+	)
+}
+
+method_body_expand {
+	\taclets ("methodBodyExpand")
+	\translation (
+		\methodCall (#mb)
+		#child-1
+	)
+}
+
+method_call_super {
+	\taclets ("methodCallSuper")
+	\translation (
+		// This SE taclet is translated to a methodBodyExpand,
+		// and can therefore be ignored
+		#child-1
 	)
 }
 

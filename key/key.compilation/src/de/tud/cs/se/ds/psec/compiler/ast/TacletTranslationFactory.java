@@ -12,6 +12,7 @@ import de.tud.cs.se.ds.psec.compiler.exceptions.NoTranslationException;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.util.Utilities;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -37,6 +38,7 @@ public class TacletTranslationFactory {
     private MethodVisitor mv;
     private TranslationDefinitions definitions = null;
     private ProgVarHelper pvHelper;
+    private Services services;
 
     /**
      * Creates a new {@link TacletTranslationFactory}.
@@ -51,10 +53,12 @@ public class TacletTranslationFactory {
      *            TODO
      */
     public TacletTranslationFactory(MethodVisitor mv, ProgVarHelper pvHelper,
-            TranslationDefinitions definitions) {
+            TranslationDefinitions definitions, Services services) {
+        super();
         this.mv = mv;
         this.pvHelper = pvHelper;
         this.definitions = definitions;
+        this.services = services;
     }
 
     /**
@@ -88,9 +92,8 @@ public class TacletTranslationFactory {
 
         if (candidates != null) {
             result = new TacletASTNode(tacletName, candidates, mv, pvHelper,
-                    app);
-        }
-        else {
+                    app, services);
+        } else {
             if (!isSimplificationSETaclet(app.taclet())) {
                 String message = Utilities.format(
                         "Don't know a translation of the following taclet app: %s",
@@ -98,8 +101,7 @@ public class TacletTranslationFactory {
 
                 logger.error(message);
                 throw new NoTranslationException(message);
-            }
-            else {
+            } else {
                 logger.debug("Ignoring taclet %s", app.rule().name());
             }
         }
@@ -154,7 +156,8 @@ public class TacletTranslationFactory {
         logger.trace("Translating taclet %s", tacletName);
 
         TacletASTNode result = new TacletASTNode(tacletName,
-                definitions.getDefinitionsFor(tacletName), mv, pvHelper, null);
+                definitions.getDefinitionsFor(tacletName), mv, pvHelper, null,
+                null);
 
         return result == null ? Optional.empty() : Optional.of(result);
     }

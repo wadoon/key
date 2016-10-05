@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -42,7 +43,7 @@ public class SimpleCompilerFunctionalTests extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
+        // Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
     }
 
     @Test
@@ -123,24 +124,17 @@ public class SimpleCompilerFunctionalTests extends TestCase {
     }
 
     @Test
-    public void testSimpleObjects() {
+    public void testObjectIdentity() {
 
         Object o1 = new Object();
         Object o2 = new Object();
-        
+
         List<TestData<Boolean>> testDataIdentical = Arrays.asList(
                 new TestData<Boolean>(true, "test", "test"),
                 new TestData<Boolean>(true, o1, o1),
                 new TestData<Boolean>(true, o2, o2),
                 new TestData<Boolean>(false, o1, o2),
                 new TestData<Boolean>(false, o1, "test"));
-        
-//        List<TestData<Boolean>> testDataEquals = Arrays.asList(
-//                new TestData<Boolean>(true, "test", "test"),
-//                new TestData<Boolean>(true, o1, o1),
-//                new TestData<Boolean>(true, o2, o2),
-//                new TestData<Boolean>(false, o1, o2),
-//                new TestData<Boolean>(false, o1, "test"));
 
         //@formatter:off
         compileAndTest(
@@ -150,6 +144,11 @@ public class SimpleCompilerFunctionalTests extends TestCase {
                 new Class<?>[] { Object.class, Object.class },
                 testDataIdentical);
         //@formatter:on
+
+    }
+
+    @Test
+    public void testObjectConstructionAndMemberAccess() {
 
         //@formatter:off
 //        compileAndTest(
@@ -165,11 +164,6 @@ public class SimpleCompilerFunctionalTests extends TestCase {
     /**
      * Compiles, loads and tests a static method.
      * 
-     * @param relPathToJavaFile
-     *            The path to the Java file to test, relative to
-     *            {@link #FUNCTIONAL_TESTS_RELATIVE_DIR}.
-     * @param className
-     *            The fully qualified class name of the class to test.
      * @param testMethodName
      *            The name of the method to test.
      * @param argTypes
@@ -185,6 +179,41 @@ public class SimpleCompilerFunctionalTests extends TestCase {
             List<TestData<C>> testData) {
 
         try {
+            Class<?> cls = compile(relPathToJavaFile, className);
+
+            assertNotNull("Compiled class could not be loaded", cls);
+
+            Method method = cls.getMethod(testMethodName, argTypes);
+
+            for (TestData<C> testItem : testData) {
+                assertEquals(testItem.getExpectedResult(),
+                        method.invoke(null, testItem.getArguments()));
+            }
+        }
+        catch (NoSuchMethodException | SecurityException
+                | IllegalArgumentException | IllegalAccessException
+                | InvocationTargetException
+                | TranslationTacletInputException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Compiles the class with name <code>className</code> in the Java file at
+     * the path <code>relPathToJavaFile</code>.
+     * 
+     * @param relPathToJavaFile
+     *            The path to the Java file to test, relative to
+     *            {@link #FUNCTIONAL_TESTS_RELATIVE_DIR}.
+     * @param className
+     *            The fully qualified class name of the class to test.
+     * @return The compiled {@link Class} file, if compilation was successful;
+     *         otherwise, the test will {@link #fail()}.
+     */
+    private Class<?> compile(String relPathToJavaFile, String className) {
+        try {
+
             Compiler compiler = new Compiler(
                     new File(functionalTestsDir, relPathToJavaFile),
                     TMP_OUT_DIR, true, true, false);
@@ -204,22 +233,14 @@ public class SimpleCompilerFunctionalTests extends TestCase {
             Class<?> cls = cl.loadClass(className);
             cl.close();
 
-            assertNotNull("Compiled class could not be loaded", cls);
+            return cls;
 
-            Method method = cls.getMethod(testMethodName, argTypes);
-
-            for (TestData<C> testItem : testData) {
-                assertEquals(testItem.getExpectedResult(),
-                        method.invoke(null, testItem.getArguments()));
-            }
         }
-        catch (NoSuchMethodException | SecurityException
-                | IllegalArgumentException | ClassNotFoundException
-                | IllegalAccessException | InvocationTargetException
-                | TranslationTacletInputException | ProblemLoaderException
-                | IOException e) {
+        catch (TranslationTacletInputException | ProblemLoaderException
+                | IOException | ClassNotFoundException e) {
             e.printStackTrace();
             fail(e.getMessage());
+            return null;
         }
     }
 

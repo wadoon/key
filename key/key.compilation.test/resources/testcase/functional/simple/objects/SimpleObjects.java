@@ -1,21 +1,40 @@
 package de.tud.test.simple.objects;
 
+/**
+ * Demonstrates some simple object-oriented features: Identity on objects,
+ * construction of objects with parameters, and field access.
+ *
+ * @author Dominic Scheurer
+ */
 public class SimpleObjects {
+    private int i;
     
-  /*@ public normal_behavior
-    @ requires true;
-    @ ensures true;
-    @*/
-  public static boolean identical(Object o1, Object o2) {
-      return o1 == o2;
-  }
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
+    public SimpleObjects(int i) {
+        //TODO: Currently, we have to do an explicit super() call.
+        // This should be done by the compiler if we omit it.
+        super();
+        
+        this.i = i;
+    }
     
-  /*@ public normal_behavior
-    @ requires true;
-    @ ensures true;
-    @*/
-//  public static boolean equals(Object o1, Object o2) {
-//      return o1.equals(o2);
-//  }
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
+    public boolean equals(SimpleObjects o1, SimpleObjects o2) {
+        return o1.i = o2.i;
+    }
+    
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
+    public static boolean identical(Object o1, Object o2) {
+        return o1 == o2;
+    }
   
 }

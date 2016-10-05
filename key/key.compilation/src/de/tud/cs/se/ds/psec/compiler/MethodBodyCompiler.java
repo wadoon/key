@@ -15,6 +15,7 @@ import de.tud.cs.se.ds.psec.compiler.ast.TacletTranslationFactory;
 import de.tud.cs.se.ds.psec.compiler.exceptions.NoTranslationException;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.util.Utilities;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -55,13 +56,13 @@ public class MethodBodyCompiler implements Opcodes {
      * @param isVoid
      *            TODO
      */
-    public MethodBodyCompiler(MethodVisitor mv,
+    public MethodBodyCompiler(MethodVisitor mv, Services services,
             Iterable<ParameterDeclaration> methodParameters,
             TranslationDefinitions definitions, boolean isStatic,
             boolean isVoid) {
         this.pvHelper = new ProgVarHelper(isStatic, methodParameters);
         this.translationFactory = new TacletTranslationFactory(mv, pvHelper,
-                definitions);
+                definitions, services);
         this.isVoid = isVoid;
 
         methodParameters.forEach(p -> pvHelper
@@ -110,8 +111,7 @@ public class MethodBodyCompiler implements Opcodes {
                             .getTranslationForTacletWithoutArgs(
                                     "methodCallEmptyReturn")
                             .get());
-                }
-                else {
+                } else {
                     stack.push(child);
                 }
             });
@@ -209,13 +209,11 @@ public class MethodBodyCompiler implements Opcodes {
 
             if (currentProofNode.childrenCount() == 1) {
                 currentProofNode = currentProofNode.child(0);
-            }
-            else {
+            } else {
                 // No children, or this is a branching node
                 break;
             }
-        }
-        while (true);
+        } while (true);
 
         return new Pair<>(currentProofNode, astCurrentNode);
     }
@@ -231,8 +229,7 @@ public class MethodBodyCompiler implements Opcodes {
         if (ruleApp instanceof TacletApp) {
             TacletApp app = (TacletApp) ruleApp;
             return translationFactory.getTranslationForTacletApp(app);
-        }
-        else {
+        } else {
             // TODO Are there other cases to support?
             String message = Utilities.format(
                     "Did not translate the following app: %s, statement: %s",

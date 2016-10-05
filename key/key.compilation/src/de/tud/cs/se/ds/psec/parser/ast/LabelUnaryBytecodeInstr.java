@@ -12,6 +12,7 @@ import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnknownInstructionException;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.tud.cs.se.ds.psec.util.Utilities;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -51,7 +52,7 @@ public class LabelUnaryBytecodeInstr extends Instruction {
         if (!OPCODES_MAP.containsKey(insn)) {
             String message = Utilities.format("Unknown instruction %s", insn);
             logger.error(message);
-            
+
             throw new UnknownInstructionException(message);
         }
 
@@ -60,7 +61,8 @@ public class LabelUnaryBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, TacletApp app, Services services,
+            List<TacletASTNode> children) {
 
         mv.visitJumpInsn(opcode, labelManager.getLabelForName(labelName));
 

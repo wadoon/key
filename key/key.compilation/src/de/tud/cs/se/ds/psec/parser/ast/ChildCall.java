@@ -7,6 +7,7 @@ import org.objectweb.asm.MethodVisitor;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -22,7 +23,8 @@ public class ChildCall extends Instruction {
      * Constructs a new {@link ChildCall} to the child in the taclet AST with
      * the given number.
      * 
-     * @param childNo The numer of the child to be compiled.
+     * @param childNo
+     *            The numer of the child to be compiled.
      */
     public ChildCall(int childNo) {
         this.childNo = childNo;
@@ -30,8 +32,9 @@ public class ChildCall extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, List<TacletASTNode> children) {
-        //XXX Remove this hack!!!
+            UniqueLabelManager labelManager, TacletApp app, Services services,
+            List<TacletASTNode> children) {
+        // XXX Remove this hack!!!
         if (children.size() > childNo - 1) {
             children.get(childNo - 1).compile();
         }

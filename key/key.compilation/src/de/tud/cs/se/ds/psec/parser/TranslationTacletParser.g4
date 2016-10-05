@@ -63,7 +63,11 @@ bytecode_instr
     |
         unary_bytecode_instr
     |
+    	putfield_instr
+    |
         load_instr
+    |
+    	method_call
     |
         child_call
     ;
@@ -91,6 +95,14 @@ unary_bytecode_instr
     |
     	int_const_unary_instrs integer # intUnaryBytecodeInstr
     ;
+
+putfield_instr
+	:
+		PUTFIELD
+		(object = LOC_REF)
+		DOT
+		(field = LOC_REF)
+	;
 
 loc_var_unary_instrs
 	:
@@ -146,6 +158,14 @@ negated_load_instr
             RPAREN
         RPAREN
     ;
+
+method_call
+	:
+		METHOD_CALL
+		LPAREN
+			(call = LOC_REF)
+		RPAREN
+	;
 
 child_call
     :

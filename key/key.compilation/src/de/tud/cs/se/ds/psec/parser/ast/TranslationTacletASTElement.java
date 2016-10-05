@@ -13,6 +13,7 @@ import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnsupportedFeatureException;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.tud.cs.se.ds.psec.util.Utilities;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -47,7 +48,7 @@ public abstract class TranslationTacletASTElement implements Opcodes {
      *            translation.
      */
     public abstract void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app,
+            UniqueLabelManager labelManager, TacletApp app, Services services,
             List<TacletASTNode> children);
 
     /**
@@ -73,11 +74,9 @@ public abstract class TranslationTacletASTElement implements Opcodes {
         if (theInt < -1 || theInt > 5) {
             if (theInt >= Byte.MIN_VALUE && theInt <= Byte.MAX_VALUE) {
                 mv.visitIntInsn(BIPUSH, theInt);
-            }
-            else if (theInt >= Short.MIN_VALUE && theInt <= Short.MAX_VALUE) {
+            } else if (theInt >= Short.MIN_VALUE && theInt <= Short.MAX_VALUE) {
                 mv.visitIntInsn(SIPUSH, theInt);
-            }
-            else {
+            } else {
                 String message = Utilities.format(
                         "Constants in full Integer range not yet covered, given: %s",
                         theInt);
@@ -85,26 +84,19 @@ public abstract class TranslationTacletASTElement implements Opcodes {
 
                 throw new UnsupportedFeatureException(message);
             }
-        }
-        else if (theInt == -1) {
+        } else if (theInt == -1) {
             mv.visitInsn(ICONST_M1);
-        }
-        else if (theInt == 0) {
+        } else if (theInt == 0) {
             mv.visitInsn(ICONST_0);
-        }
-        else if (theInt == 1) {
+        } else if (theInt == 1) {
             mv.visitInsn(ICONST_1);
-        }
-        else if (theInt == 2) {
+        } else if (theInt == 2) {
             mv.visitInsn(ICONST_2);
-        }
-        else if (theInt == 3) {
+        } else if (theInt == 3) {
             mv.visitInsn(ICONST_3);
-        }
-        else if (theInt == 4) {
+        } else if (theInt == 4) {
             mv.visitInsn(ICONST_4);
-        }
-        else if (theInt == 5) {
+        } else if (theInt == 5) {
             mv.visitInsn(ICONST_5);
         }
     }

@@ -151,8 +151,7 @@ public class Compiler {
             try {
                 Files.createDirectories(path.getParent());
                 Files.write(path, compilationResult.getBytecode());
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 logger.error(
                         "I/O exception in writing compiled file to disk, message:\n%s",
                         e.getMessage());
@@ -179,8 +178,7 @@ public class Compiler {
         if (typeDecl instanceof ClassDeclaration
                 || typeDecl instanceof InterfaceDeclaration) {
             return compile((TypeDeclaration) typeDecl);
-        }
-        else {
+        } else {
             throw new UnsupportedOperationException(
                     "Unexpected top level type: " + typeDecl.getFullName());
         }
@@ -217,20 +215,17 @@ public class Compiler {
             members.forEach(m -> {
                 if (m.getClass().equals(FieldDeclaration.class)) {
                     compile(cw, (FieldDeclaration) m);
-                }
-                else if (m.getClass().equals(ProgramMethod.class)
+                } else if (m.getClass().equals(ProgramMethod.class)
                         && !((ProgramMethod) m).getName().endsWith(">")) {
                     compile(cw, (ProgramMethod) m);
-                }
-                else {
+                } else {
                     // TODO: Throw exception
                 }
             });
 
             cw.visitEnd();
 
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
 
             if (debug) {
                 logger.error("%s, message: %s", e.getClass().getName(),
@@ -245,8 +240,7 @@ public class Compiler {
                     logger.error("Bytecode failed verification:");
                     logger.error(sw);
                 }
-            }
-            else {
+            } else {
                 logger.error(
                         "Compilation failed. This is probably due to an error in one of "
                                 + "the translation methods. Run with argument --debug "
@@ -270,15 +264,19 @@ public class Compiler {
      *            The {@link ProgramMethod} to compile.
      */
     private void compile(ClassWriter cw, ProgramMethod mDecl) {
-        logger.debug("Compiling method %s::%s",
+        logger.debug("Compiling %s %s::%s",
+                mDecl.isConstructor() ? "Constructor" : "method",
                 mDecl.getContainerType().getJavaType().getFullName(),
                 mDecl.getName());
 
         int accessFlags = InformationExtraction.createOpcode(mDecl);
         String descriptor = InformationExtraction
                 .getMethodTypeDescriptor(mDecl);
-        MethodVisitor mv = cw.visitMethod(accessFlags, mDecl.getName(),
-                descriptor, null, null);
+        MethodVisitor mv = cw.visitMethod(accessFlags,
+                mDecl.isConstructor() ? "<init>" : mDecl.getName(), descriptor,
+                null, // Signature (for Generics)
+                null // Exceptions (TODO!)
+        );
 
         //@formatter:off
         // The following structure could be used to simplicfy the allocation
@@ -286,7 +284,7 @@ public class Compiler {
 //        LocalVariablesSorter sorter = new LocalVariablesSorter(accessFlags,
 //                descriptor, mv);
         //@formatter:on
-        
+
         if (!mDecl.isAbstract()) {
             mv.visitCode();
 
@@ -302,8 +300,7 @@ public class Compiler {
                     builder.getProof().saveToFile(new File(proofFileName));
                     logger.info("Dumping proof tree to file %s", proofFileName);
 
-                }
-                catch (java.io.IOException e) {
+                } catch (java.io.IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -311,8 +308,9 @@ public class Compiler {
             logger.trace("Translating SET of method %s::%s to bytecode",
                     mDecl.getContainerType().getJavaType().getFullName(),
                     mDecl.getName());
-            new MethodBodyCompiler(mv, mDecl.getParameters(), definitions,
-                    mDecl.isStatic(), mDecl.isVoid()).compile(builder);
+            new MethodBodyCompiler(mv, builder.getProof().getServices(),
+                    mDecl.getParameters(), definitions, mDecl.isStatic(),
+                    mDecl.isVoid() || mDecl.isConstructor()).compile(builder);
         }
 
         mv.visitMaxs(-1, -1);

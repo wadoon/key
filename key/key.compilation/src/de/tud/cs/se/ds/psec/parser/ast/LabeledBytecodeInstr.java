@@ -7,6 +7,7 @@ import org.objectweb.asm.MethodVisitor;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -33,10 +34,12 @@ public class LabeledBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, TacletApp app, Services services,
+            List<TacletASTNode> children) {
 
         mv.visitLabel(labelManager.getLabelForName(labelName));
-        labeledInstruction.translate(mv, pvHelper, labelManager, app, children);
+        labeledInstruction.translate(mv, pvHelper, labelManager, app, services,
+                children);
 
     }
 
