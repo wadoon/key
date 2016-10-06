@@ -79,7 +79,20 @@ public class TranslationDefinition extends TranslationTacletASTElement {
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             UniqueLabelManager labelManager, TacletApp app, Services services,
             List<TacletASTNode> children) {
-        instructions.translate(mv, pvHelper, labelManager, app, services, children);
+        instructions.translate(mv, pvHelper, labelManager, app, services,
+                children);
+    }
+
+    /**
+     * Computes the number of children calls as defined in the
+     * {@link TranslationDefinition}. This may be used to ignore branches in the
+     * SET that should be ignored according to the translation.
+     * 
+     * @return The number of children calls in this
+     *         {@link TranslationDefinition}.
+     */
+    public int numberOfChildrenCalls() {
+        return instructions.numberOfChildrenCalls();
     }
 
 }

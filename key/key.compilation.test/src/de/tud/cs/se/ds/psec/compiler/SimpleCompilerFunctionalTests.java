@@ -54,10 +54,10 @@ public class SimpleCompilerFunctionalTests extends TestCase {
     public void testSimpleArithmeticAndIf() {
 
         List<TestData<Integer>> testData = Arrays.asList(
-                new TestData<Integer>(5, 10, true),
-                new TestData<Integer>(5, 10, false),
-                new TestData<Integer>(42, 4, true),
-                new TestData<Integer>(42, 4, false));
+                new TestData<Integer>(5, null, 10, true),
+                new TestData<Integer>(5, null, 10, false),
+                new TestData<Integer>(42, null, 4, true),
+                new TestData<Integer>(42, null, 4, false));
 
         //@formatter:off
         compileAndTest(
@@ -74,8 +74,10 @@ public class SimpleCompilerFunctionalTests extends TestCase {
     public void testSimpleWhile() {
 
         List<TestData<Integer>> testData = Arrays.asList(
-                new TestData<Integer>(0, 10), new TestData<Integer>(0, 100),
-                new TestData<Integer>(0, 42), new TestData<Integer>(-1, -1));
+                new TestData<Integer>(0, null, 10),
+                new TestData<Integer>(0, null, 100),
+                new TestData<Integer>(0, null, 42),
+                new TestData<Integer>(-1, null, -1));
 
         //@formatter:off
         compileAndTest(
@@ -93,8 +95,10 @@ public class SimpleCompilerFunctionalTests extends TestCase {
             ProblemLoaderException, IOException {
 
         List<TestData<Integer>> testData = Arrays.asList(
-                new TestData<Integer>(16, 10), new TestData<Integer>(106, 100),
-                new TestData<Integer>(48, 42), new TestData<Integer>(5, -1));
+                new TestData<Integer>(16, null, 10),
+                new TestData<Integer>(106, null, 100),
+                new TestData<Integer>(48, null, 42),
+                new TestData<Integer>(5, null, -1));
 
         //@formatter:off
         compileAndTest(
@@ -111,10 +115,10 @@ public class SimpleCompilerFunctionalTests extends TestCase {
     public void testSimpleBoolean() {
 
         List<TestData<Boolean>> testData = Arrays.asList(
-                new TestData<Boolean>(false, false, false),
-                new TestData<Boolean>(false, false, true),
-                new TestData<Boolean>(false, true, false),
-                new TestData<Boolean>(true, true, true));
+                new TestData<Boolean>(false, null, false, false),
+                new TestData<Boolean>(false, null, false, true),
+                new TestData<Boolean>(false, null, true, false),
+                new TestData<Boolean>(true, null, true, true));
 
         //@formatter:off
         compileAndTest(
@@ -134,11 +138,11 @@ public class SimpleCompilerFunctionalTests extends TestCase {
         Object o2 = new Object();
 
         List<TestData<Boolean>> testDataIdentical = Arrays.asList(
-                new TestData<Boolean>(true, "test", "test"),
-                new TestData<Boolean>(true, o1, o1),
-                new TestData<Boolean>(true, o2, o2),
-                new TestData<Boolean>(false, o1, o2),
-                new TestData<Boolean>(false, o1, "test"));
+                new TestData<Boolean>(true, null, "test", "test"),
+                new TestData<Boolean>(true, null, o1, o1),
+                new TestData<Boolean>(true, null, o2, o2),
+                new TestData<Boolean>(false, null, o1, o2),
+                new TestData<Boolean>(false, null, o1, "test"));
 
         //@formatter:off
         compileAndTest(
@@ -160,18 +164,32 @@ public class SimpleCompilerFunctionalTests extends TestCase {
         try {
 
             Constructor<?> ctor = simpleObjects.getConstructor(int.class);
-            final int paramArg = 3;
-            Object obj = ctor.newInstance(paramArg);
 
-            Field f = obj.getClass().getDeclaredField("i");
+            final int paramArg = 1;
+            Object o1 = ctor.newInstance(paramArg);
+
+            Field f = o1.getClass().getDeclaredField("i");
 
             // Assert that the field was correctly compiled as a private one
-            assertNotEquals(0, f.getModifiers() & Modifier.PRIVATE);
+            assertNotEquals("Field not private as expected", 0,
+                    f.getModifiers() & Modifier.PRIVATE);
 
             // Make the field public to retrieve its value
             f.setAccessible(true);
 
-            assertEquals("Field not initialized as expected", paramArg, f.getInt(obj));
+            assertEquals("Field not initialized as expected", paramArg,
+                    f.getInt(o1));
+
+            Object o2 = ctor.newInstance(1);
+            Object o3 = ctor.newInstance(2);
+
+            List<TestData<Boolean>> testDataEquals = Arrays.asList(
+                    new TestData<Boolean>(true, o1, o1),
+                    new TestData<Boolean>(true, o1, o2),
+                    new TestData<Boolean>(false, o1, o3));
+
+            runTests(simpleObjects, "equals", new Class<?>[] { simpleObjects },
+                    testDataEquals);
 
         } catch (NoSuchMethodException | SecurityException
                 | InstantiationException | IllegalAccessException
@@ -201,16 +219,50 @@ public class SimpleCompilerFunctionalTests extends TestCase {
             List<TestData<C>> testData) {
 
         try {
-            Class<?> cls = compile(relPathToJavaFile, className);
 
+            Class<?> cls = compile(relPathToJavaFile, className);
             assertNotNull("Compiled class could not be loaded", cls);
+            runTests(cls, testMethodName, argTypes, testData);
+
+        } catch (SecurityException | IllegalArgumentException
+                | TranslationTacletInputException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Compiles, loads and tests a static method.
+     * 
+     * @param cls
+     *            The {@link Class} containing the method to test.
+     * @param testMethodName
+     *            The name of the method to test.
+     * @param argTypes
+     *            An array of {@link Class}es of the arguments for the method to
+     *            test.
+     * @param testData
+     *            The {@link TestData} object.
+     * @param <C>
+     *            The type for the expected results in the test data.
+     */
+    private <C> void runTests(Class<?> cls, String testMethodName,
+            Class<?>[] argTypes, List<TestData<C>> testData) {
+
+        try {
 
             Method method = cls.getMethod(testMethodName, argTypes);
 
             for (TestData<C> testItem : testData) {
-                assertEquals(testItem.getExpectedResult(),
-                        method.invoke(null, testItem.getArguments()));
+                //@formatter:off
+                assertEquals(
+                        testItem.getExpectedResult(),
+                        method.invoke(
+                                testItem.getThisObject(),
+                                testItem.getArguments()));
+                //@formatter:on
             }
+
         } catch (NoSuchMethodException | SecurityException
                 | IllegalArgumentException | IllegalAccessException
                 | InvocationTargetException
@@ -273,15 +325,31 @@ public class SimpleCompilerFunctionalTests extends TestCase {
      */
     private static class TestData<C> {
         private C expectedResult;
+        private Object thisObject;
         private Object[] arguments;
 
-        public TestData(C expectedResult, Object... arguments) {
+        /**
+         * @param expectedResult
+         *            The expected result for the test.
+         * @param thisObject
+         *            The "this" object for executing a method. May be null if
+         *            the method under test is static.
+         * @param arguments
+         *            The arguments for the test.
+         */
+        public TestData(C expectedResult, Object thisObject,
+                Object... arguments) {
             this.expectedResult = expectedResult;
+            this.thisObject = thisObject;
             this.arguments = arguments;
         }
 
         public C getExpectedResult() {
             return expectedResult;
+        }
+
+        public Object getThisObject() {
+            return thisObject;
         }
 
         public Object[] getArguments() {

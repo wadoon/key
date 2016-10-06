@@ -63,7 +63,7 @@ bytecode_instr
     |
         unary_bytecode_instr
     |
-    	putfield_instr
+    	field_instr
     |
         load_instr
     |
@@ -96,9 +96,9 @@ unary_bytecode_instr
     	int_const_unary_instrs integer # intUnaryBytecodeInstr
     ;
 
-putfield_instr
+field_instr
 	:
-		PUTFIELD
+		(instr = (GETFIELD | PUTFIELD))
 		(object = LOC_REF)
 		DOT
 		(field = LOC_REF)
@@ -107,6 +107,8 @@ putfield_instr
 loc_var_unary_instrs
 	:
 		ALOAD
+	|
+		ASTORE
 	|
 		ISTORE
 	;

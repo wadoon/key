@@ -61,7 +61,6 @@
 	</target>
 
 	<target name="tacletlexer" unless="tacletlexer.notRequired">
-	<!--<target name="tacletlexer">-->
 		<echo message="Running antlr ..." />
 		<java jar="${ext.dir}/antlr-v4.jar" fork="true" failonerror="true">
 			<arg value="-package" />
@@ -73,7 +72,6 @@
 	</target>
 
 	<target name="tacletparser" depends="tacletlexer" unless="tacletparser.notRequired">
-	<!--<target name="tacletparser" depends="tacletlexer">-->
 		<echo message="Running antlr ..." />
 		<java jar="${ext.dir}/antlr-v4.jar" fork="true" failonerror="true">
 			<arg value="-no-listener" />
@@ -95,6 +93,8 @@
 			classpathref="classpath"
 			includeantruntime="false"
 			deprecation="true"
+			debug="true"
+			debuglevel="lines,vars,source"
 			source="1.8" />
 	</target>
 

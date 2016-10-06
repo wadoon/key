@@ -26,6 +26,7 @@ public class LocVarUnaryBytecodeInstr extends Instruction {
 
     static {
         OPCODES_MAP.put("ALOAD", ALOAD);
+        OPCODES_MAP.put("ASTORE", ASTORE);
         OPCODES_MAP.put("ISTORE", ISTORE);
     }
 

@@ -26,9 +26,9 @@ public class SimpleObjects {
       @ requires true;
       @ ensures true;
       @*/
-//    public boolean equals(SimpleObjects o1, SimpleObjects o2) {
-//        return o1.i = o2.i;
-//    }
+    public boolean equals(SimpleObjects o) {
+        return i == o.i;
+    }
     
     /*@ public normal_behavior
       @ requires true;

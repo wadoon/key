@@ -67,6 +67,23 @@ methodCallWithAssignment {
 }
 */
 
+method_body_expand {
+	\taclets ("methodBodyExpand")
+	\translation (
+		\methodCall (#mb)
+		#child-1
+	)
+}
+
+method_call_super {
+	\taclets ("methodCallSuper")
+	\translation (
+		// This SE taclet is translated to a methodBodyExpand,
+		// and can therefore be ignored
+		#child-1
+	)
+}
+
 // ###############
 // ### Returns ###
 // ############### 
@@ -101,6 +118,31 @@ assignment_write_attribute_this {
 	)
 }
 
+// For assignment_read_attribute, we ignore
+// the possible NullPointerExceptions so far.
+// In the future, we could try to prevent those.
+assignment_read_attribute_object {
+	\taclets ("assignment_read_attribute", "assignment_read_attribute_this")
+	\condition (!isSimpleType(#v0))
+	\translation (
+		\load (#v)
+		GETFIELD #v.#a
+		ASTORE #v0
+		#child-1
+	)
+}
+
+assignment_read_attribute_primitive {
+	\taclets ("assignment_read_attribute", "assignment_read_attribute_this")
+	\condition (isSimpleType(#v0))
+	\translation (
+		\load (#v)
+		GETFIELD #v.#a
+		ISTORE #v0
+		#child-1
+	)
+}
+
 equality_comparison_objects {
 	\taclets ("equality_comparison_simple")
 	\condition (!isSimpleType(#se0))
@@ -114,23 +156,6 @@ equality_comparison_objects {
 	    l1: ICONST_0
 	    l2: ISTORE #lhs
 	    #child-1
-	)
-}
-
-method_body_expand {
-	\taclets ("methodBodyExpand")
-	\translation (
-		\methodCall (#mb)
-		#child-1
-	)
-}
-
-method_call_super {
-	\taclets ("methodCallSuper")
-	\translation (
-		// This SE taclet is translated to a methodBodyExpand,
-		// and can therefore be ignored
-		#child-1
 	)
 }
 

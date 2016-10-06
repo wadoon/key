@@ -17,6 +17,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.ArithmeticExpressionA
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Child_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.ConditionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.DefinitionContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Field_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
@@ -25,7 +26,6 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeIn
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Method_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Negated_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Nullary_bytecode_instrContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Putfield_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SimpleTypeExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_arithmetic_expressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrContext;
@@ -34,6 +34,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.TranslationContext;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
 import de.tud.cs.se.ds.psec.parser.ast.ChildCall;
+import de.tud.cs.se.ds.psec.parser.ast.FieldInstr;
 import de.tud.cs.se.ds.psec.parser.ast.Instruction;
 import de.tud.cs.se.ds.psec.parser.ast.Instructions;
 import de.tud.cs.se.ds.psec.parser.ast.IntegerUnaryBytecodeInstr;
@@ -43,7 +44,6 @@ import de.tud.cs.se.ds.psec.parser.ast.LoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.LocVarUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.MethodCallInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
-import de.tud.cs.se.ds.psec.parser.ast.PutfieldInstr;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationTacletASTElement;
@@ -321,7 +321,7 @@ public class TranslationTacletParserFE extends
             Labeled_bytecode_instrContext ctx) {
         return new LabeledBytecodeInstr(
                 getUniquePerTranslationLabelName(ctx.LABEL().getText()),
-                visit(ctx.bytecode_instr()));
+                (Instruction) visit(ctx.bytecode_instr()));
     }
     
     @Override
@@ -359,9 +359,9 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
-    public PutfieldInstr visitPutfield_instr(
-            Putfield_instrContext ctx) {
-        return new PutfieldInstr(ctx.PUTFIELD().getText(), ctx.object.getText(),
+    public FieldInstr visitField_instr(
+            Field_instrContext ctx) {
+        return new FieldInstr(ctx.instr.getText(), ctx.object.getText(),
                 ctx.field.getText());
     }
 

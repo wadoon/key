@@ -1,6 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler.ast;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,7 +104,8 @@ public class TacletASTNode implements Opcodes {
 
         UniqueLabelManager labelManager = new UniqueLabelManager();
 
-        candidates.get(0).translate(mv, pvHelper, labelManager, app, services, children);
+        candidates.get(0).translate(mv, pvHelper, labelManager, app, services,
+                children);
     }
 
     /**
@@ -152,6 +154,17 @@ public class TacletASTNode implements Opcodes {
      */
     public String seTacletName() {
         return seTacletName;
+    }
+
+    /**
+     * @return The maximum number of children calls in the
+     *         {@link TranslationDefinition}s supplied to this
+     *         {@link TacletASTNode}.
+     */
+    public int maxNumberOfChildrenCallsInTranslations() {
+        return definitions.stream()
+                .map(TranslationDefinition::numberOfChildrenCalls)
+                .collect(Collectors.maxBy(Comparator.naturalOrder())).get();
     }
 
     /**

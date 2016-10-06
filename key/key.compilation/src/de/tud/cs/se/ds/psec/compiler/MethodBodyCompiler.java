@@ -160,11 +160,13 @@ public class MethodBodyCompiler implements Opcodes {
         currentNode = endNode.first;
         currentASTNode = endNode.second;
 
-        // XXX The following statement leads to an assertion error
-        // when compilation is started from within a Junit test case.
-        // currentStatement = currentNode.toString();
-
         if (currentNode.childrenCount() > 0) {
+
+            // We only compile as many children as are called in the
+            // TranslationDefinitions. Translations may decide to explicitly
+            // ignore certain subbranches.
+            final int numChildrenInTranslations = currentASTNode
+                    .maxNumberOfChildrenCallsInTranslations();
 
             // Note: Stack Map Frames are not generated manually here;
             // we're trying to leave it to the ASM framework to generate
@@ -173,8 +175,10 @@ public class MethodBodyCompiler implements Opcodes {
             // http://chrononsystems.com/blog/java-7-design-flaw-leads-to-huge-backward-step-for-the-jvm
             // http://asm.ow2.org/doc/developer-guide.html#classwriter
 
+            int cnt = 0;
             Iterator<Node> childIt = currentNode.childrenIterator();
-            while (childIt.hasNext()) {
+            while (childIt.hasNext() && cnt < numChildrenInTranslations) {
+                cnt++;
                 translateToTacletTree(childIt.next(), currentASTNode);
             }
 

@@ -93,7 +93,9 @@ MINUS : '-' ;
 // Bytecode directives
 
 ALOAD     : 'ALOAD';
+ASTORE    : 'ASTORE';
 BIPUSH    : 'BIPUSH';
+GETFIELD  : 'GETFIELD';
 GOTO      : 'GOTO';
 IADD      : 'IADD';
 ICONST    : 'ICONST';

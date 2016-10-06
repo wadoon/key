@@ -19,7 +19,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  *
  * @author Dominic Scheurer
  */
-public class PutfieldInstr extends Instruction {
+public class FieldInstr extends Instruction {
     private int opcode;
     private String object;
     private String field;
@@ -28,6 +28,7 @@ public class PutfieldInstr extends Instruction {
 
     static {
         OPCODES_MAP.put("PUTFIELD", PUTFIELD);
+        OPCODES_MAP.put("GETFIELD", GETFIELD);
     }
 
     /**
@@ -35,9 +36,9 @@ public class PutfieldInstr extends Instruction {
      *            The bytecode instruction.
      * @param locVarSV
      *            The location variable that is the argument of this
-     *            {@link PutfieldInstr}.
+     *            {@link FieldInstr}.
      */
-    public PutfieldInstr(String insn, String object, String field) {
+    public FieldInstr(String insn, String object, String field) {
         opcode = OPCODES_MAP.get(insn);
 
         this.object = object;
@@ -55,17 +56,20 @@ public class PutfieldInstr extends Instruction {
         // objRef is currently not used, because it's always "this" so far.
         // Probably extend this in the future.
         @SuppressWarnings("unused")
-        ThisReference objRef = (ThisReference) getTacletAppInstValue(app,
-                object);
+//        ThisReference objRef = (ThisReference) getTacletAppInstValue(app,
+//                object);
         LocationVariable fieldRef = (LocationVariable) getTacletAppInstValue(
                 app, field);
-
+        
+        //@formatter:off
         mv.visitFieldInsn(opcode,
                 InformationExtraction
                         .toInternalName(fieldRef.getContainerType()),
-                extractFieldNameFromFQN(fieldRef), InformationExtraction
+                extractFieldNameFromFQN(fieldRef),
+                InformationExtraction
                         .typeToTypeDescriptor(fieldRef.getKeYJavaType()));
-
+        //@formatter:on
+        
     }
 
     /**

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public class LabeledBytecodeInstr extends Instruction {
     private String labelName;
-    private TranslationTacletASTElement labeledInstruction;
+    private Instruction labeledInstruction;
 
     /**
      * @param labelName
@@ -27,7 +27,7 @@ public class LabeledBytecodeInstr extends Instruction {
      *            The {@link TranslationTacletASTElement} that is labeled.
      */
     public LabeledBytecodeInstr(String labelName,
-            TranslationTacletASTElement labeledInstruction) {
+            Instruction labeledInstruction) {
         this.labelName = labelName;
         this.labeledInstruction = labeledInstruction;
     }
@@ -41,6 +41,14 @@ public class LabeledBytecodeInstr extends Instruction {
         labeledInstruction.translate(mv, pvHelper, labelManager, app, services,
                 children);
 
+    }
+
+    /**
+     * @return The labeled {@link Instruction} inside this
+     *         {@link LabeledBytecodeInstr}.
+     */
+    Instruction getLabeledInstruction() {
+        return labeledInstruction;
     }
 
 }
