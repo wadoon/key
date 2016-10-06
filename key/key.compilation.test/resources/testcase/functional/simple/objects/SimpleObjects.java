@@ -25,6 +25,22 @@ public class SimpleObjects {
       @ requires true;
       @ ensures true;
       @*/
+    public boolean equals(Object o) {
+        if (!(o instanceof SimpleObjects)) {
+            return false;
+        }
+        
+        return i == ((SimpleObjects) o).i;
+        
+        //TODO: Also support method calls. Maybe have to implement
+        //a special taclet for doing this, as in the case of loops...
+        // return equals((SimpleObjects) o);
+    }
+    
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
     public boolean equals(SimpleObjects o) {
         return i == o.i;
     }

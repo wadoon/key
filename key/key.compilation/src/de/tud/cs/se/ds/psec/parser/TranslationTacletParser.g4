@@ -94,6 +94,8 @@ unary_bytecode_instr
     	label_unary_instrs LABEL       # labelUnaryBytecodeInstr
     |
     	int_const_unary_instrs integer # intUnaryBytecodeInstr
+    |
+    	special_unary_instrs LOC_REF   # specialUnaryInstrs
     ;
 
 field_instr
@@ -133,6 +135,11 @@ label_unary_instrs
 int_const_unary_instrs
 	:
 		BIPUSH
+	;
+
+special_unary_instrs
+	:
+		CHECKCAST
 	;
 
 load_instr

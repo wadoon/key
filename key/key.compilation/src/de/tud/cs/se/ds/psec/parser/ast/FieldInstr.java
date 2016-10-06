@@ -55,7 +55,6 @@ public class FieldInstr extends Instruction {
 
         // objRef is currently not used, because it's always "this" so far.
         // Probably extend this in the future.
-        @SuppressWarnings("unused")
 //        ThisReference objRef = (ThisReference) getTacletAppInstValue(app,
 //                object);
         LocationVariable fieldRef = (LocationVariable) getTacletAppInstValue(

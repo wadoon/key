@@ -95,6 +95,7 @@ MINUS : '-' ;
 ALOAD     : 'ALOAD';
 ASTORE    : 'ASTORE';
 BIPUSH    : 'BIPUSH';
+CHECKCAST : 'CHECKCAST';
 GETFIELD  : 'GETFIELD';
 GOTO      : 'GOTO';
 IADD      : 'IADD';

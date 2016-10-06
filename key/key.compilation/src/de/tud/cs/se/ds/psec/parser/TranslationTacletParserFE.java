@@ -30,6 +30,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SimpleTypeExpressionC
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_arithmetic_expressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialExpressionAtomContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialUnaryInstrsContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.TranslationContext;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
@@ -47,6 +48,7 @@ import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationTacletASTElement;
+import de.tud.cs.se.ds.psec.parser.ast.TypeInstr;
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -323,7 +325,7 @@ public class TranslationTacletParserFE extends
                 getUniquePerTranslationLabelName(ctx.LABEL().getText()),
                 (Instruction) visit(ctx.bytecode_instr()));
     }
-    
+
     @Override
     public TranslationTacletASTElement visitMethod_call(
             Method_callContext ctx) {
@@ -359,8 +361,13 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
-    public FieldInstr visitField_instr(
-            Field_instrContext ctx) {
+    public TypeInstr visitSpecialUnaryInstrs(SpecialUnaryInstrsContext ctx) {
+        return new TypeInstr(ctx.special_unary_instrs().getText(),
+                ctx.LOC_REF().getText());
+    }
+
+    @Override
+    public FieldInstr visitField_instr(Field_instrContext ctx) {
         return new FieldInstr(ctx.instr.getText(), ctx.object.getText(),
                 ctx.field.getText());
     }

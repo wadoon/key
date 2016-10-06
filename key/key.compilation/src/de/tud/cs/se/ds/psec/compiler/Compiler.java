@@ -27,6 +27,7 @@ import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.tud.cs.se.ds.psec.se.SymbolicExecutionInterface;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.ResourceManager;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -267,7 +268,7 @@ public class Compiler {
         logger.debug("Compiling %s %s::%s",
                 mDecl.isConstructor() ? "Constructor" : "method",
                 mDecl.getContainerType().getJavaType().getFullName(),
-                mDecl.getName());
+                methodNameWithArgs(mDecl));
 
         int accessFlags = InformationExtraction.createOpcode(mDecl);
         String descriptor = InformationExtraction
@@ -290,7 +291,7 @@ public class Compiler {
 
             logger.trace("Running symbolic execution on method %s::%s",
                     mDecl.getContainerType().getJavaType().getFullName(),
-                    mDecl.getName());
+                    methodNameWithArgs(mDecl));
             SymbolicExecutionTreeBuilder builder = new SymbolicExecutionInterface(
                     environment, javaFile).execute(mDecl);
 
@@ -307,7 +308,7 @@ public class Compiler {
 
             logger.trace("Translating SET of method %s::%s to bytecode",
                     mDecl.getContainerType().getJavaType().getFullName(),
-                    mDecl.getName());
+                    methodNameWithArgs(mDecl));
             new MethodBodyCompiler(mv, builder.getProof().getServices(),
                     mDecl.getParameters(), definitions, mDecl.isStatic(),
                     mDecl.isVoid() || mDecl.isConstructor()).compile(builder);
@@ -347,6 +348,25 @@ public class Compiler {
     }
 
     /**
+     * Returns a precise method name, like "equals(java.lang.String)".
+     * 
+     * @param mDecl
+     *            The {@link ProgramMethod} to generate a name for.
+     * @return A precise method name, like "equals(java.lang.String)".
+     */
+    private String methodNameWithArgs(ProgramMethod mDecl) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(mDecl.getName()).append("(").append(Utilities
+                .toStream(mDecl.getParameters())
+                .map(param -> param.getVariableSpecification()
+                        .getProgramVariable().getKeYJavaType().getFullName())
+                .collect(Collectors.joining(","))).append(")");
+
+        return sb.toString();
+    }
+
+    /**
      * Generates the name for the dumped SET .proof file of the given
      * {@link ProgramMethod}.
      *
@@ -357,6 +377,6 @@ public class Compiler {
      */
     private String proofFileNameForProgramMethod(ProgramMethod mDecl) {
         return outputDir + mDecl.getContainerType().getFullName() + "::"
-                + mDecl.getName() + ".proof";
+                + methodNameWithArgs(mDecl) + ".proof";
     }
 }

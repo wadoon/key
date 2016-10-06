@@ -6,11 +6,14 @@ import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnknownInstructionException;
+import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -75,12 +78,22 @@ public abstract class Instruction extends TranslationTacletASTElement {
         } else {
 
             // Literals
-            // XXX Support other literals, like null
+            // XXX Support more literals
 
             if (expr instanceof ThisReference) {
 
                 mv.visitVarInsn(ALOAD, 0);
 
+            } else if (expr instanceof Instanceof) {
+                
+                Instanceof instOf = (Instanceof) expr;
+                
+                LocationVariable obj = (LocationVariable) instOf.getChildAt(0);
+                KeYJavaType typeRef = instOf.getTypeReference().getKeYJavaType();
+                
+                mv.visitVarInsn(ALOAD, pvHelper.progVarNr(obj));
+                mv.visitTypeInsn(INSTANCEOF, InformationExtraction.toInternalName(typeRef));
+                
             } else if (expr instanceof IntLiteral) {
 
                 intConstInstruction(mv, (negative ? -1 : 1)

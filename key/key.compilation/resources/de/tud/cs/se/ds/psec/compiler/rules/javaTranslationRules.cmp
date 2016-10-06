@@ -143,6 +143,20 @@ assignment_read_attribute_primitive {
 	)
 }
 
+// Here we could make use of the fact that we
+// already know whether a cast will succeed since
+// the second sub branch of this taclet will be
+// closed then.
+check_cast {
+	\taclets ("reference_type_cast")
+	\translation (
+		\load (#se)
+		CHECKCAST #npit
+		ASTORE #lhs
+		#child-1
+	)
+}
+
 equality_comparison_objects {
 	\taclets ("equality_comparison_simple")
 	\condition (!isSimpleType(#se0))

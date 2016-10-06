@@ -183,6 +183,7 @@ public class SimpleCompilerFunctionalTests extends TestCase {
             Object o2 = ctor.newInstance(1);
             Object o3 = ctor.newInstance(2);
 
+            // Test "equals" method with SimpleObjects argument
             List<TestData<Boolean>> testDataEquals = Arrays.asList(
                     new TestData<Boolean>(true, o1, o1),
                     new TestData<Boolean>(true, o1, o2),
@@ -190,6 +191,17 @@ public class SimpleCompilerFunctionalTests extends TestCase {
 
             runTests(simpleObjects, "equals", new Class<?>[] { simpleObjects },
                     testDataEquals);
+            
+            // Test "equals" method with Object argument
+            List<TestData<Boolean>> testDataEqualsObj = Arrays.asList(
+                    new TestData<Boolean>(true, o1, o1),
+                    new TestData<Boolean>(true, o1, o2),
+                    new TestData<Boolean>(false, o1, o3),
+                    new TestData<Boolean>(false, o1, new Object()),
+                    new TestData<Boolean>(true, o1, (Object) o2));
+
+            runTests(simpleObjects, "equals", new Class<?>[] { Object.class },
+                    testDataEqualsObj);
 
         } catch (NoSuchMethodException | SecurityException
                 | InstantiationException | IllegalAccessException
