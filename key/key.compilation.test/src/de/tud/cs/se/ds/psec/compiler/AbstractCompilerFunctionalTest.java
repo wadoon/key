@@ -27,6 +27,11 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
     private static final String TMP_OUT_DIR = "./testTmp/";
 
     private String functionalTestsDir;
+    private boolean deleteTmpFiles;
+
+    public AbstractCompilerFunctionalTest(boolean deleteTmpFiles) {
+        this.deleteTmpFiles = deleteTmpFiles;
+    }
 
     @Override
     protected void setUp() throws Exception {
@@ -39,7 +44,9 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-         Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
+        if (deleteTmpFiles) {
+            Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
+        }
     }
 
     /**
@@ -55,8 +62,8 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
      * @param <C>
      *            The type for the expected results in the test data.
      */
-    protected <C> void compileAndTest(String relPathToJavaFile, String className,
-            String testMethodName, Class<?>[] argTypes,
+    protected <C> void compileAndTest(String relPathToJavaFile,
+            String className, String testMethodName, Class<?>[] argTypes,
             List<TestData<C>> testData) {
 
         try {

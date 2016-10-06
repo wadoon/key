@@ -23,6 +23,10 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  */
 public class SimpleCompilerFunctionalTests extends AbstractCompilerFunctionalTest {
 
+    public SimpleCompilerFunctionalTests() {
+        super(true);
+    }
+    
     @Test
     public void testSimpleArithmeticAndIf() {
 
