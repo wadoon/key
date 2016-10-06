@@ -21,7 +21,6 @@ public class SimpleObjects {
         this.i = i;
     }
     
-    //TODO: Compile following method.
     /*@ public normal_behavior
       @ requires true;
       @ ensures true;
