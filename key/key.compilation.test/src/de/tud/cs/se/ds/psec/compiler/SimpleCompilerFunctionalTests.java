@@ -180,8 +180,8 @@ public class SimpleCompilerFunctionalTests extends AbstractCompilerFunctionalTes
                 | InstantiationException | IllegalAccessException
                 | IllegalArgumentException | InvocationTargetException
                 | NoSuchFieldException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            fail(e.getMessage());
         }
 
     }
