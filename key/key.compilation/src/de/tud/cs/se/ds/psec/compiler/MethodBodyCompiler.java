@@ -21,6 +21,8 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -35,7 +37,6 @@ import de.uka.ilkd.key.util.Pair;
 public class MethodBodyCompiler implements Opcodes {
     private static final Logger logger = LogManager.getFormatterLogger();
 
-    private String currentStatement;
     private ProgVarHelper pvHelper;
     private TacletTranslationFactory translationFactory;
     private TacletASTNode astRoot = null;
@@ -202,7 +203,7 @@ public class MethodBodyCompiler implements Opcodes {
         do {
             RuleApp app = currentProofNode.getAppliedRuleApp();
             Optional<TacletASTNode> newNode = Optional.empty();
-            if (hasNonEmptyActiveStatement(currentProofNode)) {
+            if (isSymbolicExecutionNode(currentProofNode)) {
                 newNode = toASTNode(app);
             }
 
@@ -231,17 +232,39 @@ public class MethodBodyCompiler implements Opcodes {
      */
     private Optional<TacletASTNode> toASTNode(RuleApp ruleApp) {
         if (ruleApp instanceof TacletApp) {
+            
             TacletApp app = (TacletApp) ruleApp;
             return translationFactory.getTranslationForTacletApp(app);
+            
+        } else if (ruleApp instanceof ContractRuleApp) {
+            
+            ContractRuleApp app = (ContractRuleApp) ruleApp;
+            throw new RuntimeException("TODO: Implement"); //TODO
+            
         } else {
             // TODO Are there other cases to support?
             String message = Utilities.format(
-                    "Did not translate the following app: %s, statement: %s",
-                    ruleApp.rule().name(), currentStatement);
+                    "Unsupported rule application: %s", ruleApp.rule().name());
 
             logger.error(message);
             throw new NoTranslationException(message);
         }
+    }
+
+    /**
+     * Determines whether the given {@link Node} is a symbolic execution node,
+     * which is true if it either has a non-empty active statement (the
+     * {@link RuleApp} is a {@link PosTacletApp}) or it is an application of the
+     * operation contract rule.
+     *
+     * @param node
+     *            The {@link Node} to check.
+     * @return true iff the given {@link Node} is a symbolic execution
+     *         {@link Node}.
+     */
+    private static boolean isSymbolicExecutionNode(Node node) {
+        return hasNonEmptyActiveStatement(node)
+                || node.getAppliedRuleApp() instanceof ContractRuleApp;
     }
 
     /**

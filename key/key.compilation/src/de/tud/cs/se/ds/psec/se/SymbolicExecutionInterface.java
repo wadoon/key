@@ -106,7 +106,7 @@ public class SymbolicExecutionInterface {
                 //@formatter:off
                 SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 
                                                                                 1000, 
-                                                                                false,  // true to apply method contracts instead of inlining, 
+                                                                                true,   // true to apply method contracts instead of inlining, 
                                                                                 false,  // true to apply loop invariants instead of unrolling, 
                                                                                 false,  // true to apply block contracts instead of expanding.
                                                                                 false,  // true to hide branch conditions caused by symbolic execution within modalities not of interest, 

@@ -20,26 +20,30 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.Pair;
 
 public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
     protected final Contract instantiation;
+    // (DS) Added for having access to instantiations in compilation
+    private UseOperationContractRule.Instantiation ruleInstantiations;
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio) {
         this(rule, pio, null);
     }
 
-    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio, Contract contract) {
-        this(rule, pio, ImmutableSLList.<PosInOccurrence>nil(), contract);
+    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
+            Contract contract) {
+        this(rule, pio, ImmutableSLList.<PosInOccurrence> nil(), contract);
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
-                                      ImmutableList<PosInOccurrence> ifInsts,
-                                      Contract contract) {
+            ImmutableList<PosInOccurrence> ifInsts, Contract contract) {
         super(rule, pio, ifInsts);
         this.instantiation = contract;
     }
@@ -50,18 +54,23 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
     public AbstractContractRuleApp check(Services services) {
         if (instantiation != null && posInOccurrence() != null) {
-            IObserverFunction target = instantiation.getTarget();            
-            IObserverFunction observerFunctionAtPos = getObserverFunction(services);                       
-            final SpecificationRepository specRepo = services.getSpecificationRepository();
-            
+            IObserverFunction target = instantiation.getTarget();
+            IObserverFunction observerFunctionAtPos = getObserverFunction(
+                    services);
+            final SpecificationRepository specRepo = services
+                    .getSpecificationRepository();
+
             target = specRepo.unlimitObs(target);
             observerFunctionAtPos = specRepo.unlimitObs(observerFunctionAtPos);
-            
+
             if (!target.equals(observerFunctionAtPos)) {
-                
-                if (!specRepo.
-                        getOverridingTargets(observerFunctionAtPos.getContainerType(), observerFunctionAtPos).
-                            contains(new Pair<KeYJavaType, IObserverFunction>(target.getContainerType(), target))){
+
+                if (!specRepo
+                        .getOverridingTargets(
+                                observerFunctionAtPos.getContainerType(),
+                                observerFunctionAtPos)
+                        .contains(new Pair<KeYJavaType, IObserverFunction>(
+                                target.getContainerType(), target))) {
                     return null;
                 }
             }
@@ -72,7 +81,6 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     @Override
     public abstract AbstractContractRuleApp tryToInstantiate(Goal goal);
 
-
     public abstract AbstractContractRuleApp setContract(Contract contract);
 
     public boolean complete() {
@@ -80,4 +88,25 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public abstract IObserverFunction getObserverFunction(Services services);
+
+    /**
+     * @return The {@link Instantiation} of this app, comprising e.g. the
+     *         {@link IProgramMethod} referred to.
+     */
+    public UseOperationContractRule.Instantiation getRuleInstantiations() {
+        return ruleInstantiations;
+    }
+
+    /**
+     * Sets the {@link Instantiation} of this app, comprising e.g. the
+     * {@link IProgramMethod} referred to.
+     * 
+     * @param ruleInstantiations
+     *            The {@link Instantiation} of this app, comprising e.g. the
+     *            {@link IProgramMethod} referred to.
+     */
+    protected void setRuleInstantiations(
+            UseOperationContractRule.Instantiation ruleInstantiations) {
+        this.ruleInstantiations = ruleInstantiations;
+    }
 }
