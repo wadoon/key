@@ -6,11 +6,11 @@ import java.util.List;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * A unary bytecode instruction expecting a location variable reference as
@@ -44,11 +44,12 @@ public class LocVarUnaryBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, Services services,
-            List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children) {
 
-        mv.visitVarInsn(opcode, pvHelper.progVarNr(
-                (LocationVariable) getTacletAppInstValue(app, locVarSV)));
+        mv.visitVarInsn(opcode,
+                pvHelper.progVarNr((LocationVariable) instantiations
+                        .getInstantiationFor(locVarSV).get()));
 
     }
 

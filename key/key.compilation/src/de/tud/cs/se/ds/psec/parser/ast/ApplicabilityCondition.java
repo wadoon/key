@@ -6,10 +6,10 @@ import java.util.function.Function;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * A condition on the applicability of a translation.
@@ -46,7 +46,7 @@ public class ApplicabilityCondition extends TranslationTacletASTElement {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, Services services,
+            UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
             List<TacletASTNode> children) {
         // This element should not be translated.
         // That's maybe a design flaw...

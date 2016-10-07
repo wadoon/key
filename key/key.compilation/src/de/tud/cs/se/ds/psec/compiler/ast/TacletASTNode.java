@@ -31,7 +31,7 @@ public class TacletASTNode implements Opcodes {
     private List<TacletASTNode> children = new ArrayList<>();
     private MethodVisitor mv;
     private ProgVarHelper pvHelper;
-    private TacletApp app;
+    private RuleInstantiations instantiations;
     private List<TranslationDefinition> definitions;
     private String seTacletName;
     private Services services;
@@ -49,16 +49,15 @@ public class TacletASTNode implements Opcodes {
      *            {@link TacletASTNode}.
      * @param pvHelper
      *            The {@link ProgVarHelper} of the corresponding method.
-     * @param app
-     *            The {@link TacletApp} to construct this {@link TacletASTNode}
-     *            from.
-     * 
+     * @param instantiations
+     *            TODO
      * @see TacletTranslationFactory
      */
     public TacletASTNode(String seTacletName,
             List<TranslationDefinition> definitions, MethodVisitor mv,
-            ProgVarHelper pvHelper, TacletApp app, Services services) {
-        this.app = app;
+            ProgVarHelper pvHelper, RuleInstantiations instantiations,
+            Services services) {
+        this.instantiations = instantiations;
         this.mv = mv;
         this.pvHelper = pvHelper;
         this.definitions = definitions;
@@ -81,7 +80,7 @@ public class TacletASTNode implements Opcodes {
         // If this is actually caused by an error, there will be a succeeding
         // NullPointerException during the applicability check.
         ApplicabilityCheckInput applCheckInput = new ApplicabilityCheckInput(
-                children.size(), (app == null ? null : app.instantiations()));
+                children.size(), instantiations);
 
         List<TranslationDefinition> candidates = definitions.stream()
                 .filter(d -> d.isApplicable(applCheckInput))
@@ -104,8 +103,8 @@ public class TacletASTNode implements Opcodes {
 
         UniqueLabelManager labelManager = new UniqueLabelManager();
 
-        candidates.get(0).translate(mv, pvHelper, labelManager, app, services,
-                children);
+        candidates.get(0).translate(mv, pvHelper, labelManager, instantiations,
+                services, children);
     }
 
     /**
@@ -121,13 +120,6 @@ public class TacletASTNode implements Opcodes {
      */
     protected ProgVarHelper pvHelper() {
         return pvHelper;
-    }
-
-    /**
-     * @return The {@link TacletApp} for this {@link TacletASTNode}.
-     */
-    protected TacletApp app() {
-        return app;
     }
 
     /**

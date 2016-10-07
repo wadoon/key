@@ -6,13 +6,12 @@ import java.util.List;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * A bytecode {@link Instruction} for a writing access to a field.
@@ -47,7 +46,7 @@ public class FieldInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, Services services,
+            UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
             List<TacletASTNode> children) {
 
         // TODO Support more taclets than assignment_write_attribute_this, and
@@ -57,8 +56,8 @@ public class FieldInstr extends Instruction {
         // Probably extend this in the future.
 //        ThisReference objRef = (ThisReference) getTacletAppInstValue(app,
 //                object);
-        LocationVariable fieldRef = (LocationVariable) getTacletAppInstValue(
-                app, field);
+        LocationVariable fieldRef = (LocationVariable) instantiations
+                .getInstantiationFor(field).get();
         
         //@formatter:off
         mv.visitFieldInsn(opcode,

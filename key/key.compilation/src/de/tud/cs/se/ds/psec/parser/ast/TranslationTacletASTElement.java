@@ -9,6 +9,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnsupportedFeatureException;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
@@ -40,16 +41,16 @@ public abstract class TranslationTacletASTElement implements Opcodes {
      * @param labelManager
      *            The {@link UniqueLabelManager} for keeping track of the
      *            connection between {@link Label} names and objects.
-     * @param app
-     *            The {@link TacletApp} being used for obtaining instantiations
-     *            of schema variables.
+     * @param instantiations
+     *            The {@link RuleInstantiations} for retrieving instantiations
+     *            for, e.g., {@link SchemaVariable}s.
      * @param children
      *            The children of in the taclet AST to be taken into account for
      *            translation.
      */
     public abstract void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, Services services,
-            List<TacletASTNode> children);
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children);
 
     /**
      * Returns the value instantiated for the {@link SchemaVariable}

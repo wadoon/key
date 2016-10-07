@@ -92,7 +92,7 @@ public class TacletTranslationFactory {
 
         if (candidates != null) {
             result = new TacletASTNode(tacletName, candidates, mv, pvHelper,
-                    app, services);
+                    new RuleInstantiations(app), services);
         } else {
             if (!isSimplificationSETaclet(app.taclet())) {
                 String message = Utilities.format(

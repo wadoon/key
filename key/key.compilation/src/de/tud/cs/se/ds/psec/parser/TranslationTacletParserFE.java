@@ -52,7 +52,6 @@ import de.tud.cs.se.ds.psec.parser.ast.TypeInstr;
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 /**
@@ -249,8 +248,8 @@ public class TranslationTacletParserFE extends
     public ApplicabilityCondition visitSimpleTypeExpression(
             SimpleTypeExpressionContext ctx) {
         return new ApplicabilityCondition(info -> {
-            Expression expr = (Expression) info.getSchemaVarInstantiations()
-                    .lookupValue(new Name(ctx.LOC_REF().getText()));
+            Expression expr = (Expression) info.getInstantiations()
+                    .getInstantiationFor(ctx.LOC_REF().getText()).get();
 
             if (!(expr instanceof LocationVariable)) {
                 return true;

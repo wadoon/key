@@ -1,7 +1,7 @@
 package de.tud.cs.se.ds.psec.parser.ast;
 
+import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * A container class for inputs that are relevant for assessing the
@@ -12,7 +12,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class ApplicabilityCheckInput {
 
     private int numChildren;
-    private SVInstantiations schemaVarInstantiations;
+    private RuleInstantiations instantiations;
 
     /**
      * @param numChildren
@@ -22,9 +22,9 @@ public class ApplicabilityCheckInput {
      *            execution {@link Taclet} to be translated.
      */
     public ApplicabilityCheckInput(int numChildren,
-            SVInstantiations schemaVarInstantiations) {
+            RuleInstantiations instantiations) {
         this.numChildren = numChildren;
-        this.schemaVarInstantiations = schemaVarInstantiations;
+        this.instantiations = instantiations;
     }
 
     /**
@@ -38,8 +38,8 @@ public class ApplicabilityCheckInput {
      * @return The instantiations for schema variables in the symbolic execution
      *         {@link Taclet} to be translated.
      */
-    public SVInstantiations getSchemaVarInstantiations() {
-        return schemaVarInstantiations;
+    public RuleInstantiations getInstantiations() {
+        return instantiations;
     }
 
 }

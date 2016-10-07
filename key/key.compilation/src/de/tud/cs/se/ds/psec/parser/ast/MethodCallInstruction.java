@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnsupportedFeatureException;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
@@ -17,7 +18,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * A special bytecode {@link Instruction} for method calls. Comprises a
@@ -40,11 +40,11 @@ public class MethodCallInstruction extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, TacletApp app, Services services,
-            List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children) {
 
-        MethodBodyStatement mbs = (MethodBodyStatement) getTacletAppInstValue(
-                app, methodBodyStatementSV);
+        MethodBodyStatement mbs = (MethodBodyStatement) instantiations
+                .getInstantiationFor(methodBodyStatementSV).get();
 
         IProgramMethod pm = mbs.getProgramMethod(services);
 

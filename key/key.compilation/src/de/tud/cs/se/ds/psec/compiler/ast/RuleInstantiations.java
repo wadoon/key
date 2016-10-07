@@ -7,6 +7,8 @@ import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Encapsulates instantiations of {@link SchemaVariable}s in {@link TacletApp}s,
@@ -16,7 +18,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public class RuleInstantiations {
 
-    private HashMap<String, Object> instantiations;
+    private HashMap<String, Object> instantiations = new HashMap<>();
 
     /**
      * @param instantiations
@@ -37,13 +39,17 @@ public class RuleInstantiations {
      * @param app
      *            The {@link TacletApp} to retrieve instantiations from.
      */
-    public RuleInstantiations(TacletApp app) {
+    public RuleInstantiations(final TacletApp app) {
+        if (app == null || app.instantiations() == null) {
+            return;
+        }
+        
         (Utilities.toStream(() -> app.instantiations().svIterator()))
                 .map(SchemaVariable::name)
-                .forEach(svName -> {
-                    instantiations.put(svName.toString(),
-                            app.instantiations().lookupValue(svName));
-                });
+                .map(svName -> new Pair<>(svName.toString(),
+                        app.instantiations().lookupValue(svName)))
+                .filter(pair -> pair.second != null)
+                .forEach(pair -> instantiations.put(pair.first, pair.second));
     }
 
     /**
