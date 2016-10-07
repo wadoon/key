@@ -67,6 +67,21 @@ methodCallWithAssignment {
 }
 */
 
+//TODO This rule is currently only supporting methods
+// in the same object ("this"-calls) that are non-void.
+// Also, only INVOKEVIRTUAL calls are supported.
+// Moreover, we so far only support methods returning
+// primitive types.
+operation_contract {
+	\taclets ("Use Operation Contract")
+	\translation (
+		\load_params (#actualParams)
+		\methodCall (#pm)
+		ISTORE #actualResult
+		#child-1
+	)
+}
+
 method_body_expand {
 	\taclets ("methodBodyExpand")
 	\translation (
@@ -212,11 +227,20 @@ xor {
 // ### Integer arithmetic ###
 // ##########################
 
-assignment {
+assignment_no_result_var {
 	\taclets ("assignment")
+	\condition (!isResultVar(#se))
 	\translation (
 		\load (#se)
 		ISTORE #loc
+		#child-1
+	)
+}
+
+assignment_result_var {
+	\taclets ("assignment")
+	\condition (isResultVar(#se))
+	\translation (
 		#child-1
 	)
 }

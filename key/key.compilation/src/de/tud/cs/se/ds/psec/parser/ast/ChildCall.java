@@ -34,7 +34,10 @@ public class ChildCall extends Instruction {
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
             List<TacletASTNode> children) {
-        // XXX Remove this hack!!!
+        // XXX Remove this hack!!! Test cases: testSimpleWhile, testSimpleFor
+        // Applies in loop transformation: The body has a last statement that
+        // expects a child, but has none. The real child is part of the loop
+        // compilation...
         if (children.size() > childNo - 1) {
             children.get(childNo - 1).compile();
         }

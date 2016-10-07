@@ -147,6 +147,8 @@ load_instr
         simple_load_instr
     |
         negated_load_instr
+    |
+    	params_load_instr
     ;
 
 simple_load_instr
@@ -167,6 +169,14 @@ negated_load_instr
             RPAREN
         RPAREN
     ;
+
+params_load_instr
+	:
+		LOAD_PARAMS
+		LPAREN
+			LOC_REF
+		RPAREN
+	;
 
 method_call
 	:
@@ -200,6 +210,11 @@ special_expression
 		LPAREN
 			LOC_REF
 		RPAREN          # simpleTypeExpression
+	|
+		IS_RESULT_VAR
+		LPAREN
+			LOC_REF
+		RPAREN          # isResultVarExpression
 	;
 
 simple_arithmetic_expression

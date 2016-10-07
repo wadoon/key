@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 public class SimpleCompilerFunctionalTests extends AbstractCompilerFunctionalTest {
 
     public SimpleCompilerFunctionalTests() {
-        super(true);
+        super(false);
     }
     
     @Test

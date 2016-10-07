@@ -9,6 +9,7 @@ import org.objectweb.asm.MethodVisitor;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.compiler.exceptions.UnexpectedTranslationSituationException;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnsupportedFeatureException;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
@@ -43,17 +44,34 @@ public class MethodCallInstruction extends Instruction {
             UniqueLabelManager labelManager, RuleInstantiations instantiations,
             Services services, List<TacletASTNode> children) {
 
-        MethodBodyStatement mbs = (MethodBodyStatement) instantiations
+        Object method = instantiations
                 .getInstantiationFor(methodBodyStatementSV).get();
+        IProgramMethod pm;
+        MethodBodyStatement mbs = null;
 
-        IProgramMethod pm = mbs.getProgramMethod(services);
+        if (method instanceof MethodBodyStatement) {
+            pm = ((MethodBodyStatement) method).getProgramMethod(services);
 
-        if (!pm.getName().equals("<init>")) {
+            mbs = (MethodBodyStatement) instantiations
+                    .getInstantiationFor(methodBodyStatementSV).get();
+        } else if (method instanceof IProgramMethod) {
+            pm = (IProgramMethod) method;
+        } else {
+            String msg = Utilities.format(
+                    "Unexpected argument type for method call translation: %s",
+                    method.getClass());
+            logger.error(msg);
+            throw new UnexpectedTranslationSituationException(msg);
+        }
+
+        boolean isConstructor = pm.getName().equals("<init>");
+
+        if (mbs != null && !isConstructor) {
             // XXX: Shouldn't be too hard to also support general method calls;
             // probably only have to replace INVOKESPECIAL by another opcode
             // depending on the situation.
             String msg = Utilities.format(
-                    "Currently only supporting calls to constructors; problem: %s",
+                    "Currently only supporting calls to constructors when translating methodBodyExpand; problem: %s",
                     mbs);
             logger.error(msg);
             throw new UnsupportedFeatureException(msg);
@@ -63,11 +81,13 @@ public class MethodCallInstruction extends Instruction {
 
             mv.visitVarInsn(ALOAD, 0);
 
-            for (Expression expr : mbs.getArguments()) {
-                loadExpressionToStack(mv, pvHelper, expr);
+            if (mbs != null) {
+                for (Expression expr : mbs.getArguments()) {
+                    loadExpressionToStack(mv, pvHelper, expr);
+                }
             }
 
-            mv.visitMethodInsn(INVOKESPECIAL,
+            mv.visitMethodInsn(isConstructor ? INVOKESPECIAL : INVOKEVIRTUAL,
                     InformationExtraction.toInternalName(pm.getContainerType()),
                     pm.getName(),
                     InformationExtraction.getMethodTypeDescriptor(pm), false);
@@ -75,7 +95,7 @@ public class MethodCallInstruction extends Instruction {
         } else {
             String msg = Utilities.format(
                     "Currently not supporting static method calls; problem: %s",
-                    mbs);
+                    pm);
             logger.error(msg);
             throw new UnsupportedFeatureException(msg);
         }

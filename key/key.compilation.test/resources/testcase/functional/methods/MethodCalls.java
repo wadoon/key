@@ -1,4 +1,4 @@
-package de.tud.test.simple.objects;
+package de.tud.test.methods;
 
 /**
  * Some experiments with method calls.

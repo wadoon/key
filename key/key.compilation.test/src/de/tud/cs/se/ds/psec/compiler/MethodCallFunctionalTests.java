@@ -27,7 +27,7 @@ public class MethodCallFunctionalTests extends AbstractCompilerFunctionalTest {
     public void testObjectConstructionAndMemberAccess() {
         
         Class<?> simpleObjects = compile("methods/MethodCalls.java",
-                "de.tud.test.simple.objects.MethodCalls");
+                "de.tud.test.methods.MethodCalls");
 
         //TODO
 

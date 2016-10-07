@@ -47,9 +47,10 @@ public class LocVarUnaryBytecodeInstr extends Instruction {
             UniqueLabelManager labelManager, RuleInstantiations instantiations,
             Services services, List<TacletASTNode> children) {
 
-        mv.visitVarInsn(opcode,
-                pvHelper.progVarNr((LocationVariable) instantiations
-                        .getInstantiationFor(locVarSV).get()));
+        LocationVariable progVar = (LocationVariable) instantiations
+                .getInstantiationFor(locVarSV).get();
+
+        mv.visitVarInsn(opcode, pvHelper.progVarNr(progVar));
 
     }
 

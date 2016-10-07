@@ -20,12 +20,14 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.DefinitionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Field_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsResultVarExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Labeled_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Method_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Negated_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Nullary_bytecode_instrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Params_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SimpleTypeExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_arithmetic_expressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrContext;
@@ -45,6 +47,7 @@ import de.tud.cs.se.ds.psec.parser.ast.LoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.LocVarUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.MethodCallInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
+import de.tud.cs.se.ds.psec.parser.ast.ParamsLoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationTacletASTElement;
@@ -262,6 +265,27 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
+    public ApplicabilityCondition visitIsResultVarExpression(
+            IsResultVarExpressionContext ctx) {
+        return new ApplicabilityCondition(info -> {
+            // XXX This is a hack for ignoring result_* variables introduced by
+            // Operation Contract rule applications. We should actually check
+            // whether this variable was indeed introduced by such an
+            // application...
+            
+            Expression expr = (Expression) info.getInstantiations()
+                    .getInstantiationFor(ctx.LOC_REF().getText()).get();
+
+            if (!(expr instanceof LocationVariable)) {
+                return false;
+            }
+
+            LocationVariable locVar = (LocationVariable) expr;
+            return locVar.name().toString().startsWith("result_");
+        });
+    }
+
+    @Override
     public ApplicabilityCondition visitSimple_arithmetic_expression(
             Simple_arithmetic_expressionContext ctx) {
         final String cmp = ctx.comparator().getText();
@@ -381,6 +405,12 @@ public class TranslationTacletParserFE extends
     public LoadInstruction visitNegated_load_instr(
             Negated_load_instrContext ctx) {
         return new LoadInstruction(ctx.LOC_REF().getText(), true);
+    }
+
+    @Override
+    public ParamsLoadInstruction visitParams_load_instr(
+            Params_load_instrContext ctx) {
+        return new ParamsLoadInstruction(ctx.LOC_REF().getText());
     }
 
     @Override

@@ -14,6 +14,9 @@ CONDITION
 LOAD
     : '\\load';
 
+LOAD_PARAMS
+    : '\\load_params';
+
 METHOD_CALL
 	: '\\methodCall';
 
@@ -85,6 +88,7 @@ OR  : '|';
 NOT : '!';
 
 IS_SIMPLE_TYPE : 'isSimpleType';
+IS_RESULT_VAR : 'isResultVar';
 
 // Arithmetics
 

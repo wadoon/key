@@ -232,15 +232,11 @@ public class MethodBodyCompiler implements Opcodes {
      */
     private Optional<TacletASTNode> toASTNode(RuleApp ruleApp) {
         if (ruleApp instanceof TacletApp) {
-            
-            TacletApp app = (TacletApp) ruleApp;
-            return translationFactory.getTranslationForTacletApp(app);
-            
+            return translationFactory
+                    .getTranslationForRuleApp((TacletApp) ruleApp);
         } else if (ruleApp instanceof ContractRuleApp) {
-            
-            ContractRuleApp app = (ContractRuleApp) ruleApp;
-            throw new RuntimeException("TODO: Implement"); //TODO
-            
+            return translationFactory
+                    .getTranslationForRuleApp((ContractRuleApp) ruleApp);
         } else {
             // TODO Are there other cases to support?
             String message = Utilities.format(
