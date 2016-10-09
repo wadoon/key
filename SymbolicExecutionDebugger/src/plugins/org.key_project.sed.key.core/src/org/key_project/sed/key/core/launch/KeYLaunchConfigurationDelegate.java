@@ -30,6 +30,7 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.IRunnableWithDocument;
@@ -97,9 +98,11 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           boolean variablesAreOnlyComputedFromUpdates = KeySEDUtil.isVariablesAreOnlyComputedFromUpdates(configuration);
           Position methodRangeStart = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeStartLine(configuration), KeySEDUtil.getMethodRangeStartColumn(configuration));
           Position methodRangeEnd = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeEndLine(configuration), KeySEDUtil.getMethodRangeEndColumn(configuration));
-          boolean truthValueEvaluationEnabled = KeySEDUtil.isTruthValueEvaluationEnabled(configuration);
+          boolean truthValueTracingEnabled = KeySEDUtil.isTruthValueTracingEnabled(configuration);
           boolean highlightReachedSourceCode = KeySEDUtil.isHighlightReachedSourceCode(configuration);
           boolean groupingEnabled = KeySEDUtil.isGroupingEnabled(configuration);
+          boolean simplifyConditions = KeySEDUtil.isSimplifyConditions(configuration);
+          boolean hideFullBranchConditionIfAdditionalLabelIsAvailable = KeySEDUtil.isHideFullBranchConditionIfAdditionalLabelIsAvailable(configuration);
           // Determine location and class path entries
           File location = null;
           List<File> classPaths = null;
@@ -151,9 +154,11 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                              usePrettyPrinting,
                                                              showSignatureOnMethodReturnNodes,
                                                              variablesAreOnlyComputedFromUpdates,
-                                                             truthValueEvaluationEnabled,
+                                                             truthValueTracingEnabled,
                                                              highlightReachedSourceCode,
-                                                             groupingEnabled); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+                                                             groupingEnabled,
+                                                             simplifyConditions,
+                                                             hideFullBranchConditionIfAdditionalLabelIsAvailable); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           // Validate proof settings
           if (newDebugSession) {
              if (method == null) {
@@ -216,7 +221,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
     
     protected SymbolicExecutionEnvironment<?> instantiateProofWithoutUserInterface(String launchConfigurationName,
                                                                                    KeYLaunchSettings settings) throws Exception {
-       UserInterfaceControl ui = new DefaultUserInterfaceControl();
+       UserInterfaceControl ui = new DefaultUserInterfaceControl(EclipseUserInterfaceCustomization.getInstance());
        return instantiateProof(ui, launchConfigurationName, settings);
     }
     
@@ -253,7 +258,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                String launchConfigurationName, 
                                                                KeYLaunchSettings settings) throws Exception {
        // Load location
-       AbstractProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(settings.isTruthValueEvaluationEnabled()), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath(), settings.getIncludes(), SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), true);
+       AbstractProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(settings.isTruthValueTracingEnabled()), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath(), settings.getIncludes(), SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), true);
        InitConfig initConfig = loader.getInitConfig();
        // Try to reuse already instantiated proof
        Proof proof = loader.getProof();
@@ -264,7 +269,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           proof = ui.createProof(initConfig, input);
        }
        // Create symbolic execution tree builder
-       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting(), settings.isVariablesAreOnlyComputedFromUpdates());
+       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting(), settings.isVariablesAreOnlyComputedFromUpdates(), settings.isSimplifyConditions());
        builder.analyse();
        // Create environment used for symbolic execution
        return new SymbolicExecutionEnvironment<UserInterfaceControl>(ui, initConfig, builder);

@@ -22,7 +22,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.util.TestBreakpointsUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -35,18 +35,16 @@ public class SWTBotChangeEntryExit extends AbstractKeYDebugTargetTestCase {
    public void test() throws Exception{
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {            
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {            
             // Get debug target TreeItem
             TestBreakpointsUtil.addSomeBreakpoints(CALLER_PATH, bot, 14, 7);
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetEntryAndExitofAllBreakpoints(target, 2,0));
-            assertTrue(TestBreakpointsUtil.checkProofEntryAndExitofAllBreakpoints(target,  2,0));
             assertTrue(TestBreakpointsUtil.changeEntryAndExit(bot, "BreakpointStopCallerAndLoop [entry] - main(int)", false, true));
             assertTrue(TestBreakpointsUtil.changeEntryAndExit(bot, "BreakpointStopCallerAndLoop [entry] - loop()", true, true));
             TestUtilsUtil.sleep(2000);
             assertTrue(TestBreakpointsUtil.checkTargetEntryAndExitofAllBreakpoints(target, 1,2));
-            assertTrue(TestBreakpointsUtil.checkProofEntryAndExitofAllBreakpoints(target,  1,2));
             TestBreakpointsUtil.removeAllBreakpoints();
          }
       };
@@ -65,6 +63,8 @@ public class SWTBotChangeEntryExit extends AbstractKeYDebugTargetTestCase {
             Boolean.FALSE,
             Boolean.TRUE,
             Boolean.FALSE,
+            Boolean.FALSE,
+            Boolean.TRUE,
             Boolean.FALSE,
             8, 
             executor);   

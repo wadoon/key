@@ -14,12 +14,16 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
+import java.io.IOException;
+
+import de.uka.ilkd.key.proof.init.*;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -27,7 +31,12 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.macros.SkipMacro;
+import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -36,13 +45,10 @@ import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
@@ -100,13 +106,18 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
            System.out.println("[ DONE  ... rule application ]");
            if (verbosity >= Verbosity.HIGH) {
                System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
-               final Statistics stat = info.getProof().statistics();
+               final Statistics stat = info.getProof().getStatistics();
                System.out.println("Proof steps: "+stat.nodes);
                System.out.println("Branches: "+stat.branches);
-               System.out.println("Automode Time: "+(stat.autoModeTimeInNano/1000000)+"ms");
-               System.out.println("Time per step: "+(stat.timePerStepInNano/1000000)+"ms");
+               System.out.println("Automode Time: " + stat.autoModeTimeInMillis + "ms");
+               System.out.println("Time per step: " + stat.timePerStepInMillis + "ms");
            }
            System.out.println("Number of goals remaining open: " + openGoals);
+           if(openGoals == 0){
+        	   System.out.println("Proved");
+           }else{
+        	   System.out.println("Not proved");
+           }
            System.out.flush();
        }
        // this seems to be a good place to free some memory
@@ -119,7 +130,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
        assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
                + " save a proof but no corresponding key problem file is "
                + "available.";
-       allProofsSuccessful &= BatchMode.saveProof(result2, info.getProof(), keyProblemFile);
+       allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
        /*
         * We "delete" the value of keyProblemFile at this point by assigning
         * null to it. That way we prevent KeY from saving another proof (that
@@ -133,8 +144,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    }
 
     @Override
-   public void taskFinished(TaskFinishedInfo info) {
-       super.taskFinished(info);
+   public void taskFinished(TaskFinishedInfo info) {    	
+       super.taskFinished(info);              
        progressMax = 0; // reset progress bar marker
        final Proof proof = info.getProof();
        if (proof==null) {
@@ -143,7 +154,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                final Object error = info.getResult();
                if (error instanceof Throwable) {
                    ((Throwable) error).printStackTrace();
-               }
+               }               
            }
            System.exit(1);
        }
@@ -153,8 +164,6 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
            info.getSource() instanceof ProofMacro) {
            if (!isAtLeastOneMacroRunning()) {
                printResults(openGoals, info, result2);
-           } else if (!macroChosen()) {
-               finish(proof);
            }
        } else if (info.getSource() instanceof ProblemLoader) {
            if (verbosity > Verbosity.SILENT) System.out.println("[ DONE ... loading ]");
@@ -171,7 +180,22 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                            openGoals);
                System.exit(0);
            }
-           if (macroChosen()) {
+           ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+           if(problemLoader.hasProofScript()) {
+               try {
+                   Pair<String, Location> script = problemLoader.readProofScript();
+                   ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+                   this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
+                   pse.execute(this, proof);
+                   // The start and end messages are fake to persuade the system ...
+                   // All this here should refactored anyway ...
+                   this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+               } catch (Exception e) {
+                   // TODO
+                   e.printStackTrace();
+                   System.exit(-1);
+               }
+           } else if (macroChosen()) {
                applyMacro();
            } else {
                finish(proof);
@@ -216,7 +240,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
        mediator.setInteractive(false);
        getProofControl().startAndWaitForAutoMode(proof);
        if (verbosity >= Verbosity.HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
-           System.out.println(proof.statistics());
+           System.out.println(proof.getStatistics());
        }
    }
 
@@ -334,10 +358,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     final public boolean selectProofObligation(InitConfig initConfig) {
-        if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("Proof Obligation selection not supported by console.");
-        }
-        return false;
+    	//ProofObligationSelector sel = new ConsoleProofObligationSelector(this, initConfig);
+        ProofObligationSelector sel = new ConsoleProofObligationSelector(this, initConfig);
+    	return sel.selectProofObligation();
+//        if(verbosity >= Verbosity.DEBUG) {
+//            System.out.println("Proof Obligation selection not supported by console.");
+//        }
+//        return false;
     }
     
    /**
@@ -366,5 +393,55 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    @Override
    public void reportWarnings(ImmutableSet<PositionedString> warnings) {
       // Nothing to do
+   }
+
+   public static boolean saveProof(Object result, Proof proof,
+         File keyProblemFile) {
+
+      if (result instanceof Throwable) {
+         throw new Error("Error in batchmode.", (Throwable) result);
+      }
+
+      // Save the proof before exit.
+
+      String baseName = keyProblemFile.getAbsolutePath();
+      int idx = baseName.indexOf(".key");
+      if (idx == -1) {
+         idx = baseName.indexOf(".proof");
+      }
+      baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
+
+      File f;
+      int counter = 0;
+      do {
+
+         f = new File(baseName + ".auto." + counter + ".proof");
+         counter++;
+      }
+      while (f.exists());
+
+      try {
+         // a copy with running number to compare different runs
+         proof.saveToFile(new File(f.getAbsolutePath()));
+         // save current proof under common name as well
+         proof.saveToFile(new File(baseName + ".auto.proof"));
+      }
+      catch (IOException e) {
+         e.printStackTrace();
+      }
+
+      if (proof.openGoals().size() == 0) {
+         // Says that all Proofs have succeeded
+         return true;
+      }
+      else {
+         // Says that there is at least one open Proof
+         return false;
+      }
+   }
+
+   @Override
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      return null;
    }
 }

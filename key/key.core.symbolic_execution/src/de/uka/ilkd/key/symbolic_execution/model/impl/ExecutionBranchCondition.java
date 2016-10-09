@@ -146,12 +146,14 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             branchCondition = services.getTermBuilder().and(mergedBranchCondtions);
             // Simplify merged branch conditions
             if (mergedConditions.length >= 2) {
-               branchCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), branchCondition);
+               if (getSettings().isSimplifyConditions()) {
+                  branchCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), branchCondition);
+               }
                branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, services);
             }
          }
          else {
-            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true, true);
+            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), getSettings().isSimplifyConditions(), true);
          }
          // Format branch condition
          formatedBranchCondition = formatTerm(branchCondition, services);
@@ -206,9 +208,15 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             parentPath = services.getTermBuilder().tt();
          }
          // Add current branch condition to path
-         pathCondition = services.getTermBuilder().and(parentPath, getBranchCondition());
+         Term branchCondition = getBranchCondition();
+         if (branchCondition == null) {
+            return; // Proof disposed in between.
+         }
+         pathCondition = services.getTermBuilder().and(parentPath, branchCondition);
          // Simplify path condition
-         pathCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), pathCondition);
+         if (getSettings().isSimplifyConditions()) {
+            pathCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), pathCondition);
+         }
          pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, services);
          // Format path condition
          formatedPathCondition = formatTerm(pathCondition, services);
@@ -256,7 +264,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
          Term[] result = new Term[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
-            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true, true);
+            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), getSettings().isSimplifyConditions(), true);
          }
          return result;
       }

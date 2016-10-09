@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions;bundle-version="3.4.300",
  org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.200"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.ui.action,
  org.key_project.sed.ui.command,
@@ -27,6 +27,8 @@ Export-Package: org.key_project.sed.ui.action,
  org.key_project.sed.ui.presentation,
  org.key_project.sed.ui.property,
  org.key_project.sed.ui.provider,
+ org.key_project.sed.ui.slicing,
+ org.key_project.sed.ui.slicing.event,
  org.key_project.sed.ui.text,
  org.key_project.sed.ui.util,
  org.key_project.sed.ui.wizard,

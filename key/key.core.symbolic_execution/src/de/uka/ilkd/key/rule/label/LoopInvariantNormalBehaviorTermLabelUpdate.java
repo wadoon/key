@@ -24,18 +24,18 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Makes sure that {@link ParameterlessTermLabel#LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL} is introduced
+ * Makes sure that {@link SymbolicExecutionUtil#LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL} is introduced
  * when a {@link WhileInvariantRule} is applied.
  * @author Martin Hentschel
  */
@@ -58,6 +58,7 @@ public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpda
                             Term applicationTerm,
                             Term modalityTerm,
                             Rule rule,
+                            RuleApp ruleApp,
                             Goal goal,
                             Object hint,
                             Term tacletTerm,

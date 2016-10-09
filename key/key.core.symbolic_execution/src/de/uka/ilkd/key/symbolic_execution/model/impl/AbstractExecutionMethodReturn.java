@@ -136,7 +136,9 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
          // Add current branch condition to path
          methodReturnCondition = services.getTermBuilder().and(bcs);
          // Simplify path condition
-         methodReturnCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), methodReturnCondition);
+         if (getSettings().isSimplifyConditions()) {
+            methodReturnCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), methodReturnCondition);
+         }
          methodReturnCondition = SymbolicExecutionUtil.improveReadability(methodReturnCondition, services);
          // Format path condition
          formatedMethodReturnCondition = formatTerm(methodReturnCondition, services);
@@ -168,8 +170,8 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
       assert proofNode.childrenCount() == 1;
       PosInOccurrence originalPIO = methodCall.getModalityPIO();
       int index = originalPIO.isInAntec() ?
-                  proofNode.sequent().antecedent().indexOf(originalPIO.constrainedFormula()) :
-                  proofNode.sequent().succedent().indexOf(originalPIO.constrainedFormula());
+                  proofNode.sequent().antecedent().indexOf(originalPIO.sequentFormula()) :
+                  proofNode.sequent().succedent().indexOf(originalPIO.sequentFormula());
       // Search relevant position in child node
       Node childNode = proofNode.child(0);
       SequentFormula nodeSF = originalPIO.isInAntec() ?

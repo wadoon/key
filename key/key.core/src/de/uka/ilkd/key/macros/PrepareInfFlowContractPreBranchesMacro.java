@@ -39,6 +39,10 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
         return "Prepare information flow pre branches";
     }
 
+    @Override
+    public String getCategory() {
+        return "Information Flow";
+    }
 
     @Override
     public String getDescription() {
@@ -80,10 +84,10 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
                                        Goal goal) {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
-                return applyTF( "b", IsPostConditionTermFeature.INSTANCE ).compute(ruleApp, pio, goal);
+                return applyTF( "b", IsPostConditionTermFeature.INSTANCE ).computeCost(ruleApp, pio, goal);
             } else if (name.equals(AND_RIGHT_RULENAME)) {
                 RuleAppCost andRightCost =
-                        FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE.compute(ruleApp, pio, goal);
+                        FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE.computeCost(ruleApp, pio, goal);
                 return andRightCost.add(NumberRuleAppCost.create(1));
             } else {
                 return TopRuleAppCost.INSTANCE;

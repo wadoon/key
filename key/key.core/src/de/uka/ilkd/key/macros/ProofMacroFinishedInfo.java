@@ -41,7 +41,7 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals,
             Proof proof, Statistics statistics) {
         this(macro, goals, proof,
-             statistics == null ? 0 : statistics.timeInNano,
+             statistics == null ? 0 : statistics.timeInMillis,
              statistics == null ? 0 : statistics.totalRuleApps,
              proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
     }
@@ -49,17 +49,17 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof,
                            Statistics statistics) {
         this(macro, goal, proof,
-             statistics == null ? 0 : statistics.timeInNano,
+             statistics == null ? 0 : statistics.timeInMillis,
              statistics == null ? 0 : statistics.totalRuleApps,
              proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
     }
 
     ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof) {
-        this(macro, goals, proof, proof == null ? null : proof.statistics());
+        this(macro, goals, proof, proof == null ? null : proof.getStatistics());
     }
 
     ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof) {
-        this(macro, goal, proof, proof == null ? null : proof.statistics());
+        this(macro, goal, proof, proof == null ? null : proof.getStatistics());
     }
 
     public ProofMacroFinishedInfo(ProofMacro macro, Goal goal) {

@@ -50,9 +50,9 @@ public class NoFindTaclet extends Taclet {
             ImmutableList<RuleSet> ruleSets, 
             TacletAttributes attrs,
             ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
-            ImmutableSet<Choice> choices){
+            ImmutableSet<Choice> choices, ImmutableSet<TacletAnnotation> tacletAnnotations){
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, 
-                choices);
+                choices, tacletAnnotations);
         createTacletServices();
     } 
 
@@ -65,6 +65,7 @@ public class NoFindTaclet extends Taclet {
      * @return Set of schemavariables of the if and the (optional)
      * find part
      */
+    @Override
     public ImmutableSet<SchemaVariable> getIfFindVariables () {
         return getIfVariables ();
     }
@@ -74,6 +75,7 @@ public class NoFindTaclet extends Taclet {
      * variables cann occur bound than in the goal templates
      * @return empty set
      */
+    @Override
     protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {        
         return DefaultImmutableSet.<QuantifiableVariable>nil();
     }
@@ -87,7 +89,7 @@ public class NoFindTaclet extends Taclet {
         attrs.setDisplayName(displayName());
         
         return new NoFindTaclet(new Name(s), 
-                applPart, goalTemplates(), getRuleSets(), attrs, prefixMap, choices);
+                applPart, goalTemplates(), getRuleSets(), attrs, prefixMap, choices, tacletAnnotations);
     }
 
     

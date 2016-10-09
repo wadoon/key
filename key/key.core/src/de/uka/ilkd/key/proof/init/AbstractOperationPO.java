@@ -16,12 +16,14 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -47,6 +49,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -77,7 +80,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
  * ->
  * &lt;updatesToStoreInitialValues&gt;
  * &lt;modalityStart&gt;
- * exc=null;try {&lt;customCode&gt;}catch(java.lang.Exception e) {exc = e}
+ * exc=null;try {&lt;customCode&gt;}catch(java.lang.Throwable e) {exc = e}
  * &lt;modalityEnd&gt;
  * (exc = null & &lt;postconditions &gt; & &lt;optionalUninterpretedPredicate&gt;)
  * </code>
@@ -115,10 +118,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * and available via {@link #getUninterpretedPredicate()}.
     */
    private Term uninterpretedPredicate;
+   
+   /**
+    * Additional uninterpreted predicates, e.g. used in the validity branch of applied block contracts.
+    */
+   private final Set<Term> additionalUninterpretedPredicates = new HashSet<Term>();
 
    protected InitConfig proofConfig;
    
    private final Map<LocationVariable, ProgramVariable> currentLocationToPreStateMapping = new HashMap<LocationVariable, ProgramVariable>();
+   protected TermBuilder tb;
 
    /**
     * Constructor.
@@ -156,8 +165,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
    @Override
    public void readProblem() throws ProofInputException {
       assert proofConfig == null;
-      proofConfig = environmentConfig.deepCopy();
-      final Services proofServices = proofConfig.getServices();
+      final Services proofServices = postInit();
       final IProgramMethod pm = getProgramMethod();
       final boolean[] transactionFlags;
       final List<Term> termPOs = new ArrayList<Term>();
@@ -214,6 +222,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
                   permsFor = tb.and(permsFor, pf);
               }
           }
+          final Map<LocationVariable, LocationVariable> beforeVars =
+                  HeapContext.getBeforeAtPreVars(heaps, proofServices, "Before");
+
+          final Map<Term, Term> heapToBefore = new LinkedHashMap<Term, Term>();
+
+          for (LocationVariable heap : heaps) {
+             heapToBefore.put(tb.var(heap), tb.var(beforeVars.get(heap)));
+          }
 
           final Term pre =
                   tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, proofServices),
@@ -223,8 +239,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
           // Add uninterpreted predicate
           if (isAddUninterpretedPredicate()) {
               postTerm = tb.and(postTerm,
-                      buildUninterpretedPredicate(paramVars, formalParamVars, null, getUninterpretedPredicateName(), proofServices));
+                      ensureUninterpretedPredicateExists(paramVars, formalParamVars, null, getUninterpretedPredicateName(), proofServices));
           }
+
+          Term frameTerm = buildFrameClause(heaps, heapToBefore, selfVar, paramVars, proofServices);
+          Term post = tb.and(postTerm, frameTerm);
           ImmutableList<FunctionalOperationContract> lookupContracts = ImmutableSLList.<FunctionalOperationContract>nil();
           ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository().getOperationContracts(getCalleeKeYJavaType(), pm);
           for(KeYJavaType superType : proofServices.getJavaInfo().getAllSupertypes(getCalleeKeYJavaType())) {
@@ -238,6 +257,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
               if(representsFromContract != null) break;
           }
           final Term progPost;
+          Term saveBeforeHeaps = null;
+          for (Term heap : heapToBefore.keySet()) {
+              final Term bu = tb.elementary(heapToBefore.get(heap), heap);
+              if(saveBeforeHeaps == null) {
+                  saveBeforeHeaps = bu;
+              } else {
+                  saveBeforeHeaps = tb.parallel(saveBeforeHeaps, bu);
+              }
+          }
+
           if(representsFromContract == null) {
               final Term[] updateSubs = new Term[target.arity()];
               int i = 0;
@@ -255,11 +284,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
               for(ProgramVariable paramVar : paramVars) {
                   updateSubs[i++] = tb.var(paramVar);
               }
-              progPost = tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), postTerm);
+              progPost = tb.apply(saveBeforeHeaps, tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), post));
           } else {
               final Term body = representsFromContract;
               assert body.op() == Equality.EQUALS : "Only fully functional represents clauses for model methods are supported!";
-              progPost = tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), postTerm);
+              progPost = tb.apply(saveBeforeHeaps, tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), post));
           }
           termPOs.add(tb.imp(pre, progPost));
       } else {
@@ -366,7 +395,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          // Add uninterpreted predicate
          if (isAddUninterpretedPredicate()) {
             postTerm = tb.and(postTerm,
-                              buildUninterpretedPredicate(paramVars, formalParamVars, exceptionVar,
+                              ensureUninterpretedPredicateExists(paramVars, formalParamVars, exceptionVar,
                                                           getUninterpretedPredicateName(), proofServices));
          }
 
@@ -399,6 +428,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
       // for JML annotation statements
       generateWdTaclets(proofConfig);
+   }
+
+   protected Services postInit() {
+      proofConfig = environmentConfig.deepCopy();
+      final Services proofServices = proofConfig.getServices();
+      tb = proofServices.getTermBuilder();
+      return proofServices;
    }
 
    /**
@@ -665,29 +701,60 @@ public abstract class AbstractOperationPO extends AbstractPO {
    }
 
    /**
-    * Builds a {@link Term} to use in the postcondition of the generated
-    * {@link Sequent} which represents the uninterpreted predicate.
+    * Creates {@link #uninterpretedPredicate}.
     * @param paramVars The parameters {@link ProgramVariable}s.
     * @param formalParamVars The formal parameters {@link LocationVariable}s.
     * @param exceptionVar The exception variable.
     * @param name The name of the uninterpreted predicate.
     * @return The created uninterpreted predicate.
     */
-   protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars,
-                                              ImmutableList<LocationVariable> formalParamVars,
-                                              ProgramVariable exceptionVar,
-                                              String name,
-                                              Services services) {
+   protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
+                                                     ImmutableList<LocationVariable> formalParamVars,
+                                                     ProgramVariable exceptionVar,
+                                                     String name,
+                                                     Services services) {
       // Make sure that the predicate is not already created
       if (uninterpretedPredicate != null) {
          throw new IllegalStateException("The uninterpreted predicate is already available.");
       }
+      uninterpretedPredicate = createUninterpretedPredicate(formalParamVars, tb.var(exceptionVar), name, services);
+      return uninterpretedPredicate;
+   }
+   
+   /**
+    * Creates a new uninterpreted predicate which is added to {@link #additionalUninterpretedPredicates}.
+    * @param formalParamVars The formal parameters {@link LocationVariable}s.
+    * @param exceptionVar The exception variable.
+    * @param name The name of the uninterpreted predicate.
+    * @return The created uninterpreted predicate.
+    */   
+   protected Term newAdditionalUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
+                                                      Term exceptionVar,
+                                                      String name,
+                                                      Services services) {
+      Term up = createUninterpretedPredicate(formalParamVars, exceptionVar, name, services);
+      additionalUninterpretedPredicates.add(up);
+      return up;
+   }
+   
+   /**
+    * Creates a {@link Term} to use in the postcondition of the generated
+    * {@link Sequent} which represents the uninterpreted predicate.
+    * @param formalParamVars The formal parameters {@link LocationVariable}s.
+    * @param exceptionVar The exception variable.
+    * @param name The name of the uninterpreted predicate.
+    * @return The created uninterpreted predicate.
+    */   
+   protected Term createUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
+                                               Term exceptionVar,
+                                               String name,
+                                               Services services) {
       // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
       ImmutableList<Term> arguments = ImmutableSLList.nil(); //tb.var(paramVars); // Method parameters
       for (LocationVariable formalParam : formalParamVars) {
          arguments = arguments.prepend(tb.var(formalParam));
       }
-      arguments = arguments.prepend(tb.var(exceptionVar)); // Exception variable (As second argument for the predicate)
+      arguments = arguments.prepend(exceptionVar); // Exception variable (As second argument for the predicate)
       arguments = arguments.prepend(tb.getBaseHeap()); // Heap (As first argument for the predicate)
       // Create non-rigid predicate with signature: SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
       ImmutableList<Sort> argumentSorts = tb.getSorts(arguments);
@@ -696,8 +763,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                 argumentSorts.toArray(new Sort[argumentSorts.size()]));
       services.getNamespaces().functions().addSafely(f);
       // Create term that uses the new predicate
-      uninterpretedPredicate = services.getTermBuilder().func(f, arguments.toArray(new Term[arguments.size()]));
-      return uninterpretedPredicate;
+      return services.getTermBuilder().func(f, arguments.toArray(new Term[arguments.size()]));
    }
 
    /**
@@ -706,6 +772,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    public Term getUninterpretedPredicate() {
       return uninterpretedPredicate;
+   }
+
+   /**
+    * Returns the available additional uninterpreted predicates.
+    * @return The available additional uninterpreted predicates.
+    */
+   public Set<Term> getAdditionalUninterpretedPredicates() {
+      return additionalUninterpretedPredicates;
    }
 
    /**
@@ -945,7 +1019,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
    public ImmutableSet<NoPosTacletApp> getInitialTaclets() {
         return taclets;
-    }
+   }
 
    /**
     * Returns the uninterpreted predicate used in the given {@link Proof} if available.
@@ -971,5 +1045,69 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    public Map<LocationVariable, ProgramVariable> getCurrentLocationToPreStateMapping() {
       return currentLocationToPreStateMapping;
+   }
+
+   /**
+    * Returns the uninterpreted predicate used in the given {@link Proof} if available.
+    * @param proof The {@link Proof} to get its uninterpreted predicate.
+    * @return The uninterpreted predicate or {@code null} if not used.
+    */
+   public static Set<Term> getAdditionalUninterpretedPredicates(Proof proof) {
+      if (proof != null && !proof.isDisposed()) {
+         ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+         if (problem instanceof AbstractOperationPO) {
+            AbstractOperationPO operationPO = (AbstractOperationPO)problem;
+            if (operationPO.isAddUninterpretedPredicate()) {
+               return operationPO.getAdditionalUninterpretedPredicates();
+            }
+         }
+      }
+      return null;
+   }
+   
+   /**
+    * This method adds the uninterpreted predicate to the given {@link Term}
+    * if the used {@link ProofOblInput} is an instance of {@link AbstractOperationPO}
+    * and {@link AbstractOperationPO#isAddUninterpretedPredicate()} is {@code true}.
+    * Otherwise the given {@link Term} is returned.  
+    * @param services The {@link Services} which provides the {@link Proof} and its {@link ProofOblInput}.
+    * @param term The {@link Term} to modify.
+    * @return The modified or original {@link Term}.
+    */
+   public static Term addUninterpretedPredicateIfRequired(Services services, Term term) {
+      ProofOblInput problem = services.getSpecificationRepository().getProofOblInput(services.getProof());
+      if (problem instanceof AbstractOperationPO) {
+         AbstractOperationPO operationPO = (AbstractOperationPO)problem;
+         if (operationPO.isAddUninterpretedPredicate()) {
+            term = services.getTermBuilder().and(term, operationPO.getUninterpretedPredicate());
+         }
+      }
+      return term;
+   }
+   
+   /**
+    * This method adds the uninterpreted predicate to the given {@link Term}
+    * if the used {@link ProofOblInput} is an instance of {@link AbstractOperationPO}
+    * and {@link AbstractOperationPO#isAddUninterpretedPredicate()} is {@code true}.
+    * Otherwise the given {@link Term} is returned.  
+    * @param services The {@link Services} which provides the {@link Proof} and its {@link ProofOblInput}.
+    * @param term The {@link Term} to modify.
+    * @param variablesToProtect {@link LocationVariable}s to protect.
+    * @param exceptionVar The exception variable to protect.
+    * @return The modified or original {@link Term}.
+    */
+   public static Term addAdditionalUninterpretedPredicateIfRequired(Services services, 
+                                                                    Term term, 
+                                                                    ImmutableList<LocationVariable> variablesToProtect,
+                                                                    Term exceptionVar) {
+      ProofOblInput problem = services.getSpecificationRepository().getProofOblInput(services.getProof());
+      if (problem instanceof AbstractOperationPO) {
+         AbstractOperationPO operationPO = (AbstractOperationPO)problem;
+         if (operationPO.isAddUninterpretedPredicate()) {
+            Term up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect, exceptionVar, operationPO.getUninterpretedPredicateName(), services);
+            term = services.getTermBuilder().and(term, up);
+         }
+      }
+      return term;
    }
 }

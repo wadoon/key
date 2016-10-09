@@ -45,6 +45,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -53,16 +54,20 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.corext.util.CodeFormatterUtil;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
 import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
+import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.internal.ui.util.CoreUtility;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLabelComposer;
 import org.eclipse.jdt.ui.JavaElementLabels;
 import org.eclipse.jdt.ui.PreferenceConstants;
+import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
 import org.key_project.util.Activator;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -455,7 +460,13 @@ public class JDTUtil {
    public static void addClasspathEntry(IJavaProject javaProject,
                                         IClasspathEntry entryToAdd) throws JavaModelException {
        if (javaProject != null && entryToAdd != null) {
-           IClasspathEntry[] newEntries = ArrayUtil.add(javaProject.getRawClasspath(), entryToAdd);
+           IClasspathEntry[] entries = javaProject.getRawClasspath();
+           for(IClasspathEntry e : entries) {
+              if(e != null && e.getPath().equals(entryToAdd.getPath())) {
+                 return;
+              }
+           }
+           IClasspathEntry[] newEntries = ArrayUtil.add(entries, entryToAdd);
            javaProject.setRawClasspath(newEntries, null);
        }
    }
@@ -949,7 +960,7 @@ public class JDTUtil {
                            boolean parametersMatches = true;
                            int i = 0;
                            while (parametersMatches && i < parameters.length) {
-                              String resolvedType = JavaModelUtil.getResolvedTypeName(parameters[i], jdtType);
+                              String resolvedType = resolveTypeSignature(parameters[i], jdtType);
                               if (!ObjectUtil.equals(resolvedType, parameterTypes[i])) {
                                  parametersMatches = false;
                               }
@@ -978,6 +989,24 @@ public class JDTUtil {
       catch (RuntimeException e) {
          throw (JavaModelException)e.getCause();
       }
+   }
+   
+   /**
+    * Resolves the given type signature.
+    * @param refTypeSig The type signature to resolve.
+    * @param declaringType The declaring {@link IType}.
+    * @return The full qualified name of the type signature.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static String resolveTypeSignature(String refTypeSig, IType declaringType) throws JavaModelException {
+      String type = JavaModelUtil.getResolvedTypeName(refTypeSig, declaringType);
+      int arrayCount = Signature.getArrayCount(refTypeSig);
+      StringBuffer sb = new StringBuffer();
+      sb.append(type);
+      for (int i = 0; i < arrayCount; i++) {
+         sb.append("[]");
+      }
+      return sb.toString();
    }
 
    /**
@@ -1028,8 +1057,8 @@ public class JDTUtil {
             String nameToValidate = sb.toString() + characters[i];
             IStatus status = project != null ?
                              JavaConventionsUtil.validateJavaTypeName(nameToValidate, project) :
-                             JavaConventions.validateJavaTypeName(nameToValidate, JavaCore.VERSION_1_3, JavaCore.VERSION_1_3);;
-            if (status.isOK()) {
+                             JavaConventions.validateJavaTypeName(nameToValidate, JavaModelUtil.VERSION_LATEST, JavaModelUtil.VERSION_LATEST);
+            if (status.isOK() || (status.getSeverity() == IStatus.WARNING && characters[i] != '.')) {
                sb.append(characters[i]);
             }
             else {
@@ -1042,6 +1071,7 @@ public class JDTUtil {
          return null;
       }
    }
+   
    
    /**
     * Returns all {@link IPackageFragmentRoot}s of the given {@link IJavaProject}.
@@ -1106,7 +1136,7 @@ public class JDTUtil {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
          parser.setResolveBindings(true);
          parser.setSource(compilationUnit);
-         Map<?, ?> options = JavaCore.getOptions();
+         Map<String, String> options = JavaCore.getOptions(); // Map<String, String> is needed for Eclipse 4.6 Neon compatibility
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);
          ASTNode result = parser.createAST(null);
@@ -1127,7 +1157,7 @@ public class JDTUtil {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
          parser.setResolveBindings(true);
          parser.setSource(classFile);
-         Map<?, ?> options = JavaCore.getOptions();
+         Map<String, String> options = JavaCore.getOptions(); // Map<String, String> is needed for Eclipse 4.6 Neon compatibility
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);
          ASTNode result = parser.createAST(null);
@@ -1169,7 +1199,7 @@ public class JDTUtil {
          parser.setKind(kind);
          parser.setResolveBindings(true);
          parser.setSource(content.toCharArray());
-         Map<?, ?> options = JavaCore.getOptions();
+         Map<String, String> options = JavaCore.getOptions(); // Map<String, String> is needed for Eclipse 4.6 Neon compatibility
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);
          ASTNode result = parser.createAST(null);
@@ -1198,5 +1228,27 @@ public class JDTUtil {
          }
       }
       return result;
+   }
+
+   /**
+    * Returns the shared {@link CompilationUnit} of the given {@link IEditorPart}.
+    * <p>
+    * Synchronization is not performed!
+    * @param editorPart The {@link IEditorPart}.
+    * @return The shared {@link CompilationUnit} if available.
+    */
+   public static CompilationUnit getSharedCompilationUnit(IEditorPart editorPart) {
+      if (editorPart != null) {
+         ITypeRoot typeRoot = EditorUtility.getEditorInputJavaElement(editorPart, false);
+         if (typeRoot != null) {
+            return SharedASTProvider.getAST(typeRoot, SharedASTProvider.WAIT_NO, null);
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
    }
 }
