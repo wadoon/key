@@ -80,7 +80,7 @@ public class TacletASTNode implements Opcodes {
         // If this is actually caused by an error, there will be a succeeding
         // NullPointerException during the applicability check.
         ApplicabilityCheckInput applCheckInput = new ApplicabilityCheckInput(
-                children.size(), instantiations);
+                children.size(), instantiations, services);
 
         List<TranslationDefinition> candidates = definitions.stream()
                 .filter(d -> d.isApplicable(applCheckInput))
@@ -102,6 +102,9 @@ public class TacletASTNode implements Opcodes {
         }
 
         UniqueLabelManager labelManager = new UniqueLabelManager();
+
+        logger.trace("Using translation %s",
+                candidates.get(0).getTranslationName());
 
         candidates.get(0).translate(mv, pvHelper, labelManager, instantiations,
                 services, children);

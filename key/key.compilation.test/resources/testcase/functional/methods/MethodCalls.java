@@ -64,6 +64,22 @@ public class MethodCalls {
       @ requires true;
       @ ensures true;
       @*/
+    public void set2(int i) {
+        set(this, i);
+    }
+    
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
+    public static void set(MethodCalls o, int i) {
+        o.i = i;
+    }
+    
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
     public int get() {
         return i;
     }

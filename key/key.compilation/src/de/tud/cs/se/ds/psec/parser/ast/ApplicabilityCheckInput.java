@@ -1,6 +1,8 @@
 package de.tud.cs.se.ds.psec.parser.ast;
 
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -13,16 +15,19 @@ public class ApplicabilityCheckInput {
 
     private int numChildren;
     private RuleInstantiations instantiations;
+    private Services services;
 
     /**
      * @param numChildren
      *            The number of children in the symbolic execution taclet AST.
-     * @param schemaVarInstantiations
+     * @param instantiations
      *            The instantiations for schema variables in the symbolic
-     *            execution {@link Taclet} to be translated.
+     *            execution {@link Rule} to be translated.
+     * @param services
+     *            The {@link Services} object.
      */
     public ApplicabilityCheckInput(int numChildren,
-            RuleInstantiations instantiations) {
+            RuleInstantiations instantiations, Services services) {
         this.numChildren = numChildren;
         this.instantiations = instantiations;
     }
@@ -40,6 +45,13 @@ public class ApplicabilityCheckInput {
      */
     public RuleInstantiations getInstantiations() {
         return instantiations;
+    }
+
+    /**
+     * @return The {@link Services} object.
+     */
+    public Services getServices() {
+        return services;
     }
 
 }

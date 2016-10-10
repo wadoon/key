@@ -30,11 +30,15 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public class TranslationDefinition extends TranslationTacletASTElement {
 
+    private String translationName;
     private ArrayList<String> symbExTacletReferences;
     private Function<ApplicabilityCheckInput, Boolean> applicabilityCheck;
     private Instructions instructions;
 
     /**
+     * @param translationName
+     *            The name of the translation as defined in the translations
+     *            file.
      * @param symbExTacletReferences
      *            The symbolic execution taclets that this
      *            {@link TranslationDefinition} can translate.
@@ -46,9 +50,11 @@ public class TranslationDefinition extends TranslationTacletASTElement {
      * @param instructions
      *            The {@link Instructions} object for translation.
      */
-    public TranslationDefinition(ArrayList<String> symbExTacletReferences,
+    public TranslationDefinition(String translationName,
+            ArrayList<String> symbExTacletReferences,
             Function<ApplicabilityCheckInput, Boolean> applicabilityCheck,
             Instructions instructions) {
+        this.translationName = translationName;
         this.symbExTacletReferences = symbExTacletReferences;
         this.applicabilityCheck = applicabilityCheck;
         this.instructions = instructions;
@@ -60,6 +66,13 @@ public class TranslationDefinition extends TranslationTacletASTElement {
      */
     public ArrayList<String> getSymbExTacletReferences() {
         return symbExTacletReferences;
+    }
+
+    /**
+     * @return The name of the translation as defined in the translations file.
+     */
+    public String getTranslationName() {
+        return translationName;
     }
 
     /**
@@ -78,10 +91,10 @@ public class TranslationDefinition extends TranslationTacletASTElement {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
-            List<TacletASTNode> children) {
-        instructions.translate(mv, pvHelper, labelManager, instantiations, services,
-                children);
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children) {
+        instructions.translate(mv, pvHelper, labelManager, instantiations,
+                services, children);
     }
 
     /**

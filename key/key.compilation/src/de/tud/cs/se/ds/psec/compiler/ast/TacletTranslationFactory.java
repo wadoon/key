@@ -12,9 +12,11 @@ import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.exceptions.NoTranslationException;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
+import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -127,11 +129,16 @@ public class TacletTranslationFactory {
      */
     public Optional<TacletASTNode> getTranslationForRuleApp(
             ContractRuleApp app) {
-        HashMap<String, Object> instantiations = new HashMap<>();
+        IProgramMethod pm = app.getRuleInstantiations().pm;
+        logger.trace(
+                "Instantiating translation of Operation Contract application for %s%s",
+                pm.name().toString(),
+                InformationExtraction.getMethodTypeDescriptor(pm));
 
-        instantiations.put("#pm", app.getRuleInstantiations().pm);
+        HashMap<String, Object> instantiations = new HashMap<>();
+        instantiations.put("#pm", pm);
         instantiations.put("#actualSelf",
-                (LocationVariable) app.getRuleInstantiations().actualSelf.op());
+                pm.isStatic() ? null : (LocationVariable) app.getRuleInstantiations().actualSelf.op());
         instantiations.put("#actualParams",
                 app.getRuleInstantiations().actualParams);
         instantiations.put("#actualResult",

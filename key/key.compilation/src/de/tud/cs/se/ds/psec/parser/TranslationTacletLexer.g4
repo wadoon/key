@@ -89,6 +89,9 @@ NOT : '!';
 
 IS_SIMPLE_TYPE : 'isSimpleType';
 IS_RESULT_VAR : 'isResultVar';
+IS_CONSTRUCTOR : 'isConstructor';
+IS_STATIC : 'isStatic';
+IS_VOID : 'isVoid';
 
 // Arithmetics
 

@@ -46,26 +46,26 @@ public class ParserTest extends TestCase {
     public void testRuleFiltering() {
         assertNotNull("No single rule for ifSplit with two children",
                 definitions.getDefinitionFor("ifSplit",
-                        new ApplicabilityCheckInput(2, null)));
+                        new ApplicabilityCheckInput(2, null, null)));
     }
 
     @Test
     public void testApplicability() {
         TranslationDefinition ifSplitDefn = definitions.getDefinitionFor(
-                "ifSplit", new ApplicabilityCheckInput(2, null));
+                "ifSplit", new ApplicabilityCheckInput(2, null, null));
 
         assertNotNull(ifSplitDefn);
 
         assertTrue("Rule is not applicable as expected",
-                ifSplitDefn.isApplicable(new ApplicabilityCheckInput(2, null)));
+                ifSplitDefn.isApplicable(new ApplicabilityCheckInput(2, null, null)));
     }
 
     @Test
     public void testSameTranslationForIfSplitAndIfElseSplit() {
         TranslationDefinition ifSplitDefn = definitions.getDefinitionFor(
-                "ifSplit", new ApplicabilityCheckInput(2, null));
+                "ifSplit", new ApplicabilityCheckInput(2, null, null));
         TranslationDefinition ifElseSplitDefn = definitions.getDefinitionFor(
-                "ifElseSplit", new ApplicabilityCheckInput(2, null));
+                "ifElseSplit", new ApplicabilityCheckInput(2, null, null));
 
         assertNotNull(ifSplitDefn);
         assertNotNull(ifElseSplitDefn);
@@ -84,13 +84,13 @@ public class ParserTest extends TestCase {
                 true).visitCondition(parser.condition());
 
         assertTrue(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(0, null)));
+                .isApplicable(new ApplicabilityCheckInput(0, null, null)));
         assertTrue(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(1, null)));
+                .isApplicable(new ApplicabilityCheckInput(1, null, null)));
         assertFalse(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(2, null)));
+                .isApplicable(new ApplicabilityCheckInput(2, null, null)));
         assertFalse(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(3, null)));
+                .isApplicable(new ApplicabilityCheckInput(3, null, null)));
     }
 
     @Test
@@ -113,13 +113,13 @@ public class ParserTest extends TestCase {
                 true).visitDefinition(parser.definition());
 
         assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(0, null)));
+                .isApplicable(new ApplicabilityCheckInput(0, null, null)));
         assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(1, null)));
+                .isApplicable(new ApplicabilityCheckInput(1, null, null)));
         assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(2, null)));
+                .isApplicable(new ApplicabilityCheckInput(2, null, null)));
         assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(3, null)));
+                .isApplicable(new ApplicabilityCheckInput(3, null, null)));
     }
 
     // TODO: Add test for "isSimpleType(...)". Need to have access to a Services

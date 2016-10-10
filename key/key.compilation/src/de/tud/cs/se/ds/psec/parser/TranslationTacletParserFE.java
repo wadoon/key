@@ -20,7 +20,10 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.DefinitionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Field_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsConstructorExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsResultVarExpressionContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsStaticExpressionContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsVoidExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Labeled_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeInstrContext;
@@ -55,7 +58,9 @@ import de.tud.cs.se.ds.psec.parser.ast.TypeInstr;
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 /**
  * Front-end for {@link TranslationTacletParser}, a parser for taclets defining
@@ -209,8 +214,9 @@ public class TranslationTacletParserFE extends
                     .reduce(true, (acc, c) -> acc && c);
         });
 
-        return new TranslationDefinition(symbExTacletReferences,
-                applicabilityCheck, visitTranslation(ctx.translation()));
+        return new TranslationDefinition(ctx.name.getText(),
+                symbExTacletReferences, applicabilityCheck,
+                visitTranslation(ctx.translation()));
     }
 
     @Override
@@ -265,6 +271,38 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
+    public ApplicabilityCondition visitIsConstructorExpression(
+            IsConstructorExpressionContext ctx) {
+        return new ApplicabilityCondition(info -> {
+            MethodBodyStatement mbs = (MethodBodyStatement) info
+                    .getInstantiations()
+                    .getInstantiationFor(ctx.LOC_REF().getText()).get();
+            return mbs.getMethodReference().getMethodName().toString()
+                    .equals("<init>");
+        });
+    }
+
+    @Override
+    public ApplicabilityCondition visitIsStaticExpression(
+            IsStaticExpressionContext ctx) {
+        return new ApplicabilityCondition(info -> {
+            ProgramMethod pm = (ProgramMethod) info.getInstantiations()
+                    .getInstantiationFor(ctx.LOC_REF().getText()).get();
+            return pm.isStatic();
+        });
+    }
+    
+    @Override
+    public ApplicabilityCondition visitIsVoidExpression(
+            IsVoidExpressionContext ctx) {
+        return new ApplicabilityCondition(info -> {
+            ProgramMethod pm = (ProgramMethod) info.getInstantiations()
+                    .getInstantiationFor(ctx.LOC_REF().getText()).get();
+            return pm.isVoid();
+        });
+    }
+
+    @Override
     public ApplicabilityCondition visitIsResultVarExpression(
             IsResultVarExpressionContext ctx) {
         return new ApplicabilityCondition(info -> {
@@ -272,7 +310,7 @@ public class TranslationTacletParserFE extends
             // Operation Contract rule applications. We should actually check
             // whether this variable was indeed introduced by such an
             // application...
-            
+
             Expression expr = (Expression) info.getInstantiations()
                     .getInstantiationFor(ctx.LOC_REF().getText()).get();
 

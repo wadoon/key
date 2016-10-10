@@ -13,12 +13,13 @@ public class TestAlfred extends TestSuite {
 
     @SuppressWarnings("unchecked")
     static Class<? extends TestCase>[] parserTests = new Class[] {
-            de.tud.cs.se.ds.psec.parser.ParserTest.class
+            de.tud.cs.se.ds.psec.parser.ParserTest.class,
     };
 
     @SuppressWarnings("unchecked")
     static Class<? extends TestCase>[] compilerTests = new Class[] {
-            de.tud.cs.se.ds.psec.compiler.SimpleCompilerFunctionalTests.class
+            de.tud.cs.se.ds.psec.compiler.SimpleCompilerFunctionalTests.class,
+            de.tud.cs.se.ds.psec.compiler.MethodCallFunctionalTests.class,
     };
 
     public static TestSuite createSuite(Class<? extends TestCase>[] testClasses, final String msg) {

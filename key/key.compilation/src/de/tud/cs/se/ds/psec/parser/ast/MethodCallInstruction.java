@@ -77,32 +77,31 @@ public class MethodCallInstruction extends Instruction {
             throw new UnsupportedFeatureException(msg);
         }
 
-        if (!pm.isStatic()) {
-
-            if (isConstructor) {
-                // TODO: Intermediate solution, should be included in rules
-                // instead
-                mv.visitVarInsn(ALOAD, 0);
-            }
-
-            if (mbs != null) {
-                for (Expression expr : mbs.getArguments()) {
-                    loadExpressionToStack(mv, pvHelper, expr);
-                }
-            }
-
-            mv.visitMethodInsn(isConstructor ? INVOKESPECIAL : INVOKEVIRTUAL,
-                    InformationExtraction.toInternalName(pm.getContainerType()),
-                    pm.getName(),
-                    InformationExtraction.getMethodTypeDescriptor(pm), false);
-
-        } else {
-            String msg = Utilities.format(
-                    "Currently not supporting static method calls; problem: %s",
-                    pm);
-            logger.error(msg);
-            throw new UnsupportedFeatureException(msg);
+        if (isConstructor) {
+            // TODO: Intermediate solution, should be included in rules
+            // instead
+            mv.visitVarInsn(ALOAD, 0);
         }
+
+        if (mbs != null) {
+            for (Expression expr : mbs.getArguments()) {
+                loadExpressionToStack(mv, pvHelper, expr);
+            }
+        }
+
+        int opcode = INVOKEVIRTUAL;
+        if (isConstructor) {
+            opcode = INVOKESPECIAL;
+        } else if (pm.isStatic()) {
+            opcode = INVOKESTATIC;
+        }
+
+        // TODO Missing: INVOKEDYNAMIC, INVOKEINTERFACE
+
+        mv.visitMethodInsn(opcode,
+                InformationExtraction.toInternalName(pm.getContainerType()),
+                pm.getName(), InformationExtraction.getMethodTypeDescriptor(pm),
+                false);
 
     }
 

@@ -12,7 +12,7 @@ definitions
 
 definition
     :
-        IDENT
+        (name = IDENT)
         LBRACE
             taclets_reference
             condition *
@@ -215,6 +215,21 @@ special_expression
 		LPAREN
 			LOC_REF
 		RPAREN          # isResultVarExpression
+	|
+		IS_CONSTRUCTOR
+		LPAREN
+			LOC_REF
+		RPAREN          # isConstructorExpression
+	|
+		IS_STATIC
+		LPAREN
+			LOC_REF
+		RPAREN          # isStaticExpression
+	|
+		IS_VOID
+		LPAREN
+			LOC_REF
+		RPAREN          # isVoidExpression
 	;
 
 simple_arithmetic_expression
