@@ -24,32 +24,16 @@ public class MethodCallFunctionalTests extends AbstractCompilerFunctionalTest {
     }
 
     @Test
-    public void testObjectConstructionAndMemberAccess() {
+    public void testEqualsAndSetMethods() {
         
         Class<?> simpleObjects = compile("methods/MethodCalls.java",
                 "de.tud.test.methods.MethodCalls");
-
-        //TODO
 
         try {
 
             Constructor<?> ctor = simpleObjects.getConstructor(int.class);
 
-            final int paramArg = 1;
-            Object o1 = ctor.newInstance(paramArg);
-
-            Field f = o1.getClass().getDeclaredField("i");
-
-            // Assert that the field was correctly compiled as a private one
-            assertNotEquals("Field not private as expected", 0,
-                    f.getModifiers() & Modifier.PRIVATE);
-
-            // Make the field public to retrieve its value
-            f.setAccessible(true);
-
-            assertEquals("Field not initialized as expected", paramArg,
-                    f.getInt(o1));
-
+            Object o1 = ctor.newInstance(1);
             Object o2 = ctor.newInstance(1);
             Object o3 = ctor.newInstance(2);
 
@@ -73,10 +57,22 @@ public class MethodCallFunctionalTests extends AbstractCompilerFunctionalTest {
             runTests(simpleObjects, "equals", new Class<?>[] { Object.class },
                     testDataEqualsObj);
 
+            // Test "set(int)" method
+            callMethod(simpleObjects, "set", o1, new Class<?>[] { int.class }, 2);
+
+            List<TestData<Boolean>> testDataEqualsObjAfterSet = Arrays.asList(
+                    new TestData<Boolean>(true, o1, o1),
+                    new TestData<Boolean>(false, o1, o2),
+                    new TestData<Boolean>(true, o1, o3),
+                    new TestData<Boolean>(false, o1, new Object()),
+                    new TestData<Boolean>(false, o1, (Object) o2));
+
+            runTests(simpleObjects, "equals", new Class<?>[] { Object.class },
+                    testDataEqualsObjAfterSet);
+
         } catch (NoSuchMethodException | SecurityException
                 | InstantiationException | IllegalAccessException
-                | IllegalArgumentException | InvocationTargetException
-                | NoSuchFieldException e) {
+                | IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();
             fail(e.getMessage());
         }

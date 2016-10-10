@@ -39,5 +39,21 @@ public class MethodCalls {
     public boolean equals(MethodCalls o) {
         return i == o.i;
     }
+    
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
+    public void set(int i) {
+        this.i = i;
+    }
+    
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
+    public int get() {
+        return i;
+    }
   
 }

@@ -94,7 +94,7 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
      * @param <C>
      *            The type for the expected results in the test data.
      */
-    protected <C> void runTests(Class<?> cls, String testMethodName,
+    protected static <C> void runTests(Class<?> cls, String testMethodName,
             Class<?>[] argTypes, List<TestData<C>> testData) {
 
         try {
@@ -117,6 +117,44 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
                 | TranslationTacletInputException e) {
             e.printStackTrace();
             fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Calls a method via reflection and returns the result; if the called
+     * method is void, the result will be null. Any exception will cause the
+     * calling test case to fail.
+     * 
+     * @param cls
+     *            The {@link Class} containing the method.
+     * @param testMethodName
+     *            The name of the {@link Method}.
+     * @param obj
+     *            The object to call the {@link Method} on. May be null for
+     *            static {@link Method}s.
+     * @param argTypes
+     *            The array of argument types.
+     * @param args
+     *            The actual arguments for the method call.
+     * @return The result of the call, or null if the method is void or the call
+     *         induces an {@link Exception}.
+     * 
+     * @see Class#getMethod(String, Class...)
+     * @see Method#invoke(Object, Object...)
+     */
+    protected static Object callMethod(Class<?> cls, String testMethodName, Object obj,
+            Class<?>[] argTypes, Object... args) {
+        try {
+
+            Method method = cls.getMethod(testMethodName, argTypes);
+            return method.invoke(obj, args);
+
+        } catch (NoSuchMethodException | SecurityException
+                | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+            return null;
         }
     }
 
