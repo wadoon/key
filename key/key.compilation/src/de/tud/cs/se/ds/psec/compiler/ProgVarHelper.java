@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
  */
 public class ProgVarHelper {
     private HashMap<String, Integer> progVarOffsetMap = new HashMap<>();
+    private int counter = 0;
 
     /**
      * Constructs a new {@link ProgVarHelper}. The helper has to know whether
@@ -29,12 +30,16 @@ public class ProgVarHelper {
     public ProgVarHelper(boolean isStatic,
             Iterable<ParameterDeclaration> methodParameters) {
         if (!isStatic) {
+            // We support the standard Java "this" as well as the KeY "self"
+            // equivalent. They serve the same purpose.
             progVarOffsetMap.put("this", 0);
+            progVarOffsetMap.put("self", 0);
+            counter++;
         }
-        
+
         for (ParameterDeclaration param : methodParameters) {
             progVarOffsetMap.put(param.getVariables().get(0).toString(),
-                    progVarOffsetMap.size());
+                    counter++);
         }
     }
 
@@ -54,11 +59,10 @@ public class ProgVarHelper {
 
         if (progVarOffsetMap.containsKey(progVarName)) {
             return progVarOffsetMap.get(progVarName);
-        }
-        else {
+        } else {
             // Offset 0 for "this" pointer, following ones for method
             // parameters, then for local variables.
-            int offset = progVarOffsetMap.size();
+            int offset = counter++;
             progVarOffsetMap.put(progVarName, offset);
 
             return offset;

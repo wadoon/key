@@ -15,6 +15,7 @@ import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -129,6 +130,8 @@ public class TacletTranslationFactory {
         HashMap<String, Object> instantiations = new HashMap<>();
 
         instantiations.put("#pm", app.getRuleInstantiations().pm);
+        instantiations.put("#actualSelf",
+                (LocationVariable) app.getRuleInstantiations().actualSelf.op());
         instantiations.put("#actualParams",
                 app.getRuleInstantiations().actualParams);
         instantiations.put("#actualResult",
@@ -232,37 +235,52 @@ public class TacletTranslationFactory {
 
 class MethodCalls {
     private int i;
-    
-    /*@ public normal_behavior
-      @ requires true;
-      @ ensures true;
-      @*/
+
+    /*
+     * @ public normal_behavior
+     * 
+     * @ requires true;
+     * 
+     * @ ensures true;
+     * 
+     * @
+     */
     public MethodCalls(int i) {
-        //TODO: Currently, we have to do an explicit super() call.
+        // TODO: Currently, we have to do an explicit super() call.
         // This should be done by the compiler if we omit it.
         super();
-        
+
         this.i = i;
     }
-    
-    /*@ public normal_behavior
-      @ requires true;
-      @ ensures true;
-      @*/
+
+    /*
+     * @ public normal_behavior
+     * 
+     * @ requires true;
+     * 
+     * @ ensures true;
+     * 
+     * @
+     */
     public boolean equals(Object o) {
         if (!(o instanceof MethodCalls)) {
             return false;
         }
-        
+
         return equals((MethodCalls) o);
     }
-    
-    /*@ public normal_behavior
-      @ requires true;
-      @ ensures true;
-      @*/
+
+    /*
+     * @ public normal_behavior
+     * 
+     * @ requires true;
+     * 
+     * @ ensures true;
+     * 
+     * @
+     */
     public boolean equals(MethodCalls o) {
         return i == o.i;
     }
-  
+
 }

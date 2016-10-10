@@ -36,6 +36,18 @@ public class MethodCalls {
       @ requires true;
       @ ensures true;
       @*/
+    public boolean equals2(Object o) {
+        if (!(o instanceof MethodCalls)) {
+            return false;
+        }
+        
+        return ((MethodCalls) o).equals(this);
+    }
+    
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
     public boolean equals(MethodCalls o) {
         return i == o.i;
     }

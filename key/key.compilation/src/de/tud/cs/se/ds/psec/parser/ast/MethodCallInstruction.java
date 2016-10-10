@@ -79,7 +79,11 @@ public class MethodCallInstruction extends Instruction {
 
         if (!pm.isStatic()) {
 
-            mv.visitVarInsn(ALOAD, 0);
+            if (isConstructor) {
+                // TODO: Intermediate solution, should be included in rules
+                // instead
+                mv.visitVarInsn(ALOAD, 0);
+            }
 
             if (mbs != null) {
                 for (Expression expr : mbs.getArguments()) {

@@ -1,11 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler;
 
-import static org.junit.Assert.assertNotEquals;
-
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,6 +51,9 @@ public class MethodCallFunctionalTests extends AbstractCompilerFunctionalTest {
                     new TestData<Boolean>(true, o1, (Object) o2));
 
             runTests(simpleObjects, "equals", new Class<?>[] { Object.class },
+                    testDataEqualsObj);
+
+            runTests(simpleObjects, "equals2", new Class<?>[] { Object.class },
                     testDataEqualsObj);
 
             // Test "set(int)" method
