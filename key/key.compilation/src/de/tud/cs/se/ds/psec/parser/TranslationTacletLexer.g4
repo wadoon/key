@@ -23,6 +23,9 @@ METHOD_CALL
 NEGATE
     : '\\negate';
 
+STORE
+    : '\\store';
+
 CHILD
     : '#child-'
     ;
@@ -100,6 +103,7 @@ MINUS : '-' ;
 // Bytecode directives
 
 ALOAD     : 'ALOAD';
+ARETURN   : 'ARETURN';
 ASTORE    : 'ASTORE';
 BIPUSH    : 'BIPUSH';
 CHECKCAST : 'CHECKCAST';

@@ -104,6 +104,7 @@ public class Main {
 
             compiler.compile();
             
+            System.exit(0);
         }
         catch (ParseException exp) {
             printHelp(options);
@@ -118,6 +119,8 @@ public class Main {
         catch (RuntimeException e) {
             logger.error("Problem occurred during compilation:\n%s", e.getMessage()); 
         }
+        
+        System.exit(1);
     }
 
     /**

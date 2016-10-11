@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.key_project.util.java.IOUtil;
 
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
@@ -23,6 +25,7 @@ import junit.framework.TestCase;
  * @author Dominic Scheurer
  */
 public abstract class AbstractCompilerFunctionalTest extends TestCase {
+    private static final Logger logger = LogManager.getFormatterLogger();
     private static final String FUNCTIONAL_TESTS_RELATIVE_DIR = "/resources/testcase/functional/";
     private static final String TMP_OUT_DIR = "./testTmp/";
 
@@ -100,6 +103,12 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
         try {
 
             Method method = cls.getMethod(testMethodName, argTypes);
+            if (!method.isAccessible()) {
+                logger.warn(
+                        "Method %s#%s was not accessible, enforcing accessibility",
+                        method.getDeclaringClass().getName(), method.getName());
+                method.setAccessible(true);
+            }
 
             for (TestData<C> testItem : testData) {
                 //@formatter:off
@@ -142,8 +151,8 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
      * @see Class#getMethod(String, Class...)
      * @see Method#invoke(Object, Object...)
      */
-    protected static Object callMethod(Class<?> cls, String testMethodName, Object obj,
-            Class<?>[] argTypes, Object... args) {
+    protected static Object callMethod(Class<?> cls, String testMethodName,
+            Object obj, Class<?>[] argTypes, Object... args) {
         try {
 
             Method method = cls.getMethod(testMethodName, argTypes);
@@ -179,6 +188,44 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
 
             compiler.compile();
 
+            Class<?> cls = loadClass(className);
+
+            return cls;
+
+        } catch (TranslationTacletInputException | ProblemLoaderException
+                | IOException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Loads the {@link Class} with the given name from the {@link #TMP_OUT_DIR}
+     * directory.
+     * 
+     * @param className
+     *            The fully qualified class name of the class to test.
+     * @return The loaded {@link Class}.
+     */
+    protected Class<?> loadClass(String className) {
+        return loadClass(className, null);
+    }
+
+    /**
+     * Loads the {@link Class} with the given name from the {@link #TMP_OUT_DIR}
+     * directory.
+     * 
+     * @param className
+     *            The fully qualified class name of the class to test.
+     * @param parentClassLoader
+     *            The {@link ClassLoader} to use for delegation. May be null.
+     * @return The loaded {@link Class}.
+     */
+    protected Class<?> loadClass(String className,
+            ClassLoader parentClassLoader) {
+        try {
+
             File outputClassFile = new File(TMP_OUT_DIR,
                     className.replace('.', '/') + ".class");
 
@@ -188,14 +235,15 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
             URL url = Paths.get(TMP_OUT_DIR).toFile().toURI().toURL();
             URL[] urls = new URL[] { url };
 
-            URLClassLoader cl = new URLClassLoader(urls);
+            URLClassLoader cl = parentClassLoader == null
+                    ? new URLClassLoader(urls)
+                    : new URLClassLoader(urls, parentClassLoader);
             Class<?> cls = cl.loadClass(className);
             cl.close();
-
             return cls;
 
-        } catch (TranslationTacletInputException | ProblemLoaderException
-                | IOException | ClassNotFoundException e) {
+        } catch (TranslationTacletInputException | IOException
+                | ClassNotFoundException e) {
             e.printStackTrace();
             fail(e.getMessage());
             return null;

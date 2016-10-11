@@ -22,6 +22,7 @@ public class NullaryBytecodeInstr extends Instruction {
     private static final HashMap<String, Integer> OPCODES_MAP = new HashMap<>();
 
     static {
+        OPCODES_MAP.put("ARETURN", ARETURN);
         OPCODES_MAP.put("IADD", IADD);
         OPCODES_MAP.put("ICONST_M1", ICONST_M1);
         OPCODES_MAP.put("ICONST_0", ICONST_0);

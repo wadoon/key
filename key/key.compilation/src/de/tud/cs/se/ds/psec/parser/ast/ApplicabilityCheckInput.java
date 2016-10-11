@@ -53,5 +53,20 @@ public class ApplicabilityCheckInput {
     public Services getServices() {
         return services;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(ApplicabilityCheckInput.class.getSimpleName())
+            .append("(")
+            .append("numChildren=")
+            .append(numChildren)
+            .append(", instantiations=")
+            .append(instantiations)
+            .append(")");
+        
+        return sb.toString();
+    }
 
 }

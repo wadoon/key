@@ -2,6 +2,7 @@ package de.tud.cs.se.ds.psec.compiler.ast;
 
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -42,7 +43,7 @@ public class RuleInstantiations {
         if (app == null || app.instantiations() == null) {
             return;
         }
-        
+
         (Utilities.toStream(() -> app.instantiations().svIterator()))
                 .map(SchemaVariable::name)
                 .map(svName -> new Pair<>(svName.toString(),
@@ -66,6 +67,19 @@ public class RuleInstantiations {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "{"
+                + instantiations.keySet().stream()
+                        .filter(k -> !k.equals("Context"))
+                        .map(k -> k + "=\""
+                                + instantiations.get(k).toString()
+                                        .replaceAll("\n", "")
+                                + "\"")
+                        .collect(Collectors.joining(","))
+                + "}";
     }
 
 }

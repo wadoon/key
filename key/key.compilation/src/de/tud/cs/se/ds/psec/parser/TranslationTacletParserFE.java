@@ -36,6 +36,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_arithmetic_exp
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialExpressionAtomContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialUnaryInstrsContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Store_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.TranslationContext;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
@@ -51,6 +52,7 @@ import de.tud.cs.se.ds.psec.parser.ast.LocVarUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.MethodCallInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.ParamsLoadInstruction;
+import de.tud.cs.se.ds.psec.parser.ast.StoreInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationTacletASTElement;
@@ -449,6 +451,12 @@ public class TranslationTacletParserFE extends
     public ParamsLoadInstruction visitParams_load_instr(
             Params_load_instrContext ctx) {
         return new ParamsLoadInstruction(ctx.LOC_REF().getText());
+    }
+    
+    @Override
+    public StoreInstruction visitStore_instr(
+            Store_instrContext ctx) {
+        return new StoreInstruction(ctx.LOC_REF().getText());
     }
 
     @Override

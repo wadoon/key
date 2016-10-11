@@ -69,11 +69,15 @@ bytecode_instr
     |
     	method_call
     |
+    	store_instr
+    |
         child_call
     ;
 
 nullary_bytecode_instr
     :
+    	ARETURN
+    |
         IADD
     |
         ICONST_D
@@ -173,6 +177,14 @@ negated_load_instr
 params_load_instr
 	:
 		LOAD_PARAMS
+		LPAREN
+			LOC_REF
+		RPAREN
+	;
+
+store_instr
+	:
+		STORE
 		LPAREN
 			LOC_REF
 		RPAREN

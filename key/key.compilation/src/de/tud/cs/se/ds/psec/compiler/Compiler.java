@@ -247,6 +247,8 @@ public class Compiler {
                                 + "the translation methods. Run with argument --debug "
                                 + "to obtain additional information.");
             }
+            
+            throw e;
 
         }
 
