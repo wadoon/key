@@ -196,24 +196,12 @@ assignment_write_attribute_this {
 // For assignment_read_attribute, we ignore
 // the possible NullPointerExceptions so far.
 // In the future, we could try to prevent those.
-assignment_read_attribute_object {
+assignment_read_attribute {
 	\taclets ("assignment_read_attribute", "assignment_read_attribute_this")
-	\condition (!isSimpleType(#v0))
 	\translation (
 		\load (#v)
 		GETFIELD #v.#a
-		ASTORE #v0
-		#child-1
-	)
-}
-
-assignment_read_attribute_primitive {
-	\taclets ("assignment_read_attribute", "assignment_read_attribute_this")
-	\condition (isSimpleType(#v0))
-	\translation (
-		\load (#v)
-		GETFIELD #v.#a
-		ISTORE #v0
+		\store (#v0)
 		#child-1
 	)
 }
