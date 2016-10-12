@@ -128,7 +128,7 @@ public class InformationExtraction implements Opcodes {
         return InformationExtraction.createOpcode(classDecl.isPublic(),
                 classDecl.isProtected(), classDecl.isPrivate(),
                 classDecl.isAbstract(), classDecl.isFinal(),
-                classDecl.isStatic(), classDecl.isInterface());
+                classDecl.isStatic(), classDecl.isInterface()) + ACC_SUPER;
     }
 
     /**

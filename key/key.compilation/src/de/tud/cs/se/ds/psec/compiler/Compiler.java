@@ -211,6 +211,7 @@ public class Compiler {
             cw.visit(CLASS_VERSION,
                     InformationExtraction.createOpcode(typeDecl), internalName,
                     null, extending, implementing);
+            cw.visitSource(javaFile.getName(), null);
 
             ImmutableArray<MemberDeclaration> members = typeDecl.getMembers();
             members.forEach(m -> {

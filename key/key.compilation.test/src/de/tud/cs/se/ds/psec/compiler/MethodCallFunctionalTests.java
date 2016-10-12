@@ -22,7 +22,7 @@ public class MethodCallFunctionalTests extends AbstractCompilerFunctionalTest {
     @Test
     public void testEqualsAndSetMethods() {
 
-        Class<?> methodCalls = compile("methods/MethodCalls.java",
+        Class<?> methodCalls = compileAndLoad("methods/MethodCalls.java",
                 "de.tud.test.methods.MethodCalls");
 
         try {
@@ -102,16 +102,15 @@ public class MethodCallFunctionalTests extends AbstractCompilerFunctionalTest {
     @Test
     public void testNonPrimitiveMethods() {
 
-        Class<?> StringContainer = compile(
-                "nonprimitive_methods/NonPrimitiveMethods.java",
-                "de.tud.test.methods.StringContainer");
+        compile("nonprimitive_methods/NonPrimitiveMethods.java");
 
-        Class<?> NonPrimitiveMethods = loadClass(
-                "de.tud.test.methods.NonPrimitiveMethods",
-                StringContainer.getClassLoader());
+        Class<?>[] classes = loadClasses(
+                new String[] { "de.tud.test.methods.StringContainer",
+                        "de.tud.test.methods.NonPrimitiveMethods" },
+                null);
 
-        assertNotNull(NonPrimitiveMethods);
-        assertNotNull(StringContainer);
+        Class<?> StringContainer = classes[0];
+        Class<?> NonPrimitiveMethods = classes[1];
 
         try {
 
@@ -156,10 +155,6 @@ public class MethodCallFunctionalTests extends AbstractCompilerFunctionalTest {
             runTests(NonPrimitiveMethods, "equals",
                     new Class<?>[] { Object.class },
                     testDataNonPrimitiveMethodsEquals);
-
-            // TODO: Obviously, the JRE thinks that NonPrimitiveMethods does not
-            // know StringContainer. So something goes wrong when the class
-            // files are written. Needs to be fixed.
 
         } catch (NoSuchMethodException | SecurityException
                 | InstantiationException | IllegalAccessException

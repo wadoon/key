@@ -71,7 +71,7 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
 
         try {
 
-            Class<?> cls = compile(relPathToJavaFile, className);
+            Class<?> cls = compileAndLoad(relPathToJavaFile, className);
             assertNotNull("Compiled class could not be loaded", cls);
             runTests(cls, testMethodName, argTypes, testData);
 
@@ -168,8 +168,9 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
     }
 
     /**
-     * Compiles the class with name <code>className</code> in the Java file at
-     * the path <code>relPathToJavaFile</code>.
+     * Compiles the Java file at the path
+     * <code>{@link #FUNCTIONAL_TESTS_RELATIVE_DIR}/relPathToJavaFile</code> and
+     * loads the class with name <code>className</code>.
      * 
      * @param relPathToJavaFile
      *            The path to the Java file to test, relative to
@@ -179,7 +180,28 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
      * @return The compiled {@link Class} file, if compilation was successful;
      *         otherwise, the test will {@link #fail()}.
      */
-    protected Class<?> compile(String relPathToJavaFile, String className) {
+    protected Class<?> compileAndLoad(String relPathToJavaFile,
+            String className) {
+        try {
+
+            compile(relPathToJavaFile);
+            return loadClass(className);
+
+        } catch (TranslationTacletInputException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Compiles the Java file at the path <code>relPathToJavaFile</code>.
+     * 
+     * @param relPathToJavaFile
+     *            relPathToJavaFile The path to the Java file to test, relative
+     *            to {@link #FUNCTIONAL_TESTS_RELATIVE_DIR}.
+     */
+    protected void compile(String relPathToJavaFile) {
         try {
 
             Compiler compiler = new Compiler(
@@ -188,15 +210,10 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
 
             compiler.compile();
 
-            Class<?> cls = loadClass(className);
-
-            return cls;
-
         } catch (TranslationTacletInputException | ProblemLoaderException
                 | IOException e) {
             e.printStackTrace();
             fail(e.getMessage());
-            return null;
         }
     }
 
@@ -224,13 +241,30 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
      */
     protected Class<?> loadClass(String className,
             ClassLoader parentClassLoader) {
+        return loadClasses(new String[] { className }, parentClassLoader)[0];
+    }
+
+    /**
+     * Loads the {@link Class}es with the given names from the
+     * {@link #TMP_OUT_DIR} directory.
+     * <p>
+     * <strong>Use this method instead of
+     * {@link #loadClass(String, ClassLoader)} if you want to load multiple
+     * dependent classes!</strong> Those need to be loaded with the same
+     * {@link ClassLoader}, otherwise you will end up with an
+     * {@link IllegalAccessError}.
+     * 
+     * @param classNames
+     *            The fully qualified class names of the classes to test.
+     * @param parentClassLoader
+     *            The {@link ClassLoader} to use for delegation. May be null.
+     * @return The loaded {@link Class}es.
+     */
+    protected Class<?>[] loadClasses(String[] classNames,
+            ClassLoader parentClassLoader) {
+
         try {
-
-            File outputClassFile = new File(TMP_OUT_DIR,
-                    className.replace('.', '/') + ".class");
-
-            assertTrue("Class file was not written to expected destination",
-                    outputClassFile.exists());
+            Class<?>[] result = new Class<?>[classNames.length];
 
             URL url = Paths.get(TMP_OUT_DIR).toFile().toURI().toURL();
             URL[] urls = new URL[] { url };
@@ -238,9 +272,20 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
             URLClassLoader cl = parentClassLoader == null
                     ? new URLClassLoader(urls)
                     : new URLClassLoader(urls, parentClassLoader);
-            Class<?> cls = cl.loadClass(className);
+
+            for (int i = 0; i < classNames.length; i++) {
+                File outputClassFile = new File(TMP_OUT_DIR,
+                        classNames[i].replace('.', '/') + ".class");
+
+                assertTrue("Class file was not written to expected destination",
+                        outputClassFile.exists());
+
+                result[i] = cl.loadClass(classNames[i]);
+            }
+
             cl.close();
-            return cls;
+
+            return result;
 
         } catch (TranslationTacletInputException | IOException
                 | ClassNotFoundException e) {
@@ -248,6 +293,7 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
             fail(e.getMessage());
             return null;
         }
+
     }
 
     /**

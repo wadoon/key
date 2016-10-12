@@ -135,7 +135,7 @@ public class SimpleCompilerFunctionalTests extends AbstractCompilerFunctionalTes
     @Test
     public void testObjectConstructionAndMemberAccess() {
 
-        Class<?> simpleObjects = compile("simple/objects/SimpleObjects.java",
+        Class<?> simpleObjects = compileAndLoad("simple/objects/SimpleObjects.java",
                 "de.tud.test.simple.objects.SimpleObjects");
 
         try {
