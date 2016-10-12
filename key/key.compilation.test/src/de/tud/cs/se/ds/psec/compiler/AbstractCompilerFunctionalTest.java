@@ -177,7 +177,7 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
      *            {@link #FUNCTIONAL_TESTS_RELATIVE_DIR}.
      * @param className
      *            The fully qualified class name of the class to test.
-     * @return The compiled {@link Class} file, if compilation was successful;
+     * @return The compiled {@link Class}, if compilation was successful;
      *         otherwise, the test will {@link #fail()}.
      */
     protected Class<?> compileAndLoad(String relPathToJavaFile,
@@ -186,6 +186,39 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
 
             compile(relPathToJavaFile);
             return loadClass(className);
+
+        } catch (TranslationTacletInputException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Compiles the Java file at the path
+     * <code>{@link #FUNCTIONAL_TESTS_RELATIVE_DIR}/relPathToJavaFile</code> and
+     * loads the classes with names <code>classNames</code>.
+     * 
+     * @param relPathToJavaFile
+     *            The path to the Java file to test, relative to
+     *            {@link #FUNCTIONAL_TESTS_RELATIVE_DIR}.
+     * @param classNames
+     *            The fully qualified class names of the class to test.
+     * @return The compiled {@link Class}es, if compilation was successful;
+     *         otherwise, the test will {@link #fail()}.
+     */
+    protected Class<?>[] compileAndLoad(String relPathToJavaFile,
+            String... classNames) {
+        if (classNames == null) {
+            String msg = "null array of class names given";
+            logger.error(msg);
+            throw new NullPointerException(msg);
+        }
+        
+        try {
+
+            compile(relPathToJavaFile);
+            return loadClasses(classNames);
 
         } catch (TranslationTacletInputException e) {
             e.printStackTrace();
