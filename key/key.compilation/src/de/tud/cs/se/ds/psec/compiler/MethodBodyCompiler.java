@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -55,7 +56,7 @@ public class MethodBodyCompiler implements Opcodes {
      * Constructs a new {@link MethodBodyCompiler}.
      * 
      * @param mDecl
-     *            TODO
+     *            The {@link ProgramMethod} to translate.
      * @param mv
      *            The {@link MethodVisitor} to be used for compilation.
      * @param definitions
@@ -94,8 +95,7 @@ public class MethodBodyCompiler implements Opcodes {
         // Add a super() call to the beginning of a constructor if there
         // is no explicit one. In Java, you can omit this, while in bytecode,
         // it is required.
-        if (mDecl.isConstructor() && !startNode.getAppliedRuleApp().rule()
-                .name().toString().equals("methodCallSuper")) {
+        if (shouldAddConstructorCall(startNode)) {
             // TODO Check what happens if there is no super constructor with
             // empty arguments. Does KeY complain in this case, like the Java
             // compiler would?
@@ -103,11 +103,7 @@ public class MethodBodyCompiler implements Opcodes {
                     "There is no super constructor call in %s%s, adding one",
                     mDecl.name(),
                     InformationExtraction.getMethodTypeDescriptor(mDecl));
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKESPECIAL,
-                    InformationExtraction.getExtending((TypeDeclaration) mDecl
-                            .getContainerType().getJavaType()),
-                    "<init>", "()V", false);
+            addConstructorCall();
         }
 
         astRoot = translationFactory.getASTRootNode();
@@ -118,6 +114,35 @@ public class MethodBodyCompiler implements Opcodes {
         }
 
         astRoot.compile();
+    }
+
+    /**
+     * Adds a call to the standard constructor of the super type of the
+     * {@link ProgramMethod}.
+     */
+    private void addConstructorCall() {
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitMethodInsn(INVOKESPECIAL, InformationExtraction.getExtending(
+                (TypeDeclaration) mDecl.getContainerType().getJavaType()),
+                "<init>", "()V", false);
+    }
+
+    /**
+     * Checks whether we should add a super call before beginning the
+     * translation of the actual {@link ProgramMethod} body; this is true iff
+     * the {@link ProgramMethod} is a constructor and the first statement to be
+     * compiled is not a super call.
+     * 
+     * @param startNode
+     *            The first {@link Node} in the {@link Proof} that should be
+     *            translated.
+     * @return True iff the {@link ProgramMethod} is a constructor and the first
+     *         statement to be compiled, given by the supplied {@link Node}, is
+     *         not a super call.
+     */
+    private boolean shouldAddConstructorCall(Node startNode) {
+        return mDecl.isConstructor() && !startNode.getAppliedRuleApp().rule()
+                .name().toString().equals("methodCallSuper");
     }
 
     /**
