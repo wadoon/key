@@ -104,10 +104,8 @@ public class MethodCallFunctionalTests extends AbstractCompilerFunctionalTest {
 
         compile("nonprimitive_methods/NonPrimitiveMethods.java");
 
-        Class<?>[] classes = loadClasses(
-                new String[] { "de.tud.test.methods.StringContainer",
-                        "de.tud.test.methods.NonPrimitiveMethods" },
-                null);
+        Class<?>[] classes = loadClasses("de.tud.test.methods.StringContainer",
+                "de.tud.test.methods.NonPrimitiveMethods");
 
         Class<?> StringContainer = classes[0];
         Class<?> NonPrimitiveMethods = classes[1];

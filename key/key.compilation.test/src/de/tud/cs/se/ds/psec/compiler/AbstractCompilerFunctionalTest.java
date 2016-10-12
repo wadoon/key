@@ -245,6 +245,13 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
     }
 
     /**
+     * @see #loadClasses(String[], ClassLoader)
+     */
+    protected Class<?>[] loadClasses(String... classNames) {
+        return loadClasses(classNames, null);
+    }
+
+    /**
      * Loads the {@link Class}es with the given names from the
      * {@link #TMP_OUT_DIR} directory.
      * <p>
