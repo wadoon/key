@@ -40,10 +40,7 @@ public class NonPrimitiveMethods {
     public boolean equals(NonPrimitiveMethods o) {
         return s.equals(o.s);
     }
-    
-    //TODO We don't get an error by the compiler so far
-    // if we replace the argument type by, e.g., int. This
-    // should not result in a seemingly successful compilation.
+
     /*@ public normal_behavior
       @ requires true;
       @ ensures true;
@@ -65,9 +62,10 @@ public class NonPrimitiveMethods {
 class StringContainer {
     private String s;
     
-    //TODO Also here, compilation finishes without an error if we
-    // type "int" instead of "String" for the argument type. Have
-    // to extract an error information from the proof.
+    //NOTE Originally, KeY did not complain if we changed the argument
+    // type in the constructor to int, that is defining an assignment
+    // with incompatible types. I changed the rule assignment_write_attribute_this
+    // in javaRules to forbid this behavior.
     /*@ public normal_behavior
       @ requires true;
       @ ensures true;

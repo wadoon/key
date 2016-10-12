@@ -12,14 +12,17 @@ import org.objectweb.asm.Opcodes;
 
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletTranslationFactory;
+import de.tud.cs.se.ds.psec.compiler.exceptions.IncompleteSymbolicExecutionException;
 import de.tud.cs.se.ds.psec.compiler.exceptions.NoTranslationException;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.util.Utilities;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -28,6 +31,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * Compiles the body of a method by Symbolic Execution.
@@ -80,6 +84,9 @@ public class MethodBodyCompiler implements Opcodes {
      *            of the method's body.
      */
     public void compile(SymbolicExecutionTreeBuilder builder) {
+
+        assertExecutionIsExhaustive(builder);
+
         // Forward until after call of this method
         Node startNode = ffUntilAfterFirstMethodCall(builder);
 
@@ -91,6 +98,35 @@ public class MethodBodyCompiler implements Opcodes {
         }
 
         astRoot.compile();
+    }
+
+    /**
+     * Checks if all leaves in the SE tree don't contain a non-empty
+     * {@link JavaBlock}; otherwise, an
+     * {@link IncompleteSymbolicExecutionException} is thrown.
+     * 
+     * @param builder
+     *            The {@link SymbolicExecutionTreeBuilder} to extract the proof
+     *            tree from.
+     * @throws IncompleteSymbolicExecutionException
+     *             if there is a leaf in the tree that still contains some Java
+     *             code.
+     */
+    private void assertExecutionIsExhaustive(
+            SymbolicExecutionTreeBuilder builder) {
+        builder.getProof().openGoals().forEach(g -> {
+            g.node().sequent().succedent().forEach(f -> {
+                JavaBlock block = JoinRuleUtils
+                        .getJavaBlockRecursive(f.formula());
+                if (!block.equals(JavaBlock.EMPTY_JAVABLOCK)) {
+                    String msg = Utilities.format(
+                            "Symbolic execution was not exhaustive; "
+                                    + "is there an error in the program?\nProblem:\n%s",
+                            JavaTools.getActiveStatement(block));
+                    throw new IncompleteSymbolicExecutionException(msg);
+                }
+            });
+        });
     }
 
     /**
