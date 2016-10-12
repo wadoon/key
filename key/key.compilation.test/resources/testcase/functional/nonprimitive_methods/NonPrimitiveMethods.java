@@ -14,10 +14,6 @@ public class NonPrimitiveMethods {
       @ ensures true;
       @*/
     public NonPrimitiveMethods(StringContainer s) {
-        //TODO: Currently, we have to do an explicit super() call.
-        // This should be done by the compiler if we omit it.
-        super();
-        
         this.s = s;
     }
     
@@ -71,10 +67,6 @@ class StringContainer {
       @ ensures true;
       @*/
     public StringContainer(String s) {
-        //TODO: Currently, we have to do an explicit super() call.
-        // This should be done by the compiler if we omit it.
-        super();
-        
         this.s = s;
     }
     

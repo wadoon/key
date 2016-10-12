@@ -13,10 +13,6 @@ public class MethodCalls {
       @ ensures true;
       @*/
     public MethodCalls(int i) {
-        //TODO: Currently, we have to do an explicit super() call.
-        // This should be done by the compiler if we omit it.
-        super();
-        
         this.i = i;
     }
     

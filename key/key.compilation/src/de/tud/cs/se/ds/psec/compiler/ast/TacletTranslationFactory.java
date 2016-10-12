@@ -1,5 +1,6 @@
 package de.tud.cs.se.ds.psec.compiler.ast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -78,6 +79,66 @@ public class TacletTranslationFactory {
     }
 
     /**
+     * Checks whether there is an available {@link TranslationDefinition} for
+     * the given {@link RuleApp}, or the {@link RuleApp} is in fact a
+     * {@link TacletApp} for a simplification {@link Taclet}.
+     * 
+     * @param app
+     *            The {@link RuleApp} to check for the availability of
+     *            {@link TranslationDefinition}s.
+     * @return true iff there is a {@link TranslationDefinition} for the given
+     *         {@link RuleApp}, or the {@link RuleApp} is in fact a
+     *         {@link TacletApp} for a simplification {@link Taclet}.
+     * @throws NoTranslationException
+     *             If there is no suitable translation and the {@link RuleApp}
+     *             is not a simplification {@link TacletApp}.
+     */
+    public boolean assertHasDefinitionFor(RuleApp app) {
+        int result = 0;
+
+        if (app instanceof TacletApp) {
+            TacletApp tacletApp = (TacletApp) app;
+
+            String tacletName = tacletApp.taclet().name().toString();
+            ArrayList<TranslationDefinition> availableDefinitions = definitions
+                    .getDefinitionsFor(tacletName);
+            if (availableDefinitions == null
+                    || availableDefinitions.size() < 1) {
+                if (isSimplificationSETaclet(tacletApp.taclet())) {
+                    result = 0;
+                } else {
+                    result = -1;
+                }
+            } else {
+                result = 1;
+            }
+        } else {
+            String ruleName = app.rule().name().toString();
+            ArrayList<TranslationDefinition> availableDefinitions = definitions
+                    .getDefinitionsFor(ruleName);
+            if (availableDefinitions == null
+                    || availableDefinitions.size() < 1) {
+                result = -1;
+            } else {
+                result = 1;
+            }
+        }
+
+        if (result == 0) {
+            return false;
+        } else if (result == 1) {
+            return true;
+        } else {
+            String message = Utilities.format(
+                    "Don't know a translation of the following taclet app: %s",
+                    app.rule().name().toString());
+
+            logger.error(message);
+            throw new NoTranslationException(message);
+        }
+    }
+
+    /**
      * Returns an {@link Optional} comprising a {@link TacletASTNode} for the
      * given {@link TacletApp}.
      *
@@ -137,8 +198,9 @@ public class TacletTranslationFactory {
 
         HashMap<String, Object> instantiations = new HashMap<>();
         instantiations.put("#pm", pm);
-        instantiations.put("#actualSelf",
-                pm.isStatic() ? null : (LocationVariable) app.getRuleInstantiations().actualSelf.op());
+        instantiations.put("#actualSelf", pm.isStatic() ? null
+                : (LocationVariable) app.getRuleInstantiations().actualSelf
+                        .op());
         instantiations.put("#actualParams",
                 app.getRuleInstantiations().actualParams);
         instantiations.put("#actualResult",
@@ -238,56 +300,4 @@ public class TacletTranslationFactory {
 
         return result == null ? Optional.empty() : Optional.of(result);
     }
-}
-
-class MethodCalls {
-    private int i;
-
-    /*
-     * @ public normal_behavior
-     * 
-     * @ requires true;
-     * 
-     * @ ensures true;
-     * 
-     * @
-     */
-    public MethodCalls(int i) {
-        // TODO: Currently, we have to do an explicit super() call.
-        // This should be done by the compiler if we omit it.
-        super();
-
-        this.i = i;
-    }
-
-    /*
-     * @ public normal_behavior
-     * 
-     * @ requires true;
-     * 
-     * @ ensures true;
-     * 
-     * @
-     */
-    public boolean equals(Object o) {
-        if (!(o instanceof MethodCalls)) {
-            return false;
-        }
-
-        return equals((MethodCalls) o);
-    }
-
-    /*
-     * @ public normal_behavior
-     * 
-     * @ requires true;
-     * 
-     * @ ensures true;
-     * 
-     * @
-     */
-    public boolean equals(MethodCalls o) {
-        return i == o.i;
-    }
-
 }

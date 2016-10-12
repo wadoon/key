@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.key_project.util.collection.ImmutableArray;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -15,14 +16,17 @@ import de.tud.cs.se.ds.psec.compiler.ast.TacletTranslationFactory;
 import de.tud.cs.se.ds.psec.compiler.exceptions.IncompleteSymbolicExecutionException;
 import de.tud.cs.se.ds.psec.compiler.exceptions.NoTranslationException;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
+import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -44,31 +48,28 @@ public class MethodBodyCompiler implements Opcodes {
     private ProgVarHelper pvHelper;
     private TacletTranslationFactory translationFactory;
     private TacletASTNode astRoot = null;
-    private boolean isVoid = false;
+    private ProgramMethod mDecl;
+    private MethodVisitor mv;
 
     /**
      * Constructs a new {@link MethodBodyCompiler}.
      * 
+     * @param mDecl
+     *            TODO
      * @param mv
      *            The {@link MethodVisitor} to be used for compilation.
-     * @param methodParameters
-     *            The parameters of this method.
      * @param definitions
-     *            TODO
-     * @param isStatic
-     *            true iff the method to be compiled is a static method, i.e.
-     *            should have no "this" field as first local variable.
-     * @param isVoid
-     *            TODO
+     *            The {@link TranslationDefinitions} to use for compilation.
      */
-    public MethodBodyCompiler(MethodVisitor mv, Services services,
-            Iterable<ParameterDeclaration> methodParameters,
-            TranslationDefinitions definitions, boolean isStatic,
-            boolean isVoid) {
-        this.pvHelper = new ProgVarHelper(isStatic, methodParameters);
+    public MethodBodyCompiler(ProgramMethod mDecl, MethodVisitor mv,
+            TranslationDefinitions definitions, Services services) {
+        this.mDecl = mDecl;
+        this.mv = mv;
+        ImmutableArray<ParameterDeclaration> methodParameters = mDecl
+                .getParameters();
+        this.pvHelper = new ProgVarHelper(mDecl.isStatic(), methodParameters);
         this.translationFactory = new TacletTranslationFactory(mv, pvHelper,
                 definitions, services);
-        this.isVoid = isVoid;
 
         methodParameters.forEach(p -> pvHelper
                 .progVarNr(p.getVariables().get(0).getProgramVariable()));
@@ -90,10 +91,29 @@ public class MethodBodyCompiler implements Opcodes {
         // Forward until after call of this method
         Node startNode = ffUntilAfterFirstMethodCall(builder);
 
+        // Add a super() call to the beginning of a constructor if there
+        // is no explicit one. In Java, you can omit this, while in bytecode,
+        // it is required.
+        if (mDecl.isConstructor() && !startNode.getAppliedRuleApp().rule()
+                .name().toString().equals("methodCallSuper")) {
+            // TODO Check what happens if there is no super constructor with
+            // empty arguments. Does KeY complain in this case, like the Java
+            // compiler would?
+            logger.info(
+                    "There is no super constructor call in %s%s, adding one",
+                    mDecl.name(),
+                    InformationExtraction.getMethodTypeDescriptor(mDecl));
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitMethodInsn(INVOKESPECIAL,
+                    InformationExtraction.getExtending((TypeDeclaration) mDecl
+                            .getContainerType().getJavaType()),
+                    "<init>", "()V", false);
+        }
+
         astRoot = translationFactory.getASTRootNode();
         translateToTacletTree(startNode, astRoot);
 
-        if (isVoid) {
+        if (mDecl.isVoid() || mDecl.isConstructor()) {
             addReturnAfterAllLeaves();
         }
 
@@ -167,12 +187,21 @@ public class MethodBodyCompiler implements Opcodes {
     private Node ffUntilAfterFirstMethodCall(
             SymbolicExecutionTreeBuilder builder) {
         Node currentNode = builder.getStartNode().getProofNode();
+
         while (!(currentNode.getAppliedRuleApp().rule().name().toString()
                 .equals("methodBodyExpand"))) {
             currentNode = currentNode.child(0);
         }
 
-        return currentNode.child(0);
+        currentNode = currentNode.child(0);
+
+        while (!translationFactory
+                .assertHasDefinitionFor(currentNode.getAppliedRuleApp())
+                && currentNode.childrenCount() == 1) {
+            currentNode = currentNode.child(0);
+        }
+
+        return currentNode;
     }
 
     /**
@@ -186,10 +215,6 @@ public class MethodBodyCompiler implements Opcodes {
      */
     private void translateToTacletTree(Node currentNode,
             TacletASTNode currentASTNode) {
-
-        // XXX Special case: "Use Operation Contract" has only one
-        // *abstract* SET child, but two in the KeY proof tree. Have
-        // to consider this. Maybe somehow deactivate all non-SE branches...
 
         Pair<Node, TacletASTNode> endNode = translateSequentialBlock(
                 currentNode, currentASTNode);
@@ -274,7 +299,6 @@ public class MethodBodyCompiler implements Opcodes {
             return translationFactory
                     .getTranslationForRuleApp((ContractRuleApp) ruleApp);
         } else {
-            // TODO Are there other cases to support?
             String message = Utilities.format(
                     "Unsupported rule application: %s", ruleApp.rule().name());
 

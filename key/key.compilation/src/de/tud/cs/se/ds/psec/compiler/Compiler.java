@@ -283,7 +283,7 @@ public class Compiler {
         );
 
         //@formatter:off
-        // The following structure could be used to simplicfy the allocation
+        // The following structure could be used to simplify the allocation
         // of new local variables, if other things fail.
 //        LocalVariablesSorter sorter = new LocalVariablesSorter(accessFlags,
 //                descriptor, mv);
@@ -312,9 +312,9 @@ public class Compiler {
             logger.trace("Translating SET of method %s::%s to bytecode",
                     mDecl.getContainerType().getJavaType().getFullName(),
                     methodNameWithArgs(mDecl));
-            new MethodBodyCompiler(mv, builder.getProof().getServices(),
-                    mDecl.getParameters(), definitions, mDecl.isStatic(),
-                    mDecl.isVoid() || mDecl.isConstructor()).compile(builder);
+            
+            new MethodBodyCompiler(mDecl, mv,
+                    definitions, builder.getProof().getServices()).compile(builder);
         }
 
         mv.visitMaxs(-1, -1);
