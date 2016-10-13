@@ -59,7 +59,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
 public class SyntacticalReplaceVisitor extends DefaultVisitor {
-
+    public static final String SUBSTITUTION_WITH_LABELS_HINT = "SUBSTITUTION_WITH_LABELS";
     protected final SVInstantiations svInst;
     protected final Services services;
     private Term computedResult = null;
@@ -290,9 +290,16 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {
             final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp, svInst.getExecutionContext(), services));
-            pushNew(services.getTermBuilder().label(
-                    newTerm, instantiateLabels(visited, newTerm.op(), newTerm.subs(),
-                            newTerm.boundVars(), newTerm.javaBlock(), newTerm.getLabels())));
+            final Term labeledTerm = TermLabelManager.label(services, 
+                                                            termLabelState, 
+                                                            applicationPosInOccurrence, 
+                                                            rule, 
+                                                            ruleApp, 
+                                                            goal, 
+                                                            labelHint, 
+                                                            visited, 
+                                                            newTerm);
+            pushNew(labeledTerm);
         } else {
             final Operator newOp = instantiateOperator(visitedOp);
             // instantiation of java block
@@ -370,6 +377,9 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         if (t.op() instanceof SubstOp) {
            Term resolved = ((SubstOp)t.op ()).apply ( t, services );
            resolved = services.getTermBuilder().label(resolved, t.sub(1).getLabels());
+           if (t.hasLabels()) {
+              resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved, rule, goal, SUBSTITUTION_WITH_LABELS_HINT, t);
+           }
            return resolved;
         }
         else {
@@ -423,11 +433,16 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         if (subtreeRoot.op() instanceof TermTransformer) {
             final TermTransformer mop = (TermTransformer) subtreeRoot.op();
             final Term newTerm = mop.transform((Term)subStack.pop(),svInst, services);
-            pushNew(services.getTermBuilder().label(newTerm,
-                    instantiateLabels(subtreeRoot, newTerm.op(),
-                            newTerm.subs(), newTerm.boundVars(),
-                            newTerm.javaBlock(),
-                            newTerm.getLabels())));
+            final Term labeledTerm = TermLabelManager.label(services, 
+                                                            termLabelState, 
+                                                            applicationPosInOccurrence, 
+                                                            rule, 
+                                                            ruleApp, 
+                                                            goal, 
+                                                            labelHint, 
+                                                            subtreeRoot, 
+                                                            newTerm);
+            pushNew(labeledTerm);
         } 
     }
 }

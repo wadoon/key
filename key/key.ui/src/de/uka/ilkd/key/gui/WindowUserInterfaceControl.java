@@ -41,6 +41,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -175,7 +176,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (!proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
+            if (proof != null && !proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
                     g = proof.openGoals().head();
@@ -196,7 +197,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 resetStatus(this);
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
-                if (!proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
+                if (proof != null && !proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
                     Goal g = proof.openGoals().head();
                     mainWindow.getMediator().goalChosen(g);
                     if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
@@ -598,5 +599,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      dialog.setLocationRelativeTo(MainWindow.getInstance());
      dialog.setVisible(true);
      dialog.dispose();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      return mainWindow.getVisibleTermLabels();
    }
 }

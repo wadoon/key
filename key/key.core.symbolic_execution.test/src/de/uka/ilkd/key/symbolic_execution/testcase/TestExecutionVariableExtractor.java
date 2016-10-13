@@ -1,12 +1,178 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
+
 import de.uka.ilkd.key.symbolic_execution.ExecutionVariableExtractor;
 
 /**
  * Tests for {@link ExecutionVariableExtractor}.
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: /set/variablesEmptyArrayCreationTest
+    */
+   public void testVariablesEmptyArrayCreationTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesEmptyArrayCreationTest/test/EmptyArrayCreationTest.java", 
+                          "EmptyArrayCreationTest", 
+                          "main", 
+                          "obj != null & n == 0",
+                          "/set/variablesEmptyArrayCreationTest/oracle/EmptyArrayCreationTest_Sequent.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesNonSimpleArrayCreationTest
+    */
+   public void testVariablesNonSimpleArrayCreationTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesNonSimpleArrayCreationTest/test/NonSimpleArrayCreationTest.java", 
+                          "NonSimpleArrayCreationTest", 
+                          "main", 
+                          "n >= 4 & instance != null & instance.value == 100",
+                          "/set/variablesNonSimpleArrayCreationTest/oracle/NonSimpleArrayCreationTest_Sequent.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesNonSimpleArrayAssignmentTest
+    */
+   public void testVariablesNonSimpleArrayAssignmentTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesNonSimpleArrayAssignmentTest/test/NonSimpleArrayAssignmentTest.java", 
+                          "NonSimpleArrayAssignmentTest", 
+                          "main", 
+                          "array != null & array.length >= 4",
+                          "/set/variablesNonSimpleArrayAssignmentTest/oracle/NonSimpleArrayAssignmentTest_Sequent.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesArrayCreationInstanceTest
+    */
+   public void testVariablesArrayCreationInstanceTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesArrayCreationInstanceTest/test/ArrayCreationInstanceTest.java", 
+                          "ArrayCreationInstanceTest", 
+                          "main", 
+                          "obj != null & n >= 4",
+                          "/set/variablesArrayCreationInstanceTest/oracle/ArrayCreationInstanceTest_Sequent.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesArrayAssignmentTest
+    */
+   public void testVariablesArrayAssignmentTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesArrayAssignmentTest/test/ArrayAssignmentTest.java", 
+                          "ArrayAssignmentTest", 
+                          "main", 
+                          "array != null & array.length >= 4",
+                          "/set/variablesArrayAssignmentTest/oracle/ArrayAssignmentTest_Sequent.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: /set/variablesArrayCreationTest
+    */
+   public void testVariablesArrayCreationTest() throws Exception {
+      doSETTestAndDispose(testCaseDirectory, 
+                          "/set/variablesArrayCreationTest/test/ArrayCreationTest.java", 
+                          "ArrayCreationTest", 
+                          "main", 
+                          "n >= 4",
+                          "/set/variablesArrayCreationTest/oracle/ArrayCreationTest_Sequent.xml",
+                          false,
+                          true,
+                          false,
+                          false,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          false,
+                          true,
+                          false);
+   }
+   
    /**
     * Tests example: /set/variableVariableMethodContractTest
     */
@@ -24,6 +190,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -48,6 +215,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -81,6 +249,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -107,6 +276,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -126,6 +296,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -159,6 +330,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -178,6 +350,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -211,6 +384,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -237,6 +411,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                false,
                 true,
                 true);
    }
@@ -256,6 +431,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,

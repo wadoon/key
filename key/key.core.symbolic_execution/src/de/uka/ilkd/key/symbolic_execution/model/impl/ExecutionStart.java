@@ -107,4 +107,13 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement> impleme
       SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
       return NodeInfo.computeActiveStatement(firstStatement);
    }
+   
+   /**
+    * Removes the given termination.
+    * @param termination The termination to be deleted.
+    * @author Anna Filighera
+    */
+   public void removeTermination(IExecutionTermination termination) {
+      terminations = terminations.removeAll(termination);
+   }
 }

@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
@@ -43,6 +45,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  * Tests {@link SymbolicLayoutExtractor}.
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCase {
 //   public void testSimpleLinkedOjbectsWithAdditionalInstances() throws Exception {
 //      doTest("/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
@@ -68,6 +71,46 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
 //             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
 //   }
 
+   /**
+    * Tests "configurationExtractorInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testEmptyArrayCreationTest() throws Exception {
+      doTest("/set/configurationExtractorEmptyArrayCreationTest/test/EmptyArrayCreationTest.java",
+             "EmptyArrayCreationTest",
+             "/set/configurationExtractorEmptyArrayCreationTest/oracle/",
+             "EmptyArrayCreationTest.xml",
+             "testEmptyArrayCreationTest_initial",
+             ".xml",
+             "testEmptyArrayCreationTest_current",
+             ".xml",
+             "n == 0",
+             1,
+             1,
+             false,
+             false);
+   }
+      
+   /**
+    * Tests "configurationExtractorInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testArrayCreationTest() throws Exception {
+      doTest("/set/configurationExtractorArrayCreationTest/test/ArrayCreationTest.java",
+             "ArrayCreationTest",
+             "/set/configurationExtractorArrayCreationTest/oracle/",
+             "ArrayCreationTest.xml",
+             "testArrayCreationTest_initial",
+             ".xml",
+             "testArrayCreationTest_current",
+             ".xml",
+             "n >= 4",
+             1,
+             1,
+             false,
+             false);
+   }
+   
    /**
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -125,6 +168,24 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              1,
              2,
              false,
+             false);
+   }
+   
+   /**
+    * Tests "configurationExtractorExistsQuantifierTest".
+    * @throws Exception Occurred Exception.
+    */
+   public void testExistsQuantifierTest() throws Exception {
+      doTest("/set/configurationExtractorExistsQuantifierTest/test/ExistsQuantifierTest.proof",
+             "/set/configurationExtractorExistsQuantifierTest/oracle/",
+             "ExistsQuantifierTest.xml",
+             "testExistsQuantifierTest_initial",
+             ".xml",
+             "testExistsQuantifierTest_current",
+             ".xml",
+             null,
+             1,
+             2,
              false);
    }
    
@@ -701,79 +762,12 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false, false, false, true);
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false, false, false, false, true);
          setOneStepSimplificationEnabled(null, true);
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, testCaseDirectory);
-         // Find most left method return node
-         IExecutionNode<?> returnNode = env.getBuilder().getStartNode();
-         int foundReturnStatement = 0;
-         while (foundReturnStatement < numberOfReturnNodeInMostLeftBranch && returnNode.getChildren().length >= 1) {
-            returnNode = returnNode.getChildren()[0];
-            if (returnNode instanceof IExecutionMethodReturn) {
-               foundReturnStatement++;
-            }
-         }
-         assertTrue(returnNode instanceof IExecutionMethodReturn);
-         IExecutionNode<?> nodeToTest;
-         if (onReturnStatementNode) {
-            // Get the return statement which is returned in returnNode
-            IExecutionNode<?> returnStatement = returnNode.getParent();
-            while (!(returnStatement instanceof IExecutionStatement)) {
-               if (returnStatement instanceof IExecutionStatement) {
-                  foundReturnStatement++;
-               }
-               returnStatement = returnStatement.getParent();
-            }
-            assertNotNull(returnStatement);
-            assertTrue(returnStatement.getName().startsWith("return"));
-            nodeToTest = returnStatement;
-         }
-         else {
-            nodeToTest = returnNode;
-         }
-         // Extract possible heaps
-         SymbolicLayoutExtractor extractor = new SymbolicLayoutExtractor(nodeToTest.getProofNode(), nodeToTest.getModalityPIO(), false, false, true);
-         extractor.analyse();
-         // Test the initial memory layouts (first time with lazy computation)
-         List<ISymbolicLayout> initialLayoutsFirstTime = new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
-         assertEquals(expectedNumberOfLayouts, extractor.getLayoutsCount());
-         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
-            ISymbolicLayout current = extractor.getInitialLayout(i);
-            initialLayoutsFirstTime.add(current);
-            String oracleFile = oraclePathInBaseDir + initialStatesOraclePrefix + i + initialStatesOracleFileExtension;
-            createOracleFile(current, oracleFile);
-            if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-               SymbolicLayoutReader reader = new SymbolicLayoutReader();
-               ISymbolicLayout expected = reader.read(new File(testCaseDirectory, oracleFile));
-               assertNotNull(expected);
-               assertModel(expected, current);
-            }
-         }
-         // Test the initial memory layouts (second time with same memory layouts)
-         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
-            ISymbolicLayout current = extractor.getInitialLayout(i);
-            assertSame(initialLayoutsFirstTime.get(i), current);
-         }
-         // Test the current memory layouts (first time with lazy computation)
-         List<ISymbolicLayout> currentLayoutsFirstTime = new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
-         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
-            ISymbolicLayout current = extractor.getCurrentLayout(i);
-            currentLayoutsFirstTime.add(current);
-            String oracleFile = oraclePathInBaseDir + currentStatesOraclePrefix + i + currentStatesOracleFileExtension;
-            createOracleFile(current, oracleFile);
-            if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-               SymbolicLayoutReader reader = new SymbolicLayoutReader();
-               ISymbolicLayout expected = reader.read(new File(testCaseDirectory, oracleFile));
-               assertNotNull(expected);
-               assertModel(expected, current);
-            }
-         }
-         // Test the current memory layouts (second time with same memory layouts)
-         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
-            ISymbolicLayout current = extractor.getCurrentLayout(i);
-            assertSame(currentLayoutsFirstTime.get(i), current);
-         }
+         // Perform test steps
+         doTestSteps(env, oraclePathInBaseDir, symbolicExecutionOracleFileName, initialStatesOraclePrefix, initialStatesOracleFileExtension, currentStatesOraclePrefix, currentStatesOracleFileExtension, precondition, numberOfReturnNodeInMostLeftBranch, expectedNumberOfLayouts, onReturnStatementNode);
       }
       finally {
          // Restore original options
@@ -782,6 +776,127 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          if (env != null) {
             env.dispose();
          }
+      }
+   }
+
+   /**
+    * Executes the test steps.
+    * @param proofFilePathInkeyRepDirectory The path to the Proof file.
+    * @param containerTypeName The class name.
+    * @param oraclePathInBaseDir The path to the oracle directory.
+    * @param symbolicExecutionOracleFileName File name of the symbolic execution oracle file.
+    * @param initialStatesOraclePrefix Prefix for initial memory layout oracles.
+    * @param initialStatesOracleFileExtension Initial memory layout oracle file extension.
+    * @param currentStatesOraclePrefix Prefix for current memory layout oracles.
+    * @param currentStatesOracleFileExtension Current memory layout oracle file extension.
+    * @param precondition An optional precondition.
+    * @param useOperationContracts Use operation contracts?
+    * @throws Exception Occurred Exception.
+    */
+   protected void doTest(String proofFilePathInkeyRepDirectory,
+                         String oraclePathInBaseDir,
+                         String symbolicExecutionOracleFileName,
+                         String initialStatesOraclePrefix,
+                         String initialStatesOracleFileExtension,
+                         String currentStatesOraclePrefix,
+                         String currentStatesOracleFileExtension,
+                         String precondition,
+                         int numberOfReturnNodeInMostLeftBranch,
+                         int expectedNumberOfLayouts,
+                         boolean onReturnStatementNode) throws Exception {
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
+      try {
+         // Load proof file
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, proofFilePathInkeyRepDirectory, false, false, false, false, false, false, false, false, false, false, true);
+         // Perform test steps
+         doTestSteps(env, oraclePathInBaseDir, symbolicExecutionOracleFileName, initialStatesOraclePrefix, initialStatesOracleFileExtension, currentStatesOraclePrefix, currentStatesOracleFileExtension, precondition, numberOfReturnNodeInMostLeftBranch, expectedNumberOfLayouts, onReturnStatementNode);
+      }
+      finally {
+         if (env != null) {
+            env.dispose();
+         }
+      }
+   }
+   
+   protected void doTestSteps(SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env,
+                              String oraclePathInBaseDir,
+                              String symbolicExecutionOracleFileName,
+                              String initialStatesOraclePrefix,
+                              String initialStatesOracleFileExtension,
+                              String currentStatesOraclePrefix,
+                              String currentStatesOracleFileExtension,
+                              String precondition,
+                              int numberOfReturnNodeInMostLeftBranch,
+                              int expectedNumberOfLayouts,
+                              boolean onReturnStatementNode) throws Exception {
+      // Find most left method return node
+      IExecutionNode<?> returnNode = env.getBuilder().getStartNode();
+      int foundReturnStatement = 0;
+      while (foundReturnStatement < numberOfReturnNodeInMostLeftBranch && returnNode.getChildren().length >= 1) {
+         returnNode = returnNode.getChildren()[0];
+         if (returnNode instanceof IExecutionMethodReturn) {
+            foundReturnStatement++;
+         }
+      }
+      assertTrue(returnNode instanceof IExecutionMethodReturn);
+      IExecutionNode<?> nodeToTest;
+      if (onReturnStatementNode) {
+         // Get the return statement which is returned in returnNode
+         IExecutionNode<?> returnStatement = returnNode.getParent();
+         while (!(returnStatement instanceof IExecutionStatement)) {
+            if (returnStatement instanceof IExecutionStatement) {
+               foundReturnStatement++;
+            }
+            returnStatement = returnStatement.getParent();
+         }
+         assertNotNull(returnStatement);
+         assertTrue(returnStatement.getName().startsWith("return"));
+         nodeToTest = returnStatement;
+      }
+      else {
+         nodeToTest = returnNode;
+      }
+      // Extract possible heaps
+      SymbolicLayoutExtractor extractor = new SymbolicLayoutExtractor(nodeToTest.getProofNode(), nodeToTest.getModalityPIO(), false, false, true);
+      extractor.analyse();
+      // Test the initial memory layouts (first time with lazy computation)
+      List<ISymbolicLayout> initialLayoutsFirstTime = new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
+      assertEquals(expectedNumberOfLayouts, extractor.getLayoutsCount());
+      for (int i = 0; i < extractor.getLayoutsCount(); i++) {
+         ISymbolicLayout current = extractor.getInitialLayout(i);
+         initialLayoutsFirstTime.add(current);
+         String oracleFile = oraclePathInBaseDir + initialStatesOraclePrefix + i + initialStatesOracleFileExtension;
+         createOracleFile(current, oracleFile);
+         if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+            SymbolicLayoutReader reader = new SymbolicLayoutReader();
+            ISymbolicLayout expected = reader.read(new File(testCaseDirectory, oracleFile));
+            assertNotNull(expected);
+            assertModel(expected, current);
+         }
+      }
+      // Test the initial memory layouts (second time with same memory layouts)
+      for (int i = 0; i < extractor.getLayoutsCount(); i++) {
+         ISymbolicLayout current = extractor.getInitialLayout(i);
+         assertSame(initialLayoutsFirstTime.get(i), current);
+      }
+      // Test the current memory layouts (first time with lazy computation)
+      List<ISymbolicLayout> currentLayoutsFirstTime = new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
+      for (int i = 0; i < extractor.getLayoutsCount(); i++) {
+         ISymbolicLayout current = extractor.getCurrentLayout(i);
+         currentLayoutsFirstTime.add(current);
+         String oracleFile = oraclePathInBaseDir + currentStatesOraclePrefix + i + currentStatesOracleFileExtension;
+         createOracleFile(current, oracleFile);
+         if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+            SymbolicLayoutReader reader = new SymbolicLayoutReader();
+            ISymbolicLayout expected = reader.read(new File(testCaseDirectory, oracleFile));
+            assertNotNull(expected);
+            assertModel(expected, current);
+         }
+      }
+      // Test the current memory layouts (second time with same memory layouts)
+      for (int i = 0; i < extractor.getLayoutsCount(); i++) {
+         ISymbolicLayout current = extractor.getCurrentLayout(i);
+         assertSame(currentLayoutsFirstTime.get(i), current);
       }
    }
    

@@ -258,9 +258,10 @@ public abstract class AbstractProblemLoader {
                         return;
                     }
                 }
+                
                 // Create and register proof at specification repository                    
                 proofList = createProof(poContainer); 
-
+                
                 // try to replay first proof
                 proof = proofList.getProof(poContainer.getProofNum());
                 
@@ -478,6 +479,7 @@ public abstract class AbstractProblemLoader {
      * @throws ProofInputException Occurred Exception.
      */
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
+    	
         ProofAggregate proofList = 
         		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
@@ -533,6 +535,9 @@ public abstract class AbstractProblemLoader {
                 problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
                 parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
                 
+                // Parser is no longer needed, set it to null to free memory.
+                parser = null;
+                
                 // For loading, we generally turn on one step simplification to be
                 // able to load proofs that used it even if the user has currently
                 // turned OSS off.
@@ -545,7 +550,7 @@ public abstract class AbstractProblemLoader {
                 lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
 
         } catch (Exception e) {
-        	if (parser == null || parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
+        	if (parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
         	        replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
         		// this exception was something unexpected
         		errors.add(e);

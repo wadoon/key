@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
@@ -71,6 +72,14 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     * {@inheritDoc}
     */
    @Override
+   public RuleApp getAppliedRuleApp() {
+      return proofNode.getAppliedRuleApp();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public InitConfig getInitConfig() {
       Proof proof = getProof();
       return proof != null && !proof.isDisposed() ? proof.getInitConfig() : null;
@@ -111,6 +120,14 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
          }
          return name;
       }
+   }
+   
+   /**
+    * Sets the name.
+    * @param name The new name to set.
+    */
+   protected void setName(String name) {
+      this.name = name;
    }
    
    /**
