@@ -102,13 +102,7 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
 
         try {
 
-            Method method = cls.getMethod(testMethodName, argTypes);
-            if (!method.isAccessible()) {
-                logger.warn(
-                        "Method %s#%s was not accessible, enforcing accessibility",
-                        method.getDeclaringClass().getName(), method.getName());
-                method.setAccessible(true);
-            }
+            Method method = findMethod(cls, testMethodName, argTypes);
 
             for (TestData<C> testItem : testData) {
                 //@formatter:off
@@ -155,22 +149,65 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
             Object obj, Class<?>[] argTypes, Object... args) {
         try {
 
-            Method method = cls.getDeclaredMethod(testMethodName, argTypes);
-            if (!method.isAccessible()) {
-                logger.warn(
-                        "Method %s#%s was not accessible, enforcing accessibility",
-                        method.getDeclaringClass().getName(), method.getName());
-                method.setAccessible(true);
-            }
+            Method method = findMethod(cls, testMethodName, argTypes);
             return method.invoke(obj, args);
 
-        } catch (NoSuchMethodException | SecurityException
-                | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
+        } catch (SecurityException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException e) {
             e.printStackTrace();
             fail(e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Finds a method with the given name and parameters; the method may also be
+     * non-public, which distinguishes this procedure from
+     * {@link Class#getMethod(String, Class...)} that recursively looks up
+     * <strong>public</strong> methods, and from
+     * {@link Class#getDeclaredMethod(String, Class...)} which works for all
+     * methods actually declared in the given class, but won't find even public
+     * super methods.
+     * <p>
+     * If the given method is not accessible, this is changed, and a log entry
+     * is documenting that change.
+     * 
+     * @param cls
+     *            The {@link Class} for which to find a {@link Method}.
+     * @param testMethodName
+     *            The name for the {@link Method} to find.
+     * @param argTypes
+     *            The argument types for the {@link Method} to find.
+     * @return A given {@link Method} of matching signature in either the given
+     *         {@link Class} or a super class, or throws a
+     *         {@link NoSuchMethodException}.
+     * @throws NoSuchMethodException
+     *             If there is no matching method, neither in the given
+     *             {@link Class} nor in any super class.
+     */
+    private static Method findMethod(Class<?> cls, String testMethodName,
+            Class<?>[] argTypes) throws NoSuchMethodException {
+        while (cls != null) {
+            try {
+                Method method = cls.getDeclaredMethod(testMethodName, argTypes);
+
+                if (!method.isAccessible()) {
+                    logger.warn(
+                            "Method %s#%s was not accessible, enforcing accessibility",
+                            method.getDeclaringClass().getName(),
+                            method.getName());
+                    method.setAccessible(true);
+                }
+
+                return method;
+            } catch (NoSuchMethodException e) {
+                cls = cls.getSuperclass();
+                continue;
+            }
+        }
+
+        throw new NoSuchMethodException();
     }
 
     /**
@@ -220,7 +257,7 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
             logger.error(msg);
             throw new NullPointerException(msg);
         }
-        
+
         try {
 
             compile(relPathToJavaFile);
