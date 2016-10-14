@@ -11,6 +11,7 @@ import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 /**
@@ -46,28 +47,43 @@ public class FieldInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
-            List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children) {
 
         // TODO Support more taclets than assignment_write_attribute_this, and
         // then of course also other types for objRef here.
 
         // objRef is currently not used, because it's always "this" so far.
         // Probably extend this in the future.
-//        ThisReference objRef = (ThisReference) getTacletAppInstValue(app,
-//                object);
+        // ThisReference objRef = (ThisReference) getTacletAppInstValue(app,
+        // object);
         LocationVariable fieldRef = (LocationVariable) instantiations
                 .getInstantiationFor(field).get();
-        
-        //@formatter:off
+
+        writeFieldInsn(opcode, mv, fieldRef);
+
+    }
+
+    /**
+     * Writes a field instruction for the given opcode the the
+     * {@link LocationVariable} referring to the field to the supplied
+     * {@link MethodVisitor}.
+     * 
+     * @param opcode
+     *            The opcode for the field instruction.
+     * @param mv
+     *            The {@link MethodVisitor} to write to.
+     * @param fieldRef
+     *            The {@link LocationVariable} referring to the field.
+     */
+    static void writeFieldInsn(int opcode, MethodVisitor mv,
+            LocationVariable fieldRef) {
         mv.visitFieldInsn(opcode,
                 InformationExtraction
                         .toInternalName(fieldRef.getContainerType()),
-                extractFieldNameFromFQN(fieldRef),
+                extractFieldNameFromFQN(fieldRef), //
                 InformationExtraction
                         .typeToTypeDescriptor(fieldRef.getKeYJavaType()));
-        //@formatter:on
-        
     }
 
     /**
@@ -80,7 +96,7 @@ public class FieldInstr extends Instruction {
      * @return The simple name of the given field reference, i.e. the name
      *         without the class prefix.
      */
-    private String extractFieldNameFromFQN(LocationVariable fieldRef) {
+    private static String extractFieldNameFromFQN(IProgramVariable fieldRef) {
         return fieldRef.toString()
                 .substring(fieldRef.toString().lastIndexOf(':') + 1);
     }

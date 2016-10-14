@@ -8,9 +8,12 @@ import org.objectweb.asm.MethodVisitor;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.compiler.exceptions.UnexpectedTranslationSituationException;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.TypeRef;
 
 /**
@@ -21,12 +24,14 @@ import de.uka.ilkd.key.java.reference.TypeRef;
  */
 public class TypeInstr extends Instruction {
     private String arg;
+    private boolean isTypeLiteral = false;
     private int opcode;
 
     private static final HashMap<String, Integer> OPCODES_MAP = new HashMap<>();
 
     static {
         OPCODES_MAP.put("CHECKCAST", CHECKCAST);
+        OPCODES_MAP.put("NEW", NEW);
     }
 
     /**
@@ -36,19 +41,39 @@ public class TypeInstr extends Instruction {
      *            The location variable that is the argument of this
      *            {@link TypeInstr}.
      */
-    public TypeInstr(String insn, String arg) {
+    public TypeInstr(String insn, String arg, boolean isTypeLiteral) {
         this.arg = arg;
+        this.isTypeLiteral = isTypeLiteral;
+
         opcode = OPCODES_MAP.get(insn);
     }
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
-            List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children) {
 
-        TypeRef type = (TypeRef) instantiations.getInstantiationFor(arg).get();
-        mv.visitTypeInsn(opcode,
-                InformationExtraction.toInternalName(type.getKeYJavaType()));
+        String typeLiteral = null;
+
+        if (isTypeLiteral) {
+            typeLiteral = arg;
+        } else {
+            Object type = instantiations.getInstantiationFor(arg).get();
+            KeYJavaType kjType = null;
+            if (type instanceof TypeRef) {
+                kjType = ((TypeRef) type).getKeYJavaType();
+            } else if (type instanceof KeYJavaType) {
+                kjType = (KeYJavaType) type;
+            } else {
+                throw new UnexpectedTranslationSituationException(Utilities
+                        .format("Unexpected type in TypeInstr given, expected TypeRef or KeYJavaType, given: %s",
+                                type.getClass().getName()));
+            }
+
+            typeLiteral = InformationExtraction.toInternalName(kjType);
+        }
+
+        mv.visitTypeInsn(opcode, typeLiteral);
 
     }
 

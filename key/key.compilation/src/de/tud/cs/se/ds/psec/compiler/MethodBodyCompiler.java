@@ -24,10 +24,14 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.SuperReference;
+import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -141,8 +145,26 @@ public class MethodBodyCompiler implements Opcodes {
      *         not a super call.
      */
     private boolean shouldAddConstructorCall(Node startNode) {
-        return mDecl.isConstructor() && !startNode.getAppliedRuleApp().rule()
-                .name().toString().equals("methodCallSuper");
+        if (!mDecl.isConstructor()) {
+            return false;
+        }
+
+        if (startNode.getAppliedRuleApp() == null) {
+            // If the rule app is null, we also need to add a constructor -- in
+            // this case, the constructor body is actually empty
+            return true;
+        }
+
+        SourceElement actStmt = NodeInfo
+                .computeActiveStatement(startNode.getAppliedRuleApp());
+
+        if (actStmt == null || !(actStmt instanceof MethodReference)) {
+            return true;
+        }
+
+        MethodReference mRef = (MethodReference) actStmt;
+        
+        return !mRef.getName().equals("<init>");
     }
 
     /**
@@ -166,7 +188,8 @@ public class MethodBodyCompiler implements Opcodes {
                 if (!block.equals(JavaBlock.EMPTY_JAVABLOCK)) {
                     String msg = Utilities.format(
                             "Symbolic execution was not exhaustive; "
-                                    + "is there an error in the program?\nProblem:\n%s",
+                                    + "is there an error in the program?\nProblem in method %s:\n%s",
+                            InformationExtraction.getMethodDescriptor(mDecl),
                             JavaTools.getActiveStatement(block));
                     throw new IncompleteSymbolicExecutionException(msg);
                 }
@@ -179,6 +202,15 @@ public class MethodBodyCompiler implements Opcodes {
      * where there is not already one present.
      */
     private void addReturnAfterAllLeaves() {
+        if (astRoot.children().isEmpty()) {
+            // This is obviously an empty method, like a private
+            // standard constructor for a Singleton.
+            astRoot.addChild(translationFactory
+                    .getTranslationForTacletWithoutArgs("methodCallEmptyReturn")
+                    .get());
+            return;
+        }
+
         Deque<TacletASTNode> stack = new LinkedList<>();
         stack.push(astRoot);
 
@@ -220,9 +252,9 @@ public class MethodBodyCompiler implements Opcodes {
 
         currentNode = currentNode.child(0);
 
-        while (!translationFactory
-                .assertHasDefinitionFor(currentNode.getAppliedRuleApp())
-                && currentNode.childrenCount() == 1) {
+        while (currentNode.childrenCount() == 1 && !currentNode.leaf()
+                && !translationFactory.assertHasDefinitionFor(
+                        currentNode.getAppliedRuleApp())) {
             currentNode = currentNode.child(0);
         }
 

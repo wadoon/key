@@ -2,6 +2,7 @@ package de.tud.cs.se.ds.psec.parser.ast;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.objectweb.asm.MethodVisitor;
 
@@ -9,6 +10,7 @@ import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
@@ -47,10 +49,19 @@ public class LocVarUnaryBytecodeInstr extends Instruction {
             UniqueLabelManager labelManager, RuleInstantiations instantiations,
             Services services, List<TacletASTNode> children) {
 
-        LocationVariable progVar = (LocationVariable) instantiations
-                .getInstantiationFor(locVarSV).get();
+        // The locVarSV may either be a SchemaVariable name pointing to a
+        // LocationVariable, of an Integer literal for direct usage.
 
-        mv.visitVarInsn(opcode, pvHelper.progVarNr(progVar));
+        Optional<Integer> intVal = Utilities.tryParseInt(locVarSV);
+
+        if (intVal.isPresent()) {
+            mv.visitVarInsn(opcode, intVal.get());
+        } else {
+            LocationVariable progVar = (LocationVariable) instantiations
+                    .getInstantiationFor(locVarSV).get();
+            mv.visitVarInsn(opcode,
+                    pvHelper.progVarNr(progVar));
+        }
 
     }
 

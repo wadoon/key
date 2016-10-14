@@ -88,16 +88,13 @@ public class TacletASTNode implements Opcodes {
 
         if (candidates.size() < 1) {
             String message = Utilities.format(
-                    "No suitable translation found for the situation %s",
+                    "No suitable translation found for the situation:\\%s",
                     applCheckInput);
-
-            logger.error(message);
             throw new UnexpectedTranslationSituationException(message);
         } else if (candidates.size() > 1) {
             String message = Utilities.format(
-                    "Too many translations (%s) found for the situation %s",
+                    "Too many translations (%s) found for the situation:\\%s",
                     candidates.size(), applCheckInput);
-            logger.error(message);
             throw new UnexpectedTranslationSituationException(message);
         }
 

@@ -16,7 +16,7 @@ import org.junit.Test;
 public class MethodCallFunctionalTests extends AbstractCompilerFunctionalTest {
 
     public MethodCallFunctionalTests() {
-        super(false);
+        super(true);
     }
 
     @Test

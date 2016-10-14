@@ -64,7 +64,8 @@ public class MethodCallInstruction extends Instruction {
             throw new UnexpectedTranslationSituationException(msg);
         }
 
-        boolean isConstructor = pm.getName().equals("<init>");
+        boolean isConstructor = pm.getName().equals("<init>")
+                || pm.isConstructor();
 
         if (mbs != null && !isConstructor) {
             // XXX: Shouldn't be too hard to also support general method calls;
@@ -77,11 +78,11 @@ public class MethodCallInstruction extends Instruction {
             throw new UnsupportedFeatureException(msg);
         }
 
-        if (isConstructor) {
-            // TODO: Intermediate solution, should be included in rules
-            // instead
-            mv.visitVarInsn(ALOAD, 0);
-        }
+        // if (isConstructor) {
+        // // TODO: Intermediate solution, should be included in rules
+        // // instead
+        // mv.visitVarInsn(ALOAD, 0);
+        // }
 
         if (mbs != null) {
             for (Expression expr : mbs.getArguments()) {
@@ -98,9 +99,11 @@ public class MethodCallInstruction extends Instruction {
 
         // TODO Missing: INVOKEDYNAMIC, INVOKEINTERFACE
 
+        String pmName = isConstructor ? "<init>" : pm.getName();
+
         mv.visitMethodInsn(opcode,
                 InformationExtraction.toInternalName(pm.getContainerType()),
-                pm.getName(), InformationExtraction.getMethodTypeDescriptor(pm),
+                pmName, InformationExtraction.getMethodTypeDescriptor(pm),
                 false);
 
     }

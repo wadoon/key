@@ -20,6 +20,7 @@ public class TestAlfred extends TestSuite {
     static Class<? extends TestCase>[] compilerTests = new Class[] {
             de.tud.cs.se.ds.psec.compiler.SimpleCompilerFunctionalTests.class,
             de.tud.cs.se.ds.psec.compiler.MethodCallFunctionalTests.class,
+            de.tud.cs.se.ds.psec.compiler.InheritanceFunctionalTest.class,
     };
 
     public static TestSuite createSuite(Class<? extends TestCase>[] testClasses, final String msg) {

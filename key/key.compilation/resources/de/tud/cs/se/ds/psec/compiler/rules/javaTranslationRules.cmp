@@ -77,8 +77,23 @@ operation_contract_nonstatic_nonvoid {
 	\taclets ("Use Operation Contract")
 	\condition (!isStatic(#pm))
 	\condition (!isVoid(#pm))
+	\condition (!isConstructor(#pm))
 	\translation (
 		ALOAD #actualSelf
+		\load_params (#actualParams)
+		\methodCall (#pm)
+		\store (#actualResult)
+		#child-1
+	)
+}
+
+operation_contract_constructor {
+	\taclets ("Use Operation Contract")
+	\condition (isConstructor(#pm))
+	\translation (
+		ALOAD 0
+		NEW #containerType
+		DUP
 		\load_params (#actualParams)
 		\methodCall (#pm)
 		\store (#actualResult)
@@ -90,6 +105,7 @@ operation_contract_nonstatic_void {
 	\taclets ("Use Operation Contract")
 	\condition (!isStatic(#pm))
 	\condition (isVoid(#pm))
+	\condition (!isConstructor(#pm))
 	\translation (
 		ALOAD #actualSelf
 		\load_params (#actualParams)
@@ -102,6 +118,7 @@ operation_contract_static_nonvoid {
 	\taclets ("Use Operation Contract")
 	\condition (isStatic(#pm))
 	\condition (!isVoid(#pm))
+	\condition (!isConstructor(#pm))
 	\translation (
 		\load_params (#actualParams)
 		\methodCall (#pm)
@@ -114,6 +131,7 @@ operation_contract_static_void {
 	\taclets ("Use Operation Contract")
 	\condition (isStatic(#pm))
 	\condition (isVoid(#pm))
+	\condition (!isConstructor(#pm))
 	\translation (
 		\load_params (#actualParams)
 		\methodCall (#pm)
@@ -121,31 +139,17 @@ operation_contract_static_void {
 	)
 }
 
-method_body_expand_constructor {
-	\taclets ("methodBodyExpand")
-	\condition (isConstructor (#mb))
-	\translation (
-		\methodCall (#mb)
-		#child-1
-	)
-}
-
-// We ignore all method body expand that are not addressing
-// constructors, since those will be turned into an operation
-// contract application and then compiled.
-method_body_expand_no_constructor {
-	\taclets ("methodBodyExpand")
-	\condition (!isConstructor (#mb))
-	\translation (
-		#child-1
-	)
-}
-
-method_call_super {
-	\taclets ("methodCallSuper")
+//TODO Check what happens for non-constructor super methods
+method_call_super_constructor {
+	//\taclets ("methodCallSuper")
+	\taclets ("superRemoveForCompilation")
+	\condition (isConstructor (#mn))
 	\translation (
 		// This SE taclet is translated to a methodBodyExpand,
 		// and can therefore be ignored
+		ALOAD 0
+		\load_params (#selist)
+		\superCall (#mn, #selist) //TEST!
 		#child-1
 	)
 }
@@ -183,12 +187,21 @@ return_void {
 // ### Objects ###
 // ###############
 
-assignment_write_attribute_this {
+assignment_write_attribute_this_no_result_var {
 	\taclets ("assignment_write_attribute", "assignment_write_attribute_this")
+	\condition (!isResultVar(#se))
 	\translation (
 		\load (#v)
 		\load (#se)
 		PUTFIELD #v.#a
+		#child-1
+	)
+}
+
+assignment_write_attribute_this_result_var {
+	\taclets ("assignment_write_attribute", "assignment_write_attribute_this")
+	\condition (isResultVar(#se))
+	\translation (
 		#child-1
 	)
 }
@@ -233,6 +246,35 @@ equality_comparison_objects {
 	    l1: ICONST_0
 	    l2: ISTORE #lhs
 	    #child-1
+	)
+}
+
+// ###############
+// ### Strings ###
+// ###############
+
+string_assgn {
+	\taclets ("stringAssignment")
+	\translation (
+		LDC #slit
+		ASTORE #v
+		#child-1
+	)
+}
+
+string_concat_int_exp_left {
+	\taclets ("stringConcatIntExpLeft")
+	\translation (
+		NEW java/lang/StringBuilder
+    	DUP
+	    \load (#seLeft)
+	    INVOKESTATIC java/lang/String.valueOf(I)Ljava/lang/String;
+	    INVOKESPECIAL java/lang/StringBuilder.<init>(Ljava/lang/String;)V
+	    \load (#sstrRight)
+	    INVOKEVIRTUAL java/lang/StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+	    INVOKEVIRTUAL java/lang/StringBuilder.toString()Ljava/lang/String;
+	    \store (#v)
+		#child-1
 	)
 }
 
@@ -359,7 +401,8 @@ greater_than_comparison {
 unary_minus_int {
 	\taclets ("unaryMinusInt")
 	\translation (
-		\load (\negate (#seCharByteShortInt))
+		\load (#seCharByteShortInt)
+		INEG
 		ISTORE #loc
 		#child-1
 	)

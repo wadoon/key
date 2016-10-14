@@ -20,6 +20,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.DefinitionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Field_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsConstructorExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsResultVarExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsStaticExpressionContext;
@@ -37,6 +38,8 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrCont
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialExpressionAtomContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialUnaryInstrsContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Store_instrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.StringLitUnaryBytecodeInstrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Super_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.TranslationContext;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
@@ -45,14 +48,17 @@ import de.tud.cs.se.ds.psec.parser.ast.FieldInstr;
 import de.tud.cs.se.ds.psec.parser.ast.Instruction;
 import de.tud.cs.se.ds.psec.parser.ast.Instructions;
 import de.tud.cs.se.ds.psec.parser.ast.IntegerUnaryBytecodeInstr;
+import de.tud.cs.se.ds.psec.parser.ast.InvokeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LabelUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LabeledBytecodeInstr;
+import de.tud.cs.se.ds.psec.parser.ast.LdcInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.LocVarUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.MethodCallInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.ParamsLoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.StoreInstruction;
+import de.tud.cs.se.ds.psec.parser.ast.SuperCallInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationTacletASTElement;
@@ -60,6 +66,9 @@ import de.tud.cs.se.ds.psec.parser.ast.TypeInstr;
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -276,11 +285,26 @@ public class TranslationTacletParserFE extends
     public ApplicabilityCondition visitIsConstructorExpression(
             IsConstructorExpressionContext ctx) {
         return new ApplicabilityCondition(info -> {
-            MethodBodyStatement mbs = (MethodBodyStatement) info
-                    .getInstantiations()
+            Object method = info.getInstantiations()
                     .getInstantiationFor(ctx.LOC_REF().getText()).get();
-            return mbs.getMethodReference().getMethodName().toString()
-                    .equals("<init>");
+
+            if (method instanceof MethodName) {
+                MethodName mName = (MethodName) method;
+                return mName.toString().equals("<init>");
+            }
+
+            MethodDeclaration methodDeclaration = null;
+            if (method instanceof MethodBodyStatement) {
+                methodDeclaration = ((MethodBodyStatement) method)
+                        .getProgramMethod(info.getServices())
+                        .getMethodDeclaration();
+            } else if (method instanceof ProgramMethod) {
+                methodDeclaration = ((ProgramMethod) method)
+                        .getMethodDeclaration();
+            }
+
+            return methodDeclaration instanceof ConstructorDeclaration
+                    || methodDeclaration.getName().equals("<init>");
         });
     }
 
@@ -293,7 +317,7 @@ public class TranslationTacletParserFE extends
             return pm.isStatic();
         });
     }
-    
+
     @Override
     public ApplicabilityCondition visitIsVoidExpression(
             IsVoidExpressionContext ctx) {
@@ -308,10 +332,10 @@ public class TranslationTacletParserFE extends
     public ApplicabilityCondition visitIsResultVarExpression(
             IsResultVarExpressionContext ctx) {
         return new ApplicabilityCondition(info -> {
-            // XXX This is a hack for ignoring result_* variables introduced by
-            // Operation Contract rule applications. We should actually check
-            // whether this variable was indeed introduced by such an
-            // application...
+            // XXX This is a hack for ignoring result_* and self_* variables
+            // introduced by Operation Contract rule applications. We should
+            // actually check whether this variable was indeed introduced by
+            // such an application...
 
             Expression expr = (Expression) info.getInstantiations()
                     .getInstantiationFor(ctx.LOC_REF().getText()).get();
@@ -321,7 +345,8 @@ public class TranslationTacletParserFE extends
             }
 
             LocationVariable locVar = (LocationVariable) expr;
-            return locVar.name().toString().startsWith("result_");
+            return locVar.name().toString().startsWith("result_")
+                    || locVar.name().toString().startsWith("self_");
         });
     }
 
@@ -390,9 +415,14 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
-    public TranslationTacletASTElement visitMethod_call(
-            Method_callContext ctx) {
+    public MethodCallInstruction visitMethod_call(Method_callContext ctx) {
         return new MethodCallInstruction(ctx.call.getText());
+    }
+
+    @Override
+    public SuperCallInstruction visitSuper_call(Super_callContext ctx) {
+        return new SuperCallInstruction(ctx.mname.getText(),
+                ctx.elist.getText());
     }
 
     @Override
@@ -405,7 +435,8 @@ public class TranslationTacletParserFE extends
     public LocVarUnaryBytecodeInstr visitLocVarUnaryBytecodeInstr(
             LocVarUnaryBytecodeInstrContext ctx) {
         return new LocVarUnaryBytecodeInstr(
-                ctx.loc_var_unary_instrs().getText(), ctx.LOC_REF().getText());
+                ctx.loc_var_unary_instrs().getText(), ctx.LOC_REF() == null
+                        ? ctx.integer().getText() : ctx.LOC_REF().getText());
     }
 
     @Override
@@ -424,13 +455,30 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
-    public TypeInstr visitSpecialUnaryInstrs(SpecialUnaryInstrsContext ctx) {
-        return new TypeInstr(ctx.special_unary_instrs().getText(),
-                ctx.LOC_REF().getText());
+    public LdcInstr visitStringLitUnaryBytecodeInstr(
+            StringLitUnaryBytecodeInstrContext ctx) {
+        return new LdcInstr(ctx.LOC_REF().getText());
     }
 
     @Override
-    public FieldInstr visitField_instr(Field_instrContext ctx) {
+    public TypeInstr visitSpecialUnaryInstrs(SpecialUnaryInstrsContext ctx) {
+        boolean isTypeLiteral = false;
+        String arg = null;
+        
+        if (ctx.LOC_REF() != null) {
+            isTypeLiteral = false;
+            arg = ctx.LOC_REF().getText();
+        } else if (ctx.type_spec() != null) {
+            isTypeLiteral = true;
+            arg = ctx.type_spec().getText();
+        }
+
+        return new TypeInstr(ctx.special_unary_instrs().getText(), arg,
+                isTypeLiteral);
+    }
+
+    @Override
+    public Instruction visitField_instr(Field_instrContext ctx) {
         return new FieldInstr(ctx.instr.getText(), ctx.object.getText(),
                 ctx.field.getText());
     }
@@ -452,11 +500,21 @@ public class TranslationTacletParserFE extends
             Params_load_instrContext ctx) {
         return new ParamsLoadInstruction(ctx.LOC_REF().getText());
     }
+
+    @Override
+    public StoreInstruction visitStore_instr(Store_instrContext ctx) {
+        return new StoreInstruction(ctx.LOC_REF().getText());
+    }
     
     @Override
-    public StoreInstruction visitStore_instr(
-            Store_instrContext ctx) {
-        return new StoreInstruction(ctx.LOC_REF().getText());
+    public InvokeInstr visitInvoke_instr(
+            Invoke_instrContext ctx) {
+        String op = ctx.invoke_op().getText();
+        String cls = ctx.method_descriptor().typename.getText();
+        String mname = ctx.method_descriptor().mname.getText();
+        String sig = ctx.method_descriptor().sig.getText();
+        
+        return new InvokeInstr(op, cls, mname, sig);
     }
 
     @Override

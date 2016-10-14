@@ -1,0 +1,83 @@
+package de.tud.cs.se.ds.psec.compiler;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Test;
+
+/**
+ * Functional test cases for the compiler (i.e., Java code is compiled,
+ * executed, and tested for correctness).
+ *
+ * @author Dominic Scheurer
+ */
+public class InheritanceFunctionalTest extends AbstractCompilerFunctionalTest {
+
+    public InheritanceFunctionalTest() {
+        super(true);
+    }
+
+    @Test
+    public void testInheritance() {
+
+        Class<?>[] classes = compileAndLoad("inheritance/Inheritance.java",
+                "de.tud.test.inheritance.Inheritance",
+                "de.tud.test.inheritance.SuperClass",
+                "de.tud.test.inheritance.NatWrapper");
+
+        Class<?> Inheritance = classes[0];
+
+        try {
+
+            Constructor<?> inheritanceCtor = Inheritance
+                    .getConstructor(int.class);
+
+            Object o1 = inheritanceCtor.newInstance(1);
+            Object o0 = inheritanceCtor.newInstance(0);
+            Object om1 = inheritanceCtor.newInstance(-1);
+
+            // Test "get" and "NatWrapper#toString" methods
+            assertEquals("1",
+                    callMethod(Inheritance, "get", o1, null, new Object[0])
+                            .toString());
+            assertEquals("0",
+                    callMethod(Inheritance, "get", o0, null, new Object[0])
+                            .toString());
+            assertEquals("1",
+                    callMethod(Inheritance, "get", om1, null, new Object[0])
+                            .toString());
+
+            // Test "equals" of StringContainer
+            List<TestData<Boolean>> testEquals1 = Arrays.asList(
+                    new TestData<Boolean>(true, o1, o1),
+                    new TestData<Boolean>(true, o1, om1),
+                    new TestData<Boolean>(false, o1, o0),
+                    new TestData<Boolean>(false, om1, o0));
+
+            runTests(Inheritance, "equals", new Class<?>[] { Object.class },
+                    testEquals1);
+            
+            // Set, and test "equals" again
+            callMethod(Inheritance, "set", o0, new Class<?>[] { int.class }, 1);
+            
+            List<TestData<Boolean>> testEquals2 = Arrays.asList(
+                    new TestData<Boolean>(true, o1, o1),
+                    new TestData<Boolean>(true, o1, om1),
+                    new TestData<Boolean>(true, o1, o0),
+                    new TestData<Boolean>(true, om1, o0));
+
+            runTests(Inheritance, "equals", new Class<?>[] { Object.class },
+                    testEquals2);
+
+        } catch (NoSuchMethodException | SecurityException
+                | InstantiationException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+
+    }
+
+}

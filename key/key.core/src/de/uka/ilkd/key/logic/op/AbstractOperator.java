@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.Term;
 /** 
  * Abstract operator class offering some common functionality.
  */
-abstract class AbstractOperator implements Operator {
+public abstract class AbstractOperator implements Operator {
     
     private final Name name;
     private final int arity;

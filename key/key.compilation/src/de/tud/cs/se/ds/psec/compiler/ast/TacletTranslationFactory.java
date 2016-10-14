@@ -198,9 +198,14 @@ public class TacletTranslationFactory {
 
         HashMap<String, Object> instantiations = new HashMap<>();
         instantiations.put("#pm", pm);
-        instantiations.put("#actualSelf", pm.isStatic() ? null
-                : (LocationVariable) app.getRuleInstantiations().actualSelf
-                        .op());
+        instantiations.put("#containerType", pm.getContainerType());
+        instantiations.put("#actualSelf",
+                pm.isStatic()
+                        || app.getRuleInstantiations().actualSelf == null
+                                ? null
+                                : (LocationVariable) app
+                                        .getRuleInstantiations().actualSelf
+                                                .op());
         instantiations.put("#actualParams",
                 app.getRuleInstantiations().actualParams);
         instantiations.put("#actualResult",

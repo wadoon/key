@@ -279,6 +279,21 @@ public class InformationExtraction implements Opcodes {
     }
 
     /**
+     * Returns a {@link String} describing the given {@link IProgramMethod}, of
+     * the form:
+     * <code>&lt;type&gt;#&lt;methodName&gt;&lt;methodTypeDescriptor&gt;</code>.
+     * 
+     * @param m
+     *            The {@link IProgramMethod} for which a descriptor should be
+     *            generated.
+     * @return A {@link String} describing the given {@link IProgramMethod}.
+     */
+    public static String getMethodDescriptor(IProgramMethod m) {
+        return m.getContainerType().getFullName() + "#" + m.getName()
+                + getMethodTypeDescriptor(m);
+    }
+
+    /**
      * Retrieves all {@link KeYJavaType}s declared in the given
      * {@link KeYEnvironment}.
      * 

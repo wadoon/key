@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -54,8 +55,7 @@ public class Utilities {
                     .peek(logger::trace)
                     // Then delete the file(s)
                     .forEach(File::delete);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error("Problem during deleting resource / directory %s:\n%s",
                     pathToDirectory, e.toString());
             return false;
@@ -84,6 +84,25 @@ public class Utilities {
         formatter.close();
 
         return sb.toString();
+    }
+
+    /**
+     * Tries to parse a {@link String} to an {@link Integer}; returns an
+     * {@link Optional} containing the {@link Integer} in case of success or an
+     * empty {@link Optional} otherwise.
+     * 
+     * @param s
+     *            The {@link String} to parse.
+     * @return An {@link Optional} containing the {@link Integer} in case of
+     *         success or an empty {@link Optional} otherwise.
+     */
+    public static Optional<Integer> tryParseInt(String s) {
+        try {
+            int result = Integer.parseInt(s);
+            return Optional.of(result);
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
 }

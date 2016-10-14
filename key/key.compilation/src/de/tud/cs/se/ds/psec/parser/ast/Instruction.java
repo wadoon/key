@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.reference.ThisReference;
@@ -93,6 +94,10 @@ public abstract class Instruction extends TranslationTacletASTElement {
                 
                 mv.visitVarInsn(ALOAD, pvHelper.progVarNr(obj));
                 mv.visitTypeInsn(INSTANCEOF, InformationExtraction.toInternalName(typeRef));
+                
+            } else if (expr instanceof NullLiteral) {
+                
+                mv.visitInsn(ACONST_NULL);
                 
             } else if (expr instanceof IntLiteral) {
 

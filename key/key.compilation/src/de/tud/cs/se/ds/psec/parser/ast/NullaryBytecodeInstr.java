@@ -23,6 +23,7 @@ public class NullaryBytecodeInstr extends Instruction {
 
     static {
         OPCODES_MAP.put("ARETURN", ARETURN);
+        OPCODES_MAP.put("DUP", DUP);
         OPCODES_MAP.put("IADD", IADD);
         OPCODES_MAP.put("ICONST_M1", ICONST_M1);
         OPCODES_MAP.put("ICONST_0", ICONST_0);
@@ -31,6 +32,7 @@ public class NullaryBytecodeInstr extends Instruction {
         OPCODES_MAP.put("ICONST_3", ICONST_3);
         OPCODES_MAP.put("ICONST_4", ICONST_4);
         OPCODES_MAP.put("ICONST_5", ICONST_5);
+        OPCODES_MAP.put("INEG", INEG);
         OPCODES_MAP.put("IRETURN", IRETURN);
         OPCODES_MAP.put("ISUB", ISUB);
         OPCODES_MAP.put("IXOR", IXOR);

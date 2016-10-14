@@ -59,7 +59,9 @@ labeled_bytecode_instr
 
 bytecode_instr
     :
-        nullary_bytecode_instr
+        invoke_instr
+    |
+    	nullary_bytecode_instr
     |
         unary_bytecode_instr
     |
@@ -68,6 +70,8 @@ bytecode_instr
         load_instr
     |
     	method_call
+    |
+    	super_call
     |
     	store_instr
     |
@@ -78,9 +82,13 @@ nullary_bytecode_instr
     :
     	ARETURN
     |
+    	DUP
+    |
         IADD
     |
         ICONST_D
+    |
+    	INEG
     |
         IRETURN
     |
@@ -92,14 +100,16 @@ nullary_bytecode_instr
     ;
 
 unary_bytecode_instr
-    :
-        loc_var_unary_instrs LOC_REF   # locVarUnaryBytecodeInstr
+	:
+        loc_var_unary_instrs (LOC_REF | integer)   # locVarUnaryBytecodeInstr
     |
-    	label_unary_instrs LABEL       # labelUnaryBytecodeInstr
+    	label_unary_instrs LABEL                   # labelUnaryBytecodeInstr
     |
-    	int_const_unary_instrs integer # intUnaryBytecodeInstr
+    	int_const_unary_instrs integer             # intUnaryBytecodeInstr
     |
-    	special_unary_instrs LOC_REF   # specialUnaryInstrs
+    	string_lit_unary_instrs LOC_REF            # stringLitUnaryBytecodeInstr
+    |
+    	special_unary_instrs (LOC_REF | type_spec) # specialUnaryInstrs
     ;
 
 field_instr
@@ -141,9 +151,16 @@ int_const_unary_instrs
 		BIPUSH
 	;
 
+string_lit_unary_instrs
+	:
+		LDC
+	;
+
 special_unary_instrs
 	:
 		CHECKCAST
+	|
+		NEW
 	;
 
 load_instr
@@ -190,11 +207,36 @@ store_instr
 		RPAREN
 	;
 
+invoke_instr
+	:
+		invoke_op
+		method_descriptor
+	;
+
+invoke_op
+	:
+		INVOKESPECIAL
+	|
+		INVOKESTATIC
+	|
+		INVOKEVIRTUAL
+	;
+
 method_call
 	:
 		METHOD_CALL
 		LPAREN
 			(call = LOC_REF)
+		RPAREN
+	;
+
+super_call
+	:
+		SUPER_CALL
+		LPAREN
+			(mname = LOC_REF)
+			COMMA
+			(elist = LOC_REF)
 		RPAREN
 	;
 
@@ -206,6 +248,71 @@ child_call
 integer
 	:
 		MINUS ? NUMBER
+	;
+
+// Typ and Method signatures
+
+// java/lang/String.valueOf(I)Ljava/lang/String;
+
+method_descriptor
+	:
+		(typename = type_spec)
+		DOT
+		(mname = method_name)
+		(sig = method_sig)
+	;
+
+method_name
+	:
+		IDENT
+	|
+		LANGLE IDENT RANGLE
+	;
+
+method_sig
+	:
+		LPAREN
+			signature_element *
+		RPAREN
+		method_result_type
+	;
+
+method_result_type
+	:
+		VOID_SIG
+	|
+		signature_element
+	;
+
+signature_element
+	:
+		primitive_sig_element
+	|
+		type_sig_element
+	;
+
+primitive_sig_element
+	:
+		INT_SIG
+	;
+
+type_sig_element
+	:
+		IDENT_L
+		(
+			SLASH
+			IDENT
+		)*
+		SEMI
+	;
+
+type_spec
+	:
+		IDENT
+		(
+			SLASH
+			IDENT
+		)*
 	;
 
 // Condition expressions

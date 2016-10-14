@@ -2,7 +2,6 @@ package de.tud.cs.se.ds.psec.parser.ast;
 
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
@@ -41,12 +40,12 @@ public class ParamsLoadInstruction extends Instruction {
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             UniqueLabelManager labelManager, RuleInstantiations instantiations,
             Services services, List<TacletASTNode> children) {
-        @SuppressWarnings("unchecked")
-        ImmutableList<Term> params = (ImmutableList<Term>) instantiations
+        Iterable<?> params = (Iterable<?>) instantiations
                 .getInstantiationFor(schemaVar).get();
 
         params.forEach(param -> loadExpressionToStack(mv, pvHelper,
-                (Expression) param.op()));
+                param instanceof Term ? (Expression) ((Term) param).op()
+                        : (Expression) param));
     }
 
 }

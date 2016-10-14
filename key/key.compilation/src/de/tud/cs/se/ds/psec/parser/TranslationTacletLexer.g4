@@ -20,6 +20,9 @@ LOAD_PARAMS
 METHOD_CALL
 	: '\\methodCall';
 
+SUPER_CALL
+	: '\\superCall';
+
 NEGATE
     : '\\negate';
 
@@ -44,6 +47,12 @@ DOT
 COMMA
 	: ',' ;
 
+SLASH
+	: '/' ;
+
+HASH
+	: '#';
+
 LPAREN
 	: '(' ;
 
@@ -55,6 +64,12 @@ LBRACE
 
 RBRACE
 	: '}' ;
+
+LANGLE
+	: '<' ;
+
+RANGLE
+	: '>' ;
 
 QUOT
     : '"' ;
@@ -102,28 +117,41 @@ MINUS : '-' ;
 
 // Bytecode directives
 
-ALOAD     : 'ALOAD';
-ARETURN   : 'ARETURN';
-ASTORE    : 'ASTORE';
-BIPUSH    : 'BIPUSH';
-CHECKCAST : 'CHECKCAST';
-GETFIELD  : 'GETFIELD';
-GOTO      : 'GOTO';
-IADD      : 'IADD';
-ICONST    : 'ICONST';
-ICONST_D  : 'ICONST_' DIGIT;
-IF_ACMPNE : 'IF_ACMPNE';
-IF_ICMPGE : 'IF_ICMPGE';
-IF_ICMPLE : 'IF_ICMPLE';
-IF_ICMPNE : 'IF_ICMPNE';
-IFEQ      : 'IFEQ';
-IFNE      : 'IFNE';
-IRETURN   : 'IRETURN';
-ISTORE    : 'ISTORE';
-ISUB      : 'ISUB';
-IXOR      : 'IXOR';
-PUTFIELD  : 'PUTFIELD';
-RETURN    : 'RETURN';
+ALOAD         : 'ALOAD' ;
+ARETURN       : 'ARETURN' ;
+ASTORE        : 'ASTORE' ;
+BIPUSH        : 'BIPUSH' ;
+CHECKCAST     : 'CHECKCAST' ;
+DUP           : 'DUP' ;
+GETFIELD      : 'GETFIELD' ;
+GOTO          : 'GOTO' ;
+IADD          : 'IADD' ;
+ICONST        : 'ICONST' ;
+ICONST_D      : 'ICONST_' DIGIT ;
+IF_ACMPNE     : 'IF_ACMPNE' ;
+IF_ICMPGE     : 'IF_ICMPGE' ;
+IF_ICMPLE     : 'IF_ICMPLE' ;
+IF_ICMPNE     : 'IF_ICMPNE' ;
+IFEQ          : 'IFEQ' ;
+IFNE          : 'IFNE' ;
+INEG          : 'INEG' ;
+INVOKEVIRTUAL : 'INVOKEVIRTUAL' ;
+INVOKESTATIC  : 'INVOKESTATIC' ;
+INVOKESPECIAL : 'INVOKESPECIAL' ;
+IRETURN       : 'IRETURN' ;
+ISTORE        : 'ISTORE' ;
+ISUB          : 'ISUB' ;
+IXOR          : 'IXOR' ;
+LDC           : 'LDC' ;
+NEW           : 'NEW' ;
+PUTFIELD      : 'PUTFIELD' ;
+RETURN        : 'RETURN' ;
+
+// Signature elements
+
+INT_SIG  : 'I';
+VOID_SIG : 'V';
+L        : 'L';
 
 // Meta variables
 
@@ -141,6 +169,12 @@ fragment LETTER
     | 'A'..'Z'
     ;
 
+fragment LETTER_NO_L
+	: 'a' .. 'z'
+	| 'A' .. 'K'
+	| 'M' .. 'Z'
+	;
+
 NUMBER
     : DIGIT +
     ;
@@ -154,6 +188,10 @@ LABEL
 
 LOC_REF
     : '#' (LETTER | DIGIT) +
+    ;
+
+IDENT_L
+    : ( L ) ( DIGIT | LETTER | '_' ) *
     ;
 
 // IDENT has to follow the bytecode directives since
