@@ -93,11 +93,26 @@ operation_contract_nonstatic_nonvoid_super {
 	)
 }
 
-operation_contract_constructor {
+operation_contract_constructor_field_store {
 	\taclets ("Use Operation Contract")
 	\condition (isConstructor(#pm))
+	\condition (isFieldReference(#actualResult))
 	\translation (
 		ALOAD 0
+		NEW #containerType
+		DUP
+		\load_params (#actualParams)
+		INVOKESPECIAL #pm
+		\store (#actualResult)
+		#child-1
+	)
+}
+
+operation_contract_constructor_var_store {
+	\taclets ("Use Operation Contract")
+	\condition (isConstructor(#pm))
+	\condition (!isFieldReference(#actualResult))
+	\translation (
 		NEW #containerType
 		DUP
 		\load_params (#actualParams)

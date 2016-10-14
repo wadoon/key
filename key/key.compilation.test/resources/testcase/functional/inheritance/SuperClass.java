@@ -29,6 +29,14 @@ public class SuperClass {
         return false;
     }
     
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
+    protected static Object zeroInstance() {
+        return new NatWrapper(0);
+    }
+    
 }
 
 class NatWrapper {

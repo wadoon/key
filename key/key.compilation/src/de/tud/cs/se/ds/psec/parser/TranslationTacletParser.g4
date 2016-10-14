@@ -333,6 +333,11 @@ special_expression
 			LOC_REF
 		RPAREN          # isConstructorExpression
 	|
+		IS_FIELD_REF
+		LPAREN
+			LOC_REF
+		RPAREN          # isFieldReference
+	|
 		IS_RESULT_VAR
 		LPAREN
 			LOC_REF

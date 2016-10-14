@@ -62,7 +62,7 @@ public class RuleInstantiations {
      *         {@link Optional#empty()}.
      */
     public Optional<Object> getInstantiationFor(String sv) {
-        if (instantiations.containsKey(sv)) {
+        if (instantiations.containsKey(sv) && instantiations.get(sv) != null) {
             return Optional.of(instantiations.get(sv));
         } else {
             return Optional.empty();

@@ -103,6 +103,7 @@ OR  : '|';
 NOT : '!';
 
 IS_CONSTRUCTOR  : 'isConstructor' ;
+IS_FIELD_REF    : 'isFieldReference' ;
 IS_RESULT_VAR   : 'isResultVar' ;
 IS_SIMPLE_TYPE  : 'isSimpleType' ;
 IS_STATIC       : 'isStatic' ;

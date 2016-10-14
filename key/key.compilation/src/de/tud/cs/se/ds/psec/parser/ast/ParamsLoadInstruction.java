@@ -7,11 +7,15 @@ import org.objectweb.asm.MethodVisitor;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.compiler.exceptions.UnexpectedTranslationSituationException;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -43,9 +47,36 @@ public class ParamsLoadInstruction extends Instruction {
         Iterable<?> params = (Iterable<?>) instantiations
                 .getInstantiationFor(schemaVar).get();
 
-        params.forEach(param -> loadExpressionToStack(mv, pvHelper,
-                param instanceof Term ? (Expression) ((Term) param).op()
-                        : (Expression) param));
+        params.forEach(param -> {
+            Expression e = null;
+
+            if (param instanceof Term) {
+                Term t = (Term) param;
+                IntegerLDT integerLDT = services.getTypeConverter()
+                        .getIntegerLDT();
+
+                if (t.op() instanceof Expression) {
+                    e = (Expression) t.op();
+                } else if (t.op() instanceof Function && ((Function) t.op())
+                        .equals(integerLDT.getNumberSymbol())) {
+                    // This is a Z-Term
+                    e = integerLDT.translateTerm(t, null, services);
+                } else {
+                    throwUnexpectedException(param);
+                }
+            } else if (param instanceof Expression) {
+                e = (Expression) param;
+            } else {
+                throwUnexpectedException(param);
+            }
+
+            loadExpressionToStack(mv, pvHelper, e);
+        });
+    }
+
+    private void throwUnexpectedException(Object param) {
+        throw new UnexpectedTranslationSituationException(Utilities
+                .format("Unexpected parameter type: %s", param.getClass()));
     }
 
 }

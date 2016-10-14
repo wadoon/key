@@ -53,4 +53,12 @@ public class Inheritance extends SuperClass {
                 && ((Inheritance) o).nat.get() == nat.get();
     }
     
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures true;
+      @*/
+    public static Object zeroInstance() {
+        return new Inheritance(((NatWrapper) SuperClass.zeroInstance()).get());
+    }
+    
 }

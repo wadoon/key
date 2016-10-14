@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -23,6 +24,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstr
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_literalContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_svContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsConstructorExpressionContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsFieldReferenceContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsResultVarExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsStaticExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsSuperMethodContext;
@@ -68,6 +70,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -326,6 +329,22 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
+    public ApplicabilityCondition visitIsFieldReference(
+            IsFieldReferenceContext ctx) {
+        return new ApplicabilityCondition(info -> {
+            // This check may also be called for void methods, during the
+            // selection of suitable translation. Therefore, locVarOrFieldRef
+            // may occasionally be no present.
+            Optional<Object> locVarOrFieldRef = info.getInstantiations()
+                    .getInstantiationFor(ctx.LOC_REF().getText());
+
+            return locVarOrFieldRef.isPresent()
+                    ? (locVarOrFieldRef.get() instanceof FieldReference)
+                    : false;
+        });
+    }
+
+    @Override
     public ApplicabilityCondition visitIsStaticExpression(
             IsStaticExpressionContext ctx) {
         return new ApplicabilityCondition(info -> {
@@ -363,7 +382,7 @@ public class TranslationTacletParserFE extends
 
             LocationVariable locVar = (LocationVariable) expr;
             return locVar.name().toString().startsWith("result_")
-                    || locVar.name().toString().startsWith("self_");
+                    || locVar.name().toString().startsWith("self");
         });
     }
 
