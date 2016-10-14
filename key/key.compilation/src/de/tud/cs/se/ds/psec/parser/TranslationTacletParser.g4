@@ -69,8 +69,6 @@ bytecode_instr
     |
         load_instr
     |
-    	method_call
-    |
     	super_call
     |
     	store_instr
@@ -209,8 +207,21 @@ store_instr
 
 invoke_instr
 	:
+		invoke_instr_literal
+	|
+		invoke_instr_sv
+	;
+
+invoke_instr_literal
+	:
 		invoke_op
 		method_descriptor
+	;
+
+invoke_instr_sv
+	:
+		invoke_op
+		LOC_REF
 	;
 
 invoke_op
@@ -220,14 +231,6 @@ invoke_op
 		INVOKESTATIC
 	|
 		INVOKEVIRTUAL
-	;
-
-method_call
-	:
-		METHOD_CALL
-		LPAREN
-			(call = LOC_REF)
-		RPAREN
 	;
 
 super_call
@@ -325,25 +328,32 @@ expression_atom
 
 special_expression
 	:
-		IS_SIMPLE_TYPE
+		IS_CONSTRUCTOR
 		LPAREN
 			LOC_REF
-		RPAREN          # simpleTypeExpression
+		RPAREN          # isConstructorExpression
 	|
 		IS_RESULT_VAR
 		LPAREN
 			LOC_REF
 		RPAREN          # isResultVarExpression
 	|
-		IS_CONSTRUCTOR
+		IS_SIMPLE_TYPE
 		LPAREN
 			LOC_REF
-		RPAREN          # isConstructorExpression
+		RPAREN          # simpleTypeExpression
 	|
 		IS_STATIC
 		LPAREN
 			LOC_REF
 		RPAREN          # isStaticExpression
+	|
+		IS_SUPER_METHOD
+		LPAREN
+			(called_method = LOC_REF)
+			COMMA
+			(compiled_method = LOC_REF)
+		RPAREN          # isSuperMethod
 	|
 		IS_VOID
 		LPAREN

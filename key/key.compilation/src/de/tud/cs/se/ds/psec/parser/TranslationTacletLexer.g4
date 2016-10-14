@@ -17,9 +17,6 @@ LOAD
 LOAD_PARAMS
     : '\\load_params';
 
-METHOD_CALL
-	: '\\methodCall';
-
 SUPER_CALL
 	: '\\superCall';
 
@@ -105,11 +102,12 @@ AND : '&';
 OR  : '|';
 NOT : '!';
 
-IS_SIMPLE_TYPE : 'isSimpleType';
-IS_RESULT_VAR : 'isResultVar';
-IS_CONSTRUCTOR : 'isConstructor';
-IS_STATIC : 'isStatic';
-IS_VOID : 'isVoid';
+IS_CONSTRUCTOR  : 'isConstructor' ;
+IS_RESULT_VAR   : 'isResultVar' ;
+IS_SIMPLE_TYPE  : 'isSimpleType' ;
+IS_STATIC       : 'isStatic' ;
+IS_SUPER_METHOD : 'isSuperMethod' ;
+IS_VOID         : 'isVoid' ;
 
 // Arithmetics
 

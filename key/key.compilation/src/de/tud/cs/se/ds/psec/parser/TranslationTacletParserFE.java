@@ -20,15 +20,16 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.DefinitionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Field_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_literalContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_svContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsConstructorExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsResultVarExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsStaticExpressionContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsSuperMethodContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsVoidExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Labeled_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeInstrContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Method_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Negated_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Nullary_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Params_load_instrContext;
@@ -54,7 +55,6 @@ import de.tud.cs.se.ds.psec.parser.ast.LabeledBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LdcInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.LocVarUnaryBytecodeInstr;
-import de.tud.cs.se.ds.psec.parser.ast.MethodCallInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.ParamsLoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.StoreInstruction;
@@ -70,6 +70,7 @@ import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
@@ -282,6 +283,22 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
+    public ApplicabilityCondition visitIsSuperMethod(IsSuperMethodContext ctx) {
+        return new ApplicabilityCondition(info -> {
+            IProgramMethod pm = (IProgramMethod) info.getInstantiations()
+                    .getInstantiationFor(ctx.called_method.getText()).get();
+            IProgramMethod methodBeingCompiled = (IProgramMethod) info
+                    .getInstantiations()
+                    .getInstantiationFor(ctx.compiled_method.getText()).get();
+
+            return !methodBeingCompiled.getContainerType().getSort()
+                    .equals(pm.getContainerType().getSort())
+                    && methodBeingCompiled.getContainerType().getSort()
+                            .extendsTrans(pm.getContainerType().getSort());
+        });
+    }
+
+    @Override
     public ApplicabilityCondition visitIsConstructorExpression(
             IsConstructorExpressionContext ctx) {
         return new ApplicabilityCondition(info -> {
@@ -415,11 +432,6 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
-    public MethodCallInstruction visitMethod_call(Method_callContext ctx) {
-        return new MethodCallInstruction(ctx.call.getText());
-    }
-
-    @Override
     public SuperCallInstruction visitSuper_call(Super_callContext ctx) {
         return new SuperCallInstruction(ctx.mname.getText(),
                 ctx.elist.getText());
@@ -464,7 +476,7 @@ public class TranslationTacletParserFE extends
     public TypeInstr visitSpecialUnaryInstrs(SpecialUnaryInstrsContext ctx) {
         boolean isTypeLiteral = false;
         String arg = null;
-        
+
         if (ctx.LOC_REF() != null) {
             isTypeLiteral = false;
             arg = ctx.LOC_REF().getText();
@@ -505,16 +517,22 @@ public class TranslationTacletParserFE extends
     public StoreInstruction visitStore_instr(Store_instrContext ctx) {
         return new StoreInstruction(ctx.LOC_REF().getText());
     }
-    
+
     @Override
-    public InvokeInstr visitInvoke_instr(
-            Invoke_instrContext ctx) {
+    public InvokeInstr visitInvoke_instr_literal(
+            Invoke_instr_literalContext ctx) {
         String op = ctx.invoke_op().getText();
         String cls = ctx.method_descriptor().typename.getText();
         String mname = ctx.method_descriptor().mname.getText();
         String sig = ctx.method_descriptor().sig.getText();
-        
+
         return new InvokeInstr(op, cls, mname, sig);
+    }
+
+    @Override
+    public InvokeInstr visitInvoke_instr_sv(Invoke_instr_svContext ctx) {
+        return new InvokeInstr(ctx.invoke_op().getText(),
+                ctx.LOC_REF().getText());
     }
 
     @Override

@@ -8,8 +8,10 @@ import org.objectweb.asm.MethodVisitor;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 /**
  * A bytecode instruction invoking a method that is literally given, i.e. not by
@@ -18,10 +20,13 @@ import de.uka.ilkd.key.java.Services;
  * @author Dominic Scheurer
  */
 public class InvokeInstr extends Instruction {
+    private int opcode;
+
     private String cls;
     private String mname;
     private String sig;
-    private int opcode;
+
+    private String sv;
 
     private static final HashMap<String, Integer> OPCODES_MAP = new HashMap<>();
 
@@ -29,6 +34,11 @@ public class InvokeInstr extends Instruction {
         OPCODES_MAP.put("INVOKESPECIAL", INVOKESPECIAL);
         OPCODES_MAP.put("INVOKESTATIC", INVOKESTATIC);
         OPCODES_MAP.put("INVOKEVIRTUAL", INVOKEVIRTUAL);
+    }
+
+    public InvokeInstr(String insn, String sv) {
+        opcode = OPCODES_MAP.get(insn);
+        this.sv = sv;
     }
 
     /**
@@ -56,7 +66,17 @@ public class InvokeInstr extends Instruction {
             Services services, List<TacletASTNode> children) {
 
         // TODO this won't work on interfaces.
-        mv.visitMethodInsn(opcode, cls, mname, sig, false);
+
+        if (sv != null) {
+            IProgramMethod pm = (IProgramMethod) instantiations
+                    .getInstantiationFor(sv).get();
+            mv.visitMethodInsn(opcode,
+                    InformationExtraction.toInternalName(pm.getContainerType()),
+                    pm.isConstructor() ? "<init>" : pm.getName(),
+                    InformationExtraction.getMethodTypeDescriptor(pm), false);
+        } else {
+            mv.visitMethodInsn(opcode, cls, mname, sig, false);
+        }
 
     }
 
