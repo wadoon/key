@@ -28,8 +28,11 @@ public class InheritanceFunctionalTest extends AbstractCompilerFunctionalTest {
                 "de.tud.test.inheritance.NatWrapper");
 
         Class<?> Inheritance = classes[0];
+        Class<?> SuperClass = classes[1];
+        Class<?> NatWrapper = classes[2];
 
         try {
+            final Object[] emptyObjArray = new Object[0];
 
             Constructor<?> inheritanceCtor = Inheritance
                     .getConstructor(int.class);
@@ -41,16 +44,16 @@ public class InheritanceFunctionalTest extends AbstractCompilerFunctionalTest {
 
             // Test "get" and "NatWrapper#toString" methods
             assertEquals("1",
-                    callMethod(Inheritance, "get", o1, null, new Object[0])
+                    callMethod(Inheritance, "get", o1, null, emptyObjArray)
                             .toString());
             assertEquals("0",
-                    callMethod(Inheritance, "get", o0, null, new Object[0])
+                    callMethod(Inheritance, "get", o0, null, emptyObjArray)
                             .toString());
             assertEquals("1",
-                    callMethod(Inheritance, "get", om1, null, new Object[0])
+                    callMethod(Inheritance, "get", om1, null, emptyObjArray)
                             .toString());
             assertEquals("17",
-                    callMethod(Inheritance, "get", o17, null, new Object[0])
+                    callMethod(Inheritance, "get", o17, null, emptyObjArray)
                             .toString());
 
             // Test "equals" of StringContainer
@@ -63,11 +66,12 @@ public class InheritanceFunctionalTest extends AbstractCompilerFunctionalTest {
 
             runTests(Inheritance, "equals", new Class<?>[] { Object.class },
                     testEquals1);
-            
+
             // Set, and test "equals" again
             callMethod(Inheritance, "set", o0, new Class<?>[] { int.class }, 1);
-            callMethod(Inheritance, "set", o17, new Class<?>[] { int.class }, 16);
-            
+            callMethod(Inheritance, "set", o17, new Class<?>[] { int.class },
+                    16);
+
             List<TestData<Boolean>> testEquals2 = Arrays.asList(
                     new TestData<Boolean>(true, o1, o1),
                     new TestData<Boolean>(true, o1, om1),
@@ -77,6 +81,20 @@ public class InheritanceFunctionalTest extends AbstractCompilerFunctionalTest {
 
             runTests(Inheritance, "equals", new Class<?>[] { Object.class },
                     testEquals2);
+
+            // Test zeroInstance() of SuperClass
+            Object zeroNatWrap = callMethod(SuperClass, "zeroInstance", null,
+                    null, emptyObjArray);
+            assertEquals(0, callMethod(NatWrapper, "get", zeroNatWrap, null,
+                    emptyObjArray));
+
+            // Test zeroInstance() of Inheritance
+            Object zeroInheritance = callMethod(Inheritance, "zeroInstance",
+                    null, null, emptyObjArray);
+            zeroNatWrap = callMethod(Inheritance, "get", zeroInheritance, null,
+                    emptyObjArray);
+            assertEquals(0, callMethod(NatWrapper, "get", zeroNatWrap, null,
+                    emptyObjArray));
 
         } catch (NoSuchMethodException | SecurityException
                 | InstantiationException | IllegalAccessException

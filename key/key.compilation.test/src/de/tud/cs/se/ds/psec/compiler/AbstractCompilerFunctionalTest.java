@@ -155,7 +155,13 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
             Object obj, Class<?>[] argTypes, Object... args) {
         try {
 
-            Method method = cls.getMethod(testMethodName, argTypes);
+            Method method = cls.getDeclaredMethod(testMethodName, argTypes);
+            if (!method.isAccessible()) {
+                logger.warn(
+                        "Method %s#%s was not accessible, enforcing accessibility",
+                        method.getDeclaringClass().getName(), method.getName());
+                method.setAccessible(true);
+            }
             return method.invoke(obj, args);
 
         } catch (NoSuchMethodException | SecurityException
