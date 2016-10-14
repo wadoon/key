@@ -44,6 +44,11 @@ public class Inheritance extends SuperClass {
       @ ensures true;
       @*/
     public boolean equals(Object o) {
+        if (nat.get() == 17) {
+            // This is a deliberate and very obvious bug ;)
+            return super.equals(o);
+        }
+        
         return (o instanceof Inheritance)
                 && ((Inheritance) o).nat.get() == nat.get();
     }

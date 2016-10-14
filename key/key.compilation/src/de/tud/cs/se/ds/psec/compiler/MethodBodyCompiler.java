@@ -25,8 +25,6 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -73,8 +71,8 @@ public class MethodBodyCompiler implements Opcodes {
         ImmutableArray<ParameterDeclaration> methodParameters = mDecl
                 .getParameters();
         this.pvHelper = new ProgVarHelper(mDecl.isStatic(), methodParameters);
-        this.translationFactory = new TacletTranslationFactory(mv, pvHelper,
-                definitions, services);
+        this.translationFactory = new TacletTranslationFactory(mDecl, mv,
+                pvHelper, definitions, services);
 
         methodParameters.forEach(p -> pvHelper
                 .progVarNr(p.getVariables().get(0).getProgramVariable()));

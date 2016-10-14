@@ -10,33 +10,31 @@ import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.compiler.exceptions.UnexpectedTranslationSituationException;
-import de.tud.cs.se.ds.psec.parser.exceptions.UnsupportedFeatureException;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.tud.cs.se.ds.psec.util.Utilities;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**
  * A special bytecode {@link Instruction} for method calls. Comprises a
- * {@link SchemaVariable} reference to a {@link MethodBodyStatement}.
+ * {@link SchemaVariable} reference to a {@link ProgramMethod}.
  *
  * @author Dominic Scheurer
  */
 public class MethodCallInstruction extends Instruction {
     private static final Logger logger = LogManager.getFormatterLogger();
-    String methodBodyStatementSV;
+    String programMethodSV;
 
     /**
-     * @param insn
-     *            The bytecode instruction.
+     * @param programMethodSV
+     *            The {@link SchemaVariable} for the {@link ProgramMethod} to
+     *            execute.
      */
-    public MethodCallInstruction(String methodBodyStatementSV) {
-        super();
-        this.methodBodyStatementSV = methodBodyStatementSV;
+    public MethodCallInstruction(String programMethodSV) {
+        this.programMethodSV = programMethodSV;
     }
 
     @Override
@@ -44,17 +42,11 @@ public class MethodCallInstruction extends Instruction {
             UniqueLabelManager labelManager, RuleInstantiations instantiations,
             Services services, List<TacletASTNode> children) {
 
-        Object method = instantiations
-                .getInstantiationFor(methodBodyStatementSV).get();
+        Object method = instantiations.getInstantiationFor(programMethodSV)
+                .get();
         IProgramMethod pm;
-        MethodBodyStatement mbs = null;
 
-        if (method instanceof MethodBodyStatement) {
-            pm = ((MethodBodyStatement) method).getProgramMethod(services);
-
-            mbs = (MethodBodyStatement) instantiations
-                    .getInstantiationFor(methodBodyStatementSV).get();
-        } else if (method instanceof IProgramMethod) {
+        if (method instanceof IProgramMethod) {
             pm = (IProgramMethod) method;
         } else {
             String msg = Utilities.format(
@@ -67,31 +59,16 @@ public class MethodCallInstruction extends Instruction {
         boolean isConstructor = pm.getName().equals("<init>")
                 || pm.isConstructor();
 
-        if (mbs != null && !isConstructor) {
-            // XXX: Shouldn't be too hard to also support general method calls;
-            // probably only have to replace INVOKESPECIAL by another opcode
-            // depending on the situation.
-            String msg = Utilities.format(
-                    "Currently only supporting calls to constructors when translating methodBodyExpand; problem: %s",
-                    mbs);
-            logger.error(msg);
-            throw new UnsupportedFeatureException(msg);
-        }
+        IProgramMethod methodBeingCompiled = (IProgramMethod) instantiations
+                .getInstantiationFor("#methodBeingCompiled").get();
 
-        // if (isConstructor) {
-        // // TODO: Intermediate solution, should be included in rules
-        // // instead
-        // mv.visitVarInsn(ALOAD, 0);
-        // }
-
-        if (mbs != null) {
-            for (Expression expr : mbs.getArguments()) {
-                loadExpressionToStack(mv, pvHelper, expr);
-            }
-        }
+        boolean isSuperMethod = !methodBeingCompiled.getContainerType()
+                .getSort().equals(pm.getContainerType().getSort())
+                && methodBeingCompiled.getContainerType().getSort()
+                        .extendsTrans(pm.getContainerType().getSort());
 
         int opcode = INVOKEVIRTUAL;
-        if (isConstructor) {
+        if (isConstructor || isSuperMethod) {
             opcode = INVOKESPECIAL;
         } else if (pm.isStatic()) {
             opcode = INVOKESTATIC;

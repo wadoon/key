@@ -57,16 +57,6 @@ while_loop_2_children {
 // ### Method Calls ###
 // ####################
 
-/*
-methodCallWithAssignment {
-	\taclets ("methodCallWithAssignment")
-	\translation (
-		ALOAD //TODO
-		#child-1
-	)
-}
-*/
-
 // TODO We so far only support methods returning
 // primitive types.
 //NOTE We could also take into account the other branches
@@ -139,14 +129,11 @@ operation_contract_static_void {
 	)
 }
 
-//TODO Check what happens for non-constructor super methods
 method_call_super_constructor {
 	//\taclets ("methodCallSuper")
 	\taclets ("superRemoveForCompilation")
 	\condition (isConstructor (#mn))
 	\translation (
-		// This SE taclet is translated to a methodBodyExpand,
-		// and can therefore be ignored
 		ALOAD 0
 		\load_params (#selist)
 		\superCall (#mn, #selist) //TEST!

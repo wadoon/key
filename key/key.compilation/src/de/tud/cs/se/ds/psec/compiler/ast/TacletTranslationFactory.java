@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
@@ -46,11 +47,12 @@ public class TacletTranslationFactory {
     private MethodVisitor mv;
     private TranslationDefinitions definitions = null;
     private ProgVarHelper pvHelper;
+    private ProgramMethod methodBeingCompiled = null;
     private Services services;
 
     /**
      * Creates a new {@link TacletTranslationFactory}.
-     * 
+     * @param methonBeingCompiled TODO
      * @param mv
      *            The {@link MethodVisitor} used in compilation of the
      *            corresponding method.
@@ -58,11 +60,13 @@ public class TacletTranslationFactory {
      *            The {@link ProgVarHelper} for obtaining indices for program
      *            variables.
      * @param definitions
-     *            TODO
+     *            The {@link TranslationDefinitions} containing the available
+     *            translations.
+     * @param services The {@link Services} object.
      */
-    public TacletTranslationFactory(MethodVisitor mv, ProgVarHelper pvHelper,
-            TranslationDefinitions definitions, Services services) {
-        super();
+    public TacletTranslationFactory(ProgramMethod methonBeingCompiled, MethodVisitor mv,
+            ProgVarHelper pvHelper, TranslationDefinitions definitions, Services services) {
+        this.methodBeingCompiled = methonBeingCompiled;
         this.mv = mv;
         this.pvHelper = pvHelper;
         this.definitions = definitions;
@@ -197,6 +201,7 @@ public class TacletTranslationFactory {
                 InformationExtraction.getMethodTypeDescriptor(pm));
 
         HashMap<String, Object> instantiations = new HashMap<>();
+        instantiations.put("#methodBeingCompiled", methodBeingCompiled);
         instantiations.put("#pm", pm);
         instantiations.put("#containerType", pm.getContainerType());
         instantiations.put("#actualSelf",

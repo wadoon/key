@@ -37,6 +37,7 @@ public class InheritanceFunctionalTest extends AbstractCompilerFunctionalTest {
             Object o1 = inheritanceCtor.newInstance(1);
             Object o0 = inheritanceCtor.newInstance(0);
             Object om1 = inheritanceCtor.newInstance(-1);
+            Object o17 = inheritanceCtor.newInstance(17);
 
             // Test "get" and "NatWrapper#toString" methods
             assertEquals("1",
@@ -48,25 +49,31 @@ public class InheritanceFunctionalTest extends AbstractCompilerFunctionalTest {
             assertEquals("1",
                     callMethod(Inheritance, "get", om1, null, new Object[0])
                             .toString());
+            assertEquals("17",
+                    callMethod(Inheritance, "get", o17, null, new Object[0])
+                            .toString());
 
             // Test "equals" of StringContainer
             List<TestData<Boolean>> testEquals1 = Arrays.asList(
                     new TestData<Boolean>(true, o1, o1),
                     new TestData<Boolean>(true, o1, om1),
                     new TestData<Boolean>(false, o1, o0),
-                    new TestData<Boolean>(false, om1, o0));
+                    new TestData<Boolean>(false, om1, o0),
+                    new TestData<Boolean>(false, o17, o17));
 
             runTests(Inheritance, "equals", new Class<?>[] { Object.class },
                     testEquals1);
             
             // Set, and test "equals" again
             callMethod(Inheritance, "set", o0, new Class<?>[] { int.class }, 1);
+            callMethod(Inheritance, "set", o17, new Class<?>[] { int.class }, 16);
             
             List<TestData<Boolean>> testEquals2 = Arrays.asList(
                     new TestData<Boolean>(true, o1, o1),
                     new TestData<Boolean>(true, o1, om1),
                     new TestData<Boolean>(true, o1, o0),
-                    new TestData<Boolean>(true, om1, o0));
+                    new TestData<Boolean>(true, om1, o0),
+                    new TestData<Boolean>(true, o17, o17));
 
             runTests(Inheritance, "equals", new Class<?>[] { Object.class },
                     testEquals2);
