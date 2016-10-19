@@ -38,6 +38,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -743,7 +744,17 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (!(activeStatement instanceof While)) {
             return false;
         }
-        return true;
+        
+        While loopStatement = (While) activeStatement;
+        
+        // Change by DS:
+        // We only allow contract application for really
+        // simple guard expressions, which means for boolean
+        // program variables. All other cases have to be
+        // simplified before.
+        return (loopStatement.getGuardExpression() instanceof ProgramVariable)
+                || (loopStatement
+                        .getGuardExpression() instanceof BooleanLiteral);
     }
 
     static Pair<Term, Term> applyUpdates(Term focusTerm, TermServices services) {

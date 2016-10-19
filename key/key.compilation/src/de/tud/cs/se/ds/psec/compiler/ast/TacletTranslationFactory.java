@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -218,6 +219,11 @@ public class TacletTranslationFactory {
 
         return getTranslationForRuleApp(app.rule().name().toString(),
                 instantiations);
+    }
+    
+    public Optional<TacletASTNode> getTranslationForRuleApp(
+            LoopInvariantBuiltInRuleApp app) {
+        throw new RuntimeException("Not yet implemented"); //TODO
     }
 
     /**

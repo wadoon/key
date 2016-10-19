@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /**
  * TODO
@@ -78,8 +79,19 @@ public class LoopComplexToSimple extends ProgramTransformer {
         StatementBlock newBlock = KeYJavaASTFactory
                 .block((StatementBlock) transf.result(), exprEvaluation);
 
+        Statement newLoop = KeYJavaASTFactory.whileLoop(newBoolVar, newBlock);
+
+        // Re-attach loop invariant, if present
+        LoopInvariant li = services.getSpecificationRepository()
+                .getLoopInvariant((While) pe);
+        
+        if (li != null) {
+            li = li.setLoop((While) newLoop);
+            services.getSpecificationRepository().addLoopInvariant(li);
+        }
+        
         return KeYJavaASTFactory.block(exprEvaluation,
-                KeYJavaASTFactory.whileLoop(newBoolVar, newBlock));
+                newLoop);
     }
 
     /**
@@ -104,7 +116,7 @@ public class LoopComplexToSimple extends ProgramTransformer {
             if (insideInnerLoop && depth() <= firstInnerLoopDepth) {
                 insideInnerLoop = false;
             }
-            
+
             if (!insideInnerLoop
                     && ((node instanceof While) || (node instanceof For)
                             || (node instanceof EnhancedFor))) {

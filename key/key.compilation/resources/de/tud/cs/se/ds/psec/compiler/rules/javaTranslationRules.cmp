@@ -28,7 +28,15 @@ if_split_2_children {
 	)
 }
 
+while_loop {
+	\taclets ("Loop Invariant")
+	\translation (
+		#child-1 // TODO
+	)
+}
+
 // This rule applies when the loop is the last statement in the program
+/*
 while_loop_1_child {
 	\taclets ("removeLoopForCompilation", "removeLoopForCompilationVoid")
 	\condition (#num-children == 1)
@@ -52,6 +60,7 @@ while_loop_2_children {
 		#child-2
 	)
 }
+*/
 
 // ####################
 // ### Method Calls ###
