@@ -589,6 +589,7 @@ TOKEN :
 		    | < TYPEOF: "#typeof" >
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
+		    | < LOOPCOMPLEXTOSIMPLE: "#loop-complex-to-simple" >
 		    | < SET: "#set" >
 		    }
 
@@ -4412,6 +4413,19 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 		  	setPrefixInfo(result);
 		 	result.setChild(loopStat);
 		 	result.setName("#enhancedfor-elim");
+		  	return result;
+	     	}
+	   )
+	   |
+	   (
+	    <LOOPCOMPLEXTOSIMPLE> "("
+	      loopStat=WhileStatement()
+	    ")" ";"
+	    	{
+	    	result = factory.createRKeYMetaConstruct();
+		  	setPrefixInfo(result);
+		 	result.setChild(loopStat);
+		 	result.setName("#loop-complex-to-simple");
 		  	return result;
 	     	}
 	   )
