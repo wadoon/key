@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -118,6 +119,10 @@ public class TacletTranslationFactory {
                 result = 1;
             }
         } else {
+            if (app instanceof OneStepSimplifierRuleApp) {
+                return false;
+            }
+            
             String ruleName = app.rule().name().toString();
             ArrayList<TranslationDefinition> availableDefinitions = definitions
                     .getDefinitionsFor(ruleName);
@@ -135,8 +140,9 @@ public class TacletTranslationFactory {
             return true;
         } else {
             String message = Utilities.format(
-                    "Don't know a translation of the following taclet app: %s",
-                    app.rule().name().toString());
+                    "Don't know a translation of the following rule: \"%s\" (App \"%s\")",
+                    app.rule().name().toString(),
+                    app.getClass());
 
             logger.error(message);
             throw new NoTranslationException(message);
@@ -230,8 +236,8 @@ public class TacletTranslationFactory {
     public Optional<TacletASTNode> getTranslationForRuleApp(
             LoopInvariantBuiltInRuleApp app) {
         logger.trace(
-                "Instantiating translation of Loop Invariant application for %s",
-                app.getLoopStatement());
+                "Instantiating translation of Loop Invariant application for while (%s) { ... }",
+                app.getLoopStatement().getGuard());
 
         HashMap<String, Object> instantiations = new HashMap<>();
         instantiations.put("#guard", app.getGuard());

@@ -113,8 +113,6 @@ unary_bytecode_instr
 field_instr
 	:
 		(instr = (GETFIELD | PUTFIELD))
-		(object = LOC_REF)
-		DOT
 		(field = LOC_REF)
 	;
 

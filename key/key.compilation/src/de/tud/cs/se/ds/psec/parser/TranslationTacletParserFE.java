@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import de.tud.cs.se.ds.psec.compiler.exceptions.UnexpectedTranslationSituationException;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.ArithmeticExpressionAtomContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Child_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.ConditionContext;
@@ -66,10 +67,12 @@ import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationTacletASTElement;
 import de.tud.cs.se.ds.psec.parser.ast.TypeInstr;
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -275,13 +278,19 @@ public class TranslationTacletParserFE extends
             Expression expr = (Expression) info.getInstantiations()
                     .getInstantiationFor(ctx.LOC_REF().getText()).get();
 
-            if (!(expr instanceof LocationVariable)) {
-                return true;
+            if (expr instanceof LocationVariable) {
+                LocationVariable locVar = (LocationVariable) expr;
+                return locVar.getKeYJavaType()
+                        .getJavaType() instanceof PrimitiveType;
+            } else if ((expr instanceof Literal)
+                    && info.getServices() != null) {
+                return ((Literal) expr).getKeYJavaType(info.getServices())
+                        .getJavaType() instanceof PrimitiveType;
+            } else {
+                throw new UnexpectedTranslationSituationException(Utilities
+                        .format("Cannot decide whether expression %s is simple, either unexpected type %s or Services is null",
+                                expr, expr.getClass().getName()));
             }
-
-            LocationVariable locVar = (LocationVariable) expr;
-            return locVar.getKeYJavaType()
-                    .getJavaType() instanceof PrimitiveType;
         });
     }
 
@@ -510,8 +519,7 @@ public class TranslationTacletParserFE extends
 
     @Override
     public Instruction visitField_instr(Field_instrContext ctx) {
-        return new FieldInstr(ctx.instr.getText(), ctx.object.getText(),
-                ctx.field.getText());
+        return new FieldInstr(ctx.instr.getText(), ctx.field.getText());
     }
 
     @Override

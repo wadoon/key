@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -333,9 +335,22 @@ public class MethodBodyCompiler implements Opcodes {
 
         do {
             RuleApp app = currentProofNode.getAppliedRuleApp();
+
             Optional<TacletASTNode> newNode = Optional.empty();
             if (isSymbolicExecutionNode(currentProofNode)) {
-                newNode = toASTNode(app);
+                Pair<JavaBlock, PosInTerm> firstJavaBlockAndPit = JoinRuleUtils
+                        .getJavaBlockRecursive(app.posInOccurrence()
+                                .sequentFormula().formula(), null);
+                PosInTerm ruleAppPit = app.posInOccurrence().posInTerm();
+
+                if (ruleAppPit.isTopLevel()
+                        || firstJavaBlockAndPit.second.equals(ruleAppPit)) {
+                    newNode = toASTNode(app);
+                }
+
+                // Otherwise (if the above if condition does not hold), this is
+                // probably an application on another modality, like the ones
+                // produced in the post condition by the loop invariant rule.
             }
 
             if (newNode.isPresent()) {
@@ -371,11 +386,12 @@ public class MethodBodyCompiler implements Opcodes {
         } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
             return translationFactory.getTranslationForRuleApp(
                     (LoopInvariantBuiltInRuleApp) ruleApp);
+        } else if (ruleApp instanceof OneStepSimplifierRuleApp) {
+            // This can be ignored
+            return Optional.empty();
         } else {
             String message = Utilities.format(
                     "Unsupported rule application: %s", ruleApp.rule().name());
-
-            logger.error(message);
             throw new NoTranslationException(message);
         }
     }

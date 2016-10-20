@@ -11,10 +11,9 @@ public class WhileWithNestedLoopsAndContinue {
     /*@ public normal_behavior
       @ requires true;
       @ ensures true;
-      @ diverges true;
       @*/
     public static int test(int i) {
-        /*@ loop_invariant true;
+        /*@ loop_invariant true; decreases 0;
           @*/
         while (i > 0) {
             if (i == 3) {
@@ -22,10 +21,12 @@ public class WhileWithNestedLoopsAndContinue {
                 continue;
             }
             
-            /*@ loop_invariant true;
+            /*@ loop_invariant true; decreases 0;
               @*/
             while (true) {
                 if (i > 0) {
+                    // The "break" makes things more
+                    // complicated in the invariant rule...
                     break;
                 }
                 

@@ -30,6 +30,7 @@ public class ApplicabilityCheckInput {
             RuleInstantiations instantiations, Services services) {
         this.numChildren = numChildren;
         this.instantiations = instantiations;
+        this.services = services;
     }
 
     /**

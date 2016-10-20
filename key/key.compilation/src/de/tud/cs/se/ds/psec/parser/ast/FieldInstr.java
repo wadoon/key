@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
  */
 public class FieldInstr extends Instruction {
     private int opcode;
-    private String object;
     private String field;
 
     private static final HashMap<String, Integer> OPCODES_MAP = new HashMap<>();
@@ -38,10 +37,8 @@ public class FieldInstr extends Instruction {
      *            The location variable that is the argument of this
      *            {@link FieldInstr}.
      */
-    public FieldInstr(String insn, String object, String field) {
+    public FieldInstr(String insn, String field) {
         opcode = OPCODES_MAP.get(insn);
-
-        this.object = object;
         this.field = field;
     }
 
@@ -49,14 +46,6 @@ public class FieldInstr extends Instruction {
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             UniqueLabelManager labelManager, RuleInstantiations instantiations,
             Services services, List<TacletASTNode> children) {
-
-        // TODO Support more taclets than assignment_write_attribute_this, and
-        // then of course also other types for objRef here.
-
-        // objRef is currently not used, because it's always "this" so far.
-        // Probably extend this in the future.
-        // ThisReference objRef = (ThisReference) getTacletAppInstValue(app,
-        // object);
         LocationVariable fieldRef = (LocationVariable) instantiations
                 .getInstantiationFor(field).get();
 

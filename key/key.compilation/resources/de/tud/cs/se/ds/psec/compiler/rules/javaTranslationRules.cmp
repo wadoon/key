@@ -212,7 +212,7 @@ assignment_write_attribute_this_no_result_var {
 	\translation (
 		\load (#v)
 		\load (#se)
-		PUTFIELD #v.#a
+		PUTFIELD #a
 		#child-1
 	)
 }
@@ -232,7 +232,7 @@ assignment_read_attribute {
 	\taclets ("assignment_read_attribute", "assignment_read_attribute_this")
 	\translation (
 		\load (#v)
-		GETFIELD #v.#a
+		GETFIELD #a
 		\store (#v0)
 		#child-1
 	)
@@ -257,8 +257,8 @@ equality_comparison_objects {
 	\condition (!isSimpleType(#se0))
 	\condition (!isSimpleType(#se1))
 	\translation (
-		ALOAD #se0
-		ALOAD #se1
+		\load (#se0)
+		\load (#se1)
 	    IF_ACMPNE l1
 	    ICONST_1
 	    GOTO l2
