@@ -156,11 +156,12 @@ public class TacletTranslationFactory {
      * @param app
      *            The {@link TacletApp} for which to create a translation
      *            object.
+     * @param statement 
      * @return An {@link Optional} with a {@link TacletASTNode} for the given
      *         {@link TacletApp} or an empty {@link Optional} if there is no
      *         suitable such {@link TacletASTNode}.
      */
-    public Optional<TacletASTNode> getTranslationForRuleApp(TacletApp app) {
+    public Optional<TacletASTNode> getTranslationForRuleApp(TacletApp app, String statement) {
         String ruleName = app.taclet().name().toString();
         logger.trace("Translating taclet %s", ruleName);
 
@@ -170,8 +171,8 @@ public class TacletTranslationFactory {
 
         if (candidates != null) {
             RuleInstantiations instantiations = new RuleInstantiations(app);
-            result = new TacletASTNode(ruleName, candidates, mv, pvHelper,
-                    instantiations, services);
+            result = new TacletASTNode(ruleName, statement, candidates, mv,
+                    pvHelper, instantiations, services);
         } else {
             if (!isSimplificationSETaclet(app.taclet())) {
                 String message = Utilities.format(
@@ -200,7 +201,7 @@ public class TacletTranslationFactory {
      *         no suitable such {@link TacletASTNode}.
      */
     public Optional<TacletASTNode> getTranslationForRuleApp(
-            ContractRuleApp app) {
+            ContractRuleApp app, String statement) {
         IProgramMethod pm = app.getRuleInstantiations().pm;
         logger.trace(
                 "Instantiating translation of Operation Contract application for %s%s",
@@ -224,7 +225,7 @@ public class TacletTranslationFactory {
                 app.getRuleInstantiations().actualResult);
 
         return getTranslationForRuleApp(app.rule().name().toString(),
-                instantiations);
+                instantiations, statement);
     }
     
     /**
@@ -234,16 +235,16 @@ public class TacletTranslationFactory {
      * @return
      */
     public Optional<TacletASTNode> getTranslationForRuleApp(
-            LoopInvariantBuiltInRuleApp app) {
+            LoopInvariantBuiltInRuleApp app, String statement) {
         logger.trace(
-                "Instantiating translation of Loop Invariant application for while (%s) { ... }",
-                app.getLoopStatement().getGuard());
+                "Instantiating translation of Loop Invariant application for %s",
+                statement);
 
         HashMap<String, Object> instantiations = new HashMap<>();
         instantiations.put("#guard", app.getGuard());
         
         return getTranslationForRuleApp(app.rule().name().toString(),
-                instantiations);
+                instantiations, statement);
     }
 
     /**
@@ -255,12 +256,13 @@ public class TacletTranslationFactory {
      * @param instantiations
      *            The instantiations for constructs used by the
      *            {@link BuiltInRule}.
+     * @param statement TODO
      * @return An {@link Optional} with a {@link TacletASTNode} for the given
      *         rule name or an empty {@link Optional} if there is no suitable
      *         such {@link TacletASTNode}.
      */
     private Optional<TacletASTNode> getTranslationForRuleApp(String ruleName,
-            HashMap<String, Object> instantiations) {
+            HashMap<String, Object> instantiations, String statement) {
         logger.trace("Translating rule %s", ruleName);
 
         TacletASTNode result = null;
@@ -269,8 +271,8 @@ public class TacletTranslationFactory {
 
         if (candidates != null) {
 
-            result = new TacletASTNode(ruleName, candidates, mv, pvHelper,
-                    new RuleInstantiations(instantiations), services);
+            result = new TacletASTNode(ruleName, statement, candidates, mv,
+                    pvHelper, new RuleInstantiations(instantiations), services);
 
         } else {
             String message = Utilities.format(
@@ -331,8 +333,8 @@ public class TacletTranslationFactory {
         logger.trace("Translating taclet %s", tacletName);
 
         TacletASTNode result = new TacletASTNode(tacletName,
-                definitions.getDefinitionsFor(tacletName), mv, pvHelper, null,
-                null);
+                "", definitions.getDefinitionsFor(tacletName), mv, pvHelper,
+                null, null);
 
         return result == null ? Optional.empty() : Optional.of(result);
     }

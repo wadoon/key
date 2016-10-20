@@ -344,7 +344,11 @@ public class MethodBodyCompiler implements Opcodes {
 
             if (isSymbolicExecutionNode(currentProofNode)
                     && isAddressingMainModality(currentProofNode, app)) {
-                newNode = toASTNode(app);
+                SourceElement activeStatement = currentProofNode.getNodeInfo()
+                        .getActiveStatement();
+                String statement = activeStatement == null ? ""
+                        : activeStatement.toString();
+                newNode = toASTNode(app, statement);
             }
 
             if (newNode.isPresent()) {
@@ -395,7 +399,7 @@ public class MethodBodyCompiler implements Opcodes {
 
         // Check whether the rule app does not address a wrong JavaBlock
         PosInTerm ruleAppPit = app.posInOccurrence().posInTerm();
-        
+
         return ruleAppPit.isTopLevel()
                 || outerModalityPio.posInTerm().equals(ruleAppPit);
     }
@@ -406,17 +410,20 @@ public class MethodBodyCompiler implements Opcodes {
      *
      * @param ruleApp
      *            The {@link RuleApp} to translate; usually a {@link TacletApp}.
+     * @param statement
+     *            TODO
      */
-    private Optional<TacletASTNode> toASTNode(RuleApp ruleApp) {
+    private Optional<TacletASTNode> toASTNode(RuleApp ruleApp,
+            String statement) {
         if (ruleApp instanceof TacletApp) {
             return translationFactory
-                    .getTranslationForRuleApp((TacletApp) ruleApp);
+                    .getTranslationForRuleApp((TacletApp) ruleApp, statement);
         } else if (ruleApp instanceof ContractRuleApp) {
-            return translationFactory
-                    .getTranslationForRuleApp((ContractRuleApp) ruleApp);
+            return translationFactory.getTranslationForRuleApp(
+                    (ContractRuleApp) ruleApp, statement);
         } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
             return translationFactory.getTranslationForRuleApp(
-                    (LoopInvariantBuiltInRuleApp) ruleApp);
+                    (LoopInvariantBuiltInRuleApp) ruleApp, statement);
         } else if (ruleApp instanceof OneStepSimplifierRuleApp) {
             // This can be ignored
             return Optional.empty();

@@ -33,6 +33,7 @@ public class TacletASTNode implements Opcodes {
     private RuleInstantiations instantiations;
     private List<TranslationDefinition> definitions;
     private String seTacletName;
+    private String statement;
     private Services services;
 
     /**
@@ -40,6 +41,8 @@ public class TacletASTNode implements Opcodes {
      * 
      * @param seTacletName
      *            The name of the SE taclet being translated.
+     * @param statement
+     *            TODO
      * @param definitions
      *            The {@link TranslationDefinition}s for the corresponding SE
      *            taclet.
@@ -52,7 +55,7 @@ public class TacletASTNode implements Opcodes {
      *            TODO
      * @see TacletTranslationFactory
      */
-    public TacletASTNode(String seTacletName,
+    public TacletASTNode(String seTacletName, String statement,
             List<TranslationDefinition> definitions, MethodVisitor mv,
             ProgVarHelper pvHelper, RuleInstantiations instantiations,
             Services services) {
@@ -61,6 +64,7 @@ public class TacletASTNode implements Opcodes {
         this.pvHelper = pvHelper;
         this.definitions = definitions;
         this.seTacletName = seTacletName;
+        this.statement = statement;
         this.services = services;
     }
 
@@ -72,7 +76,8 @@ public class TacletASTNode implements Opcodes {
      *             applicable in the present situation.
      */
     public void compile() throws UnexpectedTranslationSituationException {
-        logger.trace("Compiling %s", seTacletName);
+        logger.trace("Compiling statement rule %s, statement \"%s\"",
+                seTacletName, statement);
 
         // We allow the app to be null; this may happen e.g. in calls to
         // TacletTranslationFactory#getTranslationForTacletWithoutArgs(String).
