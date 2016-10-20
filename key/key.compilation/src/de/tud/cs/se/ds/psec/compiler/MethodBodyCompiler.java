@@ -28,8 +28,12 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
@@ -42,6 +46,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
@@ -335,22 +340,11 @@ public class MethodBodyCompiler implements Opcodes {
 
         do {
             RuleApp app = currentProofNode.getAppliedRuleApp();
-
             Optional<TacletASTNode> newNode = Optional.empty();
-            if (isSymbolicExecutionNode(currentProofNode)) {
-                Pair<JavaBlock, PosInTerm> firstJavaBlockAndPit = JoinRuleUtils
-                        .getJavaBlockRecursive(app.posInOccurrence()
-                                .sequentFormula().formula(), null);
-                PosInTerm ruleAppPit = app.posInOccurrence().posInTerm();
 
-                if (ruleAppPit.isTopLevel()
-                        || firstJavaBlockAndPit.second.equals(ruleAppPit)) {
-                    newNode = toASTNode(app);
-                }
-
-                // Otherwise (if the above if condition does not hold), this is
-                // probably an application on another modality, like the ones
-                // produced in the post condition by the loop invariant rule.
+            if (isSymbolicExecutionNode(currentProofNode)
+                    && isAddressingMainModality(currentProofNode, app)) {
+                newNode = toASTNode(app);
             }
 
             if (newNode.isPresent()) {
@@ -367,6 +361,43 @@ public class MethodBodyCompiler implements Opcodes {
         } while (true);
 
         return new Pair<>(currentProofNode, astCurrentNode);
+    }
+
+    /**
+     * Checks whether the given {@link RuleApp} addresses the {@link Modality}
+     * with the highest {@link SymbolicExecutionTermLabel}, which is usually the
+     * one that we want to compile.
+     * 
+     * @param currentProofNode
+     *            The current {@link Proof} {@link Node} on which the
+     *            {@link RuleApp} is applied.
+     * @param app
+     *            The {@link RuleApp} for which we should check whether the
+     *            right {@link Modality} is addressed.
+     * @return true iff the modality with the highest
+     *         {@link SymbolicExecutionTermLabel} is addressed by the
+     *         {@link RuleApp}.
+     */
+    private static boolean isAddressingMainModality(Node currentProofNode,
+            RuleApp app) {
+        // Find the relevant modality
+        PosInOccurrence outerModalityPio = SymbolicExecutionUtil
+                .findModalityWithMaxSymbolicExecutionLabelId(
+                        currentProofNode.sequent());
+
+        // Go below updates
+        while (outerModalityPio.subTerm().op() instanceof UpdateApplication) {
+            outerModalityPio = outerModalityPio.down(1);
+        }
+
+        // This should now really have a JavaBlock
+        assert !outerModalityPio.subTerm().javaBlock().isEmpty();
+
+        // Check whether the rule app does not address a wrong JavaBlock
+        PosInTerm ruleAppPit = app.posInOccurrence().posInTerm();
+        
+        return ruleAppPit.isTopLevel()
+                || outerModalityPio.posInTerm().equals(ruleAppPit);
     }
 
     /**
@@ -408,8 +439,9 @@ public class MethodBodyCompiler implements Opcodes {
      *         {@link Node}.
      */
     private static boolean isSymbolicExecutionNode(Node node) {
-        return hasNonEmptyActiveStatement(node)
-                || node.getAppliedRuleApp() instanceof AbstractBuiltInRuleApp;
+        return !(node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp)
+                && (hasNonEmptyActiveStatement(node) || node
+                        .getAppliedRuleApp() instanceof AbstractBuiltInRuleApp);
     }
 
     /**
