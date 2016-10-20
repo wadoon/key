@@ -1,7 +1,6 @@
 package de.tud.cs.se.ds.psec.compiler.ast;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -155,8 +154,8 @@ public class TacletASTNode implements Opcodes {
      */
     public int maxNumberOfChildrenCallsInTranslations() {
         return definitions.stream()
-                .map(TranslationDefinition::numberOfChildrenCalls)
-                .collect(Collectors.maxBy(Comparator.naturalOrder())).get();
+                .map(TranslationDefinition::maxIndexOfCalledChildren)
+                .mapToInt(Integer::intValue).max().getAsInt();
     }
 
     /**

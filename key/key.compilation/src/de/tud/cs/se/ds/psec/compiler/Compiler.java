@@ -41,7 +41,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaCompilationProfile;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
  * The main compiler class. Run {@link #compile()} to initiate compilation.
@@ -117,7 +117,8 @@ public class Compiler {
         logger.trace("Building KeY environment for file %s", javaFile);
         // @formatter:off
         environment = KeYEnvironment.load(
-                SymbolicExecutionJavaCompilationProfile.getDefaultInstance(),
+                //SymbolicExecutionJavaCompilationProfile.getDefaultInstance(),
+                SymbolicExecutionJavaProfile.getDefaultInstance(),
                 javaFile, // location
                 null,     // class path
                 null,     // boot class path

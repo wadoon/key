@@ -28,39 +28,17 @@ if_split_2_children {
 	)
 }
 
-while_loop {
+while_loop_by_invariant {
 	\taclets ("Loop Invariant")
-	\translation (
-		#child-1 // TODO
-	)
-}
-
-// This rule applies when the loop is the last statement in the program
-/*
-while_loop_1_child {
-	\taclets ("removeLoopForCompilation", "removeLoopForCompilationVoid")
-	\condition (#num-children == 1)
+	\condition (#num-children == 3)
 	\translation (
 		GOTO l1
-		l2: #child-1
-		l1: \load (#se)
+		l2: #child-2
+		l1: \load (#guard)
 		IFNE l2
-		RETURN
+		#child-3
 	)
 }
-
-while_loop_2_children {
-	\taclets ("removeLoopForCompilation", "removeLoopForCompilationVoid")
-	\condition (#num-children == 2)
-	\translation (
-		GOTO l1
-		l2: #child-1
-		l1: \load (#se)
-		IFNE l2
-		#child-2
-	)
-}
-*/
 
 // ####################
 // ### Method Calls ###

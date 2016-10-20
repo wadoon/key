@@ -14,9 +14,10 @@ import org.junit.Test;
  * @author Dominic Scheurer
  */
 public class MethodCallFunctionalTests extends AbstractCompilerFunctionalTest {
+    private static final boolean DELETE_TMP_FILES = true;
 
     public MethodCallFunctionalTests() {
-        super(true);
+        super(DELETE_TMP_FILES);
     }
 
     @Test

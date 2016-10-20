@@ -32,6 +32,11 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
     private String functionalTestsDir;
     private boolean deleteTmpFiles;
 
+    /**
+     * @param deleteTmpFiles
+     *            Set to true iff you want all temporary files to be deleted
+     *            after test execution.
+     */
     public AbstractCompilerFunctionalTest(boolean deleteTmpFiles) {
         this.deleteTmpFiles = deleteTmpFiles;
     }

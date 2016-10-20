@@ -32,7 +32,46 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /**
- * TODO
+ * Converts a loop with a non-simple guard expression into one with a simple
+ * guard expression, that is only having a boolean program variables as a guard
+ * which is "manually" updated before each loop repetition.
+ * 
+ * <h2>Example</h2>
+ * 
+ * <pre>
+ * while (++x < 42) {
+ *     if (i == 2)
+ *         continue;
+ *     if (i == 3)
+ *         break;
+ * 
+ *     int j = 1;
+ *     while (j++ < 3) {
+ *         continue;
+ *     }
+ * }
+ * </pre>
+ * 
+ * is translated to
+ * 
+ * <pre>
+ * boolean b = (++x < 42);
+ * while (b) {
+ *     if (i == 2) {
+ *         b = (++x < 42);
+ *         continue; // Relevant continue
+ *     }
+ *     if (i == 3)
+ *         break;
+ * 
+ *     int j = 1;
+ *     while (j++ < 3) {
+ *         continue; // Continue in other loop scope
+ *     }
+ * 
+ *     b = (++x < 42); // Update before regular loop repetition
+ * }
+ * </pre>
  * 
  * @author Dominic Scheurer
  * @see ForToWhile
@@ -41,17 +80,14 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 public class LoopComplexToSimple extends ProgramTransformer {
 
     /**
-     * TODO
-     * 
-     * @param schemaVariable
+     * @param loop
+     *            The {@link While} loop to be transformed.
      */
     public LoopComplexToSimple(While loop) {
         super("#loop-complex-to-simple", loop);
     }
 
-    /**
-     * TODO
-     */
+    @Override
     public ProgramElement transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         assert pe instanceof While;
@@ -84,18 +120,19 @@ public class LoopComplexToSimple extends ProgramTransformer {
         // Re-attach loop invariant, if present
         LoopInvariant li = services.getSpecificationRepository()
                 .getLoopInvariant((While) pe);
-        
+
         if (li != null) {
             li = li.setLoop((While) newLoop);
             services.getSpecificationRepository().addLoopInvariant(li);
         }
-        
-        return KeYJavaASTFactory.block(exprEvaluation,
-                newLoop);
+
+        return KeYJavaASTFactory.block(exprEvaluation, newLoop);
     }
 
     /**
-     * TODO
+     * A {@link ProgramReplaceVisitor} adding a given {@link Statement} before
+     * any continue in the current "loop scope", that is not in the scope of any
+     * inner loop.
      *
      * @author Dominic Scheurer
      */

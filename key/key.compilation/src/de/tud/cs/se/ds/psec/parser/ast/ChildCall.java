@@ -30,10 +30,17 @@ public class ChildCall extends Instruction {
         this.childNo = childNo;
     }
 
+    /**
+     * @return The index of the child to be called; lowest index is 1 (not 0)!
+     */
+    public int getChildNo() {
+        return childNo;
+    }
+
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
-            List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children) {
         // XXX Remove this hack!!! Test cases: testSimpleWhile, testSimpleFor
         // Applies in loop transformation: The body has a last statement that
         // expects a child, but has none. The real child is part of the loop

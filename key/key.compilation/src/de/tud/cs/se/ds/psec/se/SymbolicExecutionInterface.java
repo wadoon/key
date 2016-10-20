@@ -107,7 +107,7 @@ public class SymbolicExecutionInterface {
                 SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 
                                                                                 1000, 
                                                                                 true,   // true to apply method contracts instead of inlining, 
-                                                                                false,  // true to apply loop invariants instead of unrolling, 
+                                                                                true,   // true to apply loop invariants instead of unrolling, 
                                                                                 false,  // true to apply block contracts instead of expanding.
                                                                                 false,  // true to hide branch conditions caused by symbolic execution within modalities not of interest, 
                                                                                 false); // true to perform alias checks during symbolic execution

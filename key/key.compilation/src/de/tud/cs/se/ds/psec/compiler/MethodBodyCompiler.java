@@ -11,6 +11,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import de.tud.cs.se.ds.psec.compiler.ast.DummyASTNode;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletTranslationFactory;
 import de.tud.cs.se.ds.psec.compiler.exceptions.IncompleteSymbolicExecutionException;
@@ -31,7 +32,9 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -161,7 +164,7 @@ public class MethodBodyCompiler implements Opcodes {
         }
 
         MethodReference mRef = (MethodReference) actStmt;
-        
+
         return !mRef.getName().equals("<init>");
     }
 
@@ -282,7 +285,8 @@ public class MethodBodyCompiler implements Opcodes {
             // We only compile as many children as are called in the
             // TranslationDefinitions. Translations may decide to explicitly
             // ignore certain subbranches.
-            final int numChildrenInTranslations = currentASTNode
+
+            final int maxIndexOfChildrenCallsInTranslations = currentASTNode
                     .maxNumberOfChildrenCallsInTranslations();
 
             // Note: Stack Map Frames are not generated manually here;
@@ -294,9 +298,20 @@ public class MethodBodyCompiler implements Opcodes {
 
             int cnt = 0;
             Iterator<Node> childIt = currentNode.childrenIterator();
-            while (childIt.hasNext() && cnt < numChildrenInTranslations) {
+            while (childIt.hasNext()
+                    && cnt < maxIndexOfChildrenCallsInTranslations) {
                 cnt++;
-                translateToTacletTree(childIt.next(), currentASTNode);
+
+                Node nextChild = childIt.next();
+
+                if (nextChild.isClosed()) {
+                    logger.trace(
+                            "Closed branch \"%s\" in the SET, adding dummy node",
+                            nextChild.getNodeInfo().getBranchLabel());
+                    currentASTNode.addChild(new DummyASTNode());
+                } else {
+                    translateToTacletTree(nextChild, currentASTNode);
+                }
             }
 
         }
@@ -353,6 +368,9 @@ public class MethodBodyCompiler implements Opcodes {
         } else if (ruleApp instanceof ContractRuleApp) {
             return translationFactory
                     .getTranslationForRuleApp((ContractRuleApp) ruleApp);
+        } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
+            return translationFactory.getTranslationForRuleApp(
+                    (LoopInvariantBuiltInRuleApp) ruleApp);
         } else {
             String message = Utilities.format(
                     "Unsupported rule application: %s", ruleApp.rule().name());
@@ -375,7 +393,7 @@ public class MethodBodyCompiler implements Opcodes {
      */
     private static boolean isSymbolicExecutionNode(Node node) {
         return hasNonEmptyActiveStatement(node)
-                || node.getAppliedRuleApp() instanceof ContractRuleApp;
+                || node.getAppliedRuleApp() instanceof AbstractBuiltInRuleApp;
     }
 
     /**

@@ -221,9 +221,23 @@ public class TacletTranslationFactory {
                 instantiations);
     }
     
+    /**
+     * TODO
+     * 
+     * @param app
+     * @return
+     */
     public Optional<TacletASTNode> getTranslationForRuleApp(
             LoopInvariantBuiltInRuleApp app) {
-        throw new RuntimeException("Not yet implemented"); //TODO
+        logger.trace(
+                "Instantiating translation of Loop Invariant application for %s",
+                app.getLoopStatement());
+
+        HashMap<String, Object> instantiations = new HashMap<>();
+        instantiations.put("#guard", app.getGuard());
+        
+        return getTranslationForRuleApp(app.rule().name().toString(),
+                instantiations);
     }
 
     /**

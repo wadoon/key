@@ -98,15 +98,15 @@ public class TranslationDefinition extends TranslationTacletASTElement {
     }
 
     /**
-     * Computes the number of children calls as defined in the
+     * Computes the maximum index of children called in the
      * {@link TranslationDefinition}. This may be used to ignore branches in the
      * SET that should be ignored according to the translation.
      * 
-     * @return The number of children calls in this
+     * @return The maximum index of children called in this
      *         {@link TranslationDefinition}.
      */
-    public int numberOfChildrenCalls() {
-        return instructions.numberOfChildrenCalls();
+    public int maxIndexOfCalledChildren() {
+        return instructions.maxIndexOfCalledChildren();
     }
 
 }

@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
+import de.tud.cs.se.ds.psec.compiler.exceptions.UnexpectedTranslationSituationException;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnknownInstructionException;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
 import de.tud.cs.se.ds.psec.util.Utilities;
@@ -17,7 +18,9 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -27,6 +30,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * @author Dominic Scheurer
  */
 public abstract class Instruction extends TranslationTacletASTElement {
+    private static final String UNEXPECTED_TYPE_FOR_LOAD_INSTRUCTION = //
+            "Unexpected type for \\load instruction: %s";
     private static final Logger logger = LogManager.getFormatterLogger();
 
     /**
@@ -42,7 +47,7 @@ public abstract class Instruction extends TranslationTacletASTElement {
      *            The {@link Expression} to load onto the stack.
      */
     protected static void loadExpressionToStack(MethodVisitor mv,
-            ProgVarHelper pvHelper, Expression expr) {
+            ProgVarHelper pvHelper, Object expr) {
         loadExpressionToStack(mv, pvHelper, expr, false);
     }
 
@@ -61,7 +66,24 @@ public abstract class Instruction extends TranslationTacletASTElement {
      *            Determines whether an {@link IntLiteral} should be inverted.
      */
     protected static void loadExpressionToStack(MethodVisitor mv,
-            ProgVarHelper pvHelper, Expression expr, boolean negative) {
+            ProgVarHelper pvHelper, Object expr, boolean negative) {
+        // We only load Expressions, or Terms that have Expressions as
+        // Operators.
+        if (expr instanceof Term) {
+            Operator op = ((Term) expr).op();
+            if (op instanceof Expression) {
+                expr = op;
+            } else {
+                throw new UnexpectedTranslationSituationException(
+                        Utilities.format(UNEXPECTED_TYPE_FOR_LOAD_INSTRUCTION,
+                                op.getClass().getName()));
+            }
+        } else if (!(expr instanceof Expression)) {
+            throw new UnexpectedTranslationSituationException(
+                    Utilities.format(UNEXPECTED_TYPE_FOR_LOAD_INSTRUCTION,
+                            expr.getClass().getName()));
+        }
+
         if (expr instanceof LocationVariable) {
 
             // Location variables of primitive or object types
@@ -86,19 +108,21 @@ public abstract class Instruction extends TranslationTacletASTElement {
                 mv.visitVarInsn(ALOAD, 0);
 
             } else if (expr instanceof Instanceof) {
-                
+
                 Instanceof instOf = (Instanceof) expr;
-                
+
                 LocationVariable obj = (LocationVariable) instOf.getChildAt(0);
-                KeYJavaType typeRef = instOf.getTypeReference().getKeYJavaType();
-                
+                KeYJavaType typeRef = instOf.getTypeReference()
+                        .getKeYJavaType();
+
                 mv.visitVarInsn(ALOAD, pvHelper.progVarNr(obj));
-                mv.visitTypeInsn(INSTANCEOF, InformationExtraction.toInternalName(typeRef));
-                
+                mv.visitTypeInsn(INSTANCEOF,
+                        InformationExtraction.toInternalName(typeRef));
+
             } else if (expr instanceof NullLiteral) {
-                
+
                 mv.visitInsn(ACONST_NULL);
-                
+
             } else if (expr instanceof IntLiteral) {
 
                 intConstInstruction(mv, (negative ? -1 : 1)
@@ -133,5 +157,5 @@ public abstract class Instruction extends TranslationTacletASTElement {
 
         }
     }
-    
+
 }

@@ -8,7 +8,6 @@ import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -40,8 +39,8 @@ public class LoadInstruction extends Instruction {
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             UniqueLabelManager labelManager, RuleInstantiations instantiations,
             Services services, List<TacletASTNode> children) {
-        loadExpressionToStack(mv, pvHelper, (Expression) instantiations
-                .getInstantiationFor(schemaVar).get(), negative);
+        loadExpressionToStack(mv, pvHelper,
+                instantiations.getInstantiationFor(schemaVar).get(), negative);
     }
 
 }

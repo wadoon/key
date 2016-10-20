@@ -12,6 +12,7 @@ public class SimpleWhile {
       @ ensures true;
       @*/
     public static int test(int i) {
+        //@ loop_invariant true; decreases 0;
         while (i > 0) {
             i--;
         }
