@@ -43,4 +43,5 @@ public class ModelVariableFactory {
     public static ModelVariable constructModelVariable(final ProgramVariable programVariable) {
         return ModelVariableFactory.constructModelVariable(programVariable, programVariable.name().toString());
     }
+    
 }

@@ -25,27 +25,27 @@ import java.util.List;
  *
  * @author christopher
  */
-public class Model{
+public class KTGModel{
 
-    public static final Model EMPTY_MODEL;
+    public static final KTGModel EMPTY_MODEL;
 
     static {
-        EMPTY_MODEL = Model.constructModel();
+        EMPTY_MODEL = KTGModel.constructModel();
     }
 
     /**
-     * Factory method for creating a new {@link Model} instance.
+     * Factory method for creating a new {@link KTGModel} instance.
      *
      * @return the new instance.
      */
-    public static Model constructModel(){
+    public static KTGModel constructModel(){
 
-        return new Model();
+        return new KTGModel();
     }
     
     //clone method. added by Huy
-    public static Model constructModel(Model modelCopy){
-       Model model = constructModel();      
+    public static KTGModel constructModel(KTGModel modelCopy){
+       KTGModel model = constructModel();      
        /*we reconstruct model based on modelCopy*/
        for(ModelVariable mv: modelCopy.variables){
           if(mv instanceof ModelArrayVariable){
@@ -89,7 +89,7 @@ public class Model{
      */
     private final LinkedList<ModelVariable> variables = new LinkedList<ModelVariable>();
 
-    private Model() {
+    private KTGModel() {
     }
 
     
@@ -308,8 +308,8 @@ public class Model{
      * then add it into this model
      * added by Huy
      */
-    public Model merge(Model dModel){
-       Model result = constructModel(this);
+    public KTGModel merge(KTGModel dModel){
+       KTGModel result = constructModel(this);
        List<ModelVariable> dMVs = dModel.getVariables(); 
        for(ModelVariable mv: dMVs){
           if(!result.hasVar(mv.getIdentifier())){
@@ -351,5 +351,35 @@ public class Model{
             }
         }
         return null;
+    }
+    
+    /*
+     * find and return a (non-primitive) variable whose intance's indetifier is equal to passing parameter
+     * */
+    public ModelVariable searchVariabaleByInstanceIdentifier(String instanceIdentifier){
+    	for(ModelVariable mv: variables){
+    		if(mv.isReferenceType()){
+    			ModelInstance refValue = (ModelInstance)mv.getValue();
+    			if(refValue.getIdentifier().equals(instanceIdentifier)){
+    				return mv;
+    			}
+    		}
+    			
+    	}
+    	return null;
+    }
+    
+    /*
+     * find and return ModelVariable as the field of object
+     * */
+    public ModelVariable searchFieldOfReferenceType(ModelVariable object, String fieldName){
+    	if(object.isReferenceType() ){
+    		ModelInstance instance = (ModelInstance)object.getValue();
+    		for(ModelVariable field: instance.getFields()){
+    			if(field.getVariableName().equals(fieldName))
+    				return field;
+    		}
+    	}
+    	return null;
     }
 }

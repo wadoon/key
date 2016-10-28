@@ -6,7 +6,7 @@ import com.csvanefalk.keytestgen.core.concurrency.monitor.CaughtException;
 import com.csvanefalk.keytestgen.core.concurrency.monitor.ICapsuleMonitor;
 import com.csvanefalk.keytestgen.core.concurrency.monitor.IMonitorEvent;
 import com.csvanefalk.keytestgen.core.keyinterface.KeYInterface;
-import com.csvanefalk.keytestgen.core.model.implementation.Model;
+import com.csvanefalk.keytestgen.core.model.implementation.KTGModel;
 import com.csvanefalk.keytestgen.core.oracle.abstraction.Oracle;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestCase;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestSuite;
@@ -90,7 +90,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
         /*
          * The generated models.
          */
-        final List<Model> models = new LinkedList<Model>();
+        final List<KTGModel> models = new LinkedList<KTGModel>();
 
         /*
          * The oracle for the method which the test cases are being generated
@@ -159,7 +159,7 @@ public class MethodCapsule extends AbstractCapsule implements ICapsuleMonitor {
              * Construct the test cases.
              */
             final List<TestCase> testCases = new LinkedList<TestCase>();
-            for (final Model model : models) {
+            for (final KTGModel model : models) {
                 final TestCase testCase = TestCase.constructTestCase(targetMethod, model, oracle);
                 testCases.add(testCase);
             }

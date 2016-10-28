@@ -11,7 +11,7 @@ import com.csvanefalk.keytestgen.core.concurrency.capsules.CapsuleController;
 import com.csvanefalk.keytestgen.core.concurrency.capsules.CapsuleExecutor;
 import com.csvanefalk.keytestgen.core.concurrency.capsules.ModelCapsule;
 import com.csvanefalk.keytestgen.core.concurrency.capsules.OracleCapsule;
-import com.csvanefalk.keytestgen.core.model.implementation.Model;
+import com.csvanefalk.keytestgen.core.model.implementation.KTGModel;
 import com.csvanefalk.keytestgen.core.oracle.abstraction.Oracle;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestCase;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestSuite;
@@ -84,7 +84,7 @@ public class NodeTestGenerator {
              * Collect the results
              */
             final Oracle oracle = oracleGenerationCapsule.getResult();
-            final Model model = modelGenerationCapsule.getResult();
+            final KTGModel model = modelGenerationCapsule.getResult();
 
             /*
              * Construct the test cases.

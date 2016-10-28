@@ -1,7 +1,7 @@
 package com.csvanefalk.keytestgen.core.model;
 
 import com.csvanefalk.keytestgen.core.keyinterface.KeYInterfaceException;
-import com.csvanefalk.keytestgen.core.model.implementation.Model;
+import com.csvanefalk.keytestgen.core.model.implementation.KTGModel;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -26,7 +26,7 @@ public class ModelIntegerTest extends ModelTest {
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
-        Model model = modelGenerator.generateModel(targetNode);
+        KTGModel model = modelGenerator.generateModel(targetNode);
 
         ModelVariable variableSelf = model.getVariable("self");
         Assert.assertNotNull(variableSelf);
@@ -57,7 +57,7 @@ public class ModelIntegerTest extends ModelTest {
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
-        Model model = modelGenerator.generateModel(targetNode);
+        KTGModel model = modelGenerator.generateModel(targetNode);
 
         ModelVariable variableSelf = model.getVariable("self");
         Assert.assertNotNull(variableSelf);
@@ -88,7 +88,7 @@ public class ModelIntegerTest extends ModelTest {
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
-        Model model = modelGenerator.generateModel(targetNode);
+        KTGModel model = modelGenerator.generateModel(targetNode);
         System.out.println("COND: " + targetNode.getFormatedPathCondition());
         System.out.println(targetNode.getPathCondition());
 
@@ -121,7 +121,7 @@ public class ModelIntegerTest extends ModelTest {
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
-        Model model = modelGenerator.generateModel(targetNode);
+        KTGModel model = modelGenerator.generateModel(targetNode);
 
         ModelVariable variableSelf = model.getVariable("self");
         Assert.assertNotNull(variableSelf);
@@ -152,7 +152,7 @@ public class ModelIntegerTest extends ModelTest {
         Assert.assertTrue(nodes.size() == 1);
 
         IExecutionNode targetNode = nodes.get(0);
-        Model model = modelGenerator.generateModel(targetNode);
+        KTGModel model = modelGenerator.generateModel(targetNode);
 
         ModelVariable variableSelf = model.getVariable("self");
         Assert.assertNotNull(variableSelf);
@@ -183,7 +183,7 @@ public class ModelIntegerTest extends ModelTest {
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(0);
-        Model model = modelGenerator.generateModel(targetNode);
+        KTGModel model = modelGenerator.generateModel(targetNode);
 
         ModelVariable variableSelf = model.getVariable("self");
         Assert.assertNotNull(variableSelf);
@@ -222,7 +222,7 @@ public class ModelIntegerTest extends ModelTest {
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(1);
-        Model model = modelGenerator.generateModel(targetNode);
+        KTGModel model = modelGenerator.generateModel(targetNode);
 
         ModelVariable variableSelf = model.getVariable("self");
         Assert.assertNotNull(variableSelf);
@@ -261,7 +261,7 @@ public class ModelIntegerTest extends ModelTest {
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(0);
-        Model model = modelGenerator.generateModel(targetNode);
+        KTGModel model = modelGenerator.generateModel(targetNode);
 
         ModelVariable variableSelf = model.getVariable("self");
         Assert.assertNotNull(variableSelf);
@@ -300,7 +300,7 @@ public class ModelIntegerTest extends ModelTest {
         Assert.assertTrue(nodes.size() == 2);
 
         IExecutionNode targetNode = nodes.get(1);
-        Model model = modelGenerator.generateModel(targetNode);
+        KTGModel model = modelGenerator.generateModel(targetNode);
 
         ModelVariable variableSelf = model.getVariable("self");
         Assert.assertNotNull(variableSelf);

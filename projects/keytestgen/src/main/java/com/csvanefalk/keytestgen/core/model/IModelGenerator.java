@@ -1,6 +1,6 @@
 package com.csvanefalk.keytestgen.core.model;
 
-import com.csvanefalk.keytestgen.core.model.implementation.Model;
+import com.csvanefalk.keytestgen.core.model.implementation.KTGModel;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 /**
@@ -13,5 +13,5 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  */
 public interface IModelGenerator {
 
-    public Model generateModel(IExecutionNode node) throws ModelGeneratorException;
+    public KTGModel generateModel(IExecutionNode node) throws ModelGeneratorException;
 }

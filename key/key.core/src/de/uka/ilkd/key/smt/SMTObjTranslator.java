@@ -78,7 +78,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	public static final String SEQ_LEN = "seqLen";
 	private static final String SELF = "self";
 	/**
-	 * Mapps some basic KeY operators to their equivalent built in operators.
+	 * Maps some basic KeY operators to their equivalent built in operators.
 	 * Initialized in initOpTable.
 	 */
 	private Map<Operator, SMTTermMultOp.Op> opTable;
@@ -256,7 +256,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		wellformedFunction = createWellFormedFunction();
 		elementOfFunction = createElementOfFunction();
 		emptyConstant = createEmptyConstant();
-		createSelfObject();
+		//createSelfObject(); Huy
 		createLengthFunction();
 		createArrFunction();
 		createSeqConstantsAndAssertions();
@@ -426,6 +426,8 @@ public class SMTObjTranslator implements SMTTranslator {
 		long maxSize = 0;
 		// Bounded Integer
 		SMTSort smtBoundedInt = new SMTSort(BINT_SORT);
+		System.out.println(settings.getClass());
+		System.out.println("setting's int bound: " + settings.getIntBound());
 		smtBoundedInt.setBitSize(settings.getIntBound());
 		maxSize = Math.max(maxSize, smtBoundedInt.getBitSize());
 		sorts.put(BINT_SORT, smtBoundedInt);
@@ -1151,6 +1153,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			overflowGuards.addAll(oc.createGuards(groundTerms));
 			oc.processTerm(po);
 		}
+		
 		// Translate the selected taclets.
 		// translateTaclets();
 		// Instantiate the any type with the other types.
@@ -1337,7 +1340,9 @@ public class SMTObjTranslator implements SMTTranslator {
 			long num = NumberTranslation.translate(term.sub(0)).longValue();
 			//System.out.println(term.sub(0)+" = "+num);
 			long size = sorts.get(BINT_SORT).getBitSize();
-			//long bound = sorts.get(BINT_SORT).getBound();
+			//long size = sorts.get(BINT_SORT).getBound();
+			long bound = sorts.get(BINT_SORT).getBound();
+			//System.out.println("size of bitvector: " + size + " and bound = " + bound);
 			// modulo max int
 			SMTTerm n;
 			if(num < 0){
@@ -1348,7 +1353,7 @@ public class SMTObjTranslator implements SMTTranslator {
 				return new SMTTermNumber(num, size, sorts.get(BINT_SORT));
 			}
 			
-		} else if (op instanceof Function) {
+		} else if (op instanceof Function) {			
 			Function fun = (Function) op;
 			if (isTrueConstant(fun, services)) {
 				return SMTTerm.TRUE;
@@ -1732,7 +1737,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		if (name.endsWith(SELECT)) {
 			SMTSort target = translateSort(fun.sort());
 			SMTTerm selectCall = call(selectFunction, subs);
-			SMTTerm result = castTermIfNecessary(selectCall, target);
+			SMTTerm result = castTermIfNecessary(selectCall, target);		
 			if (target.getId().equals(OBJECT_SORT)
 			        && !fun.sort().equals(objectSort)) {
 				Sort castTarget = fun.sort();
@@ -1794,6 +1799,7 @@ public class SMTObjTranslator implements SMTTranslator {
 				function = createClassInvariantFunction();
 			}
 		} else {
+			System.out.println("nondefined function:" +fun.name().toString());
 			List<SMTSort> domainSorts = new LinkedList<SMTSort>();
 			for (int i = 0; i < fun.argSorts().size(); ++i) {
 				Sort s = fun.argSort(i);

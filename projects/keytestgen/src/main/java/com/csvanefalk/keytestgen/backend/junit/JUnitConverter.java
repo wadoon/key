@@ -3,7 +3,7 @@ package com.csvanefalk.keytestgen.backend.junit;
 import com.csvanefalk.keytestgen.backend.AbstractJavaSourceGenerator;
 import com.csvanefalk.keytestgen.backend.IFrameworkConverter;
 import com.csvanefalk.keytestgen.core.classabstraction.KeYJavaClass;
-import com.csvanefalk.keytestgen.core.model.implementation.Model;
+import com.csvanefalk.keytestgen.core.model.implementation.KTGModel;
 import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import com.csvanefalk.keytestgen.core.oracle.abstraction.*;
@@ -125,13 +125,13 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements IFram
         }
 
         /**
-         * Given a {@link Model}, this method will extract all instances of
+         * Given a {@link KTGModel}, this method will extract all instances of
          * {@link ModelInstance} from it.
          *
          * @param model
          * @return
          */
-        private List<ModelInstance> extractInstancesFromModel(final Model model) {
+        private List<ModelInstance> extractInstancesFromModel(final KTGModel model) {
 
             final List<ModelInstance> instances = new LinkedList<ModelInstance>();
             for (final ModelVariable variable : model.getVariables()) {
@@ -430,7 +430,7 @@ public class JUnitConverter extends AbstractJavaSourceGenerator implements IFram
          * involves declaring and instantiating variables and parameter values.
          * Only variables declared on the top level are considered here.
          *
-         * @param model {@link Model} instance representing the fixture
+         * @param model {@link KTGModel} instance representing the fixture
          */
         private void writeTestFixture(final TestCase testCase) {
 

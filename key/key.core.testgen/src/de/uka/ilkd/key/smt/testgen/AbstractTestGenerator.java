@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -143,7 +144,7 @@ public abstract class AbstractTestGenerator {
              synchronized(macro) {
                           info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
              }           
-           //  System.out.println("Proof after:"+proof.toString());
+             //System.out.println("Proof after:"+ProofSaver.printAnything(proof.openEnabledGoals().head().sequent(), proof.getServices()));
              problems.addAll(SMTProblem.createSMTProblems(proof));
           } catch (final InterruptedException e) {
              Debug.out("Semantics blasting interrupted");

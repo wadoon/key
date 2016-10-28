@@ -10,7 +10,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 public class ModelBuilder {
 
     /**
-     * Creates a skeletal {@link Model} instance from a {@link Term}. The Term
+     * Creates a skeletal {@link KTGModel} instance from a {@link Term}. The Term
      * will be parsed, and all representations of program variables (along with
      * their relationships to one another) will be used to construct a
      * "skeletal" Model instance (i.e. no concrete primitive values).
@@ -19,10 +19,10 @@ public class ModelBuilder {
      * @throws TermTransformerException
      * @throws ProofInputException
      */
-    public Model createModel(IExecutionNode node,
+    public KTGModel createModel(IExecutionNode node,
                              Term pathCondition) throws TermTransformerException, ProofInputException {
 
-        final Model model = Model.constructModel();
+        final KTGModel model = KTGModel.constructModel();
 
         /*
          * Construct the initial Model, containing representation of all the

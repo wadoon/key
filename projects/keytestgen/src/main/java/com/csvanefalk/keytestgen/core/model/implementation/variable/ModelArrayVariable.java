@@ -2,6 +2,9 @@ package com.csvanefalk.keytestgen.core.model.implementation.variable;
 
 
 
+import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelArrayInstance;
+import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance;
+
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /**
@@ -77,5 +80,13 @@ public class ModelArrayVariable extends ModelVariable {
       this.arrInterp = arrInterp;
    }
     
-    
+   public ModelVariable searchArrayElement(int idx){
+	   ModelInstance instance = (ModelInstance)getValue();
+		for(ModelVariable field: instance.getFields()){
+			if (idx == field.getArrayIdx())
+				return field;
+		}
+	   return null;
+   }
+   
 }

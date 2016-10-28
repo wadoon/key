@@ -1,7 +1,7 @@
 package com.csvanefalk.keytestgen.util.parsers;
 
 import com.csvanefalk.keytestgen.StringConstants;
-import com.csvanefalk.keytestgen.core.model.implementation.Model;
+import com.csvanefalk.keytestgen.core.model.implementation.KTGModel;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import com.csvanefalk.keytestgen.util.transformers.TermTransformerException;
 import de.uka.ilkd.key.logic.Term;
@@ -655,7 +655,7 @@ public final class TermParserTools {
      *
      * @param term the {@link Term} representing the variable
      * @return the identifier String.
-     * @see Model
+     * @see KTGModel
      */
     public static String resolveIdentifierString(final Term term, final String separator) {
 

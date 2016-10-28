@@ -366,6 +366,8 @@ public class Model {
 		 */
 
 		//val is of type bint
+		//System.out.println("val::: "+val);
+		//System.out.println("types.getPrefixForSort(types.getSort(SMTObjTranslator.BINT_SORT))): " + types.getPrefixForSort(types.getSort(SMTObjTranslator.BINT_SORT)));
 		if(val.startsWith(types.getPrefixForSort(types.getSort(SMTObjTranslator.BINT_SORT)))){
 			long intBound = types.getSort(SMTObjTranslator.BINT_SORT).getBound();
 			long intSize =  types.getSort(SMTObjTranslator.BINT_SORT).getBitSize();
@@ -781,8 +783,9 @@ public class Model {
 		//process constants
 		Map<String,String> newConstants = new HashMap<String, String>();
 		for(String c : constants.keySet()){
-
+			
 			String value = constants.get(c);
+			//System.out.println("value of "+ c + " got from SMT Solver: " + value);
 			SMTSort s = types.getTypeForConstant(c);
 			if(s == null){
 				//System.err.println("No sort for: "+c);
@@ -790,7 +793,7 @@ public class Model {
 			else{
 				newConstants.put(c, processConstantValue(value,s));
 			}
-
+			//System.out.println("value of "+ c + " after resolving: " +  processConstantValue(value,s));
 
 
 		}
@@ -805,9 +808,10 @@ public class Model {
 				for(String f : o.getFieldvalues().keySet()){
 
 					String value = o.getFieldvalues().get(f);
+					//System.out.println("value " + f + " got from SMT Solver: " + value);
 					newFieldValues.put(f, processAnyValue(value));
 
-
+					//System.out.println("set field value: " + f + " by " + processAnyValue(value));
 				}			
 				o.setFieldvalues(newFieldValues);
 			}

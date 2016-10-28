@@ -345,7 +345,11 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         		throws IllegalFormulaException, IOException {
 
 
-        	if(getType() == SolverType.Z3_CE_SOLVER){
+        if(getType() == SolverType.Z3_CE_SOLVER){
+        	KeYJavaType typeOfClassUnderTest = null;
+        	if(problem instanceof KegSMTProblem){
+        		typeOfClassUnderTest = ((KegSMTProblem)problem).getTypeOfClassUnderTest();
+        	}else{
         	   Proof proof = problem.getGoal().proof();
         	   SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
         	   
@@ -360,10 +364,9 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         		   
         	   }
         	   //System.out.println(originalProof.name());
-        	   
-        	   
-        	   
-        	   KeYJavaType typeOfClassUnderTest = specrep.getProofOblInput(originalProof).getContainerType();
+        	   typeOfClassUnderTest = specrep.getProofOblInput(originalProof).getContainerType();
+
+        	}
         	   
         		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
         		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
@@ -374,6 +377,19 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         		
         		exceptionsForTacletTranslation.addAll(objTrans.getExceptionsOfTacletTranslation());
 
+        	}
+        	else if(getType() == SolverType.Z3_EG_SOLVER){
+        		
+         	   
+         	   KeYJavaType typeOfClassUnderTest = ((KegSMTProblem)problem).getTypeOfClassUnderTest();
+         		SMTComprehensionTranslator objTrans = new SMTComprehensionTranslator(smtSettings, services, typeOfClassUnderTest);
+         		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
+         		problemTypeInformation = objTrans.getTypes();
+         		ModelExtractor query = objTrans.getQuery();
+         		getSocket().setQuery(query);
+         		tacletTranslation = null;
+         		
+         		exceptionsForTacletTranslation.addAll(objTrans.getExceptionsOfTacletTranslation());
         	}
         	else{
         		SMTTranslator trans = getType().createTranslator(services);

@@ -35,7 +35,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
     * @param proof The proof.
     * @param sp The {@link StrategyProperties} to use.
     */
-   private SimplifyTermStrategy(Proof proof, StrategyProperties sp) {
+   public SimplifyTermStrategy(Proof proof, StrategyProperties sp) {
       super(proof, sp);
    }
 

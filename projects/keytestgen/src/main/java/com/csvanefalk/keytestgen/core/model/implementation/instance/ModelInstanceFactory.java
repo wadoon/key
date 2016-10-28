@@ -24,5 +24,11 @@ public class ModelInstanceFactory {
         return new ModelInstance(keYJavaType);
     }
     
-    
+    public static ModelInstance constructModelInstance(final String runtimeType, boolean isArray) {
+
+        if (isArray) {
+            return new ModelArrayInstance(runtimeType);
+        }
+        return new ModelInstance(runtimeType);
+    }
 }

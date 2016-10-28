@@ -286,7 +286,7 @@ public final class IntegerLDT extends LDT {
         one = translateLiteral(new IntLiteral(1), services);   
         
       //--------added by Huy for power, floor, round function ------------
-        power				= new Function(new Name("power"), Sort.ANY);
+        power				= new Function(new Name("power"), Sort.ANY); 
         round				= new Function(new Name("round"), Sort.ANY);
         floor				= new Function(new Name("floor"), Sort.ANY);
     }

@@ -3,6 +3,7 @@ package com.csvanefalk.keytestgen.core.model.implementation.instance;
 import com.csvanefalk.keytestgen.StringConstants;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ConcreteArrInterp;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
 import java.util.LinkedList;
@@ -16,7 +17,14 @@ public class ModelArrayInstance extends ModelInstance {
         super(keYJavaType);
     }
     
+    public ModelArrayInstance(String runtimeType){
+    	super(runtimeType);
+    }
     
+    public ModelArrayInstance(String identifier, String runtimeType){
+    	super(identifier,runtimeType);
+    }
+
    
    /**
      * Gets the length of this array. If the length is defined explicitly in connection

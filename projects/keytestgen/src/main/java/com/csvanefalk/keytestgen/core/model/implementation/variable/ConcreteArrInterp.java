@@ -29,6 +29,10 @@ public class ConcreteArrInterp {
    public Map<int[], Object> getEntries() {
       return entries;
    }
+   public void addEntry(int[] idxs, Object val){
+	   entries.put(idxs, val);
+   }
+   
    public void setEntries(Map<int[], Object> entries) {
       this.entries = entries;
    }

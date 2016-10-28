@@ -21,7 +21,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 /**
  * This Visitor walks a {@link Term} and extracts information related to the
  * program variables represented in the term. The goal of this procedure is to
- * provide sufficient information for later constructing a {@link Model}
+ * provide sufficient information for later constructing a {@link KTGModel}
  * including the extracted variables.
  *
  * @author christopher
@@ -79,11 +79,11 @@ public class ModelBuilderVisitor extends KeYTestGenTermVisitor {
     private final JavaInfo javaInfo;
 
     /**
-     * The {@link Model} to be populated by visiting the associated Term.
+     * The {@link KTGModel} to be populated by visiting the associated Term.
      */
-    Model model;
+    KTGModel model;
 
-    public ModelBuilderVisitor(final Model model, final IExecutionNode node) {
+    public ModelBuilderVisitor(final KTGModel model, final IExecutionNode node) {
 
         final IExecutionMethodCall methodCall = getMethodCallNode(node);
         this.model = model;
@@ -183,7 +183,7 @@ public class ModelBuilderVisitor extends KeYTestGenTermVisitor {
      *
      * @return
      */
-    public Model getModel() {
+    public KTGModel getModel() {
 
         return model;
     }

@@ -4,7 +4,7 @@ import com.csvanefalk.keytestgen.StringConstants;
 import com.csvanefalk.keytestgen.backend.IFrameworkConverter;
 import com.csvanefalk.keytestgen.backend.custom.ITestCaseParser;
 import com.csvanefalk.keytestgen.core.classabstraction.KeYJavaMethod;
-import com.csvanefalk.keytestgen.core.model.implementation.Model;
+import com.csvanefalk.keytestgen.core.model.implementation.KTGModel;
 import com.csvanefalk.keytestgen.core.model.implementation.instance.ModelInstance;
 import com.csvanefalk.keytestgen.core.model.implementation.variable.ModelVariable;
 import com.csvanefalk.keytestgen.core.testsuiteabstraction.TestCase;
@@ -202,14 +202,14 @@ public class XMLConverter extends XMLHandler implements IFrameworkConverter {
     }
 
     /**
-     * Converts a {@link Model} instance to KeYTestgens native XML format. In
+     * Converts a {@link KTGModel} instance to KeYTestgens native XML format. In
      * the context of the test case itself, this represents the test fixture, or
      * program state prior to the execution of the method.
      *
      * @param model the model to convert
      * @throws XMLStreamException in case the XML could not be generated
      */
-    private void writeFixture(final Model model) throws XMLStreamException {
+    private void writeFixture(final KTGModel model) throws XMLStreamException {
 
         writeStartTag(XMLHandler.TESTFIXTURE_ROOT);
 

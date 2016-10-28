@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.rulefilter.RulesetFilter;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
@@ -107,7 +108,12 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     */
    @Override
    protected Feature setupApprovalF() {
-      Feature result = super.setupApprovalF();
+/**
+	   RulesetFilter onlyIntSemantics = new RulesetFilter(new Name("javaIntegerSemantics"));
+	   return ConditionalFeature.createConditional(onlyIntSemantics, longConst(-1000));
+*/	   
+	   
+	   Feature result = super.setupApprovalF();
       // Make sure that cuts are only applied if the cut term is not already part of the sequent. This check is performed exactly before the rule is applied because the sequent might has changed in the time after the schema variable instantiation was instantiated.
       SetRuleFilter depFilter = new SetRuleFilter();
       depFilter.addRuleToSet(getProof().getInitConfig().lookupActiveTaclet(new Name("cut")));

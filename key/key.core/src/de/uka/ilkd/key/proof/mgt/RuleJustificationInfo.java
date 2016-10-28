@@ -70,4 +70,8 @@ public class RuleJustificationInfo {
         info.rule2justif.putAll(rule2justif);
         return info;
     }
+    
+    public Map<RuleKey, RuleJustification> getMapRule(){
+    	return rule2justif;
+    }
 }

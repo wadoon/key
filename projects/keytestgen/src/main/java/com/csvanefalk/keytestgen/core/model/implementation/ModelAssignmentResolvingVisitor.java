@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 /**
  * Looks for junctors in a {@link Term}, and reflects their semantic meaning in
- * the {@link Model} corresponding to the term.
+ * the {@link KTGModel} corresponding to the term.
  *
  * @author christopher
  */
@@ -24,17 +24,17 @@ class ModelAssignmentResolvingVisitor extends KeYTestGenTermVisitor {
     private static final String SEPARATOR = StringConstants.FIELD_SEPARATOR;
 
     /**
-     * The {@link Model} instance associated with the Term being visited.
+     * The {@link KTGModel} instance associated with the Term being visited.
      * Constructed separately by an instance of {@link ModelBuilderVisitor}.
      */
-    private final Model model;
+    private final KTGModel model;
 
     /**
      * Flag to indicate if we have seen a Not operator.
      */
     private boolean sawNot;
 
-    public ModelAssignmentResolvingVisitor(final Model model) {
+    public ModelAssignmentResolvingVisitor(final KTGModel model) {
 
         this.model = model;
     }

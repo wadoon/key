@@ -89,8 +89,8 @@ public class ModelVariable {
        this.arrayIdx = -1;
        this.arrayIdxTerm = null;
        this.valueCondition = new TermFactory().createTerm(Junctor.TRUE);
-       parentIdentifier = "";
-       isFresh = false;
+       this.parentIdentifier = "";
+       this.isFresh = false;
     }
 
     /*
@@ -119,12 +119,19 @@ public class ModelVariable {
        this.arrayIdxTerm = mv.arrayIdxTerm;
        this.selectForm = mv.selectForm;
        this.isFresh = mv.isFresh;
+       this.rawSymbolicValue = mv.rawSymbolicValue;
+       
     }
     
     /*
-     * added by Huy, used to store symbolic value of variable
+     * added by Huy, used to store refined symbolic value of variable
      */
     private Term symbolicValue;
+    
+    /*
+     * added by Huy, used to store raw symbolic value of variable
+     */
+    private Term rawSymbolicValue; 
     
     /*
      * added by Huy, used to indicate the variable is static or nonstatic
@@ -273,13 +280,25 @@ public class ModelVariable {
         boundValue = value;
     }
 
-   
+   /*
+    * assign value for variable using String
+    * incase the variable is reference type, the value will be used for instance's identifier
+    * */
+	public void setValueByString(String value){
+		if(isReferenceType()){
+			((ModelInstance)boundValue).setIdentifier(value); //use identifier to find the reference instance from field‚
+		}else{
+			if(getTypeName().equals("int")||getTypeName().equals("long"))
+				setValue(Long.parseLong(value));
+			else if( getTypeName().equals("boolean"))
+				setValue(Boolean.parseBoolean(value));
+		}
+	}
 
    @Override
     public String toString() {
-	   
-      String result = "";      
-      result +=  identifier + "; select form: " + selectForm + "; type: " + getTypeName()+ "; symbolic value: " + symbolicValue + 
+	  
+      String result =  identifier + "; field name: "+ getVariableName() + ", select form: " + selectForm + "; type: " + getTypeName()+ "; symbolic value: " + symbolicValue + 
                 "; concrete value: " + getValue() + "; parent indentifier: " + parentIdentifier;             
       if(arrayIdxTerm!=null){
          result += "; arrayIdxTerm: " + arrayIdxTerm;
@@ -295,6 +314,10 @@ public class ModelVariable {
           return TermParserTools.isPrimitiveType(selectForm);
        else
           return boundValue instanceof Number || boundValue instanceof Boolean;
+    }
+    
+    public boolean isReferenceType(){
+    	return boundValue instanceof ModelInstance || boundValue instanceof ModelArrayInstance;
     }
 
    /**
@@ -446,8 +469,28 @@ public class ModelVariable {
    public void setFresh(boolean isFresh) {
       this.isFresh = isFresh;
    }
+
+	public Term getRawSymbolicValue() {
+		return rawSymbolicValue;
+	}
+	
+	public void setRawSymbolicValue(Term rawSymbolicValue) {
+		this.rawSymbolicValue = rawSymbolicValue;
+	}
    
    
-   
+	/*
+     * find and return ModelVariable as the field of object
+     * */
+    public ModelVariable searchField(String fieldName){
+    	if(isReferenceType() ){
+    		ModelInstance instance = (ModelInstance)boundValue;
+    		for(ModelVariable field: instance.getFields()){
+    			if(field.getVariableName().equals(fieldName))
+    				return field;
+    		}
+    	}
+    	return null;
+    }
    
 }

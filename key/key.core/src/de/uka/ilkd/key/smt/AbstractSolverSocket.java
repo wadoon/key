@@ -47,6 +47,8 @@ public abstract class AbstractSolverSocket implements PipeListener<SolverCommuni
 		}
 		else if(type == SolverType.Z3_CE_SOLVER){
 			return new Z3CESocket(name, query);
+		}else if(type == SolverType.Z3_EG_SOLVER){
+			return new Z3EGSocket(name, query);
 		}
 		else if(type == SolverType.SIMPLIFY_SOLVER){
 			return new SimplifySocket(name, query);
@@ -218,6 +220,93 @@ class Z3CESocket extends AbstractSolverSocket{
 
 
 }
+
+class Z3EGSocket extends AbstractSolverSocket{
+
+	public Z3EGSocket(String name, ModelExtractor query) {
+		super(name, query);
+	}
+
+
+
+	@Override
+	public void messageIncoming(Pipe<SolverCommunication> pipe, String message,
+			int type) {
+	    message = message.trim();
+
+		SolverCommunication sc = pipe.getSession();
+		if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
+			sc.addMessage(message);
+			if(message.indexOf("WARNING:")>-1){
+				return;
+			}
+			throw new RuntimeException("Error while executing Z3:\n" +message);
+		}
+		if (!message.equals("success")) {
+			sc.addMessage(message);
+		}
+
+		switch (sc.getState()) {
+			case WAIT_FOR_RESULT:
+				if(message.equals("unsat")){
+					sc.setFinalResult(SMTSolverResult.createValidResult(name));
+					//pipe.sendMessage("(get-proof)\n");
+					pipe.sendMessage("(exit)\n");
+					sc.setState(WAIT_FOR_DETAILS);
+				}
+				if(message.equals("sat")){
+					sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
+					pipe.sendMessage("(get-model)");
+					pipe.sendMessage("(echo \"endmodel\")");
+					sc.setState(WAIT_FOR_MODEL);					
+				}
+				if(message.equals("unknown")){
+					sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
+					sc.setState(WAIT_FOR_DETAILS);
+					pipe.sendMessage("(exit)\n");
+				}
+
+				break;
+
+			case WAIT_FOR_DETAILS:
+				if(message.equals("success")){
+					pipe.close();
+				}						
+				break;		
+
+			case WAIT_FOR_QUERY:
+				if(message.equals("success")){
+					pipe.close();
+				}
+				else{
+					query.messageIncoming(pipe, message, type);
+				}
+
+				break;
+
+			case WAIT_FOR_MODEL:
+				if(message.equals("endmodel")){
+					if(query !=null && query.getState()==ModelExtractor.DEFAULT){
+						query.getModel().setEmpty(false);
+						//System.out.println("Starting query");						 
+						query.start(pipe);
+						sc.setState(WAIT_FOR_QUERY);
+					}
+					else{
+						pipe.sendMessage("(exit)\n");
+						sc.setState(WAIT_FOR_DETAILS); 
+					}
+				}
+
+
+				break;
+		}
+
+	}
+
+
+}
+
 
 class CVC3Socket extends AbstractSolverSocket{
 

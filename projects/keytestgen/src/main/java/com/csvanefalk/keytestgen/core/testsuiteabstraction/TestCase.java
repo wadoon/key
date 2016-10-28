@@ -1,7 +1,7 @@
 package com.csvanefalk.keytestgen.core.testsuiteabstraction;
 
 import com.csvanefalk.keytestgen.core.classabstraction.KeYJavaMethod;
-import com.csvanefalk.keytestgen.core.model.implementation.Model;
+import com.csvanefalk.keytestgen.core.model.implementation.KTGModel;
 import com.csvanefalk.keytestgen.core.oracle.abstraction.Oracle;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -44,7 +44,7 @@ public class TestCase implements Comparable<TestCase> {
      * @param oracle the oracle for the test case.
      * @return the test case.
      */
-    public static TestCase constructTestCase(final KeYJavaMethod method, final Model model, final Oracle oracle) {
+    public static TestCase constructTestCase(final KeYJavaMethod method, final KTGModel model, final Oracle oracle) {
 
         return new TestCase(method, model, oracle);
     }
@@ -61,7 +61,7 @@ public class TestCase implements Comparable<TestCase> {
      * state before execution will all be represented as part of the same
      * heapstate.
      */
-    private final Model model;
+    private final KTGModel model;
 
     /**
      * DEBUG: the execution node associated with this test case.
@@ -76,7 +76,7 @@ public class TestCase implements Comparable<TestCase> {
      */
     private final Oracle oracle;
 
-    private TestCase(final KeYJavaMethod method, final Model model, final Oracle oracle) {
+    private TestCase(final KeYJavaMethod method, final KTGModel model, final Oracle oracle) {
 
         this.method = method;
         this.model = model;
@@ -110,11 +110,11 @@ public class TestCase implements Comparable<TestCase> {
     }
 
     /**
-     * Retrieve the {@link Model} instance for this test case.
+     * Retrieve the {@link KTGModel} instance for this test case.
      *
      * @return
      */
-    public Model getModel() {
+    public KTGModel getModel() {
 
         return model;
     }

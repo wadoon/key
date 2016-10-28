@@ -32,7 +32,7 @@ public class ModelInstance {
      * A unique identifier for this particular instance. Think of it as the
      * memory address of an actual Java object on the heap.
      */
-    private final String identifier;
+    private String identifier;
 
     /**
      * Variables pointing to this instance
@@ -44,11 +44,25 @@ public class ModelInstance {
      */
     private final KeYJavaType type;
 
+    //private final String runtimeType; //runtime type of the instance (added by Huy)
+    
     ModelInstance(final KeYJavaType keYJavaType) {
 
         type = keYJavaType;
         identifier = Integer.toString(++ModelInstance.ID);
+        //runtimeType = type.getJavaType().getName().toString();
     }
+    public ModelInstance(String runtimeType){
+    	this.type = null;
+    	//this.runtimeType = runtimeType;
+    }
+    
+    public ModelInstance(String identifier, String runtimeType){
+    	this.identifier = identifier;
+    	this.type = null;
+    	//this.runtimeType = runtimeType;
+    }
+
 
     public void addField(final ModelVariable variable) {
 
@@ -108,14 +122,21 @@ public class ModelInstance {
        }
     }
 
+    
+    
     public String getTypeName() {
 
         return type.getJavaType().getName().toString();
+    	//return runtimeType;
     }
 
     @Override
     public String toString() {
 
         return "Instance " + identifier;
+    }
+    
+    public void setIdentifier(String identifier){
+    	this.identifier = identifier;
     }
 }

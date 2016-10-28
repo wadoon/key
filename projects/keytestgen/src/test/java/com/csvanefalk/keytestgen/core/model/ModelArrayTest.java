@@ -1,7 +1,7 @@
 package com.csvanefalk.keytestgen.core.model;
 
 import com.csvanefalk.keytestgen.core.keyinterface.KeYInterfaceException;
-import com.csvanefalk.keytestgen.core.model.implementation.Model;
+import com.csvanefalk.keytestgen.core.model.implementation.KTGModel;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import org.junit.Ignore;
@@ -21,7 +21,7 @@ public class ModelArrayTest extends ModelTest {
         IExecutionNode node = getFirstSymbolicNodeForStatement("ObjectArrayIndexWriteAccess.compute",
                                                                "return array[0].value");
 
-        Model model = modelGenerator.generateModel(node);
+        KTGModel model = modelGenerator.generateModel(node);
     }
 
     @Ignore
@@ -37,7 +37,7 @@ public class ModelArrayTest extends ModelTest {
 
         IExecutionNode node = getFirstSymbolicNodeForStatement("SimpleArrayLength.compute", null);
 
-        Model model = modelGenerator.generateModel(node);
+        KTGModel model = modelGenerator.generateModel(node);
     }
 
     @Ignore
@@ -46,7 +46,7 @@ public class ModelArrayTest extends ModelTest {
 
         IExecutionNode node = getFirstSymbolicNodeForStatement("ArrayInstanceCreationTest.compute", null);
 
-        Model model = modelGenerator.generateModel(node);
+        KTGModel model = modelGenerator.generateModel(node);
     }
 
     @Ignore
@@ -55,7 +55,7 @@ public class ModelArrayTest extends ModelTest {
 
         IExecutionNode node = getFirstSymbolicNodeForStatement("ArrayIndexReadAccess.compute", null);
 
-        Model model = modelGenerator.generateModel(node);
+        KTGModel model = modelGenerator.generateModel(node);
     }
 
     @Ignore
@@ -64,7 +64,7 @@ public class ModelArrayTest extends ModelTest {
 
         IExecutionNode node = getFirstSymbolicNodeForStatement("VariablesArrayTest.compute", null);
 
-        Model model = modelGenerator.generateModel(node);
+        KTGModel model = modelGenerator.generateModel(node);
     }
 
     @Ignore
@@ -73,7 +73,7 @@ public class ModelArrayTest extends ModelTest {
 
         IExecutionNode node = getFirstSymbolicNodeForStatement("MultiArrayIndexReadWriteAccess.compute", null);
 
-        Model model = modelGenerator.generateModel(node);
+        KTGModel model = modelGenerator.generateModel(node);
     }
 
     @Ignore
@@ -82,7 +82,7 @@ public class ModelArrayTest extends ModelTest {
 
         IExecutionNode node = getFirstSymbolicNodeForStatement("SimpleArrayCreation.compute", null);
 
-        Model model = modelGenerator.generateModel(node);
+        KTGModel model = modelGenerator.generateModel(node);
     }
 
 }

@@ -84,6 +84,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
 
         public long intBound    = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+        //public long intBound    = 32;
         public long heapBound   = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
         public long seqBound    = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
         public long objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;

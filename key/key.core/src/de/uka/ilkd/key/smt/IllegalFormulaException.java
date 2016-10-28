@@ -19,7 +19,7 @@ public class IllegalFormulaException extends Exception {
      */
     private static final long serialVersionUID = 1L;
 
-    IllegalFormulaException(String msg) {
+    public IllegalFormulaException(String msg) {
 	super(msg);
     }
 }
