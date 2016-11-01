@@ -380,6 +380,12 @@
                text="False"
                toolTipText="Mark the partial tree as false.">
          </action>
+         <action
+               class="org.key_project.sed.ui.action.AlgorithmicDebugLinkAction"
+               icon="icons/ant.gif"
+               text="Algorithmic Debug"
+               toolTipText="Find a bug with Algorithmic Debugging">
+         </action>
       </extension>
       <extension
             point="org.key_project.sed.ui.annotationLinkEditActions">

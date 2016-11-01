@@ -1,6 +1,5 @@
 package org.key_project.sed.ui.action;
 
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.core.model.ISEBranchStatement;
 import org.key_project.sed.core.model.ISENode;
@@ -9,10 +8,8 @@ import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.annotation.impl.AlgorithmicDebugCorrectAnnotation;
-import org.key_project.sed.core.annotation.impl.AlgorithmicDebugCorrectAnnotationLink;
 import org.key_project.sed.core.annotation.impl.AlgorithmicDebugCorrectAnnotationType;
 import org.key_project.sed.core.annotation.impl.AlgorithmicDebugFalseAnnotation;
-import org.key_project.sed.core.annotation.impl.AlgorithmicDebugFalseAnnotationLink;
 import org.key_project.sed.core.annotation.impl.AlgorithmicDebugFalseAnnotationType;
 import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.util.SEAnnotationUtil;
@@ -37,72 +34,50 @@ public class AlgorithmicDebugCorrectAnnotationLinkAction implements ISEAnnotatio
       this.annotationTypeFalse = SEAnnotationUtil.getAnnotationtype(AlgorithmicDebugFalseAnnotationType.TYPE_ID);
       this.registeredAnnotationsCorrect = node.getDebugTarget().getRegisteredAnnotations(annotationTypeCorrect);
       this.registeredAnnotationsFalse = node.getDebugTarget().getRegisteredAnnotations(annotationTypeFalse);
+//      
+//      Assert.isNotNull(node);
+//      Assert.isNotNull(annotationTypeCorrect);
       
-      Assert.isNotNull(node);
-      Assert.isNotNull(annotationTypeCorrect);
+    
+    ISEAnnotation annotationCorrect = ArrayUtil.search(registeredAnnotationsCorrect, new IFilter<ISEAnnotation>() {
+       @Override
+       public boolean select(ISEAnnotation element) {
+          return element instanceof AlgorithmicDebugCorrectAnnotation; 
+       }
+    });
       
-      
-        AlgorithmicDebugCorrectAnnotationLink linkCorrect = getCorrectLink(node);
-        AlgorithmicDebugFalseAnnotationLink linkFalse = getFalseLink(node);
-        
+      if(annotationCorrect == null){
+         ISEDebugTarget target = node.getDebugTarget();
+         annotationCorrect = annotationTypeCorrect.createAnnotation();
+         target.registerAnnotation(annotationCorrect);
+      }
+
       //If AnnotationLink was not found, we create a new one and attach it to the node
-        if(!node.containsAnnotationLink(linkCorrect)){
-           if(!node.containsAnnotationLink(linkFalse)){
-              node.addAnnotationLink(linkCorrect);
-              annotateNext(shell, node);
+        if(node.getAnnotationLinks(annotationTypeCorrect).length == 0){
+           if(node.getAnnotationLinks(annotationTypeFalse).length == 0){
+  
+              node.addAnnotationLink(annotationTypeCorrect.createLink(annotationCorrect, node));
+             // annotateNext(shell, node);
               }
            else{
-              node.removeAnnotationLink(linkFalse);
-              node.addAnnotationLink(linkCorrect);
-              annotateNext(shell, node);
+              ISEAnnotation annotationFalse = ArrayUtil.search(registeredAnnotationsFalse, new IFilter<ISEAnnotation>() {
+                 @Override
+                 public boolean select(ISEAnnotation element) {
+                    return element instanceof AlgorithmicDebugFalseAnnotation; 
+                 }
+              });
+              node.removeAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
+              node.addAnnotationLink(annotationTypeCorrect.createLink(annotationCorrect, node));
+             //annotateNext(shell, node);
            }
         }
-        else{
+//        else{
 //         MessageBox mb = new MessageBox(shell);
 //         mb.setText("Hint");
 //         mb.setMessage("Node already marked as correct");
 //         mb.open();
-        }
+//        }
    }
-   
-   private AlgorithmicDebugCorrectAnnotationLink getCorrectLink(ISENode node){
-    
-      ISEDebugTarget target = node.getDebugTarget();
-      ISEAnnotation annotationCorrect = ArrayUtil.search(registeredAnnotationsCorrect, new IFilter<ISEAnnotation>() {
-         @Override
-         public boolean select(ISEAnnotation element) {
-            return element instanceof AlgorithmicDebugCorrectAnnotation; 
-         }
-      });
-      
-      
-      if (annotationCorrect == null){
-         annotationCorrect = annotationTypeCorrect.createAnnotation();
-         target.registerAnnotation(annotationCorrect);}
-      
-      AlgorithmicDebugCorrectAnnotationLink linkCorrect = (AlgorithmicDebugCorrectAnnotationLink)annotationTypeCorrect.createLink(annotationCorrect, node);
-      return linkCorrect;
-   }
-   
-   private AlgorithmicDebugFalseAnnotationLink getFalseLink(ISENode node){
-      
-      ISEDebugTarget target = node.getDebugTarget();
-      ISEAnnotation annotationFalse = ArrayUtil.search(registeredAnnotationsFalse, new IFilter<ISEAnnotation>() {
-         @Override
-         public boolean select(ISEAnnotation element) {
-            return element instanceof AlgorithmicDebugFalseAnnotation; 
-         }
-      });
-      
-      
-      if (annotationFalse == null){
-         annotationFalse = annotationTypeFalse.createAnnotation();
-         target.registerAnnotation(annotationFalse);}
-      
-      AlgorithmicDebugFalseAnnotationLink linkFalse = (AlgorithmicDebugFalseAnnotationLink)annotationTypeFalse.createLink(annotationFalse, node);
-      return linkFalse;
-   }
-   
    
    /**
     * @author Peter Schauberger
@@ -110,8 +85,7 @@ public class AlgorithmicDebugCorrectAnnotationLinkAction implements ISEAnnotatio
     */
    private void annotateNext(Shell shell, ISENode node){
       try {
-         ISENode parent =  node.getParent();
-         
+         ISENode parent = node.getParent();
              
          if(!(parent instanceof ISEBranchStatement))
             run (shell, parent);

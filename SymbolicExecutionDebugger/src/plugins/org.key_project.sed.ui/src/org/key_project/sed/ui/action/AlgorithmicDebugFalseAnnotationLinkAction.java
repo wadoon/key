@@ -36,8 +36,8 @@ public class AlgorithmicDebugFalseAnnotationLinkAction implements ISEAnnotationL
       this.registeredAnnotationsFalse = node.getDebugTarget().getRegisteredAnnotations(annotationTypeFalse);
       this.registeredAnnotationsCorrect = node.getDebugTarget().getRegisteredAnnotations(annotationTypeCorrect);
       
-      Assert.isNotNull(node);
-      Assert.isNotNull(annotationTypeFalse);
+//      Assert.isNotNull(node);
+//      Assert.isNotNull(annotationTypeFalse);
       
       ISEDebugTarget target = node.getDebugTarget();
       ISEAnnotation annotationFalse = ArrayUtil.search(registeredAnnotationsFalse, new IFilter<ISEAnnotation>() {
@@ -60,19 +60,16 @@ public class AlgorithmicDebugFalseAnnotationLinkAction implements ISEAnnotationL
       if (annotationCorrect == null){
          annotationCorrect = annotationTypeCorrect.createAnnotation();
          target.registerAnnotation(annotationCorrect);}
-      
-        AlgorithmicDebugFalseAnnotationLink linkFalse = (AlgorithmicDebugFalseAnnotationLink)annotationTypeFalse.createLink(annotationFalse, node);
-        AlgorithmicDebugCorrectAnnotationLink linkCorrect = (AlgorithmicDebugCorrectAnnotationLink)annotationTypeCorrect.createLink(annotationCorrect, node);
-        
+
       //If AnnotationLink was not found, we create a new one and attach it to the node
-        if(!node.containsAnnotationLink(linkFalse)){
-           if(annotationCorrect == null || !node.containsAnnotationLink(linkCorrect)){
+        if(node.getAnnotationLinks(annotationTypeFalse).length == 0){
+           if(annotationCorrect == null || node.getAnnotationLinks(annotationTypeCorrect).length == 0){
+              
 //              MessageBox mb = new MessageBox(shell);
 //              mb.setText("Hint");
 //              mb.setMessage("Correct Annotation nicht gefunden, markiere False");
 //              mb.open();
-              
-              node.addAnnotationLink(linkFalse);
+              node.addAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
               }
            else{
 //              MessageBox mb = new MessageBox(shell);
@@ -80,12 +77,12 @@ public class AlgorithmicDebugFalseAnnotationLinkAction implements ISEAnnotationL
 //              mb.setMessage("Node already marked as Correct. Toggle annotation to False");
 //              mb.open();
              
-              node.removeAnnotationLink(linkCorrect);
-              node.addAnnotationLink(linkFalse);
+              node.removeAnnotationLink(annotationTypeCorrect.createLink(annotationCorrect, node));
+              node.addAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
            }
         }
         else{
-         node.removeAnnotationLink(linkFalse);
+         node.removeAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
            
          MessageBox mb = new MessageBox(shell);
          mb.setText("Hint");
