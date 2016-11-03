@@ -54,7 +54,7 @@ public class JoinPointRule implements BuiltInRule {
  //       ImmutableList<Goal> goalsToJoin = null;
         ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
                 ImmutableSLList.nil();
-        deleteJoinPointStatement(goal, ruleApp.posInOccurrence(), services);
+        
         for (Goal g : openGoals){
             if (!g.equals(goal) && !g.isLinked() && isJoinPointStatement(JoinRuleUtils.getJavaBlockRecursive(g.sequent().succedent().get(1).formula()).program())){
                 Semisequent succedent = g.sequent().succedent();
