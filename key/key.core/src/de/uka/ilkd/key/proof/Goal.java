@@ -609,7 +609,6 @@ public final class Goal  {
     }
 
     public ImmutableList<Goal> apply(final RuleApp ruleApp ) {
-
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
