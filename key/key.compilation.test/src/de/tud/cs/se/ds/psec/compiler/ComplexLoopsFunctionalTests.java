@@ -21,7 +21,7 @@ public class ComplexLoopsFunctionalTests
 
     /**
      * This test case is subsumed by
-     * {@link #testWhileLoopWithContinueAndInnerLoop()}, but if the more complex
+     * {@link #testWhileWithNestedLoopsAndContinue()}, but if the more complex
      * one fails, this one can be another benchmark.
      */
     @Test
@@ -31,12 +31,13 @@ public class ComplexLoopsFunctionalTests
                 new TestData<Integer>(0, null, 10),
                 new TestData<Integer>(0, null, 100),
                 new TestData<Integer>(0, null, 42),
-                new TestData<Integer>(-1, null, -1));
+                new TestData<Integer>(-1, null, -1),
+                new TestData<Integer>(0, null, 3));
 
         //@formatter:off
         compileAndTest(
-                "complex_loops/one_break_or_continue/WhileWithBreaks.java",
-                "de.tud.test.complex_loops.WhileWithBreaks",
+                "complex_loops/one_break_or_continue/WhileWithOneBreak.java",
+                "de.tud.test.complex_loops.WhileWithOneBreak",
                 "testSimpleBreak",
                 new Class<?>[] { int.class },
                 testData);
@@ -46,7 +47,7 @@ public class ComplexLoopsFunctionalTests
 
     /**
      * This test case is subsumed by
-     * {@link #testWhileLoopWithContinueAndInnerLoop()}, but if the more complex
+     * {@link #testWhileWithNestedLoopsAndContinue()}, but if the more complex
      * one fails, this one can be another benchmark.
      */
     @Test
@@ -71,7 +72,7 @@ public class ComplexLoopsFunctionalTests
 
     /**
      * This test case is subsumed by
-     * {@link #testWhileLoopWithContinueAndInnerLoop()}, but if the more complex
+     * {@link #testWhileWithNestedLoopsAndContinue()}, but if the more complex
      * one fails, this one can be another benchmark.
      */
     @Test
@@ -95,7 +96,7 @@ public class ComplexLoopsFunctionalTests
     }
 
     @Test
-    public void testWhileLoopWithContinueAndInnerLoop() {
+    public void testWhileWithNestedLoopsAndContinue() {
 
         List<TestData<Integer>> testData = Arrays.asList(
                 new TestData<Integer>(0, null, 10),

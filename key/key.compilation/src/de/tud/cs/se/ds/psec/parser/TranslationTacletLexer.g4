@@ -12,23 +12,34 @@ CONDITION
     : '\\condition' ;
 
 LOAD
-    : '\\load';
+    : '\\load' ;
 
 LOAD_PARAMS
-    : '\\load_params';
+    : '\\load_params' ;
 
 SUPER_CALL
-	: '\\superCall';
+	: '\\superCall' ;
 
 NEGATE
-    : '\\negate';
+    : '\\negate' ;
+
+POP_LOOP_ENTRY_LABEL
+	: '\\popLoopEntryLabel' ;
+
+POP_LOOP_EXIT_LABEL
+	: '\\popLoopExitLabel' ;
+
+PUSH_LOOP_ENTRY_LABEL
+	: '\\pushLoopEntryLabel' ;
+
+PUSH_LOOP_EXIT_LABEL
+	: '\\pushLoopExitLabel' ;
 
 STORE
-    : '\\store';
+    : '\\store' ;
 
 CHILD
-    : '#child-'
-    ;
+    : '#child-' ;
 
 // General punctuation
 

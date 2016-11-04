@@ -7,7 +7,7 @@ package de.tud.test.complex_loops;
  *
  * @author Dominic Scheurer
  */
-public class WhileWithBreaks {
+public class WhileWithOneBreak {
     
     /*@ public normal_behavior
       @ requires true;

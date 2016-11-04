@@ -29,7 +29,9 @@ public class WhileWithNestedLoopsAndContinue {
                     // The "break" makes things more
                     // complicated in the invariant rule...
                     break;
-                } else {
+                }
+                
+                if (i > -1) {
                     continue;
                 }
                 

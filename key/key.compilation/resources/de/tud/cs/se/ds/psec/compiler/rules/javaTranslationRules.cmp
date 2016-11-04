@@ -32,11 +32,15 @@ while_loop_by_invariant {
 	\taclets ("Loop Invariant")
 	\condition (#num-children == 3)
 	\translation (
+		\pushLoopEntryLabel (l1)
+		\pushLoopExitLabel (l3)
 		GOTO l1
 		l2: #child-2
 		l1: \load (#guard)
 		IFNE l2
-		#child-3
+		\popLoopEntryLabel
+		\popLoopExitLabel
+		l3: #child-3
 	)
 }
 

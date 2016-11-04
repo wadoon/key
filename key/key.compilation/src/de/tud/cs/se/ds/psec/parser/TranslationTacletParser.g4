@@ -74,6 +74,10 @@ bytecode_instr
     	store_instr
     |
         child_call
+    |
+    	push_label_instr
+    |
+    	pop_label_instr
     ;
 
 nullary_bytecode_instr
@@ -245,6 +249,26 @@ child_call
     :
         CHILD NUMBER
     ;
+
+push_label_instr
+	:
+		PUSH_LOOP_ENTRY_LABEL
+		LPAREN
+			LABEL
+		RPAREN               # pushLoopEntryLabel
+	|
+		PUSH_LOOP_EXIT_LABEL
+		LPAREN
+			LABEL
+		RPAREN               # pushLoopExitLabel
+	;
+
+pop_label_instr
+	:
+		POP_LOOP_ENTRY_LABEL # popLoopEntryLabel
+	|
+		POP_LOOP_EXIT_LABEL  # popLoopExitLabel
+	;
 
 integer
 	:
