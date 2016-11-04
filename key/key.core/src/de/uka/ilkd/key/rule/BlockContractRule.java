@@ -22,15 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.util.ExtList;
-<<<<<<< HEAD
-import org.key_project.util.collection.*;
-=======
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
->>>>>>> a995c964dfe6d168ed88113d0a98fd3859923f35
 
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
@@ -519,18 +515,11 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     private ImmutableList<Goal> apply(final Goal goal, final Services services,
-<<<<<<< HEAD
-            final BlockContractBuiltInRuleApp application)
-            throws RuleAbortException {
-        final Instantiation instantiation = instantiate(
-                application.posInOccurrence().subTerm(), goal, services);
-=======
                                       final BlockContractBuiltInRuleApp application)
                                               throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);
->>>>>>> a995c964dfe6d168ed88113d0a98fd3859923f35
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self);
         assert contract.getBlock().equals(instantiation.block);
@@ -585,11 +574,6 @@ public class BlockContractRule implements BuiltInRule {
                         /* anonymisationLocalVariables, */
                         modifiesClauses);
         final ImmutableList<Goal> result;
-<<<<<<< HEAD
-        final GoalsConfigurator configurator = new GoalsConfigurator(
-                instantiation, contract.getLabels(), variables,
-                application.posInOccurrence(), services);
-=======
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                                                                      termLabelState,
                                                                      instantiation,
@@ -598,7 +582,6 @@ public class BlockContractRule implements BuiltInRule {
                                                                      application.posInOccurrence(),
                                                                      services,
                                                                      this);
->>>>>>> a995c964dfe6d168ed88113d0a98fd3859923f35
         if (WellDefinednessCheck.isOn()) {
             result = goal.split(4);
             configurator.setUpWdGoal(result.tail().tail().tail().head(),
@@ -620,15 +603,6 @@ public class BlockContractRule implements BuiltInRule {
                         reachableOutCondition, atMostOneFlagSetCondition });
         if (!InfFlowCheckInfo.isInfFlow(goal)) {
             configurator.setUpValidityGoal(result.tail().tail().head(),
-<<<<<<< HEAD
-                    new Term[] { contextUpdate, remembranceUpdate },
-                    new Term[] { precondition, wellFormedHeapsCondition,
-                            reachableInCondition },
-                    new Term[] { postcondition, frameCondition
-                    /* , atMostOneFlagSetCondition */ }, exceptionParameter);
-        }
-        else {
-=======
                                            new Term[] {contextUpdate, remembranceUpdate},
                                            new Term[] {precondition, wellFormedHeapsCondition,
                                                        reachableInCondition},
@@ -637,7 +611,6 @@ public class BlockContractRule implements BuiltInRule {
                                            exceptionParameter,
                                            conditionsAndClausesBuilder.terms);
         } else {
->>>>>>> a995c964dfe6d168ed88113d0a98fd3859923f35
             Goal validityGoal = result.tail().tail().head();
             validityGoal.setBranchLabel("Information Flow Validity");
 
@@ -1209,12 +1182,6 @@ public class BlockContractRule implements BuiltInRule {
         private final Services services;
         private final BlockContractRule rule;
 
-<<<<<<< HEAD
-        public GoalsConfigurator(final Instantiation instantiation,
-                final List<Label> labels,
-                final BlockContract.Variables variables,
-                final PosInOccurrence occurrence, final Services services) {
-=======
         public GoalsConfigurator(final BlockContractBuiltInRuleApp application,
                                  final TermLabelState termLabelState,
                                  final Instantiation instantiation,
@@ -1226,7 +1193,6 @@ public class BlockContractRule implements BuiltInRule {
         {
             this.application = application;
             this.termLabelState = termLabelState;
->>>>>>> a995c964dfe6d168ed88113d0a98fd3859923f35
             this.instantiation = instantiation;
             this.labels = labels;
             this.variables = variables;
@@ -1257,47 +1223,6 @@ public class BlockContractRule implements BuiltInRule {
         }
 
         public void setUpValidityGoal(final Goal goal, final Term[] updates,
-<<<<<<< HEAD
-                final Term[] assumptions, final Term[] postconditions,
-                final ProgramVariable exceptionParameter) {
-            goal.setBranchLabel("Validity");
-            final TermBuilder tb = services.getTermBuilder();
-            goal.addFormula(
-                    new SequentFormula(
-                            tb.applySequential(updates, tb.and(assumptions))),
-                    true, false);
-            final StatementBlock block = new ValidityProgramConstructor(labels,
-                    instantiation.block, variables, exceptionParameter,
-                    services).construct();
-            Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(
-                    block);
-            StatementBlock finishedBlock = finishTransactionIfModalityIsTransactional(
-                    wrappedBlock);
-            goal.changeFormula(new SequentFormula(tb.applySequential(updates,
-                    tb.prog(instantiation.modality,
-                            JavaBlock.createJavaBlock(finishedBlock),
-                            tb.and(postconditions)))),
-                    occurrence);
-            final boolean oldInfFlowCheckInfoValue = goal.getStrategyInfo(
-                    InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
-                    && goal.getStrategyInfo(
-                            InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
-            StrategyInfoUndoMethod undo = new StrategyInfoUndoMethod() {
-
-                @Override
-                public void undo(
-                        de.uka.ilkd.key.util.properties.Properties strategyInfos) {
-                    strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY,
-                            oldInfFlowCheckInfoValue);
-                }
-            };
-            goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY,
-                    false, undo);
-        }
-
-        private Statement wrapInMethodFrameIfContextIsAvailable(
-                final StatementBlock block) {
-=======
                                       final Term[] assumptions,
                                       final Term[] postconditions,
                                       final ProgramVariable exceptionParameter,
@@ -1354,7 +1279,6 @@ public class BlockContractRule implements BuiltInRule {
         }
 
         private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block) {
->>>>>>> a995c964dfe6d168ed88113d0a98fd3859923f35
             if (instantiation.context == null) {
                 return block;
             }
@@ -1381,18 +1305,11 @@ public class BlockContractRule implements BuiltInRule {
                 final Term[] preconditions) {
             final TermBuilder tb = services.getTermBuilder();
             goal.setBranchLabel("Precondition");
-<<<<<<< HEAD
-            goal.changeFormula(
-                    new SequentFormula(
-                            tb.apply(update, tb.and(preconditions), null)),
-                    occurrence);
-=======
             Term fullPrecondition = tb.apply(update, tb.and(preconditions), null);
             fullPrecondition = TermLabelManager.refactorTerm(termLabelState, services, null, fullPrecondition, rule, goal, BlockContractRule.FULL_PRECONDITION_TERM_HINT, null);
             goal.changeFormula(new SequentFormula(fullPrecondition),
                                occurrence);
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
->>>>>>> a995c964dfe6d168ed88113d0a98fd3859923f35
         }
 
         public void setUpUsageGoal(final Goal goal, final Term[] updates,
@@ -1402,20 +1319,6 @@ public class BlockContractRule implements BuiltInRule {
             Term uAssumptions = tb.applySequential(updates,
                     tb.and(assumptions));
             goal.addFormula(new SequentFormula(uAssumptions), true, false);
-<<<<<<< HEAD
-            goal.changeFormula(
-                    new SequentFormula(
-                            tb.applySequential(updates, buildUsageFormula())),
-                    occurrence);
-        }
-
-        private Term buildUsageFormula() {
-            return services.getTermBuilder().prog(instantiation.modality,
-                    replaceBlock(instantiation.formula.javaBlock(),
-                            instantiation.block,
-                            constructAbruptTerminationIfCascade()),
-                    instantiation.formula.sub(0));
-=======
             goal.changeFormula(new SequentFormula(tb.applySequential(updates, buildUsageFormula(goal))),
                                                   occurrence);
             TermLabelManager.refactorGoal(termLabelState, services, occurrence, application.rule(), goal, null, null);
@@ -1442,7 +1345,6 @@ public class BlockContractRule implements BuiltInRule {
                                                    instantiation.formula.javaBlock(), 
                                                    instantiation.formula.getLabels())
             );
->>>>>>> a995c964dfe6d168ed88113d0a98fd3859923f35
         }
 
         private JavaBlock replaceBlock(final JavaBlock java,
