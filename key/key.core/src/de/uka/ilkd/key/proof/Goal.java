@@ -215,7 +215,7 @@ public final class Goal  {
      */
     protected void fireSequentChanged(SequentChangeInfo sci) {
 	getFormulaTagManager().sequentChanged(this, sci);
-	ruleAppIndex()        .sequentChanged(this, sci);
+	ruleAppIndex().sequentChanged(this, sci);
 	for (GoalListener listener : listeners) {
 	    listener.sequentChanged(this, sci);
 	}
