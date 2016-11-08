@@ -79,8 +79,6 @@ public class AlgorithmicDebugLinkAction implements ISEAnnotationLinkAction {
 //         if (answer == null) return null;
 //         answer.markNodes();
          
-         
-         
          switch(answer){
          case 0:
             return 0;
@@ -119,8 +117,10 @@ public class AlgorithmicDebugLinkAction implements ISEAnnotationLinkAction {
     */
    //selectNode wählt den nächsten Knoten der noch nicht annotiert wurde.
    private ISENode selectNode(ISENode node){
-      ISENode candidate = preOrderTraversal(getRoot(node));
-      return candidate;
+      AlgorithmicTraversal at = new AlgorithmicTraversal();
+      at.setStrategie(new TraversalStrategyPreOrder());
+      
+      return at.traverse(node);
    }
    
    /**
