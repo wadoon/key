@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.util.rifl;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -110,7 +111,29 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 	@Override
 	public String returnValue(String inPackage, String inClass,
 			                  String methodName, String[] paramTypes, Type type) {
-		return return2domain.get(new ReturnValue(methodName, paramTypes, inPackage, inClass, type));
+		//System.out.println("Lookup: "+methodName);
+		//System.out.println(this.toString());
+		
+		String s = null;
+		for(ReturnValue rv : return2domain.keySet()){
+			ReturnValue val = new ReturnValue(methodName, paramTypes, inPackage, inClass, type);
+			if(rv.toString().equals(val.toString())){
+				s = return2domain.get(rv);
+			}
+			break;
+		}
+		
+		
+		
+		//String result;// = return2domain.get(new ReturnValue(methodName, paramTypes, inPackage, inClass, type));
+		
+		
+		
+		
+		//System.out.println("Result: "+s);
+		//System.out.println(return2domain.toString());
+		return s;
+		
 	}
 
 	@Override

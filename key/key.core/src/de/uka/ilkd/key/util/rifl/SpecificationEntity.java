@@ -148,11 +148,12 @@ public abstract class SpecificationEntity {
          * @param p package name of the class where the method is declared
          * @param c name of the class where the method is declared
          */
-        ReturnValue(String m, String p, String c, Type t) {
+        ReturnValue(String m, String p, String c, Type t) {        	
             super(p, c, t);
-            final int i = m.indexOf('(');
+            System.out.println("Method: "+m);
+            final int i = m.indexOf('(');            
             methodName = m.substring(0, i).intern();
-            paramTypes = m.substring(i + 1, m.lastIndexOf(')')).split(",");
+            paramTypes = m.substring(i+1, m.lastIndexOf(')')).split(",");            
         }
 
         /**
@@ -170,10 +171,15 @@ public abstract class SpecificationEntity {
 
         @Override
         public boolean equals(Object o) {
+        	
+        	
+        	
             if (super.equals(o) && o instanceof ReturnValue) {
-                return (methodName.equals(((ReturnValue) o).methodName)
-                        && Arrays.equals(paramTypes, ((ReturnValue) o).paramTypes));
-            } else { return false; }
+                boolean result =  (methodName.equals(((ReturnValue) o).methodName)
+                        && Arrays.equals(paramTypes, ((ReturnValue) o).paramTypes));                
+                return result;
+            } else {
+            	return false; }
         }
 
         @Override
@@ -194,7 +200,9 @@ public abstract class SpecificationEntity {
                 sb.append(p);
                 sb.append(',');
             }
-            sb.deleteCharAt(sb.length()-1);
+            if(paramTypes.length > 0){
+            	sb.deleteCharAt(sb.length()-1);
+            }
             sb.append(')');
             return sb.toString();
         }

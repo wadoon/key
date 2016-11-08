@@ -16,7 +16,7 @@ package de.uka.ilkd.key.util.rifl;
 import java.io.*;
 import javax.xml.parsers.*;
 
-
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
@@ -201,6 +201,25 @@ public class RIFLTransformer {
         xmlReader.parse(fileName.toURI().toString());
         return ((RIFLHandler) xmlReader.getContentHandler()).getSpecification();
     }
+    
+    public static String getTypeString(String javaTypeString){
+    	String result = javaTypeString;
+    	
+    	if(javaTypeString.endsWith("[]")){
+    		result = result.substring(0, result.length()-2);
+    		if(result.startsWith("[")){
+    			result = "["+result;
+    		}else{
+    			if(result.equals("String")){
+    				result = "java.lang."+result;
+    			}
+    			result = "[L"+result;
+    		}
+    		return getTypeString(result);
+    	}
+    	
+    	return result;
+    }
 
     public void doTransform(final File riflFilename,
                             final File source,
@@ -211,6 +230,9 @@ public class RIFLTransformer {
 
         // step 1: read files
         SpecificationContainer sc = readRIFL(riflFilename);
+        
+        //System.out.println(sc.toString());
+        
         Map<CompilationUnit, File> javaCUs = readJava(javaRoot);
         int counter = 0;
         // step 2: inject specifications
@@ -225,7 +247,11 @@ public class RIFLTransformer {
             	
             	StringBuilder sb = new StringBuilder();
             	for (ParameterDeclaration p : mdecl.getParameters()) {
-            		sb.append(p.getTypeReference().getName());
+            		
+            		String type = getTypeString(p.getTypeReference().toSource());
+            		type = type.trim();
+            		
+            		sb.append(type);
             		sb.append(",");
             	}
             	if(sb.length()>0){
@@ -236,6 +262,8 @@ public class RIFLTransformer {
             			clazz.getFullName() + "\\\\:\\\\:" +
             			mdecl.getName() + "(" + sb + ")" + "]"
             			+ ".Non-interference contract.0";
+            	
+            	//System.out.println("PO: "+poname);
 
             	File problemFileName = new File(javaRoot.getParent(), riflFilename.getName() + "_" + counter++ + ".key");
 

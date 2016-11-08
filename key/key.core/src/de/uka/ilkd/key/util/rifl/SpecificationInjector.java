@@ -88,6 +88,7 @@ public class SpecificationInjector extends SourceVisitor {
 
         /** Adds \result to a determines clause labeled by key. */
         void addResultToDetermines(String key, Type t) {
+        	System.out.println("Add result: "+key+" "+t);
             put(key, t, RESULT);
         }
 
@@ -299,10 +300,10 @@ public class SpecificationInjector extends SourceVisitor {
         final JMLFactory factory = new JMLFactory(sc);
 
         // add return value
-        final String returnDomainSrc = sc.returnValue(md, Type.SOURCE);
+        //final String returnDomainSrc = sc.returnValue(md, Type.SOURCE);
         // debug
         // System.out.println(".... return domain: "+returnDomain);
-        factory.addResultToDetermines(returnDomainSrc, Type.SOURCE);
+        //factory.addResultToDetermines(returnDomainSrc, Type.SOURCE);
         final String returnDomainSnk = sc.returnValue(md, Type.SINK);
         // debug
         // System.out.println(".... return domain: "+returnDomain);
