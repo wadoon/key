@@ -140,6 +140,7 @@ import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.ForUpdates;
 import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -409,6 +410,8 @@ public interface SimultaneousVisitor {
     public void visit(ProgramVariable x1, ProgramVariable x2);
 
     public void visit(IProgramVariable x1, IProgramVariable x2);
+    
+    public void visit(JoinPointStatement x1, JoinPointStatement x2);
 
     public void visit(Return x1, Return x2);
 
