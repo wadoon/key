@@ -32,154 +32,167 @@ public class JoinPointRule implements BuiltInRule {
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
     public JoinPointRule() {
-       
+
     }
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
         // delete JoinPointStatement
+
+        PosInOccurrence pio = ruleApp.posInOccurrence();
+
+        JoinRuleBuiltInRuleApp app = new JoinRuleBuiltInRuleApp(new JoinRule(),
+                pio);
+
+        JoinProcedure concreteRule = ((JoinPointStatement) ((StatementBlock) JoinRuleUtils
+                .getJavaBlockRecursive(pio.subTerm()).program())
+                        .getInnerMostMethodFrame().getBody().getFirstElement())
+                                .getApplication().getContract()
+                                .getJoinProcedure();
+
+        ImmutableList<Goal> joinGoals = getJoinGoals(goal, services);
+        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = getJoinPartners(
+                goal, joinGoals, pio, services);
+
+        app.setJoinNode(goal.node());
+        app.setConcreteRule(concreteRule);
+        app.setJoinPartners(joinPartners);
+
+        ImmutableList<Goal> newGoals = goal.split(1);
+        Goal goalB = newGoals.head();
+        newGoals = goalB.apply(app);
+
         ImmutableList<Goal> goals = goal.split(1);
         goal = goals.head();
-        ImmutableList<Goal> openGoals = goal.proof().openGoals();
-        PosInOccurrence pio = ruleApp.posInOccurrence();
-       
-        JavaBlock jB = null;
-      
-        JoinProcedure concreteRule = null;
-       
+
+        if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
+                && JoinRuleUtils.getJavaBlockRecursive(
+                        pio.subTerm()) != JavaBlock.EMPTY_JAVABLOCK) {
+
+            deleteJoinPointStatement(goal, pio, services);
+            SequentFormula f = goal.sequent().succedent().get(1);
+            PosInTerm pit = PosInTerm.getTopLevel();
+            pio = new PosInOccurrence(f, pit, false);
+        }
+
         // ImmutableList<Goal> goalsToJoin = null;
+
+        return newGoals;
+    }
+    //use the one from joinRule.
+    private ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> getJoinPartners(
+            Goal goal, ImmutableList<Goal> joinGoals, PosInOccurrence pio,
+            Services services) {
         ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = ImmutableSLList
                 .nil();
-        concreteRule = ((JoinPointStatement) ((StatementBlock) JoinRuleUtils
-                .getJavaBlockRecursive(pio.subTerm())
-                .program()).getInnerMostMethodFrame().getBody()
-                        .getFirstElement()).getApplication().getContract()
-                                .getJoinProcedure();
-        for (Goal g : openGoals) {
-   
-                if(g.equals(goal) && ruleApp.posInOccurrence() != null
-                && ruleApp.posInOccurrence().subTerm()
-                        .isContainsJavaBlockRecursive()
-                && JoinRuleUtils.getJavaBlockRecursive(pio
-                        .subTerm()) != JavaBlock.EMPTY_JAVABLOCK) {
-                    
-                    deleteJoinPointStatement(goal, pio, services);
-                    SequentFormula f = goal.sequent().succedent().get(1);
+
+        for (Goal g : joinGoals) {
+
+            if (!g.equals(goal) && !g.isLinked()) {
+                Semisequent succedent = g.sequent().succedent();
+
+                for (int i = 0; i < succedent.size(); i++) {
+                    SequentFormula f = succedent.get(i);
+
                     PosInTerm pit = PosInTerm.getTopLevel();
-                    pio = new PosInOccurrence(f,
-                            pit, false);
-                }
-                // TODO: check if it belongs to the same joinPointStatement
-                else if (!g.isLinked()) {
-                    Semisequent succedent = g.sequent().succedent();
-                    
-                    for (int i = 0; i < succedent.size(); i++) {
-                        SequentFormula f = succedent.get(i);
-                        if (f.formula() != null) {
-                            jB = JoinRuleUtils.getJavaBlockRecursive(f.formula());
-                            if (jB != null
-                                    && isJoinPointStatement(jB.program())) {
-                                ImmutableList<Goal> gCopy = g.split(1);
-                                g = gCopy.head();
-                                PosInTerm pit = PosInTerm.getTopLevel();
-                                PosInOccurrence gPio = new PosInOccurrence(f,
-                                        pit, false);
-                                deleteJoinPointStatement(g, gPio,
-                                        g.proof().getServices());
-                                succedent = g.sequent().succedent();
-                                f = succedent.get(i);
-                                pit = PosInTerm.getTopLevel();
-                                gPio = new PosInOccurrence(f,
-                                        pit, false);
-                                if (JoinRule.isOfAdmissibleForm(g, gPio,
-                                        false)) {
-                                    Triple<Term, Term, Term> ownSEState = sequentToSETriple(
-                                            goal.node(), pio, services);
-                                   // JavaBlock jb2 = JoinRuleUtils.getJavaBlockRecursive(g.sequent().succedent().get(i).formula());
-                                    Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
-                                            g.node(), gPio, services);
 
-                                    // NOTE: The equality check for the Java
-                                    // blocks can be
-                                    // problematic, since KeY instantiates
-                                    // declared program
-                                    // variables with different identifiers;
-                                    // e.g.
-                                    // {int x = 10; if (x...)} could get
-                                    // {x_1 = 10; if (x_1...)}
-                                    // in one and {x_2 = 10; if (x_2...)} in the
-                                    // other
-                                    // branch. This cannot be circumvented with
-                                    // equalsModRenaming, since at this point,
-                                    // the PVs are
-                                    // already declared. We therefore check
-                                    // equality
-                                    // modulo switching to branch-unique (and
-                                    // not globally
-                                    // unique) names.
-                                    // TODO: Update this comment above
+                    PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
 
-                                    JavaProgramElement ownProgramElem = ownSEState.third
-                                            .javaBlock().program();
-                                    JavaProgramElement partnerProgramElem = partnerSEState.third
-                                            .javaBlock().program();
+                    if (JoinRule.isOfAdmissibleForm(g, gPio, false)) {
+                        Triple<Term, Term, Term> ownSEState = sequentToSETriple(
+                                goal.node(), pio, services);
+                        Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
+                                g.node(), gPio, services);
 
-                                    Term ownPostCond = ownSEState.third
-                                            .op() instanceof Modality
-                                                    ? ownSEState.third.sub(0)
-                                                    : ownSEState.third;
-                                    Term partnerPostCond = partnerSEState.third
-                                            .op() instanceof Modality
-                                                    ? partnerSEState.third
-                                                            .sub(0)
-                                                    : partnerSEState.third;
+                        // NOTE: The equality check for the Java
+                        // blocks can be
+                        // problematic, since KeY instantiates
+                        // declared program
+                        // variables with different identifiers;
+                        // e.g.
+                        // {int x = 10; if (x...)} could get
+                        // {x_1 = 10; if (x_1...)}
+                        // in one and {x_2 = 10; if (x_2...)} in the
+                        // other
+                        // branch. This cannot be circumvented with
+                        // equalsModRenaming, since at this point,
+                        // the PVs are
+                        // already declared. We therefore check
+                        // equality
+                        // modulo switching to branch-unique (and
+                        // not globally
+                        // unique) names.
+                        // TODO: Update this comment above
 
-                                    ProgramVariablesMatchVisitor matchVisitor = new ProgramVariablesMatchVisitor(
-                                            partnerProgramElem, ownProgramElem,
-                                            services);
-                                    matchVisitor.start();
+                        JavaProgramElement ownProgramElem = ownSEState.third
+                                .javaBlock().program();
+                        JavaProgramElement partnerProgramElem = partnerSEState.third
+                                .javaBlock().program();
 
-                                    // Requirement: Same post condition,
-                                    // matching program
-                                    // parts.
-                                    // NOTE: If we have a modality in the post
-                                    // condition,
-                                    // the equality of post conditions may be
-                                    // too strict,
-                                    // so some legal cases will be excluded from
-                                    // the join
-                                    // partners list.
-                                    if (ownPostCond.equals(partnerPostCond)
-                                            && !matchVisitor.isIncompatible()) {
+                        Term ownPostCond = ownSEState.third
+                                .op() instanceof Modality
+                                        ? ownSEState.third.sub(0)
+                                        : ownSEState.third;
+                        Term partnerPostCond = partnerSEState.third
+                                .op() instanceof Modality
+                                        ? partnerSEState.third.sub(0)
+                                        : partnerSEState.third;
 
-                                        joinPartners = joinPartners
-                                                .prepend(
-                                                        new Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>(
-                                                                g, gPio,
-                                                                matchVisitor
-                                                                        .getMatches()
-                                                                        .getValue()));
+                        ProgramVariablesMatchVisitor matchVisitor = new ProgramVariablesMatchVisitor(
+                                partnerProgramElem, ownProgramElem, services);
+                        matchVisitor.start();
 
-                                    }
-                                }
-                            }
+                        // Requirement: Same post condition,
+                        // matching program
+                        // parts.
+                        // NOTE: If we have a modality in the post
+                        // condition,
+                        // the equality of post conditions may be
+                        // too strict,
+                        // so some legal cases will be excluded from
+                        // the join
+                        // partners list.
+                        if (ownPostCond.equals(partnerPostCond)
+                                && !matchVisitor.isIncompatible()) {
+
+                            joinPartners = joinPartners.prepend(
+                                    new Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>(
+                                            g, gPio, matchVisitor.getMatches()
+                                                    .getValue()));
+
                         }
                     }
 
                 }
-            
+            }
+        
+    }
+
+    return joinPartners;
+
+    }
+
+    private ImmutableList<Goal> getJoinGoals(Goal goal, Services services) {
+        ImmutableList<Goal> result = ImmutableSLList.nil();
+        ImmutableList<Goal> openGoals = goal.proof().openGoals();
+        JavaBlock jB = null;
+
+        for (Goal g : openGoals) {
+            if (!g.equals(goal) && !g.isLinked()) {
+                Semisequent succedent = g.sequent().succedent();
+                for (int i = 0; i < succedent.size(); i++) {
+                    SequentFormula f = succedent.get(i);
+                    if (f.formula() != null) {
+                        jB = JoinRuleUtils.getJavaBlockRecursive(f.formula());
+                        if (jB != null && isJoinPointStatement(jB.program())) {
+                            result = result.append(g);
+                        }
+                    }
+                }
+            }
         }
-        
-        JoinRuleBuiltInRuleApp app = new JoinRuleBuiltInRuleApp(new JoinRule(),
-                pio);
-        
-        app.setJoinNode(goal.node());
-        app.setJoinPartners(joinPartners);
-        app.setConcreteRule(concreteRule);
-        ImmutableList<Goal> newGoals = goal.split(1);
-       newGoals =  newGoals.head().apply(app);
-        return newGoals;
+        return result;
     }
 
     @Override
@@ -201,7 +214,7 @@ public class JoinPointRule implements BuiltInRule {
                 && isJoinPointStatement(JoinRuleUtils
                         .getJavaBlockRecursive(pio.subTerm()).program())) {
             ImmutableList<Goal> openGoals = goal.proof().openGoals();
-         
+
             for (Goal g : openGoals) {
                 if (!g.equals(goal) && !isJoinPointStatement(JoinRuleUtils
                         .getJavaBlockRecursive(
@@ -290,4 +303,5 @@ public class JoinPointRule implements BuiltInRule {
         return new JoinPointBuiltInRuleApp(this, pos);
     }
 
+    //toString
 }
