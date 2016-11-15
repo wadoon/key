@@ -25,6 +25,10 @@
 
 package java.lang.annotation;
 
+public enum RetentionPolicy {
+    SOURCE,
 
-public @interface Documented {
+    CLASS,
+
+    RUNTIME
 }
