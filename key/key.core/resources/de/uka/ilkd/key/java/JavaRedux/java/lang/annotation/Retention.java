@@ -40,9 +40,7 @@ package java.lang.annotation;
  * @since 1.5
  * @jls 9.6.3.2 @Retention
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.ANNOTATION_TYPE)
+
 public @interface Retention {
     /**
      * Returns the retention policy.

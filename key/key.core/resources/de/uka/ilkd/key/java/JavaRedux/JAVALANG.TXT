@@ -3,6 +3,7 @@ java.lang.annotation.Annotation
 java.lang.annotation.Documented
 java.lang.annotation.Retention
 java.lang.annotation.Target
+java.lang.annotation.ElementType
 java.lang.ArithmeticException
 java.lang.ArrayIndexOutOfBoundsException
 java.lang.ArrayStoreException

@@ -36,8 +36,6 @@ package java.lang.annotation;
  * @author  Joshua Bloch
  * @since 1.5
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.ANNOTATION_TYPE)
+
 public @interface Documented {
 }
