@@ -8,9 +8,9 @@ import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
-public class JoinPointBuiltInRuleApp extends AbstractBuiltInRuleApp{
+public class DeleteJoinPointBuiltInRuleApp extends AbstractBuiltInRuleApp{
 
-    public JoinPointBuiltInRuleApp(final BuiltInRule rule, final PosInOccurrence occurrence) {
+    public DeleteJoinPointBuiltInRuleApp(final BuiltInRule rule, final PosInOccurrence occurrence) {
         super(rule, occurrence);
     }
 

@@ -37,6 +37,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.join.DeleteJoinPointRule;
 import de.uka.ilkd.key.rule.join.JoinPointRule;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
@@ -50,15 +51,15 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 public class JavaProfile extends AbstractProfile {
     public static final String NAME = "Java Profile";
     public static final String NAME_WITH_PERMISSIONS = "Java with Permissions Profile";
-    
+
     /**
      * <p>
      * The default instance of this class.
      * </p>
-     * <p> 
-     * It is typically used in the {@link Thread} of the user interface.
-     * Other instances of this class are typically only required to 
-     * use them in different {@link Thread}s (not the UI {@link Thread}).
+     * <p>
+     * It is typically used in the {@link Thread} of the user interface. Other
+     * instances of this class are typically only required to use them in
+     * different {@link Thread}s (not the UI {@link Thread}).
      * </p>
      */
     public static JavaProfile defaultInstance;
@@ -66,8 +67,7 @@ public class JavaProfile extends AbstractProfile {
 
     private boolean permissions = false;
 
-    public final static StrategyFactory DEFAULT =
-        new JavaCardDLStrategyFactory();
+    public final static StrategyFactory DEFAULT = new JavaCardDLStrategyFactory();
 
     private OneStepSimplifier oneStepSimpilifier;
 
@@ -81,38 +81,45 @@ public class JavaProfile extends AbstractProfile {
     }
 
     private JavaProfile(boolean perms) {
-    	this();
-    	this.permissions = perms;
+        this();
+        this.permissions = perms;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
-       ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
-       result = result.prepend(new TermLabelConfiguration(
-               ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
-               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
-       result = result.prepend(new TermLabelConfiguration(
-               ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
-               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
-       result = result.prepend(new TermLabelConfiguration(
-               ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
-               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
-       result = result.prepend(new TermLabelConfiguration(
-               ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
-               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)));
-       result = result.prepend(new TermLabelConfiguration(
-               ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
-               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
-       result = result.prepend(new TermLabelConfiguration(
-               ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
-               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
-       result = result.prepend(new TermLabelConfiguration(
-               ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
-               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
-       return result;
+        ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+        result = result.prepend(new TermLabelConfiguration(
+                ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                        ParameterlessTermLabel.ANON_HEAP_LABEL)));
+        result = result.prepend(new TermLabelConfiguration(
+                ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                        ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
+        result = result.prepend(new TermLabelConfiguration(
+                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                        ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
+        result = result.prepend(new TermLabelConfiguration(
+                ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                        ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)));
+        result = result.prepend(new TermLabelConfiguration(
+                ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                        ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
+        result = result.prepend(new TermLabelConfiguration(
+                ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                        ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
+        result = result.prepend(new TermLabelConfiguration(
+                ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                        ParameterlessTermLabel.POST_CONDITION_LABEL)));
+        return result;
     }
 
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
@@ -121,59 +128,59 @@ public class JavaProfile extends AbstractProfile {
         return set;
     }
 
-    
-    protected ImmutableList<BuiltInRule> initBuiltInRules() {       
+    protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
-        
+
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
-                                   .prepend(BlockContractRule.INSTANCE)
-                                   .prepend(UseDependencyContractRule.INSTANCE)
-                                   .prepend(getOneStepSimpilifier())
-                                   .prepend(QueryExpand.INSTANCE)
-                                   .prepend(JoinRule.INSTANCE).prepend(JoinPointRule.INSTANCE);
-  
-        //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
+                .prepend(BlockContractRule.INSTANCE)
+                .prepend(UseDependencyContractRule.INSTANCE)
+                .prepend(getOneStepSimpilifier()).prepend(QueryExpand.INSTANCE)
+                .prepend(JoinRule.INSTANCE).prepend(JoinPointRule.INSTANCE)
+                .prepend(DeleteJoinPointRule.INSTANCE);
+
+        // contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!
         builtInRules = builtInRules.prepend(UseOperationContractRule.INSTANCE);
 
         return builtInRules;
     }
-    
+
     /**
      * <p>
-     * Returns the {@link OneStepSimplifier} instance which should be used
-     * in this {@link JavaProfile}. It is added to the build in rules via
+     * Returns the {@link OneStepSimplifier} instance which should be used in
+     * this {@link JavaProfile}. It is added to the build in rules via
      * {@link #initBuiltInRules()}.
      * </p>
      * <p>
-     * Sub profiles may exchange the {@link OneStepSimplifier} instance,
-     * for instance for site proofs used in the symbolic execution tree extraction.
-     * </p> 
+     * Sub profiles may exchange the {@link OneStepSimplifier} instance, for
+     * instance for site proofs used in the symbolic execution tree extraction.
+     * </p>
+     * 
      * @return The {@link OneStepSimplifier} instance to use.
      */
     public OneStepSimplifier getOneStepSimpilifier() {
-       synchronized (this) {
-          if (oneStepSimpilifier == null) {
-             oneStepSimpilifier = new OneStepSimplifier();
-          }
-          return oneStepSimpilifier;
-       }
+        synchronized (this) {
+            if (oneStepSimpilifier == null) {
+                oneStepSimpilifier = new OneStepSimplifier();
+            }
+            return oneStepSimpilifier;
+        }
     }
 
     /**
-     * determines the justification of rule <code>r</code>. For a method contract rule it
-     * returns a new instance of a {@link ComplexRuleJustification} otherwise the rule
-     * justification determined by the super class is returned
+     * determines the justification of rule <code>r</code>. For a method
+     * contract rule it returns a new instance of a
+     * {@link ComplexRuleJustification} otherwise the rule justification
+     * determined by the super class is returned
      *
      * @return justification for the given rule
      */
     public RuleJustification getJustification(Rule r) {
-        return r == UseOperationContractRule.INSTANCE 
-               || r == UseDependencyContractRule.INSTANCE
-               ? new ComplexRuleJustificationBySpec()
-               : super.getJustification(r);
+        return r == UseOperationContractRule.INSTANCE
+                || r == UseDependencyContractRule.INSTANCE
+                        ? new ComplexRuleJustificationBySpec()
+                        : super.getJustification(r);
     }
-
 
     /**
      * the name of the profile
@@ -194,41 +201,44 @@ public class JavaProfile extends AbstractProfile {
      * Returns the default instance of this class.
      * </p>
      * <p>
-     * It is typically used in the {@link Thread} of the user interface.
-     * Other instances of this class are typically only required to 
-     * use them in different {@link Thread}s (not the UI {@link Thread}).
+     * It is typically used in the {@link Thread} of the user interface. Other
+     * instances of this class are typically only required to use them in
+     * different {@link Thread}s (not the UI {@link Thread}).
      * </p>
-     * @return The default instance for usage in the {@link Thread} of the user interface.
+     * 
+     * @return The default instance for usage in the {@link Thread} of the user
+     *         interface.
      */
     public static synchronized JavaProfile getDefaultInstance(boolean perms) {
-        if(!perms) {
-          if (defaultInstance == null) {
-            defaultInstance = new JavaProfile();
-          }
-          return defaultInstance;
-        }else{
-          if (defaultInstancePermissions == null) {
-            defaultInstancePermissions = new JavaProfile(true);
-          }
-          return defaultInstancePermissions;
+        if (!perms) {
+            if (defaultInstance == null) {
+                defaultInstance = new JavaProfile();
+            }
+            return defaultInstance;
+        }
+        else {
+            if (defaultInstancePermissions == null) {
+                defaultInstancePermissions = new JavaProfile(true);
+            }
+            return defaultInstancePermissions;
         }
     }
 
     public static synchronized JavaProfile getDefaultInstance() {
-       return getDefaultInstance(false);
+        return getDefaultInstance(false);
     }
 
-	public boolean withPermissions() {
-		return permissions;
-	}
+    public boolean withPermissions() {
+        return permissions;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-   @Override
-   public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
-      return app instanceof LoopInvariantBuiltInRuleApp ||
-             app instanceof AbstractContractRuleApp ||
-             app instanceof BlockContractBuiltInRuleApp;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
+        return app instanceof LoopInvariantBuiltInRuleApp
+                || app instanceof AbstractContractRuleApp
+                || app instanceof BlockContractBuiltInRuleApp;
+    }
 }
