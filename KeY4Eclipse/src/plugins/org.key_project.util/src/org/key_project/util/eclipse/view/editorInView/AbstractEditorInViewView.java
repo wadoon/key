@@ -162,7 +162,9 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
       composite.setLayout(new FillLayout());
       composite.setEnabled(isEditorEnabled());
       editorPart.createPartControl(composite);
-      editorActionBarContributor.setActiveEditor(editorPart);
+      if (editorActionBarContributor != null) {
+         editorActionBarContributor.setActiveEditor(editorPart);
+      }
       return composite;
    }
 
@@ -492,21 +494,5 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
    @Override
    public boolean isSaveOnCloseNeeded() {
       return isEditorShown() && editorPart.isSaveOnCloseNeeded();
-   }
-
-   /**
-    * Returns the virtual {@link EditorInViewWorkbenchPage}.
-    * @return The virtual {@link EditorInViewWorkbenchPage}.
-    */
-   public EditorInViewWorkbenchPage getVirtualEditorWorkbenchPage() {
-      return virtualEditorWorkbenchPage;
-   }
-
-   /**
-    * Returns the virtual {@link EditorInViewEditorSite}.
-    * @return The virtual {@link EditorInViewEditorSite}.
-    */
-   public EditorInViewEditorSite getVirtualEditorSite() {
-      return virtualEditorSite;
    }
 }
