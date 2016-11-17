@@ -495,4 +495,20 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
    public boolean isSaveOnCloseNeeded() {
       return isEditorShown() && editorPart.isSaveOnCloseNeeded();
    }
+
+   /**
+    * Returns the virtual {@link EditorInViewWorkbenchPage}.
+    * @return The virtual {@link EditorInViewWorkbenchPage}.
+    */
+   public EditorInViewWorkbenchPage getVirtualEditorWorkbenchPage() {
+      return virtualEditorWorkbenchPage;
+   }
+
+   /**
+    * Returns the virtual {@link EditorInViewEditorSite}.
+    * @return The virtual {@link EditorInViewEditorSite}.
+    */
+   public EditorInViewEditorSite getVirtualEditorSite() {
+      return virtualEditorSite;
+   }
 }
