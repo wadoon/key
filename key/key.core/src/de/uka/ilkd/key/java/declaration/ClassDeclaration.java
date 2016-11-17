@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -20,7 +22,9 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.abstraction.AnnotationUse;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -276,5 +280,11 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printClassDeclaration(this);
+    }
+
+    @Override
+    public List<AnnotationUseSpecification> getAnnotations() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

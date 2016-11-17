@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.java.abstraction;
 
+import java.util.List;
+
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
+
 /**
    A program model element representing members.   
  */
@@ -60,4 +64,12 @@ public interface Member extends ProgramModelElement {
        <CODE>false</CODE> otherwise.
      */
     boolean isStrictFp();
+    
+    /**
+      Get the annotations applied on the member. 
+      @return <CODE>List<CODE> of annotations of the member.
+     */
+    List<AnnotationUseSpecification> getAnnotations();
+    
+    
 }

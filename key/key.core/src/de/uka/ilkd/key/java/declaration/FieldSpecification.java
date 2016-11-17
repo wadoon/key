@@ -13,11 +13,15 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.abstraction.AnnotationUse;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -160,5 +164,11 @@ public class FieldSpecification extends VariableSpecification
      */
     public void visit(Visitor v) {
 	v.performActionOnFieldSpecification(this);
+    }
+
+    @Override
+    public List<AnnotationUseSpecification> getAnnotations() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

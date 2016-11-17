@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -24,11 +26,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.TypeScope;
 import de.uka.ilkd.key.java.VariableScope;
+import de.uka.ilkd.key.java.abstraction.AnnotationUse;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Constructor;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Method;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -362,5 +366,12 @@ public abstract class TypeDeclaration extends JavaDeclaration
         if (o instanceof TypeDeclaration){
             return ((TypeDeclaration)o).fullName.equals(fullName);
         } else return false;
+    }
+    
+    
+    @Override
+    public List<AnnotationUseSpecification> getAnnotations() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

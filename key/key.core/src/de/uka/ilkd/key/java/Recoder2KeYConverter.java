@@ -16,9 +16,11 @@ package de.uka.ilkd.key.java;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -31,6 +33,7 @@ import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.java.abstraction.AnnotationUse;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
@@ -1097,14 +1100,23 @@ public class Recoder2KeYConverter {
 
         KeYJavaType kjt = getKeYJavaType(td);
         ExtList members = collectChildren(td);
-        InterfaceDeclaration keYInterfaceDecl = new InterfaceDeclaration(
-                members, new ProgramElementName(td.getFullName()),
-                isParsingLibs());
+        
+        List<AnnotationUseSpecification> annotations = new ArrayList<AnnotationUseSpecification>();
+        
+        List<recoder.java.declaration.AnnotationUseSpecification> l = td.getAnnotations();
+        for (recoder.java.declaration.AnnotationUseSpecification a : l) {
+            AnnotationUseSpecification ann = convert(a);           
+            annotations.add(ann);
+        }
+        
+        InterfaceDeclaration keYInterfaceDecl = new InterfaceDeclaration(members, new ProgramElementName(td.getFullName()), 
+                isParsingLibs(), annotations); 
         kjt.setJavaType(keYInterfaceDecl);
 
         return keYInterfaceDecl;
     }
 
+    
     /**
      * converts a recoder ParameterDeclaration to a KeY ParameterDeclaration
      * (especially the declaration type of its parent is determined and handed
@@ -1303,12 +1315,12 @@ public class Recoder2KeYConverter {
         	    }
         	}
             }
-
+                        
             final MethodDeclaration methDecl
             	= new MethodDeclaration(
                     collectChildren(md),
                     md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration,
-                    voidComments);
+                    voidComments, checkRemote(md));
             recoder.abstraction.ClassType cont
             	= getServiceConfiguration().getCrossReferenceSourceInfo()
             	                           .getContainingClassType((recoder.abstraction.Member) md);
@@ -1332,6 +1344,42 @@ public class Recoder2KeYConverter {
         }
         methodsDeclaring.remove(md);
         result = (IProgramMethod) getMapping().toKeY(md);
+        return result;
+    }
+    
+    /**
+     * check whether the given method is declared to be remote.
+     * This is done by checking all supertypes of the declaring class or interface whether they are decorated to be remote. 
+     * @param md
+     * @return
+     */
+    private boolean checkRemote(recoder.java.declaration.MethodDeclaration md) {
+        boolean isRemote = false;
+        
+        if (md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration) {
+            recoder.java.declaration.InterfaceDeclaration p = (recoder.java.declaration.InterfaceDeclaration) md.getASTParent();
+            isRemote = checkContainsRemoteType(p.getAllSupertypes()); 
+        } else if (md.getASTParent() instanceof recoder.java.declaration.ClassDeclaration) {
+            recoder.java.declaration.ClassDeclaration p = (recoder.java.declaration.ClassDeclaration) md.getASTParent();
+            isRemote = checkContainsRemoteType(p.getAllSupertypes()); 
+        }
+        
+        return isRemote;
+    }
+    
+    private boolean checkContainsRemoteType(List<recoder.abstraction.ClassType> cts) {
+        boolean result=false;
+        
+        for (recoder.abstraction.ClassType ct : cts) {
+            List<? extends recoder.abstraction.AnnotationUse> anns = ct.getAnnotations();
+            for (recoder.abstraction.AnnotationUse ann : anns) {
+                if (ann.toString().equals("@Remote")) {                    
+                    result = true;
+                }
+            }
+            
+        }
+        
         return result;
     }
 

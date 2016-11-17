@@ -460,4 +460,10 @@ public final class ProgramMethod extends ObserverFunction
             return null;
         }        
     }
+
+    @Override
+    public boolean isRemote() {
+        // TODO Auto-generated method stub
+        return method.isRemote();
+    }
 }

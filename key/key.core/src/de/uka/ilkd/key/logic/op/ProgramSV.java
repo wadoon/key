@@ -655,4 +655,10 @@ public final class ProgramSV extends AbstractSV
    public ReferencePrefix getRuntimeInstance() {
       return null;
    }
+
+
+   @Override
+   public boolean isRemote() {
+       return false;
+   }
 }

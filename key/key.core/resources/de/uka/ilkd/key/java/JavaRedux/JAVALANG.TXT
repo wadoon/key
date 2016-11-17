@@ -46,3 +46,5 @@ java.util.Map
 java.util.Set
 java.io.IOException
 java.io.Serializable
+javax.ejb.Remote
+javax.ejb.Local

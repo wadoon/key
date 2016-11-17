@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -25,7 +27,9 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.VariableScope;
+import de.uka.ilkd.key.java.abstraction.AnnotationUse;
 import de.uka.ilkd.key.java.abstraction.Method;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -55,6 +59,11 @@ public class MethodDeclaration extends JavaDeclaration
      * unable to walk the tree upwards to check this
      */
     protected final boolean parentIsInterfaceDeclaration;
+    
+    /** this field stores whether the method is declared remote.
+     * this information has to be provided by constructor, since the tree can not be walked upwards.
+     */
+    protected final boolean isRemote; 
 
 
     /**
@@ -70,7 +79,7 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public MethodDeclaration(ExtList children, 
 			     boolean parentIsInterfaceDeclaration,
-			     Comment[] voidComments) {
+			     Comment[] voidComments, boolean isRemote) {
 	super(children);
 	returnType = children.get(TypeReference.class);
 	this.voidComments = voidComments;
@@ -80,7 +89,27 @@ public class MethodDeclaration extends JavaDeclaration
 	exceptions = children.get(Throws.class);
 	body = children.get(StatementBlock.class);
 	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+	this.isRemote = isRemote;
 	assert returnType == null || voidComments == null;
+    }
+    
+    /**
+     *      Method declaration.
+     * @param children an ExtList of children.  May
+     * include: a TypeReference (as a reference to the return type), a
+     * de.uka.ilkd.key.logic.ProgramElementName (as Name of the method),
+     * several ParameterDeclaration (as parameters of the declared method), a
+     * StatementBlock (as body of the declared method), several Modifier 
+     * (taken as modifiers of the declaration), a Comment
+     * @param parentIsInterfaceDeclaration a boolean set true iff
+     * parent is an InterfaceDeclaration 
+     */
+    public MethodDeclaration(ExtList children, 
+                 boolean parentIsInterfaceDeclaration,
+                 Comment[] voidComments) {
+        this(children, 
+                parentIsInterfaceDeclaration,
+                voidComments, false);
     }
 
     
@@ -112,6 +141,29 @@ public class MethodDeclaration extends JavaDeclaration
     }
     
     
+    
+    /**
+     * Method declaration.
+     * @param modifiers a modifier array
+     * @param returnType a type reference.
+     * @param name an identifier.
+     * @param parameters a parameter declaration mutable list.
+     * @param exceptions a throws.     
+     * @param body a statement block.
+     * @param parentIsInterfaceDeclaration a boolean set true iff
+     * parent is an InterfaceDeclaration 
+     */
+    public MethodDeclaration(Modifier[] modifiers, 
+                     TypeReference returnType, 
+                 ProgramElementName name,
+                 ImmutableArray<ParameterDeclaration> parameters, 
+                 Throws exceptions, 
+                 StatementBlock body, 
+                 boolean parentIsInterfaceDeclaration) { 
+        this(modifiers, returnType, name, parameters, exceptions, 
+                body, parentIsInterfaceDeclaration, false);
+    }
+    
     /**
      * Method declaration.
      * @param modifiers a modifier array
@@ -129,7 +181,7 @@ public class MethodDeclaration extends JavaDeclaration
 			     ImmutableArray<ParameterDeclaration> parameters, 
 			     Throws exceptions, 
 			     StatementBlock body, 
-			     boolean parentIsInterfaceDeclaration) { 
+			     boolean parentIsInterfaceDeclaration, boolean isRemote) { 
 	super(modifiers);
 	this.returnType = returnType;
 	this.voidComments = null;
@@ -138,6 +190,7 @@ public class MethodDeclaration extends JavaDeclaration
         this.exceptions = exceptions;
 	this.body = body;
 	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+	this.isRemote = isRemote;
     }
 
     
@@ -389,5 +442,17 @@ public class MethodDeclaration extends JavaDeclaration
     @Override    
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printMethodDeclaration(this);
+    }
+
+
+    @Override
+    public List<AnnotationUseSpecification> getAnnotations() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    public boolean isRemote() {
+        return isRemote;
+        
     }
 }

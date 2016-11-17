@@ -51,6 +51,8 @@ public interface IProgramMethod extends IObserverFunction, SourceElement, Progra
    public abstract boolean isModel();
 
    public abstract boolean isVoid();
+   
+   public abstract boolean isRemote();
 
    /**
     * @return the return type

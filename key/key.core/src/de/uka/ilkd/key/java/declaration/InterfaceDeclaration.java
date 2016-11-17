@@ -13,13 +13,17 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.abstraction.AnnotationUse;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -29,10 +33,13 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 public class InterfaceDeclaration extends TypeDeclaration {
 
     protected final Extends extending;
+    
+    protected final List<AnnotationUseSpecification> annotations;
 
 
     public InterfaceDeclaration() {
 	extending = null;
+	annotations = null;
     }
 
     /** Construct a new outer or member interface class. */
@@ -42,6 +49,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
 				boolean isLibrary){
         super(modifiers, name, fullName, members, false, isLibrary);
 	extending = extended;
+	annotations = null;
     }
 
     /** Construct a new outer or member interface class. */
@@ -50,6 +58,24 @@ public class InterfaceDeclaration extends TypeDeclaration {
 				boolean isLibrary){
         this(modifiers, name, name, extended, members, isLibrary);
     }
+    
+    /** Construct a new outer or member interface class. */
+    public InterfaceDeclaration(Modifier[] modifiers, ProgramElementName name,
+                ProgramElementName fullName,
+                Extends extended, MemberDeclaration[] members,
+                boolean isLibrary, List<AnnotationUseSpecification> annotations){
+        super(modifiers, name, fullName, members, false, isLibrary);
+    extending = extended;
+    this.annotations = annotations;
+    }
+    
+    /** Construct a new outer or member interface class. */
+    public InterfaceDeclaration(Modifier[] modifiers, ProgramElementName name,
+                Extends extended, MemberDeclaration[] members, 
+                boolean isLibrary, List<AnnotationUseSpecification> annotations){
+        this(modifiers, name, name, extended, members, isLibrary, annotations);
+    }
+    
 
     /**
      * uses children list to create non-anonymous class 
@@ -68,7 +94,28 @@ public class InterfaceDeclaration extends TypeDeclaration {
 				boolean isLibrary) { 
 	super(children, fullName, isLibrary);
 	extending=children.get(Extends.class);
+	annotations=null;
     } 
+    
+    /**
+     * uses children list to create non-anonymous class 
+     * @param children an ExtList that may contain: an Extends 
+     * (as pointer to a class), ProgramElementName (as name), 
+     * several MemberDeclaration (as members of
+     * the type), a parentIsInterfaceDeclaration (indicating if parent is
+     * interface), several Modifier (as modifiers of the type decl), a Comment
+     * @param fullName the fully qualified ProgramElementName of the declared 
+     * type
+     * @param isLibrary a boolean flag indicating if this interface is part of 
+     * a library (library interfaces come often with a specification and are
+     * only available as bytecode) 
+     */
+    public InterfaceDeclaration(ExtList children, ProgramElementName fullName,
+                boolean isLibrary, List<AnnotationUseSpecification> annotations) { 
+    super(children, fullName, isLibrary);
+    extending=children.get(Extends.class);
+    this.annotations=annotations;
+    }
 
     public InterfaceDeclaration(ProgramElementName name) { 
 	this (new de.uka.ilkd.key.java.declaration.Modifier[] {}, 
@@ -219,5 +266,11 @@ public class InterfaceDeclaration extends TypeDeclaration {
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printInterfaceDeclaration(this);
+    }
+
+    @Override
+    public List<AnnotationUseSpecification> getAnnotations() {
+        // TODO Auto-generated method stub
+        return this.annotations;
     }
 }

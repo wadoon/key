@@ -34,6 +34,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import recoder.ParserException;
 import recoder.ProgramFactory;
+import recoder.abstraction.ClassType;
 import recoder.bytecode.ByteCodeParser;
 import recoder.bytecode.ClassFile;
 import recoder.convenience.TreeWalker;
@@ -50,6 +51,7 @@ import recoder.parser.ParseException;
 import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.KeYCrossReferenceSourceInfo;
+import recoder.service.NameInfo;
 import recoder.service.UnresolvedReferenceException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.NullType;
@@ -632,7 +634,7 @@ public class Recoder2KeY implements JavaReader {
             while(walker.step()) {
         	Reader f = null;
         	try {
-                    currentDataLocation = walker.getCurrentDataLocation();
+                    currentDataLocation = walker.getCurrentDataLocation();                   
                     InputStream is = walker.openCurrent();
                     f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -753,36 +755,34 @@ public class Recoder2KeY implements JavaReader {
         if (mapping.parsedSpecial()) {
             return;
         }
-
         // go to special mode -> used by the converter!
         setParsingLibs(true);
-
         List<recoder.java.CompilationUnit> specialClasses = parseLibs();
 
-//        for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
-//            System.out.println(compilationUnit.toSource());
-//        }
-        
+        for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
+            System.out.println(compilationUnit.toSource());
+        }
+       
         ChangeHistory changeHistory = servConf.getChangeHistory();
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
             specialClasses.get(i).makeAllParentRolesValid();
             // TODO if duplicated files, take first one only!
-            changeHistory.attached(specialClasses.get(i));
-        }
+            changeHistory.attached(specialClasses.get(i));            
+        }      
         
-        
-        CrossReferenceSourceInfo sourceInfo = servConf.getCrossReferenceSourceInfo();
+        CrossReferenceSourceInfo sourceInfo = servConf.getCrossReferenceSourceInfo();      
         assert sourceInfo instanceof KeYCrossReferenceSourceInfo :
             "SourceInfo is not of type KeYCrossReferenceSourceInfo";
+        
         KeYCrossReferenceSourceInfo keySourceInfo = 
-            (KeYCrossReferenceSourceInfo)sourceInfo;
+            (KeYCrossReferenceSourceInfo)sourceInfo;     
         
         keySourceInfo.setIgnoreUnresolvedClasses(true);
-
-        if (changeHistory.needsUpdate()) {
+        
+        if (changeHistory.needsUpdate()) {  
             changeHistory.updateModel();
         }
-        
+     
         dynamicallyCreatedCompilationUnits = keySourceInfo.getCreatedStubClasses();
         specialClasses.addAll(dynamicallyCreatedCompilationUnits);
         keySourceInfo.setIgnoreUnresolvedClasses(false);
@@ -790,12 +790,12 @@ public class Recoder2KeY implements JavaReader {
         changeHistory.updateModel();
 
         transformModel(specialClasses);
-        
-//        NameInfo ni = servConf.getNameInfo();
-//        System.out.println("Known types:");
-//        for(ClassType ct : ni.getClassTypes()) {
-//            System.out.println(ct.getFullName());
-//        }
+      
+        NameInfo ni = servConf.getNameInfo();
+        System.out.println("Known types:");
+        for(ClassType ct : ni.getClassTypes()) {
+            System.out.println(ct.getFullName());
+        }
         
         // make them available to the rec2key mapping
         for(recoder.java.CompilationUnit cu : specialClasses) {
@@ -803,7 +803,7 @@ public class Recoder2KeY implements JavaReader {
             assert dl != null : "DataLocation not set on " + cu.toSource();
             getConverter().processCompilationUnit(cu, dl.toString());
         }
-        
+       
         // Ensure that rec2key is complete (at least the NullType needs to be available!)
         if (!rec2key().mapped(servConf.getNameInfo().getNullType())) {
            Sort objectSort = (Sort)services.getNamespaces().sorts().lookup(new Name("java.lang.Object"));
@@ -815,7 +815,7 @@ public class Recoder2KeY implements JavaReader {
            }
            rec2key().put(servConf.getNameInfo().getNullType(), result);
         }
-        
+       
         // tell the mapping that we have parsed the special classes
         rec2key().parsedSpecial(true);
 

@@ -13,7 +13,11 @@
 
 package de.uka.ilkd.key.java.abstraction;
 
+import java.util.List;
+
 import org.key_project.util.ExtList;
+
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 
 /**
    Default constructor of class types.
@@ -173,5 +177,11 @@ public class DefaultConstructor implements Constructor {
      */
     public String getFullName() {
         return name;
+    }
+
+    @Override
+    public List<AnnotationUseSpecification> getAnnotations() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

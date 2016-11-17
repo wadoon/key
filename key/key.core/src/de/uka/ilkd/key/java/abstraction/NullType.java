@@ -13,9 +13,12 @@
 
 package de.uka.ilkd.key.java.abstraction;
 
+import java.util.List;
+
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.expression.Literal;
 
 /**
@@ -210,5 +213,11 @@ public class NullType implements ClassType {
     public int hashCode() {
         //singleton
         return System.identityHashCode(this);
+    }
+
+    @Override
+    public List<AnnotationUseSpecification> getAnnotations() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
