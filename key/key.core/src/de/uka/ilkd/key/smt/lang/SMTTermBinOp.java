@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.smt.lang.SMTTermMultOp.Op;
+
 /**
  * 
  * 
@@ -45,7 +47,7 @@ public class SMTTermBinOp extends SMTTerm {
 		// BitVec operators 
 		CONCAT, BVOR, BVAND,  BVNAND, BVNOR, BVXNOR,
 		BVSREM, BVSMOD, BVSHL, BVLSHR, BVASHR,
-		BVSLT, BVSLE, BVSGT, BVSGE
+		BVSLT, BVSLE, BVSGT, BVSGE, BVXOR; //BVXOR is added by Huy
 	}
 	private Op operator;
 	private SMTTerm left, right;
@@ -113,6 +115,7 @@ public class SMTTermBinOp extends SMTTerm {
 		bvSymbols.put(Op.BVSGT, "bvsgt");
 		bvSymbols.put(Op.BVSGE, "bvsge");
 
+		bvSymbols.put(Op.BVXOR, "bvxor");
 		//int
 		intSymbols = new HashMap<SMTTermBinOp.Op, String>();
 		intSymbols.put(Op.IFF, "iff");

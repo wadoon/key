@@ -168,7 +168,7 @@ public final class IntegerLDT extends LDT {
     private final Term zero;
 
   //---added by Huy for some function: power, round, floor
-    private final Function power;
+    //private final Function power;
     private final Function round;
     private final Function floor;
 
@@ -286,9 +286,9 @@ public final class IntegerLDT extends LDT {
         one = translateLiteral(new IntLiteral(1), services);   
         
       //--------added by Huy for power, floor, round function ------------
-        power				= new Function(new Name("power"), Sort.ANY); 
+        //power				= new Function(new Name("power"), Sort.ANY); 
         round				= new Function(new Name("round"), Sort.ANY);
-        floor				= new Function(new Name("floor"), Sort.ANY);
+        floor				= addFunction(services, "floor");
     }
     
     
@@ -1079,9 +1079,7 @@ public final class IntegerLDT extends LDT {
     }
     
   //----------added by Huy to support power, floor, round
-    public Function getPower() {
-		return power;
-	}
+   
 	public Function getRound() {
 		return round;
 	}

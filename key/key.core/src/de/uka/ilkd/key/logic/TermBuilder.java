@@ -2407,7 +2407,7 @@ public class TermBuilder {
         else if(exponent.equals(one))
         	return base;
         else
-        	return func(integerLDT.getPower(),base,exponent);
+        	return func(integerLDT.getPow(),base,exponent);
     }
     
     public Term ground(Term t){
@@ -2417,5 +2417,10 @@ public class TermBuilder {
     public Term floor(Term t){
     	final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();    	
     	return func(integerLDT.getFloor(),t);
+    }
+    
+    public Term mod(Term dividend, Term divisor){
+    	final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();    	
+    	return func(integerLDT.getArithModulo(),dividend, divisor);
     }
 }

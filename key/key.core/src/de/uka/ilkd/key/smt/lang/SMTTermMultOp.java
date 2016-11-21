@@ -44,13 +44,13 @@ public class SMTTermMultOp extends SMTTerm {
 
     public static enum Op {
 	// Bool/Int operator
-	IFF, IMPLIES, EQUALS, MUL, DIV, REM,
+	IFF, IMPLIES, EQUALS, MUL, DIV, REM, MOD, //MOD is added by Huy
 	LT, LTE, GT, GTE, PLUS, MINUS, AND, OR,XOR, DISTINCT,
 
 	// BitVec operators 
 	CONCAT, BVOR, BVAND,  BVNAND, BVNOR, BVXNOR,
 	BVSREM, BVSMOD, BVSHL, BVLSHR, BVASHR,
-	BVSLT, BVSLE, BVSGT, BVSGE, BVSDIV;
+	BVSLT, BVSLE, BVSGT, BVSGE, BVSDIV, BVXOR; //BVXOR is added by Huy
 
 	public SMTTerm getIdem () {
 	    switch (this) {
@@ -124,6 +124,8 @@ public class SMTTermMultOp extends SMTTerm {
 	bvSymbols.put(Op.BVSGT, "bvsgt");
 	bvSymbols.put(Op.BVSGE, "bvsge");
 	bvSymbols.put(Op.BVSDIV, "bvsdiv");
+	
+	bvSymbols.put(Op.BVXOR, "bvxor");
 	//int
 	intSymbols = new HashMap<Op, String>();
 	intSymbols.put(Op.IFF, "iff");
@@ -139,6 +141,8 @@ public class SMTTermMultOp extends SMTTerm {
 	intSymbols.put(Op.REM, "rem");
 	intSymbols.put(Op.PLUS, "+");
 	intSymbols.put(Op.MINUS, "-");
+	intSymbols.put(Op.BVXOR, "xor");
+	intSymbols.put(Op.MOD, "mod");
     }
 
 
