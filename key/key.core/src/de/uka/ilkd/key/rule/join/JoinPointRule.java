@@ -83,7 +83,6 @@ public class JoinPointRule implements BuiltInRule {
     
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        boolean result = false;
         
         if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
                 && JoinRuleUtils.getJavaBlockRecursive(

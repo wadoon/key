@@ -87,6 +87,7 @@ public class JoinRuleTests extends TestCase {
         Proof proof = loadProof("gcd.closed.predicateAbstractionWithUserChoices.proof");
         assertTrue(proof.closed());
     }
+    
 
     /**
      * Runs the FullAutoPilotWithJMLSpecJoinsProofMacro on the problem with join

@@ -13,11 +13,7 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -25,6 +21,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -52,6 +50,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
@@ -536,14 +536,46 @@ public class JMLSpecFactory {
         }
         
         // Extract the name of the join procedure: Remove beginning <code>"join_proc<code> and trailing <code>;"</code>.
+        //String[] str = originalClauses.head().text.split(":");
+        // String joinProcName = str[0].substring(11, str[0].length() - 2);
         String joinProcName = originalClauses.head().text.substring(11, originalClauses.head().text.length() - 2);
+       
         JoinProcedure chosenProc = JoinProcedure.getProcedureByName(joinProcName);
         
         if (chosenProc == null) {
             throw new SLTranslationException("Unknown join procedure: \"" + joinProcName + "\"",
                     originalClauses.head().fileName,
                     originalClauses.head().pos);
+            
+          
         }
+        
+       /* if(chosenProc instanceof JoinWithPredicateAbstraction){
+          
+           ArrayList<AbstractionPredicate> predicates;
+           Class<? extends AbstractPredicateAbstractionLattice> latticeType;
+           String type = str[0].substring(1, str[0].length - 2);
+           
+           if(type.equals("simple")) latticeType = new SimplePredicateAbstractionLattice.class;
+           else if (type.equals("con")) latticeType = new ConjunctivePredicateAbstractionLattice.class;
+           else if (type.equals("dis")) latticeType = new DisjunctivePredicateAbstractionLattice.class;
+           else ERROR
+           
+            for(int i = 2; i< str.length ; i++){
+                //placeholder variables
+                 * String [] input = str[i].split(",");
+                 * JoinRuleUtils.parsePlaceholder(input[0], services);
+                // JoinRuleUtils.parsePredicate(input[1], registeredPlaceholders, services);
+                 //or
+                  * AbstractionPredicate.fromString(str[i]);
+               
+            }
+            
+            final JoinWithPredicateAbstractionFactory absPredicateFactory =
+            (JoinWithPredicateAbstractionFactory) chosenProc;
+            chosenProc = absPredicateFactory.instantiate(predicates, latticeType(),
+               userInput.getAbstractDomElemUserChoices())*/
+       // }
         
         return chosenProc;
     }

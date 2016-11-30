@@ -113,7 +113,39 @@ public class TestJMLPreTranslator extends TestCase {
         assertTrue(specCase2.getSignals().size() == 1);
         assertTrue(specCase2.getSignalsOnly().size() == 0);
     }
-
+    
+    public void testJoinITESpecs() throws SLTranslationException {
+        ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec("/*@  join_proc \"JoinByIfThenElse\";\n" +
+                                                                          "@\n" +
+                                                                          "@*/");
+        assertTrue(constructs != null);
+        TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
+        System.out.println(specCase.getJoinProcs().head());
+        //assertTrue(specCase.getJoinProcs().head());
+        
+    }
+    
+    public void testJoinPredicateSpecs() throws SLTranslationException {
+        ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec("/*@  join_proc \"JoinByPredicateAbstraction\";\n" +
+                                                                          "@\n" +
+                                                                          "@*/");
+        assertTrue(constructs != null);
+        TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
+        System.out.println(specCase.getJoinProcs().head());
+        //assertTrue(specCase.getJoinProcs().head());
+        
+    } 
+    public void testJoinITEAntecedentSpecs() throws SLTranslationException {
+        ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec("/*@  join_proc \"JoinByIfThenElseAntecedent\";\n" +
+                                                                          "@\n" +
+                                                                          "@*/");
+        assertTrue(constructs != null);
+        TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
+        System.out.println(specCase.getJoinProcs().head());
+        //assertTrue(specCase.getJoinProcs().head());
+        
+    } 
+    
     public void testAtInModelmethod() throws SLTranslationException {
         parseMethodSpec(
                 "/*@ model_behaviour\n" +
