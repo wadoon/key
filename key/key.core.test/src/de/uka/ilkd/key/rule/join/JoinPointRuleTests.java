@@ -44,7 +44,8 @@ public class JoinPointRuleTests extends TestCase {
 
         Node nodeBefore = proof.openGoals().head().node();
 
-        startAutomaticStrategyOneStep(proof);
+        startAutomaticStrategy(proof);
+     
         assertTrue(proof.openGoals().head().appliedRuleApps()
                 .head() instanceof BlockContractBuiltInRuleApp);
 
@@ -61,11 +62,25 @@ public class JoinPointRuleTests extends TestCase {
     }
     
     @Test
+    public void testJoinPointRuleApp() {
+        final Proof proof = loadProof("absBlockContract.beforeJoinPointRule.key");
+        
+        startAutomaticStrategy(proof);
+        System.out.println(proof.openGoals());
+        assertTrue(proof.openGoals().head().appliedRuleApps()
+                .tail().head() instanceof JoinPointBuiltInRuleApp);
+        
+        assertTrue(proof.openGoals().head().appliedRuleApps()
+                .head() instanceof JoinRuleBuiltInRuleApp);
+       
+    }
+    @Test
     public void testRemoveJPS() {
         final Proof proof = loadProof("absBlockContract.beforeDelete.key");
         Node nodeBefore = proof.openGoals().head().node();
 
-        startAutomaticStrategyOneStep(proof);
+        startAutomaticStrategy(proof);
+        System.out.println(proof.openGoals());
         assertTrue(proof.openGoals().head().appliedRuleApps()
                 .head() instanceof DeleteJoinPointBuiltInRuleApp);
 
@@ -140,14 +155,6 @@ public class JoinPointRuleTests extends TestCase {
         starter.start();
     }
 
-    private void startAutomaticStrategyOneStep(final Proof proof) {
-        ProofStarter starter = new ProofStarter(false);
-        starter.setMaxRuleApplications(1);
-        starter.init(proof);
-        starter.start();
-        // .head().posInOccurrence().subTerm();
-
-    }
 
     static Proof loadProof(String proofFileName) {
         File proofFile = new File(TEST_RESOURCES_DIR_PREFIX + proofFileName);
