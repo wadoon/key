@@ -1,6 +1,7 @@
 package de.tud.cs.se.ds.psec.util;
 
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * Access to bundled resources.
@@ -27,15 +28,15 @@ public class ResourceManager {
      *            The String that contains the name of the resource.
      * @return The URL of the resource.
      */
-    public URL getResourceFile(Class<?> cl, String resourcename) {
+    public Optional<URL> getResourceFile(Class<?> cl, String resourcename) {
         URL resourceURL = cl.getResource(resourcename);
         if (resourceURL == null && cl.getSuperclass() != null) {
             return getResourceFile(cl.getSuperclass(), resourcename);
         }
         else if (resourceURL == null && cl.getSuperclass() == null) {
-            return null;
+            return Optional.empty();
         }
-        return resourceURL;
+        return Optional.of(resourceURL);
     }
 
     /**
@@ -47,7 +48,7 @@ public class ResourceManager {
      *            The String that contains the name of the resource.
      * @return The URL of the resource.
      */
-    public URL getResourceFile(Object o, String resourcename) {
+    public Optional<URL> getResourceFile(Object o, String resourcename) {
         return getResourceFile(o.getClass(), resourcename);
     }
 

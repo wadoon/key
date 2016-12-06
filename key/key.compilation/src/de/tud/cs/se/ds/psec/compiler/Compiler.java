@@ -1,6 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -70,7 +72,8 @@ public class Compiler {
      *            The file to compile (will compile all contained classes, and
      *            all contained methods with a JML specification).
      * @param outputDir
-     *            TODO
+     *            The path to the directory where compiled files should be
+     *            written.
      * @param debug
      *            Set to true to display further debug output in case of a
      *            bytecode verification error.
@@ -100,10 +103,15 @@ public class Compiler {
         this.dumpSET = dumpSET;
 
         logger.trace("Loading translation definitions...");
-        URL url = ResourceManager.instance().getResourceFile(
+        Optional<URL> maybeUrl = ResourceManager.instance().getResourceFile(
                 TranslationTacletParser.class, TRANSLATION_RULES_PATH);
+
+        if (!maybeUrl.isPresent()) {
+            throw new FileNotFoundException(TRANSLATION_RULES_PATH);
+        }
+
         definitions = new TranslationTacletParserFE(bailAtParseError)
-                .parse(url);
+                .parse(maybeUrl.get());
 
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Ensure that Taclets are parsed
@@ -249,7 +257,7 @@ public class Compiler {
                                 + "the translation methods. Run with argument --debug "
                                 + "to obtain additional information.");
             }
-            
+
             throw e;
 
         }
@@ -313,9 +321,9 @@ public class Compiler {
             logger.trace("Translating SET of method %s::%s to bytecode",
                     mDecl.getContainerType().getJavaType().getFullName(),
                     methodNameWithArgs(mDecl));
-            
-            new MethodBodyCompiler(mDecl, mv,
-                    definitions, builder.getProof().getServices()).compile(builder);
+
+            new MethodBodyCompiler(mDecl, mv, definitions,
+                    builder.getProof().getServices()).compile(builder);
         }
 
         mv.visitMaxs(-1, -1);

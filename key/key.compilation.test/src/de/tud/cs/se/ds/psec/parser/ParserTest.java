@@ -2,6 +2,7 @@ package de.tud.cs.se.ds.psec.parser;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
@@ -27,10 +28,14 @@ public class ParserTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        URL url = ResourceManager.instance().getResourceFile(
+        Optional<URL> maybeUrl = ResourceManager.instance().getResourceFile(
                 TranslationTacletParser.class, TRANSLATION_RULES_PATH);
+        
+        if (!maybeUrl.isPresent()) {
+            fail("Could not find translation rules path: " + TRANSLATION_RULES_PATH);
+        }
 
-        definitions = new TranslationTacletParserFE(true).parse(url);
+        definitions = new TranslationTacletParserFE(true).parse(maybeUrl.get());
     }
 
     @Test
