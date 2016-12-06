@@ -1,5 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler;
 
+import static org.junit.Assert.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;

@@ -3,7 +3,9 @@ package de.tud.cs.se.ds.psec.compiler;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Timeout;
 
 /**
  * Functional test cases for the compiler (i.e., Java code is compiled,
@@ -14,6 +16,10 @@ import org.junit.Test;
 public class ComplexLoopsFunctionalTests
         extends AbstractCompilerFunctionalTest {
     private static final boolean DELETE_TMP_FILES = false;
+    
+    // Let tests time out after 15 seconds.
+    @Rule
+    public Timeout globalTimeout = Timeout.millis(15000);
 
     public ComplexLoopsFunctionalTests() {
         super(DELETE_TMP_FILES);

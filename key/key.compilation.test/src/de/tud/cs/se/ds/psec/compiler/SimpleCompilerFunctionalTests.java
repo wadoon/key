@@ -1,5 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler;
 
+import static org.junit.Assert.*;
+
 import static org.junit.Assert.assertNotEquals;
 
 import java.io.IOException;

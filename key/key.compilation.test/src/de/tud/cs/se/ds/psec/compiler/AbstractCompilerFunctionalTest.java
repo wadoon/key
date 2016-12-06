@@ -1,5 +1,7 @@
 package de.tud.cs.se.ds.psec.compiler;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -12,19 +14,20 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
 import org.key_project.util.java.IOUtil;
 
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import junit.framework.TestCase;
 
 /**
  * Abstract template for functional compiler tests.
  *
  * @author Dominic Scheurer
  */
-public abstract class AbstractCompilerFunctionalTest extends TestCase {
+public abstract class AbstractCompilerFunctionalTest {
     private static final Logger logger = LogManager.getFormatterLogger();
     private static final String FUNCTIONAL_TESTS_RELATIVE_DIR = "/resources/testcase/functional/";
     private static final String TMP_OUT_DIR = "./testTmp/";
@@ -41,8 +44,8 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
         this.deleteTmpFiles = deleteTmpFiles;
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         Files.createDirectories(Paths.get(TMP_OUT_DIR));
 
         File projectRoot = IOUtil
@@ -50,8 +53,8 @@ public abstract class AbstractCompilerFunctionalTest extends TestCase {
         functionalTestsDir = projectRoot + FUNCTIONAL_TESTS_RELATIVE_DIR;
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         if (deleteTmpFiles) {
             Utilities.recursivelyRemoveFiles(Paths.get(TMP_OUT_DIR));
         }

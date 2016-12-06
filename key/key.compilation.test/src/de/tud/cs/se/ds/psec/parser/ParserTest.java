@@ -1,5 +1,11 @@
 package de.tud.cs.se.ds.psec.parser;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -7,6 +13,7 @@ import java.util.Optional;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.junit.Before;
 import org.junit.Test;
 
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
@@ -14,20 +21,19 @@ import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.util.ResourceManager;
-import junit.framework.TestCase;
 
 /**
  * Tests for the translation taclet parser.
  *
  * @author Dominic Scheurer
  */
-public class ParserTest extends TestCase {
+public class ParserTest {
     private static final String TRANSLATION_RULES_PATH = "/de/tud/cs/se/ds/psec/compiler/rules/javaTranslationRules.cmp";
 
     private TranslationDefinitions definitions;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         Optional<URL> maybeUrl = ResourceManager.instance().getResourceFile(
                 TranslationTacletParser.class, TRANSLATION_RULES_PATH);
         
