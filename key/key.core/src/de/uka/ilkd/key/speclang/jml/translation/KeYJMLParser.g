@@ -337,7 +337,7 @@ options {
 
 	return null;
     }
-    
+
     // Helper variable, which is necessary because antlr doesn't forward local variables to generated DFAs.
     // It is used in a semantic predicate to determine the branch that will be taken by the generated DFA.
     private boolean representsClauseLhsIsLocSet;
@@ -366,7 +366,7 @@ options {
             BitSet follow) throws RecognitionException {
         throw new MismatchedTokenException(ttype, input);
     }
-    
+
     protected void mismatch(IntStream input, int ttype, BitSet follow) throws RecognitionException
     {
         throw new MismatchedTokenException(ttype, input);
@@ -392,6 +392,7 @@ top returns [Object ret = null] throws  SLTranslationException
     |   representsclause { ret = $representsclause.result; }
     |   axiomsclause { ret = $axiomsclause.ret; }
     |   requiresclause { ret = $requiresclause.ret; }
+    |   joinpredicateclause { ret = $joinpredicateclause.ret; }
     |   joinprocclause { ret = $joinprocclause.ret; }
     |   requiresfreeclause { ret = $requiresfreeclause.ret; }
     |   decreasesclause { ret = $decreasesclause.ret; }
@@ -453,6 +454,12 @@ requiresfreeclause returns [Term ret = null] throws SLTranslationException
 :
     req=REQUIRES_FREE result=predornot
             { ret = translator.translate(req.getText(), Term.class, result, services); }
+    ;
+
+joinpredicateclause returns [Term ret = null] throws SLTranslationException
+:
+    jpred=JOIN_PREDICATE result=predornot
+            { ret = translator.translate(jpred.getText(), Term.class, result, services); }
     ;
 
 joinprocclause returns [Term ret = null] throws SLTranslationException
@@ -939,7 +946,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 :
 	result=shiftexpr
 	(
-	    lt=LT right=shiftexpr 
+	    lt=LT right=shiftexpr
 	    // allow range predicates of the shape 0 < x < 23 (JML extension)
 	    ( LT right2=shiftexpr )?
 	    {
@@ -1043,7 +1050,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 
 			    result = new SLExpression(
 				tb.func(f,result.getTerm(),right.getTerm()));
-			} 
+			}
 			if (right2 != null) { // range expressions like 0 <= x < 23
 			    if (right2.isType()) {
 			    raiseError("Cannot build relational expression from type " +
@@ -1241,7 +1248,7 @@ postfixexpr returns [SLExpression ret=null] throws SLTranslationException
 @after { ret = result; }
 :
 	expr=primaryexpr
-	{  
+	{
 	    fullyQualifiedName = input.LT(-1).getText();
 	}
 	(
@@ -1337,7 +1344,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
     {
         result = lookupIdentifier("<transient>", receiver, null, tr);
     }
-    |    
+    |
      THIS
     {
     	result = new SLExpression(
@@ -1455,9 +1462,9 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
     |
 	c=CHAR_LITERAL
 	{
-       Term charLit = 
+       Term charLit =
          services.getTypeConverter().getIntegerLDT().translateLiteral(new CharLiteral(c.getText()), services);
-        	   
+
 	    return new SLExpression(charLit, javaInfo.getKeYJavaType("char"));
 	}
     ;
@@ -1508,7 +1515,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 	    result = new SLExpression(tb.var(resultVar), resultVar.getKeYJavaType());
 	}
 	|
-	  EXCEPTION 
+	  EXCEPTION
 	  { if (excVar==null) raiseError("\\exception may only appear in determines clauses");
 	    else result = new SLExpression(tb.var(excVar), excVar.getKeYJavaType()); }
     |
@@ -1577,9 +1584,9 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         {
             result = translator.translate("\\dl_", SLExpression.class, escape, list, services);
         }
-        
+
     |   mapEmpty=MAPEMPTY { result = translator.translateMapExpressionToJDL(mapEmpty,list,services); }
-        
+
     |   tk=mapExpression LPAREN ( list=expressionlist )? RPAREN
 		{
 		    result = translator.translateMapExpressionToJDL(tk,list,services);
@@ -1781,8 +1788,8 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         | SEQCONCAT
         | SEQGET
         | INDEXOF)
-         => result = sequence    
-    
+         => result = sequence
+
     |   LPAREN result=expression RPAREN
 ;
 
@@ -1826,7 +1833,7 @@ sequence returns [SLExpression ret = null] throws SLTranslationException
             final Term put = tb.seqConcat(ante, tb.seqConcat(insert, post));
             result = new SLExpression(put);
         }
-        
+
     |   (tk2= SEQCONCAT{tk=tk2;} | tk3= SEQGET{tk=tk3;} | tk4= INDEXOF{tk=tk4;})
         LPAREN e1=expression COMMA e2=expression RPAREN
         {
@@ -2132,4 +2139,3 @@ quantifiedvariabledeclarator[KeYJavaType t] returns [LogicVariable v = null] thr
 	  v = new LogicVariable(new Name(id.getText()), varType.getSort());
    }
 ;
-

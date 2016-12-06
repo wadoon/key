@@ -51,13 +51,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> joinProcs =
             ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> joinPredicate =
+            ImmutableSLList.<PositionedString>nil();
 
     private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
             ImmutableSLList.<Triple<PositionedString,PositionedString,PositionedString>>nil();
 
     private ImmutableList<PositionedString> infFlowSpecs =
             ImmutableSLList.<PositionedString>nil();
-    
+
     private Map<String, ImmutableList<PositionedString>>
       accessibles = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
@@ -109,7 +111,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.setPosition(assertStm);
         return res;
     }
-    
+
     /**
      * Merge clauses of two spec cases.
      * Keep behavior of this one.
@@ -129,9 +131,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.addDiverges(tsc.getDiverges());
         res.addMeasuredBy(tsc.getMeasuredBy());
         res.addJoinProcs(tsc.getJoinProcs());
+        res.addJoinPredicates(tsc.getJoinPredicates());
         return res;
     }
-    
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public TextualJMLSpecCase clone() {
@@ -153,6 +156,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.continues = continues;
         res.returns = returns;
         res.joinProcs = joinProcs;
+        res.joinPredicate = joinPredicate;
         res.measuredBy = measuredBy;
         res.name = name;
         res.workingSpace = workingSpace;
@@ -200,7 +204,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addAssignable(PositionedString ps) {
         addGeneric(assignables, ps);
     }
-    
+
     public void addAssignable(ImmutableList<PositionedString> l) {
         for (PositionedString ps: l)
             addAssignable(ps);
@@ -315,6 +319,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         returns = returns.append(l);
     }
 
+    public void addJoinPredicates(PositionedString ps) {
+        joinPredicate = joinPredicate.append(ps);
+        setPosition(ps);
+    }
+
+    public void addJoinPredicates(ImmutableList<PositionedString> l) {
+        joinPredicate = joinPredicate.append(l);
+    }
     public void addJoinProcs(PositionedString ps) {
         joinProcs = joinProcs.append(ps);
         setPosition(ps);
@@ -460,7 +472,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getReturns() {
         return returns;
     }
-    
+
+    public ImmutableList<PositionedString> getJoinPredicates() {
+        return joinPredicate;
+    }
+
     public ImmutableList<PositionedString> getJoinProcs() {
         return joinProcs;
     }
@@ -574,6 +590,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("join procedure: ").append(it.next()).append("\n");
         }
+        it = joinPredicate.iterator();
+        while (it.hasNext()) {
+            sb.append("join predicate: ").append(it.next()).append("\n");
+        }
         return sb.toString();
     }
 
@@ -602,6 +622,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && continues.equals(sc.continues)
                && returns.equals(sc.returns)
                && joinProcs.equals(sc.joinProcs)
+               && joinPredicate.equals(sc.joinPredicate)
                && infFlowSpecs.equals(sc.infFlowSpecs);
     }
 
@@ -626,6 +647,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + continues.hashCode()
                + returns.hashCode()
                + joinProcs.hashCode()
+               + joinPredicate.hashCode()
                + infFlowSpecs.hashCode();
     }
 }

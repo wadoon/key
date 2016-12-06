@@ -251,7 +251,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
         final ArrayList<AbstractionPredicate> result =
                 new ArrayList<AbstractionPredicate>();
 
-        Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
+        Pattern p = Pattern.compile("\\((.+?), (.+?)\\)");
         Matcher m = p.matcher(s);
 
         boolean matched = false;

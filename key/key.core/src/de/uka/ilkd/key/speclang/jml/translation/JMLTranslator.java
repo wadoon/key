@@ -131,6 +131,7 @@ public final class JMLTranslator {
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
         JOIN_PROC ("join_proc"),
+        JOIN_PREDICATE("join_predicate"),
 
         // quantifiers and "generalized quantifiers"
         FORALL ("\\forall"),
@@ -327,7 +328,7 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.ENSURES, termTranslationMethod);
         translationMethods.put(JMLKeyWord.ENSURES_FREE, termTranslationMethod);
         translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, termTranslationMethod);
-       translationMethods.put(JMLKeyWord.REPRESENTS,
+        translationMethods.put(JMLKeyWord.REPRESENTS,
                                new JMLTranslationMethod() {
 
             @Override
@@ -347,6 +348,16 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.REQUIRES, termTranslationMethod);
         translationMethods.put(JMLKeyWord.REQUIRES_FREE, termTranslationMethod);
         translationMethods.put(JMLKeyWord.JOIN_PROC, new JMLTranslationMethod() {
+            
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                // TODO Auto-generated method stub
+                System.out.println("XXX");
+                return null;
+            }
+        });
+        translationMethods.put(JMLKeyWord.JOIN_PREDICATE, new JMLTranslationMethod() {
             
             @Override
             public Object translate(SLTranslationExceptionManager excManager,
