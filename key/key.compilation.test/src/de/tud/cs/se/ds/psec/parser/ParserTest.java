@@ -6,8 +6,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -16,11 +18,19 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.util.ResourceManager;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
  * Tests for the translation taclet parser.
@@ -31,17 +41,20 @@ public class ParserTest {
     private static final String TRANSLATION_RULES_PATH = "/de/tud/cs/se/ds/psec/compiler/rules/javaTranslationRules.cmp";
 
     private TranslationDefinitions definitions;
+    private Services services;
 
     @Before
     public void setUp() throws Exception {
         Optional<URL> maybeUrl = ResourceManager.instance().getResourceFile(
                 TranslationTacletParser.class, TRANSLATION_RULES_PATH);
-        
+
         if (!maybeUrl.isPresent()) {
-            fail("Could not find translation rules path: " + TRANSLATION_RULES_PATH);
+            fail("Could not find translation rules path: "
+                    + TRANSLATION_RULES_PATH);
         }
 
         definitions = new TranslationTacletParserFE(true).parse(maybeUrl.get());
+        services = loadProof("resources/testcase/dummy.key").getServices();
     }
 
     @Test
@@ -67,8 +80,8 @@ public class ParserTest {
 
         assertNotNull(ifSplitDefn);
 
-        assertTrue("Rule is not applicable as expected",
-                ifSplitDefn.isApplicable(new ApplicabilityCheckInput(2, null, null)));
+        assertTrue("Rule is not applicable as expected", ifSplitDefn
+                .isApplicable(new ApplicabilityCheckInput(2, null, null)));
     }
 
     @Test
@@ -133,8 +146,27 @@ public class ParserTest {
                 .isApplicable(new ApplicabilityCheckInput(3, null, null)));
     }
 
-    // TODO: Add test for "isSimpleType(...)". Need to have access to a Services
-    // object for that.
+    @Test
+    public void testSimpleTypeExpr() {
+        String testStr = "\\condition (isSimpleType(#se))";
+
+        TranslationTacletParser parser = setupParser(testStr);
+        ApplicabilityCondition parsedCondition = new TranslationTacletParserFE(
+                true).visitCondition(parser.condition());
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("#se", new LocationVariable(new ProgramElementName("v"),
+                services.getJavaInfo().getKeYJavaType("int")));
+
+        assertTrue(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
+                new RuleInstantiations(map), services)));
+
+        map.put("#se", new LocationVariable(new ProgramElementName("v"),
+                services.getJavaInfo().getKeYJavaType("java.lang.Object")));
+
+        assertFalse(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
+                new RuleInstantiations(map), services)));
+    }
 
     /**
      * Creates a {@link TranslationTacletParser} for the given input
@@ -157,6 +189,33 @@ public class ParserTest {
         TranslationTacletParser parser = new TranslationTacletParser(tokens);
 
         return parser;
+    }
+
+    /**
+     * Loads the given proof file. Checks if the proof file exists and the proof
+     * is not null, and fails if the proof could not be loaded.
+     *
+     * @param proofFileName
+     *            The file name of the proof file to load.
+     * @return The loaded proof.
+     */
+    private static Proof loadProof(String proofFileName) {
+        File proofFile = new File(proofFileName);
+        assertTrue(proofFile.exists());
+    
+        try {
+            KeYEnvironment<?> environment =
+                    KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                            proofFile, null, null, null, true);
+            Proof proof = environment.getLoadedProof();
+            assertNotNull(proof);
+    
+            return proof;
+        }
+        catch (ProblemLoaderException e) {
+            fail("Proof could not be loaded:\n" + e.getMessage());
+            return null;
+        }
     }
 
 }
