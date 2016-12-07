@@ -26,6 +26,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
+import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -54,7 +55,9 @@ public class TacletTranslationFactory {
 
     /**
      * Creates a new {@link TacletTranslationFactory}.
-     * @param methonBeingCompiled TODO
+     * 
+     * @param methonBeingCompiled
+     *            TODO
      * @param mv
      *            The {@link MethodVisitor} used in compilation of the
      *            corresponding method.
@@ -64,10 +67,12 @@ public class TacletTranslationFactory {
      * @param definitions
      *            The {@link TranslationDefinitions} containing the available
      *            translations.
-     * @param services The {@link Services} object.
+     * @param services
+     *            The {@link Services} object.
      */
-    public TacletTranslationFactory(ProgramMethod methonBeingCompiled, MethodVisitor mv,
-            ProgVarHelper pvHelper, TranslationDefinitions definitions, Services services) {
+    public TacletTranslationFactory(ProgramMethod methonBeingCompiled,
+            MethodVisitor mv, ProgVarHelper pvHelper,
+            TranslationDefinitions definitions, Services services) {
         this.methodBeingCompiled = methonBeingCompiled;
         this.mv = mv;
         this.pvHelper = pvHelper;
@@ -122,7 +127,7 @@ public class TacletTranslationFactory {
             if (app instanceof OneStepSimplifierRuleApp) {
                 return false;
             }
-            
+
             String ruleName = app.rule().name().toString();
             ArrayList<TranslationDefinition> availableDefinitions = definitions
                     .getDefinitionsFor(ruleName);
@@ -141,8 +146,7 @@ public class TacletTranslationFactory {
         } else {
             String message = Utilities.format(
                     "Don't know a translation of the following rule: \"%s\" (App \"%s\")",
-                    app.rule().name().toString(),
-                    app.getClass());
+                    app.rule().name().toString(), app.getClass());
 
             logger.error(message);
             throw new NoTranslationException(message);
@@ -156,12 +160,13 @@ public class TacletTranslationFactory {
      * @param app
      *            The {@link TacletApp} for which to create a translation
      *            object.
-     * @param statement 
+     * @param statement
      * @return An {@link Optional} with a {@link TacletASTNode} for the given
      *         {@link TacletApp} or an empty {@link Optional} if there is no
      *         suitable such {@link TacletASTNode}.
      */
-    public Optional<TacletASTNode> getTranslationForRuleApp(TacletApp app, String statement) {
+    public Optional<TacletASTNode> getTranslationForRuleApp(TacletApp app,
+            String statement) {
         String ruleName = app.taclet().name().toString();
         logger.trace("Translating taclet %s", ruleName);
 
@@ -171,8 +176,18 @@ public class TacletTranslationFactory {
 
         if (candidates != null) {
             RuleInstantiations instantiations = new RuleInstantiations(app);
+
+            // TODO Check that the following update-extraction code works
+            Optional<Term> maybeUpdate = Optional.empty();
+            if (app instanceof PosTacletApp) {
+                Term formula = ((PosTacletApp) app).posInOccurrence()
+                        .sequentFormula().formula();
+
+                maybeUpdate = extractUpdate(formula);
+            }
+
             result = new TacletASTNode(ruleName, statement, candidates, mv,
-                    pvHelper, instantiations, services);
+                    pvHelper, instantiations, maybeUpdate, services);
         } else {
             if (!isSimplificationSETaclet(app.taclet())) {
                 String message = Utilities.format(
@@ -190,6 +205,22 @@ public class TacletTranslationFactory {
     }
 
     /**
+     * TODO
+     * 
+     * @param formula
+     * @return
+     */
+    private Optional<Term> extractUpdate(Term formula) {
+        Optional<Term> maybeUpdate;
+        if (formula.op() instanceof UpdateApplication) {
+            maybeUpdate = Optional.of(formula.sub(0));
+        } else {
+            maybeUpdate = Optional.empty();
+        }
+        return maybeUpdate;
+    }
+
+    /**
      * Returns an {@link Optional} comprising a {@link TacletASTNode} for the
      * given {@link ContractRuleApp}.
      *
@@ -200,8 +231,8 @@ public class TacletTranslationFactory {
      *         {@link ContractRuleApp} or an empty {@link Optional} if there is
      *         no suitable such {@link TacletASTNode}.
      */
-    public Optional<TacletASTNode> getTranslationForRuleApp(
-            ContractRuleApp app, String statement) {
+    public Optional<TacletASTNode> getTranslationForRuleApp(ContractRuleApp app,
+            String statement) {
         IProgramMethod pm = app.getRuleInstantiations().pm;
         logger.trace(
                 "Instantiating translation of Operation Contract application for %s%s",
@@ -224,15 +255,20 @@ public class TacletTranslationFactory {
         instantiations.put("#actualResult",
                 app.getRuleInstantiations().actualResult);
 
+        // TODO Check if update extraction works!
         return getTranslationForRuleApp(app.rule().name().toString(),
-                instantiations, statement);
+                instantiations, extractUpdate(app.programTerm()), statement);
     }
-    
+
     /**
-     * TODO
+     * Translates a {@link LoopInvariantBuiltInRuleApp} to a
+     * {@link TacletASTNode}.
      * 
      * @param app
-     * @return
+     *            The {@link LoopInvariantBuiltInRuleApp} to translate.
+     * @param statement
+     *            The Java statement being translated.
+     * @return The translation.
      */
     public Optional<TacletASTNode> getTranslationForRuleApp(
             LoopInvariantBuiltInRuleApp app, String statement) {
@@ -242,9 +278,9 @@ public class TacletTranslationFactory {
 
         HashMap<String, Object> instantiations = new HashMap<>();
         instantiations.put("#guard", app.getGuard());
-        
+
         return getTranslationForRuleApp(app.rule().name().toString(),
-                instantiations, statement);
+                instantiations, Optional.empty(), statement);
     }
 
     /**
@@ -256,13 +292,17 @@ public class TacletTranslationFactory {
      * @param instantiations
      *            The instantiations for constructs used by the
      *            {@link BuiltInRule}.
-     * @param statement TODO
+     * @param update
+     *            TODO
+     * @param statement
+     *            The Java statement being translated.
      * @return An {@link Optional} with a {@link TacletASTNode} for the given
      *         rule name or an empty {@link Optional} if there is no suitable
      *         such {@link TacletASTNode}.
      */
     private Optional<TacletASTNode> getTranslationForRuleApp(String ruleName,
-            HashMap<String, Object> instantiations, String statement) {
+            HashMap<String, Object> instantiations, Optional<Term> update,
+            String statement) {
         logger.trace("Translating rule %s", ruleName);
 
         TacletASTNode result = null;
@@ -272,7 +312,8 @@ public class TacletTranslationFactory {
         if (candidates != null) {
 
             result = new TacletASTNode(ruleName, statement, candidates, mv,
-                    pvHelper, new RuleInstantiations(instantiations), services);
+                    pvHelper, new RuleInstantiations(instantiations), update,
+                    services);
 
         } else {
             String message = Utilities.format(
@@ -301,6 +342,10 @@ public class TacletTranslationFactory {
      * {@link Operator} of the <code>\replacewith</code> part is
      * <strong>not</strong> an {@link UpdateApplication}.</li>
      * </ul>
+     * 
+     * TODO: This method is probably not precise enough, there could be false
+     * positives; for instance, break statements would be ignored... We should
+     * try to better capture the concept of a rewriting rule.
      * 
      * @param taclet
      *            The {@link Taclet} to check.
@@ -332,8 +377,8 @@ public class TacletTranslationFactory {
             String tacletName) {
         logger.trace("Translating taclet %s", tacletName);
 
-        TacletASTNode result = new TacletASTNode(tacletName,
-                "", definitions.getDefinitionsFor(tacletName), mv, pvHelper,
+        TacletASTNode result = new TacletASTNode(tacletName, "",
+                definitions.getDefinitionsFor(tacletName), mv, pvHelper, null,
                 null, null);
 
         return result == null ? Optional.empty() : Optional.of(result);

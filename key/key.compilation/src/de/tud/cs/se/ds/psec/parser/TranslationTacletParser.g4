@@ -107,6 +107,8 @@ unary_bytecode_instr
     |
     	label_unary_instrs LABEL                   # labelUnaryBytecodeInstr
     |
+    	label_unary_instrs special_lbl_term        # specialLabelUnaryBytecodeInstr
+    |
     	int_const_unary_instrs integer             # intUnaryBytecodeInstr
     |
     	string_lit_unary_instrs LOC_REF            # stringLitUnaryBytecodeInstr
@@ -270,6 +272,14 @@ pop_label_instr
 		POP_LOOP_EXIT_LABEL  # popLoopExitLabel
 	;
 
+
+special_lbl_term
+	:
+		UPPERMOST_LOOP_ENTRY_LABEL # getUppermostLoopEntryLabel
+	|
+		UPPERMOST_LOOP_EXIT_LABEL  # getUppermostLoopExitLabel
+	;
+
 integer
 	:
 		MINUS ? NUMBER
@@ -374,6 +384,11 @@ special_expression
 		LPAREN
 			LOC_REF
 		RPAREN          # isStaticExpression
+	|
+		IS_VALID_IN_STATE
+		LPAREN
+			(formula = STRING_LITERAL)
+		RPAREN          # isValidInStateExpression
 	|
 		IS_SUPER_METHOD
 		LPAREN

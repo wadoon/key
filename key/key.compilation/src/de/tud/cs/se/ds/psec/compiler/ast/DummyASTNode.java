@@ -23,7 +23,7 @@ public class DummyASTNode extends TacletASTNode {
      *      TranslationDefinitions, TacletApp)
      */
     public DummyASTNode() {
-        super(null, "", null, null, null, null, null);
+        super(null, "", null, null, null, null, null, null);
     }
 
     @Override

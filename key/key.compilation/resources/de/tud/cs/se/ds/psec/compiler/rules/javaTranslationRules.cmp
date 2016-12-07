@@ -44,6 +44,22 @@ while_loop_by_invariant {
 	)
 }
 
+break {
+	\taclets ("blockBreakLabel")
+	\condition (isValidInState("brk = TRUE"))
+	\translation (
+		GOTO \uppermostLoopExitLabel
+	)
+}
+
+continue {
+	\taclets ("blockBreakLabel")
+	\condition (!isValidInState("brk = TRUE"))
+	\translation (
+		GOTO \uppermostLoopEntryLabel
+	)
+}
+
 // ####################
 // ### Method Calls ###
 // ####################

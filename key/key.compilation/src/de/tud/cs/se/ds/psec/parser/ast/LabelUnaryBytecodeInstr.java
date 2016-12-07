@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParserFE;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnknownInstructionException;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.tud.cs.se.ds.psec.util.Utilities;
@@ -61,10 +63,24 @@ public class LabelUnaryBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
-            List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children) {
 
-        mv.visitJumpInsn(opcode, labelManager.getLabelForName(labelName));
+        Label lbl;
+        switch (labelName) {
+        case TranslationTacletParserFE.UPPERMOST_LOOP_ENTRY_SPECIAL_LBL:
+            lbl = getUppermostLoopEntryLabel();
+            break;
+        case TranslationTacletParserFE.UPPERMOST_LOOP_EXIT_SPECIAL_LBL:
+            lbl = getUppermostLoopExitLabel();
+            break;
+        default:
+            lbl = labelManager.getLabelForName(labelName);
+        }
+
+        //TODO Visit label iff it has not been visited already
+//        mv.visitLabel(lbl);
+        mv.visitJumpInsn(opcode, lbl);
 
     }
 

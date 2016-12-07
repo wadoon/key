@@ -35,6 +35,12 @@ PUSH_LOOP_ENTRY_LABEL
 PUSH_LOOP_EXIT_LABEL
 	: '\\pushLoopExitLabel' ;
 
+UPPERMOST_LOOP_ENTRY_LABEL
+	: '\\uppermostLoopEntryLabel';
+
+UPPERMOST_LOOP_EXIT_LABEL
+	: '\\uppermostLoopExitLabel';
+
 STORE
     : '\\store' ;
 
@@ -113,13 +119,14 @@ AND : '&';
 OR  : '|';
 NOT : '!';
 
-IS_CONSTRUCTOR  : 'isConstructor' ;
-IS_FIELD_REF    : 'isFieldReference' ;
-IS_RESULT_VAR   : 'isResultVar' ;
-IS_SIMPLE_TYPE  : 'isSimpleType' ;
-IS_STATIC       : 'isStatic' ;
-IS_SUPER_METHOD : 'isSuperMethod' ;
-IS_VOID         : 'isVoid' ;
+IS_CONSTRUCTOR    : 'isConstructor' ;
+IS_FIELD_REF      : 'isFieldReference' ;
+IS_RESULT_VAR     : 'isResultVar' ;
+IS_SIMPLE_TYPE    : 'isSimpleType' ;
+IS_STATIC         : 'isStatic' ;
+IS_SUPER_METHOD   : 'isSuperMethod' ;
+IS_VALID_IN_STATE : 'isValidInState' ;
+IS_VOID           : 'isVoid' ;
 
 // Arithmetics
 

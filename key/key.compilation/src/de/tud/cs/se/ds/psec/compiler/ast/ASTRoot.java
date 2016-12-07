@@ -22,7 +22,7 @@ class ASTRoot extends TacletASTNode {
      *      TranslationDefinitions, TacletApp)
      */
     public ASTRoot() {
-        super(null, "", null, null, null, null, null);
+        super(null, "", null, null, null, null, null, null);
     }
 
     @Override

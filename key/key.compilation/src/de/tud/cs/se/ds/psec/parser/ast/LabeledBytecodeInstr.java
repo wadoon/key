@@ -37,6 +37,7 @@ public class LabeledBytecodeInstr extends Instruction {
             UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
             List<TacletASTNode> children) {
 
+        //TODO Visit label iff not visited already
         mv.visitLabel(labelManager.getLabelForName(labelName));
         labeledInstruction.translate(mv, pvHelper, labelManager, instantiations, services,
                 children);

@@ -19,6 +19,8 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Child_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.ConditionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.DefinitionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Field_instrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GetUppermostLoopEntryLabelContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GetUppermostLoopExitLabelContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_literalContext;
@@ -28,6 +30,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsFieldReferenceConte
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsResultVarExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsStaticExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsSuperMethodContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsValidInStateExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsVoidExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Labeled_bytecode_instrContext;
@@ -43,6 +46,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SimpleTypeExpressionC
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_arithmetic_expressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialExpressionAtomContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialLabelUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialUnaryInstrsContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Store_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.StringLitUnaryBytecodeInstrContext;
@@ -65,6 +69,7 @@ import de.tud.cs.se.ds.psec.parser.ast.LoopLabelInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.ParamsLoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.StoreInstruction;
+import de.tud.cs.se.ds.psec.parser.ast.StringTranslationTacletASTElement;
 import de.tud.cs.se.ds.psec.parser.ast.SuperCallInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
@@ -91,6 +96,9 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
  */
 public class TranslationTacletParserFE extends
         TranslationTacletParserBaseVisitor<TranslationTacletASTElement> {
+
+    public static final String UPPERMOST_LOOP_EXIT_SPECIAL_LBL = "<<UPPERMOST_LOOP_EXIT>>";
+    public static final String UPPERMOST_LOOP_ENTRY_SPECIAL_LBL = "<<UPPERMOST_LOOP_ENTRY>>";
 
     /**
      * The file that's being parsed. May be null if a String is being parsed.
@@ -384,6 +392,25 @@ public class TranslationTacletParserFE extends
                     || locVar.name().toString().startsWith("self");
         });
     }
+    
+    @Override
+    public StringTranslationTacletASTElement visitGetUppermostLoopEntryLabel(
+            GetUppermostLoopEntryLabelContext ctx) {
+        return new StringTranslationTacletASTElement(UPPERMOST_LOOP_ENTRY_SPECIAL_LBL);
+    }
+    
+    @Override
+    public StringTranslationTacletASTElement visitGetUppermostLoopExitLabel(
+            GetUppermostLoopExitLabelContext ctx) {
+        return new StringTranslationTacletASTElement(UPPERMOST_LOOP_EXIT_SPECIAL_LBL);
+    }
+    
+    @Override
+    public TranslationTacletASTElement visitIsValidInStateExpression(
+            IsValidInStateExpressionContext ctx) {
+        // TODO Enter actual method body
+        return super.visitIsValidInStateExpression(ctx);
+    }
 
     @Override
     public ApplicabilityCondition visitSimple_arithmetic_expression(
@@ -474,6 +501,14 @@ public class TranslationTacletParserFE extends
             LabelUnaryBytecodeInstrContext ctx) {
         return new LabelUnaryBytecodeInstr(ctx.label_unary_instrs().getText(),
                 getUniquePerTranslationLabelName(ctx.LABEL().getText()));
+    }
+
+    @Override
+    public TranslationTacletASTElement visitSpecialLabelUnaryBytecodeInstr(
+            SpecialLabelUnaryBytecodeInstrContext ctx) {
+        return new LabelUnaryBytecodeInstr(ctx.label_unary_instrs().getText(),
+                ((StringTranslationTacletASTElement) visit(
+                        ctx.special_lbl_term())).getString());
     }
 
     @Override

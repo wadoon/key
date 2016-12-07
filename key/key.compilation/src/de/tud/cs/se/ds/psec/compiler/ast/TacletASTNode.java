@@ -2,6 +2,7 @@ package de.tud.cs.se.ds.psec.compiler.ast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +17,7 @@ import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -34,6 +36,7 @@ public class TacletASTNode implements Opcodes {
     private List<TranslationDefinition> definitions;
     private String seTacletName;
     private String statement;
+    private Optional<Term> update;
     private Services services;
 
     /**
@@ -42,7 +45,7 @@ public class TacletASTNode implements Opcodes {
      * @param seTacletName
      *            The name of the SE taclet being translated.
      * @param statement
-     *            TODO
+     *            The Java statement being compiled.
      * @param definitions
      *            The {@link TranslationDefinition}s for the corresponding SE
      *            taclet.
@@ -52,19 +55,21 @@ public class TacletASTNode implements Opcodes {
      * @param pvHelper
      *            The {@link ProgVarHelper} of the corresponding method.
      * @param instantiations
-     *            TODO
+     *            Instantiations of schema variables, or, in the case of
+     *            built-in rules, internal parameters.
      * @see TacletTranslationFactory
      */
     public TacletASTNode(String seTacletName, String statement,
             List<TranslationDefinition> definitions, MethodVisitor mv,
             ProgVarHelper pvHelper, RuleInstantiations instantiations,
-            Services services) {
+            Optional<Term> update, Services services) {
         this.instantiations = instantiations;
         this.mv = mv;
         this.pvHelper = pvHelper;
         this.definitions = definitions;
         this.seTacletName = seTacletName;
         this.statement = statement;
+        this.update = update;
         this.services = services;
     }
 
@@ -161,6 +166,24 @@ public class TacletASTNode implements Opcodes {
         return definitions.stream()
                 .map(TranslationDefinition::maxIndexOfCalledChildren)
                 .mapToInt(Integer::intValue).max().getAsInt();
+    }
+
+    /**
+     * @return true iff for this {@link TacletASTNode}, an update (that is, a
+     *         program execution state) is known
+     */
+    public boolean hasUpdate() {
+        return update.isPresent();
+    }
+
+    /**
+     * Returns the update {@link Term} for this {@link TacletASTNode}. May be
+     * null if not present; use {@link #hasUpdate()} to check this.
+     * 
+     * @return The update {@link Term} for this {@link TacletASTNode}.
+     */
+    public Term getUpdate() {
+        return update.get();
     }
 
     /**
