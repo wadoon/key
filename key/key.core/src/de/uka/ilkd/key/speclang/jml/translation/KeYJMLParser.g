@@ -392,7 +392,7 @@ top returns [Object ret = null] throws  SLTranslationException
     |   representsclause { ret = $representsclause.result; }
     |   axiomsclause { ret = $axiomsclause.ret; }
     |   requiresclause { ret = $requiresclause.ret; }
-    |   joinpredicateclause { ret = $joinpredicateclause.ret; }
+    |   joinparamsclause { ret = $joinparamsclause.ret; }
     |   joinprocclause { ret = $joinprocclause.ret; }
     |   requiresfreeclause { ret = $requiresfreeclause.ret; }
     |   decreasesclause { ret = $decreasesclause.ret; }
@@ -456,10 +456,10 @@ requiresfreeclause returns [Term ret = null] throws SLTranslationException
             { ret = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
-joinpredicateclause returns [Term ret = null] throws SLTranslationException
+joinparamsclause returns [Term ret = null] throws SLTranslationException
 :
-    jpred=JOIN_PREDICATE result=predornot
-            { ret = translator.translate(jpred.getText(), Term.class, result, services); }
+    jparams=JOIN_PARAMS result=predornot
+            { ret = translator.translate(jparams.getText(), Term.class, result, services); }
     ;
 
 joinprocclause returns [Term ret = null] throws SLTranslationException

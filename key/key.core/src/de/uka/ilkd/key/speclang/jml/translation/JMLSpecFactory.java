@@ -454,7 +454,7 @@ public class JMLSpecFactory {
         try {
             clauses.joinProcedure = translateJoinProcedure(
                     textualSpecCase.getJoinProcs(),
-                    textualSpecCase.getJoinPredicates());
+                    textualSpecCase.getJoinParams());
         }
         catch (ParserException e) {
             // TODO Auto-generated catch block
@@ -522,11 +522,11 @@ public class JMLSpecFactory {
         }
     }
 
-    private List<AbstractionPredicate> translateJoinPredicate(String predicates)
+    private List<AbstractionPredicate> translateJoinParameters(String params)
             throws SLTranslationException, ParserException {
         // String predicatesString = joinPredicate.head().text.substring(15);
 
-        return AbstractionPredicate.fromString(predicates, services);
+        return AbstractionPredicate.fromString(params, services);
 
     }
 
@@ -543,10 +543,7 @@ public class JMLSpecFactory {
 
         String joinProcName = originalClauses.head().text.substring(11,
                 originalClauses.head().text.length() - 2);
-        String[] parameters = joinPredicates.head().text
-                .substring(16, joinPredicates.head().text.length() - 1)
-                .split("\" : ");
-
+        
         JoinProcedure chosenProc = JoinProcedure
                 .getProcedureByName(joinProcName);
 
@@ -563,7 +560,13 @@ public class JMLSpecFactory {
                 throw new SLTranslationException(
                         "Abstraction Predicates are missing");
             }
-            else if (parameters.length != 2) {
+            else {
+                String[] parameters = joinPredicates.head().text
+                        .substring(13, joinPredicates.head().text.length() - 1)
+                        .split("\" : ");
+
+               if (parameters.length != 2) {
+            
                 throw new SLTranslationException("Unknown lattice type:",
                         originalClauses.head().fileName,
                         originalClauses.head().pos);
@@ -573,9 +576,10 @@ public class JMLSpecFactory {
 
                 final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) chosenProc;
                 chosenProc = absPredicateFactory.instantiate(
-                        translateJoinPredicate(parameters[1]),
+                        translateJoinParameters(parameters[1]),
                         translateLatticeType(parameters[0]),
                         new LinkedHashMap<ProgramVariable, AbstractDomainElement>());
+            }
             }
         }
 

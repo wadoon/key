@@ -51,7 +51,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> joinProcs =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> joinPredicate =
+    private ImmutableList<PositionedString> joinParams =
             ImmutableSLList.<PositionedString>nil();
 
     private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
@@ -131,7 +131,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.addDiverges(tsc.getDiverges());
         res.addMeasuredBy(tsc.getMeasuredBy());
         res.addJoinProcs(tsc.getJoinProcs());
-        res.addJoinPredicates(tsc.getJoinPredicates());
+        res.addJoinParams(tsc.getJoinParams());
         return res;
     }
 
@@ -156,7 +156,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.continues = continues;
         res.returns = returns;
         res.joinProcs = joinProcs;
-        res.joinPredicate = joinPredicate;
+        res.joinParams = joinParams;
         res.measuredBy = measuredBy;
         res.name = name;
         res.workingSpace = workingSpace;
@@ -319,13 +319,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         returns = returns.append(l);
     }
 
-    public void addJoinPredicates(PositionedString ps) {
-        joinPredicate = joinPredicate.append(ps);
+    public void addJoinParams(PositionedString ps) {
+        joinParams = joinParams.append(ps);
         setPosition(ps);
     }
 
-    public void addJoinPredicates(ImmutableList<PositionedString> l) {
-        joinPredicate = joinPredicate.append(l);
+    public void addJoinParams(ImmutableList<PositionedString> l) {
+        joinParams = joinParams.append(l);
     }
     public void addJoinProcs(PositionedString ps) {
         joinProcs = joinProcs.append(ps);
@@ -473,8 +473,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return returns;
     }
 
-    public ImmutableList<PositionedString> getJoinPredicates() {
-        return joinPredicate;
+    public ImmutableList<PositionedString> getJoinParams() {
+        return joinParams;
     }
 
     public ImmutableList<PositionedString> getJoinProcs() {
@@ -590,9 +590,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("join procedure: ").append(it.next()).append("\n");
         }
-        it = joinPredicate.iterator();
+        it = joinParams.iterator();
         while (it.hasNext()) {
-            sb.append("join predicate: ").append(it.next()).append("\n");
+            sb.append("join parameters: ").append(it.next()).append("\n");
         }
         return sb.toString();
     }
@@ -622,7 +622,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && continues.equals(sc.continues)
                && returns.equals(sc.returns)
                && joinProcs.equals(sc.joinProcs)
-               && joinPredicate.equals(sc.joinPredicate)
+               && joinParams.equals(sc.joinParams)
                && infFlowSpecs.equals(sc.infFlowSpecs);
     }
 
@@ -647,7 +647,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + continues.hashCode()
                + returns.hashCode()
                + joinProcs.hashCode()
-               + joinPredicate.hashCode()
+               + joinParams.hashCode()
                + infFlowSpecs.hashCode();
     }
 }

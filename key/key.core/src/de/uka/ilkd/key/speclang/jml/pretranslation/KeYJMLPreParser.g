@@ -734,7 +734,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
   |   ps=joinproc_clause        { sc.addJoinProcs(ps); }
-  |   ps=joinpredicate_clause  { sc.addJoinPredicate(ps); }
+  |   ps=joinparams_clause  { sc.addJoinParams(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
@@ -1617,19 +1617,19 @@ joinproc_keyword
    JOIN_PROC
 ;
 
-joinpredicate_clause
+joinparams_clause
    returns [PositionedString r = null]
    throws SLTranslationException
 @init { result = r; }
 @after { r = result; }
 :
-   joinpredicate_keyword result=expression { result = result.prepend("join_predicate "); }
+   joinparams_keyword result=expression { result = result.prepend("join_params "); }
 ;
 
 
-joinpredicate_keyword
+joinparams_keyword
 :
-   JOIN_PREDICATE
+   JOIN_PARAMS
 ;
 
 

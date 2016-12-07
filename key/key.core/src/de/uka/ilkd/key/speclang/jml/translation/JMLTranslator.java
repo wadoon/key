@@ -131,7 +131,7 @@ public final class JMLTranslator {
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
         JOIN_PROC ("join_proc"),
-        JOIN_PREDICATE("join_predicate"),
+        JOIN_PARAMS("join_params"),
 
         // quantifiers and "generalized quantifiers"
         FORALL ("\\forall"),
@@ -357,7 +357,7 @@ public final class JMLTranslator {
                 return null;
             }
         });
-        translationMethods.put(JMLKeyWord.JOIN_PREDICATE, new JMLTranslationMethod() {
+        translationMethods.put(JMLKeyWord.JOIN_PARAMS, new JMLTranslationMethod() {
             
             @Override
             public Object translate(SLTranslationExceptionManager excManager,

@@ -79,7 +79,7 @@ lexer grammar KeYJMLPreLexer;
     INSTANCE 			: 'instance';
     INVARIANT 			: 'invariant';
     INVARIANT_RED 		: 'invariant_redundantly';
-    JOIN_PREDICATE    : 'join_predicate';
+    JOIN_PARAMS    : 'join_params';
     JOIN_PROC           : 'join_proc';
     LOOP_INVARIANT  		: 'loop_invariant';
     LOOP_INVARIANT_RED  	: 'loop_invariant_redundantly';
